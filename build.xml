@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="DTTools" default="jar" basedir=".">
+    <description>
+        Builds, tests, and runs the project DTTools.
+    </description>
+
+
+    <!-- 
+        ===================
+        CONFIGURATION SECTION
+        ===================
+    -->
+
+    <!-- Input paths -->
+    <property name="src.dir"      location="src" />
+    <property name="test.src.dir" location="test" />
+    <property name="libs.dir"      location="libs" />
+    <property name="scripts.dir"      location="scripts" />
+    
+    <!-- Output paths -->
+    <property name="build.dir" location="build"/>
+    <property name="dist.dir" location="dist"/>
+    <property name="dist.libs.dir" location="${dist.dir}/libs"/>
+    <property name="javadoc.dir" location="${dist.dir}/javadoc"/>
+    
+    <!-- ? -->
+    <property name="source.encoding" value="UTF-8"/>
+    <property name="javac.compilerargs" value="-Xlint:all"/>
+    <property name="main.class" value="uk.ac.susx.mlcl.dttools.DTTools"/>
+    <property name="run.jvmargs" value="-Xmx2g"/>
+
+
+    <!-- 
+        ======================
+        INITIALISATION SECTION
+        ====================== 
+    -->
+
+    <target name="init">
+        
+        <tstamp/>
+        
+        <property name="build.classes.dir" location="${build.dir}/classes"/>
+        
+        <path id="classpath">
+            <fileset dir="${libs.dir}" includes="**/*.jar"/>
+        </path>
+        
+        <path id="application" location="${dist.dir}/${ant.project.name}.jar" />
+        
+        <property name="test.report.dir"  location="${build.dir}/junitreport"/>
+    </target>
+
+
+    <!-- 
+        ===================
+        COMPILATION SECTION
+        ===================
+    -->
+
+    <target name="compile" depends="init" 
+            description="Compile the source code" >
+
+        <mkdir dir="${build.classes.dir}" />
+                
+       <!-- Compile all java sources to classes dir -->
+        <javac srcdir="${src.dir}" destdir="${build.classes.dir}"  
+                classpathref="classpath" 
+                includeantruntime="false" >
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
+       
+       <!-- Copy non-java resources to classes dir -->
+        <copy todir="${build.classes.dir}" verbose="true">
+            <fileset dir="${src.dir}" excludes="**/*.java"/>
+        </copy>
+        
+    </target>
+
+
+    <!-- 
+        =================
+        BUILD JAR SECTION
+        =================
+    -->
+
+    <target name="jar" depends="compile" description="Generate the distribution" >    
+
+        <copy todir="${dist.dir}" file="LICENCE" />
+        <copy todir="${dist.dir}" file="README.md" />
+        
+        <copy todir="${dist.dir}" >
+            <fileset dir="${scripts.dir}" includes="**/*.sh" />
+        </copy>
+        <chmod perm="a+x">
+            <fileset dir="${dist.dir}" includes="**/*.sh" />            
+        </chmod>
+        
+        <mkdir dir="${dist.libs.dir}" />
+        <copy todir="${dist.libs.dir}" >
+            <fileset dir="${libs.dir}" includes="**/*.jar" />
+        </copy>
+
+        <!-- Convert the libraries classpath to space separated list suitable
+            for the jar manifest attribute. -->
+        <pathconvert pathsep=" " property="jar.classpath" refid="classpath">
+            <chainedmapper>
+                <flattenmapper/>
+                <globmapper from="*" to="libs/*"/>
+            </chainedmapper>
+        </pathconvert>
+                
+        <jar jarfile="${dist.dir}/${ant.project.name}.jar" 
+            basedir="${build.classes.dir}" >     
+            <manifest>
+                <attribute name="Built-By" value="${user.name}"/>
+                
+                <attribute name="Implementation-Vendor" value="University of Sussex"/>
+                <attribute name="Implementation-Title" value="DTTools"/>
+                <attribute name="Implementation-Version" value="unknown"/>
+                
+                <attribute name="Class-Path" value="${jar.classpath}" />
+                <attribute name="Main-Class" value="${main.class}"/>
+            </manifest>
+        </jar>
+        
+        
+    </target>
+
+
+    <!-- 
+        ===============
+        JAVADOC SECTION
+        ===============
+    -->
+
+    <target depends="init" description="Build Javadoc." name="javadoc">
+
+        <mkdir dir="${javadoc.dir}" />
+        
+        <javadoc additionalparam="" 
+                author="true" 
+                charset="UTF-8" 
+                destdir="${javadoc.dir}" 
+                docencoding="UTF-8" 
+                encoding="${source.encoding}" 
+                failonerror="true" 
+                private="false" 
+                source="1.6" 
+                splitindex="true" 
+                use="true"
+                useexternalfile="true" 
+                version="true" 
+                windowtitle="">
+                    
+            <classpath refid="classpath" />
+            <fileset dir="${src.dir}" excludes="*.java" includes="**">
+                <filename name="**/*.java"/>
+            </fileset>
+        </javadoc>
+        
+        <copy todir="${javadoc.dir}">
+            <fileset dir="${src.dir}" excludes="" includes="**">
+                <filename name="**/doc-files/**"/>
+            </fileset>
+        </copy>
+        
+    </target>
+
+    
+    <!-- 
+        ============
+        TEST SECTION
+        ============
+    -->
+    
+    <target name="test" depends="jar">
+        <mkdir dir="${test.report.dir}"/>
+        <junit printsummary="yes">
+            <classpath>
+                <path refid="classpath" />
+                <path refid="application" />
+            </classpath>
+            <formatter type="xml"/>
+            <batchtest fork="yes" todir="${test.report.dir}">
+                <fileset dir="${test.src.dir}" includes="**/*Test.java" />
+            </batchtest>
+            
+        </junit>
+    </target>
+    
+    <target name="testreport" depends="init">
+        <junitreport todir="${test.report.dir}">
+            <fileset dir="${test.report.dir}" includes="TEST-*.xml"/>
+            <report todir="${test.report.dir}"/>
+        </junitreport>
+    </target>
+    
+    
+    <!-- 
+        =============
+        CLEAN SECTION
+        =============
+    -->
+
+    <target name="clean" description="clean up" >
+      
+        <delete dir="${build.dir}" />
+        <delete dir="${javadoc.dir}" />
+        <delete dir="${dist.dir}" />
+    
+    </target>
+  
+      
+</project>
