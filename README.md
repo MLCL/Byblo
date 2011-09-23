@@ -130,4 +130,4 @@ If you have changes to contribute back to the main project, send me a pull reque
 
 ## Licence
 
-This software is distributed under the 3-claws [BSD Licence](https://github.com/hamishmorgan/DTTools/wiki/Licence).
+This software is distributed under the 3-clause [BSD Licence](https://github.com/hamishmorgan/DTTools/wiki/Licence).
