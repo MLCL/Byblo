@@ -1,6 +1,6 @@
-# DTTools
+# Byblo
 
-DTTools is a software package for the construction of large-scale *distributional thesauri*. It provides an efficient yet flexible framework for calculating all pair-wise similarities between terms in a corpus.
+Byblo is a software package for the construction of large-scale *distributional thesauri*. It provides an efficient yet flexible framework for calculating all pair-wise similarities between terms in a corpus.
 
 ## Distribution Thesauri Overview 
 
@@ -35,7 +35,7 @@ The resultant thesaurus will have a highly semantic notion of similarity. The ne
 ## Distribution 
 
 The software is primarily distributed in source-code form. Binaries may be available sporadically, and on request. 
-The source code can be acquired from the [github repository](https://github.com/hamishmorgan/DTTools), click the *Downloads* button, and select a version to download an archive of the source code.
+The source code can be acquired from the [github repository](https://github.com/hamishmorgan/Byblo), click the *Downloads* button, and select a version to download an archive of the source code.
 
 ## Dependencies
 
@@ -81,22 +81,22 @@ $ ./download_libraries.sh
 
 2. Start Netbeans and select "File -> New Project" from the menu bar. Select *Java / Java Project with Existing Sources* and click *Next*.
 
-4. Enter the *Project Name* as "DTTools", and select the *Project Folder* a the location of the project source code. Click *Next*.
+4. Enter the *Project Name* as "Byblo", and select the *Project Folder* a the location of the project source code. Click *Next*.
 
 5. To *Source Package Folders* click *Add Folder* and select `src`. To *Test Package Folders* click *Add Folder* and select `test`. Click *Next* then *Finish*.
 
 6. Right click on *Libraries* in the *Projects* view, and select *Add JAR/Folder*. Select all `.jar` files in the `libs` directory and click *Choose*.
 
-From here you can run the project by clicking *Run -> Run Main Project* from the menu bar, and selecting `uk.ac.susx.mlcl.dttools.DTTools` as the main class.
+From here you can run the project by clicking *Run -> Run Main Project* from the menu bar, and selecting `uk.ac.susx.mlcl.byblo.Byblo` as the main class.
 
 ## Usage 
 
-This `builddt.sh` script is designed to be the primary point of usage for the thesaurus building software. It runs a complete build process from frequency counting to K-Nearest-Neighbours in a single pass, providing all the
+This `byblo.sh` script is designed to be the primary point of usage for the thesaurus building software. It runs a complete build process from frequency counting to K-Nearest-Neighbours in a single pass, providing all the
 most commonly used functionality of the underlying software.
 
 
 ```sh
-$ ./builddt.sh [<options>] [@<config>] <file>
+$ ./byblo.sh [<options>] [@<config>] <file>
 ```
 
 Where the arguments are:
@@ -107,7 +107,7 @@ Where the arguments are:
 
  * `<options>` Any number of the option switches
 
-There are a large number of options. To view a complete list enter ```./builddt.sh --help``` or view the wiki page on [Running the Sotware](https://github.com/hamishmorgan/DTTools/wiki/Running-the-Software)
+There are a large number of options. To view a complete list enter ```./byblo.sh --help``` or view the wiki page on [Running the Sotware](https://github.com/hamishmorgan/Byblo/wiki/Running-the-Software)
 
 ## Attribution 
 
@@ -120,9 +120,9 @@ Special thanks to all members of the Machine Learning and Computational Linguist
 To contributed to the project you should fork the git repository. First click the "Fork" button on github. Then open a console and type the following:
 
 ```sh
-$ git clone git@github.com:[your-user-name]/DTTools.git
-$ cd DTTools
-$ git remote add upsteam git@github.com:hamishmorgan/DTTools.git
+$ git clone git@github.com:[your-user-name]/Byblo.git
+$ cd Byblo
+$ git remote add upsteam git@github.com:hamishmorgan/Byblo.git
 $ git fetch upstream
 ```
 
@@ -130,4 +130,4 @@ If you have changes to contribute back to the main project, send me a pull reque
 
 ## Licence
 
-This software is distributed under the 3-clause [BSD Licence](https://github.com/hamishmorgan/DTTools/wiki/Licence).
+This software is distributed under the 3-clause [BSD Licence](https://github.com/hamishmorgan/Byblo/wiki/Licence).
