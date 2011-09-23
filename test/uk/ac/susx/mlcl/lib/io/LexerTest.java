@@ -219,8 +219,8 @@ public class LexerTest {
 //     * Construction from a file throws:
 //     *  java.lang.IllegalArgumentException: Size exceeds Integer.MAX_VALUE
 //     *        at sun.nio.ch.FileChannelImpl.map(FileChannelImpl.java:694)
-//     *        at hiam.dtbuilder.io.Lexer.<init>(Lexer.java:263)
-//     *        at hiam.dtbuilder.io.LexerTest.veryLargeFilesTest(LexerTest.java:168)
+//     *        at uk.ac.susx.mlcl.byblo.io.Lexer.<init>(Lexer.java:263)
+//     *        at uk.ac.susx.mlcl.byblo.io.LexerTest.veryLargeFilesTest(LexerTest.java:168)
 //     *
 //     * @throws FileNotFoundException
 //     * @throws IOException

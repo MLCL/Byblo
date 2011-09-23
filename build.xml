@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="DTTools" default="jar" basedir=".">
+<project name="Byblo" default="jar" basedir=".">
     <description>
-        Builds, tests, and runs the project DTTools.
+        Builds, tests, and runs the project Byblo
     </description>
 
 
@@ -26,7 +26,7 @@
     <!-- ? -->
     <property name="source.encoding" value="UTF-8"/>
     <property name="javac.compilerargs" value="-Xlint:all"/>
-    <property name="main.class" value="uk.ac.susx.mlcl.dttools.DTTools"/>
+    <property name="main.class" value="uk.ac.susx.mlcl.byblo.Byblo"/>
     <property name="run.jvmargs" value="-Xmx2g"/>
 
 
@@ -116,7 +116,7 @@
                 <attribute name="Built-By" value="${user.name}"/>
                 
                 <attribute name="Implementation-Vendor" value="University of Sussex"/>
-                <attribute name="Implementation-Title" value="DTTools"/>
+                <attribute name="Implementation-Title" value="Byblo"/>
                 <attribute name="Implementation-Version" value="unknown"/>
                 
                 <attribute name="Class-Path" value="${jar.classpath}" />

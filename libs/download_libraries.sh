@@ -30,13 +30,13 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
 # POSSIBILITY OF SUCH DAMAGE.
 
-# DTTools Libarary Downloader
+# Byblo Libarary Downloader
 #
 # Author: Hamish Morgan <hamish.morgan@sussex.ac.uk>
 # Date: 20th September 2011
 #
 # This script attempts to download (and compile where neccessary) the 
-# dependancies for the DTTools project. It is assumed that it will be run from
+# dependancies for the Byblo project. It is assumed that it will be run from
 # within the libraries directory (libs) --- if not change the libs_dir 
 # variable bellow.
 #
