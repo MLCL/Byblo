@@ -156,7 +156,7 @@ public class Byblo {
         }
 
         // XXX: The following is required when the software is run from the
-        // builddt.sh script. Otherwise it hangs, presumably because a thread is
+        // byblo.sh script. Otherwise it hangs, presumably because a thread is
         // still running.
         System.exit(0);
     }

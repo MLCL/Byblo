@@ -45,7 +45,7 @@
 # ============================================
 
 # Name of job
-#$ -N BuildDT
+#$ -N Byblo
 
 # Shell to use
 #$ -S /bin/bash
