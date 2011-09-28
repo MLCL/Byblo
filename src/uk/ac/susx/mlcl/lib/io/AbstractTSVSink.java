@@ -48,7 +48,6 @@ import java.util.logging.Logger;
  * Abstract class that holds functionality to read a Tab Separated Values file.
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 27th March 2011
  * @param <T>
  */
 public abstract class AbstractTSVSink<T>

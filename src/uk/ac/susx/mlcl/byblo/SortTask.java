@@ -32,65 +32,70 @@ package uk.ac.susx.mlcl.byblo;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
+import uk.ac.susx.mlcl.lib.Checks;
+import uk.ac.susx.mlcl.lib.io.IOUtil;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Task that takes a single input file and sorts it according to some comparator,
+ * then writes the results to an output file.
+ * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(commandDescription = "Delete a file.")
-public class DeleteTask extends AbstractTask {
+@Parameters(commandDescription = "Sort a file.")
+public class SortTask extends CopyTask {
 
-    private static final Logger LOG = Logger.getLogger(CopyTask.class.getName());
+    private static final Logger LOG = Logger.getLogger(
+            SortTask.class.getName());
 
-    @Parameter(names = {"-f", "--file"},
-               description = "File to deleted")
-    private File file;
+    private Comparator<String> comparator;
 
-    public DeleteTask(File file) {
-        setFile(file);
+    @Parameter(names = {"-c", "--charset"},
+               description = "The character set encoding to use for both input and output files.")
+    private Charset charset = IOUtil.DEFAULT_CHARSET;
+
+    public SortTask(File sourceFile, File destinationFile, Charset charset,
+            Comparator<String> comparator) {
+        super(sourceFile, destinationFile);
+        setCharset(charset);
+        this.comparator = comparator;
     }
 
-    public DeleteTask() {
-        file = null;
+    public final Charset getCharset() {
+        return charset;
     }
 
-    @Override
-    protected void initialiseTask() throws Exception {
+    public final void setCharset(Charset charset) {
+        Checks.checkNotNull(charset);
+        this.charset = charset;
     }
 
-    @Override
-    protected void finaliseTask() throws Exception {
+    public final Comparator<String> getComparator() {
+        return comparator;
+    }
+
+    public final void setComparator(Comparator<String> comparator) {
+        if (comparator == null)
+            throw new NullPointerException("comparator is null");
+        this.comparator = comparator;
     }
 
     @Override
     protected void runTask() throws Exception {
         LOG.log(Level.INFO,
-                "Deleting file \"{0}\". (Thread:{1})",
-                new Object[]{getFile(),
-                    Thread.currentThread().getName()});
-        if (file == null)
-            throw new NullPointerException("file is null");
-        if (!file.exists())
-            throw new FileNotFoundException("Unnable to delete file because it "
-                    + "doesn't exist: \"" + file + "\"");
-        if (!file.delete())
-            throw new IOException("Unnable to delete file: \"" + file + "\"");
-    }
-
-    public final File getFile() {
-        return file;
-    }
-
-    public final void setFile(final File file)
-            throws NullPointerException {
-        if (file == null)
-            throw new NullPointerException("file is null");
-        this.file = file;
+                "Sorting file in memory, from \"{0}\" to \"{1}\". ({2})",
+                new Object[]{getSrcFile(), getDstFile(), Thread.currentThread().
+                    getName()});
+        final List<String> lines = new ArrayList<String>();
+        IOUtil.readAllLines(getSrcFile(), getCharset(), lines);
+        Collections.sort(lines, getComparator());
+        IOUtil.writeAllLines(getDstFile(), getCharset(), lines);
     }
 }

@@ -85,7 +85,7 @@ public class TanimotoTest {
             "--measure", "Tanimoto",
             "--input", SAMPLE_DATA_DIR + dataSet + ".features",
             "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
             "--output", output.toString()
         };
 
@@ -116,7 +116,7 @@ public class TanimotoTest {
                     "--measure", "Tanimoto",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", output1.toString()
                 });
         Byblo.main(new String[]{
@@ -126,7 +126,7 @@ public class TanimotoTest {
                     "--measure-reversed",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", output2.toString()
                 });
 

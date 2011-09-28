@@ -31,56 +31,79 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
-import uk.ac.susx.mlcl.lib.io.Sink;
+import uk.ac.susx.mlcl.lib.io.AbstractTSVSource;
+import uk.ac.susx.mlcl.lib.io.Source;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.text.DecimalFormat;
 
 /**
- * 
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
  */
-public class FeatureSink
-        extends AbstractTSVSink<FeatureRecord>
-        implements Sink<FeatureRecord> {
+public class WeightedEntryFeatureSource
+        extends AbstractTSVSource<WeightedEntryFeatureRecord>
+        implements Source<WeightedEntryFeatureRecord> {
 
-    private final ObjectIndex<String> stringIndex;
+    private final ObjectIndex<String> entryIndex;
 
-    private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
+    private final ObjectIndex<String> featureIndex;
 
-    public FeatureSink(
-            File file, Charset charset, ObjectIndex<String> stringIndex)
+    private long count = 0;
+
+    public WeightedEntryFeatureSource(File file, Charset charset,
+            ObjectIndex<String> entryIndex, ObjectIndex<String> featureIndex)
             throws FileNotFoundException, IOException {
         super(file, charset);
-        
-        if (stringIndex == null)
-            throw new NullPointerException("stringIndex == null");
-        this.stringIndex = stringIndex;
+        if (entryIndex == null)
+            throw new NullPointerException("entryIndex == null");
+        if (featureIndex == null)
+            throw new NullPointerException("featureIndex == null");
+        this.entryIndex = entryIndex;
+        this.featureIndex = featureIndex;
     }
 
-    public FeatureSink(File file, Charset charset) throws FileNotFoundException, IOException {
+    public WeightedEntryFeatureSource(File file, Charset charset,
+            ObjectIndex<String> combinedIndex)
+            throws FileNotFoundException, IOException {
+        this(file, charset, combinedIndex, combinedIndex);
+    }
+
+    public WeightedEntryFeatureSource(File file, Charset charset)
+            throws FileNotFoundException, IOException {
         this(file, charset, new ObjectIndex<String>());
     }
 
-    public final ObjectIndex<String> getStringIndex() {
-        return stringIndex;
+    public long getCount() {
+        return count;
+    }
+
+    public final ObjectIndex<String> getEntryIndex() {
+        return entryIndex;
+    }
+
+    public ObjectIndex<String> getFeatureIndex() {
+        return featureIndex;
+    }
+
+    public boolean isIndexCombined() {
+        return getEntryIndex() == getFeatureIndex();
+    }
+
+    public WeightedEntryFeatureVectorSource getVectorSource() {
+        return new WeightedEntryFeatureVectorSource(this);
     }
 
     @Override
-    public void write(FeatureRecord record) throws IOException {
-        
-        writeString(stringIndex.get(record.getFeatureId()));
-        
-        writeValueDelimiter();
-        
-        if (Double.compare((int) record.getWeight(), record.getWeight()) == 0)
-            writeInt((int) record.getWeight());
-        else
-            writeString(f.format(record.getWeight()));
-        
-        writeRecordDelimiter();
+    public WeightedEntryFeatureRecord read() throws IOException {
+        final int entryId = entryIndex.get(parseString());
+        parseValueDelimiter();
+        final int featureId = featureIndex.get(parseString());
+        parseValueDelimiter();
+        final double weight = parseDouble();
+        if (hasNext())
+            parseRecordDelimiter();
+        count++;
+        return new WeightedEntryFeatureRecord(entryId, featureId, weight);
     }
 }

@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
-import uk.ac.susx.mlcl.byblo.Byblo;
 import com.google.common.io.Files;
 import java.nio.charset.Charset;
 import java.io.File;
@@ -72,24 +71,24 @@ public class FilterTaskTest {
     }
 
     @Test
-    public void testMainMethodRun_fruit_headFreqFilter() throws Exception {
+    public void testMainMethodRun_fruit_entryFreqFilter() throws Exception {
         System.out.println(
-                "Testing FilterHeads: on fruit, from main method, filter by head freqency.");
+                "Testing FilterTask: on fruit, from main method, filter by Entry freqency.");
 
         final String dataSet = "bnc-gramrels-fruit";
 
-        File inputHeads = new File(INPUT_DIR, dataSet + ".heads");
+        File inputEntries = new File(INPUT_DIR, dataSet + ".entries");
         File inputContexts = new File(INPUT_DIR, dataSet + ".contexts");
         File inputFeatures = new File(INPUT_DIR, dataSet + ".features");
-        File outputHeads = new File(OUTPUT_DIR,
-                dataSet + ".heads.headFreqFilter");
+        File outputEntries = new File(OUTPUT_DIR,
+                dataSet + ".entries.entryFreqFilter");
         File outputContexts = new File(OUTPUT_DIR,
-                dataSet + ".contexts.headFreqFilter");
+                dataSet + ".contexts.entryFreqFilter");
         File outputFeatures = new File(OUTPUT_DIR,
-                dataSet + ".features.headFreqFilter");
+                dataSet + ".features.entryFreqFilter");
 
-        if (outputHeads.exists())
-            outputHeads.delete();
+        if (outputEntries.exists())
+            outputEntries.delete();
         if (outputContexts.exists())
             outputContexts.delete();
         if (outputFeatures.exists())
@@ -98,23 +97,23 @@ public class FilterTaskTest {
         String[] args = new String[]{
             "filter",
             "--charset", "UTF-8",
-            "--input-heads", inputHeads.toString(),
+            "--input-entries", inputEntries.toString(),
             "--input-contexts", inputContexts.toString(),
             "--input-features", inputFeatures.toString(),
-            "--output-heads", outputHeads.toString(),
+            "--output-entries", outputEntries.toString(),
             "--output-contexts", outputContexts.toString(),
             "--output-features", outputFeatures.toString(),
-            "--filter-head-freq", "50"
+            "--filter-entry-freq", "50"
         };
 
         Byblo.main(args);
 
-        assertTrue("Output file " + outputHeads + " does not exist.", outputHeads.
-                exists());
-        assertTrue("Output file " + outputContexts + " does not exist.", outputContexts.
-                exists());
-        assertTrue("Output file " + outputFeatures + " does not exist.", outputFeatures.
-                exists());
+        assertTrue("Output file " + outputEntries + " does not exist.",
+                outputEntries.exists());
+        assertTrue("Output file " + outputContexts + " does not exist.",
+                outputContexts.exists());
+        assertTrue("Output file " + outputFeatures + " does not exist.",
+                outputFeatures.exists());
 
         Thread.sleep(100);
     }
@@ -122,22 +121,22 @@ public class FilterTaskTest {
     @Test
     public void testMainMethodRun_fruit_contextFreqFilter() throws Exception {
         System.out.println(
-                "Testing FilterHeads on fruit from main method, filter by context freqency.");
+                "Testing FilterTask on fruit from main method, filter by context freqency.");
 
         final String dataSet = "bnc-gramrels-fruit";
 
-        File inputHeads = new File(INPUT_DIR, dataSet + ".heads");
+        File inputEntries = new File(INPUT_DIR, dataSet + ".entries");
         File inputContexts = new File(INPUT_DIR, dataSet + ".contexts");
         File inputFeatures = new File(INPUT_DIR, dataSet + ".features");
-        File outputHeads = new File(OUTPUT_DIR,
-                dataSet + ".heads.contextFreqFilter");
+        File outputEntries = new File(OUTPUT_DIR,
+                dataSet + ".entries.contextFreqFilter");
         File outputContexts = new File(OUTPUT_DIR,
                 dataSet + ".contexts.contextFreqFilter");
         File outputFeatures = new File(OUTPUT_DIR,
                 dataSet + ".features.contextFreqFilter");
 
-        if (outputHeads.exists())
-            outputHeads.delete();
+        if (outputEntries.exists())
+            outputEntries.delete();
         if (outputContexts.exists())
             outputContexts.delete();
         if (outputFeatures.exists())
@@ -146,10 +145,10 @@ public class FilterTaskTest {
         String[] args = new String[]{
             "filter",
             "--charset", "UTF-8",
-            "--input-heads", inputHeads.toString(),
+            "--input-entries", inputEntries.toString(),
             "--input-contexts", inputContexts.toString(),
             "--input-features", inputFeatures.toString(),
-            "--output-heads", outputHeads.toString(),
+            "--output-entries", outputEntries.toString(),
             "--output-contexts", outputContexts.toString(),
             "--output-features", outputFeatures.toString(),
             "--filter-context-freq", "50"
@@ -157,12 +156,12 @@ public class FilterTaskTest {
 
         Byblo.main(args);
 
-        assertTrue("Output file " + outputHeads + " does not exist.", outputHeads.
-                exists());
-        assertTrue("Output file " + outputContexts + " does not exist.", outputContexts.
-                exists());
-        assertTrue("Output file " + outputFeatures + " does not exist.", outputFeatures.
-                exists());
+        assertTrue("Output file " + outputEntries + " does not exist.",
+                outputEntries.exists());
+        assertTrue("Output file " + outputContexts + " does not exist.",
+                outputContexts.exists());
+        assertTrue("Output file " + outputFeatures + " does not exist.",
+                outputFeatures.exists());
 
         Thread.sleep(100);
     }
@@ -170,22 +169,22 @@ public class FilterTaskTest {
     @Test
     public void testMainMethodRun_fruit_featureFreqFilter() throws Exception {
         System.out.println(
-                "Testing FilterHeads on fruit from main method, filter by feature freqency.");
+                "Testing FilterTask on fruit from main method, filter by feature freqency.");
 
         final String dataSet = "bnc-gramrels-fruit";
 
-        File inputHeads = new File(INPUT_DIR, dataSet + ".heads");
+        File inputEntries = new File(INPUT_DIR, dataSet + ".entries");
         File inputContexts = new File(INPUT_DIR, dataSet + ".contexts");
         File inputFeatures = new File(INPUT_DIR, dataSet + ".features");
-        File outputHeads = new File(OUTPUT_DIR,
-                dataSet + ".heads.featureFreqFilter");
+        File outputEntries = new File(OUTPUT_DIR,
+                dataSet + ".entries.featureFreqFilter");
         File outputContexts = new File(OUTPUT_DIR,
                 dataSet + ".contexts.featureFreqFilter");
         File outputFeatures = new File(OUTPUT_DIR,
                 dataSet + ".features.featureFreqFilter");
 
-        if (outputHeads.exists())
-            outputHeads.delete();
+        if (outputEntries.exists())
+            outputEntries.delete();
         if (outputContexts.exists())
             outputContexts.delete();
         if (outputFeatures.exists())
@@ -194,10 +193,10 @@ public class FilterTaskTest {
         String[] args = new String[]{
             "filter",
             "--charset", "UTF-8",
-            "--input-heads", inputHeads.toString(),
+            "--input-entries", inputEntries.toString(),
             "--input-contexts", inputContexts.toString(),
             "--input-features", inputFeatures.toString(),
-            "--output-heads", outputHeads.toString(),
+            "--output-entries", outputEntries.toString(),
             "--output-contexts", outputContexts.toString(),
             "--output-features", outputFeatures.toString(),
             "--filter-feature-freq", "5"
@@ -205,42 +204,41 @@ public class FilterTaskTest {
 
         Byblo.main(args);
 
-        assertTrue("Output file " + outputHeads + " does not exist.", outputHeads.
-                exists());
-        assertTrue("Output file " + outputContexts + " does not exist.", outputContexts.
-                exists());
-        assertTrue("Output file " + outputFeatures + " does not exist.", outputFeatures.
-                exists());
+        assertTrue("Output file " + outputEntries + " does not exist.",
+                outputEntries.exists());
+        assertTrue("Output file " + outputContexts + " does not exist.",
+                outputContexts.exists());
+        assertTrue("Output file " + outputFeatures + " does not exist.",
+                outputFeatures.exists());
 
         Thread.sleep(100);
     }
 
     @Test
-    public void testMainMethodRun_fruit_headWordlistFilter() throws Exception {
+    public void testMainMethodRun_fruit_EntrylistFilter() throws Exception {
         System.out.println(
-                "Testing FilterHeads: on fruit, from main method, filter by head word list.");
-
+                "Testing FilterTask: on fruit, from main method, filter by entry word list.");
 
         final String dataSet = "bnc-gramrels-fruit";
 
 
-        File inputHeads = new File(INPUT_DIR, dataSet + ".heads");
+        File inputEntries = new File(INPUT_DIR, dataSet + ".entries");
         File inputContexts = new File(INPUT_DIR, dataSet + ".contexts");
         File inputFeatures = new File(INPUT_DIR, dataSet + ".features");
-        File outputHeads = new File(OUTPUT_DIR,
-                dataSet + ".heads.headWordlistFilter");
+        File outputEntries = new File(OUTPUT_DIR,
+                dataSet + ".entries.EntrylistFilter");
         File outputContexts = new File(OUTPUT_DIR,
-                dataSet + ".contexts.headWordlistFilter");
+                dataSet + ".contexts.EntrylistFilter");
         File outputFeatures = new File(OUTPUT_DIR,
-                dataSet + ".features.headWordlistFilter");
-        File headWorldList = new File(OUTPUT_DIR, dataSet + ".headWordList");
+                dataSet + ".features.EntrylistFilter");
+        File entryWorldList = new File(OUTPUT_DIR, dataSet + ".EntryList");
 
         // Create the word list
-        Files.write("apple\norange\npear\nbanana", headWorldList, Charset.
+        Files.write("apple\norange\npear\nbanana", entryWorldList, Charset.
                 forName("UTF-8"));
 
-        if (outputHeads.exists())
-            outputHeads.delete();
+        if (outputEntries.exists())
+            outputEntries.delete();
         if (outputContexts.exists())
             outputContexts.delete();
         if (outputFeatures.exists())
@@ -249,23 +247,23 @@ public class FilterTaskTest {
         String[] args = new String[]{
             "filter",
             "--charset", "UTF-8",
-            "--input-heads", inputHeads.toString(),
+            "--input-entries", inputEntries.toString(),
             "--input-contexts", inputContexts.toString(),
             "--input-features", inputFeatures.toString(),
-            "--output-heads", outputHeads.toString(),
+            "--output-entries", outputEntries.toString(),
             "--output-contexts", outputContexts.toString(),
             "--output-features", outputFeatures.toString(),
-            "--filter-head-wordlist", headWorldList.toString()
+            "--filter-entry-wordlist", entryWorldList.toString()
         };
 
         Byblo.main(args);
 
-        assertTrue("Output file " + outputHeads + " does not exist.", outputHeads.
-                exists());
-        assertTrue("Output file " + outputContexts + " does not exist.", outputContexts.
-                exists());
-        assertTrue("Output file " + outputFeatures + " does not exist.", outputFeatures.
-                exists());
+        assertTrue("Output file " + outputEntries + " does not exist.",
+                outputEntries.exists());
+        assertTrue("Output file " + outputContexts + " does not exist.",
+                outputContexts.exists());
+        assertTrue("Output file " + outputFeatures + " does not exist.",
+                outputFeatures.exists());
 
         Thread.sleep(100);
     }
@@ -273,16 +271,16 @@ public class FilterTaskTest {
     @Test
     public void testMainMethodRun_fruit_contextWordlistFilter() throws Exception {
         System.out.println(
-                "Testing FilterHeads: on fruit, from main method, filter by context word list.");
+                "Testing FilterTask: on fruit, from main method, filter by context word list.");
 
         final String dataSet = "bnc-gramrels-fruit";
 
 
-        File inputHeads = new File(INPUT_DIR, dataSet + ".heads");
+        File inputEntries = new File(INPUT_DIR, dataSet + ".entries");
         File inputContexts = new File(INPUT_DIR, dataSet + ".contexts");
         File inputFeatures = new File(INPUT_DIR, dataSet + ".features");
-        File outputHeads = new File(OUTPUT_DIR,
-                dataSet + ".heads.contextWordlistFilter");
+        File outputEntries = new File(OUTPUT_DIR,
+                dataSet + ".entries.contextWordlistFilter");
         File outputContexts = new File(OUTPUT_DIR,
                 dataSet + ".contexts.contextWordlistFilter");
         File outputFeatures = new File(OUTPUT_DIR,
@@ -294,8 +292,8 @@ public class FilterTaskTest {
         Files.write("det:the\ndet:a\niobj:of\nncmod:back\nncmod:for\npassive",
                 contextWorldList, Charset.forName("UTF-8"));
 
-        if (outputHeads.exists())
-            outputHeads.delete();
+        if (outputEntries.exists())
+            outputEntries.delete();
         if (outputContexts.exists())
             outputContexts.delete();
         if (outputFeatures.exists())
@@ -304,10 +302,10 @@ public class FilterTaskTest {
         String[] args = new String[]{
             "filter",
             "--charset", "UTF-8",
-            "--input-heads", inputHeads.toString(),
+            "--input-entries", inputEntries.toString(),
             "--input-contexts", inputContexts.toString(),
             "--input-features", inputFeatures.toString(),
-            "--output-heads", outputHeads.toString(),
+            "--output-entries", outputEntries.toString(),
             "--output-contexts", outputContexts.toString(),
             "--output-features", outputFeatures.toString(),
             "--filter-context-wordlist", contextWorldList.toString()
@@ -315,8 +313,8 @@ public class FilterTaskTest {
 
         Byblo.main(args);
 
-        assertTrue("Output file " + outputHeads + " does not exist.",
-                outputHeads.exists());
+        assertTrue("Output file " + outputEntries + " does not exist.",
+                outputEntries.exists());
         assertTrue("Output file " + outputContexts + " does not exist.",
                 outputContexts.exists());
         assertTrue("Output file " + outputFeatures + " does not exist.",
@@ -326,26 +324,26 @@ public class FilterTaskTest {
     }
 
     @Test
-    public void testMainMethodRun_fruit_headPatternFilter() throws Exception {
+    public void testMainMethodRun_fruit_entryPatternFilter() throws Exception {
         System.out.println(
-                "Testing FilterHeads: on fruit, from main method, filter by head pattern.");
+                "Testing FilterTask: on fruit, from main method, filter by entry pattern.");
 
 
         final String dataSet = "bnc-gramrels-fruit";
 
 
-        File inputHeads = new File(INPUT_DIR, dataSet + ".heads");
+        File inputEntries = new File(INPUT_DIR, dataSet + ".entries");
         File inputContexts = new File(INPUT_DIR, dataSet + ".contexts");
         File inputFeatures = new File(INPUT_DIR, dataSet + ".features");
-        File outputHeads = new File(OUTPUT_DIR,
-                dataSet + ".heads.headPatternFilter");
+        File outputEntries = new File(OUTPUT_DIR,
+                dataSet + ".entries.entryPatternFilter");
         File outputContexts = new File(OUTPUT_DIR,
-                dataSet + ".contexts.headPatternFilter");
+                dataSet + ".contexts.entryPatternFilter");
         File outputFeatures = new File(OUTPUT_DIR,
-                dataSet + ".features.headPatternFilter");
+                dataSet + ".features.entryPatternFilter");
 
-        if (outputHeads.exists())
-            outputHeads.delete();
+        if (outputEntries.exists())
+            outputEntries.delete();
         if (outputContexts.exists())
             outputContexts.delete();
         if (outputFeatures.exists())
@@ -354,23 +352,23 @@ public class FilterTaskTest {
         String[] args = new String[]{
             "filter",
             "--charset", "UTF-8",
-            "--input-heads", inputHeads.toString(),
+            "--input-entries", inputEntries.toString(),
             "--input-contexts", inputContexts.toString(),
             "--input-features", inputFeatures.toString(),
-            "--output-heads", outputHeads.toString(),
+            "--output-entries", outputEntries.toString(),
             "--output-contexts", outputContexts.toString(),
             "--output-features", outputFeatures.toString(),
-            "--filter-head-pattern", "^.{0,5}$"
+            "--filter-entry-pattern", "^.{0,5}$"
         };
 
         Byblo.main(args);
 
-        assertTrue("Output file " + outputHeads + " does not exist.", outputHeads.
-                exists());
-        assertTrue("Output file " + outputContexts + " does not exist.", outputContexts.
-                exists());
-        assertTrue("Output file " + outputFeatures + " does not exist.", outputFeatures.
-                exists());
+        assertTrue("Output file " + outputEntries + " does not exist.",
+                outputEntries.exists());
+        assertTrue("Output file " + outputContexts + " does not exist.",
+                outputContexts.exists());
+        assertTrue("Output file " + outputFeatures + " does not exist.",
+                outputFeatures.exists());
 
         Thread.sleep(100);
     }
@@ -378,24 +376,24 @@ public class FilterTaskTest {
     @Test
     public void testMainMethodRun_fruit_contextPatternFilter() throws Exception {
         System.out.println(
-                "Testing FilterHeads: on fruit, from main method, filter by context pattern.");
+                "Testing FilterTask: on fruit, from main method, filter by context pattern.");
 
 
         final String dataSet = "bnc-gramrels-fruit";
 
 
-        File inputHeads = new File(INPUT_DIR, dataSet + ".heads");
+        File inputEntries = new File(INPUT_DIR, dataSet + ".entries");
         File inputContexts = new File(INPUT_DIR, dataSet + ".contexts");
         File inputFeatures = new File(INPUT_DIR, dataSet + ".features");
-        File outputHeads = new File(OUTPUT_DIR,
-                dataSet + ".heads.contextPatternFilter");
+        File outputEntries = new File(OUTPUT_DIR,
+                dataSet + ".entries.contextPatternFilter");
         File outputContexts = new File(OUTPUT_DIR,
                 dataSet + ".contexts.contextPatternFilter");
         File outputFeatures = new File(OUTPUT_DIR,
                 dataSet + ".features.contextPatternFilter");
 
-        if (outputHeads.exists())
-            outputHeads.delete();
+        if (outputEntries.exists())
+            outputEntries.delete();
         if (outputContexts.exists())
             outputContexts.delete();
         if (outputFeatures.exists())
@@ -404,10 +402,10 @@ public class FilterTaskTest {
         String[] args = new String[]{
             "filter",
             "--charset", "UTF-8",
-            "--input-heads", inputHeads.toString(),
+            "--input-entries", inputEntries.toString(),
             "--input-contexts", inputContexts.toString(),
             "--input-features", inputFeatures.toString(),
-            "--output-heads", outputHeads.toString(),
+            "--output-entries", outputEntries.toString(),
             "--output-contexts", outputContexts.toString(),
             "--output-features", outputFeatures.toString(),
             "--filter-context-pattern", "det:.*"
@@ -415,12 +413,12 @@ public class FilterTaskTest {
 
         Byblo.main(args);
 
-        assertTrue("Output file " + outputHeads + " does not exist.", outputHeads.
-                exists());
-        assertTrue("Output file " + outputContexts + " does not exist.", outputContexts.
-                exists());
-        assertTrue("Output file " + outputFeatures + " does not exist.", outputFeatures.
-                exists());
+        assertTrue("Output file " + outputEntries + " does not exist.",
+                outputEntries.exists());
+        assertTrue("Output file " + outputContexts + " does not exist.",
+                outputContexts.exists());
+        assertTrue("Output file " + outputFeatures + " does not exist.",
+                outputFeatures.exists());
 
         Thread.sleep(100);
     }
@@ -428,35 +426,38 @@ public class FilterTaskTest {
     @Test
     public void testMainMethodRun_fruit_allFilters() throws Exception {
         System.out.println(
-                "Testing FilterHeads: on fruit, from main method, using all filters.");
+                "Testing FilterTask: on fruit, from main method, using all filters.");
 
 
         final String dataSet = "bnc-gramrels-fruit";
 
 
-        File inputHeads = new File(INPUT_DIR, dataSet + ".heads");
+        File inputEntries = new File(INPUT_DIR, dataSet + ".entries");
         File inputContexts = new File(INPUT_DIR, dataSet + ".contexts");
         File inputFeatures = new File(INPUT_DIR, dataSet + ".features");
-        File outputHeads = new File(OUTPUT_DIR,
-                dataSet + ".heads.allFilters");
+        File outputEntries = new File(OUTPUT_DIR,
+                dataSet + ".entries.allFilters");
         File outputContexts = new File(OUTPUT_DIR,
                 dataSet + ".contexts.allFilters");
         File outputFeatures = new File(OUTPUT_DIR,
                 dataSet + ".features.allFilters");
-        File headWorldList = new File(OUTPUT_DIR, dataSet + ".allFilters-headWordList");
-        File contextWorldList = new File(OUTPUT_DIR, dataSet + ".allFilters-contextWordList");
+        File entryWorldList = new File(OUTPUT_DIR,
+                dataSet + ".allFilters-EntryList");
+        File contextWorldList = new File(OUTPUT_DIR,
+                dataSet + ".allFilters-contextWordList");
 
         // Create the word list
         Files.write("apple\napricot\navocado\nbanana\nbilberry\nblackberry\n"
                 + "blackcap\nblackcurrant\nblueberry\ncantaloupe\ncherry\n"
                 + "clementine\ncurrant\ndamson\ndate\ndurian\neggplant\n"
                 + "elderberry\ngooseberry\ngrape\ngrapefruit\nhuckleberry\n"
-                + "kumquat", headWorldList, Charset.forName("UTF-8"));
+                + "kumquat", entryWorldList, Charset.forName("UTF-8"));
 
-         Files.write("det:the\ndet:a\niobj:of\nncmod:back\nncmod:for\npassive", contextWorldList, Charset.forName("UTF-8"));
+        Files.write("det:the\ndet:a\niobj:of\nncmod:back\nncmod:for\npassive",
+                contextWorldList, Charset.forName("UTF-8"));
 
-        if (outputHeads.exists())
-            outputHeads.delete();
+        if (outputEntries.exists())
+            outputEntries.delete();
         if (outputContexts.exists())
             outputContexts.delete();
         if (outputFeatures.exists())
@@ -465,30 +466,29 @@ public class FilterTaskTest {
         String[] args = new String[]{
             "filter",
             "--charset", "UTF-8",
-            "--input-heads", inputHeads.toString(),
+            "--input-entries", inputEntries.toString(),
             "--input-contexts", inputContexts.toString(),
             "--input-features", inputFeatures.toString(),
-            "--output-heads", outputHeads.toString(),
+            "--output-entries", outputEntries.toString(),
             "--output-contexts", outputContexts.toString(),
             "--output-features", outputFeatures.toString(),
-            "--filter-head-wordlist", headWorldList.toString(), // a-k
-            "--filter-head-freq", "10",
+            "--filter-entry-wordlist", entryWorldList.toString(), // a-k
+            "--filter-entry-freq", "10",
             "--filter-context-freq", "5",
             "--filter-feature-freq", "2",
             "--filter-context-pattern", ":", // removes "passive"
             "--filter-context-wordlist", contextWorldList.toString(),
-            "--filter-head-pattern", "a" // remove gooseberry, cherry...
-
+            "--filter-entry-pattern", "a" // remove gooseberry, cherry...
         };
 
         Byblo.main(args);
 
-        assertTrue("Output file " + outputHeads + " does not exist.", outputHeads.
-                exists());
-        assertTrue("Output file " + outputContexts + " does not exist.", outputContexts.
-                exists());
-        assertTrue("Output file " + outputFeatures + " does not exist.", outputFeatures.
-                exists());
+        assertTrue("Output file " + outputEntries + " does not exist.",
+                outputEntries.exists());
+        assertTrue("Output file " + outputContexts + " does not exist.",
+                outputContexts.exists());
+        assertTrue("Output file " + outputFeatures + " does not exist.",
+                outputFeatures.exists());
 
         Thread.sleep(100);
     }
@@ -497,23 +497,23 @@ public class FilterTaskTest {
      * Test ignored because it uses bnc gram rels dense which doesn't exist any more
      */
     @Test
-    @Ignore 
+    @Ignore
     public void testMainMethodRun_Dense() throws Exception {
-        System.out.println("Testing FilterHeads on dense from main method.");
+        System.out.println("Testing FilterTask on dense from main method.");
 
         final String dataSet = "bnc-gramrels-dense";
 
-        File inputHeads = new File(INPUT_DIR, dataSet + ".heads");
+        File inputEntries = new File(INPUT_DIR, dataSet + ".entries");
         File inputContexts = new File(INPUT_DIR, dataSet + ".contexts");
         File inputFeatures = new File(INPUT_DIR, dataSet + ".features");
-        File outputHeads = new File(OUTPUT_DIR, dataSet + ".heads.filtered");
+        File outputEntries = new File(OUTPUT_DIR, dataSet + ".entries.filtered");
         File outputContexts = new File(OUTPUT_DIR,
                 dataSet + ".contexts.filtered");
         File outputFeatures = new File(OUTPUT_DIR,
                 dataSet + ".features.filtered");
 
-        if (outputHeads.exists())
-            outputHeads.delete();
+        if (outputEntries.exists())
+            outputEntries.delete();
         if (outputContexts.exists())
             outputContexts.delete();
         if (outputFeatures.exists())
@@ -522,44 +522,44 @@ public class FilterTaskTest {
         String[] args = new String[]{
             "filter",
             "--charset", "UTF-8",
-            "--input-heads", inputHeads.toString(),
+            "--input-entries", inputEntries.toString(),
             "--input-contexts", inputContexts.toString(),
             "--input-features", inputFeatures.toString(),
-            "--output-heads", outputHeads.toString(),
+            "--output-entries", outputEntries.toString(),
             "--output-contexts", outputContexts.toString(),
             "--output-features", outputFeatures.toString(),
-            "--filter-head-freq", "50"
+            "--filter-entry-freq", "50"
         };
 
         Byblo.main(args);
 
-        assertTrue("Output file " + outputHeads + " does not exist.", outputHeads.
-                exists());
-        assertTrue("Output file " + outputContexts + " does not exist.", outputContexts.
-                exists());
-        assertTrue("Output file " + outputFeatures + " does not exist.", outputFeatures.
-                exists());
+        assertTrue("Output file " + outputEntries + " does not exist.",
+                outputEntries.exists());
+        assertTrue("Output file " + outputContexts + " does not exist.",
+                outputContexts.exists());
+        assertTrue("Output file " + outputFeatures + " does not exist.",
+                outputFeatures.exists());
 
         Thread.sleep(100);
     }
 
     @Test
     public void testMainMethodRun_Sparse() throws Exception {
-        System.out.println("Testing FilterHeads on sparse from main method.");
+        System.out.println("Testing FilterTask on sparse from main method.");
 
         final String dataSet = "bnc-gramrels-sparse";
 
-        File inputHeads = new File(INPUT_DIR, dataSet + ".heads");
+        File inputEntries = new File(INPUT_DIR, dataSet + ".entries");
         File inputContexts = new File(INPUT_DIR, dataSet + ".contexts");
         File inputFeatures = new File(INPUT_DIR, dataSet + ".features");
-        File outputHeads = new File(OUTPUT_DIR, dataSet + ".heads.filtered");
+        File outputEntries = new File(OUTPUT_DIR, dataSet + ".entries.filtered");
         File outputContexts = new File(OUTPUT_DIR,
                 dataSet + ".contexts.filtered");
         File outputFeatures = new File(OUTPUT_DIR,
                 dataSet + ".features.filtered");
 
-        if (outputHeads.exists())
-            outputHeads.delete();
+        if (outputEntries.exists())
+            outputEntries.delete();
         if (outputContexts.exists())
             outputContexts.delete();
         if (outputFeatures.exists())
@@ -568,23 +568,23 @@ public class FilterTaskTest {
         String[] args = new String[]{
             "filter",
             "--charset", "UTF-8",
-            "--input-heads", inputHeads.toString(),
+            "--input-entries", inputEntries.toString(),
             "--input-contexts", inputContexts.toString(),
             "--input-features", inputFeatures.toString(),
-            "--output-heads", outputHeads.toString(),
+            "--output-entries", outputEntries.toString(),
             "--output-contexts", outputContexts.toString(),
             "--output-features", outputFeatures.toString(),
-            "--filter-head-freq", "50"
+            "--filter-entry-freq", "50"
         };
 
         Byblo.main(args);
 
-        assertTrue("Output file " + outputHeads + " does not exist.", outputHeads.
-                exists());
-        assertTrue("Output file " + outputContexts + " does not exist.", outputContexts.
-                exists());
-        assertTrue("Output file " + outputFeatures + " does not exist.", outputFeatures.
-                exists());
+        assertTrue("Output file " + outputEntries + " does not exist.",
+                outputEntries.exists());
+        assertTrue("Output file " + outputContexts + " does not exist.",
+                outputContexts.exists());
+        assertTrue("Output file " + outputFeatures + " does not exist.",
+                outputFeatures.exists());
 
         Thread.sleep(100);
     }

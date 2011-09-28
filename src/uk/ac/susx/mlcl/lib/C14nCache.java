@@ -67,7 +67,6 @@ import java.util.WeakHashMap;
  * </p>
  * 
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 1.00 (13th November 2010)
  * @param <T> The type of object that will be held here.
  */
 public class C14nCache<T> extends AbstractSet<T> {

@@ -28,38 +28,54 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo;
+package uk.ac.susx.mlcl.byblo.io;
 
-import com.beust.jcommander.IStringConverter;
-import com.beust.jcommander.ParameterException;
-import com.beust.jcommander.converters.FileConverter;
-import uk.ac.susx.mlcl.lib.io.TempFileFactory;
-import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.Serializable;
 
-public class TempFileFactoryConverter implements IStringConverter<TempFileFactory> {
+/**
+ * 
+ * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ */
+public final class FeatureRecord implements Serializable {
 
-    private final Logger LOG = Logger.getLogger(TempFileFactoryConverter.class.
-            getName());
+    private static final long serialVersionUID = 63617210012669024L;
 
-    private final FileConverter inner = new FileConverter();
+    private int featureId;
+
+    private double weight;
+
+    public FeatureRecord(final int featureId, final double weight) {
+        this.featureId = featureId;
+        this.weight = weight;
+    }
+
+    public final int getFeatureId() {
+        return featureId;
+    }
+
+    public final double getWeight() {
+        return weight;
+    }
 
     @Override
-    public TempFileFactory convert(String value) {
-        File tmpDir = inner.convert(value);
-        if (!tmpDir.exists()) {
-            LOG.log(Level.INFO,
-                    "Attempting to create temporary " + "directory: \"{0}\"",
-                    tmpDir);
-            if (!tmpDir.mkdirs()) {
-                throw new ParameterException(
-                        "Unable create temporary " + "directory \"" + tmpDir + "\"");
-            }
-        } else if (!tmpDir.isDirectory()) {
-            throw new ParameterException(
-                    "The given temporary directory \"" + tmpDir + "\" already exists but it is not a directory.");
-        }
-        return new TempFileFactory("temp.", ".txt", tmpDir);
+    public String toString() {
+        return "FeatureRecord{" + "id=" + featureId + "weight=" + weight + '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final FeatureRecord other = (FeatureRecord) obj;
+        if (this.featureId != other.featureId)
+            return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return 29 * 3 + this.featureId;
     }
 }

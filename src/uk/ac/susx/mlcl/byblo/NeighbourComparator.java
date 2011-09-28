@@ -36,8 +36,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @version 2nd December 2010
+ * A string comparator that takes strings composed of three tab delimited 
+ * fields. The first two are strings and the third is a double-precision 
+ * floating point number. The comparator orders by first field ASCII order 
+ * ascending, then by third field numeric order descending.
+ * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public class NeighbourComparator implements Comparator<String>, Serializable {
@@ -50,25 +53,8 @@ public class NeighbourComparator implements Comparator<String>, Serializable {
     public NeighbourComparator() {
     }
 
+    @Override
     public int compare(String string1, String string2) {
-
-//        String[] parts1 = string1.split("\t");
-//        if (parts1.length != 3)
-//            throw new IllegalArgumentException("Expected 3 delimiters but found "
-//                    + parts1.length + " in  string \"" + string1 + "\"");
-//        if (parts1[0].isEmpty() || parts1[1].isEmpty() || parts1[2].isEmpty())
-//            throw new IllegalArgumentException("EmptyExpected 3 delimiters but found "
-//                    + parts1.length + " in  string \"" + string1 + "\"");
-//
-//
-//        String[] parts2 = string2.split("\t");
-//        if (parts2.length != 3)
-//            throw new IllegalArgumentException("Expected 2 delimiters but found "
-//                    + parts2.length + " in  string \"" + string2 + "\"");
-//
-
-
-
         try {
 
             final int n = string1.length();
@@ -90,7 +76,7 @@ public class NeighbourComparator implements Comparator<String>, Serializable {
             }
 
 
-            // find the ends of the headwords
+            // find the ends of the Entries
             while (i < n && string1.charAt(i) != '\t') {
                 i++;
             }

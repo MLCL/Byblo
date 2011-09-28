@@ -32,84 +32,119 @@ package uk.ac.susx.mlcl.byblo.io;
 
 import uk.ac.susx.mlcl.lib.ObjectIndex;
 import uk.ac.susx.mlcl.lib.io.AbstractTSVSource;
-import uk.ac.susx.mlcl.lib.io.Source;
+import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
+import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
+ *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 27th March 2011
  */
-public class FeatureSource
-        extends AbstractTSVSource<FeatureEntry>
-        implements Source<FeatureEntry> {
+public class FeatureSource extends AbstractTSVSource<FeatureRecord> {
 
-    private final ObjectIndex<String> headIndex;
+    private static final Logger LOG =
+            Logger.getLogger(FeatureSource.class.getName());
 
-    private final ObjectIndex<String> contextIndex;
+    private final ObjectIndex<String> stringIndex;
+
+    private double weightSum = 0;
+
+    private int cardinality = 0;
 
     private long count = 0;
 
     public FeatureSource(File file, Charset charset,
-            ObjectIndex<String> headIndex, ObjectIndex<String> contextIndex)
+            ObjectIndex<String> stringIndex)
             throws FileNotFoundException, IOException {
         super(file, charset);
-        if (headIndex == null)
-            throw new NullPointerException("headIndex == null");
-        if (contextIndex == null)
-            throw new NullPointerException("contextIndex == null");
-        this.headIndex = headIndex;
-        this.contextIndex = contextIndex;
+        if (stringIndex == null)
+            throw new NullPointerException("stringIndex == null");
+        this.stringIndex = stringIndex;
     }
 
-    public FeatureSource(File file, Charset charset,
-            ObjectIndex<String> combinedIndex)
+    public FeatureSource(File file, Charset charset)
             throws FileNotFoundException, IOException {
-        this(file, charset, combinedIndex, combinedIndex);
+        this(file, charset, new ObjectIndex<String>());
     }
 
-    public FeatureSource(File file, Charset charset) throws FileNotFoundException, IOException {
-        this(file, charset, new ObjectIndex<String>());
+    public ObjectIndex<String> getStringIndex() {
+        return stringIndex;
+    }
+
+    @Override
+    public FeatureRecord read() throws IOException {
+        final int featureId = stringIndex.get(parseString());
+        parseValueDelimiter();
+        final double weight = parseDouble();
+
+        // Read record delimiter if it exist (may be end of file)
+        if (hasNext())
+            parseRecordDelimiter();
+
+        cardinality = Math.max(cardinality, featureId + 1);
+        weightSum += weight;
+        ++count;
+        return new FeatureRecord(featureId, weight);
+    }
+
+    public double getWeightSum() {
+        return weightSum;
+    }
+
+    public int getCardinality() {
+        return cardinality;
     }
 
     public long getCount() {
         return count;
     }
 
+    public Int2DoubleMap readAll() throws IOException {
+        Int2DoubleMap featureFrequenciesMap = new Int2DoubleOpenHashMap();
+        while (this.hasNext()) {
+            FeatureRecord entry = this.read();
+            if (featureFrequenciesMap.containsKey(entry.getFeatureId())) {
+                // XXX: This shouldn't happen any-more, becaue perl is no longer used.
+                //
+                // If we encounter the same feature more than once, it means
+                // the previous stage has decided two strings are not-equal, 
+                // but the corrent stage thinks are equals 
+                // ... so we need to merge the records:
 
-    public final ObjectIndex<String> getHeadIndex() {
-        return headIndex;
+                final int id = entry.getFeatureId();
+                final double oldFreq = featureFrequenciesMap.get(id);
+                final double newFreq = oldFreq + entry.getWeight();
+
+                LOG.log(Level.WARNING,
+                        "Found duplicate record \"{0}\" (id={1}) in features "
+                        + "file. Merging records. Old frequency = {2}, new "
+                        + "frequency = {3}.",
+                        new Object[]{stringIndex.get(id),
+                            id, oldFreq, newFreq});
+
+                featureFrequenciesMap.put(id, newFreq);
+            }
+            featureFrequenciesMap.put(entry.getFeatureId(), entry.getWeight());
+
+        }
+        return featureFrequenciesMap;
     }
 
-    public ObjectIndex<String> getContextIndex() {
-        return contextIndex;
-    }
-
-    public FeatureVectorSource getVectorSource() {
-        return new FeatureVectorSource(this);
-    }
-
-    public FeatureEntry read() throws IOException {
-//        final String head = parseString();
-//        final int head_id = stringIndex.get(head);
-//        final String head = ;
-        final int head_id = headIndex.get(parseString());
-        parseValueDelimiter();
-//        final String tail = parseString();
-//        final int tail_id = stringIndex.get(tail);
-//        final String tail = ;
-        final int tail_id = contextIndex.get(parseString());
-        parseValueDelimiter();
-        final double weight = parseDouble();
-        if (hasNext())
-            parseRecordDelimiter();
-        count++;
-        return new FeatureEntry(//stringIndex.get(head_id),
-                                //stringIndex.get(tail_id),
-                                head_id,
-                                tail_id,
-                                weight);
+    public double[] readAllAsArray() throws IOException {
+        Int2DoubleMap tmp = readAll();
+        double[] featureFreqs = new double[getCardinality()];
+        ObjectIterator<Int2DoubleMap.Entry> it =
+                tmp.int2DoubleEntrySet().iterator();
+        while (it.hasNext()) {
+            Int2DoubleMap.Entry entry = it.next();
+            featureFreqs[entry.getIntKey()] = entry.getDoubleValue();
+        }
+        return featureFreqs;
     }
 }

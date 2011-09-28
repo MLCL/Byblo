@@ -30,47 +30,43 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
-import uk.ac.susx.mlcl.lib.io.Sink;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.text.DecimalFormat;
+/**
+ *
+ * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ */
+public final class WeightedEntryFeatureRecord extends EntryFeatureRecord {
 
-public class ContextSink
-        extends AbstractTSVSink<ContextEntry>
-        implements Sink<ContextEntry> {
+    private static final long serialVersionUID = 1L;
 
-    private final ObjectIndex<String> stringIndex;
+    private final double weight;
 
-    private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
-
-    public ContextSink(File file, Charset charset,
-            ObjectIndex<String> stringIndex) throws FileNotFoundException, IOException {
-        super(file, charset);
-        if (stringIndex == null)
-            throw new NullPointerException("stringIndex == null");
-        this.stringIndex = stringIndex;
+    public WeightedEntryFeatureRecord(
+            final int entryId, final int featureId, final double weight) {
+        super(entryId, featureId);
+        this.weight = weight;
     }
 
-    public ContextSink(File file, Charset charset) throws FileNotFoundException, IOException {
-        this(file, charset, new ObjectIndex<String>());
-    }
-
-    public final ObjectIndex<String> getStringIndex() {
-        return stringIndex;
+    public double getWeight() {
+        return weight;
     }
 
     @Override
-    public void write(ContextEntry record) throws IOException {
-        super.writeString(stringIndex.get(record.getId()));//record.getContext());
-        super.writeValueDelimiter();
-        if (Double.compare((int) record.getWeight(), record.getWeight()) == 0)
-            super.writeInt((int) record.getWeight());
-        else
-            super.writeString(f.format(record.getWeight()));
-        super.writeRecordDelimiter();
+    public String toString() {
+        return "FeatureEntry{" + "entryId=" + getEntryId()
+                + ", featureId=" + getFeatureId() + ", weight=" + weight + '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        return super.equals((EntryFeatureRecord) obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

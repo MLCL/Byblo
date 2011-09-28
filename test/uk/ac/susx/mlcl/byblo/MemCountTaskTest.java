@@ -30,23 +30,19 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
-import uk.ac.susx.mlcl.byblo.MemCountTask;
 import com.google.common.io.Files;
 import java.io.File;
 import java.nio.charset.Charset;
 import org.junit.After;
 import org.junit.AfterClass;
-import static org.junit.Assume.*;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 15th April 2011
  */
 public class MemCountTaskTest {
 
@@ -96,26 +92,26 @@ public class MemCountTaskTest {
     @Test
     public void testRunOnFruit() throws Exception {
         System.out.println("Testing CountTask on " + FRUIT_INSTANCES);
-        final File heads = new File(OUTPUT, FRUIT_PREFIX + ".heads");
+        final File entries = new File(OUTPUT, FRUIT_PREFIX + ".entries");
         final File contexts = new File(OUTPUT, FRUIT_PREFIX + ".contexts");
         final File features = new File(OUTPUT, FRUIT_PREFIX + ".features");
 
-        final MemCountTask countTask = new MemCountTask(
-                FRUIT_INSTANCES, features, heads, contexts, CHARSET);
+        final CountTask countTask = new CountTask(
+                FRUIT_INSTANCES, features, entries, contexts, CHARSET);
         countTask.run();
 
         while (countTask.isExceptionThrown())
             countTask.throwException();
 
-        assertTrue("Output files not created.", heads.exists()
+        assertTrue("Output files not created.", entries.exists()
                 && contexts.exists() && features.exists());
-        assertTrue("Empty output file found.", heads.length() > 0
+        assertTrue("Empty output file found.", entries.length() > 0
                 && contexts.length() > 0 && features.length() > 0);
 
-        // NB: Heads file differs due to indexing strategy
+        // NB: entries file differs due to indexing strategy
 
-//        assertTrue("Output heads file length differs from sampledata file.",
-//                heads.length() == new File(SAMPLE_DATA, heads.getName()).length());
+//        assertTrue("Output entries file length differs from sampledata file.",
+//                entries.length() == new File(SAMPLE_DATA, entries.getName()).length());
         assertTrue("Output context file length differs from sampledata file.",
                    contexts.length() == new File(SAMPLE_DATA, contexts.getName()).
                 length());
@@ -123,8 +119,8 @@ public class MemCountTaskTest {
                    features.length() == new File(SAMPLE_DATA, features.getName()).
                 length());
 
-//        assertTrue("Output heads file differs from sampledata file.",
-//                Files.equal(heads, new File(SAMPLE_DATA, heads.getName())));
+//        assertTrue("Output entries file differs from sampledata file.",
+//                Files.equal(entries, new File(SAMPLE_DATA, entries.getName())));
         assertTrue("Output context file differs from sampledata file.",
                    Files.equal(contexts, new File(SAMPLE_DATA,
                                                   contexts.getName())));
@@ -137,19 +133,19 @@ public class MemCountTaskTest {
 //    @Test
 //    public void testRunOnSparse() throws Exception {
 //        System.out.println("Testing CountTask on " + SPARSE_INSTANCES);
-//        File heads = new File(OUTPUT, SPARSE_PREFIX + ".heads");
+//        File entries = new File(OUTPUT, SPARSE_PREFIX + ".entries");
 //        File contexts = new File(OUTPUT, SPARSE_PREFIX + ".contexts");
 //        File features = new File(OUTPUT, SPARSE_PREFIX + ".features");
 //
-//        MemCountTask countTask = new MemCountTask(
-//                SPARSE_INSTANCES, features, heads, contexts, CHARSET);
+//        CountTask countTask = new CountTask(
+//                SPARSE_INSTANCES, features, entries, contexts, CHARSET);
 //        countTask.run();
 //        while (countTask.isExceptionThrown())
 //            countTask.throwException();
 //
-//        // NB: Heads file differs due to indexing strategy
-////        assertTrue("Output heads file length differs from sampledata file.",
-////                heads.length() == new File(SAMPLE_DATA, heads.getName()).length());
+//        // NB: entries file differs due to indexing strategy
+////        assertTrue("Output entries file length differs from sampledata file.",
+////                entries.length() == new File(SAMPLE_DATA, entries.getName()).length());
 //
 //        assertTrue(
 //                "Output context file (" + contexts + ") length differs from sampledata file.",
@@ -160,9 +156,9 @@ public class MemCountTaskTest {
 //                features.length() == new File(SAMPLE_DATA, features.getName()).
 //                length());
 //
-//        // NB: Heads file differs due to indexing strategy
-////        assertTrue("Output heads file differs from sampledata file.",
-////                Files.equal(heads, new File(SAMPLE_DATA, heads.getName())));
+//        // NB: entries file differs due to indexing strategy
+////        assertTrue("Output entries file differs from sampledata file.",
+////                Files.equal(entries, new File(SAMPLE_DATA, entries.getName())));
 //
 //        // NB: Context words aren't concatonated with ':' in the new version
 ////        assertTrue(
@@ -184,21 +180,21 @@ public class MemCountTaskTest {
 //        // Don't run the tests if the data doesn't exist
 //        assumeTrue(BIG_INSTANCES.exists());
 //
-//        File headsFile = new File(OUTPUT, "bnc.rasp2.gramrels.lcase.heads");
+//        File entriesFile = new File(OUTPUT, "bnc.rasp2.gramrels.lcase.entries");
 //        File contextFile = new File(OUTPUT,
 //                                    "bnc.rasp2.gramrels.lcase.contexts");
 //        File featureFile = new File(OUTPUT,
 //                                    "bnc.rasp2.gramrels.lcase.features");
 //
-//        MemCountTask countTask = new MemCountTask(BIG_INSTANCES, featureFile,
-//                                            headsFile, contextFile, CHARSET);
+//        CountTask countTask = new CountTask(BIG_INSTANCES, featureFile,
+//                                            entriesFile, contextFile, CHARSET);
 //        countTask.run();
 //        while (countTask.isExceptionThrown())
 //            countTask.throwException();
 //
-//        assertTrue("Output files not created.", headsFile.exists()
+//        assertTrue("Output files not created.", entriesFile.exists()
 //                && contextFile.exists() && featureFile.exists());
-//        assertTrue("Empty output file found.", headsFile.length() > 0
+//        assertTrue("Empty output file found.", entriesFile.length() > 0
 //                && contextFile.length() > 0 && featureFile.length() > 0);
 //
 //    }
@@ -208,18 +204,18 @@ public class MemCountTaskTest {
 //        System.out.println("Testing CountTask for bad parameterisation.");
 //
 //        final File instances = new File(SAMPLE_DATA, FRUIT_PREFIX);
-//        final File heads = new File(OUTPUT, FRUIT_PREFIX + ".heads");
+//        final File entries = new File(OUTPUT, FRUIT_PREFIX + ".entries");
 //        final File contexts = new File(OUTPUT, FRUIT_PREFIX + ".contexts");
 //        final File features = new File(OUTPUT, FRUIT_PREFIX + ".features");
 //
 //        // Tests for required parameters not being set at all
 //
 //        try {
-//            final MemCountTask countTask = new MemCountTask();
-////            countTask.setContextsFile(contexts);
-//            countTask.setHeadsFile(heads);
+//            final CountTask countTask = new CountTask();
+////            countTask.setFeaturesFile(contexts);
+//            countTask.setEntriesFile(entries);
 //            countTask.setInstancesFile(instances);
-//            countTask.setFeaturesFile(features);
+//            countTask.setEntryFeaturesFile(features);
 //            countTask.run();
 //            while (countTask.isExceptionThrown())
 //                countTask.throwException();
@@ -230,11 +226,11 @@ public class MemCountTaskTest {
 //        }
 //
 //        try {
-//            final MemCountTask countTask = new MemCountTask();
-//            countTask.setContextsFile(contexts);
-////            countTask.setHeadsFile(heads);
+//            final CountTask countTask = new CountTask();
+//            countTask.setFeaturesFile(contexts);
+////            countTask.setEntriesFile(entries);
 //            countTask.setInstancesFile(instances);
-//            countTask.setFeaturesFile(features);
+//            countTask.setEntryFeaturesFile(features);
 //            countTask.run();
 //            while (countTask.isExceptionThrown())
 //                countTask.throwException();
@@ -245,11 +241,11 @@ public class MemCountTaskTest {
 //        }
 //
 //        try {
-//            final MemCountTask countTask = new MemCountTask();
-//            countTask.setContextsFile(contexts);
-//            countTask.setHeadsFile(heads);
+//            final CountTask countTask = new CountTask();
+//            countTask.setFeaturesFile(contexts);
+//            countTask.setEntriesFile(entries);
 ////            countTask.setInstancesFile(instances);
-//            countTask.setFeaturesFile(features);
+//            countTask.setEntryFeaturesFile(features);
 //            countTask.run();
 //            while (countTask.isExceptionThrown())
 //                countTask.throwException();
@@ -260,11 +256,11 @@ public class MemCountTaskTest {
 //        }
 //
 //        try {
-//            final MemCountTask countTask = new MemCountTask();
-//            countTask.setContextsFile(contexts);
-//            countTask.setHeadsFile(heads);
+//            final CountTask countTask = new CountTask();
+//            countTask.setFeaturesFile(contexts);
+//            countTask.setEntriesFile(entries);
 //            countTask.setInstancesFile(instances);
-////            countTask.setFeaturesFile(features);
+////            countTask.setEntryFeaturesFile(features);
 //            countTask.run();
 //            while (countTask.isExceptionThrown())
 //                countTask.throwException();
@@ -278,58 +274,58 @@ public class MemCountTaskTest {
 //        // Tests for required files being set to a directory
 //
 //        try {
-//            final MemCountTask countTask = new MemCountTask();
-//            countTask.setContextsFile(OUTPUT);
-//            countTask.setHeadsFile(heads);
-//            countTask.setInstancesFile(instances);
-//            countTask.setFeaturesFile(features);
-//            countTask.run();
-//            while (countTask.isExceptionThrown())
-//                countTask.throwException();
-//            fail("NullPointerException should have been "
-//                    + "thrown due to missing parameter.");
-//        } catch (IllegalStateException ex) {
-//            // pass
-//        }
-//
-//
-//
-//        try {
-//            final MemCountTask countTask = new MemCountTask();
-//            countTask.setContextsFile(contexts);
-//            countTask.setHeadsFile(OUTPUT);
-//            countTask.setInstancesFile(instances);
-//            countTask.setFeaturesFile(features);
-//            countTask.run();
-//            while (countTask.isExceptionThrown())
-//                countTask.throwException();
-//            fail("NullPointerException should have been "
-//                    + "thrown due to missing parameter.");
-//        } catch (IllegalStateException ex) {
-//            // pass
-//        }
-//
-//        try {
-//            final MemCountTask countTask = new MemCountTask();
-//            countTask.setContextsFile(contexts);
-//            countTask.setHeadsFile(heads);
-//            countTask.setInstancesFile(OUTPUT);
-//            countTask.setFeaturesFile(features);
-//            countTask.run();
-//            while (countTask.isExceptionThrown())
-//                countTask.throwException();
-//            fail("NullPointerException should have been "
-//                    + "thrown due to missing parameter.");
-//        } catch (IllegalStateException ex) {
-//            // pass
-//        }
-//
-//        try {
-//            final MemCountTask countTask = new MemCountTask();
-//            countTask.setContextsFile(contexts);
-//            countTask.setHeadsFile(heads);
-//            countTask.setInstancesFile(instances);
+//            final CountTask countTask = new CountTask();
 //            countTask.setFeaturesFile(OUTPUT);
+//            countTask.setEntriesFile(entries);
+//            countTask.setInstancesFile(instances);
+//            countTask.setEntryFeaturesFile(features);
+//            countTask.run();
+//            while (countTask.isExceptionThrown())
+//                countTask.throwException();
+//            fail("NullPointerException should have been "
+//                    + "thrown due to missing parameter.");
+//        } catch (IllegalStateException ex) {
+//            // pass
+//        }
+//
+//
+//
+//        try {
+//            final CountTask countTask = new CountTask();
+//            countTask.setFeaturesFile(contexts);
+//            countTask.setEntriesFile(OUTPUT);
+//            countTask.setInstancesFile(instances);
+//            countTask.setEntryFeaturesFile(features);
+//            countTask.run();
+//            while (countTask.isExceptionThrown())
+//                countTask.throwException();
+//            fail("NullPointerException should have been "
+//                    + "thrown due to missing parameter.");
+//        } catch (IllegalStateException ex) {
+//            // pass
+//        }
+//
+//        try {
+//            final CountTask countTask = new CountTask();
+//            countTask.setFeaturesFile(contexts);
+//            countTask.setEntriesFile(entries);
+//            countTask.setInstancesFile(OUTPUT);
+//            countTask.setEntryFeaturesFile(features);
+//            countTask.run();
+//            while (countTask.isExceptionThrown())
+//                countTask.throwException();
+//            fail("NullPointerException should have been "
+//                    + "thrown due to missing parameter.");
+//        } catch (IllegalStateException ex) {
+//            // pass
+//        }
+//
+//        try {
+//            final CountTask countTask = new CountTask();
+//            countTask.setFeaturesFile(contexts);
+//            countTask.setEntriesFile(entries);
+//            countTask.setInstancesFile(instances);
+//            countTask.setEntryFeaturesFile(OUTPUT);
 //            countTask.run();
 //            while (countTask.isExceptionThrown())
 //                countTask.throwException();

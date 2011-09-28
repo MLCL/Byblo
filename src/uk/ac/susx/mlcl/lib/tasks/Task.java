@@ -33,7 +33,6 @@ package uk.ac.susx.mlcl.lib.tasks;
 /**
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 27th March 2011
  */
 public interface Task extends Runnable {
 

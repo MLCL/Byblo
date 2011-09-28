@@ -40,8 +40,6 @@ import java.io.IOException;
  * from Iterator in that it can throw IOException.
  * 
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @since 23rd September 2010
- * @version 15 March 2011
  * @param <T> The type of object that the implementing class will provide.
  */
 public interface Source<T> {

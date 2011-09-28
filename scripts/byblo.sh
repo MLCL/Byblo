@@ -33,9 +33,9 @@
 
 # This script wraps all various tasks of the Byblo.jar software into a single
 # process for building distributional thesauruses. It takes, as input, raw
-# instance files composed of tab-separated head/context string pairs, one pair
+# instance files composed of tab-separated entry/feature string pairs, one pair
 # per line. The script produces a number of files, the last of which is the
-# k-nearest-neighbours of each head string according the defined measure of
+# k-nearest-neighbours of each entry string according the defined measure of
 # similarity and filtering rules.
 #
 
@@ -85,11 +85,11 @@ readonly VERBOSITY_DEBUG=4
 readonly VERBOSITY_TRACE=5
 
 # File name modifiers:
-readonly HEADS_SUFFIX=".heads"       # formerly .headsdb
-readonly CONTEXTS_SUFFIX=".contexts" # formerly .tailsdb
-readonly FEATURES_SUFFIX=".features" # formerly .maindb
-readonly FILTERED_SUFFIX=".filtered" # formerly .f
-readonly PAIRS_SUFFIX=".pairs"       # formerly .sims
+readonly ENTRIES_SUFFIX=".entries"    
+readonly FEATURES_SUFFIX=".features" 
+readonly ENTRY_FEATURES_SUFFIX=".entry-features" 
+readonly FILTERED_SUFFIX=".filtered" 
+readonly PAIRS_SUFFIX=".pairs"       
 readonly NEIGHBOURS_SUFFIX=".neighs"
 
 readonly JAVA_ARGS="-Xmx16g"
@@ -134,7 +134,7 @@ function printUsage {
     cat <<USAGE_STRING
 Usage: `basename $0` [<options>] [@<config>] <file>
 
-  <file>                    Input file containing head/contexts pairs.
+  <file>                    Input file containing entry/feature pairs.
 
   @<config>                 Options and input files can be read from a <config>
                             file specified directly after an '@' character.
@@ -158,26 +158,26 @@ Usage: `basename $0` [<options>] [@<config>] <file>
                             3=info, 4=debug, 5=trace. Default is $verbosity.
 
   Filtering options:
-    -fhf, --filter-head-freq <num>  Accept head strings with a frequency greater
+    -fef, --filter-entry-freq <num>  Accept entry strings with a frequency greater
                             than or equal to <num>.
-    -fhp, --filter-head-pattern <exp>  Accept head strings that match the given
+    -fep, --filter-entry-pattern <exp>  Accept entry strings that match the given
                             Perl style regular expression <exp>.
-    -fhw, --filter-head-wordlist <file>  Accept head strings that are exact
+    -few, --filter-entry-whitelist <file>  Accept entry strings that are exact
                             matches a line within the given <file>.
-    -fcf, --filter-context-freq <num>  Accept context strings with a frequency
+    -fff, --filter-feature-freq <num>  Accept feature strings with a frequency
                             greater than or equal to <num>.
-    -fcp, --filter-context-pattern <exp>  Accept context strings that match the
+    -ffp, --filter-feature-pattern <exp>  Accept feature strings that match the
                             given Perl style regular expression <exp>.
-    -fcw, --filter-context-wordlist <file>  Accept context strings that are
+    -ffw, --filter-feature-whitelist <file>  Accept feature strings that are
                             exact matches a line within the given <file>.
-    -fff, --filter-feature-freq <num>  Accept head/context feature pairs with a
+    -feff, --filter-entry-feature-freq <num>  Accept entry/feature feature pairs with a
                             frequency greater than or equal to <num>.
 
   All-pairs options:
     --allpairs-chunk-size <num> Process at most <num> records, per work
                             unit. Default is '$allpairsChunkSize'.
-    -m, --measure <name>    Proximity measure to compare heads with. E.g: lin,
-                            jaccard, crmi, recallmi. Default is '$measure'.
+    -m, --measure <name>    Proximity measure to compare entries with. E.g: 
+                            lin, jaccard, crmi, recallmi. Default is '$measure'.
     -r, --measure-reversed  Calculate inverse similarities. Has no effect with
                             symmertic measures.
     -Smn, --similarity-min <num> Minimum similarity value at which resultant
@@ -198,7 +198,7 @@ Usage: `basename $0` [<options>] [@<config>] <file>
     --p <num>               For "lp" measure. Default is '$lpP'.
 
   Sorting and K-nearest-neighbours options:
-    -k, --sort-k <num>      For each resultant head string, produce it's <num>
+    -k, --sort-k <num>      For each resultant entry string, produce it's <num>
                             nearest neighbours. Default is '$sortK'.
     --sort-chunk-size <num> Process at most <num> bytes in memory, per
                             work unit. Default is '$sortChunkSize'.
@@ -271,9 +271,9 @@ function checkOutputDirs {
     trace "checkOutputDirs(" $@ ")"
 
     while (( "$#" > 0 )); do
-        [[ -e "$1" ]] || die "Directory '$1' does not exist.\n`usage`"
-        [[ -d "$1" ]] || die "Directory '$1' is not a directory.\n`usage`"
-        [[ -w "$1" ]] || die "Directory '$1' is not writable.\n`usage`"
+        [[ -e "$1" ]] || die "Directory '$1' does not exist." 
+        [[ -d "$1" ]] || die "Directory '$1' is not a directory."  
+        [[ -w "$1" ]] || die "Directory '$1' is not writable." 
         shift
     done
 }
@@ -325,15 +325,14 @@ function parseArgs {
                 (( verbosity >= 0 && verbosity <= 5 )) ||
                     die "verbosity expected in range 0 to 5, found $verbosity."
                 shift 2;;
-#            @(-f[ch][fpw]|-fff|--filter-@(@(context|head)-@(freq|pattern|wordlist)|feature-freq)))
-            -f[ch][fpw]|-fff|\
-            --filter-context-freq|\
-            --filter-context-pattern|\
-            --filter-context-wordlist|\
-            --filter-head-freq|\
-            --filter-head-pattern|\
-            --filter-head-wordlist|\
-            --filter-feature-freq)
+            -f[fe][fpw]|-feff|\
+            --filter-feature-freq|\
+            --filter-feature-pattern|\
+            --filter-feature-whitelist|\
+            --filter-entry-freq|\
+            --filter-entry-pattern|\
+            --filter-entry-whitelist|\
+            --filter-entry-feature-freq)
                 filters="$1 $2 $filters";
                 shift 2;;
             '--allpairs-chunk-size')
@@ -402,21 +401,21 @@ function count {
 
     info "Counting raw instances - `date`"
     debug "Input instances file: $inputFile"
-    debug "Output heads files: $headsFile"
-    debug "Output contexts files: $contextsFile"
+    debug "Output entries files: $entriesFile"
     debug "Output features files: $featuresFile"
+    debug "Output entry-features files: $entryFeaturesFile"
     debug "Charset: $charset"
 
-    [[ -e $headsFile ]] && warn "Overwriting heads file '$headsFile'."
-    [[ -e $contextsFile ]] && warn "Overwriting contexts file '$contextsFile'."
+    [[ -e $entriesFile ]] && warn "Overwriting entries file '$entriesFile'."
     [[ -e $featuresFile ]] && warn "Overwriting features file '$featuresFile'."
+    [[ -e $entryFeaturesFile ]] && warn "Overwriting features file '$entryFeaturesFile'."
 
     java $JAVA_ARGS -jar Byblo.jar count \
         --charset $charset \
-        --input-instances $inputFile \
-        --output-heads $headsFile \
-        --output-contexts $contextsFile \
+        --input $inputFile \
+        --output-entries $entriesFile \
         --output-features $featuresFile \
+        --output-entry-features $entryFeaturesFile \
         --temporary-directory $tempdir \
         || die >&2
 
@@ -428,36 +427,36 @@ function filter {
     trace "filter(" $@ ")"
 
     info "Filtering frequency data files - `date`"
-    debug "Input heads files: $headsFile"
-    debug "Input contexts files: $contextsFile"
+    debug "Input entries files: $entriesFile"
     debug "Input features files: $featuresFile"
-    debug "Output heads files: $headsFile${FILTERED_SUFFIX}"
-    debug "Output contexts files: $contextsFile${FILTERED_SUFFIX}"
+    debug "Input entry-features files: $entryFeaturesFile"
+    debug "Output entries files: $entriesFile${FILTERED_SUFFIX}"
     debug "Output features files: $featuresFile${FILTERED_SUFFIX}"
+    debug "Output entry-features files: $entryFeaturesFile${FILTERED_SUFFIX}"
     debug "Filters: $filters"
     debug "Charset: $charset"
 
-    [[ -e $headsFile${FILTERED_SUFFIX} ]] && \
-        warn "Overwriting heads file '$headsFile${FILTERED_SUFFIX}'."
-    [[ -e $contextsFile${FILTERED_SUFFIX} ]] && \
-        warn "Overwriting contexts file '$contextsFile${FILTERED_SUFFIX}'."
+    [[ -e $entriesFile${FILTERED_SUFFIX} ]] && \
+        warn "Overwriting entries file '$entriesFile${FILTERED_SUFFIX}'."
     [[ -e $featuresFile${FILTERED_SUFFIX} ]] && \
         warn "Overwriting features file '$featuresFile${FILTERED_SUFFIX}'."
+    [[ -e $entryFeaturesFile${FILTERED_SUFFIX} ]] && \
+        warn "Overwriting entry-features file '$entryFeaturesFile${FILTERED_SUFFIX}'."
 
     java $JAVA_ARGS -jar Byblo.jar filter $filters \
         -T $tempdir \
-        --input-heads $headsFile \
-        --input-contexts $contextsFile \
+        --input-entries $entriesFile \
         --input-features $featuresFile \
-        --output-heads $headsFile${FILTERED_SUFFIX} \
-        --output-contexts $contextsFile${FILTERED_SUFFIX} \
+        --input-entry-features $entryFeaturesFile \
+        --output-entries $entriesFile${FILTERED_SUFFIX} \
         --output-features $featuresFile${FILTERED_SUFFIX} \
+        --output-entry-features $entryFeaturesFile${FILTERED_SUFFIX} \
         --charset $charset \
         || die >&2
 
-    headsFile=$headsFile${FILTERED_SUFFIX}
-    contextsFile=$contextsFile${FILTERED_SUFFIX}
+    entriesFile=$entriesFile${FILTERED_SUFFIX}
     featuresFile=$featuresFile${FILTERED_SUFFIX}
+    entryFeaturesFile=$entryFeaturesFile${FILTERED_SUFFIX}
 
     info "Finished filtering - `date`"
 
@@ -467,9 +466,9 @@ function allpairs {
     trace "allpairs(" $@ ")"
 
     info "Generate similarity file - `date`"
-    debug "Input Heads File: $headsFile"
-    debug "Input Contexts File: $contextsFile"
-    debug "Input Features File: $featuresFile"
+    debug "Input entries File: $entriesFile"
+    debug "Input features File: $featuresFile"
+    debug "Input entry-features File: $entryFeaturesFile"
     debug "Output: $neighsFile"
     debug "Threads: $threads"
     debug "Charset: $charset"
@@ -486,9 +485,9 @@ function allpairs {
     [[ -e $pairsFile ]] && warn "Overwriting pairs file '$pairsFile'."
 
     java $JAVA_ARGS -jar Byblo.jar allpairs $apssArgs \
-            --input-heads $headsFile \
-            --input $featuresFile \
-            --input-contexts $contextsFile \
+            --input $entryFeaturesFile \
+            --input-entries $entriesFile \
+            --input-features $featuresFile \
             --output $pairsFile \
             --charset $charset \
             --measure $measure \
@@ -518,7 +517,7 @@ function neighbours {
     debug "K neighbours: $sortK"
 
     sortArgs=""
-    [[ -n $threads ]] && sortArgs="$sortArgs --nthreads $threads"
+    [[ -n $threads ]] && sortArgs="$sortArgs --threads $threads"
 
     [[ -e $neighsFile ]] && warn "Overwriting neighbours file '$neighsFile'."
 
@@ -600,14 +599,14 @@ checkOutputDirs $tempdir
 
 inputFileName=`basename $inputFile`
 
-headsFile=${outputDir}/${inputFileName}${HEADS_SUFFIX}
-contextsFile=${outputDir}/${inputFileName}${CONTEXTS_SUFFIX}
+entriesFile=${outputDir}/${inputFileName}${ENTRIES_SUFFIX}
 featuresFile=${outputDir}/${inputFileName}${FEATURES_SUFFIX}
+entryFeaturesFile=${outputDir}/${inputFileName}${ENTRY_FEATURES_SUFFIX}
 pairsFile=${outputDir}/${inputFileName}${PAIRS_SUFFIX}-$measure
 neighsFile=${pairsFile}${NEIGHBOURS_SUFFIX}-${sortK}nn
 
-checkOutputFiles $headsFile $contextsFile \
-    $featuresFile $pairsFile $neighsFile
+checkOutputFiles $entriesFile $featuresFile \
+    $entryFeaturesFile $pairsFile $neighsFile
 #
 # ====================================
 # Run the task

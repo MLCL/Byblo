@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-
 import uk.ac.susx.mlcl.lib.ObjectIndex;
 import uk.ac.susx.mlcl.lib.io.AbstractTSVSource;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
@@ -46,12 +45,11 @@ import java.util.logging.Logger;
 /**
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 27th March 2011
  */
-public class HeadSource extends AbstractTSVSource<HeadEntry> {
+public class EntrySource extends AbstractTSVSource<EntryRecord> {
 
-    private static final Logger LOG = Logger.getLogger(HeadSource.class.
-            getName());
+    private static final Logger LOG = Logger.getLogger(
+            EntrySource.class.getName());
 
     private final ObjectIndex<String> stringIndex;
 
@@ -67,7 +65,7 @@ public class HeadSource extends AbstractTSVSource<HeadEntry> {
 
     private int count = 0;
 
-    public HeadSource(File file, Charset charset,
+    public EntrySource(File file, Charset charset,
             ObjectIndex<String> stringIndex)
             throws FileNotFoundException, IOException {
         super(file, charset);
@@ -76,7 +74,7 @@ public class HeadSource extends AbstractTSVSource<HeadEntry> {
         this.stringIndex = stringIndex;
     }
 
-    public HeadSource(File file, Charset charset)
+    public EntrySource(File file, Charset charset)
             throws FileNotFoundException, IOException {
         this(file, charset, new ObjectIndex<String>());
     }
@@ -109,72 +107,60 @@ public class HeadSource extends AbstractTSVSource<HeadEntry> {
         return count;
     }
 
-    public HeadEntry read() throws IOException {
-//        final String head = parseString();
-//        final int head_id = stringIndex.get(head);
-        final int head_id = stringIndex.get(parseString());
+    @Override
+    public EntryRecord read() throws IOException {
+        final int entryId = stringIndex.get(parseString());
         parseValueDelimiter();
-//        final int index = parseInt();
-//        parseValueDelimiter();
-//        final int width = parseInt();
-//        parseValueDelimiter();
+
         final double weight = parseDouble();
+
         if (hasNext())
             parseRecordDelimiter();
-        cardinality = Math.max(cardinality, head_id + 1);
+
+        cardinality = Math.max(cardinality, entryId + 1);
         weightSum += weight;
         weightMax = Math.max(weightMax, weight);
-//        widthSum += width;
-//        widthMax = Math.max(widthMax, width);
         ++count;
-        return new HeadEntry(
-//                head,
-                head_id, 
-//                index, width,
-                weight);
-
+        return new EntryRecord(entryId, weight);
     }
 
     public Int2DoubleMap readAll() throws IOException {
-        Int2DoubleMap contextFrequenciesMap = new Int2DoubleOpenHashMap();
+        Int2DoubleMap entityFrequenciesMap = new Int2DoubleOpenHashMap();
         while (this.hasNext()) {
-            HeadEntry entry = this.read();
-            if (contextFrequenciesMap.containsKey(entry.getHeadId())) {
-                // If we encounter the same headword more than once, it means
+            EntryRecord entry = this.read();
+            if (entityFrequenciesMap.containsKey(entry.getEntryId())) {
+                // If we encounter the same EntryRecord more than once, it means
                 // the perl has decided two strings are not-equal, which java
                 // thinks are equals ... so we need to merge the records:
 
-                // TODO: Rewrite the perl script
+                // TODO: Not true any more.. remove this code?
 
-//                String word = stringIndex.get(entry.getHeadId());//entry.getHeadword();
-                final int id = entry.getHeadId();
-                final double oldFreq = contextFrequenciesMap.get(id);
-                final double newFreq = oldFreq + entry.getTotal();
+                final int id = entry.getEntryId();
+                final double oldFreq = entityFrequenciesMap.get(id);
+                final double newFreq = oldFreq + entry.getWeight();
 
                 LOG.log(Level.WARNING,
-                        "Found duplicate headword \"{0}\" (id={1}) in headsdb "
+                        "Found duplicate Entry \"{0}\" (id={1}) in entries "
                         + "file. Merging records. Old frequency = {2}, new "
                         + "frequency = {3}.",
-                        new Object[]{stringIndex.get(entry.getHeadId()), id, oldFreq, newFreq});
+                        new Object[]{stringIndex.get(entry.getEntryId()), id, oldFreq, newFreq});
 
-                contextFrequenciesMap.put(id, newFreq);
-
-//                throw new AssertionError();
+                entityFrequenciesMap.put(id, newFreq);
             }
-            contextFrequenciesMap.put(entry.getHeadId(), entry.getTotal());
+            entityFrequenciesMap.put(entry.getEntryId(), entry.getWeight());
         }
-        return contextFrequenciesMap;
+        return entityFrequenciesMap;
     }
 
     public double[] readAllAsArray() throws IOException {
         Int2DoubleMap tmp = readAll();
-        double[] contextFreqs = new double[getCardinality()];
+        double[] entryFreqs = new double[getCardinality()];
         ObjectIterator<Int2DoubleMap.Entry> it = tmp.int2DoubleEntrySet().
                 iterator();
         while (it.hasNext()) {
             Int2DoubleMap.Entry entry = it.next();
-            contextFreqs[entry.getIntKey()] = entry.getDoubleValue();
+            entryFreqs[entry.getIntKey()] = entry.getDoubleValue();
         }
-        return contextFreqs;
+        return entryFreqs;
     }
 }

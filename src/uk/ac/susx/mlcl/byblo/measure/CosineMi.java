@@ -33,11 +33,11 @@ package uk.ac.susx.mlcl.byblo.measure;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- * @version 2nd December 2010
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public class CosineMi extends AbstractMIProximity implements Proximity {
 
+    @Override
     public double shared(SparseDoubleVector Q, SparseDoubleVector R) {
         double numerator = 0;
 
@@ -57,6 +57,7 @@ public class CosineMi extends AbstractMIProximity implements Proximity {
         return numerator;
     }
 
+    @Override
     public double left(SparseDoubleVector Q) {
         double Qdenominator = 0;
         for (int i = 0; i < Q.size; i++) {
@@ -68,14 +69,17 @@ public class CosineMi extends AbstractMIProximity implements Proximity {
         return Qdenominator;
     }
 
+    @Override
     public double right(SparseDoubleVector R) {
         return left(R);
     }
 
+    @Override
     public double combine(double shared, double left, double right) {
         return shared / Math.sqrt(left * right);
     }
 
+    @Override
     public boolean isSymmetric() {
         return true;
     }

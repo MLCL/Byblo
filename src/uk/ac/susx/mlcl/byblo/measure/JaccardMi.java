@@ -33,7 +33,6 @@ package uk.ac.susx.mlcl.byblo.measure;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- * @version 2nd December 2010
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public class JaccardMi extends AbstractMIProximity implements Proximity {
@@ -89,6 +88,4 @@ public class JaccardMi extends AbstractMIProximity implements Proximity {
     public String toString() {
         return "JaccardMi{}";
     }
-
-
 }

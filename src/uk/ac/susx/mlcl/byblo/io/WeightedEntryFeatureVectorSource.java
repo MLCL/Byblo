@@ -42,33 +42,36 @@ import java.io.IOException;
 import java.nio.charset.CharacterCodingException;
 
 /**
- * Wraps a {@link FeatureSource} to produce complete feature vectors instead of
- * just individual feature/context pairs.
+ * Wraps a {@link WeightedEntryFeatureSource} to produce complete feature 
+ * vectors instead of just individual entry/feature records.
  * 
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 27th March 2011
  */
-public class FeatureVectorSource
+public class WeightedEntryFeatureVectorSource
         implements SeekableSource<Entry<SparseDoubleVector>, Lexer.Tell> {
 
-    private final FeatureSource inner;
+    private final WeightedEntryFeatureSource inner;
 
-    private FeatureEntry next;
+    private WeightedEntryFeatureRecord next;
 
     private Lexer.Tell tell;
 
-    public FeatureVectorSource(FeatureSource inner) {
+    public WeightedEntryFeatureVectorSource(WeightedEntryFeatureSource inner) {
         this.inner = inner;
         tell = Lexer.Tell.START;
         next = null;
     }
 
-    public ObjectIndex<String> getHeadIndex() {
-        return inner.getHeadIndex();
+    public ObjectIndex<String> getEntryIndex() {
+        return inner.getEntryIndex();
     }
 
-    public ObjectIndex<String> getContextIndex() {
-        return inner.getContextIndex();
+    public ObjectIndex<String> getFeatureIndex() {
+        return inner.getFeatureIndex();
+    }
+
+    public boolean isIndexCombined() {
+        return inner.isIndexCombined();
     }
 
     @Override
@@ -81,19 +84,19 @@ public class FeatureVectorSource
         if (next == null)
             readNext();
         Int2DoubleMap features = new Int2DoubleOpenHashMap();
-        FeatureEntry start = next;
+        WeightedEntryFeatureRecord start = next;
         int cardinality = 0;
         do {
-            features.put(next.getContextId(), next.getWeight());
-            cardinality = Math.max(cardinality, next.getContextId() + 1);
+            features.put(next.getFeatureId(), next.getWeight());
+            cardinality = Math.max(cardinality, next.getFeatureId() + 1);
             // XXX position() should not need to be called every iteration
             tell = inner.position();
             readNext();
-        } while (next != null && next.getHeadId() == start.getHeadId());
+        } while (next != null && next.getEntryId() == start.getEntryId());
 
 
         return new Entry<SparseDoubleVector>(
-                start.getHeadId(),
+                start.getEntryId(),
                 SparseVectors.toDoubleVector(features, cardinality));
     }
 

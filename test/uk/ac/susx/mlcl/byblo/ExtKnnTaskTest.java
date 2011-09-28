@@ -93,7 +93,7 @@ public class ExtKnnTaskTest {
         final File in = new File(SAMPLE_DATA, FRUIT_PREFIX + ".pairs-lin");
         final File out = new File(OUTPUT, FRUIT_PREFIX + ".pairs-lin" + ".knn");
 
-        final ExtKnnTask knnTask = new ExtKnnTask(
+        final ExternalKnnTask knnTask = new ExternalKnnTask(
                 in, out, CHARSET, 2);
         knnTask.setMaxChunkSize(111);
         knnTask.run();

@@ -55,7 +55,6 @@ import java.util.Arrays;
  *       warning would be appropriate, if at all. (Issue #27)
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 21 Aug 2010
  */
 public abstract class SparseVector implements Serializable {
 

@@ -34,11 +34,11 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
  *
- * @version 2nd December 2010
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public class Lin extends AbstractMIProximity {
 
+    @Override
     public double shared(SparseDoubleVector Q, SparseDoubleVector R) {
         double numerator = 0.0;
 
@@ -66,6 +66,7 @@ public class Lin extends AbstractMIProximity {
         return numerator;
     }
 
+    @Override
     public double left(SparseDoubleVector Q) {
         double denominator = 0.0;
 
@@ -76,14 +77,17 @@ public class Lin extends AbstractMIProximity {
         return denominator;
     }
 
+    @Override
     public double right(SparseDoubleVector R) {
         return left(R);
     }
 
+    @Override
     public double combine(double shared, double left, double right) {
         return shared / (left + right);
     }
 
+    @Override
     public boolean isSymmetric() {
         return true;
     }
@@ -92,6 +96,4 @@ public class Lin extends AbstractMIProximity {
     public String toString() {
         return "Lin{}";
     }
-
-
 }

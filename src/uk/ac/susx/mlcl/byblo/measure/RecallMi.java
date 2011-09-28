@@ -58,7 +58,6 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * Note that recall(x,y) = precision(y,x) so the precision can be calculated
  * by wrapping an instance of RecallMi in the ReversedProximity decorator.
  *
- * @version 2nd December 2010
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public class RecallMi extends AbstractMIProximity implements Proximity {
@@ -66,6 +65,7 @@ public class RecallMi extends AbstractMIProximity implements Proximity {
     public RecallMi() {
     }
 
+    @Override
     public double shared(SparseDoubleVector A, SparseDoubleVector B) {
         double numerator = 0.0;
 
@@ -86,6 +86,7 @@ public class RecallMi extends AbstractMIProximity implements Proximity {
         return numerator;
     }
 
+    @Override
     public double left(SparseDoubleVector A) {
         double denominator = 0;
         for (int i = 0; i < A.size; i++) {
@@ -94,14 +95,17 @@ public class RecallMi extends AbstractMIProximity implements Proximity {
         return denominator;
     }
 
+    @Override
     public double right(SparseDoubleVector B) {
         return 0;
     }
 
+    @Override
     public double combine(double shared, double left, double right) {
         return shared / left;
     }
 
+    @Override
     public boolean isSymmetric() {
         return false;
     }

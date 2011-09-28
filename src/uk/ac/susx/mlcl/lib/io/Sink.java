@@ -38,8 +38,6 @@ import java.util.Collection;
  * {@code T}.
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @since 23rd September 2010
- * @version 15th March 2011
  * @param <T> The type of object that the implementing class will provide.
  */
 public interface Sink<T> {

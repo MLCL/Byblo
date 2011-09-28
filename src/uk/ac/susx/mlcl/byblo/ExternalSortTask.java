@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import uk.ac.susx.mlcl.lib.io.TempFileFactoryConverter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -52,45 +53,42 @@ import java.util.logging.Logger;
 
 /**
  *
- * @version 2nd December 2010
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(commandDescription = "USAGE_SORT_COMMAND")
-public class ExtSortTask extends AbstractParallelTask {
+@Parameters(commandDescription = "Sort a file.")
+public class ExternalSortTask extends AbstractParallelTask {
 
     private static final Logger LOG = Logger.getLogger(
-            ExtSortTask.class.getName());
+            ExternalSortTask.class.getName());
 
     private static final int DEFAULT_MAX_CHUNK_SIZE = ChunkTask.DEFAULT_MAX_CHUNK_SIZE;
 
-    @Parameter(names = {"-c", "--chunk-size"},
-               descriptionKey = "USAGE_MAX_CHUNK_SIZE")
+    @Parameter(names = {"-C", "--chunk-size"},
+               description = "Number of lines that will be read and sorted in RAM at one time (per thread). Larger values increase memory usage and performace.")
     private int maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
 
     @Parameter(names = {"-i", "--input"},
-               descriptionKey = "USAGE_INPUT_FILE")
+               description = "Source file. If this argument is not given, or if it is \"-\", then stdin will be read.")
     private File sourceFile = IOUtil.STDIN_FILE;
 
     @Parameter(names = {"-o", "--output"},
-               descriptionKey = "USAGE_OUTPUT_FILE")
+               description = "Destination file. If this argument is not given, or if it is \"-\", then stdout will be written to.")
     private File destFile = IOUtil.STDOUT_FILE;
-//      --compress-program=PROG  compress temporaries with PROG;
-//                              decompress them with PROG -d
 
     @Parameter(names = {"-T", "--temporary-directory"},
-               descriptionKey = "USAGE_TEMP_DIR",
+               description = "Directory which will be used for storing temporary files.",
                converter = TempFileFactoryConverter.class)
     private FileFactory tempFileFactory = new TempFileFactory("temp", ".txt");
 
-    @Parameter(names = {"--charset"},
-               descriptionKey = "USAGE_CHARSET")
+    @Parameter(names = {"-c", "--charset"},
+               description = "Character encoding for reading and writing files.")
     private Charset charset = IOUtil.DEFAULT_CHARSET;
 
     private Comparator<String> comparator = new NeighbourComparator();
 
     private Queue<File> mergeQueue;
 
-    public ExtSortTask(File src, File dst, Charset charset,
+    public ExternalSortTask(File src, File dst, Charset charset,
                        Comparator<String> comparator,
                        int maxChunkSize) {
         this(src, dst, charset);
@@ -98,13 +96,13 @@ public class ExtSortTask extends AbstractParallelTask {
         setMaxChunkSize(maxChunkSize);
     }
 
-    public ExtSortTask(File src, File dst, Charset charset) {
+    public ExternalSortTask(File src, File dst, Charset charset) {
         setSourceFile(src);
         setDestinationFile(dst);
         setCharset(charset);
     }
 
-    public ExtSortTask() {
+    public ExternalSortTask() {
         super();
     }
 
@@ -200,12 +198,12 @@ public class ExtSortTask extends AbstractParallelTask {
             } else if(!chunkQueue.isEmpty()) {
 
                 File chunk = chunkQueue.take();
-                submitTask(new MemSortTask(chunk, chunk, getCharset(),
+                submitTask(new SortTask(chunk, chunk, getCharset(),
                                           getComparator()));
                 
             }
 
-            // Nasty hack to stop it tight looping when both queues are empty
+            // XXX: Nasty hack to stop it tight looping when both queues are empty
             Thread.sleep(1);
         }
         chunkTask.throwException();
@@ -221,9 +219,9 @@ public class ExtSortTask extends AbstractParallelTask {
     protected void handleCompletedTask(Task task) throws Exception {
         task.throwException();
 
-        if (task.getClass().equals(MemSortTask.class)) {
+        if (task.getClass().equals(SortTask.class)) {
 
-            MemSortTask sortTask = (MemSortTask) task;
+            SortTask sortTask = (SortTask) task;
             queueMergeTask(sortTask.getDstFile());
 
         } else if (task.getClass().equals(MergeTask.class)) {

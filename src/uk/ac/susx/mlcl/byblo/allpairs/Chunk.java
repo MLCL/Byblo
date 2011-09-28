@@ -38,8 +38,7 @@ import java.util.List;
 
 /**
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 27th March 2011
- * @param <T>
+ * @param <T> The atomic type of items in this chunk
  */
 public class Chunk<T> extends AbstractList<T>
         implements SeekableSource<T, Integer>, Cloneable {
@@ -53,6 +52,11 @@ public class Chunk<T> extends AbstractList<T>
         nextIndex = 0;
     }
 
+    /**
+     * Protected constructor for cloning only.
+     * 
+     * @param other Chunk to clone (using a shallow copy).
+     */
     protected Chunk(Chunk<T> other) {
         this.items = other.items;
         nextIndex = other.nextIndex;
@@ -73,18 +77,22 @@ public class Chunk<T> extends AbstractList<T>
         return items.get(index);
     }
 
+    @Override
     public T read() throws IOException {
         return items.get(nextIndex++);
     }
 
+    @Override
     public boolean hasNext() throws IOException {
         return nextIndex < items.size();
     }
 
+    @Override
     public void position(Integer offset) throws IOException {
         nextIndex = offset;
     }
 
+    @Override
     public Integer position() throws IOException {
         return nextIndex;
     }

@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
-import uk.ac.susx.mlcl.byblo.CopyTask;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import com.beust.jcommander.JCommander;
 import java.io.IOException;
@@ -47,7 +46,6 @@ import static org.junit.Assert.*;
 /**
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 27th March 2011
  */
 public class CopyTaskTest {
 

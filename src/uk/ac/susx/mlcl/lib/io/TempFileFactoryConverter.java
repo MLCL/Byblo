@@ -28,71 +28,44 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo;
+package uk.ac.susx.mlcl.lib.io;
 
-import com.beust.jcommander.Parameter;
-import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
+import com.beust.jcommander.IStringConverter;
+import com.beust.jcommander.ParameterException;
+import com.beust.jcommander.converters.FileConverter;
 import java.io.File;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @version 2nd December 2010
+ * An IStringConverter implementation for extending JCommander. Take a string 
+ * path and produces a TempFileFactory object for the production of temprory
+ * files.
+ * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-public class MemSortTask extends CopyTask {
+public class TempFileFactoryConverter implements IStringConverter<TempFileFactory> {
 
     private static final Logger LOG = Logger.getLogger(
-            MemSortTask.class.getName());
+            TempFileFactoryConverter.class.getName());
 
-    private Comparator<String> comparator;
-
-    @Parameter(names = {"--charset"},
-               descriptionKey = "USAGE_CHARSET")
-    private Charset charset = IOUtil.DEFAULT_CHARSET;
-
-    public final Charset getCharset() {
-        return charset;
-    }
-
-    public final void setCharset(Charset charset) {
-        Checks.checkNotNull(charset);
-        this.charset = charset;
-    }
-
-    public MemSortTask(File sourceFile, File destinationFile, Charset charset,
-                       Comparator<String> comparator) {
-        super(sourceFile, destinationFile);
-        setCharset(charset);
-        this.comparator = comparator;
-    }
-
-    public final Comparator<String> getComparator() {
-        return comparator;
-    }
-
-    public final void setComparator(Comparator<String> comparator) {
-        if (comparator == null)
-            throw new NullPointerException("comparator is null");
-        this.comparator = comparator;
-    }
+    private final FileConverter inner = new FileConverter();
 
     @Override
-    protected void runTask() throws Exception {
-        LOG.log(Level.INFO,
-                "Sorting file in memory, from \"{0}\" to \"{1}\". ({2})",
-                new Object[]{getSrcFile(), getDstFile(), Thread.currentThread().
-                    getName()});
-        final List<String> lines = new ArrayList<String>();
-        IOUtil.readAllLines(getSrcFile(), getCharset(), lines);
-        Collections.sort(lines, getComparator());
-        IOUtil.writeAllLines(getDstFile(), getCharset(), lines);
+    public TempFileFactory convert(String value) {
+        File tmpDir = inner.convert(value);
+        if (!tmpDir.exists()) {
+            if (LOG.isLoggable(Level.FINE))
+                LOG.log(Level.FINE, "Attempting to create "
+                        + "temporary directory: \"{0}\"", tmpDir);
+            if (!tmpDir.mkdirs()) {
+                throw new ParameterException(
+                        "Unable create temporary directory \"" + tmpDir + "\"");
+            }
+        } else if (!tmpDir.isDirectory()) {
+            throw new ParameterException("The given temporary directory \""
+                    + tmpDir + "\" already exists but it is not a directory.");
+        }
+        return new TempFileFactory("temp.", ".txt", tmpDir);
     }
 }

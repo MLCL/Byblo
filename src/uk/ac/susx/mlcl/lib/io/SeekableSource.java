@@ -38,10 +38,8 @@ package uk.ac.susx.mlcl.lib.io;
  * order. It is entirely agnostic in terms of actual source of data.
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @since 15th March 2011
- * @version 15th March 2011
  * @param <T> The type of object that the implementing class will provide.
  */
-public interface SeekableSource<T, S> extends Source<T>, Seekable<S>{
+public interface SeekableSource<T, P> extends Source<T>, Seekable<P>{
 
 }

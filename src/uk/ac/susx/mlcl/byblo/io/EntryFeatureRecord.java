@@ -32,32 +32,36 @@ package uk.ac.susx.mlcl.byblo.io;
 
 import java.io.Serializable;
 
-public class InstanceEntry implements Serializable, Comparable<InstanceEntry> {
+/**
+ * 
+ * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ */
+public class EntryFeatureRecord implements Serializable, Comparable<EntryFeatureRecord> {
 
     private static final long serialVersionUID = 1L;
 
-    private int headId;
+    private int entryId;
 
-    private int contextId;
+    private int featureId;
 
-    public InstanceEntry(final int head_id, final int context_id) {
-        this.headId = head_id;
-        this.contextId = context_id;
+    public EntryFeatureRecord(final int entryId, final int contextId) {
+        this.entryId = entryId;
+        this.featureId = contextId;
     }
 
-    public final int getHeadId() {
-        return headId;
+    public final int getEntryId() {
+        return entryId;
     }
 
-    public final int getContextId() {
-        return contextId;
+    public final int getFeatureId() {
+        return featureId;
     }
 
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + '{'
-                + "head=" + headId
-                + ", context=" + contextId
+                + "entryId=" + entryId
+                + ", featureId=" + featureId
                 + '}';
     }
 
@@ -67,19 +71,23 @@ public class InstanceEntry implements Serializable, Comparable<InstanceEntry> {
             return true;
         if (obj == null || getClass() != obj.getClass())
             return false;
-        final InstanceEntry other = (InstanceEntry) obj;
-        return this.headId == other.headId && this.contextId == other.contextId;
+        return equals((EntryFeatureRecord) obj);
+    }
+
+    public boolean equals(EntryFeatureRecord other) {
+        return this.getEntryId() == other.getEntryId() 
+                && this.getFeatureId() == other.getFeatureId();
     }
 
     @Override
     public int hashCode() {
-        return 47 * (47 * 3 + this.headId) + this.contextId;
+        return 47 * (47 * 3 + this.entryId) + this.featureId;
     }
 
     @Override
-    public int compareTo(InstanceEntry that) {
-        return this.headId != that.headId
-                ? this.headId - that.headId
-                : this.contextId - that.contextId;
+    public int compareTo(EntryFeatureRecord that) {
+        return this.getEntryId() != that.getEntryId()
+                ? this.getEntryId() - that.getEntryId()
+                : this.getFeatureId() - that.getFeatureId();
     }
 }

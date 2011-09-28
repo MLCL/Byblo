@@ -32,7 +32,6 @@ package uk.ac.susx.mlcl.byblo.measure;
 
 /**
  *
- * @version 2nd December 2010
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public class Tanimoto extends Cosine {

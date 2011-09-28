@@ -33,7 +33,6 @@ package uk.ac.susx.mlcl.byblo.measure;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- * @version 2nd December 2010
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public class Hindle extends AbstractMIProximity implements Proximity {
@@ -51,10 +50,10 @@ public class Hindle extends AbstractMIProximity implements Proximity {
 
                 j++;
             } else { // Q.keys[i] == R.keys[j]
-                final double Cprob = contextProb(Q.keys[i]);
+                final double Cprob = featurePrior(Q.keys[i]);
                 final double Qprob = prob(Q, i);
                 if (Qprob > Cprob) {
-                    final double Rprob = prob(R,j);
+                    final double Rprob = prob(R, j);
                     if (Rprob > Cprob) {
                         sim += Math.log(Math.min(Qprob / Cprob, Rprob / Cprob));
                     }
@@ -90,6 +89,4 @@ public class Hindle extends AbstractMIProximity implements Proximity {
     public String toString() {
         return "Hindle{}";
     }
-
-
 }

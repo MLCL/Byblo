@@ -33,30 +33,27 @@ package uk.ac.susx.mlcl.byblo.allpairs;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.Seekable;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
-import uk.ac.susx.mlcl.lib.io.Source;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 27th March 2011
- * @param <T>
+ * @param <T> The atomic data type
+ * @param <P> Data offset type for seeking
  */
-public class Chunker<T, S> implements SeekableSource<Chunk<T>, S>, Closeable {
+public class Chunker<T, P> implements SeekableSource<Chunk<T>, P>, Closeable {
 
-//    private static final Logger LOG = Logger.getLogger(
-//            Chunker.class.getName());
+    private static final long DEFAULT_MAX_CHUNK_SIZE = 1000;
 
-    private long maxChunkSize = 1000;
+    private long maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
 
-    private final SeekableSource<T, S> inner;
+    private final SeekableSource<T, P> inner;
 
     private final boolean seekable;
 
-    public Chunker(SeekableSource<T, S> inner, long maxChunkSize) {
+    public Chunker(SeekableSource<T, P> inner, long maxChunkSize) {
         this.inner = inner;
         this.seekable = inner instanceof Seekable;
         this.maxChunkSize = maxChunkSize;
@@ -87,22 +84,20 @@ public class Chunker<T, S> implements SeekableSource<Chunk<T>, S>, Closeable {
         return inner.hasNext();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void position(S offset) throws IOException {
+    public void position(P offset) throws IOException {
         if (!seekable)
             throw new UnsupportedOperationException(
                     "Not supported by wrapped instance.");
-        ((Seekable) inner).position(offset);
+        ((Seekable<P>) inner).position(offset);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public S position() throws IOException {
+    public P position() throws IOException {
         if (!seekable)
             throw new UnsupportedOperationException(
                     "Not supported by wrapped instance.");
-        return (S)((Seekable) inner).position();
+        return ((Seekable<P>) inner).position();
     }
 
     @Override
@@ -112,57 +107,4 @@ public class Chunker<T, S> implements SeekableSource<Chunk<T>, S>, Closeable {
                     "Not supported by wrapped instance.");
         ((Closeable) inner).close();
     }
-//
-//    public void initialiseTask() throws IOException {
-//        // Initialise source B
-//
-//        if (restartChunk > 0) {
-//            long restartRecords = restartChunk * maxChunkSize;
-//            if (LOG.isLoggable(Level.INFO))
-//                LOG.log(Level.INFO,
-//                        "Skipping {0} chunks ({1} records).",
-//                        new Object[]{restartChunk, restartRecords});
-//            currentRecord += skip(restartRecords);
-//            currentChunk += restartChunk;
-//        }
-//    }
-//
-//    public void reset() throws IOException {
-//        inner.position(startPosition);
-//        currentChunk = 0;
-//        currentRecord = startRecord;
-//    }
-//
-//    private long skip(long count) throws IOException {
-//        int i = 0;
-//        while (i < count && inner.hasNext()) {
-//            inner.read();
-//            //                stats.incrementSourceReads();
-//            ++i;
-//        }
-//        return i;
-//    }
-//
-//    public boolean hasNextChunk() throws IOException {
-//        return currentRecord < endRecord && inner.hasNext();
-//    }
-//
-//    public Chunk<T> readChunk() throws IOException {
-//        int count = Math.min(maxChunkSize, endRecord - currentRecord);
-//        final List<T> items = new ArrayList<T>(
-//                count);
-//        final int start = currentRecord;
-//        final int id = currentChunk;
-//        int k = 0;
-//        while (k < count && inner.hasNext()) {
-//            T next = inner.read();
-////            if (validHeads.length > next.key() && validHeads[next.key()] > 0)
-//            items.add(next);
-//            ++k;
-//        }
-//        currentRecord += items.size();
-//        if (!items.isEmpty())
-//            ++currentChunk;
-//        return new Chunk<T>(items, start, id);
-//    }
 }

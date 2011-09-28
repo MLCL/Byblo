@@ -90,27 +90,27 @@ public class ExtCountTaskTest {
     @Test
     public void testRunOnFruit() throws Exception {
         System.out.println("Testing CountTask on " + FRUIT_INSTANCES);
-        final File heads = new File(OUTPUT, FRUIT_PREFIX + ".heads");
+        final File entries = new File(OUTPUT, FRUIT_PREFIX + ".entries");
         final File contexts = new File(OUTPUT, FRUIT_PREFIX + ".contexts");
         final File features = new File(OUTPUT, FRUIT_PREFIX + ".features");
 
-        final ExtCountTask countTask = new ExtCountTask(
-                FRUIT_INSTANCES, features, heads, contexts, CHARSET, 1000000);
+        final ExternalCountTask countTask = new ExternalCountTask(
+                FRUIT_INSTANCES, features, entries, contexts, CHARSET, 1000000);
         countTask.run();
 
         while (countTask.isExceptionThrown()) {
             countTask.throwException();
         }
 
-        assertTrue("Output files not created.", heads.exists()
+        assertTrue("Output files not created.", entries.exists()
                 && contexts.exists() && features.exists());
-        assertTrue("Empty output file found.", heads.length() > 0
+        assertTrue("Empty output file found.", entries.length() > 0
                 && contexts.length() > 0 && features.length() > 0);
 
-        // NB: Heads file differs due to indexing strategy
+        // NB: entries file differs due to indexing strategy
 
-//        assertTrue("Output heads file length differs from sampledata file.",
-//                heads.length() == new File(SAMPLE_DATA, heads.getName()).length());
+//        assertTrue("Output entries file length differs from sampledata file.",
+//                entries.length() == new File(SAMPLE_DATA, entries.getName()).length());
         assertTrue("Output context file length differs from sampledata file.",
                 contexts.length() == new File(SAMPLE_DATA, contexts.getName()).
                 length());
@@ -118,8 +118,8 @@ public class ExtCountTaskTest {
                 features.length() == new File(SAMPLE_DATA, features.getName()).
                 length());
 
-//        assertTrue("Output heads file differs from sampledata file.",
-//                Files.equal(heads, new File(SAMPLE_DATA, heads.getName())));
+//        assertTrue("Output entries file differs from sampledata file.",
+//                Files.equal(entries, new File(SAMPLE_DATA, entries.getName())));
         assertTrue("Output context file differs from sampledata file.",
                 Files.equal(contexts, new File(SAMPLE_DATA,
                 contexts.getName())));

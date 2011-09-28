@@ -44,7 +44,6 @@ import java.util.Comparator;
  *
  * @param <T>
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 15 March 2011
  */
 public class ReverseComparator<T>
         implements Comparator<T>, Serializable {

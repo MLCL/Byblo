@@ -30,47 +30,27 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import java.io.Serializable;
-
 /**
+ *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 27th March 2011
  */
-public final class ContextEntry implements Serializable {
+public class EntryRecord {
 
-    private static final long serialVersionUID = 63617210012669024L;
+    private final int entryId;
 
-//    private String context;
+    private final double weight;
 
-    private int id;
-
-    private double weight;
-
-    public ContextEntry(//String str,
-            final int tail_id, final double weight) {
-//        this.context = str;
-        this.id = tail_id;
+    public EntryRecord(final int entryId, final double weight) {
+        this.entryId = entryId;
         this.weight = weight;
     }
 
-    public final int getId() {
-        return id;
+    public int getEntryId() {
+        return entryId;
     }
 
-    public final double getWeight() {
+    public double getWeight() {
         return weight;
-    }
-//
-//    public final String getContext() {
-//        return context;
-//    }
-
-    @Override
-    public String toString() {
-        return "ContextEntry{"
-//                + "context=" + context
-                + "id=" + id
-                + "weight=" + weight + '}';
     }
 
     @Override
@@ -79,18 +59,19 @@ public final class ContextEntry implements Serializable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final ContextEntry other = (ContextEntry) obj;
-        if (this.id != other.id)
+        final EntryRecord other = (EntryRecord) obj;
+        if (this.entryId != other.entryId)
             return false;
         return true;
     }
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 29 * hash + this.id;
-        return hash;
+        return 71 * 3 + this.entryId;
     }
 
-
+    @Override
+    public String toString() {
+        return "EntryRecord{" + ", entryId=" + entryId + ", weight=" + weight + '}';
+    }
 }

@@ -41,7 +41,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * All-Pairs process, that can be used for debugging and performance evaluation.
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 27th March 2011
  */
 public class ApssStats implements Serializable {
 
@@ -147,7 +146,8 @@ public class ApssStats implements Serializable {
 
     @Override
     public String toString() {
-        return "ApssStats{" + "candidates=" + candidates
+        return "ApssStats{" 
+                + "candidates=" + candidates
                 + ", comparisons=" + comparisons
                 + ", productions=" + productions
                 + ", srcReads=" + srcReads + '}';

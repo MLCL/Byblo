@@ -41,31 +41,30 @@ import java.util.logging.Logger;
 
 /**
  * 
- * @version 2nd December 2010
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(commandDescription = "USAGE_KNN_COMMAND")
-public class ExtKnnTask extends ExtSortTask {
+@Parameters(commandDescription = "Perform k-nearest-neighbours on a similarity file.")
+public class ExternalKnnTask extends ExternalSortTask {
 
     private static final Logger LOG =
-            Logger.getLogger(ExtKnnTask.class.getName());
+            Logger.getLogger(ExternalKnnTask.class.getName());
 
     public static final int DEFAULT_K = 100;
 
-    @Parameter(names = {"-k"}, descriptionKey = "USAGE_K")
+    @Parameter(names = {"-k"}, description = "The number of neighbours to produce for each base entry.")
     private int k = DEFAULT_K;
 
-    public ExtKnnTask(File sourceFile, File destinationFile, Charset charset,
+    public ExternalKnnTask(File sourceFile, File destinationFile, Charset charset,
                       Comparator<String> comparator, int maxChunkSize, int k) {
         super(sourceFile, destinationFile, charset, comparator, maxChunkSize);
         setK(k);
     }
 
-    public ExtKnnTask(File sourceFile, File destinationFile, Charset charset, int k) {
+    public ExternalKnnTask(File sourceFile, File destinationFile, Charset charset, int k) {
         super(sourceFile, destinationFile, charset);
         setK(k);
     }
-    public ExtKnnTask() {
+    public ExternalKnnTask() {
         super();
     }
 
@@ -113,22 +112,22 @@ public class ExtKnnTask extends ExtSortTask {
             MergeTask mergeTask = (MergeTask) task;
             submitTask(new DeleteTask(mergeTask.getSourceFileA()));
             submitTask(new DeleteTask(mergeTask.getSourceFileB()));
-            submitTask(new MemKnnTask(mergeTask.getDestFile(),
+            submitTask(new KnnTask(mergeTask.getDestFile(),
                                      mergeTask.getDestFile(),
                                      getCharset(),
                                      getComparator(), getK()));
 
-        } else if (task.getClass().equals(MemSortTask.class)) {
+        } else if (task.getClass().equals(SortTask.class)) {
 
-            MemSortTask sortTask = (MemSortTask) task;
-            submitTask(new MemKnnTask(sortTask.getDstFile(),
+            SortTask sortTask = (SortTask) task;
+            submitTask(new KnnTask(sortTask.getDstFile(),
                                      sortTask.getDstFile(),
                                      getCharset(),
                                      getComparator(), getK()));
 
-        } else if (task.getClass().equals(MemKnnTask.class)) {
+        } else if (task.getClass().equals(KnnTask.class)) {
 
-            MemKnnTask knnTask = (MemKnnTask) task;
+            KnnTask knnTask = (KnnTask) task;
             queueMergeTask(knnTask.getDstFile());
 
         } else if (task.getClass().equals(DeleteTask.class)) {

@@ -44,7 +44,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * A simple of bi-map for indexing complex objects (usually strings).
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 15th March 2011
  */
 public final class ObjectIndex<T> implements Serializable {
 

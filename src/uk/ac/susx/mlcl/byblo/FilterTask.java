@@ -30,24 +30,21 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import uk.ac.susx.mlcl.lib.io.TempFileFactoryConverter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Function;
-import com.google.common.base.Functions;
 import static com.google.common.base.Preconditions.*;
 import com.google.common.base.Predicate;
 import static uk.ac.susx.mlcl.lib.Predicates2.*;
 import com.google.common.io.Files;
-import uk.ac.susx.mlcl.byblo.AllPairsCommand.DoubleConverter;
-import uk.ac.susx.mlcl.byblo.io.ContextEntry;
-import uk.ac.susx.mlcl.byblo.io.ContextSink;
-import uk.ac.susx.mlcl.byblo.io.ContextSource;
-import uk.ac.susx.mlcl.byblo.io.FeatureEntry;
+import uk.ac.susx.mlcl.byblo.AllPairsTask.DoubleConverter;
+import uk.ac.susx.mlcl.byblo.io.FeatureRecord;
 import uk.ac.susx.mlcl.byblo.io.FeatureSink;
 import uk.ac.susx.mlcl.byblo.io.FeatureSource;
-import uk.ac.susx.mlcl.byblo.io.HeadEntry;
-import uk.ac.susx.mlcl.byblo.io.HeadSink;
-import uk.ac.susx.mlcl.byblo.io.HeadSource;
+import uk.ac.susx.mlcl.byblo.io.EntryRecord;
+import uk.ac.susx.mlcl.byblo.io.EntrySink;
+import uk.ac.susx.mlcl.byblo.io.EntrySource;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.ObjectIndex;
 import uk.ac.susx.mlcl.lib.Predicates2;
@@ -67,6 +64,9 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureRecord;
+import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureSink;
+import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureSource;
 
 /**
  *
@@ -74,160 +74,164 @@ import org.apache.commons.logging.LogFactory;
  *  intelligently. If, for e.g, one predicate was found to be implied by another
  *  then only the stronger need be taken.
  *
- * @author hamish
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(commandDescription = "",
-            resourceBundle = "uk.ac.susx.mlcl.byblo.strings")
+@Parameters(commandDescription = "Filter a set of frequency files")
 public class FilterTask extends AbstractTask implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Log LOG = LogFactory.getLog(MemCountTask.class);
+    private static final Log LOG = LogFactory.getLog(CountTask.class);
 
     /**
      * Number of records to read or write between progress updates.
      */
     private static final int PROGRESS_INTERVAL = 1000000;
 
-    @Parameter(names = {"-if", "--input-features"},
-               required = true,
-               descriptionKey = "uk.ac.susx.mlcl.byblo.FilterHeadsTask.INPUT_FEATURES_DESCRIPTION")
-    private File inputFeatures;
+    /*
+     * === INPUT FILES ===
+     */
+    @Parameter(names = {"-ief", "--input-entry-features"}, required = true,
+               description = "Input entry/feature pair frequencies file.")
+    private File inputEntryFeaturesFile;
 
-    @Parameter(names = {"-ih", "--input-heads"},
-               required = true,
-               descriptionKey = "uk.ac.susx.mlcl.byblo.FilterHeadsTask.INPUT_HEADS_DESCRIPTION")
-    private File inputHeads;
+    @Parameter(names = {"-ie", "--input-entries"}, required = true,
+               description = "Input entry frequencies file.")
+    private File inputEntriesFile;
 
-    @Parameter(names = {"-ic", "--input-contexts"},
-               required = true,
-               descriptionKey = "uk.ac.susx.mlcl.byblo.FilterHeadsTask.INPUT_CONTEXTS_DESCRIPTION")
-    private File inputContexts;
+    @Parameter(names = {"-if", "--input-features"}, required = true,
+               description = "Input features frequencies file.")
+    private File inputFeaturesFile;
 
-    @Parameter(names = {"-of", "--output-features"},
-               required = true,
-               descriptionKey = "uk.ac.susx.mlcl.byblo.FilterHeadsTask.OUTPUT_FEATURES_DESCRIPTION")
-    private File outputFeatures;
+    /*
+     * === OUTPUT FILES ===
+     */
+    @Parameter(names = {"-oef", "--output-entry-features"}, required = true,
+               description = "Output entry/feature pair frequencies file.")
+    private File outputEntryFeaturesFile;
 
-    @Parameter(names = {"-oh", "--output-heads"},
-               required = true,
-               descriptionKey = "uk.ac.susx.mlcl.byblo.FilterHeadsTask.OUTPUT_HEADS_DESCRIPTION")
-    private File outputHeads;
+    @Parameter(names = {"-oe", "--output-entries"}, required = true,
+               description = "Output entry frequencies file")
+    private File outputEntriesFile;
 
-    @Parameter(names = {"-oc", "--output-contexts"},
-               required = true,
-               descriptionKey = "uk.ac.susx.mlcl.byblo.FilterHeadsTask.OUTPUT_CONTEXTS_DESCRIPTION")
-    private File outputContexts;
+    @Parameter(names = {"-of", "--output-features"}, required = true,
+               description = "Output features frequencies file.")
+    private File outputFeaturesFile;
 
+    /*
+     * === CHARACTER ENCODING ===
+     */
     @Parameter(names = {"-c", "--charset"},
-               descriptionKey = "uk.ac.susx.mlcl.byblo.FilterHeadsTask.CHARSET_DESCRIPTION")
+               description = "Character encoding to use for both input and output.")
     private Charset charset = IOUtil.DEFAULT_CHARSET;
 
-    @Parameter(names = {"-fhf", "--filter-head-freq"},
-               descriptionKey = "uk.ac.susx.mlcl.byblo.FilterHeadsTask.FILTER_HEAD_FREQUENCY_DESCRIPTION",
+    /*
+     * === FILTER PARAMATERISATION ===
+     */
+    @Parameter(names = {"-fef", "--filter-entry-freq"},
+               description = "Minimum entry pair frequency threshold.",
                converter = DoubleConverter.class)
-    private double filterHeadMinFreq;
+    private double filterEntryMinFreq;
 
-    @Parameter(names = {"-fhw", "--filter-head-wordlist"},
-               descriptionKey = "uk.ac.susx.mlcl.byblo.FilterHeadsTask.FILTER_HEAD_WORDLIST_DESCRIPTION")
-    private File filterHeadWhitelist;
+    @Parameter(names = {"-few", "--filter-entry-whitelist"},
+               description = "Whitelist file containing entries of interest. (All others will be ignored)")
+    private File filterEntryWhitelist;
 
-    @Parameter(names = {"-fhp", "--filter-head-pattern"},
-               descriptionKey = "uk.ac.susx.mlcl.byblo.FilterHeadsTask.FILTER_HEAD_PATTERN_DESCRIPTION")
-    private String filterHeadPattern;
+    @Parameter(names = {"-fep", "--filter-entry-pattern"},
+               description = "Regular expresion that accepted entries must match.")
+    private String filterEntryPattern;
+
+    @Parameter(names = {"-feff", "--filter-entry-feature-freq"},
+               description = "Minimum entry/feature pair frequency threshold.",
+               converter = DoubleConverter.class)
+    private double filterEntryFeatureMinFreq;
 
     @Parameter(names = {"-fff", "--filter-feature-freq"},
-               descriptionKey = "uk.ac.susx.mlcl.byblo.FilterHeadsTask.FILTER_FEATURE_FREQUENCY_DESCRIPTION",
+               description = "Minimum feature pair frequency threshold.",
                converter = DoubleConverter.class)
     private double filterFeatureMinFreq;
 
-    @Parameter(names = {"-fcf", "--filter-context-freq"},
-               descriptionKey = "uk.ac.susx.mlcl.byblo.FilterHeadsTask.FILTER_CONTEXT_FREQUENCY_DESCRIPTION",
-               converter = DoubleConverter.class)
-    private double filterContextMinFreq;
+    @Parameter(names = {"-ffw", "--filter-feature-whitelist"},
+               description = "Whitelist file containing features of interest. (All others will be ignored)")
+    private File filterFeatureWhitelist;
 
-    @Parameter(names = {"-fcw", "--filter-context-wordlist"},
-               descriptionKey = "uk.ac.susx.mlcl.byblo.FilterHeadsTask.FILTER_CONTEXT_WORDLIST_DESCRIPTION")
-    private File filterContextWhitelist;
-
-    @Parameter(names = {"-fcp", "--filter-context-pattern"},
-               descriptionKey = "uk.ac.susx.mlcl.byblo.FilterHeadsTask.FILTER_CONTEXT_PATTERN_DESCRIPTION")
-    private String filterContextPattern;
+    @Parameter(names = {"-ffp", "--filter-feature-pattern"},
+               description = "Regular expresion that accepted features must match.")
+    private String filterFeaturePattern;
 
     @Parameter(names = {"-T", "--temp-dir"},
-               descriptionKey = "USAGE_TEMP_DIR",
+               description = "Temorary directory which will be used during filtering.",
                converter = TempFileFactoryConverter.class)
     private FileFactory tempFiles = new TempFileFactory("temp", ".txt");
-    //
-    //===============================
-    //
-    //
 
-    private Predicate<HeadEntry> acceptHead = alwaysTrue();
+    /*
+     * === INTERNAL ===
+     */
+    private Predicate<EntryRecord> acceptEntry = alwaysTrue();
 
-    private Predicate<FeatureEntry> acceptFeature = alwaysTrue();
+    private Predicate<WeightedEntryFeatureRecord> acceptEntryFeature = alwaysTrue();
 
-    private Predicate<ContextEntry> acceptContext = alwaysTrue();
+    private Predicate<FeatureRecord> acceptFeature = alwaysTrue();
 
-    private boolean headFilterRequired = false;
+    private boolean entryFilterRequired = false;
+
+    private boolean entryFeatureFilterRequired = false;
 
     private boolean featureFilterRequired = false;
 
-    private boolean contextFilterRequired = false;
+    final ObjectIndex<String> entryIndex = new ObjectIndex<String>();
 
-    final ObjectIndex<String> headIndex = new ObjectIndex<String>();
+    final ObjectIndex<String> featureIndex = new ObjectIndex<String>();
 
-    final ObjectIndex<String> contextIndex = new ObjectIndex<String>();
+    private File activeEntryFeaturesFile;
+
+    private File activeEntriesFile;
 
     private File activeFeaturesFile;
 
-    private File activeHeadsFile;
-
-    private File activeContextsFile;
-
     public FilterTask() {
-//        setCharset(IOUtil.DEFAULT_CHARSET);
     }
 
-    public FilterTask(File inputFeatures, File inputHeads,
-            File inputContexts, File outputFeatures,
-            File outputHeads, File outputContexts,
+    public FilterTask(
+            File inputEntryFeaturesFile, File inputEntriesFile,
+            File inputFeaturesFile, File outputEntryFeaturesFile,
+            File outputEntriesFile, File outputFeaturesFile,
             Charset charset) {
         setCharset(charset);
-        setInputContexts(inputContexts);
-        setInputFeatures(inputFeatures);
-        setInputHeads(inputHeads);
-        setOutputContexts(outputContexts);
-        setOutputFeatures(outputFeatures);
-        setOutputHeads(outputHeads);
+        setInputFeaturesFile(inputFeaturesFile);
+        setInputEntryFeaturesFile(inputEntryFeaturesFile);
+        setInputEntriesFile(inputEntriesFile);
+        setOutputFeaturesFile(outputFeaturesFile);
+        setOutputEntryFeaturesFile(outputEntryFeaturesFile);
+        setOutputEntriesFile(outputEntriesFile);
     }
 
     @Override
     protected void initialiseTask() throws Exception {
 
-        if (filterContextMinFreq > 0)
-            addContextMinimumFrequency(filterContextMinFreq);
-        if (filterContextPattern != null)
-            addContextPattern(filterContextPattern);
-        if (filterContextWhitelist != null)
-            addContextWhitelist(Files.readLines(
-                    filterContextWhitelist, charset));
-
-        if (filterHeadMinFreq > 0)
-            addHeadMinimumFrequency(filterHeadMinFreq);
-        if (filterHeadPattern != null)
-            addHeadPattern(filterHeadPattern);
-        if (filterHeadWhitelist != null)
-            addHeadWhitelist(Files.readLines(
-                    filterHeadWhitelist, charset));
-
         if (filterFeatureMinFreq > 0)
-            addFeatureMinimumFrequency(filterFeatureMinFreq);
+            addFeaturesMinimumFrequency(filterFeatureMinFreq);
+        if (filterFeaturePattern != null)
+            addFeaturesPattern(filterFeaturePattern);
+        if (filterFeatureWhitelist != null)
+            addFeaturesWhitelist(Files.readLines(
+                    filterFeatureWhitelist, charset));
+
+        if (filterEntryMinFreq > 0)
+            addEntryMinimumFrequency(filterEntryMinFreq);
+        if (filterEntryPattern != null)
+            addEntryPattern(filterEntryPattern);
+        if (filterEntryWhitelist != null)
+            addEntryWhitelist(Files.readLines(
+                    filterEntryWhitelist, charset));
+
+        if (filterEntryFeatureMinFreq > 0)
+            addEntryFeatureMinimumFrequency(filterEntryFeatureMinFreq);
 
         checkState();
-        activeFeaturesFile = inputFeatures;
-        activeHeadsFile = inputHeads;
-        activeContextsFile = inputContexts;
+        activeEntryFeaturesFile = inputEntryFeaturesFile;
+        activeEntriesFile = inputEntriesFile;
+        activeFeaturesFile = inputFeaturesFile;
     }
 
     @Override
@@ -244,146 +248,147 @@ public class FilterTask extends AbstractTask implements Serializable {
 
         int passCount = 0;
 
-        while (headFilterRequired
-                || featureFilterRequired
-                || contextFilterRequired) {
+        while (entryFilterRequired
+                || entryFeatureFilterRequired
+                || featureFilterRequired) {
 
-            if (headFilterRequired || featureFilterRequired) {
-                // forwards pass
-                LOG.info(
-                        "Running forwards filtering pass (#" + (++passCount) + ").");
+            if (entryFilterRequired || entryFeatureFilterRequired) {
+                if (LOG.isInfoEnabled())
+                    LOG.info(
+                            "Running forwards filtering pass (#" + (++passCount) + ").");
 
-                if (headFilterRequired)
-                    filterHeads();
+                if (entryFilterRequired)
+                    filterEntries();
+
+                if (entryFeatureFilterRequired)
+                    filterEntryFeatures();
 
                 if (featureFilterRequired)
                     filterFeatures();
-
-                if (contextFilterRequired)
-                    filterContexts();
             }
 
-            if (contextFilterRequired || featureFilterRequired) {
-                LOG.info(
-                        "Running backwards filtering pass (#" + (++passCount) + ").");
-
-                if (contextFilterRequired)
-                    filterContexts();
+            if (featureFilterRequired || entryFeatureFilterRequired) {
+                if (LOG.isInfoEnabled())
+                    LOG.info(
+                            "Running backwards filtering pass (#" + (++passCount) + ").");
 
                 if (featureFilterRequired)
                     filterFeatures();
 
-                if (headFilterRequired)
-                    filterHeads();
+                if (entryFeatureFilterRequired)
+                    filterEntryFeatures();
+
+                if (entryFilterRequired)
+                    filterEntries();
             }
         }
 
         // Finished filtering so copy the results files to the outputs.
 
         if (LOG.isInfoEnabled())
-            LOG.info("Copying heads from " + activeHeadsFile
-                    + " to " + outputHeads + ".");
-        Files.copy(activeHeadsFile, outputHeads);
+            LOG.info("Copying entries from " + activeEntriesFile
+                    + " to " + outputEntriesFile + ".");
+        Files.copy(activeEntriesFile, outputEntriesFile);
+
+        if (LOG.isInfoEnabled())
+            LOG.info("Copying features from " + activeEntryFeaturesFile
+                    + " to " + outputEntryFeaturesFile + ".");
+        Files.copy(activeEntryFeaturesFile, outputEntryFeaturesFile);
 
         if (LOG.isInfoEnabled())
             LOG.info("Copying features from " + activeFeaturesFile
-                    + " to " + outputFeatures + ".");
-        Files.copy(activeFeaturesFile, outputFeatures);
-
-        if (LOG.isInfoEnabled())
-            LOG.info("Copying contexts from " + activeContextsFile
-                    + " to " + outputContexts + ".");
-        Files.copy(activeContextsFile, outputContexts);
+                    + " to " + outputFeaturesFile + ".");
+        Files.copy(activeFeaturesFile, outputFeaturesFile);
 
         if (LOG.isInfoEnabled())
             LOG.info("Completed " + this + ". (thread:" + Thread.currentThread().
                     getName() + ")");
     }
-    // Read the heads file, passing it thought the filter. accepted entries
+    // Read the entries file, passing it thought the filter. accepted entries
     // are written out to the output file while rejected entries are stored
-    // for filtering the features.
+    // for filtering the AllPairsTask.
 
-    private void filterHeads()
+    private void filterEntries()
             throws FileNotFoundException, IOException {
 
         final IntSet rejected = new IntOpenHashSet();
 
-        HeadSource headSource = new HeadSource(
-                activeHeadsFile, charset, headIndex);
+        EntrySource entriesSource = new EntrySource(
+                activeEntriesFile, charset, entryIndex);
 
         File outputFile = tempFiles.createFile();
         outputFile.deleteOnExit();
 
-        HeadSink headSink = new HeadSink(outputFile, charset, headIndex);
+        EntrySink entriesSink = new EntrySink(outputFile, charset, entryIndex);
 
         if (LOG.isInfoEnabled())
             LOG.info(
-                    "Filtering heads from " + activeHeadsFile + " to " + outputFile + ".");
+                    "Filtering entries from " + activeEntriesFile + " to " + outputFile + ".");
 
-        while (headSource.hasNext()) {
-            HeadEntry entry = headSource.read();
-            if (acceptHead.apply(entry)) {
-                headSink.write(entry);
+        while (entriesSource.hasNext()) {
+            EntryRecord entry = entriesSource.read();
+            if (acceptEntry.apply(entry)) {
+                entriesSink.write(entry);
             } else {
-                rejected.add(entry.getHeadId());
+                rejected.add(entry.getEntryId());
             }
-            if ((headSource.getCount() % PROGRESS_INTERVAL == 0 || !headSource.
+            if ((entriesSource.getCount() % PROGRESS_INTERVAL == 0 || !entriesSource.
                     hasNext())
                     && LOG.isInfoEnabled()) {
                 LOG.info(
-                        "Read " + headSource.getCount()
-                        + " head entries."
-                        + "(" + (int) headSource.percentRead() + "% complete)");
+                        "Read " + entriesSource.getCount()
+                        + " entry entries."
+                        + "(" + (int) entriesSource.percentRead() + "% complete)");
                 LOG.debug(MiscUtil.memoryInfoString());
             }
         }
-        headSink.flush();
-        headSink.close();
-        headFilterRequired = false;
-        activeHeadsFile = outputFile;
+        entriesSink.flush();
+        entriesSink.close();
+        entryFilterRequired = false;
+        activeEntriesFile = outputFile;
 
         // Update the feature acceptance predicate
         if (rejected.size() > 0) {
-            featureFilterRequired = true;
-            acceptFeature = and(acceptFeature,
-                    compose(not(in(rejected)), featureHeadId()));
+            entryFeatureFilterRequired = true;
+            acceptEntryFeature = and(acceptEntryFeature,
+                    compose(not(in(rejected)), entryFeatureEntryId()));
         }
     }
 
-    // Filter the features file, rejecting all entires that contain heads
-    // dropped in the heads file filter pass. Store a list of contexts that
-    // only appear in filtered heads to filter the contexts file.
-    private void filterFeatures()
+    // Filter the AllPairsTask file, rejecting all entires that contain entries
+    // dropped in the entries file filter pass. Store a list of featuress that
+    // only appear in filtered entries to filter the featuress file.
+    private void filterEntryFeatures()
             throws FileNotFoundException, IOException {
-        IntSet acceptedHeads = new IntOpenHashSet();
-        IntSet rejectedHeads = new IntOpenHashSet();
+        IntSet acceptedEntries = new IntOpenHashSet();
+        IntSet rejectedEntries = new IntOpenHashSet();
 
-        IntSet rejectedContexts = new IntOpenHashSet();
-        IntSet acceptedContexts = new IntOpenHashSet();
+        IntSet rejectedFeatures = new IntOpenHashSet();
+        IntSet acceptedFeatures = new IntOpenHashSet();
 
-        FeatureSource featuresSource = new FeatureSource(
-                activeFeaturesFile, charset, headIndex, contextIndex);
+        WeightedEntryFeatureSource featuresSource = new WeightedEntryFeatureSource(
+                activeEntryFeaturesFile, charset, entryIndex, featureIndex);
 
         File outputFile = tempFiles.createFile();
         outputFile.deleteOnExit();
 
-        FeatureSink featuresSink = new FeatureSink(
+        WeightedEntryFeatureSink entryFeaturesSink = new WeightedEntryFeatureSink(
                 outputFile, charset,
-                headIndex, contextIndex);
+                entryIndex, featureIndex);
 
         if (LOG.isInfoEnabled())
             LOG.info(
-                    "Filtering features from " + activeFeaturesFile + " to " + outputFile + ".");
+                    "Filtering entry/features pairs from " + activeEntryFeaturesFile + " to " + outputFile + ".");
 
         while (featuresSource.hasNext()) {
-            FeatureEntry entry = featuresSource.read();
-            if (acceptFeature.apply(entry)) {
-                featuresSink.write(entry);
-                acceptedContexts.add(entry.getContextId());
-                acceptedHeads.add(entry.getHeadId());
+            WeightedEntryFeatureRecord entry = featuresSource.read();
+            if (acceptEntryFeature.apply(entry)) {
+                entryFeaturesSink.write(entry);
+                acceptedFeatures.add(entry.getFeatureId());
+                acceptedEntries.add(entry.getEntryId());
             } else {
-                rejectedContexts.add(entry.getContextId());
-                rejectedHeads.add(entry.getHeadId());
+                rejectedFeatures.add(entry.getFeatureId());
+                rejectedEntries.add(entry.getEntryId());
             }
 
 
@@ -395,78 +400,78 @@ public class FilterTask extends AbstractTask implements Serializable {
                 LOG.debug(MiscUtil.memoryInfoString());
             }
         }
-        featuresSink.flush();
-        featuresSink.close();
-        featureFilterRequired = false;
-        activeFeaturesFile = outputFile;
+        entryFeaturesSink.flush();
+        entryFeaturesSink.close();
+        entryFeatureFilterRequired = false;
+        activeEntryFeaturesFile = outputFile;
 
-        rejectedContexts.removeAll(acceptedContexts);
-        rejectedHeads.removeAll(acceptedHeads);
+        rejectedFeatures.removeAll(acceptedFeatures);
+        rejectedEntries.removeAll(acceptedEntries);
 
-        if (rejectedHeads.size() > 0) {
-            acceptHead = and(acceptHead,
-                    compose(not(in(rejectedHeads)), headId()));
-            headFilterRequired = true;
+        if (rejectedEntries.size() > 0) {
+            acceptEntry = and(acceptEntry,
+                    compose(not(in(rejectedEntries)), entryId()));
+            entryFilterRequired = true;
         }
 
-        if (rejectedContexts.size() > 0) {
-            acceptContext = and(acceptContext,
-                    not(compose(in(rejectedContexts), contextId())));
-            contextFilterRequired = true;
+        if (rejectedFeatures.size() > 0) {
+            acceptFeature = and(acceptFeature,
+                    not(compose(in(rejectedFeatures), featureId())));
+            featureFilterRequired = true;
 
         }
     }
 
-    // Filter the contexts file, rejecting all entries that where found to
-    // be only used by filtered heads.
-    private void filterContexts()
+    // Filter the AllPairsTask file, rejecting all entries that where found to
+    // be only used by filtered entries.
+    private void filterFeatures()
             throws FileNotFoundException, IOException {
-        IntSet rejectedContexts = new IntOpenHashSet();
+        IntSet rejectedFeatures = new IntOpenHashSet();
 
-        ContextSource contextSource = new ContextSource(
-                activeContextsFile, charset, contextIndex);
+        FeatureSource featureSource = new FeatureSource(
+                activeFeaturesFile, charset, featureIndex);
 
         File outputFile = tempFiles.createFile();
         outputFile.deleteOnExit();
 
-        ContextSink contextSink = new ContextSink(
-                outputFile, charset, contextIndex);
+        FeatureSink featureSink = new FeatureSink(
+                outputFile, charset, featureIndex);
 
         if (LOG.isInfoEnabled())
             LOG.info(
-                    "Filtering contexts from " + activeContextsFile + " to " + outputFile + ".");
+                    "Filtering features from " + activeFeaturesFile + " to " + outputFile + ".");
 
-        while (contextSource.hasNext()) {
-            ContextEntry entry = contextSource.read();
+        while (featureSource.hasNext()) {
+            FeatureRecord feature = featureSource.read();
 
-            if (acceptContext.apply(entry)) {
-                contextSink.write(entry);
+            if (acceptFeature.apply(feature)) {
+                featureSink.write(feature);
             } else {
-                rejectedContexts.add(entry.getId());
+                rejectedFeatures.add(feature.getFeatureId());
             }
 
-            if ((contextSource.getCount() % PROGRESS_INTERVAL == 0
-                    || !contextSource.hasNext())
+            if ((featureSource.getCount() % PROGRESS_INTERVAL == 0
+                    || !featureSource.hasNext())
                     && LOG.isInfoEnabled()) {
                 LOG.info(
-                        "Read " + contextSource.getCount()
-                        + " context entries."
-                        + "(" + (int) contextSource.percentRead() + "% complete)");
+                        "Read " + featureSource.getCount()
+                        + " features."
+                        + "(" + (int) featureSource.percentRead() + "% complete)");
                 LOG.debug(MiscUtil.memoryInfoString());
             }
         }
-        contextSink.flush();
-        contextSink.close();
-        contextFilterRequired = false;
-        activeContextsFile = outputFile;
+        featureSink.flush();
+        featureSink.close();
+        featureFilterRequired = false;
+        activeFeaturesFile = outputFile;
 
         // Update the feature acceptance predicate
-        if (rejectedContexts.size() > 0) {
+        if (rejectedFeatures.size() > 0) {
 
-            featureFilterRequired = true;
-            acceptFeature = and(
-                    acceptFeature,
-                    compose(not(in(rejectedContexts)), featureContextId()));
+            entryFeatureFilterRequired = true;
+            acceptEntryFeature = and(
+                    acceptEntryFeature,
+                    compose(not(in(rejectedFeatures)), entryFeatureFeatureId()));
 
         }
     }
@@ -474,31 +479,30 @@ public class FilterTask extends AbstractTask implements Serializable {
     @Override
     public String toString() {
         return "FilterTask{"
-                + "inputFeatures=" + inputFeatures
-                + ", inputHeads=" + inputHeads
-                + ", inputContexts=" + inputContexts
-                + ", outputFeatures=" + outputFeatures
-                + ", outputHeads=" + outputHeads
-                + ", outputContexts=" + outputContexts
+                + "inputEntryFeaturesFile=" + inputEntryFeaturesFile
+                + ", inputEntriesFile=" + inputEntriesFile
+                + ", inputFeaturesFile=" + inputFeaturesFile
+                + ", outputEntryFeaturesFile=" + outputEntryFeaturesFile
+                + ", outputEntriesFile=" + outputEntriesFile
+                + ", outputFeaturesFile=" + outputFeaturesFile
                 + ", charset=" + charset
                 + ", filters={"
-                + "HeadMinFreq=" + filterHeadMinFreq
-                + ", HeadWhitelist=" + filterHeadWhitelist
-                + ", HeadPattern=" + filterHeadPattern
+                + "EntryMinFreq=" + filterEntryMinFreq
+                + ", EntryWhitelist=" + filterEntryWhitelist
+                + ", EntryPattern=" + filterEntryPattern
+                + ", EntryFeatureMinFreq=" + filterEntryFeatureMinFreq
                 + ", FeatureMinFreq=" + filterFeatureMinFreq
-                + ", ContextMinFreq=" + filterContextMinFreq
-                + ", ContextWhitelist=" + filterContextWhitelist
-                + ", ContextPattern=" + filterContextPattern
+                + ", FeatureWhitelist=" + filterFeatureWhitelist
+                + ", FeaturePattern=" + filterFeaturePattern
                 + "}"
-                + ", acceptHead=" + acceptHead
+                + ", acceptEntry=" + acceptEntry
+                + ", acceptEntryFeature=" + acceptEntryFeature
                 + ", acceptFeature=" + acceptFeature
-                + ", acceptContext=" + acceptContext
                 + '}';
     }
 
     @Override
     protected void finaliseTask() throws Exception {
-//        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public final Charset getCharset() {
@@ -509,198 +513,198 @@ public class FilterTask extends AbstractTask implements Serializable {
         this.charset = checkNotNull(charset);
     }
 
-    public final File getInputContexts() {
-        return inputContexts;
+    public final File getInputFeaturesFile() {
+        return inputFeaturesFile;
     }
 
-    public final void setInputContexts(File inputContexts) {
-        this.inputContexts = checkNotNull(inputContexts);
+    public final void setInputFeaturesFile(File inputFeaturesFile) {
+        this.inputFeaturesFile = checkNotNull(inputFeaturesFile);
     }
 
-    public final File getInputFeatures() {
-        return inputFeatures;
+    public final File getInputEntryFeaturesFile() {
+        return inputEntryFeaturesFile;
     }
 
-    public final void setInputFeatures(File inputFeatures) {
-        this.inputFeatures = checkNotNull(inputFeatures);
+    public final void setInputEntryFeaturesFile(File inputEntryFeaturesFile) {
+        this.inputEntryFeaturesFile = checkNotNull(inputEntryFeaturesFile);
     }
 
-    public final File getInputHeads() {
-        return inputHeads;
+    public final File getInputEntriesFile() {
+        return inputEntriesFile;
     }
 
-    public final void setInputHeads(File inputHeads) {
-        this.inputHeads = checkNotNull(inputHeads);
+    public final void setInputEntriesFile(File inputEntriesFile) {
+        this.inputEntriesFile = checkNotNull(inputEntriesFile);
     }
 
-    public final File getOutputContexts() {
-        return outputContexts;
+    public final File getOutputFeaturesFile() {
+        return outputFeaturesFile;
     }
 
-    public final void setOutputContexts(File outputContexts) {
-        this.outputContexts = checkNotNull(outputContexts);
+    public final void setOutputFeaturesFile(File outputFeaturesFile) {
+        this.outputFeaturesFile = checkNotNull(outputFeaturesFile);
     }
 
-    public final File getOutputFeatures() {
-        return outputFeatures;
+    public final File getOutputEntryFeaturesFile() {
+        return outputEntryFeaturesFile;
     }
 
-    public final void setOutputFeatures(File outputFeatures) {
-        this.outputFeatures = checkNotNull(outputFeatures);
+    public final void setOutputEntryFeaturesFile(File outputEntryFeaturesFile) {
+        this.outputEntryFeaturesFile = checkNotNull(outputEntryFeaturesFile);
     }
 
-    public final File getOutputHeads() {
-        return outputHeads;
+    public final File getOutputEntriesFile() {
+        return outputEntriesFile;
     }
 
-    public final void setOutputHeads(File outputHeads) {
-        this.outputHeads = checkNotNull(outputHeads);
+    public final void setOutputEntriesFile(File outputEntriesFile) {
+        this.outputEntriesFile = checkNotNull(outputEntriesFile);
     }
 
-    public Predicate<ContextEntry> getAcceptContext() {
-        return acceptContext;
-    }
-
-    public void setAcceptContext(Predicate<ContextEntry> acceptContext) {
-        if (!acceptContext.equals(this.acceptContext)) {
-            this.acceptContext = acceptContext;
-            contextFilterRequired = true;
-        }
-    }
-
-    public void addContextMinimumFrequency(double threshold) {
-        setAcceptContext(Predicates2.<ContextEntry>and(
-                getAcceptContext(),
-                compose(gte(threshold), contextFreq())));
-    }
-
-    public void addContextMaximumFrequency(double threshold) {
-        setAcceptContext(Predicates2.<ContextEntry>and(
-                getAcceptContext(),
-                compose(lte(threshold), contextFreq())));
-    }
-
-    public void addContextFrequencyRange(double min, double max) {
-        setAcceptContext(Predicates2.<ContextEntry>and(
-                getAcceptContext(),
-                compose(inRange(min, max), contextFreq())));
-    }
-
-    public void addContextPattern(String pattern) {
-        setAcceptContext(Predicates2.<ContextEntry>and(
-                getAcceptContext(),
-                compose(containsPattern(pattern), contextString())));
-    }
-
-    public void addContextWhitelist(List<String> strings) {
-        IntSet contextIdSet = new IntOpenHashSet();
-        for (String string : strings) {
-            final int id = contextIndex.get(string);
-            contextIdSet.add(id);
-        }
-        setAcceptContext(Predicates2.<ContextEntry>and(
-                getAcceptContext(),
-                compose(in(contextIdSet), contextId())));
-
-    }
-
-    public void addContextBlacklist(List<String> strings) {
-        IntSet contextIdSet = new IntOpenHashSet();
-        for (String string : strings) {
-            final int id = contextIndex.get(string);
-            contextIdSet.add(id);
-        }
-        setAcceptContext(Predicates2.<ContextEntry>and(
-                getAcceptContext(),
-                compose(not(in(contextIdSet)), contextId())));
-
-    }
-
-    public Predicate<FeatureEntry> getAcceptFeature() {
+    public Predicate<FeatureRecord> getAcceptFeatures() {
         return acceptFeature;
     }
 
-    public void setAcceptFeature(Predicate<FeatureEntry> acceptFeature) {
+    public void setAcceptFeatures(Predicate<FeatureRecord> acceptFeature) {
         if (!acceptFeature.equals(this.acceptFeature)) {
             this.acceptFeature = acceptFeature;
             featureFilterRequired = true;
         }
     }
 
-    public void addFeatureMinimumFrequency(double threshold) {
-        setAcceptFeature(Predicates2.<FeatureEntry>and(
-                getAcceptFeature(),
+    public void addFeaturesMinimumFrequency(double threshold) {
+        setAcceptFeatures(Predicates2.<FeatureRecord>and(
+                getAcceptFeatures(),
                 compose(gte(threshold), featureFreq())));
     }
 
-    public void addFeatureMaximumFrequency(double threshold) {
-        setAcceptFeature(Predicates2.<FeatureEntry>and(
-                getAcceptFeature(),
+    public void addFeaturesMaximumFrequency(double threshold) {
+        setAcceptFeatures(Predicates2.<FeatureRecord>and(
+                getAcceptFeatures(),
                 compose(lte(threshold), featureFreq())));
     }
 
-    public void addFeatureFrequencyRange(double min, double max) {
-        setAcceptFeature(Predicates2.<FeatureEntry>and(
-                getAcceptFeature(),
+    public void addFeaturesFrequencyRange(double min, double max) {
+        setAcceptFeatures(Predicates2.<FeatureRecord>and(
+                getAcceptFeatures(),
                 compose(inRange(min, max), featureFreq())));
     }
 
-    public Predicate<HeadEntry> getAcceptHead() {
-        return acceptHead;
+    public void addFeaturesPattern(String pattern) {
+        setAcceptFeatures(Predicates2.<FeatureRecord>and(
+                getAcceptFeatures(),
+                compose(containsPattern(pattern), featureString())));
     }
 
-    public void setAcceptHead(Predicate<HeadEntry> acceptHead) {
-        if (!acceptHead.equals(this.acceptHead)) {
-            this.acceptHead = acceptHead;
-            headFilterRequired = true;
-        }
-    }
-
-    public void addHeadMinimumFrequency(double threshold) {
-        setAcceptHead(Predicates2.<HeadEntry>and(
-                getAcceptHead(),
-                compose(gte(threshold), headFreq())));
-    }
-
-    public void addHeadMaximumFrequency(double threshold) {
-        setAcceptHead(Predicates2.<HeadEntry>and(
-                getAcceptHead(),
-                compose(lte(threshold), headFreq())));
-    }
-
-    public void addHeadFrequencyRange(double min, double max) {
-        setAcceptHead(Predicates2.<HeadEntry>and(
-                getAcceptHead(),
-                compose(inRange(min, max), headFreq())));
-    }
-
-    public void addHeadPattern(String pattern) {
-        setAcceptHead(Predicates2.<HeadEntry>and(
-                getAcceptHead(),
-                compose(containsPattern(pattern), headString())));
-    }
-
-    public void addHeadWhitelist(List<String> strings) {
-        IntSet headIdSet = new IntOpenHashSet();
+    public void addFeaturesWhitelist(List<String> strings) {
+        IntSet featureIdSet = new IntOpenHashSet();
         for (String string : strings) {
-            final int id = headIndex.get(string);
-            headIdSet.add(id);
+            final int id = featureIndex.get(string);
+            featureIdSet.add(id);
         }
-        setAcceptHead(Predicates2.<HeadEntry>and(
-                getAcceptHead(),
-                compose(in(headIdSet), headId())));
+        setAcceptFeatures(Predicates2.<FeatureRecord>and(
+                getAcceptFeatures(),
+                compose(in(featureIdSet), featureId())));
+    }
+
+    public void addFeaturesBlacklist(List<String> strings) {
+        IntSet featureIdSet = new IntOpenHashSet();
+        for (String string : strings) {
+            final int id = featureIndex.get(string);
+            featureIdSet.add(id);
+        }
+        setAcceptFeatures(Predicates2.<FeatureRecord>and(
+                getAcceptFeatures(),
+                compose(not(in(featureIdSet)), featureId())));
 
     }
 
-    public void addHeadBlacklist(List<String> strings) {
-        IntSet headIdSet = new IntOpenHashSet();
-        for (String string : strings) {
-            final int id = headIndex.get(string);
-            headIdSet.add(id);
+    public Predicate<WeightedEntryFeatureRecord> getAcceptEntryFeature() {
+        return acceptEntryFeature;
+    }
+
+    public void setAcceptEntryFeature(
+            Predicate<WeightedEntryFeatureRecord> acceptFeature) {
+        if (!acceptFeature.equals(this.acceptEntryFeature)) {
+            this.acceptEntryFeature = acceptFeature;
+            entryFeatureFilterRequired = true;
         }
-        setAcceptHead(Predicates2.<HeadEntry>and(
-                getAcceptHead(),
-                compose(not(in(headIdSet)), headId())));
+    }
+
+    public void addEntryFeatureMinimumFrequency(double threshold) {
+        setAcceptEntryFeature(Predicates2.<WeightedEntryFeatureRecord>and(
+                getAcceptEntryFeature(),
+                compose(gte(threshold), entryFeatureFreq())));
+    }
+
+    public void addEntryFeatureMaximumFrequency(double threshold) {
+        setAcceptEntryFeature(Predicates2.<WeightedEntryFeatureRecord>and(
+                getAcceptEntryFeature(),
+                compose(lte(threshold), entryFeatureFreq())));
+    }
+
+    public void addEntryFeatureFrequencyRange(double min, double max) {
+        setAcceptEntryFeature(Predicates2.<WeightedEntryFeatureRecord>and(
+                getAcceptEntryFeature(),
+                compose(inRange(min, max), entryFeatureFreq())));
+    }
+
+    public Predicate<EntryRecord> getAcceptEntry() {
+        return acceptEntry;
+    }
+
+    public void setAcceptEntry(Predicate<EntryRecord> acceptEntry) {
+        if (!acceptEntry.equals(this.acceptEntry)) {
+            this.acceptEntry = acceptEntry;
+            entryFilterRequired = true;
+        }
+    }
+
+    public void addEntryMinimumFrequency(double threshold) {
+        setAcceptEntry(Predicates2.<EntryRecord>and(
+                getAcceptEntry(),
+                compose(gte(threshold), entryFreq())));
+    }
+
+    public void addEntryMaximumFrequency(double threshold) {
+        setAcceptEntry(Predicates2.<EntryRecord>and(
+                getAcceptEntry(),
+                compose(lte(threshold), entryFreq())));
+    }
+
+    public void addEntryFrequencyRange(double min, double max) {
+        setAcceptEntry(Predicates2.<EntryRecord>and(
+                getAcceptEntry(),
+                compose(inRange(min, max), entryFreq())));
+    }
+
+    public void addEntryPattern(String pattern) {
+        setAcceptEntry(Predicates2.<EntryRecord>and(
+                getAcceptEntry(),
+                compose(containsPattern(pattern), entryString())));
+    }
+
+    public void addEntryWhitelist(List<String> strings) {
+        IntSet entryIdSet = new IntOpenHashSet();
+        for (String string : strings) {
+            final int id = entryIndex.get(string);
+            entryIdSet.add(id);
+        }
+        setAcceptEntry(Predicates2.<EntryRecord>and(
+                getAcceptEntry(),
+                compose(in(entryIdSet), entryId())));
+
+    }
+
+    public void addEntryBlacklist(List<String> strings) {
+        IntSet entryIdSet = new IntOpenHashSet();
+        for (String string : strings) {
+            final int id = entryIndex.get(string);
+            entryIdSet.add(id);
+        }
+        setAcceptEntry(Predicates2.<EntryRecord>and(
+                getAcceptEntry(),
+                compose(not(in(entryIdSet)), entryId())));
 
     }
 
@@ -715,14 +719,17 @@ public class FilterTask extends AbstractTask implements Serializable {
      */
     private void checkState()
             throws NullPointerException, IllegalStateException, FileNotFoundException {
+
         final Map<String, File> inputFiles = new HashMap<String, File>();
-        inputFiles.put("inputHeads", inputHeads);
-        inputFiles.put("inputContexts", inputContexts);
-        inputFiles.put("inputFeatures", inputFeatures);
+        inputFiles.put("inputEntries", inputEntriesFile);
+        inputFiles.put("inputFeatures", inputFeaturesFile);
+        inputFiles.put("inputEntryFeatures", inputEntryFeaturesFile);
+
         final Map<String, File> outputFiles = new HashMap<String, File>();
-        outputFiles.put("outputHeads", outputHeads);
-        outputFiles.put("outputContexts", outputContexts);
-        outputFiles.put("outputFeatures", outputFeatures);
+        outputFiles.put("outputEntries", outputEntriesFile);
+        outputFiles.put("outputFeatures", outputFeaturesFile);
+        outputFiles.put("outputEntryFeatures", outputEntryFeaturesFile);
+
         final Map<String, File> allFiles = new HashMap<String, File>();
         allFiles.putAll(inputFiles);
         allFiles.putAll(outputFiles);
@@ -778,31 +785,58 @@ public class FilterTask extends AbstractTask implements Serializable {
     }
 
     //
+    // ==== FIELD EXTRACTION FUNCTIONS ====
     //
-    //
-    // ===================================================================
-    //
-    //
-    private Function<HeadEntry, Double> headFreq() {
-        return new Function<HeadEntry, Double>() {
+    private Function<EntryRecord, Double> entryFreq() {
+        return new Function<EntryRecord, Double>() {
 
             @Override
-            public Double apply(HeadEntry input) {
-                return input.getTotal();
+            public Double apply(EntryRecord input) {
+                return input.getWeight();
             }
 
             @Override
             public String toString() {
-                return "HeadFrequency";
+                return "EntryFrequency";
             }
         };
     }
 
-    private Function<FeatureEntry, Double> featureFreq() {
-        return new Function<FeatureEntry, Double>() {
+    private Function<EntryRecord, Integer> entryId() {
+        return new Function<EntryRecord, Integer>() {
 
             @Override
-            public Double apply(FeatureEntry input) {
+            public Integer apply(EntryRecord input) {
+                return input.getEntryId();
+            }
+
+            @Override
+            public String toString() {
+                return "EntryID";
+            }
+        };
+    }
+
+    private Function<EntryRecord, String> entryString() {
+        return new Function<EntryRecord, String>() {
+
+            @Override
+            public String apply(EntryRecord input) {
+                return entryIndex.get(input.getEntryId());
+            }
+
+            @Override
+            public String toString() {
+                return "EntriesString";
+            }
+        };
+    }
+
+    private Function<FeatureRecord, Double> featureFreq() {
+        return new Function<FeatureRecord, Double>() {
+
+            @Override
+            public Double apply(FeatureRecord input) {
                 return input.getWeight();
             }
 
@@ -813,137 +847,107 @@ public class FilterTask extends AbstractTask implements Serializable {
         };
     }
 
-    private Function<ContextEntry, Double> contextFreq() {
-        return new Function<ContextEntry, Double>() {
+    private Function<FeatureRecord, Integer> featureId() {
+        return new Function<FeatureRecord, Integer>() {
 
             @Override
-            public Double apply(ContextEntry input) {
+            public Integer apply(FeatureRecord input) {
+                return input.getFeatureId();
+            }
+
+            @Override
+            public String toString() {
+                return "FeatureID";
+            }
+        };
+    }
+
+    private Function<FeatureRecord, String> featureString() {
+        return new Function<FeatureRecord, String>() {
+
+            @Override
+            public String apply(FeatureRecord input) {
+                return featureIndex.get(input.getFeatureId());
+            }
+
+            @Override
+            public String toString() {
+                return "FeatureString";
+            }
+        };
+    }
+
+    private Function<WeightedEntryFeatureRecord, Double> entryFeatureFreq() {
+        return new Function<WeightedEntryFeatureRecord, Double>() {
+
+            @Override
+            public Double apply(WeightedEntryFeatureRecord input) {
                 return input.getWeight();
             }
 
             @Override
             public String toString() {
-                return "ContextFrequency";
+                return "FeatureEntryFrequency";
             }
         };
     }
 
-    private Function<ContextEntry, Integer> contextId() {
-        return new Function<ContextEntry, Integer>() {
+    private Function<WeightedEntryFeatureRecord, Integer> entryFeatureEntryId() {
+        return new Function<WeightedEntryFeatureRecord, Integer>() {
 
             @Override
-            public Integer apply(ContextEntry input) {
-                return input.getId();
+            public Integer apply(WeightedEntryFeatureRecord input) {
+                return input.getEntryId();
             }
 
             @Override
             public String toString() {
-                return "ContextID";
+                return "FeatureEntryID";
             }
         };
     }
 
-    private Function<HeadEntry, Integer> headId() {
-        return new Function<HeadEntry, Integer>() {
+    private Function<WeightedEntryFeatureRecord, Integer> entryFeatureFeatureId() {
+        return new Function<WeightedEntryFeatureRecord, Integer>() {
 
             @Override
-            public Integer apply(HeadEntry input) {
-                return input.getHeadId();
+            public Integer apply(WeightedEntryFeatureRecord input) {
+                return input.getFeatureId();
             }
 
             @Override
             public String toString() {
-                return "HeadID";
+                return "EntryFeatureID";
             }
         };
     }
 
-    private Function<FeatureEntry, Integer> featureHeadId() {
-        return new Function<FeatureEntry, Integer>() {
+    private Function<WeightedEntryFeatureRecord, String> entryFeatureFeatureString() {
+        return new Function<WeightedEntryFeatureRecord, String>() {
 
             @Override
-            public Integer apply(FeatureEntry input) {
-                return input.getHeadId();
+            public String apply(WeightedEntryFeatureRecord input) {
+                return featureIndex.get(input.getFeatureId());
             }
 
             @Override
             public String toString() {
-                return "HeadID";
+                return "EntryFeatureFeatureString";
             }
         };
     }
 
-    private Function<FeatureEntry, Integer> featureContextId() {
-        return new Function<FeatureEntry, Integer>() {
+    private Function<WeightedEntryFeatureRecord, String> entryFeatureEntryString() {
+        return new Function<WeightedEntryFeatureRecord, String>() {
 
             @Override
-            public Integer apply(FeatureEntry input) {
-                return input.getContextId();
+            public String apply(WeightedEntryFeatureRecord input) {
+                return entryIndex.get(input.getEntryId());
             }
 
             @Override
             public String toString() {
-                return "ContextID";
-            }
-        };
-    }
-
-    private Function<HeadEntry, String> headString() {
-        return new Function<HeadEntry, String>() {
-
-            @Override
-            public String apply(HeadEntry input) {
-                return headIndex.get(input.getHeadId());
-            }
-
-            @Override
-            public String toString() {
-                return "HeadString";
-            }
-        };
-    }
-
-    private Function<ContextEntry, String> contextString() {
-        return new Function<ContextEntry, String>() {
-
-            @Override
-            public String apply(ContextEntry input) {
-                return contextIndex.get(input.getId());
-            }
-
-            @Override
-            public String toString() {
-                return "ContextString";
-            }
-        };
-    }
-
-    private Function<FeatureEntry, String> featureHeadString() {
-        return new Function<FeatureEntry, String>() {
-
-            @Override
-            public String apply(FeatureEntry input) {
-                return headIndex.get(input.getHeadId());
-            }
-
-            @Override
-            public String toString() {
-                return "HeadString";
-            }
-        };
-    }
-
-    private Function<FeatureEntry, String> featureContextString() {
-        return new Function<FeatureEntry, String>() {
-
-            @Override
-            public String apply(FeatureEntry input) {
-                return contextIndex.get(input.getContextId());
-            }
-
-            @Override
-            public String toString() {
-                return "ContextString";
+                return "EntryFeatureEntryString";
             }
         };
     }

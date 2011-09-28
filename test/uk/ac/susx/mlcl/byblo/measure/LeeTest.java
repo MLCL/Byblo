@@ -86,7 +86,7 @@ public class LeeTest {
             "--lee-alpha", "0.00",
             "--input", SAMPLE_DATA_DIR + dataSet + ".features",
             "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
             "--output", output.toString()
         };
 
@@ -114,7 +114,7 @@ public class LeeTest {
             "--lee-alpha", "0.01",
             "--input", SAMPLE_DATA_DIR + dataSet + ".features",
             "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
             "--output", output.toString()
         };
 
@@ -142,7 +142,7 @@ public class LeeTest {
             "--lee-alpha", "0.50",
             "--input", SAMPLE_DATA_DIR + dataSet + ".features",
             "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
             "--output", output.toString()
         };
 
@@ -170,7 +170,7 @@ public class LeeTest {
             "--lee-alpha", "0.99",
             "--input", SAMPLE_DATA_DIR + dataSet + ".features",
             "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
             "--output", output.toString()
         };
 
@@ -200,7 +200,7 @@ public class LeeTest {
             "--lee-alpha", "1.00",
             "--input", SAMPLE_DATA_DIR + dataSet + ".features",
             "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
             "--output", output.toString()
         };
 

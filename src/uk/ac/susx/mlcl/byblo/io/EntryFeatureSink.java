@@ -37,38 +37,67 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.text.DecimalFormat;
 
 /**
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 27th March 2011
  */
-public class HeadSink extends AbstractTSVSink<HeadEntry>
-        implements Sink<HeadEntry> {
+public class EntryFeatureSink
+        extends AbstractTSVSink<EntryFeatureRecord>
+        implements Sink<EntryFeatureRecord> {
 
-    private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
+    private final ObjectIndex<String> entryIndex;
 
-    private final ObjectIndex<String> stringIndex;
+    private final ObjectIndex<String> featureIndex;
 
-    public HeadSink(File file, Charset charset, ObjectIndex<String> stringIndex) throws FileNotFoundException, IOException {
+    public EntryFeatureSink(File file, Charset charset,
+            ObjectIndex<String> entryIndex, ObjectIndex<String> featureIndex)
+            throws FileNotFoundException, IOException {
         super(file, charset);
-        this.stringIndex = stringIndex;
+        if (entryIndex == null)
+            throw new NullPointerException("entryIndex == null");
+        if (featureIndex == null)
+            throw new NullPointerException("featureIndex == null");
+        this.entryIndex = entryIndex;
+        this.featureIndex = featureIndex;
+    }
+
+    public EntryFeatureSink(File file, Charset charset,
+            ObjectIndex<String> combinedIndex)
+            throws FileNotFoundException, IOException {
+        this(file, charset, combinedIndex, combinedIndex);
+    }
+
+    public EntryFeatureSink(File file, Charset charset)
+            throws FileNotFoundException, IOException {
+        this(file, charset, new ObjectIndex<String>());
+    }
+
+    public final ObjectIndex<String> getEntryIndex() {
+        return entryIndex;
+    }
+
+    public ObjectIndex<String> getFeatureIndex() {
+        return featureIndex;
+    }
+
+    public boolean isIndexCombined() {
+        return getFeatureIndex() == getEntryIndex();
     }
 
     @Override
-    @SuppressWarnings("deprecation")
-    public void write(final HeadEntry record) throws IOException {
-        writeString(stringIndex.get(record.getHeadId()));//record.getHeadword());
+    public void write(final EntryFeatureRecord record) throws IOException {
+        writeEntry(record.getEntryId());
         writeValueDelimiter();
-//        writeInt(record.getHeadId());
-//        writeValueDelimiter();
-//        writeInt(record.getWidth());
-//        writeValueDelimiter();
-        if (Double.compare((int) record.getTotal(), record.getTotal()) == 0)
-            super.writeInt((int) record.getTotal());
-        else
-            super.writeString(f.format(record.getTotal()));
+        writeFeature(record.getFeatureId());
         writeRecordDelimiter();
+    }
+
+    protected final void writeEntry(final int entryId) throws IOException {
+        writeString(entryIndex.get(entryId));
+    }
+
+    protected final void writeFeature(final int featureId) throws IOException {
+        writeString(featureIndex.get(featureId));
     }
 }

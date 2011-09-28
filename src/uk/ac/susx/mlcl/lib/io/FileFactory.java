@@ -37,7 +37,6 @@ import java.io.IOException;
  * Define a factory method for the creation of files.
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 15th March 2011
  */
 public interface FileFactory {
 

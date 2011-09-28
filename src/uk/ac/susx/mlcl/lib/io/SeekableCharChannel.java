@@ -33,9 +33,8 @@ package uk.ac.susx.mlcl.lib.io;
 /**
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 27th March 2011
  */
-public interface SeekableCharChannel<S>
-        extends ReadableCharChannel, WritableCharChannel, Seekable<S> {
+public interface SeekableCharChannel<P>
+        extends ReadableCharChannel, WritableCharChannel, Seekable<P> {
 
 }

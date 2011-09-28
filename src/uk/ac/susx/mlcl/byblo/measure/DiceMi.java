@@ -33,7 +33,6 @@ package uk.ac.susx.mlcl.byblo.measure;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- * @version 18th April 2011
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public class DiceMi extends AbstractMIProximity implements Proximity {

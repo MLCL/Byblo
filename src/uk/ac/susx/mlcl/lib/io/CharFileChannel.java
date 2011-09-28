@@ -76,8 +76,6 @@ import java.util.logging.Logger;
  * {@link java.nio.channels.FileChannel}.</p>
  *
  * @author Hamish I A Morgan (hamish.morgan@sussex.ac.uk)
- * @since 13 March 2011
- * @version 13 March 2011
  */
 public class CharFileChannel
         implements ReadableCharChannel, WritableCharChannel, Seekable<Long> {

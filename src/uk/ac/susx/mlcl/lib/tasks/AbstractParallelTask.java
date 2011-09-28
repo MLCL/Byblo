@@ -55,8 +55,8 @@ public abstract class AbstractParallelTask extends AbstractTask {
     protected static final int DEFAULT_NUM_THREADS =
             Runtime.getRuntime().availableProcessors();
 
-    @Parameter(names = {"-t", "--nthreads"},
-               descriptionKey = "USAGE_NUM_THREADS")
+    @Parameter(names = {"-t", "--threads"},
+               description= "Number of threads to use.")
     private int nThreads = DEFAULT_NUM_THREADS;
 
     private ExecutorService executor = null;

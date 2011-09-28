@@ -101,7 +101,7 @@ $ ./byblo.sh [<options>] [@<config>] <file>
 
 Where the arguments are:
 
- * `<file>` Input instances file containing head/contexts pairs.
+ * `<file>` Input instances file containing entry/feature pairs.
 
  * `@<config>` Options and input files can be read from a <config> file specified directly after an '$\mathtt{@}$' character. Options in this file should be specified exactly as they would be at the command line, and may contain additional `@` references to other config files. 
 

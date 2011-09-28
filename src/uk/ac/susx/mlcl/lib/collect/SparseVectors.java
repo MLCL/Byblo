@@ -41,7 +41,6 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
  *          constructors to Sparse*Vector classes. (Issue #41)
  * 
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 21 Aug 2010
  */
 public final class SparseVectors {
 

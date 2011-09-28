@@ -35,13 +35,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- *
- *
- *
  * tau(q,r) = sum_i_j( sign((qi - qj)(ri - rj)) / (2 * |V|)  )
  *
- *
- * @version 2nd December 2010
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public class KendallTau implements Proximity {
@@ -62,14 +57,14 @@ public class KendallTau implements Proximity {
     }
 
     public final void setNumFeatures(int numFeatures) {
-        if(numFeatures <= 0)
+        if (numFeatures <= 0)
             throw new IllegalArgumentException("exepcting numFeatures to be > "
                     + "0, but found " + numFeatures);
         this.numFeatures = numFeatures;
     }
 
     private void checkState() {
-        if(numFeatures <= 0)
+        if (numFeatures <= 0)
             throw new IllegalStateException("exepcting numFeatures to be > 0, "
                     + "but found " + numFeatures);
     }
@@ -77,7 +72,7 @@ public class KendallTau implements Proximity {
     @Override
     public double shared(SparseDoubleVector Q, SparseDoubleVector R) {
         checkState();
-        
+
         int sum = 0;
         int intersectionSize = 0;
         int unionSize = 0;
@@ -228,13 +223,6 @@ public class KendallTau implements Proximity {
         //
         double sim = (double) (sum) / (double) (numFeatures * (numFeatures - 1));
 
-
-//        System.out.println("sim=" + sim
-//                + ", sum=" + sum
-//                + ", numFeatures=" + numFeatures
-//                + ", unionSize=" + unionSize
-//                + ", intersectionSize=" + intersectionSize
-//                );
         return sim;
     }
 

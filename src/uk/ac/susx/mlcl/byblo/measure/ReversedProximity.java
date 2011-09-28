@@ -36,7 +36,6 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * Decorator that reverses the features sets, for calculating asymmetric
  * measures with the inputs the other way around.
  *
- * @version 2nd December 2010
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public final class ReversedProximity implements Proximity {
@@ -47,23 +46,28 @@ public final class ReversedProximity implements Proximity {
         this.inner = inner;
     }
 
+    @Override
     public double shared(final SparseDoubleVector Q, final SparseDoubleVector R) {
         return inner.shared(R, Q);
     }
 
+    @Override
     public double left(final SparseDoubleVector Q) {
         return inner.right(Q);
     }
 
+    @Override
     public double right(final SparseDoubleVector R) {
         return inner.left(R);
     }
 
+    @Override
     public double combine(final double shared, final double left,
-                          final double right) {
+            final double right) {
         return inner.combine(shared, right, left);
     }
 
+    @Override
     public boolean isSymmetric() {
         return inner.isSymmetric();
     }
@@ -76,6 +80,4 @@ public final class ReversedProximity implements Proximity {
     public String toString() {
         return "ReversedProximity{" + "inner=" + inner + '}';
     }
-
-    
 }

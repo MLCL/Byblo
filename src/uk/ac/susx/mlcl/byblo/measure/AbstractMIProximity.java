@@ -37,41 +37,36 @@ import java.util.logging.Logger;
 /**
  * AbstractMIProximity is a class that mutual information (MI) based proximity
  * measures can extend. Unlike more tradition measures (such as Jaccard) these
- * require global feature context statistical information, which is held in
+ * require global feature statistical information, which is held in
  * the class fields.
  *
- * @version 18th April 2011
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public abstract class AbstractMIProximity implements Proximity {
 
-    private static final Logger LOG = Logger.getLogger(AbstractMIProximity.class.getName());
+    private static final Logger LOG = Logger.getLogger(AbstractMIProximity.class.
+            getName());
+
     /**
-     * A mapping from context id to frequency, stored as a double because it
+     * A mapping from feature id to frequency, stored as a double because it
      * may have been waited in a pre-processing stage.
      */
-    private double[] contextFrequencies;
+    private double[] featureFrequencies;
 
     /**
-     * The total number of contexts, not just the number of unique contexts.
+     * The total number of features, not just the number of unique features.
      * This should be equal to the sum of all values in
-     * {@link #contextFrequencies}.
+     * {@link #featureFrequencies}.
      */
-    private double contextSum;
+    private double featureFrequencySum;
 
     /**
-     * The number of unique contexts in this data set, should be equals to
-     * {@link #contextFrequencies.length }.
-     */
-    private int contextCardinality;
-
-    /**
-     * The number of contexts that are actually occurring more than once.
-     * Due to pre-processing a context may have been previously filtered,
+     * The number of features that are actually occurring more than once.
+     * Due to pre-processing a feature may have been previously filtered,
      * resulting in this value being less than the cardinality. This could
      * be described as the non-zero cardinality.
      */
-    private long uniqueContextCount;
+    private long occuringFeatureCount;
 
     /**
      * 
@@ -79,99 +74,95 @@ public abstract class AbstractMIProximity implements Proximity {
     public AbstractMIProximity() {
     }
 
-    public void setContextFreqs(double[] contextFrequencies) {
-        if (contextFrequencies == null)
-            throw new NullPointerException("contextFrequencies == null");
-        this.contextFrequencies = contextFrequencies;
+    public void setFeatureFrequencies(double[] featureFrequencies) {
+        if (featureFrequencies == null)
+            throw new NullPointerException("featureFrequencies == null");
+        this.featureFrequencies = featureFrequencies;
     }
 
-    public void setContextSum(double contextSum) {
-        if (Double.isNaN(contextSum))
-            throw new IllegalArgumentException("grandtotal is NaN");
-        if (Double.isInfinite(contextSum))
-            throw new IllegalArgumentException("grandtotal is infinite");
-        this.contextSum = contextSum;
+    public void setFeatureFrequencySum(double featureFrequencySum) {
+        if (Double.isNaN(featureFrequencySum))
+            throw new IllegalArgumentException("featureFrequencySum is NaN");
+        if (Double.isInfinite(featureFrequencySum))
+            throw new IllegalArgumentException("featureFrequencySum is infinite");
+        this.featureFrequencySum = featureFrequencySum;
     }
 
-    public void setUniqueContextCount(long uniqueContextCount) {
-        this.uniqueContextCount = uniqueContextCount;
-    }
-
-    public void setContextCardinality(int contextCardinality) {
-        this.contextCardinality = contextCardinality;
+    public void setOccuringFeatureCount(int occuringFeatureCount) {
+        this.occuringFeatureCount = occuringFeatureCount;
     }
 
     /**
-     * The total number of contexts, not just the number of unique contexts.
+     * The total number of features, not just the number of unique features.
      * 
-     * @return sum of all context frequencies.
+     * @return sum of all feature frequencies.
      */
-    public final double getContextSum() {
-        return contextSum;
+    public final double getFeatureFrequencySum() {
+        return featureFrequencySum;
     }
 
     /**
-     * The number of unique contexts.
-     * @return number of unique contexts.
+     * The number of unique features.
+     * @return number of unique featuress.
      */
-    public final int getContextsCount() {
-        return contextFrequencies.length;
+    public final int getFeatureCount() {
+        return featureFrequencies.length;
     }
 
-    public int getContextCardinality() {
-        return contextCardinality;
-    }
-
-    public long getUniqueContextCount() {
-        return uniqueContextCount;
+//    public int getOccuringFeatureCount() {
+//        return numFeatures;
+//    }
+    public long getOccuringFeatureCount() {
+        return occuringFeatureCount;
     }
 
     /**
-     * Return the frequency of a particular context, denoted by the index k.
+     * Return the frequency of a particular feature, denoted by the index k.
      *
-     * @param k The context id (or dimension) to access
-     * @return The frequency of that context feature over the whole corpus.
+     * @param k The feature id (or dimension) to access
+     * @return The frequency of that feature over the whole corpus.
      */
-    protected final double contextFreq(final int k) {
-        // XXX Nasty work arround for strange bug where contexts in the features
-        // file don't exist in the contexts file.
-        if(k >= contextFrequencies.length) {
-            LOG.log(Level.WARNING, "Unable to find context freqency for key " + k);
+    protected final double featureFreq(final int k) {
+        // XXX Nasty work arround for strange bug where features in the entry-features
+        // file don't exist in the features file.
+        if (k >= featureFrequencies.length) {
+            LOG.log(Level.WARNING, "Unable to find feature freqency for key {0}",
+                    k);
             return 1; // must return 1 or we can get divide by zeros
         }
-        return contextFrequencies[k];
+        return featureFrequencies[k];
     }
 
     /**
-     * Return the independent probability of a particular context, calculated
+     * Return the independent probability of a particular feature, calculated
      * as the frequency of the feature divided by the total number of features
      * observed over the corpus.
      *
-     * @param k the context feature id (or dimension)
-     * @return independent probability of that context occurring.
+     * @param k the  feature id (or dimension)
+     * @return independent probability of that feature occurring.
      */
-    protected final double contextProb(final int k) {
-        return contextFreq(k) / contextSum;
+    protected final double featurePrior(final int k) {
+        return featureFreq(k) / featureFrequencySum;
     }
 
     /**
      * <p>Calculate the information content of the vector V at dimension i
-     * with respect to the context information held by this class.</p>
+     * with respect to the feature information held by this class.</p>
      *
      * <p>If only the positive information is required then use
-     * posInf(null, contextCardinality) because it's faster.</p>
+     * posInf(null, featureCardinality) because it's faster.</p>
      *
      * @param V vector
      * @param i dimension (aka feature id) to calculate
      * @return information content of V at i
      */
     protected final double inf(final SparseDoubleVector V, final int i) {
-        return Math.log((V.values[i] / V.sum) / contextProb(V.keys[i]));
+        return Math.log((V.values[i] / V.sum) / featurePrior(V.keys[i]));
     }
 
     /**
      * Calculate the positive information given by the vector V at dimension i
-     * with respect to the context information held by this class. If the
+     * with respect to the feature information held by this class. If the
      * information content is negative then 0 is returned.
      *
      * @param V vector
@@ -179,24 +170,23 @@ public abstract class AbstractMIProximity implements Proximity {
      * @return information content of V at i if positive, otherwise 0
      */
     protected final double posInf(final SparseDoubleVector V, final int i) {
-        final double tmp = (V.values[i] / V.sum) / contextProb(V.keys[i]);
+        final double tmp = (V.values[i] / V.sum) / featurePrior(V.keys[i]);
         return tmp > 1 ? Math.log(tmp) : 0;
     }
 
     public boolean hasPosInf(final SparseDoubleVector V, final int i) {
-        return prob(V, i) > contextProb(V.keys[i]);
+        return prob(V, i) > featurePrior(V.keys[i]);
     }
 
     // Calculate if the features would both have positive
-    // information content w.r.t the context data.
-    public boolean hasPosInf(final SparseDoubleVector Q, final int i, final SparseDoubleVector R, final int j) {
-        final double vprob = contextProb(Q.keys[i]);
+    // information content w.r.t the feature data.
+    public boolean hasPosInf(final SparseDoubleVector Q, final int i,
+            final SparseDoubleVector R, final int j) {
+        final double vprob = featurePrior(Q.keys[i]);
         return prob(Q, i) > vprob && prob(R, j) > vprob;
     }
 
     protected final double prob(final SparseDoubleVector V, final int k) {
         return V.values[k] / V.sum;
     }
-
-
 }

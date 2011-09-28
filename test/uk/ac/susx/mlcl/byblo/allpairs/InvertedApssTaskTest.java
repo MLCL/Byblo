@@ -30,16 +30,15 @@
  */
 package uk.ac.susx.mlcl.byblo.allpairs;
 
-import uk.ac.susx.mlcl.byblo.allpairs.InvertedApssTask;
+import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureSource;
+import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureVectorSource;
 import com.google.common.base.Predicate;
 import uk.ac.susx.mlcl.byblo.measure.Proximity;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import java.io.File;
 import java.nio.charset.Charset;
-import uk.ac.susx.mlcl.byblo.io.FeatureSource;
-import uk.ac.susx.mlcl.byblo.io.FeatureVectorSource;
 import uk.ac.susx.mlcl.byblo.measure.Jaccard;
-import uk.ac.susx.mlcl.lib.collect.WeightedPair;
+import uk.ac.susx.mlcl.lib.collect.Pair;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.After;
@@ -52,7 +51,6 @@ import static org.junit.Assert.*;
 /**
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 27th March 2011
  */
 public class InvertedApssTaskTest {
 
@@ -63,8 +61,8 @@ public class InvertedApssTaskTest {
 
     private static final Proximity MEASURE = new Jaccard();
 
-    private static final Predicate<WeightedPair> PAIR_FILTER =
-            WeightedPair.similarityGTE(0.1);
+    private static final Predicate<Pair> PAIR_FILTER =
+            Pair.similarityGTE(0.1);
 
     public InvertedApssTaskTest() {
     }
@@ -94,18 +92,18 @@ public class InvertedApssTaskTest {
 
         InvertedApssTask instance = new InvertedApssTask();
 
-        FeatureSource mdbsa = new FeatureSource(
+        WeightedEntryFeatureSource mdbsa = new WeightedEntryFeatureSource(
                 FEATURES_FILE, CHARSET);
-        FeatureVectorSource vsa = mdbsa.getVectorSource();
+        WeightedEntryFeatureVectorSource vsa = mdbsa.getVectorSource();
 
-        FeatureSource mdbsb = new FeatureSource(
-                FEATURES_FILE, CHARSET, mdbsa.getHeadIndex(), mdbsa.
-                getContextIndex());
+        WeightedEntryFeatureSource mdbsb = new WeightedEntryFeatureSource(
+                FEATURES_FILE, CHARSET, mdbsa.getEntryIndex(), mdbsa.
+                getFeatureIndex());
 
 
-        FeatureVectorSource vsb = mdbsb.getVectorSource();
+        WeightedEntryFeatureVectorSource vsb = mdbsb.getVectorSource();
 
-        List<WeightedPair> result = new ArrayList<WeightedPair>();
+        List<Pair> result = new ArrayList<Pair>();
 
         instance.setSourceA(vsa);
         instance.setSourceB(vsb);

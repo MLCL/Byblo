@@ -35,13 +35,6 @@ import com.beust.jcommander.IStringConverterFactory;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
-import com.beust.jcommander.converters.BooleanConverter;
-import com.beust.jcommander.converters.FileConverter;
-import com.beust.jcommander.converters.IntegerConverter;
-import com.beust.jcommander.converters.LongConverter;
-import com.beust.jcommander.converters.StringConverter;
-import com.beust.jcommander.internal.Maps;
-import java.io.File;
 import uk.ac.susx.mlcl.lib.tasks.Task;
 import java.nio.charset.Charset;
 import java.util.EnumMap;
@@ -59,7 +52,7 @@ public class Byblo {
     private static final Logger LOG = Logger.getLogger(CopyTask.class.getName());
 
     @Parameter(names = {"-h", "--help"},
-               description = "USAGE_HELP")
+               description = "Display this message")
     private boolean usageRequested = false;
 
     public boolean isUsageRequested() {
@@ -68,11 +61,11 @@ public class Byblo {
 
     enum Command {
 
-        sort(ExtSortTask.class),
+        sort(ExternalSortTask.class),
         merge(MergeTask.class),
-        knn(ExtKnnTask.class),
-        allpairs(AllPairsCommand.class),
-        count(ExtCountTask.class),
+        knn(ExternalKnnTask.class),
+        allpairs(AllPairsTask.class),
+        count(ExternalCountTask.class),
         filter(FilterTask.class);
 
         private Class<? extends Task> taskClass;
@@ -87,18 +80,6 @@ public class Byblo {
     }
 
     public static void main(String[] args) throws InstantiationException, IllegalAccessException, Exception {
-////
-//        args = new String[]{"count"
-////                    "allpairs",
-////                    "--input", "sampledata/bnc-gramrels-fruit.features",
-////                    "--input-contexts", "sampledata/bnc-gramrels-fruit.contexts",
-////                    "--input-heads", "sampledata/bnc-gramrels-fruit.heads",
-////                    "--output", "sampledata/out/bnc-gramrels-fruit.lin",
-////                    "--measure", "lin",
-////                    "--charset", "UTF-8",
-////                    "--similarity-min", "0.01",
-////                    "--chunk-size", "10"
-//                };
 
         if (args == null)
             throw new NullPointerException();

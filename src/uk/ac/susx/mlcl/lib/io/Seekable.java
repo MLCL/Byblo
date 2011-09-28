@@ -45,9 +45,8 @@ import java.io.IOException;
  * amount of RAM, at the expense of increased disk I/O.</p>
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 15 March 2011
  */
-public interface Seekable<T> {
+public interface Seekable<P> {
 
     /**
      * <p>Move the internal data pointer to some offset.<p>
@@ -59,7 +58,7 @@ public interface Seekable<T> {
      * @param offset location to seek to
      * @throws IOException something has gone wrong with the underlying store
      */
-    void position(T offset) throws IOException;
+    void position(P offset) throws IOException;
 
     /**
      * <p>Return the offset of the internal data pointer to the next item that
@@ -71,5 +70,5 @@ public interface Seekable<T> {
      * @return some current data store offset
      * @throws IOException something has gone wrong with the underlying store
      */
-    T position() throws IOException;
+    P position() throws IOException;
 }

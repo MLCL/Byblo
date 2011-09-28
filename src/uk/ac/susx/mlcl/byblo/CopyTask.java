@@ -41,13 +41,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Sort a file by reading it into memory, performing the sort and then writing
- * it out again.
+ * Copy a source file to a destination.
  * 
- * @version 2nd December 2010
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(commandDescription = "USAGE_COPY_COMMAND")
+@Parameters(commandDescription = "Copy a file.")
 public class CopyTask extends AbstractTask {
 
     private static final Logger LOG = Logger.getLogger(CopyTask.class.getName());
@@ -55,11 +53,11 @@ public class CopyTask extends AbstractTask {
     private static final int BUFFER_SIZE = 100000;
 
     @Parameter(names = {"-i", "--input-file"},
-               descriptionKey = "USAGE_INPUT_FILE")
+               description = "Source file that will be read")
     private File sourceFile = IOUtil.STDIN_FILE;
 
     @Parameter(names = {"-o", "--output-file"},
-               descriptionKey = "USAGE_OUTPUT_FILE")
+               description = "Destination file that will be writen to.")
     private File destFile = IOUtil.STDOUT_FILE;
 
     public CopyTask(File sourceFile, File destinationFile) {

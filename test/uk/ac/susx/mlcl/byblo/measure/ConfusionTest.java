@@ -84,7 +84,7 @@ public class ConfusionTest {
             "--measure", "Confusion",
             "--input", SAMPLE_DATA_DIR + dataSet + ".features",
             "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
             "--output", output.toString()
         };
 
@@ -95,7 +95,4 @@ public class ConfusionTest {
 
         Thread.sleep(100);
     }
-
-
-  
 }

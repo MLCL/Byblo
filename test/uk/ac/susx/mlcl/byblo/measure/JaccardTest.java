@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.measure;
 
-import uk.ac.susx.mlcl.byblo.measure.Jaccard;
 import com.google.common.io.Files;
 import uk.ac.susx.mlcl.byblo.Byblo;
 import java.io.File;
@@ -49,7 +48,6 @@ import static org.junit.Assert.*;
 /**
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 28th March 2010
  */
 public class JaccardTest {
 
@@ -95,7 +93,7 @@ public class JaccardTest {
             "--measure", "Jaccard",
             "--input", SAMPLE_DATA_DIR + dataSet + ".features",
             "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
             "--output", output.toString()
         };
 
@@ -123,7 +121,7 @@ public class JaccardTest {
             "--measure", "JaccardMI",
             "--input", SAMPLE_DATA_DIR + dataSet + ".features",
             "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
             "--output", output.toString()
         };
 
@@ -290,7 +288,7 @@ public class JaccardTest {
                     "--measure", "Jaccard",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", output1.toString()
                 });
         Byblo.main(new String[]{
@@ -300,7 +298,7 @@ public class JaccardTest {
                     "--measure-reversed",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", output2.toString()
                 });
 
@@ -330,7 +328,7 @@ public class JaccardTest {
                     "--measure", "JaccardMi",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", output1.toString()
                 });
         Byblo.main(new String[]{
@@ -340,7 +338,7 @@ public class JaccardTest {
                     "--measure-reversed",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", output2.toString()
                 });
 

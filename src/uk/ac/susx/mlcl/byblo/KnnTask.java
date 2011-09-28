@@ -43,20 +43,23 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @version 2nd December 2010
+ * Task that read in a file and produces the k-nearest-neighbors for each base 
+ * entry. Assumes the file is composed of entry, entry, weight triples that are
+ * delimited by tabs.
+ * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters()
-public class MemKnnTask extends MemSortTask {
+@Parameters(commandDescription="Perform k-nearest-neighbours on a similarity file.")
+public class KnnTask extends SortTask {
 
     private static final Logger LOG =
-            Logger.getLogger(MemKnnTask.class.getName());
+            Logger.getLogger(KnnTask.class.getName());
 
-    @Parameter(names = {"-k"}, descriptionKey = "USAGE_K")
-    private int k = ExtKnnTask.DEFAULT_K;
+    @Parameter(names = {"-k"},
+               description = "The maximum number of neighbours to produce per word.")
+    private int k = ExternalKnnTask.DEFAULT_K;
 
-    public MemKnnTask(File sourceFile, File destinationFile, Charset charset,
+    public KnnTask(File sourceFile, File destinationFile, Charset charset,
             Comparator<String> comparator, int k) {
         super(sourceFile, destinationFile, charset, comparator);
         this.k = k;
@@ -79,10 +82,10 @@ public class MemKnnTask extends MemSortTask {
                 new Object[]{getSrcFile(), getDstFile(), Thread.currentThread().
                     getName()});
         final List<String> linesIn = new ArrayList<String>();
-        IOUtil.readAllLines(getSrcFile(), getCharset(),linesIn);
+        IOUtil.readAllLines(getSrcFile(), getCharset(), linesIn);
         final List<String> linesOut = new ArrayList<String>();
         knnLines(linesIn, linesOut);
-        IOUtil.writeAllLines(getDstFile(), getCharset(),linesOut);
+        IOUtil.writeAllLines(getDstFile(), getCharset(), linesOut);
     }
 
     protected void knnLines(Collection<? extends String> in,

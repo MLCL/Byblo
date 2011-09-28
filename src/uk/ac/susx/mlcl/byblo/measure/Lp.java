@@ -35,7 +35,6 @@ import java.util.logging.Logger;
 
 /**
  *
- * @version 2nd December 2010
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public class Lp implements Proximity {

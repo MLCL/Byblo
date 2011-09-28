@@ -47,7 +47,6 @@ import java.util.Arrays;
  * be searched for.
  * 
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 22 Aug 2010
  */
 public final class SparseDoubleVector
         extends SparseVector

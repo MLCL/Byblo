@@ -98,7 +98,7 @@ public class CrMiTest {
             "--crmi-gamma", "0.00",
             "--input", SAMPLE_DATA_DIR + dataSet + ".features",
             "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
             "--output", output.toString()
         };
 
@@ -128,7 +128,7 @@ public class CrMiTest {
             "--crmi-gamma", "0.00",
             "--input", SAMPLE_DATA_DIR + dataSet + ".features",
             "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
             "--output", output.toString()
         };
 
@@ -159,7 +159,7 @@ public class CrMiTest {
             "--crmi-gamma", "0.00",
             "--input", SAMPLE_DATA_DIR + dataSet + ".features",
             "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
             "--output", output.toString()
         };
 
@@ -189,7 +189,7 @@ public class CrMiTest {
             "--crmi-gamma", "1.00",
             "--input", SAMPLE_DATA_DIR + dataSet + ".features",
             "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
             "--output", output.toString()
         };
 
@@ -222,7 +222,7 @@ public class CrMiTest {
                     "--measure", "RecallMi",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", expectedOutput.toString()
                 });
         Byblo.main(new String[]{
@@ -233,7 +233,7 @@ public class CrMiTest {
                     "--crmi-gamma", "0.00",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", crmiOutput.toString()
                 });
 
@@ -265,7 +265,7 @@ public class CrMiTest {
                     "--measure-reversed",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", expectedOutput.toString()
                 });
         Byblo.main(new String[]{
@@ -276,7 +276,7 @@ public class CrMiTest {
                     "--crmi-gamma", "0.00",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", crmiOutput.toString()
                 });
 
@@ -286,7 +286,7 @@ public class CrMiTest {
     }
 
     @Test
-    @Ignore(value="Fails though may have an equivilant ranking.")
+    @Ignore(value = "Fails though may have an equivilant ranking.")
     public void testMainMethodRun_diceCheck() throws Exception {
         System.out.println(
                 "Testing CrMi(beta=NA, gamma=1) \"harmonic mean\" equals DiceMi  from main method.");
@@ -308,7 +308,7 @@ public class CrMiTest {
                     "--measure", "DiceMi",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", expectedOutput.toString()
                 });
         Byblo.main(new String[]{
@@ -319,7 +319,7 @@ public class CrMiTest {
                     "--crmi-gamma", "1.00",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", crmiOutput.toString()
                 });
 

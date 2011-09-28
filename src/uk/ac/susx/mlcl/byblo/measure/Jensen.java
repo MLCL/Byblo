@@ -36,7 +36,6 @@ import java.util.logging.Logger;
 /**
  * Jensen-Shannon divergence
  * 
- * @version 2nd December 2010
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public class Jensen implements Proximity {
@@ -61,7 +60,6 @@ public class Jensen implements Proximity {
             } else if (Q.keys[i] > R.keys[j]) {
                 j++;
             } else {
-                // chain rule - nom nom nom!
                 final double Qprob = Q.values[i] / Q.sum;
                 final double Rprob = R.values[j] / R.sum;
                 final double avprob = Math.log(Qprob + Rprob) - LN2;

@@ -85,7 +85,7 @@ public class DiceTest {
             "--measure", "Dice",
             "--input", SAMPLE_DATA_DIR + dataSet + ".features",
             "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
             "--output", output.toString()
         };
 
@@ -96,7 +96,6 @@ public class DiceTest {
 
         Thread.sleep(100);
     }
-
 
     @Test
     public void testMainMethodRun_DiceMI() throws Exception {
@@ -114,7 +113,7 @@ public class DiceTest {
             "--measure", "DiceMi",
             "--input", SAMPLE_DATA_DIR + dataSet + ".features",
             "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
             "--output", output.toString()
         };
 
@@ -125,8 +124,6 @@ public class DiceTest {
 
         Thread.sleep(100);
     }
-
-
 
     @Test
     public void test_Dice_Symmetry() throws Exception {
@@ -147,7 +144,7 @@ public class DiceTest {
                     "--measure", "Dice",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", output1.toString()
                 });
         Byblo.main(new String[]{
@@ -157,7 +154,7 @@ public class DiceTest {
                     "--measure-reversed",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", output2.toString()
                 });
 
@@ -165,8 +162,6 @@ public class DiceTest {
 
         Thread.sleep(100);
     }
-
-
 
     @Test
     public void test_DiceMi_Symmetry() throws Exception {
@@ -187,7 +182,7 @@ public class DiceTest {
                     "--measure", "DiceMi",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", output1.toString()
                 });
         Byblo.main(new String[]{
@@ -197,7 +192,7 @@ public class DiceTest {
                     "--measure-reversed",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", output2.toString()
                 });
 

@@ -39,7 +39,6 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * Expected range: 0 to +inf
  * Measure type: proximity (0 = distinct, +inf = identical)
  *
- * @version 2nd December 2010
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public class Confusion extends AbstractMIProximity implements Proximity {
@@ -56,7 +55,7 @@ public class Confusion extends AbstractMIProximity implements Proximity {
                 j++;
             } else { // Q.keys[i] == R.keys[j]
                 total += (prob(A, i) * prob(B, j))
-                        / contextProb(A.keys[i]);
+                        / featurePrior(A.keys[i]);
                 i++;
                 j++;
             }

@@ -30,84 +30,40 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import uk.ac.susx.mlcl.lib.ObjectIndex;
+import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
+import uk.ac.susx.mlcl.lib.io.Sink;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.text.DecimalFormat;
+
 /**
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 27th March 2011
  */
-public class HeadEntry {
+public class EntrySink extends AbstractTSVSink<EntryRecord>
+        implements Sink<EntryRecord> {
 
-//    private final String head;
+    private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
 
-    private final int headId;
-//
-//    @Deprecated
-//    private final int index;
-//
-//    @Deprecated
-//    private final int width;
+    private final ObjectIndex<String> stringIndex;
 
-    private final double total;
-
-    public HeadEntry(//final String head,
-            final int headId,
-//            final int index,
-//            final int width,
-            final double total) {
-//        this.head = head;
-        this.headId = headId;
-//        this.index = index;
-//        this.width = width;
-        this.total = total;
-    }
-
-    public int getHeadId() {
-        return headId;
-    }
-//
-//    @Deprecated
-//    public int getIndex() {
-//        return index;
-//    }
-//
-//    @Deprecated
-//    public int getWidth() {
-//        return width;
-//    }
-
-    public double getTotal() {
-        return total;
-    }
-//
-//    public String getHeadword() {
-//        return head;
-//    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        final HeadEntry other = (HeadEntry) obj;
-        if (this.headId != other.headId)
-            return false;
-        return true;
+    public EntrySink(File file, Charset charset, ObjectIndex<String> stringIndex)
+            throws FileNotFoundException, IOException {
+        super(file, charset);
+        this.stringIndex = stringIndex;
     }
 
     @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 71 * hash + this.headId;
-        return hash;
-    }
-
-    @Override
-    public String toString() {
-        return "HeadDbEntry{" //+ "head=" + head
-                + ", headId=" + headId
-//                + ", index=" + index
-//                + ", width=" + width
-                + ", total=" + total + '}';
+    public void write(final EntryRecord record) throws IOException {
+        writeString(stringIndex.get(record.getEntryId()));
+        writeValueDelimiter();
+        if (Double.compare((int) record.getWeight(), record.getWeight()) == 0)
+            super.writeInt((int) record.getWeight());
+        else
+            super.writeString(f.format(record.getWeight()));
+        writeRecordDelimiter();
     }
 }

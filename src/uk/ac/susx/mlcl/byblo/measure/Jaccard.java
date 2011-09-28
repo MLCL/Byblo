@@ -36,7 +36,6 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * The Jaccard Co-efficient on binary features. Each vector is interpreted as a
  * a set of features, where a non-zero frequency weighting denotes existence.
  *
- * @version 2nd December 2010
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public class Jaccard implements Proximity {

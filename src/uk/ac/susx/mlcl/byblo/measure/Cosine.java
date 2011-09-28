@@ -35,7 +35,6 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 /**
  * Measure of orthogonality between the two vectors. 
  *
- * @version 2nd December 2010
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public class Cosine implements Proximity {
@@ -64,8 +63,9 @@ public class Cosine implements Proximity {
     @Override
     public double left(SparseDoubleVector A) {
         double normSquared = 0;
-        for (int i = 0; i < A.size; i++)
+        for (int i = 0; i < A.size; i++) {
             normSquared += (A.values[i] / A.sum) * (A.values[i] / A.sum);
+        }
         return normSquared;
     }
 

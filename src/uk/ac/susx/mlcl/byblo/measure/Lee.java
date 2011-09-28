@@ -43,7 +43,6 @@ import java.util.logging.Logger;
  * Statistical Language Analysis" Artificial Intelligence and Statistics 2001,
  * pp. 65--72, 2001
  *
- * @version 2nd December 2010
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public class Lee implements Proximity {

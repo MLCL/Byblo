@@ -88,7 +88,7 @@ public class LpTest {
             "--mink-p", "0",
             "--input", SAMPLE_DATA_DIR + dataSet + ".features",
             "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
             "--output", output.toString()
         };
 
@@ -117,7 +117,7 @@ public class LpTest {
             "--mink-p", "1",
             "--input", SAMPLE_DATA_DIR + dataSet + ".features",
             "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
             "--output", output.toString()
         };
 
@@ -146,7 +146,7 @@ public class LpTest {
             "--mink-p", "2",
             "--input", SAMPLE_DATA_DIR + dataSet + ".features",
             "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
             "--output", output.toString()
         };
 
@@ -175,7 +175,7 @@ public class LpTest {
             "--mink-p", "3",
             "--input", SAMPLE_DATA_DIR + dataSet + ".features",
             "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
             "--output", output.toString()
         };
 
@@ -204,7 +204,7 @@ public class LpTest {
             "--mink-p", Double.toString(Math.E),
             "--input", SAMPLE_DATA_DIR + dataSet + ".features",
             "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
             "--output", output.toString()
         };
 
@@ -233,7 +233,7 @@ public class LpTest {
             "--mink-p", "Infinity",
             "--input", SAMPLE_DATA_DIR + dataSet + ".features",
             "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
             "--output", output.toString()
         };
 
@@ -265,7 +265,7 @@ public class LpTest {
                     "--mink-p", "1",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", output1.toString()
                 });
         Byblo.main(new String[]{
@@ -276,7 +276,7 @@ public class LpTest {
                     "--measure-reversed",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", output2.toString()
                 });
 
@@ -306,7 +306,7 @@ public class LpTest {
                     "--mink-p", "2",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", output1.toString()
                 });
         Byblo.main(new String[]{
@@ -317,7 +317,7 @@ public class LpTest {
                     "--measure-reversed",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", output2.toString()
                 });
 
@@ -347,7 +347,7 @@ public class LpTest {
                     "--mink-p", "3",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", output1.toString()
                 });
         Byblo.main(new String[]{
@@ -358,7 +358,7 @@ public class LpTest {
                     "--measure-reversed",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", output2.toString()
                 });
 
@@ -388,7 +388,7 @@ public class LpTest {
                     "--mink-p", "Infinity",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", output1.toString()
                 });
         Byblo.main(new String[]{
@@ -399,7 +399,7 @@ public class LpTest {
                     "--measure-reversed",
                     "--input", SAMPLE_DATA_DIR + dataSet + ".features",
                     "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-heads", SAMPLE_DATA_DIR + dataSet + ".heads",
+                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
                     "--output", output2.toString()
                 });
 

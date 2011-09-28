@@ -32,63 +32,74 @@ package uk.ac.susx.mlcl.byblo.io;
 
 import uk.ac.susx.mlcl.lib.ObjectIndex;
 import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
-import uk.ac.susx.mlcl.lib.io.Sink;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.text.DecimalFormat;
+import uk.ac.susx.mlcl.lib.io.Sink;
 
-public class InstanceSink
-        extends AbstractTSVSink<InstanceEntry>
-        implements Sink<InstanceEntry> {
+/**
+ * 
+ * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ */
+public class WeightedEntryFeatureSink
+        extends AbstractTSVSink<WeightedEntryFeatureRecord>
+        implements Sink<WeightedEntryFeatureRecord> {
 
-    private final ObjectIndex<String> headIndex;
+    private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
 
-    private final ObjectIndex<String> contextIndex;
+    private final ObjectIndex<String> entryIndex;
 
-    public InstanceSink(File file, Charset charset,
-            ObjectIndex<String> headIndex, ObjectIndex<String> contextIndex)
+    private final ObjectIndex<String> featureIndex;
+
+    public WeightedEntryFeatureSink(File file, Charset charset,
+            ObjectIndex<String> entryIndex, ObjectIndex<String> featureIndex)
             throws FileNotFoundException, IOException {
         super(file, charset);
-        if (headIndex == null)
-            throw new NullPointerException("headIndex == null");
-        if (contextIndex == null)
-            throw new NullPointerException("contextIndex == null");
-        this.headIndex = headIndex;
-        this.contextIndex = contextIndex;
+        if (entryIndex == null)
+            throw new NullPointerException("entryIndex == null");
+        if (featureIndex == null)
+            throw new NullPointerException("featureIndex == null");
+        this.entryIndex = entryIndex;
+        this.featureIndex = featureIndex;
     }
 
-    public InstanceSink(File file, Charset charset,
+    public WeightedEntryFeatureSink(File file, Charset charset,
             ObjectIndex<String> combinedIndex)
             throws FileNotFoundException, IOException {
         this(file, charset, combinedIndex, combinedIndex);
     }
 
-    public InstanceSink(File file, Charset charset) throws FileNotFoundException, IOException {
+    public WeightedEntryFeatureSink(File file, Charset charset) throws FileNotFoundException, IOException {
         this(file, charset, new ObjectIndex<String>());
     }
 
-    public final ObjectIndex<String> getHeadIndex() {
-        return headIndex;
+    public final ObjectIndex<String> getEntryIndex() {
+        return entryIndex;
     }
 
-    public ObjectIndex<String> getContextIndex() {
-        return contextIndex;
+    public ObjectIndex<String> getFeatureIndex() {
+        return featureIndex;
     }
 
+    public boolean isIndexCombined() {
+        return getEntryIndex() == getFeatureIndex();
+    }
+    
     @Override
-    public void write(final InstanceEntry record) throws IOException {
-        writeHead(record.getHeadId());
+    public void write(WeightedEntryFeatureRecord record) throws IOException {
+        
+        super.writeString(entryIndex.get(record.getEntryId()));
         super.writeValueDelimiter();
-        writeContext(record.getContextId());
+        
+        super.writeString(featureIndex.get(record.getFeatureId()));
+        super.writeValueDelimiter();
+        
+        if (Double.compare((int) record.getWeight(), record.getWeight()) == 0)
+            super.writeInt((int) record.getWeight());
+        else
+            super.writeString(f.format(record.getWeight()));
         super.writeRecordDelimiter();
-    }
-
-    protected final void writeHead(final int head_id) throws IOException {
-        super.writeString(headIndex.get(head_id));
-    }
-
-    protected final void writeContext(final int context_id) throws IOException {
-        super.writeString(contextIndex.get(context_id));
     }
 }

@@ -55,10 +55,9 @@ import java.util.logging.Logger;
  * Any file denoted by the name string "-" is assumed to be standard-in in the
  * case of source files, and standard out in the case of destination files..
  *
- * @version 2nd December 2010
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(commandDescription = "USAGE_MERGE_COMMAND")
+@Parameters(commandDescription = "Merges the contents of two sorted source files, line by line, into a destination file.")
 public class MergeTask extends AbstractTask {
 
     private static final Logger LOG = Logger.getLogger(MergeTask.class.getName());
@@ -68,29 +67,20 @@ public class MergeTask extends AbstractTask {
     private Formatter formatter = new DefaultFormatter();
 
     @Parameter(names = {"-ifa", "--input-file-a"}, required = true,
-               descriptionKey = "USAGE_INPUT_FILE_A")
+               description = "The first file to merge.")
     private File sourceFileA;
 
     @Parameter(names = {"-ifb", "--input-file-b"}, required = true,
-               descriptionKey = "USAGE_INPUT_FILE_B")
+               description = "The second file to merge.")
     private File sourceFileB;
 
     @Parameter(names = {"-of", "--output-file"},
-               descriptionKey = "USAGE_OUTPUT_FILE")
+               description = "The output file to which both input will be merged.")
     private File destinationFile;
 
-    @Parameter(names = {"--charset"},
-               descriptionKey = "USAGE_CHARSET")
+    @Parameter(names = {"-c", "--charset"},
+               description = "The character set encoding to use for both input and output files.")
     private Charset charset = IOUtil.DEFAULT_CHARSET;
-
-    public final Charset getCharset() {
-        return charset;
-    }
-
-    public final void setCharset(Charset charset) {
-        Checks.checkNotNull(charset);
-        this.charset = charset;
-    }
 
     public MergeTask(File sourceFileA, File sourceFileB, File destination,
             Charset charset) {
@@ -103,6 +93,15 @@ public class MergeTask extends AbstractTask {
 
     public MergeTask() {
         comparator = new CaseInsensitiveComparator<String>();
+    }
+
+    public final Charset getCharset() {
+        return charset;
+    }
+
+    public final void setCharset(Charset charset) {
+        Checks.checkNotNull(charset);
+        this.charset = charset;
     }
 
     @Override

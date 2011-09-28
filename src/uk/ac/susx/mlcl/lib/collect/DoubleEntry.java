@@ -42,7 +42,6 @@ import java.util.Comparator;
  * Immutable object that holds a key/value pair
  * 
  * @author Hamish Morgan (Hamish.Morgan@sussex.ac.uk)
- * @version 22nd October 2010
  */
 public class DoubleEntry extends AbstractEntry implements Serializable, Cloneable {
 

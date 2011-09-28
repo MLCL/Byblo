@@ -51,10 +51,9 @@ import java.util.logging.Logger;
 
 /**
  *
- * @version 2nd December 2010
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(commandDescription = "USAGE_CHUNK_COMMAND")
+@Parameters(commandDescription = "Split a large file into a number of smaller files.")
 public class ChunkTask extends AbstractTask {
 
     private static final Logger LOG = Logger.getLogger(ChunkTask.class.getName());
@@ -66,18 +65,18 @@ public class ChunkTask extends AbstractTask {
     private FileFactory chunkFileFactory =
             new TempFileFactory(this.getClass().getName() + ".", "");
 
-    @Parameter(names = {"-c", "--max-chunk-size"},
-               descriptionKey = "USAGE_MAX_CHUNK_SIZE")
+    @Parameter(names = {"-C", "--max-chunk-size"},
+               description = "Number of lines that will be read and sorted in RAM at one time (per thread). Larger values increase memory usage and performace.")
     private int maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
 
     @Parameter(names = {"-i", "--input-file"},
-               descriptionKey = "USAGE_INPUT_FILE")
+               description = "Source file. If this argument is not given, or if it is \"-\", then stdin will be read.")
     private File sourceFile = DEFAULT_SOURCE_FILE;
 
     private BlockingQueue<File> dstFileQueue = new LinkedBlockingDeque<File>();
 
-    @Parameter(names = {"--charset"},
-               descriptionKey = "USAGE_CHARSET")
+    @Parameter(names = {"-c", "--charset"},
+               description = "Character encoding to use.")
     private Charset charset = IOUtil.DEFAULT_CHARSET;
 
     public final Charset getCharset() {

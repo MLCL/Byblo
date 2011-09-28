@@ -38,59 +38,69 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-public class InstanceSource
-        extends AbstractTSVSource<InstanceEntry>
-        implements Source<InstanceEntry> {
+/**
+ *
+ * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ */
+public class EntryFeatureSource
+        extends AbstractTSVSource<EntryFeatureRecord>
+        implements Source<EntryFeatureRecord> {
 
-    private final ObjectIndex<String> headIndex;
+    private final ObjectIndex<String> entryIndex;
 
-    private final ObjectIndex<String> contextIndex;
+    private final ObjectIndex<String> featureIndex;
 
-    public InstanceSource(File file, Charset charset,
-            ObjectIndex<String> headIndex,
-            ObjectIndex<String> contextIndex)
+    public EntryFeatureSource(
+            File file, Charset charset,
+            ObjectIndex<String> entryIndex,
+            ObjectIndex<String> featureIndex)
             throws FileNotFoundException, IOException {
         super(file, charset);
-        if (headIndex == null)
-            throw new NullPointerException("headIndex == null");
-        if (contextIndex == null)
-            throw new NullPointerException("contextIndex == null");
-        this.headIndex = headIndex;
-        this.contextIndex = contextIndex;
+        if (entryIndex == null)
+            throw new NullPointerException("entryIndex == null");
+        if (featureIndex == null)
+            throw new NullPointerException("featureIndex == null");
+        this.entryIndex = entryIndex;
+        this.featureIndex = featureIndex;
     }
 
-    public InstanceSource(File file, Charset charset,
+    public EntryFeatureSource(File file, Charset charset,
             ObjectIndex<String> combinedIndex)
             throws FileNotFoundException, IOException {
         this(file, charset, combinedIndex, combinedIndex);
     }
 
-    public InstanceSource(File file, Charset charset) throws FileNotFoundException, IOException {
+    public EntryFeatureSource(File file, Charset charset)
+            throws FileNotFoundException, IOException {
         this(file, charset, new ObjectIndex<String>());
     }
 
-    public final ObjectIndex<String> getHeadIndex() {
-        return headIndex;
+    public final ObjectIndex<String> getEntryIndex() {
+        return entryIndex;
     }
 
-    public ObjectIndex<String> getContextIndex() {
-        return contextIndex;
+    public ObjectIndex<String> getFeatureIndex() {
+        return featureIndex;
+    }
+
+    public boolean isIndexCombined() {
+        return getEntryIndex() == getFeatureIndex();
     }
 
     @Override
-    public InstanceEntry read() throws IOException {
-        final int head_id = readHead();
+    public EntryFeatureRecord read() throws IOException {
+        final int entryId = readEntry();
         parseValueDelimiter();
-        final int tail_id = readContext();
+        final int featureId = readFeature();
         parseRecordDelimiter();
-        return new InstanceEntry(head_id, tail_id);
+        return new EntryFeatureRecord(entryId, featureId);
     }
 
-    protected final int readHead() throws IOException {
-        return headIndex.get(parseString());
+    protected final int readEntry() throws IOException {
+        return entryIndex.get(parseString());
     }
 
-    protected final int readContext() throws IOException {
-        return contextIndex.get(parseString());
+    protected final int readFeature() throws IOException {
+        return featureIndex.get(parseString());
     }
 }

@@ -38,10 +38,10 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import uk.ac.susx.mlcl.byblo.allpairs.InvertedApssTask;
 import uk.ac.susx.mlcl.byblo.allpairs.ThreadedApssTask;
-import uk.ac.susx.mlcl.byblo.io.ContextSource;
 import uk.ac.susx.mlcl.byblo.io.FeatureSource;
-import uk.ac.susx.mlcl.byblo.io.FeatureVectorSource;
-import uk.ac.susx.mlcl.byblo.io.HeadSource;
+import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureSource;
+import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureVectorSource;
+import uk.ac.susx.mlcl.byblo.io.EntrySource;
 import uk.ac.susx.mlcl.byblo.io.WeightedPairSink;
 import uk.ac.susx.mlcl.byblo.measure.AbstractMIProximity;
 import uk.ac.susx.mlcl.byblo.measure.CrMi;
@@ -51,7 +51,7 @@ import uk.ac.susx.mlcl.byblo.measure.Lp;
 import uk.ac.susx.mlcl.byblo.measure.Proximity;
 import uk.ac.susx.mlcl.byblo.measure.ReversedProximity;
 import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.lib.collect.WeightedPair;
+import uk.ac.susx.mlcl.lib.collect.Pair;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
@@ -68,91 +68,90 @@ import java.util.logging.Logger;
 
 /**
  *
- * @version 2nd December 2010
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(commandDescription = "USAGE_ALL_PAIRS",
-            resourceBundle = "uk.ac.susx.mlcl.byblo.strings")
-public class AllPairsCommand extends AbstractTask {
+@Parameters(
+commandDescription = "Perform all-pair similarity search on the given input frequency files.")
+public class AllPairsTask extends AbstractTask {
 
     private static final Logger LOG =
-            Logger.getLogger(AllPairsCommand.class.getName());
+            Logger.getLogger(AllPairsTask.class.getName());
 
     @Parameter(names = {"-i", "--input"},
-               descriptionKey = "USAGE_FEATURE_FILE",
+               description = "Entry-feature frequency vectors files.",
                required = true,
+               validateWith = InputFileValidator.class)
+    private File entryFeaturesFile;
+
+    @Parameter(names = {"-if", "--input-features"},
+               description = "Feature frequencies file",
                validateWith = InputFileValidator.class)
     private File featuresFile;
 
-    @Parameter(names = {"--input-contexts"},
-               descriptionKey = "USAGE_CONTEXTS_FILE",
+    @Parameter(names = {"-ie", "--input-entries"},
+               description = "Entry frequencies file",
                validateWith = InputFileValidator.class)
-    private File contextsFile;
-
-    @Parameter(names = {"--input-heads"},
-               descriptionKey = "USAGE_HEADS_FILE",
-               validateWith = InputFileValidator.class)
-    private File headsFile;
+    private File entriesFile;
 
     @Parameter(names = {"-o", "--output"},
-               descriptionKey = "USAGE_OUTPUT_FILE",
+               description = "Output similarity matrix file.",
                required = true,
                validateWith = OutputFileValidator.class)
     private File outputFile;
 
-    @Parameter(names = {"--charset"},
-               descriptionKey = "USAGE_CHARSET")
+    @Parameter(names = {"-c", "--charset"},
+               description = "Character encoding to use for reading and writing.")
     private Charset charset = IOUtil.DEFAULT_CHARSET;
 
     @Parameter(names = {"-C", "--chunk-size"},
-               descriptionKey = "USAGE_CHUNK_SIZE")
+               description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
     private int chunkSize = 5000;
 
-    @Parameter(names = {"--threads"},
-               descriptionKey = "USAGE_NUM_THREADS")
+    @Parameter(names = {"-t", "--threads"},
+               description = "Number of conccurent processing threads.")
     private int nThreads = Runtime.getRuntime().availableProcessors() + 1;
 
     @Parameter(names = {"-Smn", "--similarity-min"},
-               descriptionKey = "USAGE_MIN_SIMILARITY",
+               description = "Minimum similarity threshold.",
                converter = DoubleConverter.class)
     private double minSimilarity = Double.NEGATIVE_INFINITY;
 
     @Parameter(names = {"-Smx", "--similarity-max"},
-               descriptionKey = "USAGE_MAX_SIMILARITY",
+               description = "Maximyum similarity threshold.",
                converter = DoubleConverter.class)
     private double maxSimilarity = Double.POSITIVE_INFINITY;
 
     @Parameter(names = {"-ip", "--identity-pairs"},
-               descriptionKey = "USAGE_IDENTITY_PAIRS")
+               description = "Produce similarity between pair of identical entries.")
     private boolean outputIdentityPairs = false;
 
     @Parameter(names = {"-m", "--measure"},
-               descriptionKey = "USAGE_MEASURE")
+               description = "Similarity measure to use.")
     private String measureName = "Jaccard";
 
     @Parameter(names = {"--measure-reversed"},
-               descriptionKey = "USAGE_MEASURE_REVERSED")
+               description = "Swap similarity measure inputs.")
     private boolean measureReversed = false;
 
     @Parameter(names = {"--lee-alpha"},
-               descriptionKey = "USAGE_LEE_ALPHA",
+               description = "Alpha parameter to Lee's alpha-skew divergence measure.",
                converter = DoubleConverter.class)
     private double leeAlpha = Lee.DEFAULT_ALPHA;
 
     @Parameter(names = {"--crmi-beta"},
-               descriptionKey = "USAGE_CRMI_BETA",
+               description = "Beta paramter to Weed's CRMI measure.",
                converter = DoubleConverter.class)
     private double crmiBeta = CrMi.DEFAULT_BETA;
 
     @Parameter(names = {"--crmi-gamma"},
-               descriptionKey = "USAGE_CRMI_GAMMA",
+               description = "Gamma paramter to Weed's CRMI measure.",
                converter = DoubleConverter.class)
     private double crmiGamma = CrMi.DEFAULT_GAMMA;
 
     @Parameter(names = {"--mink-p"},
-               descriptionKey = "USAGE_MINK_P",
+               description = "P parameter to Minkowski/Lp space measure.",
                converter = DoubleConverter.class)
-    private double minkP = 2d;
+    private double minkP = 2;
 
     @Override
     protected void initialiseTask() throws Exception {
@@ -168,8 +167,8 @@ public class AllPairsCommand extends AbstractTask {
                 "uk.ac.susx.mlcl.byblo.measure.measures");
         final String[] measures = res.getString("measures").split(",");
 
-        for (String measure : measures) {
-            measure = measure.trim();
+        for (int i = 0; i < measures.length; i++) {
+            final String measure = measures[i].trim();
             final String className = res.getString(
                     "measure." + measure + ".class");
             @SuppressWarnings("unchecked")
@@ -223,52 +222,53 @@ public class AllPairsCommand extends AbstractTask {
 
         ObjectIndex<String> strIndex = new ObjectIndex<String>();
 
-        LOG.info("Loading head entries file " + headsFile);
-        HeadSource headsDb = new HeadSource(
-                headsFile, charset, strIndex);
+        LOG.info("Loading entry frequencies file " + entriesFile);
+        EntrySource entrySource = new EntrySource(
+                entriesFile, charset, strIndex);
         //TODO: Remove because it's never used?
-        double[] heads = headsDb.readAllAsArray();
+        double[] entryFrequencies = entrySource.readAllAsArray();
 
 
-        // Headword index is not really required for the core algorithm
-        // implementation but is used to filter headwords
+        // Entry index is not really required for the core algorithm
+        // implementation but is used to filter Entries
 
         // Mutual Information based proximity measures require the frequencies
-        // of each context feature, and other associate values, so load them
+        // of each feature, and other associate values, so load them
         // if required.
         if (prox instanceof AbstractMIProximity) {
             try {
-                LOG.info("Loading context entries file " + contextsFile);
+                LOG.log(Level.INFO, "Loading features file {0}",
+                        featuresFile);
 
-                ContextSource contexts = new ContextSource(
-                        contextsFile, charset, strIndex);
+                FeatureSource features = new FeatureSource(
+                        featuresFile, charset, strIndex);
                 AbstractMIProximity bmip = ((AbstractMIProximity) prox);
-//                contexts.position(0);
-                bmip.setContextFreqs(contexts.readAllAsArray());
-                bmip.setContextSum(contexts.getWeightSum());
-                bmip.setContextCardinality(contexts.getCardinality());
-                bmip.setUniqueContextCount(contexts.getCount());
+                bmip.setFeatureFrequencies(features.readAllAsArray());
+                bmip.setFeatureFrequencySum(features.getWeightSum());
+                bmip.setOccuringFeatureCount(features.getCardinality());
 
             } catch (IOException e) {
-                System.err.println("Error reading context totals file "
-                        + contextsFile + " : " + e.toString());
+                LOG.log(Level.SEVERE,
+                        "Error reading feature totals file {0} : {1}",
+                        new Object[]{featuresFile, e.toString()});
                 System.exit(1);
             }
-            System.err.println("Loaded contexts for MI");
+            System.err.println("Loaded features for MI");
         } else if (prox instanceof KendallTau) {
             try {
-                LOG.info("Loading context entries file for "
-                        + "KendalTau.numFeatures: " + contextsFile);
+                LOG.log(Level.INFO,
+                        "Loading entries file for KendalTau.numFeatures: {0}",
+                        featuresFile);
 
-                ContextSource contexts = new ContextSource(
-                        contextsFile, charset, strIndex);
-                contexts.readAll();
+                FeatureSource features = new FeatureSource(
+                        featuresFile, charset, strIndex);
+                features.readAll();
 
-                ((KendallTau) prox).setNumFeatures(contexts.getCardinality());
+                ((KendallTau) prox).setNumFeatures(features.getCardinality());
 
             } catch (IOException e) {
-                LOG.severe("Error reading contexts  file "
-                        + contextsFile + " : " + e.toString());
+                LOG.log(Level.SEVERE, "Error reading features file {0} : {1}",
+                        new Object[]{featuresFile, e.toString()});
                 System.exit(1);
             }
         }
@@ -286,15 +286,15 @@ public class AllPairsCommand extends AbstractTask {
         // combinations of vectors, so will be looking at two differnt points
         // in the file. Also this allows for the possibility of having differnt
         // files, e.g compare fruit words with cake words
-        final FeatureVectorSource sourceA = new FeatureSource(
-                featuresFile, charset, strIndex).getVectorSource();
-        final FeatureVectorSource sourceB = new FeatureSource(
-                featuresFile, charset, strIndex).getVectorSource();
+        final WeightedEntryFeatureVectorSource sourceA = new WeightedEntryFeatureSource(
+                entryFeaturesFile, charset, strIndex).getVectorSource();
+        final WeightedEntryFeatureVectorSource sourceB = new WeightedEntryFeatureSource(
+                entryFeaturesFile, charset, strIndex).getVectorSource();
 
         // Create a sink object that will act as a recipient for all pairs that
         // are produced by the algorithm.
 
-        final Sink<WeightedPair> sink =
+        final Sink<Pair> sink =
                 new WeightedPairSink(outputFile, charset, strIndex, strIndex);
 
         // Instantiate the all-pairs algorithm as given on the command line.
@@ -307,17 +307,17 @@ public class AllPairsCommand extends AbstractTask {
         apss.setMeasure(prox);
         apss.setMaxChunkSize(chunkSize);
 
-        List<Predicate<WeightedPair>> pairFilters =
-                new ArrayList<Predicate<WeightedPair>>();
+        List<Predicate<Pair>> pairFilters =
+                new ArrayList<Predicate<Pair>>();
 
         if (minSimilarity != Double.NEGATIVE_INFINITY)
-            pairFilters.add(WeightedPair.similarityGTE(minSimilarity));
+            pairFilters.add(Pair.similarityGTE(minSimilarity));
 
         if (maxSimilarity != Double.POSITIVE_INFINITY)
-            pairFilters.add(WeightedPair.similarityLTE(maxSimilarity));
+            pairFilters.add(Pair.similarityLTE(maxSimilarity));
 
         if (!outputIdentityPairs)
-            pairFilters.add(Predicates.not(WeightedPair.identity()));
+            pairFilters.add(Predicates.not(Pair.identity()));
 
         if (pairFilters.size() == 1)
             apss.setProducatePair(pairFilters.get(0));
@@ -339,6 +339,7 @@ public class AllPairsCommand extends AbstractTask {
         public InputFileValidator() {
         }
 
+        @Override
         public void validate(String name, String value) throws ParameterException {
             File file = new File(value);
             if (!file.exists())
@@ -361,6 +362,7 @@ public class AllPairsCommand extends AbstractTask {
         public OutputFileValidator() {
         }
 
+        @Override
         public void validate(String name, String value) throws ParameterException {
             File file;
             try {
@@ -401,9 +403,9 @@ public class AllPairsCommand extends AbstractTask {
         return "AllPairsCommand{"
                 + "usageRequested=" + isUsageRequested()
                 + ", exceptionThrown=" + isExceptionThrown()
+                + ", entryFeaturesFile=" + entryFeaturesFile
                 + ", featuresFile=" + featuresFile
-                + ", contextsFile=" + contextsFile
-                + ", headsFile=" + headsFile
+                + ", entriesFile=" + entriesFile
                 + ", outputFile=" + outputFile
                 + ", charset=" + charset
                 + ", chunkSize=" + chunkSize

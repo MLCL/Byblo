@@ -40,8 +40,6 @@ import java.util.logging.Logger;
 /**
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 27th March 2011
- * @author hamish
  */
 @Parameters()
 public abstract class AbstractTask implements Task {
@@ -50,7 +48,7 @@ public abstract class AbstractTask implements Task {
             Logger.getLogger(AbstractTask.class.getName());
 
     @Parameter(names = {"-h", "--help"},
-               description = "USAGE_HELP")
+               description = "Display this help message.")
     private boolean usageRequested = false;
 
     private Queue<Exception> exceptions = null;

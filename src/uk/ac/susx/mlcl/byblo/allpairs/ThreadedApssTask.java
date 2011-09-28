@@ -33,7 +33,7 @@ package uk.ac.susx.mlcl.byblo.allpairs;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.collect.Entry;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.collect.WeightedPair;
+import uk.ac.susx.mlcl.lib.collect.Pair;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.tasks.Task;
@@ -56,7 +56,6 @@ import java.util.logging.Logger;
  * are run concurrently.
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 27th March 2011
  */
 public class ThreadedApssTask<S> extends NaiveApssTask<S> {
 
@@ -82,7 +81,7 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
     public ThreadedApssTask(
             SeekableSource<Entry<SparseDoubleVector>, S> A,
             SeekableSource<Entry<SparseDoubleVector>, S> B,
-            Sink<WeightedPair> sink) {
+            Sink<Pair> sink) {
         super(A, B, sink);
         setNumThreads(DEFAULT_NUM_THREADS);
     }
@@ -167,11 +166,12 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 queueTask(task);
 
                 // retrieve the results
-                while(getFutureQueue().peek().isDone()) {
+                while (getFutureQueue().peek().isDone()) {
                     Future<? extends Task> completed = getFutureQueue().poll();
                     Task t = completed.get();
-                    while(t.isExceptionThrown())
+                    while (t.isExceptionThrown()) {
                         t.throwException();
+                    }
                 }
             }
             nChunks = j + 1;
@@ -180,13 +180,12 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
         getExecutor().shutdown();
         getExecutor().awaitTermination(1, TimeUnit.DAYS);
 
-
         if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "Completed all-pairs similarity search: {0} ({1})",
+            LOG.log(Level.INFO,
+                    "Completed all-pairs similarity search: {0} ({1})",
                     new Object[]{this, Thread.currentThread().getName()});
             LOG.log(Level.INFO, MiscUtil.memoryInfoString());
         }
-
     }
 
     @Override

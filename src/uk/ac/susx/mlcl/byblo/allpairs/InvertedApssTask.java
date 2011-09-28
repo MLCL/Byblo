@@ -34,7 +34,7 @@ import uk.ac.susx.mlcl.lib.Checks;
 import java.util.logging.Logger;
 import uk.ac.susx.mlcl.lib.collect.Entry;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.collect.WeightedPair;
+import uk.ac.susx.mlcl.lib.collect.Pair;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -46,12 +46,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * An all=pairs similarity search implementation that improves efficiency by
+ * An all-pairs similarity search implementation that improves efficiency by
  * building a reverse index of one of the input sources. This allows candidate
- * pairs to be found very quickly.
+ * pairs to be found relatively quickly given sufficient sparsity
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 27th March 2011
  */
 public class InvertedApssTask<S> extends NaiveApssTask<S> {
 
@@ -76,7 +75,7 @@ public class InvertedApssTask<S> extends NaiveApssTask<S> {
     protected void computeAllPairs()
             throws IOException {
         final S startB = getSourceB().position();
-        List<WeightedPair> pairs = new ArrayList<WeightedPair>();
+        List<Pair> pairs = new ArrayList<Pair>();
 
         while (getSourceB().hasNext()) {
             Entry<SparseDoubleVector> b = getSourceB().read();
@@ -91,7 +90,7 @@ public class InvertedApssTask<S> extends NaiveApssTask<S> {
                 getStats().incrementCandidatesCount();
 
                 double sim = sim(a, b);
-                WeightedPair pair = new WeightedPair(a.key(), b.key(), sim);
+                Pair pair = new Pair(a.key(), b.key(), sim);
                 if (getProducatePair().apply(pair)) {
                     pairs.add(pair);
                     getStats().incrementProductionCount();

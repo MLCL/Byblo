@@ -30,9 +30,7 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
-import uk.ac.susx.mlcl.lib.io.IOUtil;
 import com.google.common.base.CharMatcher;
-import org.junit.Ignore;
 import uk.ac.susx.mlcl.lib.Strings;
 import uk.ac.susx.mlcl.lib.io.Lexer.Type;
 import java.io.OutputStream;
@@ -51,12 +49,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static org.junit.Assume.*;
 
 /**
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 27th March 2011
  */
 public class LexerTest {
 

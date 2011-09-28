@@ -43,8 +43,6 @@ import java.util.logging.Logger;
  * needs to be refactored before AbstractParallelTask can be integrated.
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 27th March 2011
- * @author hiam20
  * @deprecated work in progress (or not in progress)
  */
 @Deprecated

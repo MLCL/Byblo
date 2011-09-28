@@ -34,7 +34,6 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
  *
- *
  * Parameters
  *
  * β   γ  Special Case
@@ -45,15 +44,12 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * 0   0  recall
  * 0.5 0  unweighted arithmetic mean
  *
- *
- *
  * <ul>
  * <li>Weeds, Julie, and David Weir. (December 2005) Co-occurrence Retrieval: A 
  * Flexible Framework for Lexical Distributional Similarity. Computational
  * Linguistics 31, no. 4: 439-475.</li>
  * </ul>
  *
- * @version 2nd December 2010
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public class CrMi extends AbstractMIProximity implements Proximity {
@@ -75,15 +71,15 @@ public class CrMi extends AbstractMIProximity implements Proximity {
     }
 
     @Override
-    public void setContextFreqs(double[] contextFrequencies) {
-        recallMi.setContextFreqs(contextFrequencies);
-        super.setContextFreqs(contextFrequencies);
+    public void setFeatureFrequencies(double[] contextFrequencies) {
+        recallMi.setFeatureFrequencies(contextFrequencies);
+        super.setFeatureFrequencies(contextFrequencies);
     }
 
     @Override
-    public void setContextSum(double contextSum) {
-        recallMi.setContextSum(contextSum);
-        super.setContextSum(contextSum);
+    public void setFeatureFrequencySum(double contextSum) {
+        recallMi.setFeatureFrequencySum(contextSum);
+        super.setFeatureFrequencySum(contextSum);
     }
 
     public final void setBeta(final double beta) {

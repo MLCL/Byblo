@@ -36,7 +36,6 @@ import java.util.Comparator;
 /**
  *
  * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
- * @version 27th March 2011
  * @param <T>
  */
 public class CaseInsensitiveComparator<T extends CharSequence>
@@ -47,6 +46,7 @@ public class CaseInsensitiveComparator<T extends CharSequence>
     public CaseInsensitiveComparator() {
     }
 
+    @Override
     public int compare(final T string1, final T string2) {
         final int n = string1.length();
         final int m = string2.length();

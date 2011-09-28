@@ -135,7 +135,6 @@ import java.util.RandomAccess;
  * </ul>
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
- * @version 1.1 (19th November 2010)
  */
 public class Lexer implements RandomAccess {
 
