@@ -1,9 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Byblo" default="jar" basedir=".">
-    <description>
-        Builds, tests, and runs the project Byblo
-    </description>
+<!-- 
+Copyright (c) 2010 - 2011, University of Sussex
+All rights reserved.
 
+Redistribution and use in source and binary forms, with or without 
+modification, are permitted provided that the following conditions are met:
+
+ * Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+ * Redistributions in binary form must reproduce the above copyright notice, 
+   this list of conditions and the following disclaimer in the documentation 
+   and/or other materials provided with the distribution.
+
+ * Neither the name of the University of Sussex nor the names of its 
+   contributors may be used to endorse or promote products  derived from this
+   software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL <COPYRIGHT HOLDER> BE LIABLE FOR ANY DIRECT, 
+INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY 
+OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, 
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<project name="Byblo" default="all" basedir=".">
+    <description >
+        Builds and tests the Byblo project.
+    </description>
 
     <!-- 
         ===================
@@ -12,22 +40,26 @@
     -->
 
     <!-- Input paths -->
-    <property name="src.dir"      location="src" />
-    <property name="test.src.dir" location="test" />
-    <property name="libs.dir"      location="libs" />
-    <property name="scripts.dir"      location="scripts" />
-    
+    <property name="src.dir"      location="${basedir}/src" />
+    <property name="libs.dir"      location="${basedir}/libs" />
+    <property name="scripts.dir"      location="${basedir}/scripts" />
+    <property name="test.src.dir" location="${basedir}/test" />
+    <property name="test.data.dir" location="${basedir}/testdata" />    
+
     <!-- Output paths -->
-    <property name="build.dir" location="build"/>
-    <property name="dist.dir" location="dist"/>
+    <property name="build.dir" location="${basedir}/build"/>
+    <property name="dist.dir" location="${basedir}/dist"/>
     <property name="dist.libs.dir" location="${dist.dir}/libs"/>
-    <property name="javadoc.dir" location="${dist.dir}/javadoc"/>
+    <property name="javadoc.dir" location="${build.dir}/javadoc"/>
+    <property name="test.output.dir" location="${test.data.dir}/out" />
+    <property name="test.report.dir"  location="${build.dir}/test-report"/>
+
+
     
-    <!-- ? -->
+    <!-- Misc properties -->
     <property name="source.encoding" value="UTF-8"/>
     <property name="javac.compilerargs" value="-Xlint:all"/>
     <property name="main.class" value="uk.ac.susx.mlcl.byblo.Byblo"/>
-    <property name="run.jvmargs" value="-Xmx2g"/>
 
 
     <!-- 
@@ -41,6 +73,7 @@
         <tstamp/>
         
         <property name="build.classes.dir" location="${build.dir}/classes"/>
+        <property name="test.classes.dir" location="${build.dir}/tests" />
         
         <path id="classpath">
             <fileset dir="${libs.dir}" includes="**/*.jar"/>
@@ -48,7 +81,6 @@
         
         <path id="application" location="${dist.dir}/${ant.project.name}.jar" />
         
-        <property name="test.report.dir"  location="${build.dir}/junitreport"/>
     </target>
 
 
@@ -59,7 +91,7 @@
     -->
 
     <target name="compile" depends="init" 
-            description="Compile the source code" >
+            description="Compile the project classes." >
 
         <mkdir dir="${build.classes.dir}" />
                 
@@ -77,39 +109,7 @@
         
     </target>
 
-
-    <!-- 
-        =================
-        BUILD JAR SECTION
-        =================
-    -->
-
-    <target name="jar" depends="compile" description="Generate the distribution" >    
-
-        <copy todir="${dist.dir}" file="LICENCE" />
-        <copy todir="${dist.dir}" file="README.md" />
-        
-        <copy todir="${dist.dir}" >
-            <fileset dir="${scripts.dir}" includes="**/*.sh" />
-        </copy>
-        <chmod perm="a+x">
-            <fileset dir="${dist.dir}" includes="**/*.sh" />            
-        </chmod>
-        
-        <mkdir dir="${dist.libs.dir}" />
-        <copy todir="${dist.libs.dir}" >
-            <fileset dir="${libs.dir}" includes="**/*.jar" />
-        </copy>
-
-        <!-- Convert the libraries classpath to space separated list suitable
-            for the jar manifest attribute. -->
-        <pathconvert pathsep=" " property="jar.classpath" refid="classpath">
-            <chainedmapper>
-                <flattenmapper/>
-                <globmapper from="*" to="libs/*"/>
-            </chainedmapper>
-        </pathconvert>
-                
+    <target name="jar" depends="compile" description="Build JAR" >    
         <jar jarfile="${dist.dir}/${ant.project.name}.jar" 
             basedir="${build.classes.dir}" >     
             <manifest>
@@ -123,9 +123,8 @@
                 <attribute name="Main-Class" value="${main.class}"/>
             </manifest>
         </jar>
-        
-        
     </target>
+    
 
 
     <!-- 
@@ -166,6 +165,56 @@
         </copy>
         
     </target>
+    
+    <!-- 
+    ==========================
+    BUILD DISTRIBUTION SECTION
+    ==========================
+    -->
+
+    <target name="src-jar" depends="init"  >    
+        <jar jarfile="${dist.dir}/${ant.project.name}-src.jar" 
+            basedir="${src.dir}" >     
+            <manifest>
+                <attribute name="Built-By" value="${user.name}"/>
+                <attribute name="Implementation-Vendor" value="University of Sussex"/>
+                <attribute name="Implementation-Title" value="Byblo"/>
+                <attribute name="Implementation-Version" value="unknown"/>
+            </manifest>
+        </jar>
+    </target>
+    
+    <target name="dist" depends="jar, src-jar, javadoc" description="Generate the binary distribution" >    
+
+        <copy todir="${dist.dir}" file="LICENCE" />
+        <copy todir="${dist.dir}" file="README.md" />
+        
+        <copy todir="${dist.dir}" >
+            <fileset dir="${scripts.dir}" includes="**/*.sh" />
+        </copy>
+
+        <chmod perm="a+x">
+            <fileset dir="${dist.dir}" includes="**/*.sh" />            
+        </chmod>
+        
+        <mkdir dir="${dist.libs.dir}" />
+        <copy todir="${dist.libs.dir}" >
+            <fileset dir="${libs.dir}" includes="**/*.jar" excludes="**junit*.jar"/>
+        </copy>
+
+        <!-- Convert the libraries classpath to space separated list suitable
+            for the jar manifest attribute. -->
+        <pathconvert pathsep=" " property="jar.classpath" refid="classpath">
+            <chainedmapper>
+                <flattenmapper/>
+                <globmapper from="*" to="libs/*"/>
+            </chainedmapper>
+        </pathconvert>
+
+        <zip zipfile="${dist.dir}/${ant.project.name}-api.zip" 
+            basedir="${javadoc.dir}" />
+
+    </target>
 
     
     <!-- 
@@ -173,27 +222,54 @@
         TEST SECTION
         ============
     -->
-    
-    <target name="test" depends="jar">
-        <mkdir dir="${test.report.dir}"/>
-        <junit printsummary="yes">
+  
+    <target name="compile-tests" depends="compile" >
+
+        <mkdir dir="${test.classes.dir}" />
+                
+       <!-- Compile all java sources to classes dir -->
+        <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}"  
+                includeantruntime="false" >
             <classpath>
                 <path refid="classpath" />
-                <path refid="application" />
-            </classpath>
-            <formatter type="xml"/>
-            <batchtest fork="yes" todir="${test.report.dir}">
-                <fileset dir="${test.src.dir}" includes="**/*Test.java" />
-            </batchtest>
-            
-        </junit>
+                <pathelement path="${build.classes.dir}"/>
+            </classpath>            
+            <compilerarg line="${javac.compilerargs}" />
+        </javac>
+       
+       <!-- Copy non-java resources to classes dir -->
+        <copy todir="${test.classes.dir}" verbose="true">
+            <fileset dir="${test.src.dir}" excludes="**/*.java"/>
+        </copy>
+        
     </target>
-    
-    <target name="testreport" depends="init">
-        <junitreport todir="${test.report.dir}">
-            <fileset dir="${test.report.dir}" includes="TEST-*.xml"/>
-            <report todir="${test.report.dir}"/>
+
+
+    <target name="test" depends="compile-tests" description="Run all unit tests.">
+        <mkdir dir="${test.report.dir}" />
+        <junit printsummary="yes" fork="yes" haltonfailure="yes" >
+            <classpath>
+                <path refid="classpath" />
+                <pathelement path="${build.classes.dir}"/>
+                <pathelement path="${test.classes.dir}"/>
+            </classpath>
+            <formatter type="xml" />
+            <batchtest fork="false" todir="${test.report.dir}">
+                <fileset dir="${test.classes.dir}">
+                    <include name="**/*Test.class"/>
+                </fileset>
+            </batchtest>
+        </junit>
+        
+                
+        <mkdir dir="${test.report.dir}" />
+        <junitreport todir="${test.report.dir}" >
+            <fileset dir="${test.report.dir}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="noframes" todir="${test.report.dir}/html"/>
         </junitreport>
+
     </target>
     
     
@@ -203,13 +279,16 @@
         =============
     -->
 
-    <target name="clean" description="clean up" >
+    <target name="clean" description="Clean-up files generated by this script." >
       
         <delete dir="${build.dir}" />
         <delete dir="${javadoc.dir}" />
         <delete dir="${dist.dir}" />
+        <delete dir="${test.output.dir}" />
     
     </target>
   
+    <target name="all" depends="test, dist" 
+        description="Build, test, and produce the distribution for the whole project."/>
       
 </project>

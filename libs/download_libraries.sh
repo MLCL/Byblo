@@ -182,3 +182,23 @@ cd "$libs_dir"
 echo "[${gg}] Done"
 
 
+#
+# Download binary distribution of junit
+# Requires: curl
+#
+
+ju=junit
+ju_version=junit-4.10
+
+echo "[${ju}] Starting"
+which -s curl || die "Can't find curl"
+
+ju_url=https://github.com/downloads/KentBeck/junit/${ju_version}.jar
+ju_dl_file=${ju_version}.jar
+echo "[${ju}] Downloading from ${ju_url} to $ju_dl_file"
+curl -L "${ju_url}" > "${ju_dl_file}" || die
+echo "[${ju}] Done"
+
+
+
+
