@@ -49,7 +49,10 @@ The project requires [Java 6](http://www.oracle.com/technetwork/java/javase/down
 
  * [Commons Logging 1.1.1](http://commons.apache.org/logging/) --- A very light weight wrapper API that enables logging frameworks to be configured and "plugged in" at runtime. 
 
+In addition to the above, [JUnit 4](http://www.junit.org/) is required for unit testing the project. The download script will also retrieve this library.
+
 All except JCommander are available in pre-compiled binary form. Simply place the `.jar` files in the `/libs/` directory. In the case JCommander you must compile it first using [maven](http://maven.apache.org/). To streamline this process there is a script `/libs/download_libraries.sh`, which will attempt to automatically download (and compile where necessary) all the dependancies.
+
 
 ## Building
 
@@ -63,10 +66,10 @@ To compile the software from the command line:
 $ cd libs
 $ ./download_libraries.sh
 $ cd ..
-$ ant jar
+$ ant dist
 ```
 
-This will compile the source code, and create a new directory `/dist/` containing the project `jar` file, and a copy of the libraries of various dependencies.
+This will compile the source code, and create a new directory `/dist/` containing the project `jar` file, and a copy of the various required libraries.
 
 ### Creating a Netbeans project.
 
@@ -111,7 +114,7 @@ There are a large number of options. To view a complete list enter ```./byblo.sh
 
 ## Attribution 
 
-This project is supported a TSB (Technology Strategy Board) grant, project  reference GCL-100934, and by [EPSRC Studentships](http://www.epsrc.ac.uk/funding/students/Pages/default.aspx), and by Graduate Teaching Assistantships from the School of Informatics, University of Sussex.
+This project is supported a TSB (Technology Strategy Board) grant reference GCL-100934, and by the [EPSRC Doctoral Training Account Scheme](http://www.epsrc.ac.uk/funding/students/dta).
 
 Special thanks to all members of the Machine Learning and Computational Linguistics Lab, School of Informatics, University of Sussex, for all the helpful input.
 
