@@ -47,7 +47,7 @@ import java.io.Serializable;
  *
  * Immutable
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T>
  */
 public class Entry<T> extends AbstractEntry

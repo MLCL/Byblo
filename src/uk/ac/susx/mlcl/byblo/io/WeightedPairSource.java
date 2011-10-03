@@ -28,54 +28,55 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo;
+package uk.ac.susx.mlcl.byblo.io;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Random;
-import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+import uk.ac.susx.mlcl.lib.ObjectIndex;
+import uk.ac.susx.mlcl.lib.io.AbstractTSVSource;
 import uk.ac.susx.mlcl.lib.io.Source;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import uk.ac.susx.mlcl.lib.collect.WeightedPair;
 
 /**
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class RandomSparseDoubleVectorSource 
-        implements Source<SparseDoubleVector> {
+public class WeightedPairSource
+        extends AbstractTSVSource<WeightedPair>
+        implements Source<WeightedPair> {
 
-    long seek = 0;
+    private final ObjectIndex<String> entryIndex;
 
-    Random rand = new Random();
-
-    int size = 100;
-
-    int cardinality = 1000;
-
-    double delta = 0.001;
-
-    public RandomSparseDoubleVectorSource() {
+    public WeightedPairSource(
+            File file, Charset charset,
+            ObjectIndex<String> entryIndex)
+            throws FileNotFoundException, IOException {
+        super(file, charset);
+        if (entryIndex == null)
+            throw new NullPointerException("entryIndex == null");
+        this.entryIndex = entryIndex;
     }
 
-    public SparseDoubleVector read() throws IOException {
-        rand.setSeed(seek);
-
-        double[] tmp = new double[size];
-        for(int i = 0; i < size; i++) {
-            tmp[i] = Math.abs(rand.nextGaussian()) + delta;
-        }
-
-        int[] keys = new int[size];
-        double[] values = new double[size];
-        for (int i = 0; i < size; i++) {
-            keys[i] = rand.nextInt(cardinality);
-            values[i] = Math.abs(rand.nextGaussian()) + delta;
-        }
-        Arrays.sort(keys);
-        return new SparseDoubleVector(keys, values, cardinality, size);
+    public WeightedPairSource(File file, Charset charset)
+            throws FileNotFoundException, IOException {
+        this(file, charset, new ObjectIndex<String>());
     }
 
-    public boolean hasNext() throws IOException {
-        return true;
+    public final ObjectIndex<String> getEntryIndex() {
+        return entryIndex;
     }
 
+    @Override
+    public WeightedPair read() throws IOException {
+        final int entryId1 = entryIndex.get(parseString());
+        parseValueDelimiter();
+        final int entryId2 = entryIndex.get(parseString());
+        parseValueDelimiter();
+        final double weight = parseDouble();
+        if (hasNext())
+            parseRecordDelimiter();
+        return new WeightedPair(entryId1, entryId2, weight);
+    }
 }

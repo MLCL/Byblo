@@ -35,7 +35,7 @@ import java.util.Comparator;
 
 /**
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T>
  */
 public class CaseInsensitiveComparator<T extends CharSequence>

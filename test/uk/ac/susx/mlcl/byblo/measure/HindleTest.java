@@ -33,93 +33,57 @@ package uk.ac.susx.mlcl.byblo.measure;
 import com.google.common.io.Files;
 import uk.ac.susx.mlcl.byblo.Byblo;
 import java.io.File;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static uk.ac.susx.mlcl.TestConstants.*;
+import static uk.ac.susx.mlcl.ExitTrapper.*;
 
 /**
  *
- * @author hiam20
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class HindleTest {
 
-    private static final String SAMPLE_DATA_DIR = "sampledata" + File.separator;
-
-    private static final String OUTPUT_DIR = SAMPLE_DATA_DIR + "out" + File.separator;
-
-    public HindleTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
-    @Test
-    public void testMainMethodRun() throws Exception {
+    @Test(timeout = 1000)
+    public void testHindleCLI() throws Exception {
         System.out.println("Testing Hindel from main method.");
 
-        final String dataSet = "bnc-gramrels-fruit";
+        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Hindel");
+        output.delete();
 
-        File output = new File(OUTPUT_DIR + dataSet + ".Hindel");
-        if (output.exists())
-            output.delete();
-
-        String[] args = new String[]{
-            "allpairs",
-            "--charset", "UTF-8",
-            "--measure", "Hindle",
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
-            "--output", output.toString()
-        };
-
-        Byblo.main(args);
-
-        assertTrue("Output file " + output + " does not exist.", output.exists());
-        assertTrue("Output file " + output + " is empty.", output.length() > 0);
-
-        Thread.sleep(100);
-    }
-
-
-
-
-    @Test
-    public void test_Hindle_Symmetry() throws Exception {
-        System.out.println("Testing symmetry.");
-
-        final String dataSet = "bnc-gramrels-fruit";
-
-        File output1 = new File(OUTPUT_DIR + dataSet + ".Hindle-1");
-        File output2 = new File(OUTPUT_DIR + dataSet + ".Hindle-2");
-        if (output1.exists())
-            output1.delete();
-        if (output2.exists())
-            output2.delete();
-
+        enableExistTrapping();
         Byblo.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "Hindle",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                    "--output", output.toString()
+                });
+        disableExitTrapping();
+
+        assertTrue("Output file " + output + " does not exist.", output.exists());
+        assertTrue("Output file " + output + " is empty.", output.length() > 0);
+    }
+
+    @Test(timeout = 1000)
+    public void testHindle_Symmetry() throws Exception {
+        System.out.println("Testing symmetry.");
+
+        File output1 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Hindle-1");
+        File output2 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Hindle-2");
+        output1.delete();
+        output2.delete();
+
+        enableExistTrapping();
+        Byblo.main(new String[]{
+                    "allpairs",
+                    "--charset", "UTF-8",
+                    "--measure", "Hindle",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output1.toString()
                 });
         Byblo.main(new String[]{
@@ -127,15 +91,12 @@ public class HindleTest {
                     "--charset", "UTF-8",
                     "--measure", "Hindle",
                     "--measure-reversed",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output2.toString()
                 });
-
+        disableExitTrapping();
         assertTrue(Files.equal(output1, output2));
-
-        Thread.sleep(100);
     }
-
 }

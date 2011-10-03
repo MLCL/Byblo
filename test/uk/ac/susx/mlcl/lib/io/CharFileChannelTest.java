@@ -30,10 +30,7 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
-import uk.ac.susx.mlcl.lib.io.IOUtil;
-import uk.ac.susx.mlcl.lib.io.CharFileChannel;
 import java.io.RandomAccessFile;
-import java.util.logging.Logger;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,24 +51,26 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static uk.ac.susx.mlcl.TestConstants.*;
 
 /**
- *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * Test cases for the CharFileChannel class.
+ * 
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class CharFileChannelTest {
 
-    private static final Logger LOG =
-            Logger.getLogger(CharFileChannelTest.class.getName());
+    static int SMALL_SAMPLE_SIZE = 1024 * 1024;
 
-    static final File smallSampleFile = new File(
-            "sampledata/bnc-gramrels-dense.features");
+    static File SMALL_SAMPLE_FILE;
 
     public CharFileChannelTest() {
     }
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        SMALL_SAMPLE_FILE = makeTempFile(SMALL_SAMPLE_SIZE);
+        SMALL_SAMPLE_FILE.deleteOnExit();
     }
 
     @AfterClass
@@ -86,52 +85,12 @@ public class CharFileChannelTest {
     public void tearDown() {
     }
 
-    @Test
-    @Ignore
-    public void testOpenVeryLargeFile() throws Exception {
-        System.out.println("Testing very large file mapping.");
-
-        // Create a file that is too big for a single map
-        File tmp = File.createTempFile(this.getClass().getName() + "-", "");
-        System.out.println(" + Creating temporary file: " + tmp);
-        tmp.deleteOnExit();
-
-
-        System.out.println(
-                " + Truncating temporary file to " + ((1L << 31L) + 1) + " bytes.");
-        RandomAccessFile raf = new RandomAccessFile(tmp, "rw");
-        raf.seek(((1L << 31L) + 1));
-        raf.writeUTF("THE END");
-        raf.close();
-
-        System.out.println(" + Testing CharFileChannel");
-
-        CharFileChannel instance = new CharFileChannel(
-                new FileInputStream(tmp).getChannel(),
-                IOUtil.DEFAULT_CHARSET);
-        instance.setMaxMappedBytes(1000000);
-
-        assertEquals(true, instance.isOpen());
-        instance.insureMapped(10000);
-
-        instance.close();
-        assertEquals(false, instance.isOpen());
-
-        try {
-            CharBuffer dst = CharBuffer.allocate(777773);
-            instance.read(dst);
-            fail("Exception should have been thrown.");
-        } catch (ClosedChannelException ex) {
-            // Yay (this is supposed to happen)
-        }
-    }
-
     @Test(timeout = 10000)
     public void testRead() throws Exception {
         System.out.println("Testing read(CharBuffer)");
 
         CharFileChannel instance = new CharFileChannel(
-                new FileInputStream(smallSampleFile).getChannel(), Charset.
+                new FileInputStream(SMALL_SAMPLE_FILE).getChannel(), Charset.
                 defaultCharset());
 
         CharBuffer dst = CharBuffer.allocate(777773);
@@ -146,15 +105,15 @@ public class CharFileChannelTest {
             dst.clear();
         }
         System.out.println(charsRead + " chars read");
-        assertEquals(charsRead, smallSampleFile.length());
+        assertEquals(charsRead, SMALL_SAMPLE_FILE.length());
     }
 
     @Test(timeout = 10000)
     public void testReadSmallBuffer() throws Exception {
-        System.out.println("Testing read(CharBuffer)");
+        System.out.println("Testing read(CharBuffer) with small buffer");
 
         CharFileChannel instance = new CharFileChannel(
-                new FileInputStream(smallSampleFile).getChannel(), Charset.
+                new FileInputStream(SMALL_SAMPLE_FILE).getChannel(), Charset.
                 defaultCharset());
 
         CharBuffer dst = CharBuffer.allocate(1 << 4);
@@ -168,7 +127,7 @@ public class CharFileChannelTest {
             dst.clear();
         }
         System.out.println(charsRead + " chars read");
-        assertEquals(charsRead, smallSampleFile.length());
+        assertEquals(charsRead, SMALL_SAMPLE_FILE.length());
     }
 
     @Test(timeout = 1000)
@@ -178,7 +137,7 @@ public class CharFileChannelTest {
 
 
         CharFileChannel instance = new CharFileChannel(
-                new FileInputStream(smallSampleFile).getChannel(), Charset.
+                new FileInputStream(SMALL_SAMPLE_FILE).getChannel(), Charset.
                 defaultCharset());
 
         int charbuffersize = 1001;
@@ -196,7 +155,7 @@ public class CharFileChannelTest {
             charsRead += n;
         }
         System.out.println(charsRead + " chars read");
-        assertEquals(charsRead, smallSampleFile.length());
+        assertEquals(charsRead, SMALL_SAMPLE_FILE.length());
 
         List<Entry<Long, CharBuffer>> entries =
                 new ArrayList<Entry<Long, CharBuffer>>(results.entrySet());
@@ -225,10 +184,52 @@ public class CharFileChannelTest {
 
 
         CharFileChannel instance = new CharFileChannel(
-                new FileInputStream(smallSampleFile).getChannel(),
+                new FileInputStream(SMALL_SAMPLE_FILE).getChannel(),
                 IOUtil.DEFAULT_CHARSET);
 
         assertEquals(true, instance.isOpen());
+        instance.close();
+        assertEquals(false, instance.isOpen());
+
+        try {
+            CharBuffer dst = CharBuffer.allocate(777773);
+            instance.read(dst);
+            fail("Exception should have been thrown.");
+        } catch (ClosedChannelException ex) {
+            // Yay (this is supposed to happen)
+        }
+    }
+
+    @Test
+    @Ignore(value = "Test creates a massive (over 2 GB) file to test address "
+    + "outside of 32bits. Hense it is not suitable for all users to "
+    + "run.")
+    public void testOpenVeryLargeFile() throws Exception {
+        System.out.println("Testing very large file mapping.");
+
+        // Create a file that is too big for a single map
+        File tmp = File.createTempFile(this.getClass().getName() + "-", "");
+        System.out.println(" + Creating temporary file: " + tmp);
+        tmp.deleteOnExit();
+
+
+        System.out.println(
+                " + Truncating temporary file to " + ((1L << 31L) + 1) + " bytes.");
+        RandomAccessFile raf = new RandomAccessFile(tmp, "rw");
+        raf.seek(((1L << 31L) + 1));
+        raf.writeUTF("THE END");
+        raf.close();
+
+        System.out.println(" + Testing CharFileChannel");
+
+        CharFileChannel instance = new CharFileChannel(
+                new FileInputStream(tmp).getChannel(),
+                IOUtil.DEFAULT_CHARSET);
+        instance.setMaxMappedBytes(1000000);
+
+        assertEquals(true, instance.isOpen());
+        instance.insureMapped(10000);
+
         instance.close();
         assertEquals(false, instance.isOpen());
 

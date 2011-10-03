@@ -27,188 +27,149 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
- */ 
+ */
 package uk.ac.susx.mlcl.byblo.measure;
 
 import org.junit.Ignore;
 import uk.ac.susx.mlcl.byblo.Byblo;
 import java.io.File;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static uk.ac.susx.mlcl.TestConstants.*;
+import static uk.ac.susx.mlcl.ExitTrapper.*;
 
 /**
- *
- * @author hiam20
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class LeeTest {
 
-    private static final String SAMPLE_DATA_DIR = "sampledata" + File.separator;
-
-    private static final String OUTPUT_DIR = SAMPLE_DATA_DIR + "out" + File.separator;
-
-    public LeeTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
-    @Test
-    public void testMainMethodRun_alpha_0_00() throws Exception {
+    @Test(timeout=1000)
+    public void testLee_alpha_0_00() throws Exception {
         System.out.println("Testing Lee (alpha=0.00) from main method.");
 
-        final String dataSet = "bnc-gramrels-fruit";
+        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Lee-alpha-0_00");
+        output.delete();
 
-        File output = new File(OUTPUT_DIR + dataSet + ".Lee-alpha-0_00");
-        if (output.exists())
-            output.delete();
-
-        String[] args = new String[]{
-            "allpairs",
-            "--charset", "UTF-8",
-            "--measure", "Lee",
-            "--lee-alpha", "0.00",
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
-            "--output", output.toString()
-        };
-
-        Byblo.main(args);
-
+        enableExistTrapping();
+        Byblo.main(new String[]{
+                    "allpairs",
+                    "--charset", "UTF-8",
+                    "--measure", "Lee",
+                    "--lee-alpha", "0.00",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                    "--output", output.toString()
+                });
+        disableExitTrapping();
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
 
         Thread.sleep(100);
     }
-    @Test
+
+    @Test(timeout=1000)
     public void testMainMethodRun_alpha_0_01() throws Exception {
         System.out.println("Testing Lee (alpha=0.01) from main method.");
 
-        final String dataSet = "bnc-gramrels-fruit";
+        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Lee-alpha-0_01");
+        output.delete();
 
-        File output = new File(OUTPUT_DIR + dataSet + ".Lee-alpha-0_01");
-        if (output.exists())
-            output.delete();
 
-        String[] args = new String[]{
-            "allpairs",
-            "--charset", "UTF-8",
-            "--measure", "Lee",
-            "--lee-alpha", "0.01",
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
-            "--output", output.toString()
-        };
-
-        Byblo.main(args);
+        enableExistTrapping();
+        Byblo.main(new String[]{
+                    "allpairs",
+                    "--charset", "UTF-8",
+                    "--measure", "Lee",
+                    "--lee-alpha", "0.01",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                    "--output", output.toString()
+                });
+        disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
 
-        Thread.sleep(100);
     }
-    @Test
+
+    @Test(timeout=1000)
     public void testMainMethodRun_alpha_0_50() throws Exception {
         System.out.println("Testing Lee (alpha=0.50) from main method.");
 
         final String dataSet = "bnc-gramrels-fruit";
 
-        File output = new File(OUTPUT_DIR + dataSet + ".Lee-alpha-0_50");
-        if (output.exists())
-            output.delete();
+        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Lee-alpha-0_50");
+        output.delete();
 
-        String[] args = new String[]{
-            "allpairs",
-            "--charset", "UTF-8",
-            "--measure", "Lee",
-            "--lee-alpha", "0.50",
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
-            "--output", output.toString()
-        };
-
-        Byblo.main(args);
+        enableExistTrapping();
+        Byblo.main(new String[]{
+                    "allpairs",
+                    "--charset", "UTF-8",
+                    "--measure", "Lee",
+                    "--lee-alpha", "0.50",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                    "--output", output.toString()
+                });
+        disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
 
         Thread.sleep(100);
     }
-    @Test
+
+    @Test(timeout=1000)
     public void testMainMethodRun_alpha_0_99() throws Exception {
         System.out.println("Testing Lee (alpha=0.99) from main method.");
+        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Lee-alpha-0_99");
+        output.delete();
 
-        final String dataSet = "bnc-gramrels-fruit";
-
-        File output = new File(OUTPUT_DIR + dataSet + ".Lee-alpha-0_99");
-        if (output.exists())
-            output.delete();
-
-        String[] args = new String[]{
-            "allpairs",
-            "--charset", "UTF-8",
-            "--measure", "Lee",
-            "--lee-alpha", "0.99",
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
-            "--output", output.toString()
-        };
-
-        Byblo.main(args);
+        enableExistTrapping();
+        Byblo.main(new String[]{
+                    "allpairs",
+                    "--charset", "UTF-8",
+                    "--measure", "Lee",
+                    "--lee-alpha", "0.99",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                    "--output", output.toString()
+                });
+        disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
 
-        Thread.sleep(100);
     }
 
-    @Test()
-    @Ignore(value="Fails - presumably due to the log(0) statement.")
-    public void testMainMethodRun_alpha_1_00() throws Exception {
+    @Test(timeout=1000)
+    @Ignore(value = "Fails - presumably due to the log(0) statement.")
+    public void testLee_alpha_1_00() throws Exception {
         System.out.println("Testing Lee (alpha=1.00) from main method.");
 
         final String dataSet = "bnc-gramrels-fruit";
 
-        File output = new File(OUTPUT_DIR + dataSet + ".Lee-alpha-1_00");
-        if (output.exists())
-            output.delete();
+        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Lee-alpha-1_00");
+        output.delete();
 
-        String[] args = new String[]{
-            "allpairs",
-            "--charset", "UTF-8",
-            "--measure", "Lee",
-            "--lee-alpha", "1.00",
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
-            "--output", output.toString()
-        };
-
-        Byblo.main(args);
+        enableExistTrapping();
+        Byblo.main(new String[]{
+                    "allpairs",
+                    "--charset", "UTF-8",
+                    "--measure", "Lee",
+                    "--lee-alpha", "1.00",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                    "--output", output.toString()
+                });
+        disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
-
-        Thread.sleep(100);
     }
 }

@@ -45,7 +45,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author hiam20
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class Byblo {
 
@@ -114,15 +114,14 @@ public class Byblo {
                     jc.usage(jc.getParsedCommand());
                 }
 
-                System.exit(0);
-            }
+            } else {
 
+                Task t = tasks.get(Command.valueOf(jc.getParsedCommand()));
+                t.run();
 
-            Task t = tasks.get(Command.valueOf(jc.getParsedCommand()));
-            t.run();
-
-            while (t.isExceptionThrown()) {
-                t.throwException();
+                while (t.isExceptionThrown()) {
+                    t.throwException();
+                }
             }
 
         } catch (ParameterException ex) {
@@ -139,7 +138,7 @@ public class Byblo {
         // XXX: The following is required when the software is run from the
         // byblo.sh script. Otherwise it hangs, presumably because a thread is
         // still running.
-        System.exit(0);
+//        System.exit(0);
     }
 
     public static class ConverterFactory implements IStringConverterFactory {

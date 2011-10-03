@@ -44,7 +44,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class FeatureSource extends AbstractTSVSource<FeatureRecord> {
 

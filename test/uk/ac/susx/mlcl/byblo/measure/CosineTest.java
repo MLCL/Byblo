@@ -33,122 +33,85 @@ package uk.ac.susx.mlcl.byblo.measure;
 import com.google.common.io.Files;
 import uk.ac.susx.mlcl.byblo.Byblo;
 import java.io.File;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static uk.ac.susx.mlcl.TestConstants.*;
+import static uk.ac.susx.mlcl.ExitTrapper.*;
 
 /**
  *
- * @author hiam20
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class CosineTest {
 
-    private static final String SAMPLE_DATA_DIR = "sampledata" + File.separator;
-
-    private static final String OUTPUT_DIR = SAMPLE_DATA_DIR + "out" + File.separator;
-
-    public CosineTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
     @Test
-    public void testMainMethodRun_Cosine() throws Exception {
+    public void testCosineCli() throws Exception {
         System.out.println("Testing Cosine from main method.");
 
-        final String dataSet = "bnc-gramrels-fruit";
+        File outputFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Cosine");
+        outputFile.delete();
 
-        File output = new File(OUTPUT_DIR + dataSet + ".Cosine");
-        if (output.exists())
-            output.delete();
+        enableExistTrapping();
+        Byblo.main(new String[]{
+                    "allpairs",
+                    "--charset", "UTF-8",
+                    "--measure", "Cosine",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                    "--output", outputFile.toString()
+                });
+        disableExitTrapping();
 
-        String[] args = new String[]{
-            "allpairs",
-            "--charset", "UTF-8",
-            "--measure", "Cosine",
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
-            "--output", output.toString()
-        };
-
-        Byblo.main(args);
-
-        assertTrue("Output file " + output + " does not exist.", output.exists());
-        assertTrue("Output file " + output + " is empty.", output.length() > 0);
-
-        Thread.sleep(100);
+        assertTrue("Output file " + outputFile + " does not exist.", outputFile.
+                exists());
+        assertTrue("Output file " + outputFile + " is empty.",
+                outputFile.length() > 0);
     }
 
-
-    @Test
-    public void testMainMethodRun_DiceMI() throws Exception {
+    @Test(timeout = 1000)
+    public void testCosineMiCli() throws Exception {
         System.out.println("Testing CosineMi from main method.");
 
-        final String dataSet = "bnc-gramrels-fruit";
+        File outputFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".CosineMi");
+        outputFile.delete();
 
-        File output = new File(OUTPUT_DIR + dataSet + ".CosineMi");
-        if (output.exists())
-            output.delete();
+        enableExistTrapping();
+        Byblo.main(new String[]{
+                    "allpairs",
+                    "--charset", "UTF-8",
+                    "--measure", "CosineMi",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                    "--output", outputFile.toString()
+                });
+        disableExitTrapping();
 
-        String[] args = new String[]{
-            "allpairs",
-            "--charset", "UTF-8",
-            "--measure", "CosineMi",
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
-            "--output", output.toString()
-        };
-
-        Byblo.main(args);
-
-        assertTrue("Output file " + output + " does not exist.", output.exists());
-        assertTrue("Output file " + output + " is empty.", output.length() > 0);
-
-        Thread.sleep(100);
+        assertTrue("Output file " + outputFile + " does not exist.", outputFile.
+                exists());
+        assertTrue("Output file " + outputFile + " is empty.",
+                outputFile.length() > 0);
     }
 
+    @Test(timeout = 1000)
+    public void testCosineSymmetry() throws Exception {
+        System.out.println("Testing Cosine symmetry.");
+
+        File output1 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Cosine-1");
+        File output2 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Cosine-2");
+        output1.delete();
+        output2.delete();
 
 
-
-    @Test
-    public void test_Cosine_Symmetry() throws Exception {
-        System.out.println("Testing symmetry.");
-
-        final String dataSet = "bnc-gramrels-fruit";
-
-        File output1 = new File(OUTPUT_DIR + dataSet + ".Cosine-1");
-        File output2 = new File(OUTPUT_DIR + dataSet + ".Cosine-2");
-        if (output1.exists())
-            output1.delete();
-        if (output2.exists())
-            output2.delete();
-
+        enableExistTrapping();
         Byblo.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "Cosine",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output1.toString()
                 });
         Byblo.main(new String[]{
@@ -156,39 +119,35 @@ public class CosineTest {
                     "--charset", "UTF-8",
                     "--measure", "Cosine",
                     "--measure-reversed",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output2.toString()
                 });
+        disableExitTrapping();
 
         assertTrue(Files.equal(output1, output2));
 
         Thread.sleep(100);
     }
 
-
-
-    @Test
+    @Test(timeout = 1000)
     public void test_CosineMi_Symmetry() throws Exception {
-        System.out.println("Testing symmetry.");
+        System.out.println("Testing CosineMi symmetry.");
 
-        final String dataSet = "bnc-gramrels-fruit";
+        File output1 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".CosineMi-1");
+        File output2 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".CosineMi-2");
+        output1.delete();
+        output2.delete();
 
-        File output1 = new File(OUTPUT_DIR + dataSet + ".CosineMi-1");
-        File output2 = new File(OUTPUT_DIR + dataSet + ".CosineMi-2");
-        if (output1.exists())
-            output1.delete();
-        if (output2.exists())
-            output2.delete();
-
+        enableExistTrapping();
         Byblo.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "CosineMi",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output1.toString()
                 });
         Byblo.main(new String[]{
@@ -196,14 +155,13 @@ public class CosineTest {
                     "--charset", "UTF-8",
                     "--measure", "CosineMi",
                     "--measure-reversed",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output2.toString()
                 });
 
         assertTrue(Files.equal(output1, output2));
-
-        Thread.sleep(100);
+        disableExitTrapping();
     }
 }

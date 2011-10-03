@@ -44,7 +44,7 @@ import java.io.IOException;
  * the All-Pairs implementation to handle arbitrarily large files, within any
  * amount of RAM, at the expense of increased disk I/O.</p>
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public interface Seekable<P> {
 

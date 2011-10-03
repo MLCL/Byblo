@@ -54,7 +54,7 @@ import java.util.Arrays;
  *       be implmented in this class which has no way of knowing what kind of
  *       warning would be appropriate, if at all. (Issue #27)
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class SparseVector implements Serializable {
 

@@ -39,7 +39,7 @@ import java.io.IOException;
  * order. It is entirely agnostic in terms of actual source of data. Differs
  * from Iterator in that it can throw IOException.
  * 
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T> The type of object that the implementing class will provide.
  */
 public interface Source<T> {

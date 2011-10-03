@@ -30,381 +30,322 @@
  */
 package uk.ac.susx.mlcl.byblo.measure;
 
+import org.junit.Ignore;
 import com.google.common.io.Files;
 import uk.ac.susx.mlcl.byblo.Byblo;
 import java.io.File;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static uk.ac.susx.mlcl.TestConstants.*;
+import static uk.ac.susx.mlcl.ExitTrapper.*;
 
 /**
  *
- * @author hiam20
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class LpTest {
 
-    private static final String SAMPLE_DATA_DIR = "sampledata" + File.separator;
-
-    private static final String OUTPUT_DIR = SAMPLE_DATA_DIR + "out" + File.separator;
-
-    public LpTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
-    @Test
-    @Ignore(value="Fails due to not yet being implemented.")
+    @Test(timeout=1000)
+    @Ignore(value = "Fails due to not yet being implemented.")
     public void testMainMethodRun_L0() throws Exception {
         System.out.println("Testing L0 from main method.");
 
-        final String dataSet = "bnc-gramrels-fruit";
-
-        File output = new File(OUTPUT_DIR + dataSet + ".L0");
+        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".L0");
         if (output.exists())
             output.delete();
 
         String[] args = new String[]{
             "allpairs",
-            "--charset", "UTF-8",
+            "--charset", "UTF-8", "--mink-p", "0",
             "--measure", "Lp",
-            "--mink-p", "0",
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+            "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+            "--input-features", TEST_FRUIT_FEATURES.toString(),
+            "--input-entries", TEST_FRUIT_ENTRIES.toString(),
             "--output", output.toString()
         };
 
+        enableExistTrapping();
         Byblo.main(args);
+        disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
 
-        Thread.sleep(100);
+
     }
 
-    @Test
+    @Test(timeout=1000)
     public void testMainMethodRun_L1() throws Exception {
         System.out.println("Testing L1 from main method.");
 
-        final String dataSet = "bnc-gramrels-fruit";
-
-        File output = new File(OUTPUT_DIR + dataSet + ".L1");
+        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".L1");
         if (output.exists())
             output.delete();
 
         String[] args = new String[]{
             "allpairs",
-            "--charset", "UTF-8",
+            "--charset", "UTF-8", "--mink-p", "1",
             "--measure", "Lp",
-            "--mink-p", "1",
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+            "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+            "--input-features", TEST_FRUIT_FEATURES.toString(),
+            "--input-entries", TEST_FRUIT_ENTRIES.toString(),
             "--output", output.toString()
         };
 
+        enableExistTrapping();
         Byblo.main(args);
+        disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
 
-        Thread.sleep(100);
+
     }
 
-    @Test
+    @Test(timeout=1000)
     public void testMainMethodRun_L2() throws Exception {
         System.out.println("Testing L2 from main method.");
 
-        final String dataSet = "bnc-gramrels-fruit";
-
-        File output = new File(OUTPUT_DIR + dataSet + ".L2");
+        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".L2");
         if (output.exists())
             output.delete();
 
         String[] args = new String[]{
             "allpairs",
-            "--charset", "UTF-8",
+            "--charset", "UTF-8", "--mink-p", "2",
             "--measure", "Lp",
-            "--mink-p", "2",
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+            "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+            "--input-features", TEST_FRUIT_FEATURES.toString(),
+            "--input-entries", TEST_FRUIT_ENTRIES.toString(),
             "--output", output.toString()
         };
 
+        enableExistTrapping();
         Byblo.main(args);
+        disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
-
-        Thread.sleep(100);
     }
 
-    @Test
+    @Test(timeout=1000)
     public void testMainMethodRun_L3() throws Exception {
         System.out.println("Testing L3 from main method.");
 
-        final String dataSet = "bnc-gramrels-fruit";
-
-        File output = new File(OUTPUT_DIR + dataSet + ".L3");
+        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".L3");
         if (output.exists())
             output.delete();
 
         String[] args = new String[]{
             "allpairs",
-            "--charset", "UTF-8",
+            "--charset", "UTF-8", "--mink-p", "3",
             "--measure", "Lp",
-            "--mink-p", "3",
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+            "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+            "--input-features", TEST_FRUIT_FEATURES.toString(),
+            "--input-entries", TEST_FRUIT_ENTRIES.toString(),
             "--output", output.toString()
         };
 
+        enableExistTrapping();
         Byblo.main(args);
+        disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
-
-        Thread.sleep(100);
     }
 
-    @Test
+    @Test(timeout=1000)
     public void testMainMethodRun_L_e() throws Exception {
         System.out.println("Testing L_e from main method.");
-
-        final String dataSet = "bnc-gramrels-fruit";
-
-        File output = new File(OUTPUT_DIR + dataSet + ".Le");
+        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Le");
         if (output.exists())
             output.delete();
 
         String[] args = new String[]{
             "allpairs",
-            "--charset", "UTF-8",
+            "--charset", "UTF-8", "--mink-p", Double.toString(Math.E),
             "--measure", "Lp",
-            "--mink-p", Double.toString(Math.E),
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+            "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+            "--input-features", TEST_FRUIT_FEATURES.toString(),
+            "--input-entries", TEST_FRUIT_ENTRIES.toString(),
             "--output", output.toString()
         };
 
+        enableExistTrapping();
         Byblo.main(args);
+        disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
-
-        Thread.sleep(100);
     }
 
-    @Test
+    @Test(timeout=1000)
     public void testMainMethodRun_LInf() throws Exception {
         System.out.println("Testing LInf from main method.");
-
-        final String dataSet = "bnc-gramrels-fruit";
-
-        File output = new File(OUTPUT_DIR + dataSet + ".LInf");
+        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".inf");
         if (output.exists())
             output.delete();
 
         String[] args = new String[]{
             "allpairs",
-            "--charset", "UTF-8",
+            "--charset", "UTF-8", "--mink-p", "Infinity",
             "--measure", "Lp",
-            "--mink-p", "Infinity",
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+            "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+            "--input-features", TEST_FRUIT_FEATURES.toString(),
+            "--input-entries", TEST_FRUIT_ENTRIES.toString(),
             "--output", output.toString()
         };
 
+        enableExistTrapping();
         Byblo.main(args);
+        disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
-
-        Thread.sleep(100);
     }
 
-    @Test
+    @Test(timeout=1000)
     public void test_L1_Symmetry() throws Exception {
         System.out.println("Testing symmetry.");
 
-        final String dataSet = "bnc-gramrels-fruit";
-
-        File output1 = new File(OUTPUT_DIR + dataSet + ".L1-1");
-        File output2 = new File(OUTPUT_DIR + dataSet + ".L1-2");
+        File output1 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".L1-1");
+        File output2 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".L1-2");
         if (output1.exists())
             output1.delete();
         if (output2.exists())
             output2.delete();
+        enableExistTrapping();
 
         Byblo.main(new String[]{
                     "allpairs",
-                    "--charset", "UTF-8",
+                    "--charset", "UTF-8", "--mink-p", "1",
                     "--measure", "Lp",
-                    "--mink-p", "1",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output1.toString()
                 });
         Byblo.main(new String[]{
                     "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "Lp",
-                    "--mink-p", "1",
-                    "--measure-reversed",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--charset", "UTF-8", "--mink-p", "1",
+                    "--measure", "Lp", "--measure-reversed",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output2.toString()
                 });
+        disableExitTrapping();
 
         assertTrue(Files.equal(output1, output2));
-
-        Thread.sleep(100);
     }
 
-
-    @Test
+    @Test(timeout=1000)
     public void test_L2_Symmetry() throws Exception {
         System.out.println("Testing symmetry.");
 
-        final String dataSet = "bnc-gramrels-fruit";
 
-        File output1 = new File(OUTPUT_DIR + dataSet + ".L2-1");
-        File output2 = new File(OUTPUT_DIR + dataSet + ".L2-2");
+        File output1 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".L2-1");
+        File output2 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".L2-2");
         if (output1.exists())
             output1.delete();
         if (output2.exists())
             output2.delete();
+        enableExistTrapping();
 
         Byblo.main(new String[]{
                     "allpairs",
-                    "--charset", "UTF-8",
+                    "--charset", "UTF-8", "--mink-p", "2",
                     "--measure", "Lp",
-                    "--mink-p", "2",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output1.toString()
                 });
         Byblo.main(new String[]{
                     "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "Lp",
-                    "--mink-p", "2",
-                    "--measure-reversed",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--charset", "UTF-8", "--mink-p", "2",
+                    "--measure", "Lp", "--measure-reversed",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output2.toString()
                 });
+        disableExitTrapping();
 
         assertTrue(Files.equal(output1, output2));
 
-        Thread.sleep(100);
     }
 
-
-    @Test
+    @Test(timeout=1000)
     public void test_L3_Symmetry() throws Exception {
         System.out.println("Testing symmetry.");
 
-        final String dataSet = "bnc-gramrels-fruit";
 
-        File output1 = new File(OUTPUT_DIR + dataSet + ".L3-1");
-        File output2 = new File(OUTPUT_DIR + dataSet + ".L3-2");
+        File output1 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".L3-1");
+        File output2 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".L3-2");
         if (output1.exists())
             output1.delete();
         if (output2.exists())
             output2.delete();
+        enableExistTrapping();
 
         Byblo.main(new String[]{
                     "allpairs",
-                    "--charset", "UTF-8",
+                    "--charset", "UTF-8", "--mink-p", "3",
                     "--measure", "Lp",
-                    "--mink-p", "3",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output1.toString()
                 });
         Byblo.main(new String[]{
                     "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "Lp",
-                    "--mink-p", "3",
-                    "--measure-reversed",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--charset", "UTF-8", "--mink-p", "3",
+                    "--measure", "Lp", "--measure-reversed",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output2.toString()
                 });
+        disableExitTrapping();
 
         assertTrue(Files.equal(output1, output2));
-
-        Thread.sleep(100);
     }
 
-
-    @Test
+    @Test(timeout=1000)
     public void test_LInf_Symmetry() throws Exception {
         System.out.println("Testing symmetry.");
 
-        final String dataSet = "bnc-gramrels-fruit";
 
-        File output1 = new File(OUTPUT_DIR + dataSet + ".LInf-1");
-        File output2 = new File(OUTPUT_DIR + dataSet + ".LInf-2");
+
+        File output1 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Linf-1");
+        File output2 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Linf-2");
         if (output1.exists())
             output1.delete();
         if (output2.exists())
             output2.delete();
+        enableExistTrapping();
 
         Byblo.main(new String[]{
                     "allpairs",
-                    "--charset", "UTF-8",
+                    "--charset", "UTF-8", "--mink-p", "inf",
                     "--measure", "Lp",
-                    "--mink-p", "Infinity",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output1.toString()
                 });
         Byblo.main(new String[]{
                     "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "Lp",
-                    "--mink-p", "Infinity",
-                    "--measure-reversed",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--charset", "UTF-8", "--mink-p", "+INFIN",
+                    "--measure", "Lp", "--measure-reversed",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output2.toString()
                 });
+        disableExitTrapping();
 
         assertTrue(Files.equal(output1, output2));
-
-        Thread.sleep(100);
     }
 }

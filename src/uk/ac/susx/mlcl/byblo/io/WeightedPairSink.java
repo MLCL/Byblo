@@ -31,7 +31,7 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.lib.collect.Pair;
+import uk.ac.susx.mlcl.lib.collect.WeightedPair;
 import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import java.io.File;
@@ -41,11 +41,11 @@ import java.text.DecimalFormat;
 
 /**
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class WeightedPairSink
-        extends AbstractTSVSink<Pair>
-        implements Sink<Pair> {
+        extends AbstractTSVSink<WeightedPair>
+        implements Sink<WeightedPair> {
 
     private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
 
@@ -64,7 +64,7 @@ public class WeightedPairSink
     }
 
     @Override
-    public void write(Pair pair) throws IOException {
+    public void write(WeightedPair pair) throws IOException {
         super.writeString(strIndexA.get(pair.getXId()));
         super.writeValueDelimiter();
         super.writeString(strIndexB.get(pair.getYId()));

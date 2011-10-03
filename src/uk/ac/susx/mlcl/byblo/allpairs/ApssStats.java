@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * An instance of ApssStats collects various bits of information about an an
  * All-Pairs process, that can be used for debugging and performance evaluation.
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class ApssStats implements Serializable {
 

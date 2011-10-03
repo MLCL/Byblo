@@ -41,7 +41,7 @@ import uk.ac.susx.mlcl.lib.io.Sink;
 
 /**
  * 
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class WeightedEntryFeatureSink
         extends AbstractTSVSink<WeightedEntryFeatureRecord>

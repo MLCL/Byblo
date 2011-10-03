@@ -36,50 +36,17 @@ import java.io.IOException;
 import java.util.ResourceBundle;
 import java.io.File;
 import java.io.FileNotFoundException;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static uk.ac.susx.mlcl.TestConstants.*;
 
 /**
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class CopyTaskTest {
 
-    public CopyTaskTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        System.out.println("\n\nTesting CopyTask");
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-        System.out.flush();
-        System.err.flush();
-    }
-
-    @After
-    public void tearDown() {
-        System.out.flush();
-        System.err.flush();
-    }
-
-//    @Test
-//    public void testGetTaskName() {
-//        System.out.println("Tasting getTaskName()");
-//        assertEquals("copy", new CopyTask().getTaskName());
-//    }
-
-    @Test
+    @Test(timeout=1000)
     public void testGetSrcFile() {
         System.out.println("Testing getSrcFile() and setSrcFile()");
         File x = new File("x");
@@ -90,7 +57,7 @@ public class CopyTaskTest {
         assertEquals(expResult, result);
     }
 
-    @Test
+    @Test(timeout=1000)
     public void testGetDstFile() {
         System.out.println("Testing getDstFile() and setDstFile()");
         File x = new File("x");
@@ -101,7 +68,7 @@ public class CopyTaskTest {
         assertEquals(expResult, result);
     }
 
-    @Test
+    @Test(timeout=1000)
     public void testRun_success() throws Exception {
         System.out.println("Testing run() -- expecting success");
         File in = File.createTempFile(getClass().getName(), "in");
@@ -121,8 +88,7 @@ public class CopyTaskTest {
         out.delete();
     }
 
-
-    @Test(expected=FileNotFoundException.class)
+    @Test(expected = FileNotFoundException.class)
     public void testRun_failure_noinput() throws Exception {
         System.out.println("Testing run() -- expecting failure (no input)");
         File in = File.createTempFile(getClass().getName(), "in");
@@ -135,7 +101,7 @@ public class CopyTaskTest {
         out.delete();
     }
 
-    @Test
+    @Test(timeout=1000)
     public void testCLI() throws IOException {
         System.out.println("Testing command line usage.");
         File x = new File("x"), y = new File("y");

@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import uk.ac.susx.mlcl.lib.DoubleConverter;
 import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
@@ -51,7 +52,7 @@ import uk.ac.susx.mlcl.byblo.measure.Lp;
 import uk.ac.susx.mlcl.byblo.measure.Proximity;
 import uk.ac.susx.mlcl.byblo.measure.ReversedProximity;
 import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.lib.collect.Pair;
+import uk.ac.susx.mlcl.lib.collect.WeightedPair;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
@@ -65,6 +66,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -294,7 +296,7 @@ public class AllPairsTask extends AbstractTask {
         // Create a sink object that will act as a recipient for all pairs that
         // are produced by the algorithm.
 
-        final Sink<Pair> sink =
+        final Sink<WeightedPair> sink =
                 new WeightedPairSink(outputFile, charset, strIndex, strIndex);
 
         // Instantiate the all-pairs algorithm as given on the command line.
@@ -307,17 +309,17 @@ public class AllPairsTask extends AbstractTask {
         apss.setMeasure(prox);
         apss.setMaxChunkSize(chunkSize);
 
-        List<Predicate<Pair>> pairFilters =
-                new ArrayList<Predicate<Pair>>();
+        List<Predicate<WeightedPair>> pairFilters =
+                new ArrayList<Predicate<WeightedPair>>();
 
         if (minSimilarity != Double.NEGATIVE_INFINITY)
-            pairFilters.add(Pair.similarityGTE(minSimilarity));
+            pairFilters.add(WeightedPair.similarityGTE(minSimilarity));
 
         if (maxSimilarity != Double.POSITIVE_INFINITY)
-            pairFilters.add(Pair.similarityLTE(maxSimilarity));
+            pairFilters.add(WeightedPair.similarityLTE(maxSimilarity));
 
         if (!outputIdentityPairs)
-            pairFilters.add(Predicates.not(Pair.identity()));
+            pairFilters.add(Predicates.not(WeightedPair.identity()));
 
         if (pairFilters.size() == 1)
             apss.setProducatePair(pairFilters.get(0));
@@ -387,14 +389,6 @@ public class AllPairsTask extends AbstractTask {
                     throw new ParameterException(
                             "Output file \"" + value + "\" does not exist and the parent directory is not writable.");
             }
-        }
-    }
-
-    public static class DoubleConverter implements com.beust.jcommander.IStringConverter<Double> {
-
-        @Override
-        public Double convert(String value) {
-            return Double.valueOf(value);
         }
     }
 

@@ -42,6 +42,7 @@ import uk.ac.susx.mlcl.lib.tasks.AbstractParallelTask;
 import uk.ac.susx.mlcl.lib.tasks.Task;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayDeque;
@@ -234,6 +235,13 @@ public class ExternalCountTask extends AbstractParallelTask {
     }
 
     @Override
+    protected void initialiseTask() throws Exception {
+        super.initialiseTask();
+        checkState();
+    }
+
+    
+    @Override
     protected void runTask() throws Exception {
         map();
         reduce();
@@ -384,4 +392,87 @@ public class ExternalCountTask extends AbstractParallelTask {
             return null;
         }
     }
+    
+      /**
+     * Method that performance a number of sanity checks on the parameterisation
+     * of this class. It is necessary to do this because the the class can be
+     * instantiated via a null constructor when run from the command line.
+     *
+     * @throws NullPointerException
+     * @throws IllegalStateException
+     * @throws FileNotFoundException
+     */
+    private void checkState() throws NullPointerException, IllegalStateException, FileNotFoundException {
+        // Check non of the parameters are null
+        if (inputFile == null)
+            throw new NullPointerException("inputFile is null");
+        if (entryFeaturesFile == null)
+            throw new NullPointerException("entryFeaturesFile is null");
+        if (featuresFile == null)
+            throw new NullPointerException("featuresFile is null");
+        if (entriesFile == null)
+            throw new NullPointerException("entriesFile is null");
+        if (charset == null)
+            throw new NullPointerException("charset is null");
+
+        // Check that no two files are the same
+        if (inputFile.equals(entryFeaturesFile))
+            throw new IllegalStateException("inputFile == featuresFile");
+        if (inputFile.equals(featuresFile))
+            throw new IllegalStateException("inputFile == contextsFile");
+        if (inputFile.equals(entriesFile))
+            throw new IllegalStateException("inputFile == entriesFile");
+        if (entryFeaturesFile.equals(featuresFile))
+            throw new IllegalStateException("entryFeaturesFile == featuresFile");
+        if (entryFeaturesFile.equals(entriesFile))
+            throw new IllegalStateException("entryFeaturesFile == entriesFile");
+        if (featuresFile.equals(entriesFile))
+            throw new IllegalStateException("featuresFile == entriesFile");
+
+
+        // Check that the instances file exists and is readable
+        if (!inputFile.exists())
+            throw new FileNotFoundException(
+                    "instances file does not exist: " + inputFile);
+        if (!inputFile.isFile())
+            throw new IllegalStateException(
+                    "instances file is not a normal data file: " + inputFile);
+        if (!inputFile.canRead())
+            throw new IllegalStateException(
+                    "instances file is not readable: " + inputFile);
+
+        // For each output file, check that either it exists and it writeable,
+        // or that it does not exist but is creatable
+        if (entriesFile.exists() && (!entriesFile.isFile() || !entriesFile.
+                canWrite()))
+            throw new IllegalStateException(
+                    "entries file exists but is not writable: " + entriesFile);
+        if (!entriesFile.exists() && !entriesFile.getAbsoluteFile().
+                getParentFile().
+                canWrite()) {
+            throw new IllegalStateException(
+                    "entries file does not exists and can not be reated: " + entriesFile);
+        }
+        if (featuresFile.exists() && (!featuresFile.isFile() || !featuresFile.
+                canWrite()))
+            throw new IllegalStateException(
+                    "features file exists but is not writable: " + featuresFile);
+        if (!featuresFile.exists() && !featuresFile.getAbsoluteFile().
+                getParentFile().
+                canWrite()) {
+            throw new IllegalStateException(
+                    "features file does not exists and can not be reated: " + featuresFile);
+        }
+        if (entryFeaturesFile.exists() && (!entryFeaturesFile.isFile() || !entryFeaturesFile.
+                canWrite()))
+            throw new IllegalStateException(
+                    "entry-features file exists but is not writable: " + entryFeaturesFile);
+        if (!entryFeaturesFile.exists() && !entryFeaturesFile.getAbsoluteFile().
+                getParentFile().
+                canWrite()) {
+            throw new IllegalStateException(
+                    "entry-features file does not exists and can not be reated: " + entryFeaturesFile);
+        }
+    }
+
 }

@@ -66,7 +66,7 @@ import java.util.WeakHashMap;
  * {@link ConcurrentModificationException}.
  * </p>
  * 
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T> The type of object that will be held here.
  */
 public class C14nCache<T> extends AbstractSet<T> {

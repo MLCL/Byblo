@@ -33,19 +33,22 @@ package uk.ac.susx.mlcl.lib.io;
 import java.util.Map;
 import java.io.File;
 import java.nio.charset.Charset;
+import java.nio.charset.CodingErrorAction;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import static uk.ac.susx.mlcl.TestConstants.*;
 
 /**
- *
- * @author hamish
+ * Unit tests for the IOUtil static utility class. 
+ * 
+ * Specifically it checks the character set decoding and encoding.
+ * 
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class IOUtilTest {
-
-    static final File CHARSET_SAMPLES_DIR = new File("sampledata/charsets");
 
     static final String[] CHARSET_SAMPLES = new String[]{
         "chinese-big5.meta.html",
@@ -55,7 +58,6 @@ public class IOUtilTest {
         "german.meta.html",
         "greek.meta.html",
         "hebrew-visual.meta.html",
-        //        "japanese.meta.html",
         "korean.meta.html",
         "russian-cp1251.meta.html",
         "russian-koi.meta.html",
@@ -70,13 +72,12 @@ public class IOUtilTest {
 
     static final String[] CHARSET = new String[]{
         "big5",
-        "gb2312", //       "hz-gb-2312",
+        "gb2312",
         "GB2312",
         "iso-8859-1",
         "iso-8859-1",
         "iso-8859-7",
         "iso-8859-8",
-        //               "iso-2022-jp",
         "ksc_5601",
         "cp1251",
         "koi8",
@@ -94,6 +95,7 @@ public class IOUtilTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        // Display the characer sets available on this system
         Map<String, Charset> charsets = Charset.availableCharsets();
         for (Charset c : charsets.values()) {
             System.out.printf("%-20s %s %s %s%n", c,
@@ -102,10 +104,15 @@ public class IOUtilTest {
                     c.aliases());
 
         }
+        
+        IOUtil.MALFORMED_INPUT_ACTION = CodingErrorAction.REPORT;
+        IOUtil.UNMAPPABLE_CHARACTER_ACTION = CodingErrorAction.REPORT;
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        IOUtil.MALFORMED_INPUT_ACTION = CodingErrorAction.REPLACE;
+        IOUtil.UNMAPPABLE_CHARACTER_ACTION = CodingErrorAction.REPLACE;
     }
 
     @Before
@@ -125,12 +132,13 @@ public class IOUtilTest {
     public void testCharsetCoding() throws Exception {
         System.out.println("testCharsetCoding()");
         int n = CHARSET_SAMPLES.length;
+        
+        // Test decoding of available sample files
         boolean[][] decoded = new boolean[n][n];
-        boolean[][] encoded = new boolean[n][n];
         for (int i = 0; i < n; i++) {
             Charset charset = Charset.forName(CHARSET[i]);
             for (int j = 0; j < n; j++) {
-                File file = new File(CHARSET_SAMPLES_DIR, CHARSET_SAMPLES[j]);
+                File file = new File(TEST_CHARSETS_DIR, CHARSET_SAMPLES[j]);
 
                 StringBuilder dst = new StringBuilder();
                 try {
@@ -143,9 +151,12 @@ public class IOUtilTest {
                 }
             }
         }
+        
+        // Test ending into sample file character sets.
+        boolean[][] encoded = new boolean[n][n];
         for (int i = 0; i < n; i++) {
             Charset charset = Charset.forName(CHARSET[i]);
-            File file = new File(CHARSET_SAMPLES_DIR, CHARSET_SAMPLES[i]);
+            File file = new File(TEST_CHARSETS_DIR, CHARSET_SAMPLES[i]);
             StringBuilder dst = new StringBuilder();
             IOUtil.readAll(file, charset, dst);
             for (int j = 0; j < n; j++) {
@@ -163,6 +174,8 @@ public class IOUtilTest {
                 }
             }
         }
+        
+        // Display the de/encode matrix
         for (int i = 0; i < n; i++) {
             System.out.printf("%-13s ", Charset.forName(CHARSET[i]));
             for (int j = 0; j < n; j++) {

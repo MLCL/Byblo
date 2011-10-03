@@ -32,49 +32,23 @@ package uk.ac.susx.mlcl.byblo.measure;
 
 import uk.ac.susx.mlcl.byblo.Byblo;
 import java.io.File;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static uk.ac.susx.mlcl.TestConstants.*;
+import static uk.ac.susx.mlcl.ExitTrapper.*;
 
 /**
  *
- * @author hiam20
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class RecallTest {
 
-    private static final String SAMPLE_DATA_DIR = "sampledata" + File.separator;
-
-    private static final String OUTPUT_DIR = SAMPLE_DATA_DIR + "out" + File.separator;
-
-    public RecallTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
-    @Test
+    @Test(timeout=1000)
     public void testMainMethodRun_RecallMI() throws Exception {
         System.out.println("Testing RecallMI from main method.");
 
-        final String dataSet = "bnc-gramrels-fruit";
 
-        File output = new File(OUTPUT_DIR + dataSet + ".RecallMI");
+        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".RecallMi");
         if (output.exists())
             output.delete();
 
@@ -82,27 +56,26 @@ public class RecallTest {
             "allpairs",
             "--charset", "UTF-8",
             "--measure", "RecallMi",
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+            "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+            "--input-features", TEST_FRUIT_FEATURES.toString(),
+            "--input-entries", TEST_FRUIT_ENTRIES.toString(),
             "--output", output.toString()
         };
 
+          enableExistTrapping();
         Byblo.main(args);
+        disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
 
-        Thread.sleep(100);
     }
 
-      @Test
+    @Test(timeout=1000)
     public void testMainMethodRun_PrecisionMI() throws Exception {
         System.out.println("Testing PrecisionMI from main method.");
 
-        final String dataSet = "bnc-gramrels-fruit";
-
-        File output = new File(OUTPUT_DIR + dataSet + ".PrecisionMI");
+        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".PrecisionMI");
         if (output.exists())
             output.delete();
 
@@ -111,17 +84,19 @@ public class RecallTest {
             "--charset", "UTF-8",
             "--measure", "RecallMi",
             "--measure-reversed",
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+            "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+            "--input-features", TEST_FRUIT_FEATURES.toString(),
+            "--input-entries", TEST_FRUIT_ENTRIES.toString(),
             "--output", output.toString()
         };
 
+
+        enableExistTrapping();
         Byblo.main(args);
+        disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
 
-        Thread.sleep(100);
     }
 }

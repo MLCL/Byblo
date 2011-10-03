@@ -52,7 +52,7 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class LexerTest {
 
@@ -132,7 +132,6 @@ public class LexerTest {
 
         Lexer lexer = new Lexer(tmp, charset);
         lexer.setDelimiterMatcher(CharMatcher.is('.'));
-//        lexer.addDelimiter('.');
 
         System.out.printf("%-6s %-12s %-6s %-6s %-15s (%s,%s)%n",
                 "num", "type", "start", "end", "value", "line",
@@ -140,17 +139,13 @@ public class LexerTest {
         int i = 0;
         while (lexer.hasNext()) {
             lexer.advance();
-//            System.out.println("tell : " + lexer.tell());
-            System.out.printf("%-6d %-12s %-6d %-6d %-15s (%d,%d)%n",
-                    0/*lexer.number()*/, lexer.type(), lexer.start(), lexer.end(),
-                    Strings.escape(lexer.value()), 0/*lexer.line()*/, 0/*lexer.column()*/);
-//            assertEquals("number", CFB_numbers[i], lexer.number());
+            System.out.printf("%-12s %-6d %-6d %-15s%n",
+                    lexer.type(), lexer.start(), lexer.end(),
+                    Strings.escape(lexer.value()));
             assertEquals("type", CFB_types[i], lexer.type());
             assertEquals("start", CFB_starts[i], lexer.start());
             assertEquals("end", CFB_ends[i], lexer.end());
             assertEquals("value", CFB_values[i], lexer.value().toString());
-//            assertEquals("line", CFB_lines[i], lexer.line());
-//            assertEquals("column", CFB_columns[i], lexer.column());
             assertEquals("charAt0", CFB_charAt0[i], lexer.charAt(0));
             i++;
         }
@@ -164,18 +159,16 @@ public class LexerTest {
         assertEquals("columns length", i, CFB_columns.length);
         assertEquals("charAt0 length", i, CFB_charAt0.length);
     }
-//
+
     @Test(timeout = 10000)
     public void seekTest() throws FileNotFoundException, IOException {
         System.out.println("seekTest");
 
         Charset charset = IOUtil.DEFAULT_CHARSET;
         File tmp = makeTmpData(CFB);
-//        ByteBuffer bb = ByteBuffer.wrap(CFB.getBytes());
 
         Lexer lexer = new Lexer(tmp, charset);
         lexer.setDelimiterMatcher(CharMatcher.is('.'));
-//        lexer.addDelimiter('.');
 
         // Iterator of the whole string, storing the tell offsets for every
         // lexeme in a list
@@ -184,7 +177,6 @@ public class LexerTest {
         while (lexer.hasNext()) {
             lexer.advance();
             tells[i] = lexer.tell();
-//            System.out.println("tell : " + lexer.tell());
             i++;
         }
 
@@ -207,58 +199,5 @@ public class LexerTest {
         }
 
     }
-//
-//    /**
-//     * The MappedByteBuffer does not support file larger than 2^31-1 bytes. This
-//     * is a major problem.
-//     *
-//     * Construction from a file throws:
-//     *  java.lang.IllegalArgumentException: Size exceeds Integer.MAX_VALUE
-//     *        at sun.nio.ch.FileChannelImpl.map(FileChannelImpl.java:694)
-//     *        at uk.ac.susx.mlcl.byblo.io.Lexer.<init>(Lexer.java:263)
-//     *        at uk.ac.susx.mlcl.byblo.io.LexerTest.veryLargeFilesTest(LexerTest.java:168)
-//     *
-//     * @throws FileNotFoundException
-//     * @throws IOException
-//     */
-//    @Test
-//    @Ignore
-//    public void veryLargeFilesTest() throws FileNotFoundException, IOException {
-//        System.out.println("veryLargeFilesTest()");
-//        File root = new File(
-//                "/Volumes/Local Scratch HD/thesaurus-bnc.rasp2.gramrels/data");
-//        File file = new File(root, "bnc.rasp2.gramrels.lcase-sims-LIN");
-//        assumeTrue(file.exists());
-//
-//        Lexer lexer = new Lexer(file, IOUtil.DEFAULT_CHARSET);
-//        lexer.setDelimiterMatcher(CharMatcher.anyOf("\t\n"));
-////        lexer.addDelimiter('\t');
-////        lexer.addDelimiter('\n');
-//        long i = 0;
-//        while (lexer.hasNext()) {
-//            lexer.advance();
-//            i++;
-//            if (i % 1000000 == 0) {
-//                System.out.println("   Read lexeme=" + i + ", position=" + lexer.
-//                        tell());
-//                lexer.seek(lexer.tell() * 2);
-//            }
-//        }
-//    }
 
-    @Test//(timeout = 5000)
-    public void largeFilesTest() throws FileNotFoundException, IOException {
-        System.out.println("largeFilesTest()");
-        File file = new File("sampledata",
-                "bnc-gramrels-dense.features");
-        Lexer lexer = new Lexer(file, Charset.forName("UTF-8"));
-        lexer.setDelimiterMatcher(CharMatcher.anyOf("\t\n"));
-        lexer.setWhitespaceMatcher(CharMatcher.NONE);
-//        lexer.addDelimiter('\t');
-//        lexer.addDelimiter('\n');
-        while (lexer.hasNext()) {
-            lexer.advance();
-            lexer.tell();
-        }
-    }
 }

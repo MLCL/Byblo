@@ -36,7 +36,7 @@ import java.nio.channels.Channel;
 
 /**
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public interface WritableCharChannel extends Channel {
 

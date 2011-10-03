@@ -39,7 +39,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Parameters()
 public abstract class AbstractTask implements Task {

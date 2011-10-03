@@ -40,7 +40,7 @@ import it.unimi.dsi.fastutil.objects.ObjectIterator;
  * TODO: Should be replaced by a mixture of IOFactory methods, and alternative
  *          constructors to Sparse*Vector classes. (Issue #41)
  * 
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class SparseVectors {
 

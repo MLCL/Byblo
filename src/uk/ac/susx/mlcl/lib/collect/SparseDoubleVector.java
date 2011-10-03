@@ -46,7 +46,7 @@ import java.util.Arrays;
  * low. Other operations can be slower than a full vector because indicies must
  * be searched for.
  * 
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class SparseDoubleVector
         extends SparseVector

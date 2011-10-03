@@ -41,7 +41,7 @@ import java.nio.charset.Charset;
 /**
  * Abstract class that holds functionality to read a Tab Separated Values file.
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T>
  */
 public abstract class AbstractTSVSource<T> 

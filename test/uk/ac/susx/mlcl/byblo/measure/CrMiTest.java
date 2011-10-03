@@ -30,199 +30,109 @@
  */
 package uk.ac.susx.mlcl.byblo.measure;
 
+import uk.ac.susx.mlcl.lib.collect.WeightedPair;
 import com.google.common.io.Files;
 import uk.ac.susx.mlcl.byblo.Byblo;
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
+import uk.ac.susx.mlcl.byblo.io.WeightedPairSource;
 import static org.junit.Assert.*;
+import static uk.ac.susx.mlcl.TestConstants.*;
+import static uk.ac.susx.mlcl.ExitTrapper.*;
 
 /**
  *
- * @author hiam20
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class CrMiTest {
 
-    private static final String SAMPLE_DATA_DIR = "sampledata" + File.separator;
-
-    private static final String OUTPUT_DIR = SAMPLE_DATA_DIR + "out" + File.separator;
-
-    public CrMiTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(CrMiTest.class.getName()).log(Level.SEVERE, null,
-                    ex);
-        }
-    }
-
-    @Test
-    public void testMainMethodRun_beta_0_gamma_0() throws Exception {
+    private void testCrmiCli(double beta, double gamma) throws Exception {
         System.out.println(
-                "Testing CrMi (beta=0, gamma=0) \"recall\" from main method.");
+                "Testing CrMi (beta=" + beta + ", gamma=" + gamma + ") from main method.");
 
-        final String dataSet = "bnc-gramrels-fruit";
+        File output = new File(TEST_OUTPUT_DIR,
+                FRUIT_NAME + ".CrMi-beta_" + beta + "-gamma_" + gamma + "");
+        output.delete();
 
-        File output = new File(
-                OUTPUT_DIR + dataSet + ".CrMi-beta-0_00-gamma_0_00");
-        if (output.exists())
-            output.delete();
-
-        String[] args = new String[]{
-            "allpairs",
-            "--charset", "UTF-8",
-            "--measure", "CrMi",
-            "--crmi-beta", "0.00",
-            "--crmi-gamma", "0.00",
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
-            "--output", output.toString()
-        };
-
-        Byblo.main(args);
+        enableExistTrapping();
+        Byblo.main(new String[]{
+                    "allpairs",
+                    "--charset", "UTF-8",
+                    "--measure", "CrMi",
+                    "--crmi-beta", "" + beta,
+                    "--crmi-gamma", "" + gamma,
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                    "--output", output.toString()
+                });
+        disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test
-    public void testMainMethodRun_beta_0_5_gamma_0() throws Exception {
-        System.out.println(
-                "Testing CrMi (beta=0.5, gamma=0) \"arithmetic mean\" from main method.");
-
-        final String dataSet = "bnc-gramrels-fruit";
-
-        File output = new File(
-                OUTPUT_DIR + dataSet + ".CrMi-beta-0_50-gamma_0_00");
-        if (output.exists())
-            output.delete();
-
-        String[] args = new String[]{
-            "allpairs",
-            "--charset", "UTF-8",
-            "--measure", "CrMi",
-            "--crmi-beta", "0.50",
-            "--crmi-gamma", "0.00",
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
-            "--output", output.toString()
-        };
-
-        Byblo.main(args);
-
-        assertTrue("Output file " + output + " does not exist.", output.exists());
-        assertTrue("Output file " + output + " is empty.", output.length() > 0);
-
+    @Test(timeout = 1000)
+    public void testCRMI_beta_0_gamma_0() throws Exception {
+        testCrmiCli(0, 0);
     }
 
-    @Test
-    public void testMainMethodRun_beta_1_gamma_0() throws Exception {
-        System.out.println(
-                "Testing CrMi (beta=1, gamma=0) \"precision\" from main method.");
-
-        final String dataSet = "bnc-gramrels-fruit";
-
-        File output = new File(
-                OUTPUT_DIR + dataSet + ".CrMi-beta-1_00-gamma_0_00");
-        if (output.exists())
-            output.delete();
-
-        String[] args = new String[]{
-            "allpairs",
-            "--charset", "UTF-8",
-            "--measure", "CrMi",
-            "--crmi-beta", "1.00",
-            "--crmi-gamma", "0.00",
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
-            "--output", output.toString()
-        };
-
-        Byblo.main(args);
-
-        assertTrue("Output file " + output + " does not exist.", output.exists());
-        assertTrue("Output file " + output + " is empty.", output.length() > 0);
-
+    @Test(timeout = 1000)
+    public void testCrmiCli_beta_0_5_gamma_0() throws Exception {
+        testCrmiCli(0.5, 0);
     }
 
-    @Test
-    public void testMainMethodRun_beta_NA_gamma_1() throws Exception {
-        System.out.println(
-                "Testing CrMi (beta=NA, gamma=1) \"harmonic mean\" from main method.");
-
-        final String dataSet = "bnc-gramrels-fruit";
-
-        File output = new File(OUTPUT_DIR + dataSet + ".CrMi-beta-NA-gamma_1_00");
-        if (output.exists())
-            output.delete();
-
-        String[] args = new String[]{
-            "allpairs",
-            "--charset", "UTF-8",
-            "--measure", "CrMi",
-            //            "--crmi-beta", "1.00",
-            "--crmi-gamma", "1.00",
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
-            "--output", output.toString()
-        };
-
-        Byblo.main(args);
-
-        assertTrue("Output file " + output + " does not exist.", output.exists());
-        assertTrue("Output file " + output + " is empty.", output.length() > 0);
-
+    @Test(timeout = 1000)
+    public void testCrmiCli_beta_1_gamma_0() throws Exception {
+        testCrmiCli(1, 0);
     }
 
-    @Test
-    public void testMainMethodRun_recallCheck() throws Exception {
+    @Test(timeout = 1000)
+    public void testCrmiCli_beta_NA_gamma_1() throws Exception {
+        testCrmiCli(1, 1);
+    }
+
+    @Test(timeout = 1000, expected = IllegalArgumentException.class)
+    public void testCrmiCli_fail1() throws Exception {
+        testCrmiCli(-0.001, 1);
+    }
+
+    @Test(timeout = 1000, expected = IllegalArgumentException.class)
+    public void testCrmiCli_fail2() throws Exception {
+        testCrmiCli(1.001, 1);
+    }
+
+    @Test(timeout = 1000, expected = IllegalArgumentException.class)
+    public void testCrmiCli_fail3() throws Exception {
+        testCrmiCli(0, -0.001);
+    }
+
+    @Test(timeout = 1000, expected = IllegalArgumentException.class)
+    public void testCrmiCli_fail4() throws Exception {
+        testCrmiCli(0, 1.001);
+    }
+
+    @Test(timeout = 1000)
+    public void testCrmiCli_recallCheck() throws Exception {
         System.out.println(
                 "Testing CrMi(beta=0, gamma=0) equals RecallMi from main method.");
 
-        final String dataSet = "bnc-gramrels-fruit";
-        File expectedOutput = new File(
-                OUTPUT_DIR + dataSet + ".CrMi-recall-expected");
-        File crmiOutput = new File(
-                OUTPUT_DIR + dataSet + ".CrMi-recall-actual");
+        File expectedOutput = new File(TEST_OUTPUT_DIR,
+                FRUIT_NAME + ".CrMi-recall-expected");
+        File crmiOutput = new File(TEST_OUTPUT_DIR,
+                FRUIT_NAME + ".CrMi-recall-actual");
 
-        if (crmiOutput.exists())
-            crmiOutput.delete();
-        if (expectedOutput.exists())
-            expectedOutput.delete();
+        crmiOutput.delete();
+        expectedOutput.delete();
 
+        enableExistTrapping();
         Byblo.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "RecallMi",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", expectedOutput.toString()
                 });
         Byblo.main(new String[]{
@@ -231,41 +141,39 @@ public class CrMiTest {
                     "--measure", "CrMi",
                     "--crmi-beta", "0.00",
                     "--crmi-gamma", "0.00",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", crmiOutput.toString()
                 });
-
+        disableExitTrapping();
 
         assertTrue(Files.equal(expectedOutput, crmiOutput));
 
     }
 
-    @Test
-    public void testMainMethodRun_precisionCheck() throws Exception {
+    @Test(timeout = 1000)
+    public void testCrmiCli_precisionCheck() throws Exception {
         System.out.println(
                 "Testing CrMi(beta=1, gamma=0) equals PrecisionMi from main method.");
 
-        final String dataSet = "bnc-gramrels-fruit";
-        File expectedOutput = new File(
-                OUTPUT_DIR + dataSet + ".CrMi-precision-expected");
-        File crmiOutput = new File(
-                OUTPUT_DIR + dataSet + ".CrMi-precision-actual");
+        File expectedOutput = new File(TEST_OUTPUT_DIR,
+                FRUIT_NAME + ".CrMi-precision-expected");
+        File crmiOutput = new File(TEST_OUTPUT_DIR,
+                FRUIT_NAME + ".CrMi-precision-actual");
 
-        if (crmiOutput.exists())
-            crmiOutput.delete();
-        if (expectedOutput.exists())
-            expectedOutput.delete();
+        crmiOutput.delete();
+        expectedOutput.delete();
 
+        enableExistTrapping();
         Byblo.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "RecallMi",
                     "--measure-reversed",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", expectedOutput.toString()
                 });
         Byblo.main(new String[]{
@@ -274,41 +182,39 @@ public class CrMiTest {
                     "--measure", "CrMi",
                     "--crmi-beta", "1.00",
                     "--crmi-gamma", "0.00",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", crmiOutput.toString()
                 });
 
+        disableExitTrapping();
 
         assertTrue(Files.equal(expectedOutput, crmiOutput));
 
     }
 
-    @Test
-    @Ignore(value = "Fails though may have an equivilant ranking.")
-    public void testMainMethodRun_diceCheck() throws Exception {
+    @Test(timeout = 1000)
+    public void testCrmiCli_diceCheck() throws Exception {
         System.out.println(
                 "Testing CrMi(beta=NA, gamma=1) \"harmonic mean\" equals DiceMi  from main method.");
 
-        final String dataSet = "bnc-gramrels-fruit";
-        File expectedOutput = new File(
-                OUTPUT_DIR + dataSet + ".CrMi-dice-expected");
-        File crmiOutput = new File(
-                OUTPUT_DIR + dataSet + ".CrMi-dice-actual");
+        File expectedOutput = new File(TEST_OUTPUT_DIR,
+                FRUIT_NAME + ".CrMi-dice-expected");
+        File crmiOutput = new File(TEST_OUTPUT_DIR,
+                FRUIT_NAME + ".CrMi-dice-actual");
 
-        if (crmiOutput.exists())
-            crmiOutput.delete();
-        if (expectedOutput.exists())
-            expectedOutput.delete();
+        crmiOutput.delete();
+        expectedOutput.delete();
 
+        enableExistTrapping();
         Byblo.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "DiceMi",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", expectedOutput.toString()
                 });
         Byblo.main(new String[]{
@@ -317,14 +223,30 @@ public class CrMiTest {
                     "--measure", "CrMi",
                     "--crmi-beta", "0.00",
                     "--crmi-gamma", "1.00",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", crmiOutput.toString()
                 });
 
+        disableExitTrapping();
 
-        assertTrue(Files.equal(expectedOutput, crmiOutput));
 
+        // The ranking should be identical, but the absolute similarity values
+        // will be different.
+        
+        WeightedPairSource expected = new WeightedPairSource(expectedOutput,
+                DEFAULT_CHARSET);
+        WeightedPairSource actual = new WeightedPairSource(crmiOutput,
+                DEFAULT_CHARSET);
+        
+        while(expected.hasNext() && actual.hasNext()) {
+            WeightedPair e = expected.read();
+            WeightedPair a = actual.read();
+            assertEquals(e.getXId(), a.getXId());
+            assertEquals(e.getYId(), a.getYId());
+        }
+        
+        assertEquals(expected.hasNext(), actual.hasNext());
     }
 }

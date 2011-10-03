@@ -34,7 +34,7 @@ import uk.ac.susx.mlcl.lib.Checks;
 import java.util.logging.Logger;
 import uk.ac.susx.mlcl.lib.collect.Entry;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.collect.Pair;
+import uk.ac.susx.mlcl.lib.collect.WeightedPair;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -50,7 +50,7 @@ import java.util.Set;
  * building a reverse index of one of the input sources. This allows candidate
  * pairs to be found relatively quickly given sufficient sparsity
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class InvertedApssTask<S> extends NaiveApssTask<S> {
 
@@ -75,7 +75,7 @@ public class InvertedApssTask<S> extends NaiveApssTask<S> {
     protected void computeAllPairs()
             throws IOException {
         final S startB = getSourceB().position();
-        List<Pair> pairs = new ArrayList<Pair>();
+        List<WeightedPair> pairs = new ArrayList<WeightedPair>();
 
         while (getSourceB().hasNext()) {
             Entry<SparseDoubleVector> b = getSourceB().read();
@@ -90,7 +90,7 @@ public class InvertedApssTask<S> extends NaiveApssTask<S> {
                 getStats().incrementCandidatesCount();
 
                 double sim = sim(a, b);
-                Pair pair = new Pair(a.key(), b.key(), sim);
+                WeightedPair pair = new WeightedPair(a.key(), b.key(), sim);
                 if (getProducatePair().apply(pair)) {
                     pairs.add(pair);
                     getStats().incrementProductionCount();

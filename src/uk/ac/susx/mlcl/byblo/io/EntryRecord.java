@@ -32,7 +32,7 @@ package uk.ac.susx.mlcl.byblo.io;
 
 /**
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class EntryRecord {
 

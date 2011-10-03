@@ -34,7 +34,7 @@ import java.io.Serializable;
 
 /**
  * 
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class EntryFeatureRecord implements Serializable, Comparable<EntryFeatureRecord> {
 

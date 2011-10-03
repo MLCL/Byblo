@@ -41,7 +41,7 @@ import java.util.Comparator;
  *
  * Immutable
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class AbstractEntry implements Serializable, Comparable<AbstractEntry> {
 

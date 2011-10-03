@@ -37,7 +37,7 @@ import java.util.Collection;
  * Interface defining the acceptance of objects of the given type
  * {@code T}.
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T> The type of object that the implementing class will provide.
  */
 public interface Sink<T> {

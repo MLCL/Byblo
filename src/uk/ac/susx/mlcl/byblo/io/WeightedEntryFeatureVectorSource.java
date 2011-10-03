@@ -45,7 +45,7 @@ import java.nio.charset.CharacterCodingException;
  * Wraps a {@link WeightedEntryFeatureSource} to produce complete feature 
  * vectors instead of just individual entry/feature records.
  * 
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class WeightedEntryFeatureVectorSource
         implements SeekableSource<Entry<SparseDoubleVector>, Lexer.Tell> {

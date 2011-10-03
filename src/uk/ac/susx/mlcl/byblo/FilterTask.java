@@ -38,7 +38,7 @@ import static com.google.common.base.Preconditions.*;
 import com.google.common.base.Predicate;
 import static uk.ac.susx.mlcl.lib.Predicates2.*;
 import com.google.common.io.Files;
-import uk.ac.susx.mlcl.byblo.AllPairsTask.DoubleConverter;
+import uk.ac.susx.mlcl.lib.DoubleConverter;
 import uk.ac.susx.mlcl.byblo.io.FeatureRecord;
 import uk.ac.susx.mlcl.byblo.io.FeatureSink;
 import uk.ac.susx.mlcl.byblo.io.FeatureSource;

@@ -38,7 +38,7 @@ import java.io.InputStreamReader;
 /**
  * Static utility methods that don't fit anywhere else.
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class MiscUtil {
 

@@ -41,7 +41,7 @@ import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.collect.Entry;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.collect.Pair;
+import uk.ac.susx.mlcl.lib.collect.WeightedPair;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
@@ -57,7 +57,7 @@ import java.util.List;
  * perform better than the inverted index approach {@link InvertedApssTask} with
  * very dense vectors.
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <P> The generic-type for offset positions.
  */
 public class NaiveApssTask<P> extends AbstractTask {
@@ -77,7 +77,7 @@ public class NaiveApssTask<P> extends AbstractTask {
 
     private Proximity measure = DEFAULT_MEASURE;
 
-    private Sink<Pair> sink;
+    private Sink<WeightedPair> sink;
 
     /**
      * Filters that determine which feature vectors are considered.
@@ -87,7 +87,7 @@ public class NaiveApssTask<P> extends AbstractTask {
     /**
      * Filters that determine which resultant pairs are output
      */
-    private Predicate<Pair> pruducePair = alwaysTrue();
+    private Predicate<WeightedPair> pruducePair = alwaysTrue();
 
     // Stat collection
     private ApssStats stats = new ApssStats();
@@ -113,7 +113,7 @@ public class NaiveApssTask<P> extends AbstractTask {
     public NaiveApssTask(
             SeekableSource<Entry<SparseDoubleVector>, P> Q,
             SeekableSource<Entry<SparseDoubleVector>, P> R,
-            Sink<Pair> sink) {
+            Sink<WeightedPair> sink) {
         setSourceA(Q);
         setSourceB(R);
         setSink(sink);
@@ -125,11 +125,11 @@ public class NaiveApssTask<P> extends AbstractTask {
     public NaiveApssTask() {
     }
 
-    public Predicate<Pair> getProducatePair() {
+    public Predicate<WeightedPair> getProducatePair() {
         return pruducePair;
     }
 
-    public void setProducatePair(Predicate<Pair> pruducePair) {
+    public void setProducatePair(Predicate<WeightedPair> pruducePair) {
         Checks.checkNotNull("pruducePair");
         this.pruducePair = pruducePair;
     }
@@ -189,11 +189,11 @@ public class NaiveApssTask<P> extends AbstractTask {
         this.measure = measure;
     }
 
-    public final Sink<Pair> getSink() {
+    public final Sink<WeightedPair> getSink() {
         return sink;
     }
 
-    public final void setSink(Sink<Pair> sink) {
+    public final void setSink(Sink<WeightedPair> sink) {
         if (sink == null)
             throw new NullPointerException("handler == null");
         this.sink = sink;
@@ -292,7 +292,7 @@ public class NaiveApssTask<P> extends AbstractTask {
     }
 
     protected void computeAllPairs() throws IOException {
-        List<Pair> pairs = new ArrayList<Pair>();
+        List<WeightedPair> pairs = new ArrayList<WeightedPair>();
         final P restartB = getSourceB().position();
 
         // for every vector (a) in source A
@@ -313,7 +313,7 @@ public class NaiveApssTask<P> extends AbstractTask {
                     continue;
 
                 double sim = sim(a, b);
-                Pair pair = new Pair(a.key(), b.key(), sim);
+                WeightedPair pair = new WeightedPair(a.key(), b.key(), sim);
                 if (pruducePair.apply(pair)) {
                     pairs.add(pair);
                     stats.incrementProductionCount();

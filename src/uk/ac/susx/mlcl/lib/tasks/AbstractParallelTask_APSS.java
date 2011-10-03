@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  * Worst still is that ThreadedApssTask inherits from NaiveApssTask so that
  * needs to be refactored before AbstractParallelTask can be integrated.
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @deprecated work in progress (or not in progress)
  */
 @Deprecated

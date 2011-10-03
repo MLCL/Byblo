@@ -39,15 +39,15 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 /**
- * Pair hold the uniue ids of two items, along with a value indicating
+ * WeightedPair hold the uniue ids of two items, along with a value indicating
  * the weight of connections between them.
  *
- * Instances of Pair are immutable, though the fields are not
+ * Instances of WeightedPair are immutable, though the fields are not
  *
  * @author Hamish Morgan
  */
-public class Pair implements
-        Comparable<Pair>, Serializable, Cloneable {
+public class WeightedPair implements
+        Comparable<WeightedPair>, Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;
 
@@ -70,7 +70,7 @@ public class Pair implements
     /**
      * Constructor used during de-serialization.
      */
-    private Pair() {
+    private WeightedPair() {
     }
 
     /**
@@ -80,7 +80,7 @@ public class Pair implements
      * @throws NullPointerException if the argument is null
      * @throws IllegalArgumentException if argument weight is NaN
      */
-    protected Pair(final Pair that)
+    protected WeightedPair(final WeightedPair that)
             throws NullPointerException, IllegalArgumentException {
         if (that == null)
             throw new NullPointerException("that == null");
@@ -100,7 +100,7 @@ public class Pair implements
      * @param weight The weight of connection between the two items.
      * @throws IllegalArgumentException if argument weight is NaN
      */
-    public Pair(final int x_id, final int y_id, final double weight)
+    public WeightedPair(final int x_id, final int y_id, final double weight)
             throws IllegalArgumentException {
         if (Double.isNaN(weight))
             throw new IllegalArgumentException("proximity == NaN");
@@ -155,7 +155,7 @@ public class Pair implements
      * @throws NullPointerException if the argument is null
      */
     @Override
-    public int compareTo(final Pair that)
+    public int compareTo(final WeightedPair that)
             throws NullPointerException {
         if (that == null)
             throw new NullPointerException("that == null");
@@ -163,15 +163,15 @@ public class Pair implements
     }
 
     @Override
-    protected Pair clone() {
-        return new Pair(this);
+    protected WeightedPair clone() {
+        return new WeightedPair(this);
     }
 
     @Override
     public boolean equals(Object obj) {
         return obj != null
                 && getClass() == obj.getClass()
-                && compareTo((Pair) obj) == 0;
+                && compareTo((WeightedPair) obj) == 0;
     }
 
     @Override
@@ -190,12 +190,12 @@ public class Pair implements
 
         private static final long serialVersionUID = 1;
 
-        private Pair pair;
+        private WeightedPair pair;
 
         public Serializer() {
         }
 
-        public Serializer(final Pair pair) {
+        public Serializer(final WeightedPair pair) {
             if (pair == null)
                 throw new NullPointerException("pair == null");
             this.pair = pair;
@@ -217,7 +217,7 @@ public class Pair implements
             final double weight = in.readDouble();
             if (Double.isNaN(weight))
                 throw new IllegalArgumentException("proximity == NaN");
-            pair = new Pair(x_id, y_id, weight);
+            pair = new WeightedPair(x_id, y_id, weight);
         }
 
         protected final Object readResolve() {
@@ -225,43 +225,43 @@ public class Pair implements
         }
     }
 
-    public static Predicate<Pair> identity() {
-        return new Predicate<Pair>() {
+    public static Predicate<WeightedPair> identity() {
+        return new Predicate<WeightedPair>() {
 
             @Override
-            public boolean apply(Pair input) {
+            public boolean apply(WeightedPair input) {
                 return input.getXId() == input.getYId();
             }
         };
     }
 
 
-    public static Predicate<Pair> similarityGTE(
+    public static Predicate<WeightedPair> similarityGTE(
             final double minSimilarity) {
-        return new Predicate<Pair>() {
+        return new Predicate<WeightedPair>() {
 
             @Override
-            public boolean apply(Pair pair) {
+            public boolean apply(WeightedPair pair) {
                 return (pair.getWeight() >= minSimilarity);
             }
         };
     }
 
-    public static Predicate<Pair> similarityLTE(
+    public static Predicate<WeightedPair> similarityLTE(
             final double maxSimilarity) {
-        return new Predicate<Pair>() {
+        return new Predicate<WeightedPair>() {
 
             @Override
-            public boolean apply(Pair pair) {
+            public boolean apply(WeightedPair pair) {
                 return (pair.getWeight() <= maxSimilarity);
             }
         };
     }
 
-    public static Comparator<Pair> ASYMMETRIC_COMPARATOR = new Comparator<Pair>() {
+    public static Comparator<WeightedPair> ASYMMETRIC_COMPARATOR = new Comparator<WeightedPair>() {
 
         @Override
-        public int compare(Pair a, Pair b) {
+        public int compare(WeightedPair a, WeightedPair b) {
             return a.x_id < b.x_id ? -1
                     : a.x_id > b.x_id ? 1
                     : a.y_id < b.y_id ? -1
@@ -270,10 +270,10 @@ public class Pair implements
         }
     };
 
-    public static Comparator<Pair> SYMMETRIC_COMPARATOR = new Comparator<Pair>() {
+    public static Comparator<WeightedPair> SYMMETRIC_COMPARATOR = new Comparator<WeightedPair>() {
 
         @Override
-        public int compare(Pair a, Pair b) {
+        public int compare(WeightedPair a, WeightedPair b) {
             final int x1 = Math.min(a.x_id, a.y_id);
             final int x2 = Math.min(b.x_id, b.y_id);
             final int y1 = Math.max(a.x_id, a.y_id);
@@ -286,10 +286,10 @@ public class Pair implements
         }
     };
 
-    public static Comparator<Pair> ASYMMETRIC_KEY_COMPARATOR = new Comparator<Pair>() {
+    public static Comparator<WeightedPair> ASYMMETRIC_KEY_COMPARATOR = new Comparator<WeightedPair>() {
 
         @Override
-        public int compare(Pair a, Pair b) {
+        public int compare(WeightedPair a, WeightedPair b) {
             return a.x_id < b.x_id ? -1
                     : a.x_id > b.x_id ? 1
                     : a.y_id < b.y_id ? -1
@@ -298,10 +298,10 @@ public class Pair implements
         }
     };
 
-    public static Comparator<Pair> SYMMETRIC_KEY_COMPARATOR = new Comparator<Pair>() {
+    public static Comparator<WeightedPair> SYMMETRIC_KEY_COMPARATOR = new Comparator<WeightedPair>() {
 
         @Override
-        public int compare(Pair a, Pair b) {
+        public int compare(WeightedPair a, WeightedPair b) {
             final int x1 = Math.min(a.x_id, a.y_id);
             final int x2 = Math.min(b.x_id, b.y_id);
             final int y1 = Math.max(a.x_id, a.y_id);

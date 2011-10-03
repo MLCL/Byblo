@@ -37,43 +37,22 @@ import com.beust.jcommander.JCommander;
 import java.io.IOException;
 import java.util.ResourceBundle;
 import java.io.File;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static uk.ac.susx.mlcl.TestConstants.*;
 
 /**
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class ChunkTaskTest {
 
-    public ChunkTaskTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        System.out.println("\n\nTesting ChunkTask");
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
+    private static final String subject = ChunkTask.class.getName();
 
     /**
      * Test of runTask method, of class ChunkTask.
      */
-    @Test
+    @Test(timeout=1000)
     public void testRunTask() throws Exception {
         System.out.println("runTask");
 
@@ -83,7 +62,7 @@ public class ChunkTaskTest {
         FileFactory fileFactory = new TempFileFactory();
 
         File in = File.createTempFile(getClass().getName(), "in");
-        IOUtil.writeAll(in, IOUtil.DEFAULT_CHARSET, str);
+        IOUtil.writeAll(in, DEFAULT_CHARSET, str);
 
         ChunkTask instance = new ChunkTask();
         instance.setSrcFile(in);
@@ -96,14 +75,14 @@ public class ChunkTaskTest {
         int i = 0;
         for (File out : instance.getDestFiles()) {
             StringBuilder sb = new StringBuilder();
-            IOUtil.readAll(out, IOUtil.DEFAULT_CHARSET, sb);
+            IOUtil.readAll(out, DEFAULT_CHARSET, sb);
             assertEquals(expectedResult[i] + "\n", sb.toString());
             i++;
             out.delete();
         }
     }
 
-    @Test
+    @Test(timeout=1000)
     public void testGetSetMaxChunkSize() {
         System.out.println("Testing setMaxChunkSize() and getMaxChunkSize()");
         int maxChunkSize = 1000;
@@ -112,7 +91,7 @@ public class ChunkTaskTest {
         assertEquals(maxChunkSize, instance.getMaxChunkSize());
     }
 
-    @Test
+    @Test(timeout=1000)
     public void testGetSetSrcFile() {
         System.out.println("Testing setSrcFile() and getSrcFile()");
         File sourceFile = new File(".");
@@ -121,7 +100,7 @@ public class ChunkTaskTest {
         assertEquals(sourceFile, instance.getSrcFile());
     }
 
-    @Test
+    @Test(timeout=1000)
     public void testGetSetChunkFileFactory() {
         System.out.println(
                 "Testing setChunkFileFactory() and getChunkFileFactory()");
@@ -131,7 +110,7 @@ public class ChunkTaskTest {
         assertEquals(chunkFileFactory, instance.getChunkFileFactory());
     }
 
-    @Test
+    @Test(timeout=1000)
     public void testCLI() throws IOException {
         System.out.println("Testing command line usage.");
         File tmp = File.createTempFile(getClass().getName(), "");

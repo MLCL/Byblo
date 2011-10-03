@@ -45,7 +45,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author hiam20
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class AbstractParallelTask extends AbstractTask {
 

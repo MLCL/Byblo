@@ -38,107 +38,71 @@ import java.util.Set;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.collect.SparseVectors;
 import java.util.HashSet;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static uk.ac.susx.mlcl.TestConstants.*;
+import static uk.ac.susx.mlcl.ExitTrapper.*;
 
 /**
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class JaccardTest {
 
-    private static final String SAMPLE_DATA_DIR = "sampledata" + File.separator;
-
-    private static final String OUTPUT_DIR = SAMPLE_DATA_DIR + "out" + File.separator;
-
-    public JaccardTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    private Jaccard instance;
-
-    @Before
-    public void setUp() throws InstantiationException, IllegalAccessException {
-        instance = Jaccard.class.newInstance();
-    }
-
-    @After
-    public void tearDown() {
-    }
-
-    @Test
-    public void testMainMethodRun_Jaccard() throws Exception {
+    @Test(timeout = 1000)
+    public void testJaccardCLI() throws Exception {
         System.out.println("Testing Jaccard from main method.");
 
-        final String dataSet = "bnc-gramrels-fruit";
+        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Jaccard");
+        output.delete();
 
-        File output = new File(OUTPUT_DIR + dataSet + ".Jaccard");
-        if (output.exists())
-            output.delete();
-
-        String[] args = new String[]{
-            "allpairs",
-            "--charset", "UTF-8",
-            "--measure", "Jaccard",
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
-            "--output", output.toString()
-        };
-
-        Byblo.main(args);
+        enableExistTrapping();
+        Byblo.main(new String[]{
+                    "allpairs",
+                    "--charset", "UTF-8",
+                    "--measure", "Jaccard",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                    "--output", output.toString()
+                });
+        disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
-
-        Thread.sleep(100);
     }
 
-    @Test
-    public void testMainMethodRun_JaccardMi() throws Exception {
+    @Test(timeout = 1000)
+    public void testJaccardMiCLI() throws Exception {
         System.out.println("Testing JaccardMI from main method.");
 
-        final String dataSet = "bnc-gramrels-fruit";
-
-        File output = new File(OUTPUT_DIR + dataSet + ".JaccardMI");
-        if (output.exists())
-            output.delete();
+        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".JaccardMI");
+        output.delete();
 
         String[] args = new String[]{
             "allpairs",
             "--charset", "UTF-8",
             "--measure", "JaccardMI",
-            "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-            "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-            "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+            "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+            "--input-features", TEST_FRUIT_FEATURES.toString(),
+            "--input-entries", TEST_FRUIT_ENTRIES.toString(),
             "--output", output.toString()
         };
 
+        enableExistTrapping();
         Byblo.main(args);
+        disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
-
-        Thread.sleep(100);
     }
 
     /**
      * http://people.revoledu.com/kardi/tutorial/Similarity/Jaccard.html
      */
-    @Test
-    public void example1() {
-        System.out.println("Testing example1()");
+    @Test(timeout = 1000)
+    public void testJaccardExample1() {
+        System.out.println("Testing Jaccard example1");
         double[] objectA = new double[]{1, 1, 1, 1};
         double[] objectB = new double[]{0, 1, 0, 0};
         int p = 1; // number of variables that positive for both objects
@@ -152,9 +116,9 @@ public class JaccardTest {
         SparseDoubleVector vecA = SparseVectors.toDoubleVector(objectA);
         SparseDoubleVector vecB = SparseVectors.toDoubleVector(objectB);
 
+        Jaccard instance = new Jaccard();
         double result = instance.combine(instance.shared(vecA, vecB),
                 instance.left(vecA), instance.left(vecB));
-//        System.out.println(result);
 
         assertEquals(jaccardCoef, result, 0.0001);
     }
@@ -162,27 +126,22 @@ public class JaccardTest {
     /**
      * http://people.revoledu.com/kardi/tutorial/Similarity/Jaccard.html
      */
-    @Test
-    public void example2() {
-        System.out.println("Testing example2()");
+    @Test(timeout = 1000)
+    public void testJaccardExample2() {
+        System.out.println("Testing Jaccard example2");
         Set<Integer> A = new HashSet<Integer>();
         A.addAll(Arrays.asList(7, 3, 2, 4, 1));
-//        System.out.println("A = " + A);
 
         Set<Integer> B = new HashSet<Integer>();
         B.addAll(Arrays.asList(4, 1, 9, 7, 5));
-//        System.out.println("B = " + B);
 
         Set<Integer> union = new HashSet<Integer>();
         union.addAll(A);
         union.addAll(B);
-//        System.out.println("A union B = " + union);
-
 
         Set<Integer> intersection = new HashSet<Integer>();
         intersection.addAll(A);
         intersection.retainAll(B);
-//        System.out.println("A intersection B = " + intersection);
 
         double jaccardCoef = (double) intersection.size() / (double) union.size();
 
@@ -196,9 +155,9 @@ public class JaccardTest {
             vecB.set(b, 1);
         }
 
+        Jaccard instance = new Jaccard();
         double result = instance.combine(instance.shared(vecA, vecB),
                 instance.left(vecA), instance.left(vecB));
-//        System.out.println(result);
 
         assertEquals(jaccardCoef, result, 0.0001);
     }
@@ -206,7 +165,7 @@ public class JaccardTest {
     /**
      * Test of shared method, of class Jaccard.
      */
-    @Test
+    @Test(timeout = 1000)
     public void testShared() {
         System.out.println("Testing shared()");
         SparseDoubleVector Q = SparseVectors.toDoubleVector(
@@ -214,6 +173,7 @@ public class JaccardTest {
         SparseDoubleVector R = SparseVectors.toDoubleVector(
                 new double[]{1, 0, 1, 0, 1, 0, 1, 1, 1, 0});
         double expResult = 2.0;
+        Jaccard instance = new Jaccard();
         double result = instance.shared(Q, R);
         assertEquals(expResult, result, 0.0);
     }
@@ -221,12 +181,13 @@ public class JaccardTest {
     /**
      * Test of left method, of class Jaccard.
      */
-    @Test
+    @Test(timeout = 1000)
     public void testLeft() {
         System.out.println("Testing left()");
         SparseDoubleVector Q = SparseVectors.toDoubleVector(
                 new double[]{0, 1, 0, 1, 0, 1, 0, 1, 1, 1});
         double expResult = 6.0;
+        Jaccard instance = new Jaccard();
         double result = instance.left(Q);
         assertEquals(expResult, result, 0.0);
     }
@@ -234,12 +195,13 @@ public class JaccardTest {
     /**
      * Test of right method, of class Jaccard.
      */
-    @Test
+    @Test(timeout = 1000)
     public void testRight() {
         System.out.println("Testing right()");
         SparseDoubleVector R = SparseVectors.toDoubleVector(
                 new double[]{0, 1, 0, 1, 0, 1, 0, 1, 1, 1});
         double expResult = 6.0;
+        Jaccard instance = new Jaccard();
         double result = instance.right(R);
         assertEquals(expResult, result, 0.0);
     }
@@ -247,13 +209,14 @@ public class JaccardTest {
     /**
      * Test of combine method, of class Jaccard.
      */
-    @Test
+    @Test(timeout = 1000)
     public void testCombine() {
         System.out.println("Testing combine()");
         double shared = 7.0;
         double left = 5.0;
         double right = 3.0;
         double expResult = shared / (left + right - shared);
+        Jaccard instance = new Jaccard();
         double result = instance.combine(shared, left, right);
         assertEquals(expResult, result, 0.0);
     }
@@ -261,34 +224,32 @@ public class JaccardTest {
     /**
      * Test of isSymmetric method, of class Jaccard.
      */
-    @Test
+    @Test(timeout = 1000)
     public void testIsSymmetric() {
         System.out.println("Testing isSymmetric()");
         boolean expResult = true;
+        Jaccard instance = new Jaccard();
         boolean result = instance.isSymmetric();
         assertEquals(expResult, result);
     }
 
-    @Test
+    @Test(timeout = 1000)
     public void testJaccard_Symmetry() throws Exception {
-        System.out.println("Testing symmetry.");
+        System.out.println("Testing Jaccard symmetry.");
 
-        final String dataSet = "bnc-gramrels-fruit";
+        File output1 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Jaccard-1");
+        File output2 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Jaccard-2");
+        output1.delete();
+        output2.delete();
 
-        File output1 = new File(OUTPUT_DIR + dataSet + ".Jaccard-1");
-        File output2 = new File(OUTPUT_DIR + dataSet + ".Jaccard-2");
-        if (output1.exists())
-            output1.delete();
-        if (output2.exists())
-            output2.delete();
-
+        enableExistTrapping();
         Byblo.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "Jaccard",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output1.toString()
                 });
         Byblo.main(new String[]{
@@ -296,39 +257,36 @@ public class JaccardTest {
                     "--charset", "UTF-8",
                     "--measure", "Jaccard",
                     "--measure-reversed",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output2.toString()
                 });
 
+        disableExitTrapping();
         assertTrue(Files.equal(output1, output2));
-
-        Thread.sleep(100);
     }
 
-
-
-    @Test
+    @Test(timeout = 1000)
     public void testJaccardMi_Symmetry() throws Exception {
         System.out.println("Testing symmetry.");
 
         final String dataSet = "bnc-gramrels-fruit";
 
-        File output1 = new File(OUTPUT_DIR + dataSet + ".JaccardMi-1");
-        File output2 = new File(OUTPUT_DIR + dataSet + ".JaccardMi-2");
-        if (output1.exists())
-            output1.delete();
-        if (output2.exists())
-            output2.delete();
+        File output1 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".JaccardMI-1");
+        File output2 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".JaccardMI-2");
+        output1.delete();
+        output2.delete();
 
+
+        enableExistTrapping();
         Byblo.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "JaccardMi",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output1.toString()
                 });
         Byblo.main(new String[]{
@@ -336,14 +294,14 @@ public class JaccardTest {
                     "--charset", "UTF-8",
                     "--measure", "JaccardMi",
                     "--measure-reversed",
-                    "--input", SAMPLE_DATA_DIR + dataSet + ".features",
-                    "--input-contexts", SAMPLE_DATA_DIR + dataSet + ".contexts",
-                    "--input-entries", SAMPLE_DATA_DIR + dataSet + ".entries",
+                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output2.toString()
                 });
 
-        assertTrue(Files.equal(output1, output2));
+        disableExitTrapping();
 
-        Thread.sleep(100);
+        assertTrue(Files.equal(output1, output2));
     }
 }

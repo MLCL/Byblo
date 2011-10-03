@@ -37,7 +37,7 @@ package uk.ac.susx.mlcl.lib.io;
  * The interface allows data to be iterated in an undefined but deterministic
  * order. It is entirely agnostic in terms of actual source of data.
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T> The type of object that the implementing class will provide.
  */
 public interface SeekableSource<T, P> extends Source<T>, Seekable<P>{

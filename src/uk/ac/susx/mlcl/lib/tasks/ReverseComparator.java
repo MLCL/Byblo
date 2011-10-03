@@ -43,7 +43,7 @@ import java.util.Comparator;
  * {@link Comparator} is also serializable.</p>
  *
  * @param <T>
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class ReverseComparator<T>
         implements Comparator<T>, Serializable {

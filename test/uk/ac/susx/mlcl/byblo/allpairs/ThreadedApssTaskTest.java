@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.allpairs;
 
+import java.io.File;
 import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureSource;
 import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureVectorSource;
 import com.google.common.base.Predicate;
@@ -38,75 +39,69 @@ import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.ObjectIndex;
 import java.util.Collections;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
-import java.io.File;
-import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.byblo.measure.Jaccard;
-import uk.ac.susx.mlcl.lib.collect.Pair;
+import uk.ac.susx.mlcl.lib.collect.WeightedPair;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import uk.ac.susx.mlcl.byblo.Byblo;
+import uk.ac.susx.mlcl.lib.io.Lexer;
 import static org.junit.Assert.*;
+import static uk.ac.susx.mlcl.TestConstants.*;
+import static uk.ac.susx.mlcl.ExitTrapper.*;
 
 /**
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class ThreadedApssTaskTest {
 
-    private static final File FEATURES_FILE =
-            new File("sampledata", "bnc-gramrels-fruit.features");
-
-    private static final Charset CHARSET = IOUtil.DEFAULT_CHARSET;
+    private static final String subject = ThreadedApssTask.class.getName();
 
     private static final Proximity MEASURE = new Jaccard();
 
-    private static final Predicate<Pair> PAIR_FILTER =
-            Pair.similarityGTE(0.1);
+    private static final Predicate<WeightedPair> PAIR_FILTER =
+            WeightedPair.similarityGTE(0.1);
 
-    public ThreadedApssTaskTest() {
+    @Test(timeout=1000)    
+    public void testCLI()  throws Exception{
+        String output = new File(TEST_OUTPUT_DIR, TEST_FRUIT_INPUT.getName() + ".sims").toString();
+        String[] args = {
+            "allpairs",
+            "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+            "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+            "--input-features", TEST_FRUIT_FEATURES.toString(),
+            "--output", output,
+            "--measure", "Jaccard",
+        };
+               
+        enableExistTrapping();
+        Byblo.main(args);
+        disableExitTrapping();
+        
+
     }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
+    
     /**
      * Test of runTask method, of class AbstractAPSS2.
      */
-    @Test
-    public void testRunTask_Naive() throws Exception {
-        System.out.println("runTask Naive");
+    @Test(timeout=1000)
+    public void testNaive() throws Exception {
+        System.out.println("Testing " + subject + " Naive");
 
         ObjectIndex<String> stringIndex = new ObjectIndex<String>();
 
         WeightedEntryFeatureVectorSource vsa =
                 new WeightedEntryFeatureVectorSource(new WeightedEntryFeatureSource(
-                FEATURES_FILE, CHARSET, stringIndex));
+                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
 
         WeightedEntryFeatureVectorSource vsb =
                 new WeightedEntryFeatureVectorSource(new WeightedEntryFeatureSource(
-                FEATURES_FILE, CHARSET, stringIndex));
+                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
 
-        List<Pair> result = new ArrayList<Pair>();
-        Sink<Pair> sink = IOUtil.asSink(result);
-        ThreadedApssTask instance = new ThreadedApssTask(vsa, vsb, sink);
-
+        List<WeightedPair> result = new ArrayList<WeightedPair>();
+        Sink<WeightedPair> sink = IOUtil.asSink(result);
+        ThreadedApssTask<Lexer.Tell> instance = new ThreadedApssTask<Lexer.Tell>(vsa, vsb, sink);
 
         instance.setInnerAlgorithm(NaiveApssTask.class);
         instance.setMeasure(MEASURE);
@@ -124,22 +119,22 @@ public class ThreadedApssTaskTest {
     /**
      * Test of runTask method, of class AbstractAPSS2.
      */
-    @Test
-    public void testRunTask_Inverted() throws Exception {
-        System.out.println("runTask Inverted");
+    @Test(timeout=1000)
+    public void testInverted() throws Exception {
+        System.out.println("Testing " + subject + " Inverted");
         ObjectIndex<String> stringIndex = new ObjectIndex<String>();
 
         WeightedEntryFeatureVectorSource vsa =
                 new WeightedEntryFeatureVectorSource(new WeightedEntryFeatureSource(
-                FEATURES_FILE, CHARSET, stringIndex));
+                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
 
         WeightedEntryFeatureVectorSource vsb =
                 new WeightedEntryFeatureVectorSource(new WeightedEntryFeatureSource(
-                FEATURES_FILE, CHARSET, stringIndex));
+                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
 
-        List<Pair> result = new ArrayList<Pair>();
-        Sink<Pair> sink = IOUtil.asSink(result);
-        ThreadedApssTask instance = new ThreadedApssTask(vsa, vsb, sink);
+        List<WeightedPair> result = new ArrayList<WeightedPair>();
+        Sink<WeightedPair> sink = IOUtil.asSink(result);
+        ThreadedApssTask<Lexer.Tell> instance = new ThreadedApssTask<Lexer.Tell>(vsa, vsb, sink);
 
         instance.setInnerAlgorithm(InvertedApssTask.class);
         instance.setMeasure(MEASURE);
@@ -153,30 +148,30 @@ public class ThreadedApssTaskTest {
         assertTrue(!result.isEmpty());
     }
 
-    @Test
+    @Test(timeout=1000)
     public void compareNaiveInverted() throws Exception {
-        System.out.println("compare Naive and Inverted");
+        System.out.println("Testing " + subject + " comparing Naive and Inverted");
 
 
 
-        List<Pair> naiveResults = new ArrayList<Pair>();
-        List<Pair> invertedResults = new ArrayList<Pair>();
+        List<WeightedPair> naiveResults = new ArrayList<WeightedPair>();
+        List<WeightedPair> invertedResults = new ArrayList<WeightedPair>();
 
         {
             ObjectIndex<String> stringIndex = new ObjectIndex<String>();
 
             WeightedEntryFeatureVectorSource vsa =
                     new WeightedEntryFeatureVectorSource(new WeightedEntryFeatureSource(
-                    FEATURES_FILE, CHARSET, stringIndex));
+                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
 
             WeightedEntryFeatureVectorSource vsb =
                     new WeightedEntryFeatureVectorSource(new WeightedEntryFeatureSource(
-                    FEATURES_FILE, CHARSET, stringIndex));
+                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
 
 
-            List<Pair> result = new ArrayList<Pair>();
-            Sink<Pair> sink = IOUtil.asSink(result);
-            ThreadedApssTask instance = new ThreadedApssTask(vsa, vsb, sink);
+            List<WeightedPair> result = new ArrayList<WeightedPair>();
+            Sink<WeightedPair> sink = IOUtil.asSink(result);
+            ThreadedApssTask<Lexer.Tell> instance = new ThreadedApssTask<Lexer.Tell>(vsa, vsb, sink);
 
             instance.setInnerAlgorithm(NaiveApssTask.class);
             instance.setMeasure(MEASURE);
@@ -193,16 +188,16 @@ public class ThreadedApssTaskTest {
             ObjectIndex<String> stringIndex = new ObjectIndex<String>();
             WeightedEntryFeatureVectorSource vsa =
                     new WeightedEntryFeatureVectorSource(new WeightedEntryFeatureSource(
-                    FEATURES_FILE, CHARSET, stringIndex));
+                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
 
             WeightedEntryFeatureVectorSource vsb =
                     new WeightedEntryFeatureVectorSource(new WeightedEntryFeatureSource(
-                    FEATURES_FILE, CHARSET, stringIndex));
+                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
 
 
-            List<Pair> result = new ArrayList<Pair>();
-            Sink<Pair> sink = IOUtil.asSink(result);
-            ThreadedApssTask instance = new ThreadedApssTask(vsa, vsb, sink);
+            List<WeightedPair> result = new ArrayList<WeightedPair>();
+            Sink<WeightedPair> sink = IOUtil.asSink(result);
+            ThreadedApssTask<Lexer.Tell> instance = new ThreadedApssTask<Lexer.Tell>(vsa, vsb, sink);
 
             instance.setInnerAlgorithm(InvertedApssTask.class);
             instance.setMeasure(MEASURE);
@@ -212,40 +207,36 @@ public class ThreadedApssTaskTest {
             while (instance.isExceptionThrown()) {
                 instance.throwException();
             }
-
         }
 
         Collections.sort(naiveResults);
         Collections.sort(invertedResults);
 
-//        System.out.println(naiveResults);
-//        System.out.println(invertedResults);
-
         assertEquals(naiveResults, invertedResults);
     }
 
-    @Test
+    @Test(timeout=1000)
     public void compareNaive_Threaded_vs_NonThreaded() throws Exception {
-        System.out.println("compareNaive_Threaded_vs_NonThreaded");
+        System.out.println("Testing " + subject + " compare Naive Threaded vs Non-Threaded");
 
 
-        List<Pair> threadedResults = new ArrayList<Pair>();
-        List<Pair> nonThreadedResults = new ArrayList<Pair>();
+        List<WeightedPair> threadedResults = new ArrayList<WeightedPair>();
+        List<WeightedPair> nonThreadedResults = new ArrayList<WeightedPair>();
 
         {
             ObjectIndex<String> stringIndex = new ObjectIndex<String>();
 
             WeightedEntryFeatureVectorSource vsa =
                     new WeightedEntryFeatureVectorSource(new WeightedEntryFeatureSource(
-                    FEATURES_FILE, CHARSET, stringIndex));
+                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
 
             WeightedEntryFeatureVectorSource vsb =
                     new WeightedEntryFeatureVectorSource(new WeightedEntryFeatureSource(
-                    FEATURES_FILE, CHARSET, stringIndex));
+                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
 
 
-            Sink<Pair> sink = IOUtil.asSink(threadedResults);
-            ThreadedApssTask instance = new ThreadedApssTask(vsa, vsb, sink);
+            Sink<WeightedPair> sink = IOUtil.asSink(threadedResults);
+            ThreadedApssTask<Lexer.Tell> instance = new ThreadedApssTask<Lexer.Tell>(vsa, vsb, sink);
 
             instance.setInnerAlgorithm(NaiveApssTask.class);
             instance.setMeasure(MEASURE);
@@ -259,18 +250,17 @@ public class ThreadedApssTaskTest {
         }
 
         {
-            NaiveApssTask instance = new NaiveApssTask();
+            NaiveApssTask<Lexer.Tell> instance = new NaiveApssTask<Lexer.Tell>();
 
             ObjectIndex<String> stringIndex = new ObjectIndex<String>();
 
             WeightedEntryFeatureVectorSource vsa =
                     new WeightedEntryFeatureVectorSource(new WeightedEntryFeatureSource(
-                    FEATURES_FILE, CHARSET, stringIndex));
+                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
 
             WeightedEntryFeatureVectorSource vsb =
                     new WeightedEntryFeatureVectorSource(new WeightedEntryFeatureSource(
-                    FEATURES_FILE, CHARSET, stringIndex));
-
+                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
 
             instance.setSourceA(vsa);
             instance.setSourceB(vsb);
@@ -282,39 +272,34 @@ public class ThreadedApssTaskTest {
             while (instance.isExceptionThrown()) {
                 instance.throwException();
             }
-
         }
 
         Collections.sort(threadedResults);
         Collections.sort(nonThreadedResults);
 
-//        System.out.println(threadedResults);
-//        System.out.println(nonThreadedResults);
-
         assertEquals(threadedResults, nonThreadedResults);
     }
 
-    @Test
+    @Test(timeout=1000)
     public void compareInverted_Threaded_vs_NonThreaded() throws Exception {
-        System.out.println("compareNaive_Threaded_vs_NonThreaded");
+        System.out.println("Testing " + subject + " compare Naive Threaded vs Non-Threaded");
 
-        List<Pair> threadedResults = new ArrayList<Pair>();
-        List<Pair> nonThreadedResults = new ArrayList<Pair>();
+        List<WeightedPair> threadedResults = new ArrayList<WeightedPair>();
+        List<WeightedPair> nonThreadedResults = new ArrayList<WeightedPair>();
 
         {
             ObjectIndex<String> stringIndex = new ObjectIndex<String>();
 
             WeightedEntryFeatureVectorSource vsa =
                     new WeightedEntryFeatureVectorSource(new WeightedEntryFeatureSource(
-                    FEATURES_FILE, CHARSET, stringIndex));
+                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
 
             WeightedEntryFeatureVectorSource vsb =
                     new WeightedEntryFeatureVectorSource(new WeightedEntryFeatureSource(
-                    FEATURES_FILE, CHARSET, stringIndex));
+                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
 
-
-            Sink<Pair> sink = IOUtil.asSink(threadedResults);
-            ThreadedApssTask instance = new ThreadedApssTask(vsa, vsb, sink);
+            Sink<WeightedPair> sink = IOUtil.asSink(threadedResults);
+            ThreadedApssTask<Lexer.Tell> instance = new ThreadedApssTask<Lexer.Tell>(vsa, vsb, sink);
 
             instance.setInnerAlgorithm(InvertedApssTask.class);
             instance.setMeasure(MEASURE);
@@ -328,19 +313,17 @@ public class ThreadedApssTaskTest {
         }
 
         {
-            InvertedApssTask instance = new InvertedApssTask();
+            InvertedApssTask<Lexer.Tell> instance = new InvertedApssTask<Lexer.Tell>();
 
             ObjectIndex<String> stringIndex = new ObjectIndex<String>();
 
             WeightedEntryFeatureVectorSource vsa =
                     new WeightedEntryFeatureVectorSource(new WeightedEntryFeatureSource(
-                    FEATURES_FILE, CHARSET, stringIndex));
+                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
 
             WeightedEntryFeatureVectorSource vsb =
                     new WeightedEntryFeatureVectorSource(new WeightedEntryFeatureSource(
-                    FEATURES_FILE, CHARSET, stringIndex));
-
-
+                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
 
             instance.setSourceA(vsa);
             instance.setSourceB(vsb);
@@ -352,14 +335,10 @@ public class ThreadedApssTaskTest {
             while (instance.isExceptionThrown()) {
                 instance.throwException();
             }
-
         }
 
         Collections.sort(threadedResults);
         Collections.sort(nonThreadedResults);
-
-//        System.out.println(threadedResults);
-//        System.out.println(nonThreadedResults);
 
         assertEquals(threadedResults, nonThreadedResults);
     }

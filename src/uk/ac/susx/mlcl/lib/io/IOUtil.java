@@ -61,7 +61,7 @@ import java.util.zip.GZIPOutputStream;
 
 /**
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class IOUtil {
 
@@ -73,9 +73,13 @@ public class IOUtil {
 
     public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");// Charset.defaultCharset();
 
-    public static final CodingErrorAction MALFORMED_INPUT_ACTION = CodingErrorAction.REPLACE;
+    /*
+     * XXX: The following fields are not final because they are changed to 
+     * "REPORT" during unit tests. Obviously this is not ideal.
+     */
+    public static CodingErrorAction MALFORMED_INPUT_ACTION = CodingErrorAction.REPLACE;
 
-    public static final CodingErrorAction UNMAPPABLE_CHARACTER_ACTION = CodingErrorAction.REPLACE;
+    public static CodingErrorAction UNMAPPABLE_CHARACTER_ACTION = CodingErrorAction.REPLACE;
 
     private IOUtil() {
     }
@@ -221,7 +225,7 @@ public class IOUtil {
     }
 
     public static void readAllLines(File file, Charset charset,
-                                    Collection<? super String> lines)
+            Collection<? super String> lines)
             throws FileNotFoundException, IOException {
         BufferedReader reader = null;
         try {
@@ -238,7 +242,7 @@ public class IOUtil {
     }
 
     public static void writeAllLines(File file, Charset charset,
-                                     Collection<? extends String> lines)
+            Collection<? extends String> lines)
             throws FileNotFoundException, IOException {
 
         BufferedWriter writer = null;
@@ -289,14 +293,15 @@ public class IOUtil {
     public static <T> Sink<T> asSink(final Collection<T> collection) {
         return new Sink<T>() {
 
+            @Override
             public void write(T record) throws IOException {
                 collection.add(record);
             }
 
+            @Override
             public void writeAll(Collection<? extends T> records) throws IOException {
                 collection.addAll(records);
             }
-
         };
     }
 
@@ -305,36 +310,55 @@ public class IOUtil {
 
             private final Iterator<? extends T> it = iterable.iterator();
 
+            @Override
             public T read() {
                 return it.next();
             }
 
+            @Override
             public boolean hasNext() {
                 return it.hasNext();
             }
         };
     }
 
-    public static <T> SeekableSource<T, Integer> asSource(final List<? extends T> list) {
+    public static <T> SeekableSource<T, Integer> asSource(
+            final List<? extends T> list) {
         return new SeekableSource<T, Integer>() {
 
-            ListIterator<? extends T> it = list.listIterator();
+            private ListIterator<? extends T> it = list.listIterator();
 
+            @Override
             public T read() {
                 return it.next();
             }
 
+            @Override
             public boolean hasNext() {
                 return it.hasNext();
             }
 
+            @Override
             public void position(Integer offset) {
                 it = list.listIterator(offset);
             }
 
+            @Override
             public Integer position() {
                 return it.nextIndex();
             }
         };
+    }
+
+    public static File createTempDir(String prefix, String suffix,
+            File directory) throws IOException {
+        final File temp = File.createTempFile(prefix, suffix, directory);
+        if (!temp.delete() || !temp.mkdir() || !temp.isDirectory())
+            throw new IOException("Failed to create temporary directory " + temp);
+        return temp;
+    }
+
+    public static File createTempDir(String prefix, String suffix) throws IOException {
+        return createTempDir(prefix, suffix, null);
     }
 }

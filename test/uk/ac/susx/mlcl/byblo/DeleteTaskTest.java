@@ -34,45 +34,17 @@ import com.beust.jcommander.JCommander;
 import java.util.ResourceBundle;
 import java.io.File;
 import java.io.IOException;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class DeleteTaskTest {
 
-    public DeleteTaskTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        System.out.println("\n\nTesting DeleteTask");
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-        System.out.flush();
-        System.err.flush();
-    }
-
-    @After
-    public void tearDown() {
-        System.out.flush();
-        System.err.flush();
-    }
-
  
-    @Test
+    @Test(timeout=1000)
     public void testRun_success() throws Exception {
         System.out.println("Testing run() -- expecting success");
         File tmp = File.createTempFile(getClass().getName(), "");
@@ -83,7 +55,7 @@ public class DeleteTaskTest {
         assertFalse(tmp.exists());
     }
 
-    @Test(expected = IOException.class)
+    @Test(expected = IOException.class, timeout=1000)
     public void testRunTask_failure() throws Exception {
         System.out.println("Testing runTask() -- expecting failure");
         File tmp = File.createTempFile(getClass().getName(), "");
@@ -94,7 +66,7 @@ public class DeleteTaskTest {
         instance.throwException();
     }
 
-    @Test(expected = IOException.class)
+    @Test(expected = IOException.class,timeout=1000)
     public void testRun_failure() throws Exception {
         System.out.println("Testing runTask() -- expecting failure");
         File tmp = File.createTempFile(getClass().getName(), "");
@@ -105,7 +77,7 @@ public class DeleteTaskTest {
         instance.throwException();
     }
 
-    @Test
+    @Test(timeout=1000)
     public void testGetSetFile() throws IOException {
         System.out.println("Testing getFile() and setFile()");
         File tmp = File.createTempFile(getClass().getName(), "");
@@ -118,7 +90,7 @@ public class DeleteTaskTest {
         tmp.delete();
     }
 
-    @Test
+    @Test(timeout=1000)
     public void testCLI() throws IOException {
         System.out.println("Testing command line usage.");
         File tmp = File.createTempFile(getClass().getName(), "");

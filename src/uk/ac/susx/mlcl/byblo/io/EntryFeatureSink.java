@@ -40,7 +40,7 @@ import java.nio.charset.Charset;
 
 /**
  *
- * @author Hamish Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class EntryFeatureSink
         extends AbstractTSVSink<EntryFeatureRecord>
