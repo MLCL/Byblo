@@ -50,20 +50,66 @@ public class EntrySink extends AbstractTSVSink<EntryRecord>
 
     private final ObjectIndex<String> stringIndex;
 
+    private boolean compactFormatEnabled = true;
+
+    private EntryRecord previousRecord = null;
+
     public EntrySink(File file, Charset charset, ObjectIndex<String> stringIndex)
             throws FileNotFoundException, IOException {
         super(file, charset);
         this.stringIndex = stringIndex;
     }
 
+    public boolean isCompactFormatEnabled() {
+        return compactFormatEnabled;
+    }
+
+    public void setCompactFormatEnabled(boolean compactFormatEnabled) {
+        this.compactFormatEnabled = compactFormatEnabled;
+    }
+
     @Override
     public void write(final EntryRecord record) throws IOException {
-        writeString(stringIndex.get(record.getEntryId()));
-        writeValueDelimiter();
-        if (Double.compare((int) record.getWeight(), record.getWeight()) == 0)
-            super.writeInt((int) record.getWeight());
+        if (isCompactFormatEnabled())
+            writeCompact(record);
         else
-            super.writeString(f.format(record.getWeight()));
+            writeVerbose(record);
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (isCompactFormatEnabled() && previousRecord != null)
+            writeRecordDelimiter();
+        super.close();
+    }
+
+    private void writeVerbose(final EntryRecord record) throws IOException {
+        writeEntry(record.getEntryId());
+        writeValueDelimiter();
+        writeWeight(record.getWeight());
         writeRecordDelimiter();
+    }
+
+    private void writeCompact(final EntryRecord record) throws IOException {
+        if (previousRecord == null) {
+            writeEntry(record.getEntryId());
+        } else if (previousRecord.getEntryId() != record.getEntryId()) {
+            writeRecordDelimiter();
+            writeEntry(record.getEntryId());
+        }
+        writeValueDelimiter();
+        writeWeight(record.getWeight());
+        previousRecord = record;
+    }
+
+    private void writeEntry(int id) throws IOException {
+        writeString(stringIndex.get(id));
+    }
+
+    private void writeWeight(double weight) throws IOException {
+        if (Double.compare((int) weight, weight) == 0)
+            super.writeInt((int) weight);
+        else
+            super.writeString(f.format(weight));
     }
 }

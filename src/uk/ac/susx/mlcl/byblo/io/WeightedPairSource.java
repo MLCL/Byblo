@@ -49,6 +49,8 @@ public class WeightedPairSource
 
     private final ObjectIndex<String> entryIndex;
 
+    private WeightedPair previousRecord = null;
+
     public WeightedPairSource(
             File file, Charset charset,
             ObjectIndex<String> entryIndex)
@@ -70,13 +72,54 @@ public class WeightedPairSource
 
     @Override
     public WeightedPair read() throws IOException {
-        final int entryId1 = entryIndex.get(parseString());
+        final int entryId1;
+        if (previousRecord == null) {
+            entryId1 = readEntry();
+            parseValueDelimiter();
+        } else {
+            entryId1 = previousRecord.getXId();
+        }
+
+        final int entryId2 = readEntry();
         parseValueDelimiter();
-        final int entryId2 = entryIndex.get(parseString());
-        parseValueDelimiter();
-        final double weight = parseDouble();
-        if (hasNext())
+        final double weight = readWight();
+
+        final WeightedPair record = new WeightedPair(
+                entryId1, entryId2, weight);
+
+        if (isValueDelimiterNext()) {
+            parseValueDelimiter();
+            previousRecord = record;
+        } else if(hasNext()) {
             parseRecordDelimiter();
-        return new WeightedPair(entryId1, entryId2, weight);
+            previousRecord = null;
+        }
+
+        return record;
+    }
+
+    protected int readEntry() throws IOException {
+        return entryIndex.get(parseString());
+    }
+
+    protected double readWight() throws IOException {
+        return parseDouble();
+    }
+
+    public static boolean equal(File a, File b, Charset charset) throws IOException {
+        final ObjectIndex<String> stringIndex = new ObjectIndex<String>();
+        final WeightedPairSource srcA = new WeightedPairSource(a, charset,
+                stringIndex);
+        final WeightedPairSource srcB = new WeightedPairSource(b, charset,
+                stringIndex);
+        boolean equal = true;
+        while (equal && srcA.hasNext() && srcB.hasNext()) {
+            final WeightedPair recA = srcA.read();
+            final WeightedPair recB = srcB.read();
+            equal = recA.getXId() == recB.getXId()
+                    && recA.getYId() == recB.getYId()
+                    && recA.getWeight() == recB.getWeight();
+        }
+        return equal && srcA.hasNext() == srcB.hasNext();
     }
 }

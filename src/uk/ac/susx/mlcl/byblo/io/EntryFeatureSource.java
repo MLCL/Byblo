@@ -50,6 +50,8 @@ public class EntryFeatureSource
 
     private final ObjectIndex<String> featureIndex;
 
+    private EntryFeatureRecord previousRecord = null;
+
     public EntryFeatureSource(
             File file, Charset charset,
             ObjectIndex<String> entryIndex,
@@ -89,11 +91,27 @@ public class EntryFeatureSource
 
     @Override
     public EntryFeatureRecord read() throws IOException {
-        final int entryId = readEntry();
-        parseValueDelimiter();
+        final int entryId;
+        if (previousRecord == null) {
+            entryId = readEntry();
+            parseValueDelimiter();
+        } else {
+            entryId = previousRecord.getEntryId();
+        }
+
         final int featureId = readFeature();
-        parseRecordDelimiter();
-        return new EntryFeatureRecord(entryId, featureId);
+        final EntryFeatureRecord record = new EntryFeatureRecord(entryId,
+                featureId);
+
+        if (isValueDelimiterNext()) {
+            parseValueDelimiter();
+            previousRecord = record;
+        } else if (hasNext()) {
+            parseRecordDelimiter();
+            previousRecord = null;
+        }
+
+        return record;
     }
 
     protected final int readEntry() throws IOException {
@@ -102,5 +120,24 @@ public class EntryFeatureSource
 
     protected final int readFeature() throws IOException {
         return featureIndex.get(parseString());
+    }
+
+    public static boolean equal(File fileA, File fileB, Charset charset)
+            throws IOException {
+        final ObjectIndex<String> stringIndex = new ObjectIndex<String>();
+        final EntryFeatureSource srcA = new EntryFeatureSource(
+                fileA, charset, stringIndex);
+        final EntryFeatureSource srcB = new EntryFeatureSource(
+                fileB, charset, stringIndex);
+        boolean equal = true;
+        while (equal && srcA.hasNext() && srcB.hasNext()) {
+            final EntryFeatureRecord recA = srcA.read();
+            final EntryFeatureRecord recB = srcB.read();
+            equal = equal 
+                    && recA.getEntryId() == recB.getEntryId()
+                    && recA.getFeatureId() == recB.getFeatureId();
+        }
+        equal = equal && srcA.hasNext() == srcB.hasNext();
+        return equal;
     }
 }

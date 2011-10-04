@@ -53,6 +53,10 @@ public class WeightedEntryFeatureSink
 
     private final ObjectIndex<String> featureIndex;
 
+    private boolean compactFormatEnabled = true;
+
+    private WeightedEntryFeatureRecord previousRecord = null;
+
     public WeightedEntryFeatureSink(File file, Charset charset,
             ObjectIndex<String> entryIndex, ObjectIndex<String> featureIndex)
             throws FileNotFoundException, IOException {
@@ -86,20 +90,68 @@ public class WeightedEntryFeatureSink
     public boolean isIndexCombined() {
         return getEntryIndex() == getFeatureIndex();
     }
-    
+
+    public boolean isCompactFormatEnabled() {
+        return compactFormatEnabled;
+    }
+
+    public void setCompactFormatEnabled(boolean compactFormatEnabled) {
+        this.compactFormatEnabled = compactFormatEnabled;
+    }
+
     @Override
     public void write(WeightedEntryFeatureRecord record) throws IOException {
-        
-        super.writeString(entryIndex.get(record.getEntryId()));
-        super.writeValueDelimiter();
-        
-        super.writeString(featureIndex.get(record.getFeatureId()));
-        super.writeValueDelimiter();
-        
-        if (Double.compare((int) record.getWeight(), record.getWeight()) == 0)
-            super.writeInt((int) record.getWeight());
+        if (isCompactFormatEnabled())
+            writeCompact(record);
         else
-            super.writeString(f.format(record.getWeight()));
-        super.writeRecordDelimiter();
+            writeVerbose(record);
+    }
+
+    private void writeVerbose(WeightedEntryFeatureRecord record) throws IOException {
+        writeEntry(record.getEntryId());
+        writeValueDelimiter();
+
+        writeFeature(record.getFeatureId());
+        writeValueDelimiter();
+
+        writeWeight(record.getWeight());
+        writeRecordDelimiter();
+    }
+
+    private void writeCompact(final WeightedEntryFeatureRecord record) throws IOException {
+        if (previousRecord == null) {
+            writeEntry(record.getEntryId());
+        } else if (previousRecord.getEntryId() != record.getEntryId()) {
+            writeRecordDelimiter();
+            writeEntry(record.getEntryId());
+        }
+
+        writeValueDelimiter();
+        writeFeature(record.getFeatureId());
+        writeValueDelimiter();
+        writeWeight(record.getWeight());
+        previousRecord = record;
+    }
+
+    private void writeEntry(int id) throws IOException {
+        writeString(entryIndex.get(id));
+    }
+
+    private void writeFeature(int id) throws IOException {
+        writeString(featureIndex.get(id));
+    }
+
+    private void writeWeight(double weight) throws IOException {
+        if (Double.compare((int) weight, weight) == 0)
+            writeInt((int) weight);
+        else
+            writeString(f.format(weight));
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (isCompactFormatEnabled() && previousRecord != null)
+            writeRecordDelimiter();
+        super.close();
     }
 }

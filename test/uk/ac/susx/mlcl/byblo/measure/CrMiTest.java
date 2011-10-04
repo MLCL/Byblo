@@ -148,7 +148,7 @@ public class CrMiTest {
                 });
         disableExitTrapping();
 
-        assertTrue(Files.equal(expectedOutput, crmiOutput));
+        assertTrue(WeightedPairSource.equal(expectedOutput, crmiOutput, DEFAULT_CHARSET));
 
     }
 
@@ -190,7 +190,7 @@ public class CrMiTest {
 
         disableExitTrapping();
 
-        assertTrue(Files.equal(expectedOutput, crmiOutput));
+        assertTrue(WeightedPairSource.equal(expectedOutput, crmiOutput, DEFAULT_CHARSET));
 
     }
 

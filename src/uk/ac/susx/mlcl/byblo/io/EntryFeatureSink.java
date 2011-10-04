@@ -50,6 +50,10 @@ public class EntryFeatureSink
 
     private final ObjectIndex<String> featureIndex;
 
+    private boolean compactFormatEnabled = true;
+
+    private EntryFeatureRecord previousRecord = null;
+
     public EntryFeatureSink(File file, Charset charset,
             ObjectIndex<String> entryIndex, ObjectIndex<String> featureIndex)
             throws FileNotFoundException, IOException {
@@ -85,12 +89,39 @@ public class EntryFeatureSink
         return getFeatureIndex() == getEntryIndex();
     }
 
+    public boolean isCompactFormatEnabled() {
+        return compactFormatEnabled;
+    }
+
+    public void setCompactFormatEnabled(boolean compactFormatEnabled) {
+        this.compactFormatEnabled = compactFormatEnabled;
+    }
+
     @Override
     public void write(final EntryFeatureRecord record) throws IOException {
+        if (isCompactFormatEnabled())
+            writeCompact(record);
+        else
+            writeVerbose(record);
+    }
+
+    private void writeVerbose(final EntryFeatureRecord record) throws IOException {
         writeEntry(record.getEntryId());
         writeValueDelimiter();
         writeFeature(record.getFeatureId());
         writeRecordDelimiter();
+    }
+
+    private void writeCompact(final EntryFeatureRecord record) throws IOException {
+        if (previousRecord == null) {
+            writeEntry(record.getEntryId());
+        } else if (previousRecord.getEntryId() != record.getEntryId()) {
+            writeRecordDelimiter();
+            writeEntry(record.getEntryId());
+        }
+        writeValueDelimiter();
+        writeFeature(record.getFeatureId());
+        previousRecord = record;
     }
 
     protected final void writeEntry(final int entryId) throws IOException {
@@ -100,4 +131,12 @@ public class EntryFeatureSink
     protected final void writeFeature(final int featureId) throws IOException {
         writeString(featureIndex.get(featureId));
     }
+
+    @Override
+    public void close() throws IOException {
+        if(isCompactFormatEnabled() && previousRecord != null)
+            writeRecordDelimiter();
+        super.close();
+    }
+
 }

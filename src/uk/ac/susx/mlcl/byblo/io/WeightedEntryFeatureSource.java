@@ -51,6 +51,8 @@ public class WeightedEntryFeatureSource
 
     private long count = 0;
 
+    private WeightedEntryFeatureRecord previousRecord = null;
+
     public WeightedEntryFeatureSource(File file, Charset charset,
             ObjectIndex<String> entryIndex, ObjectIndex<String> featureIndex)
             throws FileNotFoundException, IOException {
@@ -96,14 +98,60 @@ public class WeightedEntryFeatureSource
 
     @Override
     public WeightedEntryFeatureRecord read() throws IOException {
-        final int entryId = entryIndex.get(parseString());
+        final int entryId;
+        if (previousRecord == null) {
+            entryId = readEntry();
+            parseValueDelimiter();
+        } else {
+            entryId = previousRecord.getEntryId();
+        }
+
+
+        final int featureId = readFeature();
         parseValueDelimiter();
-        final int featureId = featureIndex.get(parseString());
-        parseValueDelimiter();
-        final double weight = parseDouble();
-        if (hasNext())
+        final double weight = readWight();
+        ++count;
+
+        final WeightedEntryFeatureRecord record = new WeightedEntryFeatureRecord(
+                entryId, featureId, weight);
+
+        if (isValueDelimiterNext()) {
+            parseValueDelimiter();
+            previousRecord = record;
+        } else if(hasNext()) {
             parseRecordDelimiter();
-        count++;
-        return new WeightedEntryFeatureRecord(entryId, featureId, weight);
+            previousRecord = null;
+        }
+
+        return record;
+    }
+
+    public int readEntry() throws IOException {
+        return entryIndex.get(parseString());
+    }
+
+    public int readFeature() throws IOException {
+        return featureIndex.get(parseString());
+    }
+
+    public double readWight() throws IOException {
+        return parseDouble();
+    }
+
+    public static boolean equal(File a, File b, Charset charset) throws IOException {
+        final ObjectIndex<String> stringIndex = new ObjectIndex<String>();
+        final WeightedEntryFeatureSource srcA = new WeightedEntryFeatureSource(a, charset,
+                stringIndex);
+        final WeightedEntryFeatureSource srcB = new WeightedEntryFeatureSource(b, charset,
+                stringIndex);
+        boolean equal = true;
+        while (equal && srcA.hasNext() && srcB.hasNext()) {
+            final WeightedEntryFeatureRecord recA = srcA.read();
+            final WeightedEntryFeatureRecord recB = srcB.read();
+            equal = recA.getEntryId() == recB.getEntryId()
+                    && recA.getFeatureId() == recB.getFeatureId()
+                    && recA.getWeight() == recB.getWeight();
+        }
+        return equal && srcA.hasNext() == srcB.hasNext();
     }
 }

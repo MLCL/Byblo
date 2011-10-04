@@ -53,7 +53,9 @@ public class WeightedPairSink
 
     private final ObjectIndex<String> strIndexB;
 
-    private final Object sync = new Object();
+    private boolean compactFormatEnabled = true;
+
+    private WeightedPair previousRecord = null;
 
     public WeightedPairSink(File file, Charset charset,
             ObjectIndex<String> strIndexA,
@@ -63,16 +65,65 @@ public class WeightedPairSink
         this.strIndexB = strIndexB;
     }
 
+    public boolean isCompactFormatEnabled() {
+        return compactFormatEnabled;
+    }
+
+    public void setCompactFormatEnabled(boolean compactFormatEnabled) {
+        this.compactFormatEnabled = compactFormatEnabled;
+    }
+
     @Override
-    public void write(WeightedPair pair) throws IOException {
-        super.writeString(strIndexA.get(pair.getXId()));
-        super.writeValueDelimiter();
-        super.writeString(strIndexB.get(pair.getYId()));
-        super.writeValueDelimiter();
-        if (Double.compare((int) pair.getWeight(), pair.getWeight()) == 0)
-            super.writeInt((int) pair.getWeight());
+    public void write(WeightedPair record) throws IOException {
+        if (isCompactFormatEnabled())
+            writeCompact(record);
         else
-        super.writeString(f.format(pair.getWeight()));
-        super.writeRecordDelimiter();
+            writeVerbose(record);
+    }
+
+    private void writeVerbose(WeightedPair record) throws IOException {
+        writeEntryA(record.getXId());
+        writeValueDelimiter();
+        writeEntryB(record.getYId());
+        writeValueDelimiter();
+        writeWeight(record.getWeight());
+        writeRecordDelimiter();
+    }
+
+    private void writeCompact(final WeightedPair record) throws IOException {
+        if (previousRecord == null) {
+            writeEntryA(record.getXId());
+        } else if (previousRecord.getXId() != record.getXId()) {
+            writeRecordDelimiter();
+            writeEntryA(record.getXId());
+        }
+
+        writeValueDelimiter();
+        writeEntryB(record.getYId());
+        writeValueDelimiter();
+        writeWeight(record.getWeight());
+        previousRecord = record;
+    }
+
+    private void writeEntryA(int id) throws IOException {
+        writeString(strIndexA.get(id));
+    }
+
+    private void writeEntryB(int id) throws IOException {
+        writeString(strIndexB.get(id));
+    }
+
+    private void writeWeight(double weight) throws IOException {
+        if (Double.compare((int) weight, weight) == 0)
+            writeInt((int) weight);
+        else
+            writeString(f.format(weight));
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (isCompactFormatEnabled() && previousRecord != null)
+            writeRecordDelimiter();
+        super.close();
     }
 }

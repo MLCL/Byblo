@@ -34,6 +34,9 @@ import com.google.common.io.Files;
 import java.io.File;
 import java.nio.charset.Charset;
 import org.junit.Test;
+import uk.ac.susx.mlcl.byblo.io.EntryFeatureSource;
+import uk.ac.susx.mlcl.byblo.io.EntrySource;
+import uk.ac.susx.mlcl.byblo.io.FeatureSource;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 
@@ -90,7 +93,7 @@ public class CountTaskTest {
         }
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void testRunOnFruitAPI() throws Exception {
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
 
@@ -108,11 +111,11 @@ public class CountTaskTest {
                 DEFAULT_CHARSET);
 
         assertTrue("Output entries file differs from sampledata file.",
-                Files.equal(eActual, TEST_FRUIT_ENTRIES));
+                EntrySource.equal(eActual, TEST_FRUIT_ENTRIES, DEFAULT_CHARSET));
         assertTrue("Output features file differs from test data file.",
-                Files.equal(fActual, TEST_FRUIT_FEATURES));
+                FeatureSource.equal(fActual, TEST_FRUIT_FEATURES, DEFAULT_CHARSET));
         assertTrue("Output entry/features file differs from test data file.",
-                Files.equal(efActual, TEST_FRUIT_ENTRY_FEATURES));
+                EntryFeatureSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET));
     }
 
     @Test(timeout=1000)

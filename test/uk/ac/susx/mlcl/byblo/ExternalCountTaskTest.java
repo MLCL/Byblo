@@ -30,10 +30,13 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import uk.ac.susx.mlcl.byblo.io.EntrySource;
+import uk.ac.susx.mlcl.byblo.io.FeatureSource;
 import com.google.common.io.Files;
 import java.io.File;
 import java.nio.charset.Charset;
 import org.junit.Test;
+import uk.ac.susx.mlcl.byblo.io.EntryFeatureSource;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import static uk.ac.susx.mlcl.ExitTrapper.*;
@@ -83,11 +86,11 @@ public class ExternalCountTaskTest {
             "--output-entry-features", outEF.toString(),
             "--charset", charset.name()
         };
-        
+
         enableExistTrapping();
         Byblo.main(args);
         disableExitTrapping();
-        
+
         assertTrue("Output files not created: " + outE, outE.exists());
         assertTrue("Output files not created: " + outF, outF.exists());
         assertTrue("Output files not created: " + outEF, outEF.exists());
@@ -135,11 +138,13 @@ public class ExternalCountTaskTest {
                 DEFAULT_CHARSET);
 
         assertTrue("Output entries file differs from sampledata file.",
-                Files.equal(eActual, TEST_FRUIT_ENTRIES));
+                EntrySource.equal(eActual, TEST_FRUIT_ENTRIES, DEFAULT_CHARSET));
         assertTrue("Output features file differs from test data file.",
-                Files.equal(fActual, TEST_FRUIT_FEATURES));
+                FeatureSource.equal(fActual, TEST_FRUIT_FEATURES,
+                DEFAULT_CHARSET));
         assertTrue("Output entry/features file differs from test data file.",
-                Files.equal(efActual, TEST_FRUIT_ENTRY_FEATURES));
+                EntryFeatureSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
+                DEFAULT_CHARSET));
     }
 
     @Test(timeout = 1000)
@@ -160,15 +165,18 @@ public class ExternalCountTaskTest {
         runwithCLI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
                 DEFAULT_CHARSET);
 
+
         assertTrue("Output entries file differs from sampledata file.",
-                Files.equal(eActual, TEST_FRUIT_ENTRIES));
+                EntrySource.equal(eActual, TEST_FRUIT_ENTRIES, DEFAULT_CHARSET));
         assertTrue("Output features file differs from test data file.",
-                Files.equal(fActual, TEST_FRUIT_FEATURES));
+                FeatureSource.equal(fActual, TEST_FRUIT_FEATURES,
+                DEFAULT_CHARSET));
         assertTrue("Output entry/features file differs from test data file.",
-                Files.equal(efActual, TEST_FRUIT_ENTRY_FEATURES));
+                EntryFeatureSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
+                DEFAULT_CHARSET));
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testMissingParameters() throws Exception {
         System.out.println("Testing " + subject + " for bad parameterisation.");
 

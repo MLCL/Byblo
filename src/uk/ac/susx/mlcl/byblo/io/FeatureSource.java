@@ -59,6 +59,8 @@ public class FeatureSource extends AbstractTSVSource<FeatureRecord> {
 
     private long count = 0;
 
+    private FeatureRecord previousRecord = null;
+
     public FeatureSource(File file, Charset charset,
             ObjectIndex<String> stringIndex)
             throws FileNotFoundException, IOException {
@@ -79,18 +81,30 @@ public class FeatureSource extends AbstractTSVSource<FeatureRecord> {
 
     @Override
     public FeatureRecord read() throws IOException {
-        final int featureId = stringIndex.get(parseString());
-        parseValueDelimiter();
-        final double weight = parseDouble();
+        final int featureId;
+        if (previousRecord == null) {
+            featureId = stringIndex.get(parseString());
+            parseValueDelimiter();
+        } else {
+            featureId = previousRecord.getFeatureId();
+        }
 
-        // Read record delimiter if it exist (may be end of file)
-        if (hasNext())
-            parseRecordDelimiter();
+        final double weight = parseDouble();
 
         cardinality = Math.max(cardinality, featureId + 1);
         weightSum += weight;
         ++count;
-        return new FeatureRecord(featureId, weight);
+        final FeatureRecord record = new FeatureRecord(featureId, weight);
+
+        if (isValueDelimiterNext()) {
+            parseValueDelimiter();
+            previousRecord = record;
+        } else if(hasNext()) {
+            parseRecordDelimiter();
+            previousRecord = null;
+        }
+
+        return record;
     }
 
     public double getWeightSum() {
@@ -114,7 +128,7 @@ public class FeatureSource extends AbstractTSVSource<FeatureRecord> {
                 //
                 // If we encounter the same feature more than once, it means
                 // the previous stage has decided two strings are not-equal, 
-                // but the corrent stage thinks are equals 
+                // but the corrent stage thinks are equal 
                 // ... so we need to merge the records:
 
                 final int id = entry.getFeatureId();
@@ -146,5 +160,19 @@ public class FeatureSource extends AbstractTSVSource<FeatureRecord> {
             featureFreqs[entry.getIntKey()] = entry.getDoubleValue();
         }
         return featureFreqs;
+    }
+
+    public static boolean equal(File a, File b, Charset charset) throws IOException {
+        final ObjectIndex<String> stringIndex = new ObjectIndex<String>();
+        final FeatureSource srcA = new FeatureSource(a, charset, stringIndex);
+        final FeatureSource srcB = new FeatureSource(b, charset, stringIndex);
+        boolean equal = true;
+        while (equal && srcA.hasNext() && srcB.hasNext()) {
+            final FeatureRecord recA = srcA.read();
+            final FeatureRecord recB = srcB.read();
+            equal = recA.getFeatureId() == recB.getFeatureId()
+                    && recA.getWeight() == recB.getWeight();
+        }
+        return equal && srcA.hasNext() == srcB.hasNext();
     }
 }

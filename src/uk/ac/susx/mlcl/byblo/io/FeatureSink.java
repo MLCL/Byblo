@@ -51,11 +51,15 @@ public class FeatureSink
 
     private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
 
+    private boolean compactFormatEnabled = true;
+
+    private FeatureRecord previousRecord = null;
+
     public FeatureSink(
             File file, Charset charset, ObjectIndex<String> stringIndex)
             throws FileNotFoundException, IOException {
         super(file, charset);
-        
+
         if (stringIndex == null)
             throw new NullPointerException("stringIndex == null");
         this.stringIndex = stringIndex;
@@ -65,22 +69,60 @@ public class FeatureSink
         this(file, charset, new ObjectIndex<String>());
     }
 
+    public boolean isCompactFormatEnabled() {
+        return compactFormatEnabled;
+    }
+
+    public void setCompactFormatEnabled(boolean compactFormatEnabled) {
+        this.compactFormatEnabled = compactFormatEnabled;
+    }
+
     public final ObjectIndex<String> getStringIndex() {
         return stringIndex;
     }
 
     @Override
     public void write(FeatureRecord record) throws IOException {
-        
-        writeString(stringIndex.get(record.getFeatureId()));
-        
-        writeValueDelimiter();
-        
-        if (Double.compare((int) record.getWeight(), record.getWeight()) == 0)
-            writeInt((int) record.getWeight());
+        if (isCompactFormatEnabled())
+            writeCompact(record);
         else
-            writeString(f.format(record.getWeight()));
-        
+            writeVerbose(record);
+    }
+
+    private void writeVerbose(FeatureRecord record) throws IOException {
+        writeFeature(record.getFeatureId());
+        writeValueDelimiter();
+        writeWeight(record.getWeight());
         writeRecordDelimiter();
+    }
+
+    private void writeCompact(FeatureRecord record) throws IOException {
+        if (previousRecord == null) {
+            writeFeature(record.getFeatureId());
+        } else if (previousRecord.getFeatureId() != record.getFeatureId()) {
+            writeRecordDelimiter();
+            writeFeature(record.getFeatureId());
+        }
+        writeValueDelimiter();
+        writeWeight(record.getWeight());
+        previousRecord = record;
+    }
+
+    private void writeFeature(int id) throws IOException {
+        writeString(stringIndex.get(id));
+    }
+
+    private void writeWeight(double weight) throws IOException {
+        if (Double.compare((int) weight, weight) == 0)
+            super.writeInt((int) weight);
+        else
+            super.writeString(f.format(weight));
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (isCompactFormatEnabled() && previousRecord != null)
+            writeRecordDelimiter();
+        super.close();
     }
 }
