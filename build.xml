@@ -110,6 +110,16 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     </target>
 
     <target name="jar" depends="compile" description="Build JAR" >    
+
+        <!-- Convert the libraries classpath to space separated list suitable
+            for the jar manifest attribute. -->
+        <pathconvert pathsep=" " property="jar.classpath" refid="classpath">
+            <chainedmapper>
+                <flattenmapper/>
+                <globmapper from="*" to="libs/*"/>
+            </chainedmapper>
+        </pathconvert>
+        
         <jar jarfile="${dist.dir}/${ant.project.name}.jar" 
             basedir="${build.classes.dir}" >     
             <manifest>
@@ -202,14 +212,6 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <fileset dir="${libs.dir}" includes="**/*.jar" excludes="**junit*.jar"/>
         </copy>
 
-        <!-- Convert the libraries classpath to space separated list suitable
-            for the jar manifest attribute. -->
-        <pathconvert pathsep=" " property="jar.classpath" refid="classpath">
-            <chainedmapper>
-                <flattenmapper/>
-                <globmapper from="*" to="libs/*"/>
-            </chainedmapper>
-        </pathconvert>
 
         <zip zipfile="${dist.dir}/${ant.project.name}-api.zip" 
             basedir="${javadoc.dir}" />
