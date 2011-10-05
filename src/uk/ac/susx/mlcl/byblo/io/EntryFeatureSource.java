@@ -103,13 +103,15 @@ public class EntryFeatureSource
         }
 
         final int featureId = readFeature();
-        final EntryFeatureRecord record = new EntryFeatureRecord(entryId,
-                featureId);
+        final EntryFeatureRecord record = new EntryFeatureRecord(
+                entryId, featureId);
 
-        if (isValueDelimiterNext()) {
+        if (hasNext() && isValueDelimiterNext()) {
             parseValueDelimiter();
             previousRecord = record;
-        } else if (hasNext()) {
+        }
+        
+        if (hasNext() && isRecordDelimiterNext()) {
             parseRecordDelimiter();
             previousRecord = null;
         }

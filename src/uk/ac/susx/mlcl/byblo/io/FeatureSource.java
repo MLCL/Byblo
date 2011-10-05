@@ -102,7 +102,9 @@ public class FeatureSource extends AbstractTSVSource<FeatureRecord> {
         if (isValueDelimiterNext()) {
             parseValueDelimiter();
             previousRecord = record;
-        } else if(hasNext()) {
+        }
+
+        if (hasNext() && isRecordDelimiterNext()) {
             parseRecordDelimiter();
             previousRecord = null;
         }

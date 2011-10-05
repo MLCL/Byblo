@@ -133,7 +133,9 @@ public class EntrySource extends AbstractTSVSource<EntryRecord> {
         if (isValueDelimiterNext()) {
             parseValueDelimiter();
             previousRecord = record;
-        } else if(hasNext()) {
+        } 
+        
+        if(hasNext() && isRecordDelimiterNext()) {
             parseRecordDelimiter();
             previousRecord = null;
         }

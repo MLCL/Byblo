@@ -92,7 +92,9 @@ public class WeightedEntryPairSource
         if (isValueDelimiterNext()) {
             parseValueDelimiter();
             previousRecord = record;
-        } else if(hasNext()) {
+        }
+        
+        if(hasNext() && isRecordDelimiterNext()) {
             parseRecordDelimiter();
             previousRecord = null;
         }
