@@ -37,7 +37,7 @@ import com.google.common.base.Predicate;
 import uk.ac.susx.mlcl.byblo.measure.Proximity;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.byblo.measure.Jaccard;
-import uk.ac.susx.mlcl.lib.collect.WeightedPair;
+import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairRecord;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
@@ -52,8 +52,8 @@ public class InvertedApssTaskTest {
 
     private static final Proximity MEASURE = new Jaccard();
 
-    private static final Predicate<WeightedPair> PAIR_FILTER =
-            WeightedPair.similarityGTE(0.1);
+    private static final Predicate<WeightedEntryPairRecord> PAIR_FILTER =
+            WeightedEntryPairRecord.similarityGTE(0.1);
 
     /**
      * Test of runTask method, of class AbstractAPSS2.
@@ -73,7 +73,7 @@ public class InvertedApssTaskTest {
                 mdbsa.getEntryIndex(), mdbsa.getFeatureIndex());
         WeightedEntryFeatureVectorSource vsb = mdbsb.getVectorSource();
 
-        List<WeightedPair> result = new ArrayList<WeightedPair>();
+        List<WeightedEntryPairRecord> result = new ArrayList<WeightedEntryPairRecord>();
 
         instance.setSourceA(vsa);
         instance.setSourceB(vsb);

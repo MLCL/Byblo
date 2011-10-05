@@ -30,20 +30,36 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import com.google.common.base.Objects;
+
 /**
+ * <tt>WeightedEntryFeatureRecord</tt> objects represent a single instance of an 
+ * entry/feature pair, associated with a weight. Typically the weight is a 
+ * frequency use to estimate the likelihood of the feature in the entries 
+ * context.
  *
+ * <p>Instances of <tt>WeightedEntryFeatureRecord</tt> are immutable.<p>
+ * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class WeightedEntryFeatureRecord extends EntryFeatureRecord {
+public final class WeightedEntryFeatureRecord
+        extends EntryFeatureRecord {
 
     private static final long serialVersionUID = 1L;
 
-    private final double weight;
+    private double weight;
 
     public WeightedEntryFeatureRecord(
             final int entryId, final int featureId, final double weight) {
         super(entryId, featureId);
         this.weight = weight;
+    }
+
+    /**
+     * Constructor used during de-serialization.
+     */
+    protected WeightedEntryFeatureRecord() {
+        super();
     }
 
     public double getWeight() {
@@ -52,10 +68,24 @@ public final class WeightedEntryFeatureRecord extends EntryFeatureRecord {
 
     @Override
     public String toString() {
-        return "FeatureEntry{" + "entryId=" + getEntryId()
-                + ", featureId=" + getFeatureId() + ", weight=" + weight + '}';
+        return Objects.toStringHelper(this).
+                add("entryId", getEntryId()).
+                add("featureId", getFeatureId()).
+                add("weight", getWeight()).
+                toString();
     }
 
+    /**
+     * Indicates whether some other object is "equal to" this one.
+     * 
+     * <p>Note that only the <tt>entryId</tt> and <tt>featureId</tt> fields are
+     * used for equality. I.e two objects with the same ids, but differing 
+     * weights <em>will</em> be consider equal.</p>
+     * 
+     * @param   obj   the reference object with which to compare.
+     * @return  <code>true</code> if this object is the same as the obj
+     *          argument; <code>false</code> otherwise.
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null)

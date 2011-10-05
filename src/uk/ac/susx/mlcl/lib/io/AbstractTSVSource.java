@@ -44,23 +44,28 @@ import java.nio.charset.Charset;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T>
  */
-public abstract class AbstractTSVSource<T> 
+public abstract class AbstractTSVSource<T>
         implements SeekableSource<T, Lexer.Tell> {
 
     private static final char RECORD_DELIM = '\n';
+
     private static final char VALUE_DELIM = '\t';
+
     private final Lexer lexer;
+
     private final File file;
 
     public AbstractTSVSource(File file, Charset charset) throws FileNotFoundException, IOException {
-        if(file == null)
+        if (file == null)
             throw new NullPointerException("file == null");
-        if(!file.exists())
+        if (!file.exists())
             throw new FileNotFoundException("Path " + file + " does not exist.");
-        if(!file.isFile())
-            throw new IllegalArgumentException("Path " + file + " is not a normal file.");
-        if(!file.canRead())
-            throw new IllegalArgumentException("File " + file + " is not readable.");
+        if (!file.isFile())
+            throw new IllegalArgumentException(
+                    "Path " + file + " is not a normal file.");
+        if (!file.canRead())
+            throw new IllegalArgumentException(
+                    "File " + file + " is not readable.");
 
         lexer = new Lexer(file, charset);
         lexer.setDelimiterMatcher(CharMatcher.anyOf("\n\t"));
@@ -78,7 +83,6 @@ public abstract class AbstractTSVSource<T>
         lexer.seek(offset);
     }
 
-
     public double percentRead() throws IOException {
         return 100d * bytesRead() / bytesTotal();
     }
@@ -90,8 +94,9 @@ public abstract class AbstractTSVSource<T>
     public long bytesTotal() throws IOException {
         return lexer.bytesTotal();
     }
+
     @Override
-    public Lexer.Tell position() { 
+    public Lexer.Tell position() {
         return lexer.tell();
     }
 
@@ -106,9 +111,22 @@ public abstract class AbstractTSVSource<T>
         }
     }
 
+    protected boolean isRecordDelimiterNext() throws CharacterCodingException, IOException {
+        return isDelimiterNext() && lexer.charAt(0) == RECORD_DELIM;
+    }
+
+    protected boolean isValueDelimiterNext() throws CharacterCodingException, IOException {
+        return isDelimiterNext() && lexer.charAt(0) == VALUE_DELIM;
+    }
+
+    protected boolean isDelimiterNext() throws CharacterCodingException, IOException {
+        return lexer.type() == Type.Delimiter;
+    }
+
     protected void parseRecordDelimiter() throws CharacterCodingException, IOException {
-        if(hasNext())
+        do {
             parseDelimiter(RECORD_DELIM);
+        } while (hasNext() && isRecordDelimiterNext());
     }
 
     protected void parseValueDelimiter() throws CharacterCodingException, IOException {
@@ -140,7 +158,7 @@ public abstract class AbstractTSVSource<T>
             lexer.advance();
     }
 
-    private  void expectType(Type expected, Type actual) {
+    private void expectType(Type expected, Type actual) {
         if (expected != actual) {
             throw new AssertionError(
                     "Expecting type " + expected + " but found " + actual);

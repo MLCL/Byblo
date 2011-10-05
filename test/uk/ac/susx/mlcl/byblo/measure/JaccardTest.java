@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.measure;
 
+import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairSource;
 import com.google.common.io.Files;
 import uk.ac.susx.mlcl.byblo.Byblo;
 import java.io.File;
@@ -264,7 +265,7 @@ public class JaccardTest {
                 });
 
         disableExitTrapping();
-        assertTrue(Files.equal(output1, output2));
+        assertTrue(WeightedEntryPairSource.equal(output1, output2, DEFAULT_CHARSET));
     }
 
     @Test(timeout = 1000)
@@ -302,6 +303,6 @@ public class JaccardTest {
 
         disableExitTrapping();
 
-        assertTrue(Files.equal(output1, output2));
+        assertTrue(WeightedEntryPairSource.equal(output1, output2, DEFAULT_CHARSET));
     }
 }

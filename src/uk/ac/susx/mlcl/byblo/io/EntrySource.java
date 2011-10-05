@@ -43,8 +43,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * An <tt>EntrySource</tt> object is used to retrieve {@link EntryRecord} 
+ * objects from a flat file. 
+ * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @see EntrySink
  */
 public class EntrySource extends AbstractTSVSource<EntryRecord> {
 
@@ -64,6 +67,8 @@ public class EntrySource extends AbstractTSVSource<EntryRecord> {
     private int cardinality = 0;
 
     private int count = 0;
+
+    private EntryRecord previousRecord = null;
 
     public EntrySource(File file, Charset charset,
             ObjectIndex<String> stringIndex)
@@ -109,19 +114,31 @@ public class EntrySource extends AbstractTSVSource<EntryRecord> {
 
     @Override
     public EntryRecord read() throws IOException {
-        final int entryId = stringIndex.get(parseString());
-        parseValueDelimiter();
+        final int entryId;
+        if (previousRecord == null) {
+            entryId = stringIndex.get(parseString());
+            parseValueDelimiter();
+        } else {
+            entryId = previousRecord.getEntryId();
+        }
 
         final double weight = parseDouble();
-
-        if (hasNext())
-            parseRecordDelimiter();
 
         cardinality = Math.max(cardinality, entryId + 1);
         weightSum += weight;
         weightMax = Math.max(weightMax, weight);
         ++count;
-        return new EntryRecord(entryId, weight);
+        final EntryRecord record = new EntryRecord(entryId, weight);
+
+        if (isValueDelimiterNext()) {
+            parseValueDelimiter();
+            previousRecord = record;
+        } else if(hasNext()) {
+            parseRecordDelimiter();
+            previousRecord = null;
+        }
+
+        return record;
     }
 
     public Int2DoubleMap readAll() throws IOException {
@@ -131,7 +148,7 @@ public class EntrySource extends AbstractTSVSource<EntryRecord> {
             if (entityFrequenciesMap.containsKey(entry.getEntryId())) {
                 // If we encounter the same EntryRecord more than once, it means
                 // the perl has decided two strings are not-equal, which java
-                // thinks are equals ... so we need to merge the records:
+                // thinks are equal ... so we need to merge the records:
 
                 // TODO: Not true any more.. remove this code?
 
@@ -162,5 +179,19 @@ public class EntrySource extends AbstractTSVSource<EntryRecord> {
             entryFreqs[entry.getIntKey()] = entry.getDoubleValue();
         }
         return entryFreqs;
+    }
+
+    public static boolean equal(File a, File b, Charset charset) throws IOException {
+        final ObjectIndex<String> stringIndex = new ObjectIndex<String>();
+        final EntrySource srcA = new EntrySource(a, charset, stringIndex);
+        final EntrySource srcB = new EntrySource(b, charset, stringIndex);
+        boolean equal = true;
+        while (equal && srcA.hasNext() && srcB.hasNext()) {
+            final EntryRecord recA = srcA.read();
+            final EntryRecord recB = srcB.read();
+            equal = recA.getEntryId() == recB.getEntryId()
+                    && recA.getWeight() == recB.getWeight();
+        }
+        return equal && srcA.hasNext() == srcB.hasNext();
     }
 }

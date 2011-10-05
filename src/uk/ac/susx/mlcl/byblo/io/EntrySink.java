@@ -40,7 +40,37 @@ import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 
 /**
- *
+ * An <tt>EntrySink</tt> object is used to store {@link EntryRecord} objects in 
+ * a flat file. 
+ * 
+ * <p>The basic file format is Tab-Separated-Values (TSV) where records are 
+ * delimited by new-lines, and values are delimited by tabs. Two variants are
+ * supported: verbose and compact. In verbose mode each {@link EntryRecord} 
+ * corresponds to a single TSV record; i.e one line per object consisting of an
+ * entry and it's weight. In compact mode each TSV record consists of a single
+ * entry followed by the weights of all sequentially written {@link EntryRecord}
+ * objects that share the same entry.</p>
+ * 
+ * Verbose mode example:
+ * <pre>
+ *      entry1  weight1
+ *      entry1  weight2
+ *      entry2  weight3
+ *      entry3  weight4
+ *      enrty3  weight5
+ *      enrty3  weight6
+ * </pre>
+ * 
+ * Equivalent compact mode example:
+ * <pre>
+ *      entry1  weight1 weight2
+ *      entry2  weight3
+ *      entry3  weight4 weight5 weight6
+ * </pre>
+ * 
+ * <p>Compact mode is the default behavior, since it can reduce file sizes by 
+ * approximately 50%, with corresponding reductions in I/O overhead.</p>
+ * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class EntrySink extends AbstractTSVSink<EntryRecord>
@@ -50,20 +80,66 @@ public class EntrySink extends AbstractTSVSink<EntryRecord>
 
     private final ObjectIndex<String> stringIndex;
 
+    private boolean compactFormatEnabled = true;
+
+    private EntryRecord previousRecord = null;
+
     public EntrySink(File file, Charset charset, ObjectIndex<String> stringIndex)
             throws FileNotFoundException, IOException {
         super(file, charset);
         this.stringIndex = stringIndex;
     }
 
+    public boolean isCompactFormatEnabled() {
+        return compactFormatEnabled;
+    }
+
+    public void setCompactFormatEnabled(boolean compactFormatEnabled) {
+        this.compactFormatEnabled = compactFormatEnabled;
+    }
+
     @Override
     public void write(final EntryRecord record) throws IOException {
-        writeString(stringIndex.get(record.getEntryId()));
-        writeValueDelimiter();
-        if (Double.compare((int) record.getWeight(), record.getWeight()) == 0)
-            super.writeInt((int) record.getWeight());
+        if (isCompactFormatEnabled())
+            writeCompact(record);
         else
-            super.writeString(f.format(record.getWeight()));
+            writeVerbose(record);
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (isCompactFormatEnabled() && previousRecord != null)
+            writeRecordDelimiter();
+        super.close();
+    }
+
+    private void writeVerbose(final EntryRecord record) throws IOException {
+        writeEntry(record.getEntryId());
+        writeValueDelimiter();
+        writeWeight(record.getWeight());
         writeRecordDelimiter();
+    }
+
+    private void writeCompact(final EntryRecord record) throws IOException {
+        if (previousRecord == null) {
+            writeEntry(record.getEntryId());
+        } else if (previousRecord.getEntryId() != record.getEntryId()) {
+            writeRecordDelimiter();
+            writeEntry(record.getEntryId());
+        }
+        writeValueDelimiter();
+        writeWeight(record.getWeight());
+        previousRecord = record;
+    }
+
+    private void writeEntry(int id) throws IOException {
+        writeString(stringIndex.get(id));
+    }
+
+    private void writeWeight(double weight) throws IOException {
+        if (Double.compare((int) weight, weight) == 0)
+            super.writeInt((int) weight);
+        else
+            super.writeString(f.format(weight));
     }
 }

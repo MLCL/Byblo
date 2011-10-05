@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.measure;
 
-import com.google.common.io.Files;
+import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairSource;
 import uk.ac.susx.mlcl.byblo.Byblo;
 import java.io.File;
 import org.junit.Test;
@@ -97,6 +97,6 @@ public class HindleTest {
                     "--output", output2.toString()
                 });
         disableExitTrapping();
-        assertTrue(Files.equal(output1, output2));
+        assertTrue(WeightedEntryPairSource.equal(output1, output2, DEFAULT_CHARSET));
     }
 }

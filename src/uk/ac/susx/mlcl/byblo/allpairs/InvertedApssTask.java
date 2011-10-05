@@ -34,7 +34,7 @@ import uk.ac.susx.mlcl.lib.Checks;
 import java.util.logging.Logger;
 import uk.ac.susx.mlcl.lib.collect.Entry;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.collect.WeightedPair;
+import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairRecord;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -75,7 +75,7 @@ public class InvertedApssTask<S> extends NaiveApssTask<S> {
     protected void computeAllPairs()
             throws IOException {
         final S startB = getSourceB().position();
-        List<WeightedPair> pairs = new ArrayList<WeightedPair>();
+        List<WeightedEntryPairRecord> pairs = new ArrayList<WeightedEntryPairRecord>();
 
         while (getSourceB().hasNext()) {
             Entry<SparseDoubleVector> b = getSourceB().read();
@@ -90,7 +90,7 @@ public class InvertedApssTask<S> extends NaiveApssTask<S> {
                 getStats().incrementCandidatesCount();
 
                 double sim = sim(a, b);
-                WeightedPair pair = new WeightedPair(a.key(), b.key(), sim);
+                WeightedEntryPairRecord pair = new WeightedEntryPairRecord(a.key(), b.key(), sim);
                 if (getProducatePair().apply(pair)) {
                     pairs.add(pair);
                     getStats().incrementProductionCount();

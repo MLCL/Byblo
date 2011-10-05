@@ -64,8 +64,6 @@ public class LeeTest {
         disableExitTrapping();
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
-
-        Thread.sleep(100);
     }
 
     @Test(timeout=1000)
@@ -118,8 +116,6 @@ public class LeeTest {
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
-
-        Thread.sleep(100);
     }
 
     @Test(timeout=1000)

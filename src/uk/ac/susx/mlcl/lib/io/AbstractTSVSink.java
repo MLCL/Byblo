@@ -106,4 +106,11 @@ public abstract class AbstractTSVSink<T>
     public void flush() throws IOException {
         out.flush();
     }
+
+    @Override
+    protected void finalize() throws Throwable {
+        flush();
+        close();
+        super.finalize();
+    }
 }

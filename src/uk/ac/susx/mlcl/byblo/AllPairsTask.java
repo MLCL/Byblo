@@ -43,7 +43,7 @@ import uk.ac.susx.mlcl.byblo.io.FeatureSource;
 import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureSource;
 import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureVectorSource;
 import uk.ac.susx.mlcl.byblo.io.EntrySource;
-import uk.ac.susx.mlcl.byblo.io.WeightedPairSink;
+import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairSink;
 import uk.ac.susx.mlcl.byblo.measure.AbstractMIProximity;
 import uk.ac.susx.mlcl.byblo.measure.CrMi;
 import uk.ac.susx.mlcl.byblo.measure.KendallTau;
@@ -52,7 +52,7 @@ import uk.ac.susx.mlcl.byblo.measure.Lp;
 import uk.ac.susx.mlcl.byblo.measure.Proximity;
 import uk.ac.susx.mlcl.byblo.measure.ReversedProximity;
 import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.lib.collect.WeightedPair;
+import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairRecord;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
@@ -296,8 +296,8 @@ public class AllPairsTask extends AbstractTask {
         // Create a sink object that will act as a recipient for all pairs that
         // are produced by the algorithm.
 
-        final Sink<WeightedPair> sink =
-                new WeightedPairSink(outputFile, charset, strIndex, strIndex);
+        final Sink<WeightedEntryPairRecord> sink =
+                new WeightedEntryPairSink(outputFile, charset, strIndex, strIndex);
 
         // Instantiate the all-pairs algorithm as given on the command line.
         ThreadedApssTask apss = new ThreadedApssTask(sourceA, sourceB, sink);
@@ -309,17 +309,17 @@ public class AllPairsTask extends AbstractTask {
         apss.setMeasure(prox);
         apss.setMaxChunkSize(chunkSize);
 
-        List<Predicate<WeightedPair>> pairFilters =
-                new ArrayList<Predicate<WeightedPair>>();
+        List<Predicate<WeightedEntryPairRecord>> pairFilters =
+                new ArrayList<Predicate<WeightedEntryPairRecord>>();
 
         if (minSimilarity != Double.NEGATIVE_INFINITY)
-            pairFilters.add(WeightedPair.similarityGTE(minSimilarity));
+            pairFilters.add(WeightedEntryPairRecord.similarityGTE(minSimilarity));
 
         if (maxSimilarity != Double.POSITIVE_INFINITY)
-            pairFilters.add(WeightedPair.similarityLTE(maxSimilarity));
+            pairFilters.add(WeightedEntryPairRecord.similarityLTE(maxSimilarity));
 
         if (!outputIdentityPairs)
-            pairFilters.add(Predicates.not(WeightedPair.identity()));
+            pairFilters.add(Predicates.not(WeightedEntryPairRecord.identity()));
 
         if (pairFilters.size() == 1)
             apss.setProducatePair(pairFilters.get(0));

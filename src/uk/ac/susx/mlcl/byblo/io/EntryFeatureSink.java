@@ -39,6 +39,36 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
+ * An <tt>EntryFeatureSink</tt> object is used to store 
+ * {@link EntryFeatureRecord} objects in a flat file. 
+ * 
+ * <p>The basic file format is Tab-Separated-Values (TSV) where records are 
+ * delimited by new-lines, and values are delimited by tabs. Two variants are
+ * supported: verbose and compact. In verbose mode each {@link EntryFeatureRecord} 
+ * corresponds to a single TSV record; i.e one line per object consisting of an
+ * entry and a feature. In compact mode each TSV record consists of a single 
+ * entry followed by the features from all sequentially written 
+ * {@link EntryFeatureRecord} objects that share the same entry.</p>
+ * 
+ * Verbose mode example:
+ * <pre>
+ *      entry1  feature1
+ *      entry1  feature2
+ *      entry2  feature3
+ *      entry3  feature2
+ *      enrty3  feature4
+ *      enrty3  feature1
+ * </pre>
+ * 
+ * Equivalent compact mode example:
+ * <pre>
+ *      entry1  feature1 feature2
+ *      entry2  feature3
+ *      entry3  feature2 feature4 feature1
+ * </pre>
+ * 
+ * <p>Compact mode is the default behavior, since it can reduce file sizes by 
+ * approximately 50%, with corresponding reductions in I/O overhead.</p>
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -49,6 +79,10 @@ public class EntryFeatureSink
     private final ObjectIndex<String> entryIndex;
 
     private final ObjectIndex<String> featureIndex;
+
+    private boolean compactFormatEnabled = true;
+
+    private EntryFeatureRecord previousRecord = null;
 
     public EntryFeatureSink(File file, Charset charset,
             ObjectIndex<String> entryIndex, ObjectIndex<String> featureIndex)
@@ -85,12 +119,39 @@ public class EntryFeatureSink
         return getFeatureIndex() == getEntryIndex();
     }
 
+    public boolean isCompactFormatEnabled() {
+        return compactFormatEnabled;
+    }
+
+    public void setCompactFormatEnabled(boolean compactFormatEnabled) {
+        this.compactFormatEnabled = compactFormatEnabled;
+    }
+
     @Override
     public void write(final EntryFeatureRecord record) throws IOException {
+        if (isCompactFormatEnabled())
+            writeCompact(record);
+        else
+            writeVerbose(record);
+    }
+
+    private void writeVerbose(final EntryFeatureRecord record) throws IOException {
         writeEntry(record.getEntryId());
         writeValueDelimiter();
         writeFeature(record.getFeatureId());
         writeRecordDelimiter();
+    }
+
+    private void writeCompact(final EntryFeatureRecord record) throws IOException {
+        if (previousRecord == null) {
+            writeEntry(record.getEntryId());
+        } else if (previousRecord.getEntryId() != record.getEntryId()) {
+            writeRecordDelimiter();
+            writeEntry(record.getEntryId());
+        }
+        writeValueDelimiter();
+        writeFeature(record.getFeatureId());
+        previousRecord = record;
     }
 
     protected final void writeEntry(final int entryId) throws IOException {
@@ -100,4 +161,12 @@ public class EntryFeatureSink
     protected final void writeFeature(final int featureId) throws IOException {
         writeString(featureIndex.get(featureId));
     }
+
+    @Override
+    public void close() throws IOException {
+        if(isCompactFormatEnabled() && previousRecord != null)
+            writeRecordDelimiter();
+        super.close();
+    }
+
 }

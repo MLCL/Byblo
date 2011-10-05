@@ -30,19 +30,36 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import com.google.common.base.Objects;
+import java.io.Serializable;
+
 /**
- *
+ * <tt>EntryRecord</tt> objects represent a single instance of a thesaurus
+ * entry, with a weighting estimated from the source corpus. The weighting is 
+ * usually the entries frequency, but it could be anything.
+ * 
+ * <p>Instances of <tt>EntryRecord</tt> are immutable.<p>
+ * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class EntryRecord {
+public class EntryRecord
+        implements Serializable, Comparable<EntryRecord> {
 
-    private final int entryId;
+    private static final long serialVersionUID = 1L;
 
-    private final double weight;
+    private int entryId;
+
+    private double weight;
 
     public EntryRecord(final int entryId, final double weight) {
         this.entryId = entryId;
         this.weight = weight;
+    }
+
+    /**
+     * Constructor used during de-serialization.
+     */
+    protected EntryRecord() {
     }
 
     public int getEntryId() {
@@ -53,25 +70,43 @@ public class EntryRecord {
         return weight;
     }
 
+    /**
+     * Indicates whether some other object is "equal to" this one.
+     * 
+     * <p>Note that only the <tt>entryId</tt> field is used for equality. I.e  
+     * two objects with the same <tt>entryId</tt>, but differing weights 
+     * <em>will</em> be consider equal.</p>
+     * 
+     * @param   obj   the reference object with which to compare.
+     * @return  <code>true</code> if this object is the same as the obj
+     *          argument; <code>false</code> otherwise.
+     */
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if (obj == this)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
             return false;
-        if (getClass() != obj.getClass())
-            return false;
-        final EntryRecord other = (EntryRecord) obj;
-        if (this.entryId != other.entryId)
-            return false;
-        return true;
+        return equals((EntryRecord) obj);
+    }
+
+    public boolean equals(EntryRecord other) {
+        return this.getEntryId() == other.getEntryId();
     }
 
     @Override
     public int hashCode() {
-        return 71 * 3 + this.entryId;
+        return this.entryId;
     }
 
     @Override
     public String toString() {
-        return "EntryRecord{" + ", entryId=" + entryId + ", weight=" + weight + '}';
+        return Objects.toStringHelper(this).
+                add("id", entryId).add("weight", weight).toString();
+    }
+
+    @Override
+    public int compareTo(EntryRecord that) {
+        return this.getEntryId() - that.getEntryId();
     }
 }
