@@ -40,6 +40,37 @@ import java.text.DecimalFormat;
 import uk.ac.susx.mlcl.lib.io.Sink;
 
 /**
+ * An <tt>WeightedEntryFeatureSink</tt> object is used to store 
+ * {@link WeightedEntryFeatureRecord} objects in a flat file. 
+ * 
+ * <p>The basic file format is Tab-Separated-Values (TSV) where records are 
+ * delimited by new-lines, and values are delimited by tabs. Two variants are
+ * support: verbose and compact. In verbose mode each 
+ * {@link WeightedEntryFeatureSink} corresponds to a single TSV record; i.e one
+ * line per object consisting of an entry, a feature, and their weight. In 
+ * compact mode each TSV record consists of a single entry followed by the 
+ * feature/weights pairs from all sequentially written 
+ * {@link WeightedEntryFeatureSink} objects that share the same entry.</p>
+ * 
+ * Verbose mode example:
+ * <pre>
+ *      entry1  feature1    weight1
+ *      entry1  feature2    weight2
+ *      entry2  feature3    weight3
+ *      entry3  feature2    weight4
+ *      enrty3  feature4    weight5
+ *      enrty3  feature1    weight6
+ * </pre>
+ * 
+ * Equivalent compact mode example:
+ * <pre>
+ *      entry1  feature1    weight1 feature2    weight2
+ *      entry2  feature3    weight3
+ *      entry3  feature2    weight4 feature4    weight5 feature1    weight6
+ * </pre>
+ * 
+ * <p>Compact mode is the default behavior, since it can reduce file sizes by 
+ * approximately 50%, with corresponding reductions in I/O overhead.</p>
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */

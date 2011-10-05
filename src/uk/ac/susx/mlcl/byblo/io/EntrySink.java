@@ -40,7 +40,37 @@ import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 
 /**
- *
+ * An <tt>EntrySink</tt> object is used to store {@link EntryRecord} objects in 
+ * a flat file. 
+ * 
+ * <p>The basic file format is Tab-Separated-Values (TSV) where records are 
+ * delimited by new-lines, and values are delimited by tabs. Two variants are
+ * supported: verbose and compact. In verbose mode each {@link EntryRecord} 
+ * corresponds to a single TSV record; i.e one line per object consisting of an
+ * entry and it's weight. In compact mode each TSV record consists of a single
+ * entry followed by the weights of all sequentially written {@link EntryRecord}
+ * objects that share the same entry.</p>
+ * 
+ * Verbose mode example:
+ * <pre>
+ *      entry1  weight1
+ *      entry1  weight2
+ *      entry2  weight3
+ *      entry3  weight4
+ *      enrty3  weight5
+ *      enrty3  weight6
+ * </pre>
+ * 
+ * Equivalent compact mode example:
+ * <pre>
+ *      entry1  weight1 weight2
+ *      entry2  weight3
+ *      entry3  weight4 weight5 weight6
+ * </pre>
+ * 
+ * <p>Compact mode is the default behavior, since it can reduce file sizes by 
+ * approximately 50%, with corresponding reductions in I/O overhead.</p>
+ * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class EntrySink extends AbstractTSVSink<EntryRecord>

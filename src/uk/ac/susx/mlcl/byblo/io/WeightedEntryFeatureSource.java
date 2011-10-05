@@ -39,7 +39,11 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
+ * A <tt>WeightedEntryFeatureSource</tt> object is used to retrieve
+ * {@link WeightedEntryFeatureRecord} objects from a flat file.
+ * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @see WeightedEntryFeatureSink
  */
 public class WeightedEntryFeatureSource
         extends AbstractTSVSource<WeightedEntryFeatureRecord>
@@ -118,7 +122,7 @@ public class WeightedEntryFeatureSource
         if (isValueDelimiterNext()) {
             parseValueDelimiter();
             previousRecord = record;
-        } else if(hasNext()) {
+        } else if (hasNext()) {
             parseRecordDelimiter();
             previousRecord = null;
         }
@@ -140,9 +144,11 @@ public class WeightedEntryFeatureSource
 
     public static boolean equal(File a, File b, Charset charset) throws IOException {
         final ObjectIndex<String> stringIndex = new ObjectIndex<String>();
-        final WeightedEntryFeatureSource srcA = new WeightedEntryFeatureSource(a, charset,
+        final WeightedEntryFeatureSource srcA = new WeightedEntryFeatureSource(a,
+                charset,
                 stringIndex);
-        final WeightedEntryFeatureSource srcB = new WeightedEntryFeatureSource(b, charset,
+        final WeightedEntryFeatureSource srcB = new WeightedEntryFeatureSource(b,
+                charset,
                 stringIndex);
         boolean equal = true;
         while (equal && srcA.hasNext() && srcB.hasNext()) {

@@ -43,8 +43,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * A <tt>FeatureSource</tt> object is used to retrieve {@link FeatureRecord} 
+ * objects from a flat file. 
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @see FeatureSink
  */
 public class FeatureSource extends AbstractTSVSource<FeatureRecord> {
 

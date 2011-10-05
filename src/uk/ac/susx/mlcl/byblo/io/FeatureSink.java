@@ -40,6 +40,36 @@ import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 
 /**
+ * An <tt>FeatureSink</tt> object is used to store {@link FeatureRecord} objects
+ * in a flat file. 
+ * 
+ * <p>The basic file format is Tab-Separated-Values (TSV) where records are 
+ * delimited by new-lines, and values are delimited by tabs. Two variants are
+ * supported: verbose and compact. In verbose mode each {@link FeatureRecord} 
+ * corresponds to a single TSV record; i.e one line per object consisting of an
+ * feature and it's weight. In compact mode each TSV record consists of a single
+ * feature followed by the weights of all sequentially written 
+ * {@link FeatureRecord} objects that share the same feature.</p>
+ * 
+ * Verbose mode example:
+ * <pre>
+ *      feature1  weight1
+ *      feature1  weight2
+ *      feature2  weight3
+ *      feature3  weight4
+ *      feature3  weight5
+ *      feature3  weight6
+ * </pre>
+ * 
+ * Equivalent compact mode example:
+ * <pre>
+ *      feature1  weight1 weight2
+ *      feature2  weight3
+ *      feature3  weight4 weight5 weight6
+ * </pre>
+ * 
+ * <p>Compact mode is the default behavior, since it can reduce file sizes by 
+ * approximately 50%, with corresponding reductions in I/O overhead.</p>
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */

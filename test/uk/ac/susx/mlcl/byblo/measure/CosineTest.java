@@ -34,7 +34,7 @@ import com.google.common.io.Files;
 import uk.ac.susx.mlcl.byblo.Byblo;
 import java.io.File;
 import org.junit.Test;
-import uk.ac.susx.mlcl.byblo.io.WeightedPairSource;
+import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairSource;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import static uk.ac.susx.mlcl.ExitTrapper.*;
@@ -127,7 +127,7 @@ public class CosineTest {
                 });
         disableExitTrapping();
 
-        assertTrue(WeightedPairSource.equal(output1, output2, DEFAULT_CHARSET));
+        assertTrue(WeightedEntryPairSource.equal(output1, output2, DEFAULT_CHARSET));
     }
 
     @Test(timeout = 1000)
@@ -160,7 +160,7 @@ public class CosineTest {
                     "--output", output2.toString()
                 });
 
-        assertTrue(WeightedPairSource.equal(output1, output2, DEFAULT_CHARSET));
+        assertTrue(WeightedEntryPairSource.equal(output1, output2, DEFAULT_CHARSET));
         disableExitTrapping();
     }
 }

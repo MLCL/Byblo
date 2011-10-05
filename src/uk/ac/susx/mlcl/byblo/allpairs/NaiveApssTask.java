@@ -41,7 +41,7 @@ import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.collect.Entry;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.collect.WeightedPair;
+import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairRecord;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
@@ -77,7 +77,7 @@ public class NaiveApssTask<P> extends AbstractTask {
 
     private Proximity measure = DEFAULT_MEASURE;
 
-    private Sink<WeightedPair> sink;
+    private Sink<WeightedEntryPairRecord> sink;
 
     /**
      * Filters that determine which feature vectors are considered.
@@ -87,7 +87,7 @@ public class NaiveApssTask<P> extends AbstractTask {
     /**
      * Filters that determine which resultant pairs are output
      */
-    private Predicate<WeightedPair> pruducePair = alwaysTrue();
+    private Predicate<WeightedEntryPairRecord> pruducePair = alwaysTrue();
 
     // Stat collection
     private ApssStats stats = new ApssStats();
@@ -113,7 +113,7 @@ public class NaiveApssTask<P> extends AbstractTask {
     public NaiveApssTask(
             SeekableSource<Entry<SparseDoubleVector>, P> Q,
             SeekableSource<Entry<SparseDoubleVector>, P> R,
-            Sink<WeightedPair> sink) {
+            Sink<WeightedEntryPairRecord> sink) {
         setSourceA(Q);
         setSourceB(R);
         setSink(sink);
@@ -125,11 +125,11 @@ public class NaiveApssTask<P> extends AbstractTask {
     public NaiveApssTask() {
     }
 
-    public Predicate<WeightedPair> getProducatePair() {
+    public Predicate<WeightedEntryPairRecord> getProducatePair() {
         return pruducePair;
     }
 
-    public void setProducatePair(Predicate<WeightedPair> pruducePair) {
+    public void setProducatePair(Predicate<WeightedEntryPairRecord> pruducePair) {
         Checks.checkNotNull("pruducePair");
         this.pruducePair = pruducePair;
     }
@@ -189,11 +189,11 @@ public class NaiveApssTask<P> extends AbstractTask {
         this.measure = measure;
     }
 
-    public final Sink<WeightedPair> getSink() {
+    public final Sink<WeightedEntryPairRecord> getSink() {
         return sink;
     }
 
-    public final void setSink(Sink<WeightedPair> sink) {
+    public final void setSink(Sink<WeightedEntryPairRecord> sink) {
         if (sink == null)
             throw new NullPointerException("handler == null");
         this.sink = sink;
@@ -292,7 +292,7 @@ public class NaiveApssTask<P> extends AbstractTask {
     }
 
     protected void computeAllPairs() throws IOException {
-        List<WeightedPair> pairs = new ArrayList<WeightedPair>();
+        List<WeightedEntryPairRecord> pairs = new ArrayList<WeightedEntryPairRecord>();
         final P restartB = getSourceB().position();
 
         // for every vector (a) in source A
@@ -313,7 +313,7 @@ public class NaiveApssTask<P> extends AbstractTask {
                     continue;
 
                 double sim = sim(a, b);
-                WeightedPair pair = new WeightedPair(a.key(), b.key(), sim);
+                WeightedEntryPairRecord pair = new WeightedEntryPairRecord(a.key(), b.key(), sim);
                 if (pruducePair.apply(pair)) {
                     pairs.add(pair);
                     stats.incrementProductionCount();

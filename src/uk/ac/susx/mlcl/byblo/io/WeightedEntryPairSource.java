@@ -37,21 +37,23 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import uk.ac.susx.mlcl.lib.collect.WeightedPair;
 
 /**
+ * A <tt>WeightedEntryPairSource</tt> object is used to retrieve
+ * {@link WeightedEntryPairRecord} objects from a flat file.
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @see WeightedEntryPairSink
  */
-public class WeightedPairSource
-        extends AbstractTSVSource<WeightedPair>
-        implements Source<WeightedPair> {
+public class WeightedEntryPairSource
+        extends AbstractTSVSource<WeightedEntryPairRecord>
+        implements Source<WeightedEntryPairRecord> {
 
     private final ObjectIndex<String> entryIndex;
 
-    private WeightedPair previousRecord = null;
+    private WeightedEntryPairRecord previousRecord = null;
 
-    public WeightedPairSource(
+    public WeightedEntryPairSource(
             File file, Charset charset,
             ObjectIndex<String> entryIndex)
             throws FileNotFoundException, IOException {
@@ -61,7 +63,7 @@ public class WeightedPairSource
         this.entryIndex = entryIndex;
     }
 
-    public WeightedPairSource(File file, Charset charset)
+    public WeightedEntryPairSource(File file, Charset charset)
             throws FileNotFoundException, IOException {
         this(file, charset, new ObjectIndex<String>());
     }
@@ -71,20 +73,20 @@ public class WeightedPairSource
     }
 
     @Override
-    public WeightedPair read() throws IOException {
+    public WeightedEntryPairRecord read() throws IOException {
         final int entryId1;
         if (previousRecord == null) {
             entryId1 = readEntry();
             parseValueDelimiter();
         } else {
-            entryId1 = previousRecord.getXId();
+            entryId1 = previousRecord.getEntry1Id();
         }
 
         final int entryId2 = readEntry();
         parseValueDelimiter();
         final double weight = readWight();
 
-        final WeightedPair record = new WeightedPair(
+        final WeightedEntryPairRecord record = new WeightedEntryPairRecord(
                 entryId1, entryId2, weight);
 
         if (isValueDelimiterNext()) {
@@ -108,16 +110,16 @@ public class WeightedPairSource
 
     public static boolean equal(File a, File b, Charset charset) throws IOException {
         final ObjectIndex<String> stringIndex = new ObjectIndex<String>();
-        final WeightedPairSource srcA = new WeightedPairSource(a, charset,
+        final WeightedEntryPairSource srcA = new WeightedEntryPairSource(a, charset,
                 stringIndex);
-        final WeightedPairSource srcB = new WeightedPairSource(b, charset,
+        final WeightedEntryPairSource srcB = new WeightedEntryPairSource(b, charset,
                 stringIndex);
         boolean equal = true;
         while (equal && srcA.hasNext() && srcB.hasNext()) {
-            final WeightedPair recA = srcA.read();
-            final WeightedPair recB = srcB.read();
-            equal = recA.getXId() == recB.getXId()
-                    && recA.getYId() == recB.getYId()
+            final WeightedEntryPairRecord recA = srcA.read();
+            final WeightedEntryPairRecord recB = srcB.read();
+            equal = recA.getEntry1Id() == recB.getEntry1Id()
+                    && recA.getEntry2Id() == recB.getEntry2Id()
                     && recA.getWeight() == recB.getWeight();
         }
         return equal && srcA.hasNext() == srcB.hasNext();

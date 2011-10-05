@@ -30,12 +30,12 @@
  */
 package uk.ac.susx.mlcl.byblo.measure;
 
-import uk.ac.susx.mlcl.lib.collect.WeightedPair;
+import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairRecord;
 import com.google.common.io.Files;
 import uk.ac.susx.mlcl.byblo.Byblo;
 import java.io.File;
 import org.junit.Test;
-import uk.ac.susx.mlcl.byblo.io.WeightedPairSource;
+import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairSource;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import static uk.ac.susx.mlcl.ExitTrapper.*;
@@ -148,7 +148,7 @@ public class CrMiTest {
                 });
         disableExitTrapping();
 
-        assertTrue(WeightedPairSource.equal(expectedOutput, crmiOutput, DEFAULT_CHARSET));
+        assertTrue(WeightedEntryPairSource.equal(expectedOutput, crmiOutput, DEFAULT_CHARSET));
 
     }
 
@@ -190,7 +190,7 @@ public class CrMiTest {
 
         disableExitTrapping();
 
-        assertTrue(WeightedPairSource.equal(expectedOutput, crmiOutput, DEFAULT_CHARSET));
+        assertTrue(WeightedEntryPairSource.equal(expectedOutput, crmiOutput, DEFAULT_CHARSET));
 
     }
 
@@ -235,16 +235,16 @@ public class CrMiTest {
         // The ranking should be identical, but the absolute similarity values
         // will be different.
         
-        WeightedPairSource expected = new WeightedPairSource(expectedOutput,
+        WeightedEntryPairSource expected = new WeightedEntryPairSource(expectedOutput,
                 DEFAULT_CHARSET);
-        WeightedPairSource actual = new WeightedPairSource(crmiOutput,
+        WeightedEntryPairSource actual = new WeightedEntryPairSource(crmiOutput,
                 DEFAULT_CHARSET);
         
         while(expected.hasNext() && actual.hasNext()) {
-            WeightedPair e = expected.read();
-            WeightedPair a = actual.read();
-            assertEquals(e.getXId(), a.getXId());
-            assertEquals(e.getYId(), a.getYId());
+            WeightedEntryPairRecord e = expected.read();
+            WeightedEntryPairRecord a = actual.read();
+            assertEquals(e.getEntry1Id(), a.getEntry1Id());
+            assertEquals(e.getEntry2Id(), a.getEntry2Id());
         }
         
         assertEquals(expected.hasNext(), actual.hasNext());

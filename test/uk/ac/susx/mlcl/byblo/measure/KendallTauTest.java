@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.measure;
 
-import uk.ac.susx.mlcl.byblo.io.WeightedPairSource;
+import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairSource;
 import uk.ac.susx.mlcl.byblo.Byblo;
 import java.io.File;
 import org.junit.Ignore;
@@ -100,6 +100,6 @@ public class KendallTauTest {
                     "--output", output2.toString(),
                 });
         disableExitTrapping();
-        assertTrue(WeightedPairSource.equal(output1, output2, DEFAULT_CHARSET));
+        assertTrue(WeightedEntryPairSource.equal(output1, output2, DEFAULT_CHARSET));
     }
 }

@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import com.google.common.primitives.Doubles;
 import uk.ac.susx.mlcl.lib.ObjectIndex;
 import uk.ac.susx.mlcl.lib.io.AbstractTSVSource;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
@@ -44,8 +43,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * An <tt>EntrySource</tt> object is used to retrieve {@link EntryRecord} 
+ * objects from a flat file. 
+ * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @see EntrySink
  */
 public class EntrySource extends AbstractTSVSource<EntryRecord> {
 

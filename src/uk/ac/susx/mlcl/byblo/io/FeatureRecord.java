@@ -30,13 +30,22 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import com.google.common.base.Objects;
 import java.io.Serializable;
 
 /**
+ * <tt>FeatureRecord</tt> objects represent a single instance of a feature used
+ * to measure the similarity between thesaurus entries. A <tt>FeatureRecord</tt> 
+ * consists of a <tt>featureId</tt>, and a <tt>weight</tt> estimated from the 
+ * source corpus. The weighting is usually the features frequency, but it could 
+ * be anything.
+ * 
+ * <p>Instances of <tt>FeatureRecord</tt> are immutable.<p>
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class FeatureRecord implements Serializable {
+public final class FeatureRecord 
+    implements Serializable, Comparable<FeatureRecord> {
 
     private static final long serialVersionUID = 63617210012669024L;
 
@@ -49,6 +58,13 @@ public final class FeatureRecord implements Serializable {
         this.weight = weight;
     }
 
+    /**
+     * Constructor used during de-serialization.
+     */
+    protected FeatureRecord() {
+    }
+
+
     public final int getFeatureId() {
         return featureId;
     }
@@ -57,25 +73,43 @@ public final class FeatureRecord implements Serializable {
         return weight;
     }
 
-    @Override
-    public String toString() {
-        return "FeatureRecord{" + "id=" + featureId + "weight=" + weight + '}';
-    }
-
+    /**
+     * Indicates whether some other object is "equal to" this one.
+     * 
+     * <p>Note that only the <tt>featureId</tt> field is used for equality. I.e 
+     * two objects with the same <tt>featureId</tt>, but differing weights 
+     * <em>will</em> be consider equal.</p>
+     * 
+     * @param   obj   the reference object with which to compare.
+     * @return  <code>true</code> if this object is the same as the obj
+     *          argument; <code>false</code> otherwise.
+     */
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        if(obj == this)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
             return false;
-        if (getClass() != obj.getClass())
-            return false;
-        final FeatureRecord other = (FeatureRecord) obj;
-        if (this.featureId != other.featureId)
-            return false;
-        return true;
+        return equals((FeatureRecord) obj);
+    }
+    
+    public boolean equals(FeatureRecord other) {
+        return this.getFeatureId() == other.getFeatureId();
     }
 
     @Override
     public int hashCode() {
-        return 29 * 3 + this.featureId;
+        return featureId;
+    }
+
+    @Override
+    public String toString() {
+        return Objects.toStringHelper(this).
+                add("id", featureId).add("weight", weight).toString();
+    }
+
+    @Override
+    public int compareTo(FeatureRecord that) {
+        return this.getFeatureId() - that.getFeatureId();
     }
 }

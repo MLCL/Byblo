@@ -39,8 +39,11 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
- *
+ * An <tt>EntryFeatureSource</tt> object is used to retrieve 
+ * {@link EntryFeatureRecord} objects from a flat file. 
+ * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @see EntryFeatureSink
  */
 public class EntryFeatureSource
         extends AbstractTSVSource<EntryFeatureRecord>

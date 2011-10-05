@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.measure;
 
-import uk.ac.susx.mlcl.byblo.io.WeightedPairSource;
+import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairSource;
 import org.junit.Ignore;
 import com.google.common.io.Files;
 import uk.ac.susx.mlcl.byblo.Byblo;
@@ -237,7 +237,7 @@ public class LpTest {
                 });
         disableExitTrapping();
 
-        assertTrue(WeightedPairSource.equal(output1, output2, DEFAULT_CHARSET));
+        assertTrue(WeightedEntryPairSource.equal(output1, output2, DEFAULT_CHARSET));
     }
 
     @Test(timeout=1000)
@@ -273,7 +273,7 @@ public class LpTest {
                 });
         disableExitTrapping();
 
-        assertTrue(WeightedPairSource.equal(output1, output2, DEFAULT_CHARSET));
+        assertTrue(WeightedEntryPairSource.equal(output1, output2, DEFAULT_CHARSET));
 
     }
 
@@ -310,7 +310,7 @@ public class LpTest {
                 });
         disableExitTrapping();
 
-        assertTrue(WeightedPairSource.equal(output1, output2, DEFAULT_CHARSET));
+        assertTrue(WeightedEntryPairSource.equal(output1, output2, DEFAULT_CHARSET));
     }
 
     @Test(timeout=1000)
@@ -347,6 +347,6 @@ public class LpTest {
                 });
         disableExitTrapping();
 
-        assertTrue(WeightedPairSource.equal(output1, output2, DEFAULT_CHARSET));
+        assertTrue(WeightedEntryPairSource.equal(output1, output2, DEFAULT_CHARSET));
     }
 }

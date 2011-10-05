@@ -39,6 +39,36 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
+ * An <tt>EntryFeatureSink</tt> object is used to store 
+ * {@link EntryFeatureRecord} objects in a flat file. 
+ * 
+ * <p>The basic file format is Tab-Separated-Values (TSV) where records are 
+ * delimited by new-lines, and values are delimited by tabs. Two variants are
+ * supported: verbose and compact. In verbose mode each {@link EntryFeatureRecord} 
+ * corresponds to a single TSV record; i.e one line per object consisting of an
+ * entry and a feature. In compact mode each TSV record consists of a single 
+ * entry followed by the features from all sequentially written 
+ * {@link EntryFeatureRecord} objects that share the same entry.</p>
+ * 
+ * Verbose mode example:
+ * <pre>
+ *      entry1  feature1
+ *      entry1  feature2
+ *      entry2  feature3
+ *      entry3  feature2
+ *      enrty3  feature4
+ *      enrty3  feature1
+ * </pre>
+ * 
+ * Equivalent compact mode example:
+ * <pre>
+ *      entry1  feature1 feature2
+ *      entry2  feature3
+ *      entry3  feature2 feature4 feature1
+ * </pre>
+ * 
+ * <p>Compact mode is the default behavior, since it can reduce file sizes by 
+ * approximately 50%, with corresponding reductions in I/O overhead.</p>
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */

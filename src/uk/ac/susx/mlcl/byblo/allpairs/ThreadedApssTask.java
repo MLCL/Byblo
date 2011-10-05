@@ -33,7 +33,7 @@ package uk.ac.susx.mlcl.byblo.allpairs;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.collect.Entry;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.collect.WeightedPair;
+import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairRecord;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.tasks.Task;
@@ -81,7 +81,7 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
     public ThreadedApssTask(
             SeekableSource<Entry<SparseDoubleVector>, S> A,
             SeekableSource<Entry<SparseDoubleVector>, S> B,
-            Sink<WeightedPair> sink) {
+            Sink<WeightedEntryPairRecord> sink) {
         super(A, B, sink);
         setNumThreads(DEFAULT_NUM_THREADS);
     }

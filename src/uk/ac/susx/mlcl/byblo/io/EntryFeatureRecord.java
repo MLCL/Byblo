@@ -30,13 +30,21 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import com.google.common.base.Objects;
 import java.io.Serializable;
 
 /**
+ * <tt>EntryFeatureRecord</tt> objects represent a single instance of an 
+ * entry/feature pair, i.e the occurrence of a feature with and entry. Typically
+ * this will be associated with a frequency use to estimate the likelihood of
+ * the feature in the entries context.
+ * 
+ * <p>Instances of <tt>EntryFeatureRecord</tt> are immutable.<p>
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class EntryFeatureRecord implements Serializable, Comparable<EntryFeatureRecord> {
+public class EntryFeatureRecord
+        implements Serializable, Comparable<EntryFeatureRecord> {
 
     private static final long serialVersionUID = 1L;
 
@@ -44,9 +52,15 @@ public class EntryFeatureRecord implements Serializable, Comparable<EntryFeature
 
     private int featureId;
 
-    public EntryFeatureRecord(final int entryId, final int contextId) {
+    public EntryFeatureRecord(final int entryId, final int featureId) {
         this.entryId = entryId;
-        this.featureId = contextId;
+        this.featureId = featureId;
+    }
+
+    /**
+     * Constructor used during de-serialization.
+     */
+    protected EntryFeatureRecord() {
     }
 
     public final int getEntryId() {
@@ -59,10 +73,8 @@ public class EntryFeatureRecord implements Serializable, Comparable<EntryFeature
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + '{'
-                + "entryId=" + entryId
-                + ", featureId=" + featureId
-                + '}';
+        return Objects.toStringHelper(this).
+                add("entryId", entryId).add("featureId", featureId).toString();
     }
 
     @Override
@@ -75,7 +87,7 @@ public class EntryFeatureRecord implements Serializable, Comparable<EntryFeature
     }
 
     public boolean equals(EntryFeatureRecord other) {
-        return this.getEntryId() == other.getEntryId() 
+        return this.getEntryId() == other.getEntryId()
                 && this.getFeatureId() == other.getFeatureId();
     }
 
