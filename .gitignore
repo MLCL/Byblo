@@ -17,8 +17,8 @@ target
 /nbproject/*
 nbbuild.xml
 manifest.mf
-/lib/*.jar
-/libs/*.jar
+/libs
+
 
 # Emacs
 \#*\#

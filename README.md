@@ -49,9 +49,9 @@ The project requires [Java 6](http://www.oracle.com/technetwork/java/javase/down
 
  * [Commons Logging 1.1.1](http://commons.apache.org/logging/) --- A very light weight wrapper API that enables logging frameworks to be configured and "plugged in" at runtime. 
 
-In addition to the above, [JUnit 4](http://www.junit.org/) is required for unit testing the project. The download script will also retrieve this library.
+In addition to the above, [JUnit 4](http://www.junit.org/) is required for unit testing the project.
 
-All except JCommander are available in pre-compiled binary form. Simply place the `.jar` files in the `/libs/` directory. In the case JCommander you must compile it first using [maven](http://maven.apache.org/). To streamline this process there is a script `/libs/download_libraries.sh`, which will attempt to automatically download (and compile where necessary) all the dependancies.
+All except JCommander are available in pre-compiled binary form. Simply place the `.jar` files in the `/libs/` directory. In the case JCommander you must compile it first using [maven](http://maven.apache.org/).
 
 
 ## Building
@@ -63,9 +63,6 @@ Compiling the software from a source distribution
 To compile the software from the command line:
 
 ```sh
-$ cd libs
-$ ./download_libraries.sh
-$ cd ..
 $ ant dist
 ```
 
@@ -75,12 +72,7 @@ This will compile the source code, and create a new directory `/dist/` containin
 
 This section how build the project from with Netbeans 7. First acquire the source code as described above. 
 
-1. From the command-line, enter the `libs` directory and run the download script:
-
-    ```sh
-$ cd libs
-$ ./download_libraries.sh
-```
+1. Download all and compile all the library dependancies (see above), placing the jar file in the `libs/` directory.
 
 2. Start Netbeans and select "File -> New Project" from the menu bar. Select *Java / Java Project with Existing Sources* and click *Next*.
 
