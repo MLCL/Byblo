@@ -134,11 +134,6 @@ public class Byblo {
             System.err.println(sb);
             System.exit(-1);
         }
-
-        // XXX: The following is required when the software is run from the
-        // byblo.sh script. Otherwise it hangs, presumably because a thread is
-        // still running.
-//        System.exit(0);
     }
 
     public static class ConverterFactory implements IStringConverterFactory {

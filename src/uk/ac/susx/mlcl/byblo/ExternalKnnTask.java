@@ -78,7 +78,7 @@ public class ExternalKnnTask extends ExternalSortTask {
 
     @Override
     protected void finaliseTask() throws Exception {
-        super.initialiseTask();
+        super.finaliseTask();
     }
 
     public final int getK() {
