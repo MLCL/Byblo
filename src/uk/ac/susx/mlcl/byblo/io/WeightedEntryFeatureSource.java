@@ -110,6 +110,11 @@ public class WeightedEntryFeatureSource
             entryId = previousRecord.getEntryId();
         }
 
+        if (!hasNext() || isDelimiterNext()) {
+            parseRecordDelimiter();
+            throw new SingletonRecordException(this,
+                    "Found weighted entry/feature record with no features.");
+        }
 
         final int featureId = readFeature();
         parseValueDelimiter();
@@ -122,8 +127,8 @@ public class WeightedEntryFeatureSource
         if (isValueDelimiterNext()) {
             parseValueDelimiter();
             previousRecord = record;
-        } 
-        
+        }
+
         if (hasNext() && isRecordDelimiterNext()) {
             parseRecordDelimiter();
             previousRecord = null;

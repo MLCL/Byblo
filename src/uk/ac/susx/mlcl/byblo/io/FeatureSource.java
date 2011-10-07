@@ -91,6 +91,12 @@ public class FeatureSource extends AbstractTSVSource<FeatureRecord> {
         } else {
             featureId = previousRecord.getFeatureId();
         }
+        
+        if (!hasNext() || isDelimiterNext()) {
+            parseRecordDelimiter();
+            throw new SingletonRecordException(this,
+                    "Found feature record with no weights.");
+        }
 
         final double weight = parseDouble();
 

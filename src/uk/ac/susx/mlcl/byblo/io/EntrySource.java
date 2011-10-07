@@ -122,6 +122,12 @@ public class EntrySource extends AbstractTSVSource<EntryRecord> {
             entryId = previousRecord.getEntryId();
         }
 
+        if (!hasNext() || isDelimiterNext()) {
+            parseRecordDelimiter();
+            throw new SingletonRecordException(this,
+                    "Found entry record with no weights.");
+        }
+
         final double weight = parseDouble();
 
         cardinality = Math.max(cardinality, entryId + 1);
@@ -133,9 +139,9 @@ public class EntrySource extends AbstractTSVSource<EntryRecord> {
         if (isValueDelimiterNext()) {
             parseValueDelimiter();
             previousRecord = record;
-        } 
-        
-        if(hasNext() && isRecordDelimiterNext()) {
+        }
+
+        if (hasNext() && isRecordDelimiterNext()) {
             parseRecordDelimiter();
             previousRecord = null;
         }

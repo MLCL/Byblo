@@ -25,9 +25,20 @@ public class EntryFeatureSourceTest {
         EntryFeatureSource efSrc = new EntryFeatureSource(testSample, charset);
         assertTrue("EntryFeatureSource is empty", efSrc.hasNext());
 
+
         while (efSrc.hasNext()) {
-            EntryFeatureRecord ef = efSrc.read();
-            assertNotNull("Found null EntryFeatureRecord", ef);
+            try {
+                EntryFeatureRecord ef = efSrc.read();
+                System.out.println(
+                        efSrc.getEntryIndex().get(ef.getEntryId()) + " => "
+                        + efSrc.getFeatureIndex().get(ef.getFeatureId()));
+                assertNotNull("Found null EntryFeatureRecord", ef);
+            } catch (SingletonRecordException ex) {
+                // This is allowed to happen here, because the file explicitly
+                // contains this erroneous expression
+                if (ex.getOffset() != 1671)
+                    throw ex;
+            }
         }
     }
 }

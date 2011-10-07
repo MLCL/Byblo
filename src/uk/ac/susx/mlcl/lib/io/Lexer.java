@@ -792,7 +792,7 @@ public class Lexer implements RandomAccess {
     private char read()
             throws CharacterCodingException, IOException {
         insureRemaining(1);
-        return cbuf.get();
+        return  cbuf.get();
 //        final char c = cbuf.get();
 //        if (c == '\n') {
 //            line++;

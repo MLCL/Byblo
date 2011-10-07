@@ -37,6 +37,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * An <tt>EntryFeatureSource</tt> object is used to retrieve 
@@ -48,6 +50,9 @@ import java.nio.charset.Charset;
 public class EntryFeatureSource
         extends AbstractTSVSource<EntryFeatureRecord>
         implements Source<EntryFeatureRecord> {
+
+    private static final Log LOG =
+            LogFactory.getLog(EntryFeatureSource.class);
 
     private final ObjectIndex<String> entryIndex;
 
@@ -101,6 +106,15 @@ public class EntryFeatureSource
         } else {
             entryId = previousRecord.getEntryId();
         }
+        
+        if (!hasNext() || isDelimiterNext()) {
+            // Encountered an entry without any features. This is incoherent wrt
+            // the task at hand, but quite a common scenario in general feature
+            // extraction. Throw an exception which is caught for end user input
+            parseRecordDelimiter();
+            throw new SingletonRecordException(this,
+                    "Found entry/feature record with no features.");
+        }
 
         final int featureId = readFeature();
         final EntryFeatureRecord record = new EntryFeatureRecord(
@@ -110,7 +124,7 @@ public class EntryFeatureSource
             parseValueDelimiter();
             previousRecord = record;
         }
-        
+
         if (hasNext() && isRecordDelimiterNext()) {
             parseRecordDelimiter();
             previousRecord = null;
@@ -138,7 +152,7 @@ public class EntryFeatureSource
         while (equal && srcA.hasNext() && srcB.hasNext()) {
             final EntryFeatureRecord recA = srcA.read();
             final EntryFeatureRecord recB = srcB.read();
-            equal = equal 
+            equal = equal
                     && recA.getEntryId() == recB.getEntryId()
                     && recA.getFeatureId() == recB.getFeatureId();
         }

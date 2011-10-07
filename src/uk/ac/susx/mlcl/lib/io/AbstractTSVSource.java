@@ -75,6 +75,10 @@ public abstract class AbstractTSVSource<T>
         this.file = file;
     }
 
+    public File getFile() {
+        return file;
+    }
+
     @Override
     public abstract T read() throws IOException;
 
@@ -84,16 +88,19 @@ public abstract class AbstractTSVSource<T>
     }
 
     public double percentRead() throws IOException {
-        return 100d * bytesRead() / bytesTotal();
+        return 100d * lexer.bytesRead() / lexer.bytesTotal();
     }
 
-    public long bytesRead() {
-        return lexer.bytesRead();
+    public long roughPosition() {
+        return lexer.start();
     }
-
-    public long bytesTotal() throws IOException {
-        return lexer.bytesTotal();
-    }
+//    public long bytesRead() {
+//        return lexer.bytesRead();
+//    }
+//
+//    public long bytesTotal() throws IOException {
+//        return lexer.bytesTotal();
+//    }
 
     @Override
     public Lexer.Tell position() {
@@ -130,7 +137,9 @@ public abstract class AbstractTSVSource<T>
     }
 
     protected void parseValueDelimiter() throws CharacterCodingException, IOException {
-        parseDelimiter(VALUE_DELIM);
+        do {
+            parseDelimiter(VALUE_DELIM);
+        } while (hasNext() && isValueDelimiterNext());
     }
 
     protected String parseString() throws CharacterCodingException, IOException {
@@ -158,17 +167,16 @@ public abstract class AbstractTSVSource<T>
             lexer.advance();
     }
 
-    private void expectType(Type expected, Type actual) {
+    private void expectType(Type expected, Type actual) throws TSVDataFormatException {
         if (expected != actual) {
-            throw new AssertionError(
+            throw new TSVDataFormatException(this,
                     "Expecting type " + expected + " but found " + actual);
         }
     }
 
-    private void expectDelim(char expected, char actual) {
+    private void expectDelim(char expected, char actual) throws TSVDataFormatException {
         if (expected != actual)
-            throw new AssertionError("Expecting delimiter "
-                    + (int) expected + " but found " + (int) actual
-                    + " when parsing file " + file);
+            throw new TSVDataFormatException(this, "Expecting delimiter "
+                    + (int) expected + " but found " + (int) actual);
     }
 }

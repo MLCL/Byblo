@@ -82,6 +82,12 @@ public class WeightedEntryPairSource
             entryId1 = previousRecord.getEntry1Id();
         }
 
+        if (!hasNext() || isDelimiterNext()) {
+            parseRecordDelimiter();
+            throw new SingletonRecordException(this,
+                    "Found weighte entry pair record with second entries.");
+        }
+
         final int entryId2 = readEntry();
         parseValueDelimiter();
         final double weight = readWight();
@@ -93,8 +99,8 @@ public class WeightedEntryPairSource
             parseValueDelimiter();
             previousRecord = record;
         }
-        
-        if(hasNext() && isRecordDelimiterNext()) {
+
+        if (hasNext() && isRecordDelimiterNext()) {
             parseRecordDelimiter();
             previousRecord = null;
         }
@@ -112,9 +118,11 @@ public class WeightedEntryPairSource
 
     public static boolean equal(File a, File b, Charset charset) throws IOException {
         final ObjectIndex<String> stringIndex = new ObjectIndex<String>();
-        final WeightedEntryPairSource srcA = new WeightedEntryPairSource(a, charset,
+        final WeightedEntryPairSource srcA = new WeightedEntryPairSource(a,
+                charset,
                 stringIndex);
-        final WeightedEntryPairSource srcB = new WeightedEntryPairSource(b, charset,
+        final WeightedEntryPairSource srcB = new WeightedEntryPairSource(b,
+                charset,
                 stringIndex);
         boolean equal = true;
         while (equal && srcA.hasNext() && srcB.hasNext()) {

@@ -59,6 +59,7 @@ import java.util.Comparator;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.io.SingletonRecordException;
 import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureRecord;
 import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureSink;
 
@@ -68,7 +69,9 @@ import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureSink;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(commandDescription = "Read in a raw feature instances file, to produce three frequency files: entries, contexts, and features.")
+@Parameters(
+commandDescription = "Read in a raw feature instances file, to produce three "
+        + "frequency files: entries, contexts, and features.")
 public class CountTask extends AbstractTask implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -178,7 +181,7 @@ public class CountTask extends AbstractTask implements Serializable {
                     final Int2IntMap entryFreq = new Int2IntOpenHashMap();
                     entryFreq.defaultReturnValue(0);
 
-                    countInstances(entryFreq, featureFreq, 
+                    countInstances(entryFreq, featureFreq,
                             entryFeatureFreq, entryIndex, featureIndex);
 
                     writeEntries(entryFreq, entryIndex);
@@ -221,7 +224,14 @@ public class CountTask extends AbstractTask implements Serializable {
 
         long i = 0;
         while (instanceSource.hasNext()) {
-            final EntryFeatureRecord instance = instanceSource.read();
+            final EntryFeatureRecord instance;
+            try {
+                instance = instanceSource.read();
+            } catch (SingletonRecordException ex) {
+                LOG.warn("Badly formed input data: " + ex.getMessage());
+                continue;
+            }
+            
             final int entry_id = instance.getEntryId();
             final int feature_id = instance.getFeatureId();
 
@@ -234,7 +244,8 @@ public class CountTask extends AbstractTask implements Serializable {
                 LOG.info("Read " + i + " instances. Found "
                         + entryFreq.size() + " entries, " + featureFreq.size()
                         + " features, and " + entryFeatureFreq.size()
-                        + " entry-features. (" + (int) instanceSource.percentRead()
+                        + " entry-features. (" + (int) instanceSource.
+                        percentRead()
                         + "% complete)");
                 LOG.debug(MiscUtil.memoryInfoString());
             }
@@ -381,7 +392,8 @@ public class CountTask extends AbstractTask implements Serializable {
         WeightedEntryFeatureSink featureSink = null;
         final int n = contextFreqList.size();
         try {
-            featureSink = new WeightedEntryFeatureSink(entryFeaturesFile, charset, entryIndex,
+            featureSink = new WeightedEntryFeatureSink(entryFeaturesFile,
+                    charset, entryIndex,
                     featureIndex);
             int i = 0;
             for (final Object2IntMap.Entry<? extends EntryFeatureRecord> feature :
