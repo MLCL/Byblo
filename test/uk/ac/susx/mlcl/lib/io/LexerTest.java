@@ -30,8 +30,9 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
+import java.util.ArrayList;
+import java.util.List;
 import com.google.common.base.CharMatcher;
-import uk.ac.susx.mlcl.lib.Strings;
 import uk.ac.susx.mlcl.lib.io.Lexer.Type;
 import java.io.OutputStream;
 import java.io.File;
@@ -48,6 +49,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import uk.ac.susx.mlcl.TestConstants;
 import static org.junit.Assert.*;
 
 /**
@@ -133,15 +135,15 @@ public class LexerTest {
         Lexer lexer = new Lexer(tmp, charset);
         lexer.setDelimiterMatcher(CharMatcher.is('.'));
 
-        System.out.printf("%-6s %-12s %-6s %-6s %-15s (%s,%s)%n",
-                "num", "type", "start", "end", "value", "line",
-                "column");
+//        System.out.printf("%-6s %-12s %-6s %-6s %-15s (%s,%s)%n",
+//                          "num", "type", "start", "end", "value", "line",
+//                          "column");
         int i = 0;
         while (lexer.hasNext()) {
             lexer.advance();
-            System.out.printf("%-12s %-6d %-6d %-15s%n",
-                    lexer.type(), lexer.start(), lexer.end(),
-                    Strings.escape(lexer.value()));
+//            System.out.printf("%-12s %-6d %-6d %-15s%n",
+//                              lexer.type(), lexer.start(), lexer.end(),
+//                              Strings.escape(lexer.value()));
             assertEquals("type", CFB_types[i], lexer.type());
             assertEquals("start", CFB_starts[i], lexer.start());
             assertEquals("end", CFB_ends[i], lexer.end());
@@ -183,15 +185,17 @@ public class LexerTest {
         // Now randomly seek into the lexer at various offsets, and check that
         // they are what they are supposed to be
         Random rand = new Random(1);
-        System.out.printf("%-6s %-6s %-12s %-6s %-6s %-15s (%s,%s)%n",
-                "seek", "num", "type", "start", "end", "value", "line",
-                "column");
+//        System.out.printf("%-6s %-6s %-12s %-6s %-6s %-15s (%s,%s)%n",
+//                          "seek", "num", "type", "start", "end", "value", "line",
+//                          "column");
         for (int j = 0; j < 500; j++) {
             i = rand.nextInt(CFB_numbers.length);
             lexer.seek(tells[i]);
-            System.out.printf("%-6d %-6d %-12s %-6d %-6d %-15s (%d,%d)%n",
-                    i, 0/*lexer.number()*/, lexer.type(), lexer.start(), lexer.end(),
-                    Strings.escape(lexer.value()), 0/*lexer.line()*/, 0/*lexer.column()*/);
+//            System.out.printf("%-6d %-6d %-12s %-6d %-6d %-15s (%d,%d)%n",
+//                              i, 0/*lexer.number()*/, lexer.type(),
+//                              lexer.start(), lexer.end(),
+//                              Strings.escape(lexer.value()), 0/*lexer.line()*/,
+//                              0/*lexer.column()*/);
             assertEquals("type[" + i + "]", CFB_types[i], lexer.type());
             assertEquals("value[" + i + "]", CFB_values[i], lexer.value().
                     toString());
@@ -200,4 +204,64 @@ public class LexerTest {
 
     }
 
+    @Test(timeout = 10000)
+    public void seekTestFruitEntries() throws FileNotFoundException, IOException {
+        seekTest(TestConstants.TEST_FRUIT_ENTRIES);
+    }
+
+    @Test(timeout = 10000)
+    public void seekTestFruitFeatures() throws FileNotFoundException, IOException {
+        seekTest(TestConstants.TEST_FRUIT_FEATURES);
+
+    }
+
+    @Test(timeout = 10000)
+    public void seekTestFruitEntryFeatures() throws FileNotFoundException, IOException {
+        seekTest(TestConstants.TEST_FRUIT_ENTRY_FEATURES);
+    }
+
+    @Test(timeout = 10000)
+    public void seekTestFruitInput() throws FileNotFoundException, IOException {
+        seekTest(TestConstants.TEST_FRUIT_INPUT);
+    }
+
+    @Test(timeout = 10000)
+    public void seekTestFruitSims() throws FileNotFoundException, IOException {
+        seekTest(TestConstants.TEST_FRUIT_SIMS);
+    }
+
+    public void seekTest(File file) throws FileNotFoundException, IOException {
+        System.out.println("Test Lexer seek with " + file.toString() + "");
+
+        Charset charset = IOUtil.DEFAULT_CHARSET;
+
+        Lexer lexer = new Lexer(file, charset);
+
+        List<Lexer.Tell> tells = new ArrayList<Lexer.Tell>();
+        List<String> values = new ArrayList<String>();
+        while (lexer.hasNext()) {
+            lexer.advance();
+            tells.add(lexer.tell());
+            values.add(lexer.value().toString());
+        }
+
+        // check a bunch random seeks
+        Random rand = new Random(0);
+        for (int j = 0; j < 500; j++) {
+            final int i = rand.nextInt(tells.size());
+
+            lexer.seek(tells.get(i));
+
+            assertEquals(values.get(i), lexer.value().toString());
+            assertEquals(tells.get(i), lexer.tell());
+        }
+
+        // Check the edge cases
+        for (int i : new int[]{tells.size()-1, 0,tells.size()-2, 1}) {
+            lexer.seek(tells.get(i));
+            assertEquals(values.get(i), lexer.value().toString());
+            assertEquals(tells.get(i), lexer.tell());
+        }
+
+    }
 }

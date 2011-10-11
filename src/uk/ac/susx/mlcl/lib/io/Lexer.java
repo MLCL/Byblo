@@ -31,6 +31,7 @@
 package uk.ac.susx.mlcl.lib.io;
 
 import com.google.common.base.CharMatcher;
+import com.google.common.base.Objects;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
@@ -38,13 +39,12 @@ import java.nio.CharBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.charset.CharacterCodingException;
 import java.util.NoSuchElementException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
 import java.util.RandomAccess;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>A {@link Lexer} performs lexical analysis of some delimited input file. It
@@ -64,11 +64,10 @@ import java.util.RandomAccess;
  *      Insures that only the absolute minimum amount of work is done at each
  *      step.</li>
  *
- *  <li>Useful debug output statistics such as line and column number.</li>
  * </ul>
  *
  * <p>{@link Lexer} is not thread safe and must be synchronized externally if
- *  concurrent access is possible.</p>
+ *  concurrent access is required.</p>
  *
  * <p>Requires Java 6</p>
  *
@@ -85,20 +84,16 @@ import java.util.RandomAccess;
  * while (lexer.hasNext()) {
  *     lexer.advance();
  *
- *     System.out.printf("%-6d %-12s %-6d %-6d %-15s (%d,%d)%n",
+ *     System.out.printf("%-6d %-12s %-6d %-6d %-15s%n",
  *         lexer.number(),
  *         lexer.type(),
  *         lexer.start(), lexer.end(),
- *         lexer.value(),
- *         lexer.line(), lexer.column());
+ *         lexer.value());
  * }
  * </pre>
  *
- * <h4>To Do</h4>
+ * <h4>ToDo</h4>
  * <ul>
- *  <li>Remove dependency on fastutil. This library is excellent, but too big to
- *      be an acceptable dependency to a tiny library like this.</li>
- *
  *  <li>Implement configurable lexeme types. Each type should be defined by a
  *      name and a character matcher. The character matcher is a function that
  *      takes a character as it's argument and returns whether or lamnda not
@@ -110,28 +105,6 @@ import java.util.RandomAccess;
  *      more complex lexical entities, but is starting to blur the line between
  *      lexical and syntactic analysis.</li>
  *
- *  <li>Seeking is messy because line, column, start, and end fields
- *      become relative to last call to {@link Lexer#seek(Tell)}. In addition
- *      the number field is inconsistent across multiple seeks to the same
- *      lexeme. There is also a problem with efficiency because calls to
- *      {@link Lexer#tell()} are expensive - if anything
- *      {@link Lexer#seek(Tell)} should be expensive. There are three
- *      approaches to resolving this problem:
- *      <ol>
- *          <li>Perform some evaluation of the surrounding characters to
- *              calculate the line and column numbers. This would be
- *              computationally expensive and would fail to solve the issues
- *              with the other fields.</li>
- *          <li>Use the less functional, but safer mark/reset method that
- *              ByteBuffer objects implement. The Lexer would then store a copy
- *              of all required fields when mark is called, that would be
- *              reinstated on a call to reset. Downside of this is that it
- *              looses the flexibility of multiple re-entry points.</li>
- *          <li>Building on mark/reset - the fields could be returned as a state
- *              object on calls to tell(), than can be reinstated by passing the
- *              state back to seek()</li>
- *      </ol>
- * </li>
  * </ul>
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
@@ -142,19 +115,19 @@ public class Lexer implements RandomAccess {
      * Report events to this logger. Only major events are reported, and to
      * Level.FINE or bellow.
      */
-    private static final Logger LOG = Logger.getLogger(Lexer.class.getName());
+    private static final Log LOG = LogFactory.getLog(Lexer.class);
 
     /**
      * <p>The number of characters that can be stored in cbuf. If more space is
      * required then the buffer will grow: n' = 2 * n + 1,
      * where n is the current buffer size, and n' is new buffer size.</p>
      *
-     * <p>Note that the buffer size is not, and should not be configurable
+     * <p>Note that the buffer size is not, and should not, be configurable
      * because it doesn't work as one would normally expect. This buffer is
      * <em>not</em> for File I/O performance enhancement, which is handled by
      * underlying MappedByteBuffer, but for character decoding. Setting it too
-     * high will reduce performance, due to L2 caching and issues with
-     * the implementation of {@link #tell()}.</p>
+     * high will reduce performance, due to L2 caching and issues. The buffer 
+     * should be approximately as large as the longest lexeme in the input.
      */
     private static final int INITIAL_BUFFER_SIZE = 1 << 8;
 
@@ -163,44 +136,48 @@ public class Lexer implements RandomAccess {
      */
     public enum Type {
 
-        Delimiter, Whitespace, Value
+        Delimiter,
+        Whitespace,
+        Value
 
     }
 
-    // =====================================
-    // Configuration fields
-    // =====================================
     /**
-     * Set of all characters that will be interpreted as delimiters with the
-     * input.
+     * Function defining the set of all whitespace characters
      */
-//    private final CharSet delimiters;
     private CharMatcher whitespaceMatcher = CharMatcher.WHITESPACE;
 
+    /**
+     * Function defining the set of all delimiter characters
+     */
     private CharMatcher delimiterMatcher = CharMatcher.NONE;
 
+    /**
+     * Source of character data
+     */
     private final CharFileChannel channel;
 
-    private long previousChannelPosition;
-//
-//    /**
-//     * ByteBuffer containing or wrapping the raw input data. In the case of a
-//     * file it should probably be a MappedByteBuffer from a FileChannel.
-//     */
-//    private final ByteBuffer bbuf;
+    /**
+     * Store of position in the channel that should be seeked to, such that the
+     * currently advanced lexeme will be re-retrievable. This is generally the
+     * previous channel position, i.e the position in the channel before the 
+     * last call to read.
+     */
+    private long channelRestartOffset;
 
     /**
-     * Target charset used to decode bytes, given in the constructor.
+     * Store the position that the last read started at. This is subtracted from 
+     * the actual cbuf position() to give the position if a restart was 
+     * performed.
      */
-//    private final Charset charset;
-//
-//    /**
-//     * Decoder object created form the defined charset.
-//     */
-//    private final CharsetDecoder decoder;
-    // =====================================
-    // State fields
-    // =====================================
+    private int charBufferRestartOffset;
+
+    /**
+     * Record the offset that can be used for seeking back to the currently
+     * advanced position.
+     */
+    private Tell tell = new Tell(0, 0);
+
     /**
      * Store decoded characters
      */
@@ -214,18 +191,6 @@ public class Lexer implements RandomAccess {
      * depending on the character encoding.
      */
     private int cbufOffset = 0;
-//
-//    /**
-//     * The line number of next character to be read form cbuf.
-//     */
-//    private int line = 0;
-//
-//    /**
-//     * The column number of the next character to be return from cbuf. This
-//     * should not be relied upon since there are (rare) occasions when it can
-//     * be wrong.
-//     */
-//    private int column = 0;
 
     /**
      * The offset of the start of the current lexeme from the beginning of cbuf.
@@ -241,23 +206,6 @@ public class Lexer implements RandomAccess {
      * The type of the current lexeme
      */
     private Type type = null;
-//
-//    /**
-//     * The line number of the start of the current lexeme.
-//     */
-//    private int startLine = -1;
-//
-//    /**
-//     * The column number of the start of the current lexeme.
-//     */
-//    private int startColumn = -1;
-//
-//    /**
-//     * A counter of the number of lexemes found, and thus the unique number
-//     * for the current lexeme. (Unique but not identifying since the same lexeme
-//     * can have multiple numbers.)
-//     */
-//    private long number = -1L;
 
     /**
      * <p>Construct a new instance of {@link Lexer} that reads from the given
@@ -267,31 +215,21 @@ public class Lexer implements RandomAccess {
      * @throws NullPointerException if buffer or charset are null
      */
     public Lexer(CharFileChannel channel) throws NullPointerException {
-//        if (buffer == null)
-//            throw new NullPointerException("buffer is null");
-//        if (charset == null)
-//            throw new NullPointerException("charset is null");
         this.channel = channel;
 
-//        this.bbuf = buffer;
-//        this.charset = charset;
-//        decoder = charset.newDecoder();
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "Decoding bytes to charset {0}.", channel.
-                    getCharset());
-            LOG.log(Level.FINE, "Initializing buffer capacity to {0} chars.",
-                    INITIAL_BUFFER_SIZE);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Decoding bytes to charset " + channel.getCharset());
+            LOG.trace(
+                    "Initializing buffer capacity to " + INITIAL_BUFFER_SIZE + " chars.");
         }
         cbuf = CharBuffer.allocate(INITIAL_BUFFER_SIZE);
         cbuf.flip();
 
-        previousChannelPosition = 0;
-//        delimiters = new CharOpenHashSet();
+        channelRestartOffset = 0;
     }
 
     public Lexer(File file, Charset charset) throws FileNotFoundException, NullPointerException, IOException {
-        this(new CharFileChannel(
-                new FileInputStream(file).getChannel(),
+        this(new CharFileChannel( new FileInputStream(file).getChannel(),
                 IOUtil.DEFAULT_CHARSET));
     }
 
@@ -311,12 +249,6 @@ public class Lexer implements RandomAccess {
         return whitespaceMatcher;
     }
 
-//
-//    public Lexer1(File file, Charset charset)
-//            throws FileNotFoundException, IOException {
-//        this(new FileInputStream(file).getChannel().map(
-//                MapMode.READ_ONLY, 0, file.length()), charset);
-//    }
     public long bytesRead() {
         return channel.position();
     }
@@ -324,54 +256,14 @@ public class Lexer implements RandomAccess {
     public long bytesTotal() throws IOException {
         return channel.size();
     }
-//
-//    /**
-//     * Set the given character to be a lexical delimiter.
-//     *
-//     * @param ch the character to set as a delimiter
-//     * @throws IllegalArgumentException if the delimiter is already set
-//     */
-//    public void addDelimiter(final char ch) throws IllegalArgumentException {
-//        if (isDelimiter(ch))
-//            throw new IllegalArgumentException(
-//                    "delimiter '" + ch + "' already added.");
-//        if (LOG.isLoggable(Level.FINE)) {
-//            LOG.log(Level.FINE, "Adding delimiter character ''{0}''.", ch);
-//        }
-//        delimiters.add(ch);
-//    }
-//
-//    /**
-//     * Unset the given character as a lexical delimiter.
-//     *
-//     * @param ch the character to unset as a delimiter
-//     * @throws IllegalArgumentException if the delimiter has not yet been set
-//     */
-//    public void removeDelimiter(final char ch) {
-//        if (!isDelimiter(ch))
-//            throw new IllegalArgumentException(
-//                    "delimiter '" + ch + "' not found.");
-//        if (LOG.isLoggable(Level.FINE)) {
-//            LOG.log(Level.FINE, "Removing delimiter character ''{0}''.", ch);
-//        }
-//        delimiters.remove(ch);
-//    }
-//
-//    /**
-//     * Return whether or not the given character is a lexical delimiter.
-//     *
-//     * @param ch the character to check if it is a delimiter
-//     * @return true if c is set as a delimiter, false otherwise
-//     */
-//    public boolean isDelimiter(final char ch) {
-//        return delimiters.contains(ch);
-//    }
 
     /**
      * Return true if the RaspLexer can produce more elements of any kind.
      *
      * @return true if there are more elements, false otherwise.
      * @throws CharacterCodingException When byte to char decoding fails
+     * @throws ClosedChannelException
+     * @throws IOException  
      */
     public final boolean hasNext() throws CharacterCodingException,
             ClosedChannelException, IOException {
@@ -382,17 +274,18 @@ public class Lexer implements RandomAccess {
      * Move internal pointers to the next lexeme.
      *
      * @throws CharacterCodingException  When byte to char decoding fails
+     * @throws ClosedChannelException
+     * @throws IOException  
      */
     public final void advance() throws CharacterCodingException,
             ClosedChannelException, IOException {
         if (!hasNext())
             throw new NoSuchElementException("iteration has no more elements.");
 
-//        number++;
+        tell.channelOffset = channelRestartOffset;
+        tell.bufferOffset = cbuf.position() - charBufferRestartOffset;
+
         start = cbuf.position();
-//        end = start;
-//        startLine = line;
-//        startColumn = column;
         char c = read();
 
         if (delimiterMatcher.matches(c)) { // isDelimiter(c)
@@ -423,25 +316,13 @@ public class Lexer implements RandomAccess {
         } catch (BufferUnderflowException e) {
             // perfectly acceptable as far as the lexer is concerned -
             // usually denoting EOF during a lexeme sequence
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.log(Level.FINE, "Reached EOF.", e);
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Reached EOF.", e);
             }
         }
         end = cbuf.position();
     }
 
-//    /**
-//     * Return the number of the current lexeme. This is the absolute number of
-//     * lexemes iterated over, and will increment for every lexeme. If seek() is
-//     * called the number will continue to increase.
-//     *
-//     * @return unique number for the current lexeme
-//     * @throws IllegalStateException when any consistency check fails
-//     */
-//    public final long number() throws IllegalStateException {
-////        checkAccessorState();
-//        return number;
-//    }
     /**
      * Return the {@link Type} of the current lexeme.
      *
@@ -449,7 +330,6 @@ public class Lexer implements RandomAccess {
      * @throws IllegalStateException when any consistency check fails
      */
     public final Type type() throws IllegalStateException {
-//        checkAccessorState();
         return type;
     }
 
@@ -463,7 +343,6 @@ public class Lexer implements RandomAccess {
      * @throws IllegalStateException when any consistency check fails
      */
     public final int start() throws IllegalStateException {
-//        checkAccessorState();
         return cbufOffset + start;
     }
 
@@ -477,35 +356,9 @@ public class Lexer implements RandomAccess {
      * @throws IllegalStateException when any consistency check fails
      */
     public final int end() throws IllegalStateException {
-//        checkAccessorState();
         return cbufOffset + end;
     }
 
-//    /**
-//     * Return the line on which the current lexeme starts. This will be relative
-//     * to the last call to seek(), and so should not be relied upon for lexeme
-//     * identification.
-//     *
-//     * @return line on which the current lexeme starts
-//     * @throws IllegalStateException when any consistency check fails
-//     */
-//    public final int line() throws IllegalStateException {
-////        checkAccessorState();
-//        return startLine;
-//    }
-//    /**
-//     * Return the lexeme start offset from the beginning of current line.
-//     *
-//     * This can on occasions be incorrect (for e.g. after a call to seek()) and so
-//     * should not be relied upon for lexeme identification.
-//     *
-//     * @return lexeme start offset from the beginning of current line
-//     * @throws IllegalStateException when any consistency check fails
-//     */
-//    public final int column() throws IllegalStateException {
-////        checkAccessorState();
-//        return startColumn;
-//    }
     /**
      * Instantiate and populate a StringBuilder object with the characters that
      * constitute the current lexeme.
@@ -514,7 +367,6 @@ public class Lexer implements RandomAccess {
      * @throws IllegalStateException when any consistency check fails
      */
     public final StringBuilder value() throws IllegalStateException {
-//        checkAccessorState();
         final StringBuilder sb = new StringBuilder(end - start);
         value(sb);
         return sb;
@@ -531,7 +383,6 @@ public class Lexer implements RandomAccess {
      */
     public final char charAt(final int offset)
             throws IndexOutOfBoundsException, IllegalStateException {
-//        checkAccessorState();
         if (offset >= end - start)
             throw new IndexOutOfBoundsException("offset >= length");
         return cbuf.get(start + offset);
@@ -546,7 +397,6 @@ public class Lexer implements RandomAccess {
      * @throws IllegalStateException when any consistency check fails
      */
     public final void value(final StringBuilder builder) throws IllegalStateException {
-//        checkAccessorState();
         for (int i = start; i < end; i++) {
             builder.append(cbuf.get(i));
         }
@@ -564,7 +414,6 @@ public class Lexer implements RandomAccess {
      * @throws IllegalStateException when any consistency check fails
      */
     public final CharSequence debugContext() throws IllegalStateException {
-//        checkAccessorState();
         int linesBefore = 0;
         int linesAfter = 0;
         int count = 0;
@@ -594,28 +443,6 @@ public class Lexer implements RandomAccess {
     }
 
     /**
-     * Performs various consistency checks that should pass before any of the
-     * entry accessors are called.
-     *
-     * @throws IllegalStateException when any consistency check fails
-     */
-//    private void checkAccessorState() throws IllegalStateException {
-//        if (type == null)
-//            throw new IllegalStateException("type == null");
-//        if (start >= end)
-//            throw new IllegalStateException(
-//                    "start >= end (" + start + " >= " + end + ")");
-//        if (start < 0)
-//            throw new IllegalStateException("start < 0 (" + start + ")");
-//        if (startColumn < 0)
-//            throw new IllegalStateException(
-//                    "startColumn < 0 (" + startColumn + ")");
-//        if (startLine < 0)
-//            throw new IllegalStateException("startLine < 0 (" + startLine + ")");
-//        if (number < 0L)
-//            throw new IllegalStateException("number < 0 (" + number + ")");
-//    }
-    /**
      * Check that the CharBuffer has required characters to be read between
      * the current position and the limit. If it doesn't then more data is
      * decode from the input ByteBuffer.
@@ -640,12 +467,11 @@ public class Lexer implements RandomAccess {
             // the contents of the current buffer from the start of the current
             // lexeme to a new buffer.
             final int newCapacity = Math.max(cbuf.capacity() * 2 + 1,
-                    cbuf.capacity() + required - available);
+                                             cbuf.capacity() + required - available);
 
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.log(Level.FINE,
-                        "Growing character buffer from length {0} to {1}",
-                        new Object[]{cbuf.capacity(), newCapacity});
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Growing character buffer from length " + cbuf.
+                        capacity() + " to " + newCapacity);
             }
 
             final CharBuffer src = cbuf;
@@ -657,10 +483,9 @@ public class Lexer implements RandomAccess {
             cbuf.compact();
         }
 
-        previousChannelPosition = channel.position();
+        charBufferRestartOffset = off;
+        channelRestartOffset = channel.position();
         channel.read(cbuf);
-//
-//        final CoderResult decodeResult = decoder.decode(bbuf, cbuf, false);
 
         // Whatever the decode result, put the buffer in a defined state so
         // recovery can be attempted - then throw the exception if one occured
@@ -669,15 +494,7 @@ public class Lexer implements RandomAccess {
         cbufOffset += start;
         start = 0;
         cbuf.position(off);
-
-//        if (decodeResult.isError()) {
-//            decodeResult.throwException();
-//        }
     }
-//
-//    Charset cset = null;
-//
-//    CharsetEncoder cencoder = null;
 
     /**
      * <p>Calculate the position, in the underlying ByteBuffer, of the currently
@@ -691,23 +508,8 @@ public class Lexer implements RandomAccess {
      *
      * @return byte offset of the current lexeme.
      */
-    public Tell tell() //            throws CharacterCodingException
-    {
-
-        return new Tell(previousChannelPosition, start);
-
-//
-//        if (cset == null) {
-//            cset = channel.getCharset();
-//            cencoder = cset.newEncoder();
-//        }
-////        else {
-////            cencoder.reset();
-////        }
-//        cbuf.position(start);
-//        final int bufferedBytesRemaining = cencoder.encode(cbuf).remaining();
-//        cbuf.position(end);
-//        return channel.position() - bufferedBytesRemaining;
+    public Tell tell() {
+        return tell.clone();
     }
 
     public static final class Tell {
@@ -720,9 +522,47 @@ public class Lexer implements RandomAccess {
 
         private int bufferOffset;
 
-        public Tell(long channelOffset, int bufferOffset) {
+        private Tell(long channelOffset, int bufferOffset) {
             this.channelOffset = channelOffset;
             this.bufferOffset = bufferOffset;
+        }
+
+        private Tell() {
+            this(0, 0);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            final Tell other = (Tell) obj;
+            if (this.channelOffset != other.channelOffset)
+                return false;
+            if (this.bufferOffset != other.bufferOffset)
+                return false;
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 83 * hash + (int) (this.channelOffset ^ (this.channelOffset >>> 32));
+            hash = 83 * hash + this.bufferOffset;
+            return hash;
+        }
+
+        @Override
+        public String toString() {
+            return Objects.toStringHelper(this).add("channelOffset",
+                                                    channelOffset).add(
+                    "bufferOffset", bufferOffset).toString();
+        }
+
+        @Override
+        protected Tell clone() {
+            return new Tell(this.channelOffset, this.bufferOffset);
         }
     }
 
@@ -743,10 +583,13 @@ public class Lexer implements RandomAccess {
      * </dl>
      * @param offset position in the underlying byte buffer to jump to
      * @throws CharacterCodingException
+     * @throws IOException  
      */
     public void seek(final Tell offset) throws CharacterCodingException, IOException {
 
         channel.position(offset.channelOffset);
+        channelRestartOffset = channel.position();
+        charBufferRestartOffset = 0;
 
         cbuf.clear();
         channel.read(cbuf);
@@ -761,26 +604,6 @@ public class Lexer implements RandomAccess {
         if (hasNext())
             advance();
 
-
-//        channel.position(offset);
-//        start = 0;
-//
-//        cbuf.clear();
-//        channel.read(cbuf);
-//        cbuf.flip();
-//
-//        cbuf.position(0);
-//        end = start;
-////        line = 0;
-////        column = 0;
-////        startLine = 0;
-////        startColumn = 0;
-//
-//        if (hasNext())
-//            advance();
-//
-////        if (decodeResult.isError())
-////            decodeResult.throwException();
     }
 
     /**
@@ -792,15 +615,7 @@ public class Lexer implements RandomAccess {
     private char read()
             throws CharacterCodingException, IOException {
         insureRemaining(1);
-        return  cbuf.get();
-//        final char c = cbuf.get();
-//        if (c == '\n') {
-//            line++;
-//            column = 0;
-//        } else {
-//            column++;
-//        }
-//        return c;
+        return cbuf.get();
     }
 
     /**
@@ -812,99 +627,5 @@ public class Lexer implements RandomAccess {
      */
     private void unread(final int num) {
         cbuf.position(cbuf.position() - num);
-//        if (column == 0) {
-//            line--;
-//            column = startColumn + (cbuf.position() - start);
-//        } else {
-//            column--;
-//        }
     }
-////
-//    public static void main(String[] args) throws FileNotFoundException, IOException {
-//        final String root = "/research/nlp/data4/hiam20/coref/test09/data";
-//        final String inputFile = root + "/bnc.gramrels-lcase.00-maindb";
-//
-//        File file = new File(inputFile);
-//        FileInputStream fis = new FileInputStream(file);
-//        MappedByteBuffer mbb = fis.getChannel().map(
-//                MapMode.READ_ONLY, 0, file.length());
-//        Charset charset = IOUtil.DEFAULT_CHARSET;
-//
-//        Lexer lexer = new Lexer(mbb, charset);
-//        lexer.addDelimiter(':');
-//        lexer.addDelimiter('(');
-//        lexer.addDelimiter(')');
-//        lexer.addDelimiter('|');
-//        lexer.addDelimiter('_');
-//        lexer.addDelimiter('+');
-//        lexer.addDelimiter(';');
-//        lexer.addDelimiter('\n');
-//
-//        System.out.printf("%-6s %-12s %-6s %-6s %-15s (%s,%s)%n",
-//                "num", "type",
-//                "start", "end", "value", "line", "column");
-//        while (lexer.hasNext()) {
-//            final long x = lexer.tell();
-//            lexer.advance();
-//
-//            System.out.printf("        %-6d %-12s %-6d %-6d %-15s (%d,%d)%n",
-//                    lexer.number(),
-//                    lexer.type(),
-//                    lexer.start(),
-//                    lexer.end(),
-//                    lexer.value(),
-//                    lexer.line(),
-//                    lexer.column());
-//
-//            lexer.seek(x);
-//
-//
-//            System.out.printf("        %-6d %-12s %-6d %-6d %-15s (%d,%d)%n",
-//                    lexer.number(),
-//                    lexer.type(),
-//                    lexer.start(),
-//                    lexer.end(),
-//                    lexer.value(),
-//                    lexer.line(),
-//                    lexer.column());
-//        }
-//    }
-//
-//    public static void main(String[] args) throws FileNotFoundException, IOException {
-//        String str = "come friendly bombs and fall on slough.";
-//        Charset charset = IOUtil.DEFAULT_CHARSET;//forName("UTF-32");
-//
-//        ByteBuffer bb = ByteBuffer.wrap(str.getBytes());
-//
-//        Lexer lexer = new Lexer(bb, charset);
-//        lexer.addDelimiter(' ');
-//        lexer.addDelimiter('.');
-//
-//        System.out.printf("%-6s %-12s %-6s %-6s %-15s (%s,%s)%n",
-//                "num", "type",
-//                "start", "end", "value", "line", "column");
-//        while (lexer.hasNext()) {
-//            lexer.advance();
-//            final long x = lexer.tell();
-//
-//            System.out.printf("%-6d %-12s %-6d %-6d %-15s (%d,%d)%n",
-//                    lexer.number(),
-//                    lexer.type(),
-//                    lexer.start(),
-//                    lexer.end(),
-//                    lexer.value(),
-//                    lexer.line(),
-//                    lexer.column());
-//
-//            lexer.seek(x);
-//            System.out.printf("%-6d %-12s %-6d %-6d %-15s (%d,%d)%n",
-//                    lexer.number(),
-//                    lexer.type(),
-//                    lexer.start(),
-//                    lexer.end(),
-//                    lexer.value(),
-//                    lexer.line(),
-//                    lexer.column());
-//        }
-//    }
 }

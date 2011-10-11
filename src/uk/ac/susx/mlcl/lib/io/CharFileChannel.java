@@ -75,24 +75,41 @@ import java.util.logging.Logger;
  * that also implements java.nio.channels.SeekableByteChannel, not just
  * {@link java.nio.channels.FileChannel}.</p>
  *
- * @author Hamish I A Morgan (hamish.morgan@sussex.ac.uk)
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public class CharFileChannel
         implements ReadableCharChannel, WritableCharChannel, Seekable<Long> {
 
-    private static final Logger LOG = Logger.getLogger(CharFileChannel.class.
-            getName());
+    private static final Logger LOG =
+            Logger.getLogger(CharFileChannel.class.getName());
 
     private static final long DEFAULT_MAX_MAPPED_BYTES = Integer.MAX_VALUE;
 
+    /**
+     * Size in bytes of the mapped region of the file. Should between 1 and 
+     * Integer.MAX_VALUE.
+     */
     private long maxMappedBytes = DEFAULT_MAX_MAPPED_BYTES;
 
+    /**
+     * The inner file change from which bytes will be read and decoded into
+     * characters.
+     */
     private final FileChannel fileChannel;
 
+    /**
+     * Character set decoding.
+     */
     private final CharsetDecoder decoder;
 
+    /**
+     * ByteBuffer over the currently mapped region of the file.
+     */
     private ByteBuffer buffer;
 
+    /**
+     * Offset of the mapped region from the start of the file.
+     */
     private long bufferOffset = 0;
 
     /**
@@ -108,7 +125,7 @@ public class CharFileChannel
      * @throws NullPointerException if either fileChannel or decoder are null
      */
     public CharFileChannel(FileChannel fileChannel, CharsetDecoder decoder)
-            throws NullPointerException, IOException {
+            throws NullPointerException {
         if (!fileChannel.isOpen())
             throw new IllegalArgumentException("fileChannel is already closed");
         if (fileChannel == null)
@@ -116,19 +133,18 @@ public class CharFileChannel
         if (decoder == null)
             throw new NullPointerException("decoder is null");
 
-        LOG.log(Level.FINE, "Instantiating new CharFileChannel on FileChannel "
-                + "{0}, decoding into charset {1}.",
-                new Object[]{fileChannel, decoder.charset()});
+        if (LOG.isLoggable(Level.FINER))
+            LOG.log(Level.FINER,
+                    "Instantiating new CharFileChannel on FileChannel "
+                    + "{0}, decoding into charset {1}.",
+                    new Object[]{fileChannel, decoder.charset()});
 
 
         this.fileChannel = fileChannel;
         this.decoder = decoder;
         this.buffer = null;
         this.bufferOffset = 0;
-        size = fileChannel.size();
     }
-
-    final long size;
 
     /**
      * Construct a new {@link CharFileChannel} object from the given 
@@ -139,7 +155,7 @@ public class CharFileChannel
      * @throws NullPointerException if either fileChannel or charset are null
      */
     public CharFileChannel(FileChannel fileChannel, Charset charset)
-            throws NullPointerException, IOException {
+            throws NullPointerException {
         this(fileChannel, IOUtil.decoderFor(charset));
     }
 
@@ -152,7 +168,7 @@ public class CharFileChannel
      * @throws NullPointerException if fileChannel is null
      */
     public CharFileChannel(FileChannel fileChannel)
-            throws NullPointerException, IOException {
+            throws NullPointerException {
         this(fileChannel, IOUtil.DEFAULT_CHARSET);
     }
 
@@ -165,13 +181,30 @@ public class CharFileChannel
         return decoder.charset();
     }
 
+    /**
+     * Return the size in bytes of the mapped region of the file. Should 
+     * between 1 and Integer.MAX_VALUE.
+     * 
+     * @return size in bytes of the mapped region of the file
+     */
     public long getMaxMappedBytes() {
         return maxMappedBytes;
     }
 
+    /**
+     * Set the size in bytes of the mapped region of the file Should 
+     * between 1 and Integer.MAX_VALUE.
+     * 
+     * @param maxMappedBytes  new mapped region size
+     * @throws IllegalArgumentException if maxMappedBytes &lt; 1 or 
+     *                  maxMappedBytes &gt; Integer.MAX_VALUE
+     */
     public void setMaxMappedBytes(long maxMappedBytes) {
         if (maxMappedBytes < 1)
             throw new IllegalArgumentException("maxMappedBytes < 1");
+        if (maxMappedBytes > Integer.MAX_VALUE)
+            throw new IllegalArgumentException(
+                    "maxMappedBytes > Integer.MAX_VALUE");
         this.maxMappedBytes = maxMappedBytes;
     }
 
@@ -184,7 +217,7 @@ public class CharFileChannel
      * @throws IOException If some other I/O error occurs
      */
     public long size() throws ClosedChannelException, IOException {
-        return size;
+        return fileChannel.size();
     }
 
     /**
@@ -264,9 +297,9 @@ public class CharFileChannel
     public final int read(final CharBuffer dst) throws MalformedInputException,
             UnmappableCharacterException, ClosedChannelException,
             CharacterCodingException, NonReadableChannelException,
-            NonWritableChannelException, IOException {
+            IOException {
 
-        // sanity check the channel state
+        // sanity check the state
         if (!isOpen())
             throw new ClosedChannelException();
         if (dst == null)
@@ -274,7 +307,7 @@ public class CharFileChannel
         if (!dst.hasRemaining())
             throw new IllegalArgumentException("dst remaining is 0");
 
-        // record the start offset so we can return how much has been read
+        // record the start offset so we can calculate how much has been read
         final int startChar = dst.position();
 
         // reference the results of each decode here
@@ -283,12 +316,10 @@ public class CharFileChannel
         // Repeat reading until the destination buffer is full, or the source
         // buffer is empty
         do {
-            // it would be nice if java had the method decoder.maxPerByteChars()
-            // but since it doesn't - guess we will need up to 4 byes per char.
-//            final int requiredBytes = (int) Math.ceil(dst.remaining() * 4);
-
             // Attempt to insure sufficient are available for reading in the
             // mapped portion of the source channel (Not guaranteed to succeed)
+            // (It would be nice if java had the method decoder.maxPerByteChars()
+            // but since it doesn't - guess we will need up to 4 byes per char.)
             insureMapped((int) Math.ceil(dst.remaining() * 4));
 
             coderResult = decoder.decode(buffer, dst, false);
@@ -304,25 +335,22 @@ public class CharFileChannel
 
 
         } while (hasBytesRemaining()
-//                bytesRemaining() > 0
                 && coderResult.isUnderflow());
 
         return dst.position() - startChar;
     }
 
     /**
-     *
+     * Return the number of bytes available for reading. Calculated as the file 
+     * size, minus the offset of the mapped region, minus the read position 
+     * within the mapped region.
+     * 
      * @return number of bytes remaining
      * @throws ClosedChannelException If this channel is closed
      * @throws IOException If some other I/O error occurs
      */
     public long bytesRemaining() throws IOException, ClosedChannelException {
-        // total file size, minus the offset of the mapped region, minus the
-        // read position within the mapped region, minus 1
-        return size
-                - bufferOffset
-                - (buffer == null ? 0 : buffer.position())
-                ;//- 1;
+        return size() - bufferOffset - (buffer == null ? 0 : buffer.position());
     }
 
     /**
@@ -354,32 +382,34 @@ public class CharFileChannel
      * @throws IOException If some other I/O error occurs
      */
     void insureMapped(int requiredBytes)
-            throws ClosedChannelException, NonReadableChannelException,
-            NonWritableChannelException, IOException {
+            throws ClosedChannelException, IOException {
 
-        final boolean readRequired;
+        final boolean mappingRequired;
 
         if (buffer == null) {
-            readRequired = true;
+            mappingRequired = true;
         } else if (hasBytesRemaining() && buffer.remaining() < requiredBytes) {
             bufferOffset += buffer.position();
-            readRequired = true;
+            mappingRequired = true;
         } else {
-            readRequired = false;
+            mappingRequired = false;
         }
-        if (readRequired) {
+
+        if (mappingRequired) {
             // Ignore the buffer ammount since we will map as much as possible
             // and let the operating system sort out the efficiency
             long length = Math.max(Math.min(
-                    size - bufferOffset,
+                    size() - bufferOffset,
                     maxMappedBytes), 0);
             if (length == 0) {
                 buffer = ByteBuffer.allocateDirect(0);
                 return;
             }
 
-            LOG.log(Level.FINE, "Mapping file region ({0} - {1}) to buffer.",
-                    new Object[]{bufferOffset, bufferOffset + length});
+            if (LOG.isLoggable(Level.FINER))
+                LOG.log(Level.FINER,
+                        "Mapping file region ({0} - {1}) to buffer.",
+                        new Object[]{bufferOffset, bufferOffset + length});
             buffer = fileChannel.map(
                     FileChannel.MapMode.READ_ONLY, bufferOffset, length);
         }

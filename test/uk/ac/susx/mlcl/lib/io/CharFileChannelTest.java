@@ -44,9 +44,6 @@ import java.io.File;
 import java.nio.CharBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.util.HashMap;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -60,29 +57,14 @@ import static uk.ac.susx.mlcl.TestConstants.*;
  */
 public class CharFileChannelTest {
 
-    static int SMALL_SAMPLE_SIZE = 1024 * 1024;
+    private static int SMALL_SAMPLE_SIZE = 1024 * 1024;
 
-    static File SMALL_SAMPLE_FILE;
-
-    public CharFileChannelTest() {
-    }
+    private static File SMALL_SAMPLE_FILE;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
         SMALL_SAMPLE_FILE = makeTempFile(SMALL_SAMPLE_SIZE);
         SMALL_SAMPLE_FILE.deleteOnExit();
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
     }
 
     @Test(timeout = 10000)
@@ -200,7 +182,7 @@ public class CharFileChannelTest {
         }
     }
 
-    @Test
+    @Test(timeout = 100000)
     @Ignore(value = "Test creates a massive (over 2 GB) file to test address "
     + "outside of 32bits. Hense it is not suitable for all users to "
     + "run.")
