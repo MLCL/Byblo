@@ -43,7 +43,7 @@ public class ExternalKnnTaskTest {
 
     private static final String subject = ExternalCountTask.class.getName();
 
-    @Test(timeout=1000)
+    @Test(timeout=2000)
     public void testRunOnFruit() throws Exception {
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
 

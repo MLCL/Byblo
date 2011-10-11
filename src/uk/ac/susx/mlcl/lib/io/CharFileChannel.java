@@ -113,6 +113,12 @@ public class CharFileChannel
     private long bufferOffset = 0;
 
     /**
+     * Cache the file size because calls to FileChannel.size() take an 
+     * excessively long time.
+     */
+    private long fileSize = -1;
+
+    /**
      * Construct a new {@link CharFileChannel} object from the given 
      * {@link java.nio.channels.FileChannel} and 
      * {@link java.nio.charset.CharsetDecoder}
@@ -217,7 +223,7 @@ public class CharFileChannel
      * @throws IOException If some other I/O error occurs
      */
     public long size() throws ClosedChannelException, IOException {
-        return fileChannel.size();
+        return (fileSize == -1) ? (fileSize = fileChannel.size()) : fileSize;
     }
 
     /**
