@@ -93,7 +93,7 @@ echo "[${jc}] Done"
 #
 
 fu=fastutil
-fu_version=fastutil-6.4
+fu_version=fastutil-6.4.1
 
 echo "[${fu}] Starting"
 which -s tar || die "Can't find tar"
@@ -157,28 +157,16 @@ echo "[${cl}] Done"
 #
 
 gg=google-guava
-gg_version=guava-r09
+gg_version=guava-10.0.1
 
 echo "[${gg}] Starting"
 which -s unzip || die "Can't find unzip"
 which -s curl || die "Can't find curl"
 
-
-gg_url=http://guava-libraries.googlecode.com/files/${gg_version}.zip
-gg_dl_file=`mktemp -t ${gg_version}-download`
-gg_ext_dir=`mktemp -dt ${gg_version}-extracted`
+gg_url=http://search.maven.org/remotecontent?filepath=com/google/guava/guava/10.0.1/${gg_version}.jar
+gg_dl_file=${gg_version}.jar
 echo "[${gg}] Downloading from ${gg_url} to $gg_dl_file"
 curl -L "${gg_url}" > "${gg_dl_file}" || die
-echo "[${gg}] Extracting to ${gg_ext_dir}"
-unzip -q "${gg_dl_file}" -d "${gg_ext_dir}"  || die
-cp "${gg_ext_dir}/${gg_version}/${gg_version}.jar" "$libs_dir" || die
-
-echo "[${gg}] Cleaning temporary files"
-rm -rf "$gg_ext_dir"
-rm -f "$gg_dl_file"
-
-cd "$libs_dir"
-
 echo "[${gg}] Done"
 
 
