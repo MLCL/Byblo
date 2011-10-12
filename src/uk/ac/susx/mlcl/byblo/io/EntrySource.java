@@ -39,8 +39,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
 
 /**
@@ -52,8 +52,7 @@ import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
  */
 public class EntrySource extends AbstractTSVSource<EntryRecord> {
 
-    private static final Logger LOG = Logger.getLogger(
-            EntrySource.class.getName());
+    private static final Log LOG = LogFactory.getLog(EntrySource.class);
 
     private final ObjectIndex<String> stringIndex;
 
@@ -176,11 +175,11 @@ public class EntrySource extends AbstractTSVSource<EntryRecord> {
                 final double oldFreq = entityFrequenciesMap.get(id);
                 final double newFreq = oldFreq + entry.getWeight();
 
-                LOG.log(Level.WARNING,
-                        "Found duplicate Entry \"{0}\" (id={1}) in entries "
-                        + "file. Merging records. Old frequency = {2}, new "
-                        + "frequency = {3}.",
-                        new Object[]{stringIndex.get(entry.getEntryId()), id, oldFreq, newFreq});
+                if (LOG.isWarnEnabled())
+                    LOG.warn("Found duplicate Entry \"" + stringIndex.get(entry.
+                            getEntryId()) + "\" (id=" + id
+                            + ") in entries file. Merging records. Old frequency = "
+                            + oldFreq + ", new frequency = " + newFreq + ".");
 
                 entityFrequenciesMap.put(id, newFreq);
             }

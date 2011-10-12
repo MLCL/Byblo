@@ -46,17 +46,18 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(commandDescription = "Split a large file into a number of smaller files.")
+@Parameters(
+commandDescription = "Split a large file into a number of smaller files.")
 public class ChunkTask extends AbstractTask {
 
-    private static final Logger LOG = Logger.getLogger(ChunkTask.class.getName());
+    private static final Log LOG = LogFactory.getLog(ChunkTask.class);
 
     public static final int DEFAULT_MAX_CHUNK_SIZE = 5000000;
 
@@ -120,12 +121,11 @@ public class ChunkTask extends AbstractTask {
         this.dstFileQueue = dstFileQueue;
     }
 
+    @Override
     protected void runTask() throws Exception {
-        LOG.log(Level.INFO,
-                "Chunking from file \"{0}\"; max-chunk-size={1}. (Thread:{2})",
-                new Object[]{sourceFile,
-                    MiscUtil.humanReadableBytes(getMaxChunkSize()),
-                    Thread.currentThread().getName()});
+        if (LOG.isInfoEnabled())
+            LOG.info("Chunking from file \"" + sourceFile + "\"; max-chunk-size=" + MiscUtil.
+                    humanReadableBytes(getMaxChunkSize()) + ".");
 
         BufferedReader reader = null;
         BufferedWriter writer = null;
@@ -145,10 +145,9 @@ public class ChunkTask extends AbstractTask {
 
                 try {
                     tmp = chunkFileFactory.createFile();
-                    LOG.log(Level.INFO,
-                            "Producing chunk {0} to file \"{1}\". (Thread:{2})",
-                            new Object[]{chunk, tmp, Thread.currentThread().
-                                getName()});
+                    if (LOG.isDebugEnabled())
+                        LOG.debug("Producing chunk " + chunk + " to file \"" + tmp
+                                + "\".");
                     writer = IOUtil.openWriter(tmp, charset);
 
                     do {

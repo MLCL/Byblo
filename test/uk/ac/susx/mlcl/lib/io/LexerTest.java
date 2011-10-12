@@ -36,9 +36,6 @@ import com.google.common.base.CharMatcher;
 import uk.ac.susx.mlcl.lib.io.Lexer.Type;
 import java.io.OutputStream;
 import java.io.File;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -92,11 +89,6 @@ public class LexerTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        Level lvl = Level.FINE;
-        Logger.getLogger("").setLevel(lvl);
-        for (Handler h : Logger.getLogger("").getHandlers()) {
-            h.setLevel(lvl);
-        }
     }
 
     @AfterClass
@@ -257,7 +249,7 @@ public class LexerTest {
         }
 
         // Check the edge cases
-        for (int i : new int[]{tells.size()-1, 0,tells.size()-2, 1}) {
+        for (int i : new int[]{tells.size() - 1, 0, tells.size() - 2, 1}) {
             lexer.seek(tells.get(i));
             assertEquals(values.get(i), lexer.value().toString());
             assertEquals(tells.get(i), lexer.tell());

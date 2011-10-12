@@ -40,8 +40,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Task that takes a single input file and sorts it according to some comparator,
@@ -52,8 +52,7 @@ import java.util.logging.Logger;
 @Parameters(commandDescription = "Sort a file.")
 public class SortTask extends CopyTask {
 
-    private static final Logger LOG = Logger.getLogger(
-            SortTask.class.getName());
+    private static final Log LOG = LogFactory.getLog(SortTask.class);
 
     private Comparator<String> comparator;
 
@@ -89,10 +88,9 @@ public class SortTask extends CopyTask {
 
     @Override
     protected void runTask() throws Exception {
-        LOG.log(Level.INFO,
-                "Sorting file in memory, from \"{0}\" to \"{1}\". ({2})",
-                new Object[]{getSrcFile(), getDstFile(), Thread.currentThread().
-                    getName()});
+        if (LOG.isInfoEnabled())
+            LOG.info("Sorting file in memory, from \"" + getSrcFile()
+                    + "\" to \"" + getDstFile() + "\".");
         final List<String> lines = new ArrayList<String>();
         IOUtil.readAllLines(getSrcFile(), getCharset(), lines);
         Collections.sort(lines, getComparator());

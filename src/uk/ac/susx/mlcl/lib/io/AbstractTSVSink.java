@@ -41,8 +41,8 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Abstract class that holds functionality to read a Tab Separated Values file.
@@ -53,8 +53,7 @@ import java.util.logging.Logger;
 public abstract class AbstractTSVSink<T>
         implements Sink<T>, Closeable, Flushable {
 
-    private static final Logger log = Logger.getLogger(
-            AbstractTSVSink.class.getName());
+    private static final Log LOG = LogFactory.getLog(AbstractTSVSink.class);
 
     private static final char RECORD_DELIM = '\n';
 
@@ -65,7 +64,8 @@ public abstract class AbstractTSVSink<T>
     public AbstractTSVSink(File file, Charset charset) throws FileNotFoundException, IOException {
         if (file == null)
             throw new NullPointerException("file == null");
-        log.log(Level.INFO, "Opening file \"{0}\" for writing.", file);
+        if (LOG.isDebugEnabled())
+            LOG.debug("Opening file \"" + file + "\" for writing.");
         out = new BufferedWriter(
                 new OutputStreamWriter(
                 new FileOutputStream(file), charset));
@@ -99,14 +99,17 @@ public abstract class AbstractTSVSink<T>
         writeString(Double.toString(val));
     }
 
+    @Override
     public void close() throws IOException {
         out.close();
     }
 
+    @Override
     public void flush() throws IOException {
         out.flush();
     }
 
+    // XXX Check if this is strictly necessary
     @Override
     protected void finalize() throws Throwable {
         flush();

@@ -47,8 +47,8 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * An all pairs similarity search implementation that parallelises another
@@ -59,10 +59,9 @@ import java.util.logging.Logger;
  */
 public class ThreadedApssTask<S> extends NaiveApssTask<S> {
 
-    private Class<? extends NaiveApssTask> innerAlgorithm = InvertedApssTask.class;
+    private static final Log LOG = LogFactory.getLog(ThreadedApssTask.class);
 
-    private static final Logger LOG = Logger.getLogger(
-            ThreadedApssTask.class.getName());
+    private Class<? extends NaiveApssTask> innerAlgorithm = InvertedApssTask.class;
 
     private static final int DEFAULT_NUM_THREADS =
             Runtime.getRuntime().availableProcessors() + 1;
@@ -120,10 +119,10 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
 
     @Override
     protected void runTask() throws Exception {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "Running all-pairs similarity search: {0} ({1})",
-                    new Object[]{this.toString(), Thread.currentThread().getName()});
-            LOG.log(Level.INFO, MiscUtil.memoryInfoString());
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Running all-pairs similarity search: " + this.toString());
+            if (LOG.isDebugEnabled())
+                LOG.debug(MiscUtil.memoryInfoString());
         }
 
         Chunker<Entry<SparseDoubleVector>, S> chunkerA =
@@ -148,10 +147,9 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
 
                 double complete = nChunks == 0 ? 0
                         : (double) (i * nChunks + j) / (double) (nChunks * nChunks);
-                LOG.log(Level.INFO,
-                        "Creating APSS task on chunk {0}:{1} ({2}% complete)",
-                        new Object[]{i, j,
-                            complete == 0 ? "estimating " : complete * 100});
+                if (LOG.isDebugEnabled())
+                    LOG.debug(
+                            "Creating APSS task on chunk " + i + ":" + j + " (" + (complete == 0 ? "estimating " : complete * 100) + "% complete)");
 
                 @SuppressWarnings("unchecked")
                 NaiveApssTask<Integer> task = innerAlgorithm.newInstance();
@@ -180,11 +178,10 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
         getExecutor().shutdown();
         getExecutor().awaitTermination(1, TimeUnit.DAYS);
 
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO,
-                    "Completed all-pairs similarity search: {0} ({1})",
-                    new Object[]{this, Thread.currentThread().getName()});
-            LOG.log(Level.INFO, MiscUtil.memoryInfoString());
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Completed all-pairs similarity search: " + this);
+            if (LOG.isDebugEnabled())
+                LOG.debug(MiscUtil.memoryInfoString());
         }
     }
 

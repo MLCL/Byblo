@@ -51,7 +51,6 @@ import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
-import java.util.logging.Logger;
 
 /**
  *
@@ -59,9 +58,6 @@ import java.util.logging.Logger;
  */
 @Parameters(commandDescription = "Freqency count a structured input instance file.")
 public class ExternalCountTask extends AbstractParallelTask {
-
-    private static final Logger LOG = Logger.getLogger(
-            ExternalCountTask.class.getName());
 
     private static final int DEFAULT_MAX_CHUNK_SIZE = ChunkTask.DEFAULT_MAX_CHUNK_SIZE;
 

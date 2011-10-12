@@ -34,8 +34,8 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import java.util.ArrayDeque;
 import java.util.Queue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  *
@@ -44,8 +44,7 @@ import java.util.logging.Logger;
 @Parameters()
 public abstract class AbstractTask implements Task {
 
-    private static final Logger LOG =
-            Logger.getLogger(AbstractTask.class.getName());
+    private static final Log LOG = LogFactory.getLog(AbstractTask.class);
 
     @Parameter(names = {"-h", "--help"},
                description = "Display this help message.")
@@ -64,8 +63,8 @@ public abstract class AbstractTask implements Task {
 
     @Override
     public void run() {
-        LOG.log(Level.FINE, "Running task {0}. ({1})",
-                new Object[]{this, Thread.currentThread().getName()});
+        if (LOG.isDebugEnabled())
+            LOG.debug("Running task " + this + ".");
         try {
             initialiseTask();
             runTask();
@@ -75,8 +74,8 @@ public abstract class AbstractTask implements Task {
         } catch (Error t) {
             catchException(new RuntimeException(t));
         }
-        LOG.log(Level.FINE, "Completed task {0}. ({1})",
-                new Object[]{this, Thread.currentThread().getName()});
+        if (LOG.isDebugEnabled())
+            LOG.debug("Completed task " + this + ".");
     }
 
     public final boolean isUsageRequested() {
@@ -84,16 +83,19 @@ public abstract class AbstractTask implements Task {
     }
 
     protected final void catchException(Exception throwable) {
-        LOG.log(Level.SEVERE, "Exception caught and queued.", throwable);
+        if (LOG.isDebugEnabled())
+            LOG.debug("Exception caught and queued.", throwable);
         if (exceptions == null)
             exceptions = new ArrayDeque<Exception>();
         exceptions.offer(throwable);
     }
 
+    @Override
     public final Throwable getException() {
         return exceptions == null ? null : exceptions.poll();
     }
 
+    @Override
     public final boolean isExceptionThrown() {
         return exceptions != null && !exceptions.isEmpty();
     }
@@ -105,6 +107,7 @@ public abstract class AbstractTask implements Task {
      *
      * @throws Exception
      */
+    @Override
     public final void throwException() throws Exception {
         if (isExceptionThrown())
             throw exceptions.poll();
@@ -116,6 +119,4 @@ public abstract class AbstractTask implements Task {
                 + "usageRequested=" + usageRequested
                 + ", exceptions=" + exceptions + '}';
     }
-
-
 }

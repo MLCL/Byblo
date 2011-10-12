@@ -36,8 +36,8 @@ import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  *
@@ -46,7 +46,7 @@ import java.util.logging.Logger;
 @Parameters(commandDescription = "Delete a file.")
 public class DeleteTask extends AbstractTask {
 
-    private static final Logger LOG = Logger.getLogger(CopyTask.class.getName());
+    private static final Log LOG = LogFactory.getLog(DeleteTask.class);
 
     @Parameter(names = {"-f", "--file"},
                description = "File to deleted")
@@ -70,10 +70,8 @@ public class DeleteTask extends AbstractTask {
 
     @Override
     protected void runTask() throws Exception {
-        LOG.log(Level.INFO,
-                "Deleting file \"{0}\". (Thread:{1})",
-                new Object[]{getFile(),
-                    Thread.currentThread().getName()});
+        if (LOG.isInfoEnabled())
+            LOG.info("Deleting file \"" + getFile() + "\".");
         if (file == null)
             throw new NullPointerException("file is null");
         if (!file.exists())

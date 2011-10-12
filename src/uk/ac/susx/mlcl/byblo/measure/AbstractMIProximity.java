@@ -31,8 +31,8 @@
 package uk.ac.susx.mlcl.byblo.measure;
 
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * AbstractMIProximity is a class that mutual information (MI) based proximity
@@ -44,8 +44,7 @@ import java.util.logging.Logger;
  */
 public abstract class AbstractMIProximity implements Proximity {
 
-    private static final Logger LOG = Logger.getLogger(AbstractMIProximity.class.
-            getName());
+    private static final Log LOG = LogFactory.getLog(AbstractMIProximity.class);
 
     /**
      * A mapping from feature id to frequency, stored as a double because it
@@ -126,8 +125,8 @@ public abstract class AbstractMIProximity implements Proximity {
         // XXX Nasty work arround for strange bug where features in the entry-features
         // file don't exist in the features file.
         if (k >= featureFrequencies.length) {
-            LOG.log(Level.WARNING, "Unable to find feature freqency for key {0}",
-                    k);
+            if (LOG.isWarnEnabled())
+                LOG.warn("Unable to find feature freqency for key " + k);
             return 1; // must return 1 or we can get divide by zeros
         }
         return featureFrequencies[k];

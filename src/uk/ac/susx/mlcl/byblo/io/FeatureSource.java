@@ -39,8 +39,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A <tt>FeatureSource</tt> object is used to retrieve {@link FeatureRecord} 
@@ -51,8 +51,7 @@ import java.util.logging.Logger;
  */
 public class FeatureSource extends AbstractTSVSource<FeatureRecord> {
 
-    private static final Logger LOG =
-            Logger.getLogger(FeatureSource.class.getName());
+    private static final Log LOG = LogFactory.getLog(FeatureSource.class);
 
     private final ObjectIndex<String> stringIndex;
 
@@ -91,7 +90,7 @@ public class FeatureSource extends AbstractTSVSource<FeatureRecord> {
         } else {
             featureId = previousRecord.getFeatureId();
         }
-        
+
         if (!hasNext() || isDelimiterNext()) {
             parseRecordDelimiter();
             throw new SingletonRecordException(this,
@@ -146,12 +145,10 @@ public class FeatureSource extends AbstractTSVSource<FeatureRecord> {
                 final double oldFreq = featureFrequenciesMap.get(id);
                 final double newFreq = oldFreq + entry.getWeight();
 
-                LOG.log(Level.WARNING,
-                        "Found duplicate record \"{0}\" (id={1}) in features "
-                        + "file. Merging records. Old frequency = {2}, new "
-                        + "frequency = {3}.",
-                        new Object[]{stringIndex.get(id),
-                            id, oldFreq, newFreq});
+                if (LOG.isWarnEnabled())
+                    LOG.warn("Found duplicate record \"" + stringIndex.get(id) + "\" (id=" + id + ") in features "
+                            + "file. Merging records. Old frequency = " + oldFreq + ", new "
+                            + "frequency = " + newFreq + ".");
 
                 featureFrequenciesMap.put(id, newFreq);
             }

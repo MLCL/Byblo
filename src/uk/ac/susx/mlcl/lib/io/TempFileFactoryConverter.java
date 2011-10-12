@@ -34,8 +34,8 @@ import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.converters.FileConverter;
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * An IStringConverter implementation for extending JCommander. Take a string 
@@ -46,8 +46,8 @@ import java.util.logging.Logger;
  */
 public class TempFileFactoryConverter implements IStringConverter<TempFileFactory> {
 
-    private static final Logger LOG = Logger.getLogger(
-            TempFileFactoryConverter.class.getName());
+    private static final Log LOG = LogFactory.getLog(
+            TempFileFactoryConverter.class);
 
     private final FileConverter inner = new FileConverter();
 
@@ -55,9 +55,9 @@ public class TempFileFactoryConverter implements IStringConverter<TempFileFactor
     public TempFileFactory convert(String value) {
         File tmpDir = inner.convert(value);
         if (!tmpDir.exists()) {
-            if (LOG.isLoggable(Level.FINE))
-                LOG.log(Level.FINE, "Attempting to create "
-                        + "temporary directory: \"{0}\"", tmpDir);
+            if (LOG.isDebugEnabled())
+                LOG.debug(
+                        "Attempting to create temporary directory: \"" + tmpDir + "\"");
             if (!tmpDir.mkdirs()) {
                 throw new ParameterException(
                         "Unable create temporary directory \"" + tmpDir + "\"");

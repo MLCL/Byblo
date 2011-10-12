@@ -31,15 +31,12 @@
 package uk.ac.susx.mlcl.byblo.measure;
 
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public class Lp implements Proximity {
-
-    private static final Logger log = Logger.getLogger(Lp.class.getName());
 
     public static final double DEFAULT_P = 1;
 

@@ -34,7 +34,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
-import java.util.logging.Logger;
 
 /**
  * This class is not currently used! The idea is that APSS should inherit from
@@ -47,9 +46,6 @@ import java.util.logging.Logger;
  */
 @Deprecated
 public abstract class AbstractParallelTask_APSS extends AbstractParallelTask {
-
-    private static final Logger LOG = Logger.getLogger(
-            AbstractParallelTask_APSS.class.getName());
 
     private int taskQueueSize = DEFAULT_NUM_THREADS;
 
@@ -83,6 +79,7 @@ public abstract class AbstractParallelTask_APSS extends AbstractParallelTask {
         throttle.acquire();
         final Callable<T> wrapper = new Callable<T>() {
 
+            @Override
             public T call() throws Exception {
                 try {
                     return task.call();

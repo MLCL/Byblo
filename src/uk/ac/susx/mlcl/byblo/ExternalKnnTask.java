@@ -36,34 +36,38 @@ import uk.ac.susx.mlcl.lib.tasks.Task;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.Comparator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(commandDescription = "Perform k-nearest-neighbours on a similarity file.")
+@Parameters(
+commandDescription = "Perform k-nearest-neighbours on a similarity file.")
 public class ExternalKnnTask extends ExternalSortTask {
 
-    private static final Logger LOG =
-            Logger.getLogger(ExternalKnnTask.class.getName());
+    private static final Log LOG = LogFactory.getLog(ExternalKnnTask.class);
 
     public static final int DEFAULT_K = 100;
 
-    @Parameter(names = {"-k"}, description = "The number of neighbours to produce for each base entry.")
+    @Parameter(names = {"-k"},
+               description = "The number of neighbours to produce for each base entry.")
     private int k = DEFAULT_K;
 
-    public ExternalKnnTask(File sourceFile, File destinationFile, Charset charset,
-                      Comparator<String> comparator, int maxChunkSize, int k) {
+    public ExternalKnnTask(File sourceFile, File destinationFile,
+            Charset charset,
+            Comparator<String> comparator, int maxChunkSize, int k) {
         super(sourceFile, destinationFile, charset, comparator, maxChunkSize);
         setK(k);
     }
 
-    public ExternalKnnTask(File sourceFile, File destinationFile, Charset charset, int k) {
+    public ExternalKnnTask(File sourceFile, File destinationFile,
+            Charset charset, int k) {
         super(sourceFile, destinationFile, charset);
         setK(k);
     }
+
     public ExternalKnnTask() {
         super();
     }
@@ -94,10 +98,9 @@ public class ExternalKnnTask extends ExternalSortTask {
     @Override
     protected void runTask() throws Exception {
 
-        LOG.log(Level.INFO,
-                "Running KNN externally: from \"{0}\" to \"{1}\". ({2})",
-                new Object[]{getSrcFile(), getDestFile(),
-                    Thread.currentThread().getName()});
+        if (LOG.isInfoEnabled())
+            LOG.info("Running KNN externally: from \"" + getSrcFile()
+                    + "\" to \"" + getDestFile() + "\".");
 
         map();
         reduce();
@@ -113,17 +116,17 @@ public class ExternalKnnTask extends ExternalSortTask {
             submitTask(new DeleteTask(mergeTask.getSourceFileA()));
             submitTask(new DeleteTask(mergeTask.getSourceFileB()));
             submitTask(new KnnTask(mergeTask.getDestFile(),
-                                     mergeTask.getDestFile(),
-                                     getCharset(),
-                                     getComparator(), getK()));
+                    mergeTask.getDestFile(),
+                    getCharset(),
+                    getComparator(), getK()));
 
         } else if (task.getClass().equals(SortTask.class)) {
 
             SortTask sortTask = (SortTask) task;
             submitTask(new KnnTask(sortTask.getDstFile(),
-                                     sortTask.getDstFile(),
-                                     getCharset(),
-                                     getComparator(), getK()));
+                    sortTask.getDstFile(),
+                    getCharset(),
+                    getComparator(), getK()));
 
         } else if (task.getClass().equals(KnnTask.class)) {
 

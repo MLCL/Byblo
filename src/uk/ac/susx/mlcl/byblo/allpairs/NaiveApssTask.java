@@ -34,8 +34,6 @@ import com.google.common.base.Predicate;
 import static com.google.common.base.Predicates.*;
 import uk.ac.susx.mlcl.byblo.measure.Jaccard;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import uk.ac.susx.mlcl.byblo.measure.Proximity;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.MiscUtil;
@@ -51,6 +49,8 @@ import java.io.Closeable;
 import java.io.Flushable;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The most basic implementation of all-pairs similarity search. Will only 
@@ -62,8 +62,7 @@ import java.util.List;
  */
 public class NaiveApssTask<P> extends AbstractTask {
 
-    private static final Logger LOG = Logger.getLogger(
-            NaiveApssTask.class.getName());
+    private static final Log LOG = LogFactory.getLog(NaiveApssTask.class);
 
     /**
      * Set to Jaccard because it requires no parameterization; hence can be
@@ -207,10 +206,10 @@ public class NaiveApssTask<P> extends AbstractTask {
 
     @Override
     protected void runTask() throws Exception {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.log(Level.INFO, "Running all-pairs similarity search: {0} ({1})",
-                    new Object[]{this.getClass(), Thread.currentThread().getName()});
-            LOG.log(Level.INFO, MiscUtil.memoryInfoString());
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Running all-pairs similarity search: " + this.getClass());
+            if (LOG.isDebugEnabled())
+                LOG.debug(MiscUtil.memoryInfoString());
         }
 
         computeAllPairs();
@@ -313,7 +312,8 @@ public class NaiveApssTask<P> extends AbstractTask {
                     continue;
 
                 double sim = sim(a, b);
-                WeightedEntryPairRecord pair = new WeightedEntryPairRecord(a.key(), b.key(), sim);
+                WeightedEntryPairRecord pair = new WeightedEntryPairRecord(
+                        a.key(), b.key(), sim);
                 if (pruducePair.apply(pair)) {
                     pairs.add(pair);
                     stats.incrementProductionCount();

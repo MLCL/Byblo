@@ -45,8 +45,8 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.MalformedInputException;
 import java.nio.charset.UnmappableCharacterException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * <p>A class that gets round the problem of very large, seekable character files
@@ -80,8 +80,7 @@ import java.util.logging.Logger;
 public class CharFileChannel
         implements ReadableCharChannel, WritableCharChannel, Seekable<Long> {
 
-    private static final Logger LOG =
-            Logger.getLogger(CharFileChannel.class.getName());
+    private static final Log LOG = LogFactory.getLog(CharFileChannel.class);
 
     private static final long DEFAULT_MAX_MAPPED_BYTES = Integer.MAX_VALUE;
 
@@ -139,11 +138,10 @@ public class CharFileChannel
         if (decoder == null)
             throw new NullPointerException("decoder is null");
 
-        if (LOG.isLoggable(Level.FINER))
-            LOG.log(Level.FINER,
-                    "Instantiating new CharFileChannel on FileChannel "
-                    + "{0}, decoding into charset {1}.",
-                    new Object[]{fileChannel, decoder.charset()});
+        if (LOG.isTraceEnabled())
+            LOG.trace("Instantiating new CharFileChannel on FileChannel "
+                    + fileChannel + ", decoding into charset "
+                    + decoder.charset() + ".");
 
 
         this.fileChannel = fileChannel;
@@ -412,10 +410,9 @@ public class CharFileChannel
                 return;
             }
 
-            if (LOG.isLoggable(Level.FINER))
-                LOG.log(Level.FINER,
-                        "Mapping file region ({0} - {1}) to buffer.",
-                        new Object[]{bufferOffset, bufferOffset + length});
+            if (LOG.isTraceEnabled())
+                LOG.trace("Mapping file region (" + bufferOffset + " - "
+                        + (bufferOffset + length) + ") to buffer.");
             buffer = fileChannel.map(
                     FileChannel.MapMode.READ_ONLY, bufferOffset, length);
         }

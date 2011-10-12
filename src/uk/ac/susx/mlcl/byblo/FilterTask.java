@@ -81,7 +81,7 @@ public class FilterTask extends AbstractTask implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Log LOG = LogFactory.getLog(CountTask.class);
+    private static final Log LOG = LogFactory.getLog(FilterTask.class);
 
     /**
      * Number of records to read or write between progress updates.
@@ -237,8 +237,7 @@ public class FilterTask extends AbstractTask implements Serializable {
     @Override
     protected void runTask() throws Exception {
         if (LOG.isInfoEnabled())
-            LOG.info("Running " + this + ". (thread:" + Thread.currentThread().
-                    getName() + ")");
+            LOG.info("Running " + this + ".");
 
 
         // Run the filters forwards then backwards. Each filtering step may
@@ -301,8 +300,7 @@ public class FilterTask extends AbstractTask implements Serializable {
         Files.copy(activeFeaturesFile, outputFeaturesFile);
 
         if (LOG.isInfoEnabled())
-            LOG.info("Completed " + this + ". (thread:" + Thread.currentThread().
-                    getName() + ")");
+            LOG.info("Completed " + this + ".");
     }
     // Read the entries file, passing it thought the filter. accepted entries
     // are written out to the output file while rejected entries are stored

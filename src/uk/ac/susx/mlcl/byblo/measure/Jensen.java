@@ -30,8 +30,9 @@
  */
 package uk.ac.susx.mlcl.byblo.measure;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import java.util.logging.Logger;
 
 /**
  * Jensen-Shannon divergence
@@ -40,13 +41,14 @@ import java.util.logging.Logger;
  */
 public class Jensen implements Proximity {
 
-    private static final Logger log = Logger.getLogger(Jensen.class.getName());
+    private static final Log LOG = LogFactory.getLog(Jensen.class);
 
     private static final double LN2 = Math.log(2);
 
     public Jensen() {
-        log.warning("The JensenShannon proximity measure has been "
-                + "thoughoughly test and is likely to contain bugs.");
+        if (LOG.isWarnEnabled())
+            LOG.warn("The JensenShannon proximity measure has been "
+                    + "thoughoughly test and is likely to contain bugs.");
     }
 
     @Override

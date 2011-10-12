@@ -41,15 +41,16 @@ import org.apache.commons.logging.LogFactory;
  */
 public class KendallTau implements Proximity {
 
-    private static final Log log = LogFactory.getLog(KendallTau.class);
+    private static final Log LOG = LogFactory.getLog(KendallTau.class);
 
     private int numFeatures;
 
     public KendallTau() {
         this.numFeatures = 0;
-        log.warn("The KendallTau proximity measure is extremely inefficient "
-                + "(quadratic on the number of features). Consider using a "
-                + "different measure.");
+        if (LOG.isWarnEnabled())
+            LOG.warn("The KendallTau proximity measure is extremely inefficient "
+                    + "(quadratic on the number of features). Consider using a "
+                    + "different measure.");
     }
 
     public final int getNumFeatures() {

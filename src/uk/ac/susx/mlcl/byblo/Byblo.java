@@ -41,15 +41,12 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class Byblo {
-
-    private static final Logger LOG = Logger.getLogger(CopyTask.class.getName());
 
     @Parameter(names = {"-h", "--help"},
                description = "Display this message")
@@ -91,8 +88,6 @@ public class Byblo {
         jc.addConverterFactory(new ConverterFactory());
 
         jc.addObject(byblo);
-        jc.setDescriptionsBundle(
-                ResourceBundle.getBundle("uk.ac.susx.mlcl.byblo.strings"));
 
         EnumMap<Command, Task> tasks =
                 new EnumMap<Command, Task>(Command.class);

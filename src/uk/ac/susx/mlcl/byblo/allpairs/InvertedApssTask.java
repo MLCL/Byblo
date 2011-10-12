@@ -31,7 +31,6 @@
 package uk.ac.susx.mlcl.byblo.allpairs;
 
 import uk.ac.susx.mlcl.lib.Checks;
-import java.util.logging.Logger;
 import uk.ac.susx.mlcl.lib.collect.Entry;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairRecord;
@@ -53,9 +52,6 @@ import java.util.Set;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class InvertedApssTask<S> extends NaiveApssTask<S> {
-
-    private static final Logger LOG = Logger.getLogger(
-            InvertedApssTask.class.getName());
 
     private Int2ObjectMap<Set<Entry<SparseDoubleVector>>> index;
 
@@ -158,9 +154,6 @@ public class InvertedApssTask<S> extends NaiveApssTask<S> {
                 + ", pairFilter=" + getProducatePair()
                 + ", recordFilter=" + getProcessRecord()
                 + ", stats=" + getStats()
-                //                + ", precalcA=" + getPrecalcA()
-                //                + ", precalcB=" + getPrecalcB()
-                //                + ", index=" + getIndex()
                 + '}';
     }
 }

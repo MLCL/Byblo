@@ -161,8 +161,7 @@ public class CountTask extends AbstractTask implements Serializable {
     @Override
     protected void runTask() throws Exception {
         if (LOG.isInfoEnabled())
-            LOG.info("Running " + this + ". (thread:" + Thread.currentThread().
-                    getName() + ")");
+            LOG.info("Running " + this + ".");
 
         {
             final ObjectIndex<String> entryIndex = new ObjectIndex<String>();
@@ -196,8 +195,7 @@ public class CountTask extends AbstractTask implements Serializable {
         }
 
         if (LOG.isInfoEnabled())
-            LOG.info("Completed " + this + ". (thread:" + Thread.currentThread().
-                    getName() + ")");
+            LOG.info("Completed " + this + ".");
     }
 
     @Override

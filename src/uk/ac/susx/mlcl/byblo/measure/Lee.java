@@ -30,8 +30,9 @@
  */
 package uk.ac.susx.mlcl.byblo.measure;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import java.util.logging.Logger;
 
 /**
  * The alpha-skew divergence measure as defined in Lee (2001)
@@ -47,7 +48,7 @@ import java.util.logging.Logger;
  */
 public class Lee implements Proximity {
 
-    private static final Logger log = Logger.getLogger(Lee.class.getName());
+    private static final Log LOG = LogFactory.getLog(Lee.class);
 
     public static final double DEFAULT_ALPHA = 0.99;
 
@@ -55,8 +56,9 @@ public class Lee implements Proximity {
 
     public Lee() {
         this.alpha = DEFAULT_ALPHA;
-        log.warning("The Lee proximity measure has been thoughoughly test and "
-                + "is likely to contain bugs.");
+        if (LOG.isWarnEnabled())
+            LOG.warn("The Lee proximity measure has been thoughoughly test and "
+                    + "is likely to contain bugs.");
     }
 
     public double getAlpha() {

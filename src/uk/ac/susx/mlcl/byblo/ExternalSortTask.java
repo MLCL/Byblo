@@ -48,8 +48,8 @@ import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  *
@@ -58,8 +58,7 @@ import java.util.logging.Logger;
 @Parameters(commandDescription = "Sort a file.")
 public class ExternalSortTask extends AbstractParallelTask {
 
-    private static final Logger LOG = Logger.getLogger(
-            ExternalSortTask.class.getName());
+    private static final Log LOG = LogFactory.getLog(ExternalSortTask.class);
 
     private static final int DEFAULT_MAX_CHUNK_SIZE = ChunkTask.DEFAULT_MAX_CHUNK_SIZE;
 
@@ -89,8 +88,8 @@ public class ExternalSortTask extends AbstractParallelTask {
     private Queue<File> mergeQueue;
 
     public ExternalSortTask(File src, File dst, Charset charset,
-                       Comparator<String> comparator,
-                       int maxChunkSize) {
+            Comparator<String> comparator,
+            int maxChunkSize) {
         this(src, dst, charset);
         setComparator(comparator);
         setMaxChunkSize(maxChunkSize);
@@ -160,10 +159,9 @@ public class ExternalSortTask extends AbstractParallelTask {
     @Override
     protected void runTask() throws Exception {
 
-        LOG.log(Level.INFO,
-                "Sorting file externally: from \"{0}\" to \"{1}\". ({2})",
-                new Object[]{getSrcFile(), getDestFile(),
-                    Thread.currentThread().getName()});
+        if (LOG.isInfoEnabled())
+            LOG.info(
+                    "Sorting file externally: from \"" + getSrcFile() + "\" to \"" + getDestFile() + "\".");
 
         if (getComparator() == null)
             throw new NullPointerException();
@@ -180,7 +178,7 @@ public class ExternalSortTask extends AbstractParallelTask {
         BlockingQueue<File> chunkQueue = new ArrayBlockingQueue<File>(2);
 
         ChunkTask chunkTask = new ChunkTask(getSrcFile(), getCharset(),
-                                            getMaxChunkSize());
+                getMaxChunkSize());
         chunkTask.setDstFileQueue(chunkQueue);
         chunkTask.setChunkFileFactory(tempFileFactory);
         Future<ChunkTask> chunkFuture = submitTask(chunkTask);
@@ -195,12 +193,12 @@ public class ExternalSortTask extends AbstractParallelTask {
 
                 handleCompletedTask(getFutureQueue().poll().get());
 
-            } else if(!chunkQueue.isEmpty()) {
+            } else if (!chunkQueue.isEmpty()) {
 
                 File chunk = chunkQueue.take();
                 submitTask(new SortTask(chunk, chunk, getCharset(),
-                                          getComparator()));
-                
+                        getComparator()));
+
             }
 
             // XXX: Nasty hack to stop it tight looping when both queues are empty

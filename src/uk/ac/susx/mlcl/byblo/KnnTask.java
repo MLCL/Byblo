@@ -39,8 +39,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Task that read in a file and produces the k-nearest-neighbors for each base 
@@ -49,11 +49,11 @@ import java.util.logging.Logger;
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(commandDescription="Perform k-nearest-neighbours on a similarity file.")
+@Parameters(
+commandDescription = "Perform k-nearest-neighbours on a similarity file.")
 public class KnnTask extends SortTask {
 
-    private static final Logger LOG =
-            Logger.getLogger(KnnTask.class.getName());
+    private static final Log LOG = LogFactory.getLog(KnnTask.class);
 
     @Parameter(names = {"-k"},
                description = "The maximum number of neighbours to produce per word.")
@@ -77,10 +77,9 @@ public class KnnTask extends SortTask {
 
     @Override
     protected void runTask() throws Exception {
-        LOG.log(Level.INFO,
-                "Running kNN in memory from \"{0}\" to \"{1}\". ({2})",
-                new Object[]{getSrcFile(), getDstFile(), Thread.currentThread().
-                    getName()});
+        if (LOG.isInfoEnabled())
+            LOG.info("Running kNN in memory from \"" + getSrcFile()
+                    + "\" to \"" + getDstFile() + "\".");
         final List<String> linesIn = new ArrayList<String>();
         IOUtil.readAllLines(getSrcFile(), getCharset(), linesIn);
         final List<String> linesOut = new ArrayList<String>();

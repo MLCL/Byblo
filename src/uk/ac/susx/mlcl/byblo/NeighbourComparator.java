@@ -32,8 +32,8 @@ package uk.ac.susx.mlcl.byblo;
 
 import java.io.Serializable;
 import java.util.Comparator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A string comparator that takes strings composed of three tab delimited 
@@ -45,8 +45,7 @@ import java.util.logging.Logger;
  */
 public class NeighbourComparator implements Comparator<String>, Serializable {
 
-    private static final Logger LOG = Logger.getLogger(NeighbourComparator.class.
-            getName());
+    private static final Log LOG = LogFactory.getLog(NeighbourComparator.class);
 
     public static final long serialVersionUID = 1L;
 
@@ -102,10 +101,10 @@ public class NeighbourComparator implements Comparator<String>, Serializable {
 
             return -Double.compare(num1, num2);
         } catch (RuntimeException ex) {
-            LOG.log(Level.SEVERE,
-                    "Caught exception when attempting to compare "
-                    + "strings \"" + string1 + "\" and \"" + string2 + "\": " + ex,
-                    ex);
+            if (LOG.isErrorEnabled())
+                LOG.error("Caught exception when attempting to compare "
+                        + "strings \"" + string1 + "\" and \"" + string2 + "\": " + ex,
+                        ex);
             throw ex;
         }
     }

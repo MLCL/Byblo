@@ -37,8 +37,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * An <tt>EntryFeatureSource</tt> object is used to retrieve 
@@ -50,9 +48,6 @@ import org.apache.commons.logging.LogFactory;
 public class EntryFeatureSource
         extends AbstractTSVSource<EntryFeatureRecord>
         implements Source<EntryFeatureRecord> {
-
-    private static final Log LOG =
-            LogFactory.getLog(EntryFeatureSource.class);
 
     private final ObjectIndex<String> entryIndex;
 
@@ -106,7 +101,7 @@ public class EntryFeatureSource
         } else {
             entryId = previousRecord.getEntryId();
         }
-        
+
         if (!hasNext() || isDelimiterNext()) {
             // Encountered an entry without any features. This is incoherent wrt
             // the task at hand, but quite a common scenario in general feature

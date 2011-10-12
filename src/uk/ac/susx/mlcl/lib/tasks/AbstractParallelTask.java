@@ -40,8 +40,8 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  *
@@ -49,14 +49,13 @@ import java.util.logging.Logger;
  */
 public abstract class AbstractParallelTask extends AbstractTask {
 
-    private static final Logger LOG = Logger.getLogger(
-            AbstractParallelTask.class.getName());
+    private static final Log LOG = LogFactory.getLog(AbstractParallelTask.class);
 
     protected static final int DEFAULT_NUM_THREADS =
             Runtime.getRuntime().availableProcessors();
 
     @Parameter(names = {"-t", "--threads"},
-               description= "Number of threads to use.")
+               description = "Number of threads to use.")
     private int nThreads = DEFAULT_NUM_THREADS;
 
     private ExecutorService executor = null;
@@ -69,10 +68,12 @@ public abstract class AbstractParallelTask extends AbstractTask {
     public void setNumThreads(int nThreads) {
         if (nThreads < 1)
             throw new IllegalArgumentException("nThreads < 1");
-        if (nThreads > Runtime.getRuntime().availableProcessors())
-            LOG.log(Level.WARNING, "nThreads ({0}) > availableProcessors ({0})",
-                    new Object[]{nThreads, Runtime.getRuntime().
-                        availableProcessors()});
+
+        if (LOG.isWarnEnabled() && nThreads > Runtime.getRuntime().
+                availableProcessors())
+            LOG.warn("nThreads (" + nThreads + ") > availableProcessors (" + Runtime.
+                    getRuntime().
+                    availableProcessors() + ")");
         if (nThreads != this.nThreads) {
             this.nThreads = nThreads;
         }
@@ -84,9 +85,9 @@ public abstract class AbstractParallelTask extends AbstractTask {
 
     protected synchronized final ExecutorService getExecutor() {
         if (executor == null) {
-            LOG.log(Level.INFO,
-                    "Initialising executor with {0} concurrent work threads.",
-                    nThreads);
+            if (LOG.isDebugEnabled())
+                LOG.debug(
+                        "Initialising executor with " + nThreads + " concurrent work threads.");
             // Create a new thread pool using an unbounded queue - throttling will
             // be handled by a semaphore
             final ThreadPoolExecutor tpe = new ThreadPoolExecutor(
@@ -116,7 +117,8 @@ public abstract class AbstractParallelTask extends AbstractTask {
                 List<Runnable> runnables = executor.shutdownNow();
             }
         } catch (InterruptedException ex) {
-            LOG.log(Level.SEVERE, null, ex);
+            if (LOG.isErrorEnabled())
+                LOG.error(null, ex);
             catchException(ex);
         } finally {
             executor.shutdownNow();
@@ -126,13 +128,13 @@ public abstract class AbstractParallelTask extends AbstractTask {
     @Override
     public void run() {
         try {
-            LOG.log(Level.FINE, "Initialising task {0}. ({1})",
-                    new Object[]{this, Thread.currentThread().getName()});
+            if (LOG.isDebugEnabled())
+                LOG.debug("Initialising task " + this + ".");
 
             initialiseTask();
 
-            LOG.log(Level.FINE, "Running task {0}. ({1})",
-                    new Object[]{this, Thread.currentThread().getName()});
+            if (LOG.isDebugEnabled())
+                LOG.debug("Running task " + this + ".");
 
             runTask();
 
@@ -146,8 +148,9 @@ public abstract class AbstractParallelTask extends AbstractTask {
             } catch (Exception ex) {
                 catchException(ex);
             }
-            LOG.log(Level.FINE, "Completed task {0}. ({1})",
-                    new Object[]{this, Thread.currentThread().getName()});
+
+            if (LOG.isDebugEnabled())
+                LOG.debug("Completed task " + this + ".");
         }
     }
 

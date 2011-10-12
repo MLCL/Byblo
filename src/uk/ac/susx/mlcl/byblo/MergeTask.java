@@ -42,8 +42,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Comparator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Merges the contents of two sorted source files, line by line, into a
@@ -57,10 +57,11 @@ import java.util.logging.Logger;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(commandDescription = "Merges the contents of two sorted source files, line by line, into a destination file.")
+@Parameters(
+commandDescription = "Merges the contents of two sorted source files, line by line, into a destination file.")
 public class MergeTask extends AbstractTask {
 
-    private static final Logger LOG = Logger.getLogger(MergeTask.class.getName());
+    private static final Log LOG = LogFactory.getLog(MergeTask.class);
 
     private Comparator<String> comparator;
 
@@ -147,11 +148,8 @@ public class MergeTask extends AbstractTask {
         BufferedWriter writer = null;
 
         try {
-            LOG.log(Level.INFO,
-                    "Merging from files \"{0}\" and \"{1}\" to \"{2}\". ({3})",
-                    new Object[]{getSourceFileA(), getSourceFileB(),
-                        getDestFile(),
-                        Thread.currentThread().getName()});
+            if (LOG.isInfoEnabled())
+                LOG.info("Merging from files \"" + getSourceFileA() + "\" and \"" + getSourceFileB() + "\" to \"" + getDestFile() + "\".");
 
             readerA = IOUtil.openReader(getSourceFileA(), getCharset());
             readerB = IOUtil.openReader(getSourceFileB(), getCharset());

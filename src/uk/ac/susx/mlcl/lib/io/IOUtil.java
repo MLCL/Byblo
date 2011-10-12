@@ -54,10 +54,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  *
@@ -65,7 +65,7 @@ import java.util.zip.GZIPOutputStream;
  */
 public class IOUtil {
 
-    private static final Logger LOG = Logger.getLogger(IOUtil.class.getName());
+    private static final Log LOG = LogFactory.getLog(IOUtil.class);
 
     public static final File STDIN_FILE = new File("-");
 
@@ -131,21 +131,23 @@ public class IOUtil {
 
         } else if (isStdin(file)) {
 
-            LOG.log(Level.FINE, "Opening stdin channel.");
+            if (LOG.isTraceEnabled())
+                LOG.trace("Opening stdin channel.");
             return Channels.newChannel(System.in);
 
         } else if (isGzip(file)) {
 
-            LOG.log(Level.FINE,
-                    "Opening gzip compressed readable file: \"{0}\".",
-                    file);
+            if (LOG.isTraceEnabled())
+                LOG.trace(
+                        "Opening gzip compressed readable file: \"" + file + "\".");
             return Channels.newChannel(
                     new GZIPInputStream(
                     new FileInputStream(file)));
 
         } else {
 
-            LOG.log(Level.FINE, "Opening readable file channel: \"{0}\".", file);
+            if (LOG.isTraceEnabled())
+                LOG.trace("Opening readable file channel: \"" + file + "\".");
             return new FileInputStream(file).getChannel();
 
         }
@@ -159,21 +161,23 @@ public class IOUtil {
 
         } else if (isStdout(file)) {
 
-            LOG.log(Level.FINE, "Opening stdout channel.");
+            if (LOG.isTraceEnabled())
+                LOG.trace("Opening stdout channel.");
             return Channels.newChannel(System.out);
 
         } else if (isGzip(file)) {
 
-            LOG.log(Level.FINE,
-                    "Opening writable gzip compressed file channel: \"{0}\".",
-                    file);
+            if (LOG.isTraceEnabled())
+                LOG.trace(
+                        "Opening writable gzip compressed file channel: \"" + file + "\".");
             return Channels.newChannel(
                     new GZIPOutputStream(
                     new FileOutputStream(file)));
 
         } else {
 
-            LOG.log(Level.FINE, "Opening writable file channe;: \"{0}\".", file);
+            if (LOG.isTraceEnabled())
+                LOG.trace("Opening writable file channe;: \"" + file + "\".");
             return new FileOutputStream(file).getChannel();
 
         }
@@ -184,15 +188,18 @@ public class IOUtil {
         if (file == null)
             throw new NullPointerException();
         if (isStdin(file)) {
-            LOG.log(Level.FINE, "Opening stdin input stream.");
+            if (LOG.isTraceEnabled())
+                LOG.trace("Opening stdin input stream.");
             return System.in;
         } else if (isGzip(file)) {
-            LOG.log(Level.FINE,
-                    "Opening gzip compressed file input stream: \"{0}\".", file);
+            if (LOG.isTraceEnabled())
+                LOG.trace(
+                        "Opening gzip compressed file input stream: \"" + file + "\".");
             return new GZIPInputStream(
                     new FileInputStream(file));
         } else {
-            LOG.log(Level.FINE, "Opening file input stream: \"{0}\".", file);
+            if (LOG.isTraceEnabled())
+                LOG.trace("Opening file input stream: \"" + file + "\".");
             return new BufferedInputStream(new FileInputStream(file));
         }
     }
@@ -202,14 +209,17 @@ public class IOUtil {
         if (file == null)
             throw new NullPointerException();
         if (isStdout(file)) {
-            LOG.log(Level.FINE, "Opening stdout stream.");
+            if (LOG.isTraceEnabled())
+                LOG.trace("Opening stdout stream.");
             return System.out;
         } else if (isGzip(file)) {
-            LOG.log(Level.FINE,
-                    "Opening gzip compressed file output stream: \"{0}\".", file);
+            if (LOG.isTraceEnabled())
+                LOG.trace("Opening gzip compressed file output stream: \""
+                        + file + "\".");
             return new GZIPOutputStream(new FileOutputStream(file));
         } else {
-            LOG.log(Level.FINE, "Opening file output stream: \"{0}\".", file);
+            if (LOG.isTraceEnabled())
+                LOG.trace("Opening file output stream: \"" + file + "\".");
             return new BufferedOutputStream(new FileOutputStream(file));
         }
     }

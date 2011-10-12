@@ -37,8 +37,8 @@ import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Copy a source file to a destination.
@@ -48,7 +48,7 @@ import java.util.logging.Logger;
 @Parameters(commandDescription = "Copy a file.")
 public class CopyTask extends AbstractTask {
 
-    private static final Logger LOG = Logger.getLogger(CopyTask.class.getName());
+    private static final Log LOG = LogFactory.getLog(CopyTask.class);
 
     private static final int BUFFER_SIZE = 100000;
 
@@ -78,10 +78,9 @@ public class CopyTask extends AbstractTask {
 
     @Override
     protected void runTask() throws Exception {
-        LOG.log(Level.INFO,
-                "Copying file from \"{0}\" to \"{1}\". (Thread:{2})",
-                new Object[]{getSrcFile(), getDstFile(),
-                    Thread.currentThread().getName()});
+        if (LOG.isInfoEnabled())
+            LOG.info("Copying file from \"" + getSrcFile() + "\" to \""
+                    + getDstFile() + "\".");
 
         // Check the configuration state
         if (sourceFile.equals(destFile) && !IOUtil.isStdin(sourceFile))

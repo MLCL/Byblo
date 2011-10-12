@@ -64,9 +64,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  *
@@ -76,8 +75,7 @@ import java.util.regex.Pattern;
 commandDescription = "Perform all-pair similarity search on the given input frequency files.")
 public class AllPairsTask extends AbstractTask {
 
-    private static final Logger LOG =
-            Logger.getLogger(AllPairsTask.class.getName());
+    private static final Log LOG = LogFactory.getLog(AllPairsTask.class);
 
     @Parameter(names = {"-i", "--input"},
                description = "Entry-feature frequency vectors files.",
@@ -192,8 +190,11 @@ public class AllPairsTask extends AbstractTask {
     @SuppressWarnings("unchecked")
     protected void runTask() throws Exception {
 
-        LOG.info("Running All-Pairs Similarity Search Command.");
-        LOG.log(Level.INFO, "Command Parameterisation {0}", this.toString());
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Running All-Pairs Similarity Search Command.");
+            if (LOG.isDebugEnabled())
+                LOG.debug("Command Parameterisation " + this.toString());
+        }
 
 
         final Map<String, Class<? extends Proximity>> classLookup =
@@ -224,7 +225,8 @@ public class AllPairsTask extends AbstractTask {
 
         ObjectIndex<String> strIndex = new ObjectIndex<String>();
 
-        LOG.info("Loading entry frequencies file " + entriesFile);
+        if (LOG.isDebugEnabled())
+            LOG.debug("Loading entry frequencies file " + entriesFile);
         EntrySource entrySource = new EntrySource(
                 entriesFile, charset, strIndex);
         //TODO: Remove because it's never used?
@@ -239,8 +241,8 @@ public class AllPairsTask extends AbstractTask {
         // if required.
         if (prox instanceof AbstractMIProximity) {
             try {
-                LOG.log(Level.INFO, "Loading features file {0}",
-                        featuresFile);
+                if (LOG.isDebugEnabled())
+                    LOG.debug("Loading features file " + featuresFile);
 
                 FeatureSource features = new FeatureSource(
                         featuresFile, charset, strIndex);
@@ -250,17 +252,16 @@ public class AllPairsTask extends AbstractTask {
                 bmip.setOccuringFeatureCount(features.getCardinality());
 
             } catch (IOException e) {
-                LOG.log(Level.SEVERE,
-                        "Error reading feature totals file {0} : {1}",
-                        new Object[]{featuresFile, e.toString()});
+                LOG.fatal("Error reading feature totals file " + featuresFile + " : " + e.
+                        toString());
                 System.exit(1);
             }
             System.err.println("Loaded features for MI");
         } else if (prox instanceof KendallTau) {
             try {
-                LOG.log(Level.INFO,
-                        "Loading entries file for KendalTau.numFeatures: {0}",
-                        featuresFile);
+                if (LOG.isDebugEnabled())
+                    LOG.debug("Loading entries file for "
+                            + "KendalTau.numFeatures: " + featuresFile);
 
                 FeatureSource features = new FeatureSource(
                         featuresFile, charset, strIndex);
@@ -269,14 +270,12 @@ public class AllPairsTask extends AbstractTask {
                 ((KendallTau) prox).setNumFeatures(features.getCardinality());
 
             } catch (IOException e) {
-                LOG.log(Level.SEVERE, "Error reading features file {0} : {1}",
-                        new Object[]{featuresFile, e.toString()});
+                if (LOG.isFatalEnabled())
+                    LOG.fatal("Error reading features file "
+                            + featuresFile + " : " + e.toString());
                 System.exit(1);
             }
         }
-
-
-
 
         // Swap the proximity measure inputs if required
         if (measureReversed) {
@@ -297,7 +296,8 @@ public class AllPairsTask extends AbstractTask {
         // are produced by the algorithm.
 
         final Sink<WeightedEntryPairRecord> sink =
-                new WeightedEntryPairSink(outputFile, charset, strIndex, strIndex);
+                new WeightedEntryPairSink(outputFile, charset, strIndex,
+                strIndex);
 
         // Instantiate the all-pairs algorithm as given on the command line.
         ThreadedApssTask apss = new ThreadedApssTask(sourceA, sourceB, sink);
@@ -326,10 +326,12 @@ public class AllPairsTask extends AbstractTask {
         else if (pairFilters.size() > 1)
             apss.setProducatePair(Predicates.and(pairFilters));
 
-        LOG.info("Running APSS algorithm.");
+        if (LOG.isInfoEnabled())
+            LOG.info("Running APSS algorithm.");
 
         apss.run();
-        LOG.info("Completed All-Pairs Similarity Search.");
+        if (LOG.isInfoEnabled())
+            LOG.info("Completed All-Pairs Similarity Search.");
     }
 
     @Override
