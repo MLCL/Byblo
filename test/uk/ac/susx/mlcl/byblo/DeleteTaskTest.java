@@ -51,7 +51,8 @@ public class DeleteTaskTest {
         assertTrue(tmp.exists());
         DeleteTask instance = new DeleteTask(tmp);
         instance.run();
-        instance.throwException();
+        while(instance.isExceptionThrown())
+            instance.throwException();
         assertFalse(tmp.exists());
     }
 

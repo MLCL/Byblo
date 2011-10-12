@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
 
 /**
  * An <tt>EntrySource</tt> object is used to retrieve {@link EntryRecord} 
@@ -110,6 +111,17 @@ public class EntrySource extends AbstractTSVSource<EntryRecord> {
 
     public int getCount() {
         return count;
+    }
+
+    @Override
+    public void position(Tell offset) throws IOException {
+        super.position(offset);
+        previousRecord = null;
+    }
+
+    @Override
+    public Tell position() {
+        return super.position();
     }
 
     @Override

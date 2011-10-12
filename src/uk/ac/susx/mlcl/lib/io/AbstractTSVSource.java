@@ -94,13 +94,6 @@ public abstract class AbstractTSVSource<T>
     public long roughPosition() {
         return lexer.start();
     }
-//    public long bytesRead() {
-//        return lexer.bytesRead();
-//    }
-//
-//    public long bytesTotal() throws IOException {
-//        return lexer.bytesTotal();
-//    }
 
     @Override
     public Lexer.Tell position() {
@@ -151,12 +144,20 @@ public abstract class AbstractTSVSource<T>
         return str;
     }
 
-    protected double parseDouble() throws CharacterCodingException, NumberFormatException, IOException {
-        return Double.valueOf(parseString());
+    protected double parseDouble() throws CharacterCodingException, IOException {
+        try {
+            return Double.valueOf(parseString());
+        } catch (NumberFormatException nfe) {
+            throw new TSVDataFormatException(this, nfe);
+        }
     }
 
-    protected int parseInt() throws CharacterCodingException, NumberFormatException, IOException {
-        return Integer.parseInt(parseString());
+    protected int parseInt() throws CharacterCodingException, IOException {
+        try {
+            return Integer.parseInt(parseString());
+        } catch (NumberFormatException nfe) {
+            throw new TSVDataFormatException(this, nfe);
+        }
     }
 
     private void parseDelimiter(char delim) throws CharacterCodingException, IOException {

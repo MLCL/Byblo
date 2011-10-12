@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo.io;
 
 import com.google.common.base.Objects;
 import java.io.Serializable;
+import uk.ac.susx.mlcl.lib.ObjectIndex;
 
 /**
  * <tt>EntryRecord</tt> objects represent a single instance of a thesaurus
@@ -103,6 +104,12 @@ public class EntryRecord
     public String toString() {
         return Objects.toStringHelper(this).
                 add("id", entryId).add("weight", weight).toString();
+    }
+
+    public String toString(ObjectIndex<String> entryIndex) {
+        return Objects.toStringHelper(this).
+                add("entry", entryIndex.get(entryId)).
+                add("weight", weight).toString();
     }
 
     @Override

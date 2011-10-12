@@ -31,6 +31,7 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import com.google.common.base.Objects;
+import uk.ac.susx.mlcl.lib.ObjectIndex;
 
 /**
  * <tt>WeightedEntryFeatureRecord</tt> objects represent a single instance of an 
@@ -71,6 +72,15 @@ public final class WeightedEntryFeatureRecord
         return Objects.toStringHelper(this).
                 add("entryId", getEntryId()).
                 add("featureId", getFeatureId()).
+                add("weight", getWeight()).
+                toString();
+    }
+
+    public String toString(ObjectIndex<String> entryIndex,
+            ObjectIndex<String> featureIndex) {
+        return Objects.toStringHelper(this).
+                add("entryId", entryIndex.get(getEntryId())).
+                add("featureId", featureIndex.get(getFeatureId())).
                 add("weight", getWeight()).
                 toString();
     }

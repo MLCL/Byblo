@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo.io;
 
 import uk.ac.susx.mlcl.lib.ObjectIndex;
 import uk.ac.susx.mlcl.lib.io.AbstractTSVSource;
+import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
 import uk.ac.susx.mlcl.lib.io.Source;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -98,6 +99,12 @@ public class WeightedEntryFeatureSource
 
     public WeightedEntryFeatureVectorSource getVectorSource() {
         return new WeightedEntryFeatureVectorSource(this);
+    }
+
+    @Override
+    public void position(Tell offset) throws IOException {
+        super.position(offset);
+        previousRecord = null;
     }
 
     @Override
