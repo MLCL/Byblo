@@ -30,11 +30,10 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
-import com.google.common.io.Files;
+import uk.ac.susx.mlcl.byblo.io.EntryFeatureSource;
 import java.io.File;
 import java.nio.charset.Charset;
 import org.junit.Test;
-import uk.ac.susx.mlcl.byblo.io.EntryFeatureSource;
 import uk.ac.susx.mlcl.byblo.io.EntrySource;
 import uk.ac.susx.mlcl.byblo.io.FeatureSource;
 import static org.junit.Assert.*;
@@ -46,8 +45,6 @@ import static uk.ac.susx.mlcl.TestConstants.*;
  */
 public class CountTaskTest {
 
-   
-    
     private static final String subject = CountTask.class.getName();
 
     private void runWithAPI(File inInst, File outE, File outF, File outEF,
@@ -113,12 +110,14 @@ public class CountTaskTest {
         assertTrue("Output entries file differs from sampledata file.",
                 EntrySource.equal(eActual, TEST_FRUIT_ENTRIES, DEFAULT_CHARSET));
         assertTrue("Output features file differs from test data file.",
-                FeatureSource.equal(fActual, TEST_FRUIT_FEATURES, DEFAULT_CHARSET));
+                FeatureSource.equal(fActual, TEST_FRUIT_FEATURES,
+                DEFAULT_CHARSET));
         assertTrue("Output entry/features file differs from test data file.",
-                EntryFeatureSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET));
+                EntryFeatureSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
+                DEFAULT_CHARSET));
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testMissingParameters() throws Exception {
         System.out.println("Testing " + subject + " for bad parameterisation.");
 

@@ -67,6 +67,14 @@ public class SortTask extends CopyTask {
         this.comparator = comparator;
     }
 
+    public SortTask(File sourceFile, File destinationFile, Charset charset) {
+        this(sourceFile, destinationFile, charset, null);
+    }
+
+    public SortTask(File sourceFile, File destinationFile) {
+        this(sourceFile, destinationFile, IOUtil.DEFAULT_CHARSET);
+    }
+
     public final Charset getCharset() {
         return charset;
     }
@@ -81,9 +89,11 @@ public class SortTask extends CopyTask {
     }
 
     public final void setComparator(Comparator<String> comparator) {
-        if (comparator == null)
-            throw new NullPointerException("comparator is null");
         this.comparator = comparator;
+    }
+
+    public boolean isComparatorSet() {
+        return getComparator() != null;
     }
 
     @Override
