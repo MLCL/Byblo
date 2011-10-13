@@ -56,7 +56,8 @@ import java.util.concurrent.Future;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(commandDescription = "Freqency count a structured input instance file.")
+@Parameters(
+commandDescription = "Freqency count a structured input instance file.")
 public class ExternalCountTask extends AbstractParallelTask {
 
     private static final int DEFAULT_MAX_CHUNK_SIZE = ChunkTask.DEFAULT_MAX_CHUNK_SIZE;
@@ -88,7 +89,7 @@ public class ExternalCountTask extends AbstractParallelTask {
     @Parameter(names = {"-T", "--temporary-directory"},
                description = "Directory used for holding temporary files.",
                converter = TempFileFactoryConverter.class)
-    private FileFactory tempFileFactory = new TempFileFactory("temp", ".txt");
+    private FileFactory tempFileFactory = new TempFileFactory();
 
     @Parameter(names = {"-c", "--charset"},
                description = "Character encoding to use for reading and writing files.")
@@ -114,7 +115,6 @@ public class ExternalCountTask extends AbstractParallelTask {
                 writer.write(strings[0]);
                 writer.newLine();
             } else {
-
                 String key = null;
                 int total = 0;
                 for (int i = 0; i < strings.length; i++) {
@@ -134,11 +134,11 @@ public class ExternalCountTask extends AbstractParallelTask {
         }
     };
 
-    private static final String FEATURES_FILE_SUFFIX = ".f";
+    private static final String FEATURES_FILE_SUFFIX = "_f";
 
-    private static final String ENTRY_FEATURES_FILE_SUFFIX = ".ef";
+    private static final String ENTRY_FEATURES_FILE_SUFFIX = "ef";
 
-    private static final String ENTRIES_FILE_SUFFIX = ".e";
+    private static final String ENTRIES_FILE_SUFFIX = "_e";
 
     private Queue<File> mergeEntryQueue;
 
@@ -236,7 +236,6 @@ public class ExternalCountTask extends AbstractParallelTask {
         checkState();
     }
 
-    
     @Override
     protected void runTask() throws Exception {
         map();
@@ -271,12 +270,16 @@ public class ExternalCountTask extends AbstractParallelTask {
             } else if (!chunkQueue.isEmpty()) {
 
                 File chunk = chunkQueue.take();
-                File chunk_entriesFile = new File(
-                        chunk.getPath() + ENTRIES_FILE_SUFFIX);
-                File chunk_featuresFile = new File(
-                        chunk.getPath() + FEATURES_FILE_SUFFIX);
-                File chunk_entryFeaturesFile = new File(
-                        chunk.getPath() + ENTRY_FEATURES_FILE_SUFFIX);
+
+                File chunk_entriesFile = new File(chunk.getParentFile(),
+                        chunk.getName() + ENTRIES_FILE_SUFFIX);
+
+                File chunk_featuresFile = new File(chunk.getParentFile(),
+                        chunk.getName() + FEATURES_FILE_SUFFIX);
+
+                File chunk_entryFeaturesFile = new File(chunk.getParentFile(),
+                        chunk.getName() + ENTRY_FEATURES_FILE_SUFFIX);
+
                 submitTask(new CountTask(chunk, chunk_entryFeaturesFile,
                         chunk_entriesFile, chunk_featuresFile, getCharset()));
             }
@@ -322,7 +325,8 @@ public class ExternalCountTask extends AbstractParallelTask {
             else if (dst.getName().endsWith(FEATURES_FILE_SUFFIX))
                 queueMergeTask(dst, mergeFeaturesQueue);
             else
-                throw new AssertionError();
+                throw new AssertionError("File ending does not match known merge types: " + dst.
+                        getName());
 
 
         } else if (task.getClass().equals(MergeTask.class)) {
@@ -337,6 +341,9 @@ public class ExternalCountTask extends AbstractParallelTask {
                 queueMergeTask(dst, mergeEntryFeatureQueue);
             else if (dst.getName().endsWith(FEATURES_FILE_SUFFIX))
                 queueMergeTask(dst, mergeFeaturesQueue);
+            else
+                throw new AssertionError("File ending does not match known merge types: " + dst.
+                        getName());
 
             submitTask(new DeleteTask(mergeTask.getSourceFileA()));
             submitTask(new DeleteTask(mergeTask.getSourceFileB()));
@@ -351,18 +358,28 @@ public class ExternalCountTask extends AbstractParallelTask {
     }
 
     protected void finish() throws Exception {
+        checkState();
 
         File finalMerge;
 
         finalMerge = mergeEntryQueue.poll();
+        if (finalMerge == null)
+            throw new AssertionError(
+                    "The entry merge queue is empty but final copy has not been completed.");
         new CopyTask(finalMerge, getEntriesFile()).runTask();
         new DeleteTask(finalMerge).runTask();
 
         finalMerge = mergeEntryFeatureQueue.poll();
+        if (finalMerge == null)
+            throw new AssertionError(
+                    "The entry/feature merge queue is empty but final copy has not been completed.");
         new CopyTask(finalMerge, getEntryFeaturesFile()).runTask();
         new DeleteTask(finalMerge).runTask();
 
         finalMerge = mergeFeaturesQueue.poll();
+        if (finalMerge == null)
+            throw new AssertionError(
+                    "The feature merge queue is empty but final copy has not been completed.");
         new CopyTask(finalMerge, getFeaturesFile()).runTask();
         new DeleteTask(finalMerge).runTask();
     }
@@ -388,8 +405,8 @@ public class ExternalCountTask extends AbstractParallelTask {
             return null;
         }
     }
-    
-      /**
+
+    /**
      * Method that performance a number of sanity checks on the parameterisation
      * of this class. It is necessary to do this because the the class can be
      * instantiated via a null constructor when run from the command line.
@@ -470,5 +487,4 @@ public class ExternalCountTask extends AbstractParallelTask {
                     "entry-features file does not exists and can not be reated: " + entryFeaturesFile);
         }
     }
-
 }

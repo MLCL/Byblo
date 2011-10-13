@@ -37,6 +37,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * An <tt>EntryFeatureSource</tt> object is used to retrieve 
@@ -49,6 +51,8 @@ public class EntryFeatureSource
         extends AbstractTSVSource<EntryFeatureRecord>
         implements Source<EntryFeatureRecord> {
 
+    private static final Log LOG = LogFactory.getLog(EntryFeatureSource.class);
+    
     private final ObjectIndex<String> entryIndex;
 
     private final ObjectIndex<String> featureIndex;
@@ -147,9 +151,14 @@ public class EntryFeatureSource
         while (equal && srcA.hasNext() && srcB.hasNext()) {
             final EntryFeatureRecord recA = srcA.read();
             final EntryFeatureRecord recB = srcB.read();
+            
             equal = equal
                     && recA.getEntryId() == recB.getEntryId()
                     && recA.getFeatureId() == recB.getFeatureId();
+            
+            if(!equal) {
+                LOG.info(recA  + " | " + recB);
+            }
         }
         equal = equal && srcA.hasNext() == srcB.hasNext();
         return equal;

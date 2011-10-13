@@ -64,7 +64,7 @@ public class ChunkTask extends AbstractTask {
     public static final File DEFAULT_SOURCE_FILE = new File("-");
 
     private FileFactory chunkFileFactory =
-            new TempFileFactory(this.getClass().getName() + ".", "");
+            new TempFileFactory();
 
     @Parameter(names = {"-C", "--max-chunk-size"},
                description = "Number of lines that will be read and sorted in RAM at one time (per thread). Larger values increase memory usage and performace.")

@@ -109,8 +109,6 @@ public class CopyTaskTest {
         String[] args = {"-i", x.toString(), "-o", y.toString()};
         JCommander jc = new JCommander();
         jc.addObject(instance);
-        jc.setDescriptionsBundle(ResourceBundle.getBundle(
-                "uk.ac.susx.mlcl.byblo.strings"));
         jc.parse(args);
         assertEquals(x, instance.getSrcFile());
         assertEquals(y, instance.getDstFile());

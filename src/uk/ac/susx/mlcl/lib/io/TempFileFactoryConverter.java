@@ -66,6 +66,6 @@ public class TempFileFactoryConverter implements IStringConverter<TempFileFactor
             throw new ParameterException("The given temporary directory \""
                     + tmpDir + "\" already exists but it is not a directory.");
         }
-        return new TempFileFactory("temp.", ".txt", tmpDir);
+        return new TempFileFactory(tmpDir);
     }
 }

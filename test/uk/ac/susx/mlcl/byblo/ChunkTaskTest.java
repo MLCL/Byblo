@@ -118,8 +118,6 @@ public class ChunkTaskTest {
         String[] args = {"-i", tmp.toString()};
         JCommander jc = new JCommander();
         jc.addObject(instance);
-        jc.setDescriptionsBundle(ResourceBundle.getBundle(
-                "uk.ac.susx.mlcl.byblo.strings"));
         jc.parse(args);
         assertEquals(tmp, instance.getSrcFile());
         tmp.delete();

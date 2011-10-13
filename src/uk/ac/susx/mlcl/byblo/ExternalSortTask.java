@@ -77,7 +77,7 @@ public class ExternalSortTask extends AbstractParallelTask {
     @Parameter(names = {"-T", "--temporary-directory"},
                description = "Directory which will be used for storing temporary files.",
                converter = TempFileFactoryConverter.class)
-    private FileFactory tempFileFactory = new TempFileFactory("temp", ".txt");
+    private FileFactory tempFileFactory = new TempFileFactory();
 
     @Parameter(names = {"-c", "--charset"},
                description = "Character encoding for reading and writing files.")

@@ -30,9 +30,9 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import org.junit.Ignore;
 import uk.ac.susx.mlcl.byblo.io.EntrySource;
 import uk.ac.susx.mlcl.byblo.io.FeatureSource;
-import com.google.common.io.Files;
 import java.io.File;
 import java.nio.charset.Charset;
 import org.junit.Test;
@@ -50,8 +50,7 @@ public class ExternalCountTaskTest {
     private static final String subject = ExternalCountTask.class.getName();
 
     private void runWithAPI(File inInst, File outE, File outF,
-            File outEF,
-            Charset charset)
+            File outEF, Charset charset, int chunkSize)
             throws Exception {
         final ExternalCountTask countTask = new ExternalCountTask();
         countTask.setInstancesFile(inInst);
@@ -59,6 +58,7 @@ public class ExternalCountTaskTest {
         countTask.setFeaturesFile(outF);
         countTask.setEntryFeaturesFile(outEF);
         countTask.setCharset(charset);
+        countTask.setMaxChunkSize(chunkSize);
         countTask.run();
         while (countTask.isExceptionThrown()) {
             countTask.throwException();
@@ -75,7 +75,7 @@ public class ExternalCountTaskTest {
 
     private void runwithCLI(File inInst, File outE, File outF,
             File outEF,
-            Charset charset)
+            Charset charset, int chunkSize)
             throws Exception {
 
         String[] args = {
@@ -84,7 +84,9 @@ public class ExternalCountTaskTest {
             "--output-entries", outE.toString(),
             "--output-features", outF.toString(),
             "--output-entry-features", outEF.toString(),
-            "--charset", charset.name()
+            "--charset", charset.name(),
+            "--chunk-size", ""+chunkSize
+                
         };
 
         enableExistTrapping();
@@ -103,7 +105,7 @@ public class ExternalCountTaskTest {
     private void runExpectingNullPointer(File inInst, File outE, File outF,
             File outEF, Charset charset) throws Exception {
         try {
-            runWithAPI(inInst, outE, outF, outEF, charset);
+            runWithAPI(inInst, outE, outF, outEF, charset, 10000);
             fail("NullPointerException should have been thrown.");
         } catch (NullPointerException ex) {
             // pass
@@ -113,7 +115,7 @@ public class ExternalCountTaskTest {
     private void runExpectingIllegalState(File inInst, File outE, File outF,
             File outEF, Charset charset) throws Exception {
         try {
-            runWithAPI(inInst, outE, outF, outEF, charset);
+            runWithAPI(inInst, outE, outF, outEF, charset, 10000);
             fail("IllegalStateException should have been thrown.");
         } catch (IllegalStateException ex) {
             // pass 
@@ -121,6 +123,7 @@ public class ExternalCountTaskTest {
     }
 
     @Test(timeout = 2000)
+    @Ignore
     public void testRunOnFruitAPI() throws Exception {
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
 
@@ -135,7 +138,7 @@ public class ExternalCountTaskTest {
         efActual.delete();
 
         runWithAPI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
-                DEFAULT_CHARSET);
+                DEFAULT_CHARSET, 1000000);
 
         assertTrue("Output entries file differs from sampledata file.",
                 EntrySource.equal(eActual, TEST_FRUIT_ENTRIES, DEFAULT_CHARSET));
@@ -147,7 +150,35 @@ public class ExternalCountTaskTest {
                 DEFAULT_CHARSET));
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 20000)
+    public void testRunOnFruitAPITinyChunk() throws Exception {
+        System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
+
+        final String fruitPrefix = TEST_FRUIT_INPUT.getName();
+        final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries"+".tiny");
+        final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features"+".tiny");
+        final File efActual = new File(TEST_OUTPUT_DIR,
+                fruitPrefix + ".entryFeatures"+".tiny");
+
+        eActual.delete();
+        fActual.delete();
+        efActual.delete();
+
+        runWithAPI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
+                DEFAULT_CHARSET, 10000);
+
+        assertTrue("Output entries file differs from sampledata file.",
+                EntrySource.equal(eActual, TEST_FRUIT_ENTRIES, DEFAULT_CHARSET));
+        assertTrue("Output features file differs from test data file.",
+                FeatureSource.equal(fActual, TEST_FRUIT_FEATURES,
+                DEFAULT_CHARSET));
+        assertTrue("Output entry/features file differs from test data file.",
+                EntryFeatureSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
+                DEFAULT_CHARSET));
+    }
+
+    @Test(timeout = 2000)
+    @Ignore
     public void testRunOnFruitCLI() throws Exception {
 
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
@@ -163,7 +194,7 @@ public class ExternalCountTaskTest {
         efActual.delete();
 
         runwithCLI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
-                DEFAULT_CHARSET);
+                DEFAULT_CHARSET, 1000000);
 
 
         assertTrue("Output entries file differs from sampledata file.",
@@ -177,6 +208,7 @@ public class ExternalCountTaskTest {
     }
 
     @Test(timeout = 1000)
+    @Ignore
     public void testMissingParameters() throws Exception {
         System.out.println("Testing " + subject + " for bad parameterisation.");
 

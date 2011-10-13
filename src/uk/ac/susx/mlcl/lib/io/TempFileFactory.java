@@ -39,9 +39,9 @@ import java.io.IOException;
  */
 public class TempFileFactory implements FileFactory {
 
-    public static final String DEFAULT_PREFIX =  ".";
+    public static final String DEFAULT_PREFIX =  "byblo-";
 
-    public static final String DEFAULT_SUFFIX = ".tmp";
+    public static final String DEFAULT_SUFFIX = "-tmp";
 
     public static final File DEFAULT_DIRECTORY =
             new File(System.getProperty("java.io.tmpdir"));
@@ -78,8 +78,9 @@ public class TempFileFactory implements FileFactory {
         this(DEFAULT_PREFIX, DEFAULT_SUFFIX, DEFAULT_DIRECTORY);
     }
 
+    @Override
     public File createFile() throws IOException {
-        return File.createTempFile(callingClass() + prefix, suffix, directory);
+        return File.createTempFile(/*callingClass() +*/ prefix, suffix, directory);
     }
 
     private String callingClass() {
@@ -99,6 +100,11 @@ public class TempFileFactory implements FileFactory {
         if (i < ste.length)
             className = ste[i].getClassName();
 
+        
+        //
+        if(className.length() > 10)
+            className = className.substring(0, 10);
+        
         return className;
     }
 

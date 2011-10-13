@@ -99,8 +99,6 @@ public class DeleteTaskTest {
         String[] args = {"-f", tmp.toString()};
         JCommander jc = new JCommander();
         jc.addObject(instance);
-        jc.setDescriptionsBundle(ResourceBundle.getBundle(
-                "uk.ac.susx.mlcl.byblo.strings"));
         jc.parse(args);
         assertEquals(tmp, instance.getFile());
         tmp.delete();

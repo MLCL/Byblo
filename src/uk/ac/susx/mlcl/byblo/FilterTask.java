@@ -162,7 +162,7 @@ public class FilterTask extends AbstractTask implements Serializable {
     @Parameter(names = {"-T", "--temp-dir"},
                description = "Temorary directory which will be used during filtering.",
                converter = TempFileFactoryConverter.class)
-    private FileFactory tempFiles = new TempFileFactory("temp", ".txt");
+    private FileFactory tempFiles = new TempFileFactory();
 
     /*
      * === INTERNAL ===
