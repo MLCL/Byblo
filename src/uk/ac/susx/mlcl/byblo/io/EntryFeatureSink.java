@@ -80,7 +80,7 @@ public class EntryFeatureSink
 
     private final ObjectIndex<String> featureIndex;
 
-    private boolean compactFormatEnabled = true;
+    private boolean compactFormatEnabled = false;
 
     private EntryFeatureRecord previousRecord = null;
 

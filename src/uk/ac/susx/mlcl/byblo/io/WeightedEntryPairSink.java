@@ -83,7 +83,7 @@ public class WeightedEntryPairSink
 
     private final ObjectIndex<String> strIndexB;
 
-    private boolean compactFormatEnabled = true;
+    private boolean compactFormatEnabled = false;
 
     private WeightedEntryPairRecord previousRecord = null;
 

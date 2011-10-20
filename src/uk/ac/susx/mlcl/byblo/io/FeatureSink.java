@@ -81,7 +81,7 @@ public class FeatureSink
 
     private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
 
-    private boolean compactFormatEnabled = true;
+    private boolean compactFormatEnabled = false;
 
     private FeatureRecord previousRecord = null;
 

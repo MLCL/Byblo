@@ -80,7 +80,7 @@ public class EntrySink extends AbstractTSVSink<EntryRecord>
 
     private final ObjectIndex<String> stringIndex;
 
-    private boolean compactFormatEnabled = true;
+    private boolean compactFormatEnabled = false;
 
     private EntryRecord previousRecord = null;
 

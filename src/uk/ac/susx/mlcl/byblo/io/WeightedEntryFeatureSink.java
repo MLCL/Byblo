@@ -84,7 +84,7 @@ public class WeightedEntryFeatureSink
 
     private final ObjectIndex<String> featureIndex;
 
-    private boolean compactFormatEnabled = true;
+    private boolean compactFormatEnabled = false;
 
     private WeightedEntryFeatureRecord previousRecord = null;
 
