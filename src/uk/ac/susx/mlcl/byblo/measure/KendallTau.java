@@ -39,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-public class KendallTau implements Proximity {
+public class KendallTau extends AbstractProximity {
 
     private static final Log LOG = LogFactory.getLog(KendallTau.class);
 

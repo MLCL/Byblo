@@ -31,64 +31,34 @@
 package uk.ac.susx.mlcl.byblo.measure;
 
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-public class JaccardMi extends AbstractMIProximity implements Proximity {
+public abstract class AbstractProximity implements Proximity {
 
-    @Override
-    public double shared(SparseDoubleVector A, SparseDoubleVector B) {
-        int shared = 0;
+    private static final Log LOG = LogFactory.getLog(AbstractProximity.class);
 
-        int i = 0, j = 0;
-        while (i < A.size && j < B.size) {
-            if (A.keys[i] < B.keys[j]) {
-                i++;
-            } else if (A.keys[i] > B.keys[j]) {
-                j++;
-            } else if (isFiltered(A.keys[i])) {
-                i++;
-                j++;
-            } else {
-                if (hasPosInf(A, i, B, j))
-                    ++shared;
-
-                i++;
-                j++;
-            }
-        }
-        return shared;
-
+    int filteredFeatureId  = -1;
+    /**
+     * 
+     */
+    public AbstractProximity() {
     }
 
     @Override
-    public double left(SparseDoubleVector A) {
-        int possible = 0;
-        for (int i = 0; i < A.size; i++) {
-            if (hasPosInf(A, i))
-                ++possible;
-        }
-        return possible;
+    public void setFilteredFeatureId(int key) {
+        filteredFeatureId = key;
     }
 
-    @Override
-    public double right(SparseDoubleVector B) {
-        return left(B);
+    public int getFilteredFeatureId() {
+        return filteredFeatureId;
     }
-
-    @Override
-    public double combine(double shared, double left, double right) {
-        return shared / (left + right - shared);
-    }
-
-    @Override
-    public boolean isSymmetric() {
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "JaccardMi{}";
+    
+    public boolean isFiltered(int featureId) {
+        return filteredFeatureId == featureId;
     }
 }

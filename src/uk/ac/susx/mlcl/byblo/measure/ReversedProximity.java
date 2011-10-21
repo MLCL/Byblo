@@ -47,23 +47,23 @@ public final class ReversedProximity implements Proximity {
     }
 
     @Override
-    public double shared(final SparseDoubleVector Q, final SparseDoubleVector R) {
-        return inner.shared(R, Q);
+    public double shared(final SparseDoubleVector A, final SparseDoubleVector B) {
+        return inner.shared(B, A);
     }
 
     @Override
-    public double left(final SparseDoubleVector Q) {
-        return inner.right(Q);
+    public double left(final SparseDoubleVector A) {
+        return inner.right(A);
     }
 
     @Override
-    public double right(final SparseDoubleVector R) {
-        return inner.left(R);
+    public double right(final SparseDoubleVector B) {
+        return inner.left(B);
     }
 
     @Override
     public double combine(final double shared, final double left,
-            final double right) {
+                          final double right) {
         return inner.combine(shared, right, left);
     }
 
@@ -79,5 +79,10 @@ public final class ReversedProximity implements Proximity {
     @Override
     public String toString() {
         return "ReversedProximity{" + "inner=" + inner + '}';
+    }
+
+    @Override
+    public void setFilteredFeatureId(int key) {
+        inner.setFilteredFeatureId(key);
     }
 }

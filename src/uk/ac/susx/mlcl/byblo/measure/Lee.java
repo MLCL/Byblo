@@ -46,7 +46,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-public class Lee implements Proximity {
+public class Lee extends AbstractProximity {
 
     private static final Log LOG = LogFactory.getLog(Lee.class);
 
@@ -70,17 +70,20 @@ public class Lee implements Proximity {
     }
 
     @Override
-    public double shared(SparseDoubleVector Q, SparseDoubleVector R) {
+    public double shared(SparseDoubleVector A, SparseDoubleVector B) {
         double sim = 0;
         int i = 0, j = 0;
-        while (i < Q.size && j < R.size) {
-            if (Q.keys[i] < R.keys[j]) {
+        while (i < A.size && j < B.size) {
+            if (A.keys[i] < B.keys[j]) {
                 i++;
-            } else if (Q.keys[i] > R.keys[j]) {
+            } else if (A.keys[i] > B.keys[j]) {
+                j++;
+            } else if (isFiltered(A.keys[i])) {
+                i++;
                 j++;
             } else {
-                final double Qprob = Q.values[i] / Q.sum;
-                final double Rprob = (R.values[j] / R.sum);
+                final double Qprob = A.values[i] / A.sum;
+                final double Rprob = (B.values[j] / B.sum);
                 sim += Qprob * (2 * Math.log(Qprob)
                         - Math.log(Rprob * alpha + Qprob * (1 - alpha))
                         + Math.log((1.0 - alpha)));
@@ -92,10 +95,10 @@ public class Lee implements Proximity {
     }
 
     @Override
-    public double left(SparseDoubleVector Q) {
+    public double left(SparseDoubleVector A) {
         double left = 0;
-        for (int i = 0; i < Q.size; i++) {
-            final double Qprob = Q.values[i] / Q.sum;
+        for (int i = 0; i < A.size; i++) {
+            final double Qprob = A.values[i] / A.sum;
             left += Qprob * (Math.log(Qprob)
                     - Math.log(Qprob * (1.0 - alpha)));
         }
@@ -103,7 +106,7 @@ public class Lee implements Proximity {
     }
 
     @Override
-    public double right(SparseDoubleVector R) {
+    public double right(SparseDoubleVector B) {
         return 0;
     }
 

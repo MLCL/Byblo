@@ -40,6 +40,7 @@ import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import java.io.IOException;
 import java.nio.charset.CharacterCodingException;
+import uk.ac.susx.mlcl.byblo.FilterTask;
 
 /**
  * Wraps a {@link WeightedEntryFeatureSource} to produce complete feature 
@@ -94,10 +95,17 @@ public class WeightedEntryFeatureVectorSource
             readNext();
         } while (next != null && next.getEntryId() == start.getEntryId());
 
-
-        return new Entry<SparseDoubleVector>(
-                start.getEntryId(),
-                SparseVectors.toDoubleVector(features, cardinality));
+        SparseDoubleVector v = SparseVectors.toDoubleVector(features, cardinality);
+        
+        
+//        v.values[v.keys[inner.getFeatureIndex().get(FilterTask.FILTERED_STRING)]] = 0;
+        
+        
+//        double sum = v.sum;
+//        v.set(inner.getFeatureIndex().get(FilterTask.FILTERED_STRING), 0);
+//        v.sum = sum;
+        
+        return new Entry<SparseDoubleVector>(start.getEntryId(), v);
     }
 
     @Override

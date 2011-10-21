@@ -38,6 +38,8 @@ import static com.google.common.base.Preconditions.*;
 import com.google.common.base.Predicate;
 import static uk.ac.susx.mlcl.lib.Predicates2.*;
 import com.google.common.io.Files;
+import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
+import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import uk.ac.susx.mlcl.lib.DoubleConverter;
 import uk.ac.susx.mlcl.byblo.io.FeatureRecord;
 import uk.ac.susx.mlcl.byblo.io.FeatureSink;
@@ -88,9 +90,11 @@ public class FilterTask extends AbstractTask implements Serializable {
      */
     private static final int PROGRESS_INTERVAL = 1000000;
 
+    public static final String FILTERED_STRING = "___FILTERED___";
     /*
      * === INPUT FILES ===
      */
+
     @Parameter(names = {"-ief", "--input-entry-features"}, required = true,
                description = "Input entry/feature pair frequencies file.")
     private File inputEntryFeaturesFile;
@@ -323,15 +327,23 @@ public class FilterTask extends AbstractTask implements Serializable {
             LOG.info(
                     "Filtering entries from " + activeEntriesFile + " to " + outputFile + ".");
 
+        final int filteredEntry = entryIndex.get(FILTERED_STRING);
+        double filteredWeight = 0;
+
         while (entriesSource.hasNext()) {
-            EntryRecord entry = entriesSource.read();
-            if (acceptEntry.apply(entry)) {
-                entriesSink.write(entry);
+            EntryRecord record = entriesSource.read();
+
+            if (record.getEntryId() == filteredEntry) {
+                filteredWeight += record.getWeight();
+            } else if (acceptEntry.apply(record)) {
+                entriesSink.write(record);
             } else {
-                rejected.add(entry.getEntryId());
+                rejected.add(record.getEntryId());
+                filteredWeight += record.getWeight();
             }
+
             if ((entriesSource.getCount() % PROGRESS_INTERVAL == 0 || !entriesSource.
-                    hasNext())
+                 hasNext())
                     && LOG.isInfoEnabled()) {
                 LOG.info(
                         "Read " + entriesSource.getCount()
@@ -340,6 +352,11 @@ public class FilterTask extends AbstractTask implements Serializable {
                 LOG.debug(MiscUtil.memoryInfoString());
             }
         }
+
+        if (filteredWeight != 0) {
+            entriesSink.write(new EntryRecord(filteredEntry, filteredWeight));
+        }
+
         entriesSink.flush();
         entriesSink.close();
         entryFilterRequired = false;
@@ -349,7 +366,8 @@ public class FilterTask extends AbstractTask implements Serializable {
         if (rejected.size() > 0) {
             entryFeatureFilterRequired = true;
             acceptEntryFeature = and(acceptEntryFeature,
-                    compose(not(in(rejected)), entryFeatureEntryId()));
+                                     compose(not(in(rejected)),
+                                             entryFeatureEntryId()));
         }
     }
 
@@ -358,48 +376,108 @@ public class FilterTask extends AbstractTask implements Serializable {
     // only appear in filtered entries to filter the featuress file.
     private void filterEntryFeatures()
             throws FileNotFoundException, IOException {
+
         IntSet acceptedEntries = new IntOpenHashSet();
         IntSet rejectedEntries = new IntOpenHashSet();
 
         IntSet rejectedFeatures = new IntOpenHashSet();
         IntSet acceptedFeatures = new IntOpenHashSet();
 
-        WeightedEntryFeatureSource featuresSource = new WeightedEntryFeatureSource(
+        WeightedEntryFeatureSource efSrc = new WeightedEntryFeatureSource(
                 activeEntryFeaturesFile, charset, entryIndex, featureIndex);
 
         File outputFile = tempFiles.createFile();
         outputFile.deleteOnExit();
 
-        WeightedEntryFeatureSink entryFeaturesSink = new WeightedEntryFeatureSink(
+        WeightedEntryFeatureSink efSink = new WeightedEntryFeatureSink(
                 outputFile, charset,
                 entryIndex, featureIndex);
 
         if (LOG.isInfoEnabled())
-            LOG.info(
-                    "Filtering entry/features pairs from " + activeEntryFeaturesFile + " to " + outputFile + ".");
+            LOG.info("Filtering entry/features pairs from "
+                    + activeEntryFeaturesFile + " to " + outputFile + ".");
 
-        while (featuresSource.hasNext()) {
-            WeightedEntryFeatureRecord entry = featuresSource.read();
-            if (acceptEntryFeature.apply(entry)) {
-                entryFeaturesSink.write(entry);
-                acceptedFeatures.add(entry.getFeatureId());
-                acceptedEntries.add(entry.getEntryId());
+        // Store the id of the special filtered feature and entry
+        final int filteredEntry = entryIndex.get(FILTERED_STRING);
+        final int filteredFeature = featureIndex.get(FILTERED_STRING);
+
+        int currentEntryId = -1;
+        int currentEntryFeatureCount = 0;
+        double currentEntryFilteredFeatureWeight = 0;
+
+        double filteredEntryWeight = 0;
+
+        while (efSrc.hasNext()) {
+            WeightedEntryFeatureRecord record = efSrc.read();
+
+            if (record.getEntryId() == filteredEntry) {
+                filteredEntryWeight += record.getWeight();
+                continue;
+            }
+
+            if (record.getEntryId() != currentEntryId) {
+
+                if (currentEntryId != -1 && currentEntryFilteredFeatureWeight != 0) {
+                    if (currentEntryFeatureCount == 0)
+                        filteredEntryWeight += currentEntryFilteredFeatureWeight;
+                    else
+                        efSink.write(new WeightedEntryFeatureRecord(
+                                currentEntryId, filteredFeature,
+                                currentEntryFilteredFeatureWeight));
+                }
+
+                currentEntryId = record.getEntryId();
+                currentEntryFilteredFeatureWeight = 0;
+                currentEntryFeatureCount = 0;
+            }
+
+            if (record.getFeatureId() == filteredFeature) {
+
+                currentEntryFilteredFeatureWeight += record.getWeight();
+
+            } else if (acceptEntryFeature.apply(record)) {
+
+                efSink.write(record);
+                acceptedFeatures.add(record.getFeatureId());
+                acceptedEntries.add(record.getEntryId());
+                ++currentEntryFeatureCount;
+
             } else {
-                rejectedFeatures.add(entry.getFeatureId());
-                rejectedEntries.add(entry.getEntryId());
+                rejectedFeatures.add(record.getFeatureId());
+                rejectedEntries.add(record.getEntryId());
+
+                currentEntryFilteredFeatureWeight += record.getWeight();
             }
 
 
-            if ((featuresSource.getCount() % PROGRESS_INTERVAL == 0
-                    || !featuresSource.hasNext()) && LOG.isInfoEnabled()) {
+            if ((efSrc.getCount() % PROGRESS_INTERVAL == 0
+                 || !efSrc.hasNext()) && LOG.isInfoEnabled()) {
                 LOG.info(
-                        "Read " + featuresSource.getCount() + " feature entries."
-                        + "(" + (int) featuresSource.percentRead() + "% complete)");
+                        "Read " + efSrc.getCount() + " feature entries."
+                        + "(" + (int) efSrc.percentRead() + "% complete)");
                 LOG.debug(MiscUtil.memoryInfoString());
             }
         }
-        entryFeaturesSink.flush();
-        entryFeaturesSink.close();
+
+
+        if (currentEntryId != -1 && currentEntryFilteredFeatureWeight != 0) {
+            if (currentEntryFeatureCount == 0)
+                filteredEntryWeight += currentEntryFilteredFeatureWeight;
+            else
+                efSink.write(new WeightedEntryFeatureRecord(
+                        currentEntryId, filteredFeature,
+                        currentEntryFilteredFeatureWeight));
+        }
+
+        // If there have been entire entries filtered then write their summed
+        // weights to a special filtered entry/feature pair
+        if (filteredEntryWeight != 0) {
+            efSink.write(new WeightedEntryFeatureRecord(
+                    filteredEntry, filteredFeature, filteredEntryWeight));
+        }
+
+        efSink.flush();
+        efSink.close();
         entryFeatureFilterRequired = false;
         activeEntryFeaturesFile = outputFile;
 
@@ -408,13 +486,13 @@ public class FilterTask extends AbstractTask implements Serializable {
 
         if (rejectedEntries.size() > 0) {
             acceptEntry = and(acceptEntry,
-                    compose(not(in(rejectedEntries)), entryId()));
+                              compose(not(in(rejectedEntries)), entryId()));
             entryFilterRequired = true;
         }
 
         if (rejectedFeatures.size() > 0) {
             acceptFeature = and(acceptFeature,
-                    not(compose(in(rejectedFeatures), featureId())));
+                                not(compose(in(rejectedFeatures), featureId())));
             featureFilterRequired = true;
 
         }
@@ -439,17 +517,25 @@ public class FilterTask extends AbstractTask implements Serializable {
             LOG.info(
                     "Filtering features from " + activeFeaturesFile + " to " + outputFile + ".");
 
+        // Store an filtered wieght here and record it so as to maintain
+        // accurate priors for those features that remain
+        double filteredWeight = 0;
+        int filteredId = featureSource.getStringIndex().get(FILTERED_STRING);
+
         while (featureSource.hasNext()) {
             FeatureRecord feature = featureSource.read();
 
-            if (acceptFeature.apply(feature)) {
+            if (feature.getFeatureId() == filteredId) {
+                filteredWeight += feature.getWeight();
+            } else if (acceptFeature.apply(feature)) {
                 featureSink.write(feature);
             } else {
                 rejectedFeatures.add(feature.getFeatureId());
+                filteredWeight += feature.getWeight();
             }
 
             if ((featureSource.getCount() % PROGRESS_INTERVAL == 0
-                    || !featureSource.hasNext())
+                 || !featureSource.hasNext())
                     && LOG.isInfoEnabled()) {
                 LOG.info(
                         "Read " + featureSource.getCount()
@@ -457,6 +543,10 @@ public class FilterTask extends AbstractTask implements Serializable {
                         + "(" + (int) featureSource.percentRead() + "% complete)");
                 LOG.debug(MiscUtil.memoryInfoString());
             }
+        }
+
+        if (filteredWeight != 0) {
+            featureSink.write(new FeatureRecord(filteredId, filteredWeight));
         }
         featureSink.flush();
         featureSink.close();

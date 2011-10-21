@@ -306,6 +306,9 @@ public class AllPairsTask extends AbstractTask {
         // Parameterise the all-pairs algorithm
         apss.setNumThreads(nThreads);
         apss.setSink(sink);
+        
+        prox.setFilteredFeatureId(strIndex.get(FilterTask.FILTERED_STRING));
+        
         apss.setMeasure(prox);
         apss.setMaxChunkSize(chunkSize);
 

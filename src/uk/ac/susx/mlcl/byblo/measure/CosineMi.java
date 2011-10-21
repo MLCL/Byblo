@@ -38,17 +38,20 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 public class CosineMi extends AbstractMIProximity implements Proximity {
 
     @Override
-    public double shared(SparseDoubleVector Q, SparseDoubleVector R) {
+    public double shared(SparseDoubleVector A, SparseDoubleVector B) {
         double numerator = 0;
 
         int i = 0, j = 0;
-        while (i < Q.size && j < R.size) {
-            if (Q.keys[i] < R.keys[j]) {
+        while (i < A.size && j < B.size) {
+            if (A.keys[i] < B.keys[j]) {
                 i++;
-            } else if (Q.keys[i] > R.keys[j]) {
+            } else if (A.keys[i] > B.keys[j]) {
+                j++;
+            } else if (isFiltered(A.keys[i])) {
+                i++;
                 j++;
             } else {
-                numerator += posInf(Q, i) * posInf(R, j);
+                numerator += posInf(A, i) * posInf(B, j);
                 i++;
                 j++;
             }
@@ -58,10 +61,10 @@ public class CosineMi extends AbstractMIProximity implements Proximity {
     }
 
     @Override
-    public double left(SparseDoubleVector Q) {
+    public double left(SparseDoubleVector A) {
         double Qdenominator = 0;
-        for (int i = 0; i < Q.size; i++) {
-            final double Qinf = posInf(Q, i);
+        for (int i = 0; i < A.size; i++) {
+            final double Qinf = posInf(A, i);
             if (Qinf > 0) {
                 Qdenominator += Qinf * Qinf;
             }
@@ -70,8 +73,8 @@ public class CosineMi extends AbstractMIProximity implements Proximity {
     }
 
     @Override
-    public double right(SparseDoubleVector R) {
-        return left(R);
+    public double right(SparseDoubleVector B) {
+        return left(B);
     }
 
     @Override

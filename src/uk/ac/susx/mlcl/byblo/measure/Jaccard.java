@@ -38,7 +38,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-public class Jaccard implements Proximity {
+public class Jaccard extends AbstractProximity {
 
     @Override
     public double shared(final SparseDoubleVector A, final SparseDoubleVector B) {
@@ -49,6 +49,9 @@ public class Jaccard implements Proximity {
             if (A.keys[i] < B.keys[j]) {
                 i++;
             } else if (A.keys[i] > B.keys[j]) {
+                j++;
+            } else if (isFiltered(A.keys[i])) {
+                i++;
                 j++;
             } else {
                 ++shared;
@@ -65,8 +68,8 @@ public class Jaccard implements Proximity {
     }
 
     @Override
-    public double right(final SparseDoubleVector A) {
-        return A.size;
+    public double right(final SparseDoubleVector B) {
+        return B.size;
     }
 
     @Override

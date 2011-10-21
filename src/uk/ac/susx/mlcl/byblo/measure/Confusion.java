@@ -41,7 +41,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-public class Confusion extends AbstractMIProximity implements Proximity {
+public class Confusion extends AbstractMIProximity {
 
     @Override
     public double shared(SparseDoubleVector A, SparseDoubleVector B) {
@@ -52,6 +52,9 @@ public class Confusion extends AbstractMIProximity implements Proximity {
             if (A.keys[i] < B.keys[j]) {
                 i++;
             } else if (A.keys[i] > B.keys[j]) {
+                j++;
+            } else if (isFiltered(A.keys[i])) {
+                i++;
                 j++;
             } else { // Q.keys[i] == R.keys[j]
                 total += (prob(A, i) * prob(B, j))

@@ -39,20 +39,23 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 public class Lin extends AbstractMIProximity {
 
     @Override
-    public double shared(SparseDoubleVector Q, SparseDoubleVector R) {
+    public double shared(SparseDoubleVector A, SparseDoubleVector B) {
         double numerator = 0.0;
 
         int i = 0;
         int j = 0;
-        while (i < Q.size && j < R.size) {
-            if (Q.keys[i] < R.keys[j]) {
+        while (i < A.size && j < B.size) {
+            if (A.keys[i] < B.keys[j]) {
                 ++i;
-            } else if (Q.keys[i] > R.keys[j]) {
+            } else if (A.keys[i] > B.keys[j]) {
                 ++j;
+            } else if (isFiltered(A.keys[i])) {
+                i++;
+                j++;
             } else {
-                final double Qinf = posInf(Q, i);
+                final double Qinf = posInf(A, i);
                 if (Qinf > 0) {
-                    final double Rinf = posInf(R, j);
+                    final double Rinf = posInf(B, j);
                     if (Rinf > 0) {
                         numerator += Qinf + Rinf;
                     }
@@ -67,19 +70,19 @@ public class Lin extends AbstractMIProximity {
     }
 
     @Override
-    public double left(SparseDoubleVector Q) {
+    public double left(SparseDoubleVector A) {
         double denominator = 0.0;
 
-        for (int i = 0; i < Q.size; i++) {
-            denominator += posInf(Q, i);
+        for (int i = 0; i < A.size; i++) {
+            denominator += posInf(A, i);
         }
 
         return denominator;
     }
 
     @Override
-    public double right(SparseDoubleVector R) {
-        return left(R);
+    public double right(SparseDoubleVector B) {
+        return left(B);
     }
 
     @Override

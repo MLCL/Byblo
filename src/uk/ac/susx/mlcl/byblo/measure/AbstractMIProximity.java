@@ -42,7 +42,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-public abstract class AbstractMIProximity implements Proximity {
+public abstract class AbstractMIProximity extends AbstractProximity {
 
     private static final Log LOG = LogFactory.getLog(AbstractMIProximity.class);
 
@@ -180,7 +180,7 @@ public abstract class AbstractMIProximity implements Proximity {
     // Calculate if the features would both have positive
     // information content w.r.t the feature data.
     public boolean hasPosInf(final SparseDoubleVector Q, final int i,
-            final SparseDoubleVector R, final int j) {
+                             final SparseDoubleVector R, final int j) {
         final double vprob = featurePrior(Q.keys[i]);
         return prob(Q, i) > vprob && prob(R, j) > vprob;
     }

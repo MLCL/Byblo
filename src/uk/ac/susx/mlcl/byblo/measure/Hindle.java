@@ -38,22 +38,25 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 public class Hindle extends AbstractMIProximity implements Proximity {
 
     @Override
-    public double shared(SparseDoubleVector Q, SparseDoubleVector R) {
+    public double shared(SparseDoubleVector A, SparseDoubleVector B) {
         double sim = 0;
 
         int i = 0, j = 0;
-        while (i < Q.size && j < R.size) {
-            if (Q.keys[i] < R.keys[j]) {
+        while (i < A.size && j < B.size) {
+            if (A.keys[i] < B.keys[j]) {
 
                 i++;
-            } else if (Q.keys[i] > R.keys[j]) {
+            } else if (A.keys[i] > B.keys[j]) {
 
                 j++;
+            } else if (isFiltered(A.keys[i])) {
+                i++;
+                j++;
             } else { // Q.keys[i] == R.keys[j]
-                final double Cprob = featurePrior(Q.keys[i]);
-                final double Qprob = prob(Q, i);
+                final double Cprob = featurePrior(A.keys[i]);
+                final double Qprob = prob(A, i);
                 if (Qprob > Cprob) {
-                    final double Rprob = prob(R, j);
+                    final double Rprob = prob(B, j);
                     if (Rprob > Cprob) {
                         sim += Math.log(Math.min(Qprob / Cprob, Rprob / Cprob));
                     }
@@ -66,12 +69,12 @@ public class Hindle extends AbstractMIProximity implements Proximity {
     }
 
     @Override
-    public double left(SparseDoubleVector Q) {
+    public double left(SparseDoubleVector A) {
         return 0;
     }
 
     @Override
-    public double right(SparseDoubleVector R) {
+    public double right(SparseDoubleVector B) {
         return 0;
     }
 

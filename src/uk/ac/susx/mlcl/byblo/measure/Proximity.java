@@ -49,17 +49,19 @@ public interface Proximity {
      * If it is not possible to break up the measure in this way, shared should
      * implement the whole measure.
      *
-     * @param Q the first feature vector
-     * @param R the second feature vector
+     * @param A the first feature vector
+     * @param B the second feature vector
      * @return portion of similarity measure dependent on both Q and R
      */
-    double shared(SparseDoubleVector Q, SparseDoubleVector R);
+    double shared(SparseDoubleVector A, SparseDoubleVector B);
 
-    double left(SparseDoubleVector Q);
+    double left(SparseDoubleVector A);
 
-    double right(SparseDoubleVector R);
+    double right(SparseDoubleVector B);
 
     double combine(double shared, double left, double right);
 
     boolean isSymmetric();
+    
+    void setFilteredFeatureId(int key);
 }

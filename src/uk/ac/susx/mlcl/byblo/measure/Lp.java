@@ -36,7 +36,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-public class Lp implements Proximity {
+public class Lp extends AbstractProximity {
 
     public static final double DEFAULT_P = 1;
 
@@ -55,21 +55,24 @@ public class Lp implements Proximity {
     }
 
     @Override
-    public double shared(SparseDoubleVector Q, SparseDoubleVector R) {
+    public double shared(SparseDoubleVector A, SparseDoubleVector B) {
         double shared = 0;
 
         if (p == 0) {
             throw new UnsupportedOperationException("L_0 isn't implemented yet.");
         } else if (p == 1) {
             int i = 0, j = 0;
-            while (i < Q.size && j < R.size) {
-                if (Q.keys[i] < R.keys[j]) {
+            while (i < A.size && j < B.size) {
+                if (A.keys[i] < B.keys[j]) {
                     i++;
-                } else if (Q.keys[i] > R.keys[j]) {
+                } else if (A.keys[i] > B.keys[j]) {
+                    j++;
+                } else if (isFiltered(A.keys[i])) {
+                    i++;
                     j++;
                 } else { // Q.keys[i] == R.keys[j]
-                    final double Qprob = Q.values[i] / Q.sum;
-                    final double Rprob = R.values[j] / R.sum;
+                    final double Qprob = A.values[i] / A.sum;
+                    final double Rprob = B.values[j] / B.sum;
                     shared += Math.abs(Qprob - Rprob)
                             - Rprob
                             - Qprob;
@@ -79,14 +82,17 @@ public class Lp implements Proximity {
             }
         } else if (p == 2) {
             int i = 0, j = 0;
-            while (i < Q.size && j < R.size) {
-                if (Q.keys[i] < R.keys[j]) {
+            while (i < A.size && j < B.size) {
+                if (A.keys[i] < B.keys[j]) {
                     i++;
-                } else if (Q.keys[i] > R.keys[j]) {
+                } else if (A.keys[i] > B.keys[j]) {
+                    j++;
+                } else if (isFiltered(A.keys[i])) {
+                    i++;
                     j++;
                 } else {
-                    final double Qprob = Q.values[i] / Q.sum;
-                    final double Rprob = R.values[j] / R.sum;
+                    final double Qprob = A.values[i] / A.sum;
+                    final double Rprob = B.values[j] / B.sum;
                     shared += (Qprob - Rprob) * (Qprob - Rprob)
                             - Rprob * Rprob
                             - Qprob * Qprob;
@@ -96,38 +102,46 @@ public class Lp implements Proximity {
             }
         } else if (p == Double.POSITIVE_INFINITY) {
             int i = 0, j = 0;
-            while (i < Q.size && j < R.size) {
-                if (Q.keys[i] < R.keys[j]) {
-                    shared = Math.max(shared, (Q.values[i] / Q.sum));
+            while (i < A.size && j < B.size) {
+                if (A.keys[i] < B.keys[j]) {
+                    shared = Math.max(shared, (A.values[i] / A.sum));
                     i++;
-                } else if (Q.keys[i] > R.keys[j]) {
-                    shared = Math.max(shared, (R.values[j] / R.sum));
+                } else if (A.keys[i] > B.keys[j]) {
+                    shared = Math.max(shared, (B.values[j] / B.sum));
+                    j++;
+                } else if (isFiltered(A.keys[i])) {
+                    shared = Math.max(shared, (A.values[i] / A.sum));
+                    shared = Math.max(shared, (B.values[j] / B.sum));
+                    i++;
                     j++;
                 } else {
                     shared = Math.max(shared, Math.abs(
-                            (Q.values[i] / Q.sum) - (R.values[j] / R.sum)));
+                            (A.values[i] / A.sum) - (B.values[j] / B.sum)));
                     i++;
                     j++;
                 }
             }
-            while (i < Q.size) {
-                shared = Math.max(shared, (Q.values[i] / Q.sum));
+            while (i < A.size) {
+                shared = Math.max(shared, (A.values[i] / A.sum));
                 i++;
             }
-            while (j < R.size) {
-                shared = Math.max(shared, (R.values[j] / R.sum));
+            while (j < B.size) {
+                shared = Math.max(shared, (B.values[j] / B.sum));
                 j++;
             }
         } else {
             int i = 0, j = 0;
-            while (i < Q.size && j < R.size) {
-                if (Q.keys[i] < R.keys[j]) {
+            while (i < A.size && j < B.size) {
+                if (A.keys[i] < B.keys[j]) {
                     i++;
-                } else if (Q.keys[i] > R.keys[j]) {
+                } else if (A.keys[i] > B.keys[j]) {
+                    j++;
+                } else if (isFiltered(A.keys[i])) {
+                    i++;
                     j++;
                 } else {
-                    final double Qprob = Q.values[i] / Q.sum;
-                    final double Rprob = R.values[j] / R.sum;
+                    final double Qprob = A.values[i] / A.sum;
+                    final double Rprob = B.values[j] / B.sum;
                     shared += Math.pow(Math.abs(Qprob - Rprob), p)
                             - (Math.pow(Rprob, p) + Math.pow(Qprob, p));
                     i++;
@@ -139,31 +153,31 @@ public class Lp implements Proximity {
     }
 
     @Override
-    public double left(SparseDoubleVector Q) {
+    public double left(SparseDoubleVector A) {
         if (p == 0) {
             throw new UnsupportedOperationException("L_0 isn't implemented yet.");
         } else if (p == 1) {
             return 1;
         } else if (p == 2) {
             double left = 0;
-            for (int i = 0; i < Q.size; i++) {
-                left += (Q.values[i] / Q.sum) * (Q.values[i] / Q.sum);
+            for (int i = 0; i < A.size; i++) {
+                left += (A.values[i] / A.sum) * (A.values[i] / A.sum);
             }
             return left;
         } else if (p == Double.POSITIVE_INFINITY) {
             return 0;
         } else {
             double left = 0;
-            for (int i = 0; i < Q.size; i++) {
-                left += Math.pow(Q.values[i] / Q.sum, p);
+            for (int i = 0; i < A.size; i++) {
+                left += Math.pow(A.values[i] / A.sum, p);
             }
             return left;
         }
     }
 
     @Override
-    public double right(SparseDoubleVector R) {
-        return left(R);
+    public double right(SparseDoubleVector B) {
+        return left(B);
     }
 
     @Override

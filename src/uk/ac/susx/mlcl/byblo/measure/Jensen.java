@@ -39,7 +39,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-public class Jensen implements Proximity {
+public class Jensen extends AbstractProximity {
 
     private static final Log LOG = LogFactory.getLog(Jensen.class);
 
@@ -52,18 +52,21 @@ public class Jensen implements Proximity {
     }
 
     @Override
-    public double shared(SparseDoubleVector Q, SparseDoubleVector R) {
+    public double shared(SparseDoubleVector A, SparseDoubleVector B) {
         double comp = 0;
 
         int i = 0, j = 0;
-        while (i < Q.size && j < R.size) {
-            if (Q.keys[i] < R.keys[j]) {
+        while (i < A.size && j < B.size) {
+            if (A.keys[i] < B.keys[j]) {
                 i++;
-            } else if (Q.keys[i] > R.keys[j]) {
+            } else if (A.keys[i] > B.keys[j]) {
+                j++;
+            } else if (isFiltered(A.keys[i])) {
+                i++;
                 j++;
             } else {
-                final double Qprob = Q.values[i] / Q.sum;
-                final double Rprob = R.values[j] / R.sum;
+                final double Qprob = A.values[i] / A.sum;
+                final double Rprob = B.values[j] / B.sum;
                 final double avprob = Math.log(Qprob + Rprob) - LN2;
                 comp += Qprob * (2 * Math.log(Qprob) - avprob - LN2)
                         + Rprob * (2 * Math.log(Rprob) - avprob - LN2);
@@ -76,18 +79,18 @@ public class Jensen implements Proximity {
     }
 
     @Override
-    public double left(SparseDoubleVector Q) {
+    public double left(SparseDoubleVector A) {
         double comp = 0;
-        for (int i = 0; i < Q.size; i++) {
-            final double Qprob = Q.values[i] / Q.sum;
+        for (int i = 0; i < A.size; i++) {
+            final double Qprob = A.values[i] / A.sum;
             comp += Qprob * (-((Qprob - 1) * Math.log(Qprob) - Qprob * LN2));
         }
         return comp;
     }
 
     @Override
-    public double right(SparseDoubleVector R) {
-        return left(R);
+    public double right(SparseDoubleVector B) {
+        return left(B);
     }
 
     @Override

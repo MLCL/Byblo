@@ -66,18 +66,21 @@ public class RecallMi extends AbstractMIProximity implements Proximity {
     }
 
     @Override
-    public double shared(SparseDoubleVector A, SparseDoubleVector B) {
+    public double shared(SparseDoubleVector Q, SparseDoubleVector R) {
         double numerator = 0.0;
 
         int i = 0, j = 0;
-        while (i < A.size && j < B.size) {
-            if (A.keys[i] < B.keys[j]) {
+        while (i < Q.size && j < R.size) {
+            if (Q.keys[i] < R.keys[j]) {
                 i++;
-            } else if (A.keys[i] > B.keys[j]) {
+            } else if (Q.keys[i] > R.keys[j]) {
+                j++;
+            } else if (isFiltered(Q.keys[i])) {
+                i++;
                 j++;
             } else {
-                if (posInf(B, j) > 0) {
-                    numerator += posInf(A, i);
+                if (posInf(R, j) > 0) {
+                    numerator += posInf(Q, i);
                 }
                 i++;
                 j++;
