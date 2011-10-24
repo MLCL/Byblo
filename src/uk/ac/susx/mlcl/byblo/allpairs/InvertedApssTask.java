@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import uk.ac.susx.mlcl.lib.io.IOUtil;
 
 /**
  * An all-pairs similarity search implementation that improves efficiency by
@@ -86,7 +87,8 @@ public class InvertedApssTask<S> extends NaiveApssTask<S> {
                 getStats().incrementCandidatesCount();
 
                 double sim = sim(a, b);
-                WeightedEntryPairRecord pair = new WeightedEntryPairRecord(a.key(), b.key(), sim);
+                WeightedEntryPairRecord pair = new WeightedEntryPairRecord(
+                        a.key(), b.key(), sim);
                 if (getProducatePair().apply(pair)) {
                     pairs.add(pair);
                     getStats().incrementProductionCount();
@@ -94,7 +96,7 @@ public class InvertedApssTask<S> extends NaiveApssTask<S> {
             }
         }
         synchronized (getSink()) {
-            getSink().writeAll(pairs);
+            IOUtil.copy(pairs, getSink());
             if (getSink() instanceof Flushable)
                 ((Flushable) getSink()).flush();
         }

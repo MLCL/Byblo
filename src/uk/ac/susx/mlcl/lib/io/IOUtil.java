@@ -58,6 +58,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.Checks;
 
 /**
  *
@@ -307,11 +308,6 @@ public class IOUtil {
             public void write(T record) throws IOException {
                 collection.add(record);
             }
-
-            @Override
-            public void writeAll(Collection<? extends T> records) throws IOException {
-                collection.addAll(records);
-            }
         };
     }
 
@@ -370,5 +366,42 @@ public class IOUtil {
 
     public static File createTempDir(String prefix, String suffix) throws IOException {
         return createTempDir(prefix, suffix, null);
+    }
+
+    public static <T> int copy(final Iterable<? extends T> source,
+            final Sink<? super T> sink, final int limit) throws IOException {
+        Checks.checkNotNull("source", source);
+        Checks.checkNotNull("sink", sink);
+        Checks.checkRangeIncl(limit, 0, Integer.MAX_VALUE);
+        int count = 0;
+        final Iterator<? extends T> it = source.iterator();
+        while (it.hasNext() && count < limit) {
+            sink.write(it.next());
+            ++count;
+        }
+        return count;
+    }
+
+    public static <T> int copy(final Iterable<? extends T> source,
+            final Sink<? super T> sink) throws IOException {
+        return copy(source, sink, Integer.MAX_VALUE);
+    }
+
+    public static <T> int copy(final Source<? extends T> source,
+            final Collection<? super T> sink, final int limit) throws IOException {
+        Checks.checkNotNull("source", source);
+        Checks.checkNotNull("sink", sink);
+        Checks.checkRangeIncl(limit, 0, Integer.MAX_VALUE);
+        int count = 0;
+        while (source.hasNext() && count < limit) {
+            sink.add(source.read());
+            ++count;
+        }
+        return count;
+    }
+
+    public static <T> int copy(final Source<? extends T> source,
+            final Collection<? super T> sink) throws IOException {
+        return copy(source, sink, Integer.MAX_VALUE);
     }
 }

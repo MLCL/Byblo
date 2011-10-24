@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.io.IOUtil;
 
 /**
  * The most basic implementation of all-pairs similarity search. Will only 
@@ -321,7 +322,7 @@ public class NaiveApssTask<P> extends AbstractTask {
             }
         }
         synchronized (getSink()) {
-            getSink().writeAll(pairs);
+            IOUtil.copy(pairs, getSink());
             if (getSink() instanceof Flushable)
                 ((Flushable) getSink()).flush();
         }

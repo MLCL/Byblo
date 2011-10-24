@@ -33,7 +33,6 @@ package uk.ac.susx.mlcl.byblo.io;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
-import java.util.Collection;
 import uk.ac.susx.mlcl.lib.collect.Entry;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.Sink;
@@ -58,13 +57,6 @@ public class WeightedEntryFeatureVectorSink
         for (int i = 0; i < vec.size; i++) {
             inner.write(new WeightedEntryFeatureRecord(
                     entryId, vec.keys[i], vec.values[i]));
-        }
-    }
-
-    @Override
-    public void writeAll(Collection<? extends Entry<SparseDoubleVector>> records) throws IOException {
-        for (Entry<SparseDoubleVector> record : records) {
-            write(record);
         }
     }
 

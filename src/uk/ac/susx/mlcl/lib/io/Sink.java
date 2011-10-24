@@ -31,7 +31,6 @@
 package uk.ac.susx.mlcl.lib.io;
 
 import java.io.IOException;
-import java.util.Collection;
 
 /**
  * Interface defining the acceptance of objects of the given type
@@ -50,6 +49,4 @@ public interface Sink<T> {
      * @throws IOException something has gone wrong with the underlying store
      */
     void write(final T record) throws IOException;
-
-    void writeAll(final Collection<? extends T> records) throws IOException;
 }

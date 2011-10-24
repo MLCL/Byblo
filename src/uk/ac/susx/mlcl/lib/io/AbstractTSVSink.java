@@ -40,7 +40,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import java.util.Collection;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -70,13 +69,6 @@ public abstract class AbstractTSVSink<T>
                 new OutputStreamWriter(
                 new FileOutputStream(file), charset));
 
-    }
-
-    @Override
-    public void writeAll(Collection<? extends T> objs) throws IOException {
-        for (T o : objs) {
-            write(o);
-        }
     }
 
     protected void writeRecordDelimiter() throws IOException {
