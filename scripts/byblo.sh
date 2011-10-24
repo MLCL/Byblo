@@ -93,6 +93,7 @@ readonly PAIRS_SUFFIX=".pairs"
 readonly NEIGHBOURS_SUFFIX=".neighs"
 
 readonly JAVA_ARGS="-Xmx16g"
+readonly JAVA_CMD="java $JAVA_ARGS -cp Byblo.jar:libs/* uk.ac.susx.mlcl.byblo.Byblo"
 
 
 # ====================================
@@ -410,7 +411,7 @@ function count {
     [[ -e $featuresFile ]] && warn "Overwriting features file '$featuresFile'."
     [[ -e $entryFeaturesFile ]] && warn "Overwriting features file '$entryFeaturesFile'."
 
-    java $JAVA_ARGS -jar Byblo.jar count \
+    $JAVA_CMD count \
         --charset $charset \
         --input $inputFile \
         --output-entries $entriesFile \
@@ -443,7 +444,7 @@ function filter {
     [[ -e $entryFeaturesFile${FILTERED_SUFFIX} ]] && \
         warn "Overwriting entry-features file '$entryFeaturesFile${FILTERED_SUFFIX}'."
 
-    java $JAVA_ARGS -jar Byblo.jar filter $filters \
+    $JAVA_CMD filter $filters \
         -T $tempdir \
         --input-entries $entriesFile \
         --input-features $featuresFile \
@@ -484,7 +485,7 @@ function allpairs {
 
     [[ -e $pairsFile ]] && warn "Overwriting pairs file '$pairsFile'."
 
-    java $JAVA_ARGS -jar Byblo.jar allpairs $apssArgs \
+    $JAVA_CMD allpairs $apssArgs \
             --input $entryFeaturesFile \
             --input-entries $entriesFile \
             --input-features $featuresFile \
@@ -521,7 +522,7 @@ function neighbours {
 
     [[ -e $neighsFile ]] && warn "Overwriting neighbours file '$neighsFile'."
 
-    java $JAVA_ARGS -jar Byblo.jar knn $sortArgs \
+    $JAVA_CMD knn $sortArgs \
         --charset $charset \
         -k $sortK \
         --temporary-directory $tempdir \
