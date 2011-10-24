@@ -244,9 +244,7 @@ public class AllPairsTask extends AbstractTask {
                 bmip.setOccuringFeatureCount(features.getCardinality());
 
             } catch (IOException e) {
-                LOG.fatal("Error reading feature totals file " + featuresFile + " : " + e.
-                        toString());
-                System.exit(1);
+                throw e;
             }
             System.err.println("Loaded features for MI");
         } else if (prox instanceof KendallTau) {
@@ -262,10 +260,7 @@ public class AllPairsTask extends AbstractTask {
                 ((KendallTau) prox).setNumFeatures(features.getCardinality());
 
             } catch (IOException e) {
-                if (LOG.isFatalEnabled())
-                    LOG.fatal("Error reading features file "
-                            + featuresFile + " : " + e.toString());
-                System.exit(1);
+                throw e;
             }
         }
 
