@@ -225,14 +225,6 @@ public class AllPairsTask extends AbstractTask {
 
         ObjectIndex<String> strIndex = new ObjectIndex<String>();
 
-        if (LOG.isDebugEnabled())
-            LOG.debug("Loading entry frequencies file " + entriesFile);
-        EntrySource entrySource = new EntrySource(
-                entriesFile, charset, strIndex);
-        //TODO: Remove because it's never used?
-        double[] entryFrequencies = entrySource.readAllAsArray();
-
-
         // Entry index is not really required for the core algorithm
         // implementation but is used to filter Entries
 
