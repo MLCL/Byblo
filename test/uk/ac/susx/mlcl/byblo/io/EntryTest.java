@@ -51,8 +51,8 @@ import static uk.ac.susx.mlcl.TestConstants.*;
 public class EntryTest {
 
     private void copyE(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        EntrySource aSrc = new EntrySource(a, DEFAULT_CHARSET);
-        EntrySink bSink = new EntrySink(b, DEFAULT_CHARSET,
+        WeightedTokenSource aSrc = new WeightedTokenSource(a, DEFAULT_CHARSET);
+        WeightedTokenSink bSink = new WeightedTokenSink(b, DEFAULT_CHARSET,
                 aSrc.getStringIndex());
         bSink.setCompactFormatEnabled(compact);
 
@@ -83,14 +83,14 @@ public class EntryTest {
     }
 
     public void testRandomAccess(File file) throws FileNotFoundException, IOException {
-        final Map<Tell, Weighted<Entry>> hist =
-                new HashMap<Tell, Weighted<Entry>>();
+        final Map<Tell, Weighted<Token>> hist =
+                new HashMap<Tell, Weighted<Token>>();
 
-        EntrySource src = new EntrySource(file, DEFAULT_CHARSET);
+        WeightedTokenSource src = new WeightedTokenSource(file, DEFAULT_CHARSET);
         {
             while (src.hasNext()) {
                 final Tell pos = src.position();
-                final Weighted<Entry> record = src.read();
+                final Weighted<Token> record = src.read();
 
                 System.out.println(pos.toString() + ": " + record.get().toString(src.
                         getStringIndex()));
@@ -106,7 +106,7 @@ public class EntryTest {
 
             for (int i = 0; i < 10; i++) {
                 final Tell pos = positions.get(rand.nextInt(positions.size()));
-                final Weighted<Entry> expected = hist.get(pos);
+                final Weighted<Token> expected = hist.get(pos);
 
                 System.out.println("expected tell: " + pos);
                 System.out.println("expected: " + expected.get().toString(src.
@@ -117,7 +117,7 @@ public class EntryTest {
                 assertTrue(src.hasNext());
                 assertEquals(pos, src.position());
 
-                Weighted<Entry> actual = src.read();
+                Weighted<Token> actual = src.read();
                 System.out.println("actual tell: " + src.position());
                 System.out.println("actual: " + actual.get().toString(src.
                         getStringIndex()));

@@ -30,13 +30,11 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
-import org.junit.Ignore;
-import uk.ac.susx.mlcl.byblo.io.EntrySource;
-import uk.ac.susx.mlcl.byblo.io.FeatureSource;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
 import java.io.File;
 import java.nio.charset.Charset;
 import org.junit.Test;
-import uk.ac.susx.mlcl.byblo.io.EntryFeatureSource;
+import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import static uk.ac.susx.mlcl.ExitTrapper.*;
@@ -85,8 +83,7 @@ public class ExternalCountTaskTest {
             "--output-features", outF.toString(),
             "--output-entry-features", outEF.toString(),
             "--charset", charset.name(),
-            "--chunk-size", ""+chunkSize
-                
+            "--chunk-size", "" + chunkSize
         };
 
         enableExistTrapping();
@@ -140,12 +137,13 @@ public class ExternalCountTaskTest {
                 DEFAULT_CHARSET, 1000000);
 
         assertTrue("Output entries file differs from sampledata file.",
-                EntrySource.equal(eActual, TEST_FRUIT_ENTRIES, DEFAULT_CHARSET));
+                WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
+                DEFAULT_CHARSET));
         assertTrue("Output features file differs from test data file.",
-                FeatureSource.equal(fActual, TEST_FRUIT_FEATURES,
+                WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
                 DEFAULT_CHARSET));
         assertTrue("Output entry/features file differs from test data file.",
-                EntryFeatureSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
+                TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
                 DEFAULT_CHARSET));
     }
 
@@ -154,10 +152,12 @@ public class ExternalCountTaskTest {
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
 
         final String fruitPrefix = TEST_FRUIT_INPUT.getName();
-        final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries"+".tiny");
-        final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features"+".tiny");
+        final File eActual = new File(TEST_OUTPUT_DIR,
+                fruitPrefix + ".entries" + ".tiny");
+        final File fActual = new File(TEST_OUTPUT_DIR,
+                fruitPrefix + ".features" + ".tiny");
         final File efActual = new File(TEST_OUTPUT_DIR,
-                fruitPrefix + ".entryFeatures"+".tiny");
+                fruitPrefix + ".entryFeatures" + ".tiny");
 
         eActual.delete();
         fActual.delete();
@@ -167,12 +167,13 @@ public class ExternalCountTaskTest {
                 DEFAULT_CHARSET, 10000);
 
         assertTrue("Output entries file differs from sampledata file.",
-                EntrySource.equal(eActual, TEST_FRUIT_ENTRIES, DEFAULT_CHARSET));
+                WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
+                DEFAULT_CHARSET));
         assertTrue("Output features file differs from test data file.",
-                FeatureSource.equal(fActual, TEST_FRUIT_FEATURES,
+                WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
                 DEFAULT_CHARSET));
 //        assertTrue("Output entry/features file differs from test data file.",
-//                EntryFeatureSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
+//                TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
 //                DEFAULT_CHARSET));
     }
 
@@ -196,12 +197,13 @@ public class ExternalCountTaskTest {
 
 
         assertTrue("Output entries file differs from sampledata file.",
-                EntrySource.equal(eActual, TEST_FRUIT_ENTRIES, DEFAULT_CHARSET));
+                WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
+                DEFAULT_CHARSET));
         assertTrue("Output features file differs from test data file.",
-                FeatureSource.equal(fActual, TEST_FRUIT_FEATURES,
+                WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
                 DEFAULT_CHARSET));
         assertTrue("Output entry/features file differs from test data file.",
-                EntryFeatureSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
+                TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
                 DEFAULT_CHARSET));
     }
 

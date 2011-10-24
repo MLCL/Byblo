@@ -33,38 +33,38 @@ package uk.ac.susx.mlcl.byblo.io;
 import uk.ac.susx.mlcl.lib.ObjectIndex;
 import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 
 /**
- * An <tt>WeightedEntryPairSink</tt> object is used to store 
- * {@link EntryPair} objects in a flat file. 
+ * An <tt>WeightedTokenSink</tt> object is used to store {@link Token} objects in 
+ * a flat file. 
  * 
  * <p>The basic file format is Tab-Separated-Values (TSV) where records are 
  * delimited by new-lines, and values are delimited by tabs. Two variants are
- * supported: verbose and compact. In verbose mode each 
- * {@link EntryPair} corresponds to a single TSV record; i.e one
- * line per object consisting of two entries, and their weight. In 
- * compact mode each TSV record consists of a single entry followed by the 
- * second-entry/weight pairs from all sequentially written 
- * {@link WeightedEntryFeatureSink} objects that share the same first entry.</p>
+ * supported: verbose and compact. In verbose mode each {@link Token} 
+ * corresponds to a single TSV record; i.e one line per object consisting of an
+ * entry and it's weight. In compact mode each TSV record consists of a single
+ * entry followed by the weights of all sequentially written {@link Token}
+ * objects that share the same entry.</p>
  * 
  * Verbose mode example:
  * <pre>
- *      entry1  entry1    weight1
- *      entry1  entry2    weight2
- *      entry2  entry3    weight3
- *      entry3  entry2    weight4
- *      enrty3  entry4    weight5
- *      enrty3  entry1    weight6
+ *      entry1  weight1
+ *      entry1  weight2
+ *      entry2  weight3
+ *      entry3  weight4
+ *      enrty3  weight5
+ *      enrty3  weight6
  * </pre>
  * 
  * Equivalent compact mode example:
  * <pre>
- *      entry1  entry1    weight1 entry2    weight2
- *      entry2  entry3    weight3
- *      entry3  entry2    weight4 entry4    weight5 entry1    weight6
+ *      entry1  weight1 weight2
+ *      entry2  weight3
+ *      entry3  weight4 weight5 weight6
  * </pre>
  * 
  * <p>Compact mode is the default behavior, since it can reduce file sizes by 
@@ -72,24 +72,20 @@ import java.text.DecimalFormat;
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightedEntryPairSink extends AbstractTSVSink<Weighted<EntryPair>> {
+public class WeightedTokenSink extends AbstractTSVSink<Weighted<Token>> {
 
     private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
 
-    private final ObjectIndex<String> strIndexA;
-
-    private final ObjectIndex<String> strIndexB;
+    private final ObjectIndex<String> stringIndex;
 
     private boolean compactFormatEnabled = false;
 
-    private Weighted<EntryPair> previousRecord = null;
+    private Weighted<Token> previousRecord = null;
 
-    public WeightedEntryPairSink(File file, Charset charset,
-            ObjectIndex<String> strIndexA,
-            ObjectIndex<String> strIndexB) throws IOException {
+    public WeightedTokenSink(File file, Charset charset, ObjectIndex<String> stringIndex)
+            throws FileNotFoundException, IOException {
         super(file, charset);
-        this.strIndexA = strIndexA;
-        this.strIndexB = strIndexB;
+        this.stringIndex = stringIndex;
     }
 
     public boolean isCompactFormatEnabled() {
@@ -101,51 +97,11 @@ public class WeightedEntryPairSink extends AbstractTSVSink<Weighted<EntryPair>> 
     }
 
     @Override
-    public void write(Weighted<EntryPair> record) throws IOException {
+    public void write(final Weighted<Token> record) throws IOException {
         if (isCompactFormatEnabled())
             writeCompact(record);
         else
             writeVerbose(record);
-    }
-
-    private void writeVerbose(Weighted<EntryPair> record) throws IOException {
-        writeEntryA(record.get().getEntry1Id());
-        writeValueDelimiter();
-        writeEntryB(record.get().getEntry2Id());
-        writeValueDelimiter();
-        writeWeight(record.getWeight());
-        writeRecordDelimiter();
-    }
-
-    private void writeCompact(final Weighted<EntryPair> record) throws IOException {
-        if (previousRecord == null) {
-            writeEntryA(record.get().getEntry1Id());
-        } else if (previousRecord.get().getEntry1Id() != record.get().
-                getEntry1Id()) {
-            writeRecordDelimiter();
-            writeEntryA(record.get().getEntry1Id());
-        }
-
-        writeValueDelimiter();
-        writeEntryB(record.get().getEntry2Id());
-        writeValueDelimiter();
-        writeWeight(record.getWeight());
-        previousRecord = record;
-    }
-
-    private void writeEntryA(int id) throws IOException {
-        writeString(strIndexA.get(id));
-    }
-
-    private void writeEntryB(int id) throws IOException {
-        writeString(strIndexB.get(id));
-    }
-
-    private void writeWeight(double weight) throws IOException {
-        if (Double.compare((int) weight, weight) == 0)
-            writeInt((int) weight);
-        else
-            writeString(f.format(weight));
     }
 
     @Override
@@ -153,5 +109,35 @@ public class WeightedEntryPairSink extends AbstractTSVSink<Weighted<EntryPair>> 
         if (isCompactFormatEnabled() && previousRecord != null)
             writeRecordDelimiter();
         super.close();
+    }
+
+    private void writeVerbose(final Weighted<Token> record) throws IOException {
+        writeEntry(record.get().id());
+        writeValueDelimiter();
+        writeWeight(record.getWeight());
+        writeRecordDelimiter();
+    }
+
+    private void writeCompact(final Weighted<Token> record) throws IOException {
+        if (previousRecord == null) {
+            writeEntry(record.get().id());
+        } else if (previousRecord.get().id() != record.get().id()) {
+            writeRecordDelimiter();
+            writeEntry(record.get().id());
+        }
+        writeValueDelimiter();
+        writeWeight(record.getWeight());
+        previousRecord = record;
+    }
+
+    private void writeEntry(int id) throws IOException {
+        writeString(stringIndex.get(id));
+    }
+
+    private void writeWeight(double weight) throws IOException {
+        if (Double.compare((int) weight, weight) == 0)
+            super.writeInt((int) weight);
+        else
+            super.writeString(f.format(weight));
     }
 }

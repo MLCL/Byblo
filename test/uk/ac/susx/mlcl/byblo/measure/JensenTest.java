@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.measure;
 
-import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairSource;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import uk.ac.susx.mlcl.byblo.Byblo;
 import java.io.File;
 import org.junit.Test;
@@ -98,6 +98,6 @@ public class JensenTest {
                 });
 
         disableExitTrapping();
-        assertTrue(WeightedEntryPairSource.equal(output1, output2, DEFAULT_CHARSET));
+        assertTrue(WeightedTokenPairSource.equal(output1, output2, DEFAULT_CHARSET));
     }
 }

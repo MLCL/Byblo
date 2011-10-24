@@ -32,11 +32,9 @@ package uk.ac.susx.mlcl.byblo;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import uk.ac.susx.mlcl.byblo.io.Feature;
-import uk.ac.susx.mlcl.byblo.io.FeatureSink;
-import uk.ac.susx.mlcl.byblo.io.Entry;
-import uk.ac.susx.mlcl.byblo.io.EntrySink;
-import uk.ac.susx.mlcl.byblo.io.EntryFeatureSource;
+import uk.ac.susx.mlcl.byblo.io.Token;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenSink;
+import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.ObjectIndex;
@@ -58,9 +56,9 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.SingletonRecordException;
+import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
-import uk.ac.susx.mlcl.byblo.io.EntryFeature;
-import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureSink;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
 
 /**
  * <p>Read in a raw feature instances file, to produce three frequency files:
@@ -166,8 +164,8 @@ public class CountTask extends AbstractTask implements Serializable {
 
             final ObjectIndex<String> featureIndex = new ObjectIndex<String>();
 
-            final Object2IntMap<EntryFeature> entryFeatureFreq =
-                    new Object2IntOpenHashMap<EntryFeature>();
+            final Object2IntMap<TokenPair> entryFeatureFreq =
+                    new Object2IntOpenHashMap<TokenPair>();
             entryFeatureFreq.defaultReturnValue(0);
 
             {
@@ -203,7 +201,7 @@ public class CountTask extends AbstractTask implements Serializable {
     private void countInstances(
             final Int2IntMap entryFreq,
             final Int2IntMap featureFreq,
-            final Object2IntMap<? super EntryFeature> entryFeatureFreq,
+            final Object2IntMap<? super TokenPair> entryFeatureFreq,
             final ObjectIndex<String> entryIndex,
             final ObjectIndex<String> featureIndex)
             throws IOException {
@@ -211,8 +209,8 @@ public class CountTask extends AbstractTask implements Serializable {
         if (LOG.isInfoEnabled())
             LOG.info(
                     "Reading entry/context instances from " + instancesFile + ".");
-        final EntryFeatureSource instanceSource =
-                new EntryFeatureSource(instancesFile, charset, entryIndex,
+        final TokenPairSource instanceSource =
+                new TokenPairSource(instancesFile, charset, entryIndex,
                 featureIndex);
 
         if (!instanceSource.hasNext() && LOG.isWarnEnabled())
@@ -220,7 +218,7 @@ public class CountTask extends AbstractTask implements Serializable {
 
         long i = 0;
         while (instanceSource.hasNext()) {
-            final EntryFeature instance;
+            final TokenPair instance;
             try {
                 instance = instanceSource.read();
             } catch (SingletonRecordException ex) {
@@ -228,8 +226,8 @@ public class CountTask extends AbstractTask implements Serializable {
                 continue;
             }
 
-            final int entry_id = instance.getEntryId();
-            final int feature_id = instance.getFeatureId();
+            final int entry_id = instance.id1();
+            final int feature_id = instance.id2();
 
             entryFreq.put(entry_id, entryFreq.get(entry_id) + 1);
             featureFreq.put(feature_id, featureFreq.get(feature_id) + 1);
@@ -274,14 +272,14 @@ public class CountTask extends AbstractTask implements Serializable {
         if (entriesFile.exists() && LOG.isWarnEnabled())
             LOG.warn("The entries file already exists and will be overwritten.");
 
-        EntrySink entriesink = null;
+        WeightedTokenSink entriesink = null;
         final int n = entryFreqList.size();
         try {
-            entriesink = new EntrySink(entriesFile, charset, entryIndex);
+            entriesink = new WeightedTokenSink(entriesFile, charset, entryIndex);
             int i = 0;
             for (final Int2IntMap.Entry entry : entryFreqList) {
-                entriesink.write(new Weighted<Entry>(
-                        new Entry(entry.getIntKey()),
+                entriesink.write(new Weighted<Token>(
+                        new Token(entry.getIntKey()),
                         entry.getIntValue()));
                 if ((++i % PROGRESS_INTERVAL == 0 || i == n) && LOG.
                         isInfoEnabled())
@@ -322,14 +320,14 @@ public class CountTask extends AbstractTask implements Serializable {
         if (featuresFile.exists() && LOG.isWarnEnabled())
             LOG.warn("The contexts file already exists and will be overwritten.");
 
-        FeatureSink contextSink = null;
+        WeightedTokenSink featureSink = null;
         final int n = contextFreqList.size();
         try {
-            contextSink = new FeatureSink(featuresFile, charset,
+            featureSink = new WeightedTokenSink(featuresFile, charset,
                     featureIdex);
             int i = 0;
             for (final Int2IntMap.Entry context : contextFreqList) {
-                contextSink.write(new Weighted<Feature>(new Feature(
+                featureSink.write(new Weighted<Token>(new Token(
                         context.getIntKey()),
                         context.getIntValue()));
                 if ((++i % PROGRESS_INTERVAL == 0 || i == n) && LOG.
@@ -338,38 +336,38 @@ public class CountTask extends AbstractTask implements Serializable {
                             + (int) (i * 100d / n) + "% complete)");
             }
         } finally {
-            if (contextSink != null) {
-                contextSink.flush();
-                contextSink.close();
+            if (featureSink != null) {
+                featureSink.flush();
+                featureSink.close();
             }
         }
     }
 
     private void writeFeatures(
-            final Object2IntMap<? extends EntryFeature> entryFeatureFreq,
+            final Object2IntMap<? extends TokenPair> entryFeatureFreq,
             final ObjectIndex<String> entryIndex,
             final ObjectIndex<String> featureIndex)
             throws FileNotFoundException, IOException {
 
         LOG.info("Sorting feature pairs frequency data.");
 
-        List<Object2IntMap.Entry<? extends EntryFeature>> contextFreqList =
-                new ArrayList<Object2IntMap.Entry<? extends EntryFeature>>(entryFeatureFreq.
+        List<Object2IntMap.Entry<? extends TokenPair>> contextFreqList =
+                new ArrayList<Object2IntMap.Entry<? extends TokenPair>>(entryFeatureFreq.
                 object2IntEntrySet());
         Collections.sort(contextFreqList,
-                new Comparator<Object2IntMap.Entry<? extends EntryFeature>>() {
+                new Comparator<Object2IntMap.Entry<? extends TokenPair>>() {
 
                     @Override
                     public int compare(
-                            Object2IntMap.Entry<? extends EntryFeature> o1,
-                            Object2IntMap.Entry<? extends EntryFeature> o2) {
-                        int v = entryIndex.get(o1.getKey().getEntryId()).
+                            Object2IntMap.Entry<? extends TokenPair> o1,
+                            Object2IntMap.Entry<? extends TokenPair> o2) {
+                        int v = entryIndex.get(o1.getKey().id1()).
                                 compareTo(
-                                entryIndex.get(o2.getKey().getEntryId()));
+                                entryIndex.get(o2.getKey().id1()));
                         if (v == 0) {
-                            v = featureIndex.get(o1.getKey().getFeatureId()).
+                            v = featureIndex.get(o1.getKey().id2()).
                                     compareTo(
-                                    featureIndex.get(o2.getKey().getFeatureId()));
+                                    featureIndex.get(o2.getKey().id2()));
                         }
                         return v;
                     }
@@ -383,18 +381,17 @@ public class CountTask extends AbstractTask implements Serializable {
         if (entryFeaturesFile.exists() && LOG.isWarnEnabled())
             LOG.warn("The features file already exists and will be overwritten.");
 
-        WeightedEntryFeatureSink featureSink = null;
+        WeightedTokenPairSink featureSink = null;
         final int n = contextFreqList.size();
         try {
-            featureSink = new WeightedEntryFeatureSink(entryFeaturesFile,
+            featureSink = new WeightedTokenPairSink(entryFeaturesFile,
                     charset, entryIndex,
                     featureIndex);
             int i = 0;
-            for (final Object2IntMap.Entry<? extends EntryFeature> feature :
-                    contextFreqList) {
-                featureSink.write(new Weighted<EntryFeature>(
-                        new EntryFeature(feature.getKey().getEntryId(),
-                        feature.getKey().getFeatureId()),
+            for (final Object2IntMap.Entry<? extends TokenPair> feature : contextFreqList) {
+                featureSink.write(new Weighted<TokenPair>(
+                        new TokenPair(feature.getKey().id1(),
+                        feature.getKey().id2()),
                         feature.getIntValue()));
                 if ((++i % PROGRESS_INTERVAL == 0 || i == n) && LOG.
                         isInfoEnabled())

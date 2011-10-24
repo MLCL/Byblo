@@ -39,10 +39,8 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import uk.ac.susx.mlcl.byblo.allpairs.InvertedApssTask;
 import uk.ac.susx.mlcl.byblo.allpairs.ThreadedApssTask;
-import uk.ac.susx.mlcl.byblo.io.FeatureSource;
-import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureSource;
-import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureVectorSource;
-import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairSink;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairVectorSource;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
 import uk.ac.susx.mlcl.byblo.measure.AbstractMIProximity;
 import uk.ac.susx.mlcl.byblo.measure.CrMi;
 import uk.ac.susx.mlcl.byblo.measure.KendallTau;
@@ -51,7 +49,7 @@ import uk.ac.susx.mlcl.byblo.measure.Lp;
 import uk.ac.susx.mlcl.byblo.measure.Proximity;
 import uk.ac.susx.mlcl.byblo.measure.ReversedProximity;
 import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.byblo.io.EntryPair;
+import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
@@ -66,6 +64,9 @@ import java.util.ResourceBundle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
+import uk.ac.susx.mlcl.lib.io.Lexer;
 
 /**
  *
@@ -236,7 +237,7 @@ public class AllPairsTask extends AbstractTask {
                 if (LOG.isDebugEnabled())
                     LOG.debug("Loading features file " + featuresFile);
 
-                FeatureSource features = new FeatureSource(
+                WeightedTokenSource features = new WeightedTokenSource(
                         featuresFile, charset, strIndex);
                 AbstractMIProximity bmip = ((AbstractMIProximity) prox);
                 bmip.setFeatureFrequencies(features.readAllAsArray());
@@ -253,7 +254,7 @@ public class AllPairsTask extends AbstractTask {
                     LOG.debug("Loading entries file for "
                             + "KendalTau.numFeatures: " + featuresFile);
 
-                FeatureSource features = new FeatureSource(
+                WeightedTokenSource features = new WeightedTokenSource(
                         featuresFile, charset, strIndex);
                 features.readAll();
 
@@ -274,20 +275,21 @@ public class AllPairsTask extends AbstractTask {
         // combinations of vectors, so will be looking at two differnt points
         // in the file. Also this allows for the possibility of having differnt
         // files, e.g compare fruit words with cake words
-        final WeightedEntryFeatureVectorSource sourceA = new WeightedEntryFeatureSource(
+        final WeightedTokenPairVectorSource sourceA = new WeightedTokenPairSource(
                 entryFeaturesFile, charset, strIndex).getVectorSource();
-        final WeightedEntryFeatureVectorSource sourceB = new WeightedEntryFeatureSource(
+        final WeightedTokenPairVectorSource sourceB = new WeightedTokenPairSource(
                 entryFeaturesFile, charset, strIndex).getVectorSource();
 
         // Create a sink object that will act as a recipient for all pairs that
         // are produced by the algorithm.
 
-        final Sink<Weighted<EntryPair>> sink =
-                new WeightedEntryPairSink(outputFile, charset, strIndex,
+        final Sink<Weighted<TokenPair>> sink =
+                new WeightedTokenPairSink(outputFile, charset, strIndex,
                 strIndex);
 
         // Instantiate the all-pairs algorithm as given on the command line.
-        ThreadedApssTask apss = new ThreadedApssTask(sourceA, sourceB, sink);
+        ThreadedApssTask<Lexer.Tell> apss = new ThreadedApssTask<Lexer.Tell>(
+                sourceA, sourceB, sink);
         apss.setInnerAlgorithm(InvertedApssTask.class);
 
         // Parameterise the all-pairs algorithm
@@ -299,24 +301,25 @@ public class AllPairsTask extends AbstractTask {
         apss.setMeasure(prox);
         apss.setMaxChunkSize(chunkSize);
 
-        List<Predicate<Weighted<EntryPair>>> pairFilters =
-                new ArrayList<Predicate<Weighted<EntryPair>>>();
+        List<Predicate<Weighted<TokenPair>>> pairFilters =
+                new ArrayList<Predicate<Weighted<TokenPair>>>();
 
         if (minSimilarity != Double.NEGATIVE_INFINITY)
-            pairFilters.add(Weighted.<EntryPair>greaterThanOrEqualTo(
+            pairFilters.add(Weighted.<TokenPair>greaterThanOrEqualTo(
                     minSimilarity));
 
         if (maxSimilarity != Double.POSITIVE_INFINITY)
-            pairFilters.add(Weighted.<EntryPair>lessThanOrEqualTo(maxSimilarity));
+            pairFilters.add(Weighted.<TokenPair>lessThanOrEqualTo(maxSimilarity));
 
         if (!outputIdentityPairs)
             pairFilters.add(Predicates.not(Predicates.compose(
-                    EntryPair.identity(), Weighted.<EntryPair>record())));
+                    TokenPair.identity(), Weighted.<TokenPair>record())));
 
         if (pairFilters.size() == 1)
             apss.setProducatePair(pairFilters.get(0));
         else if (pairFilters.size() > 1)
-            apss.setProducatePair(Predicates.and(pairFilters));
+            apss.setProducatePair(Predicates.<Weighted<TokenPair>>and(
+                    pairFilters));
 
         if (LOG.isInfoEnabled())
             LOG.info("Running APSS algorithm.");

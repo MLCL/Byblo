@@ -31,47 +31,44 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import com.google.common.base.Objects;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.io.Serializable;
+import uk.ac.susx.mlcl.lib.ObjectIndex;
 
 /**
- * <tt>Feature</tt> objects represent a single instance of a feature used
- * to measure the similarity between thesaurus entries. A <tt>Feature</tt> 
- * consists of a <tt>featureId</tt>, and a <tt>weight</tt> estimated from the 
- * source corpus. The weighting is usually the features frequency, but it could 
- * be anything.
+ * <tt>Token</tt> objects represent a single instance of an indexed string.
  * 
- * <p>Instances of <tt>Feature</tt> are immutable.<p>
+ * <p>Instances of <tt>Token</tt> are immutable.<p>
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class Feature 
-    implements Serializable, Comparable<Feature> {
+public class Token implements Serializable, Comparable<Token>, Cloneable {
 
-    private static final long serialVersionUID = 63617210012669024L;
+    private static final long serialVersionUID = 2L;
 
-    private int id;
+    private final int id;
 
-    public Feature(final int featureId) {
-        this.id = featureId;
+    public Token(final int id) {
+        this.id = id;
     }
 
-    /**
-     * Constructor used during de-serialization.
-     */
-    protected Feature() {
+    protected Token(final Token other) {
+        this.id = other.id();
     }
 
 
-    public final int getId() {
+    public int id() {
         return id;
     }
-
 
     /**
      * Indicates whether some other object is "equal to" this one.
      * 
-     * <p>Note that only the <tt>featureId</tt> field is used for equality. I.e 
-     * two objects with the same <tt>featureId</tt>, but differing weights 
+     * <p>Note that only the <tt>entryId</tt> field is used for equality. I.e  
+     * two objects with the same <tt>entryId</tt>, but differing weights 
      * <em>will</em> be consider equal.</p>
      * 
      * @param   obj   the reference object with which to compare.
@@ -80,30 +77,82 @@ public final class Feature
      */
     @Override
     public boolean equals(Object obj) {
-        if(obj == this)
+        if (obj == this)
             return true;
         if (obj == null || getClass() != obj.getClass())
             return false;
-        return equals((Feature) obj);
+        return equals((Token) obj);
     }
-    
-    public boolean equals(Feature other) {
-        return this.getId() == other.getId();
+
+    public boolean equals(Token other) {
+        return this.id() == other.id();
     }
 
     @Override
     public int hashCode() {
-        return id;
+        return this.id;
     }
 
     @Override
     public String toString() {
         return Objects.toStringHelper(this).
-                add("id", id).toString();
+                add("id", id).
+                toString();
+    }
+
+    public String toString(ObjectIndex<String> stringIndex) {
+        return Objects.toStringHelper(this).
+                add("id", id).
+                add("string", stringIndex.get(id)).
+                toString();
     }
 
     @Override
-    public int compareTo(Feature that) {
-        return this.getId() - that.getId();
+    public int compareTo(Token that) {
+        return this.id() - that.id();
+    }
+
+    @Override
+    protected Token clone() throws CloneNotSupportedException {
+        return new Token(this);
+    }
+    
+    
+    protected final Object writeReplace() {
+        return new Serializer(this);
+    }
+
+    private static final class Serializer
+            implements Externalizable {
+
+        private static final long serialVersionUID = 1;
+
+        private Token token;
+
+        public Serializer() {
+        }
+
+        public Serializer(final Token token) {
+            if (token == null)
+                throw new NullPointerException("token == null");
+            this.token = token;
+        }
+
+        @Override
+        public final void writeExternal(final ObjectOutput out)
+                throws IOException {
+            out.writeInt(token.id());
+        }
+
+        @Override
+        public final void readExternal(final ObjectInput in)
+                throws IOException, ClassNotFoundException {
+            final int id = in.readInt();
+            token = new Token(id);
+        }
+
+        protected final Object readResolve() {
+            return token;
+        }
     }
 }

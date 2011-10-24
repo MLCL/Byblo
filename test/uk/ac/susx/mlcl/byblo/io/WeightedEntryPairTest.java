@@ -45,10 +45,10 @@ import static uk.ac.susx.mlcl.TestConstants.*;
 public class WeightedEntryPairTest {
 
     private void copyWEP(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        WeightedEntryPairSource aSrc = new WeightedEntryPairSource(a,
+        WeightedTokenPairSource aSrc = new WeightedTokenPairSource(a,
                 DEFAULT_CHARSET);
-        WeightedEntryPairSink bSink = new WeightedEntryPairSink(b,
-                DEFAULT_CHARSET, aSrc.getEntryIndex(), aSrc.getEntryIndex());
+        WeightedTokenPairSink bSink = new WeightedTokenPairSink(b,
+                DEFAULT_CHARSET, aSrc.getStringIndex1(), aSrc.getStringIndex2());
         bSink.setCompactFormatEnabled(compact);
 
         copy(aSrc, bSink);

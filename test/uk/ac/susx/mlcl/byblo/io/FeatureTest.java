@@ -45,10 +45,10 @@ import static uk.ac.susx.mlcl.TestConstants.*;
 public class FeatureTest {
 
     private void copyF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        FeatureSource aSrc = new FeatureSource(a, DEFAULT_CHARSET);
-        FeatureSink bSink = new FeatureSink(b, DEFAULT_CHARSET,
+        WeightedTokenSource aSrc = new WeightedTokenSource(a, DEFAULT_CHARSET);
+        WeightedTokenSink bSink = new WeightedTokenSink(b, DEFAULT_CHARSET,
                 aSrc.getStringIndex());
-    bSink.setCompactFormatEnabled(compact);
+        bSink.setCompactFormatEnabled(compact);
 
         copy(aSrc, bSink);
         bSink.close();
@@ -63,13 +63,16 @@ public class FeatureTest {
                 TEST_FRUIT_FEATURES.getName() + ".verbose");
 
         copyF(a, b, true);
-        
-         assertTrue("Compact copy is smaller that verbose source.", b.length() <= a.length());
-         
+
+        assertTrue("Compact copy is smaller that verbose source.",
+                b.length() <= a.length());
+
         copyF(b, c, false);
 
-        
-        assertTrue("Verbose copy is smaller that compact source.", c.length() >= b.length());
-        assertTrue("Double converted file is not equal to origion.", Files.equal(a, c));
+
+        assertTrue("Verbose copy is smaller that compact source.",
+                c.length() >= b.length());
+        assertTrue("Double converted file is not equal to origion.",
+                Files.equal(a, c));
     }
 }

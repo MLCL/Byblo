@@ -47,27 +47,27 @@ import java.nio.charset.CharacterCodingException;
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightedEntryFeatureVectorSource
+public class WeightedTokenPairVectorSource
         implements SeekableSource<Indexed<SparseDoubleVector>, Lexer.Tell> {
 
-    private final WeightedEntryFeatureSource inner;
+    private final WeightedTokenPairSource inner;
 
-    private Weighted<EntryFeature> next;
+    private Weighted<TokenPair> next;
 
     private Lexer.Tell tell;
 
-    public WeightedEntryFeatureVectorSource(WeightedEntryFeatureSource inner) {
+    public WeightedTokenPairVectorSource(WeightedTokenPairSource inner) {
         this.inner = inner;
         tell = Lexer.Tell.START;
         next = null;
     }
 
-    public ObjectIndex<String> getEntryIndex() {
-        return inner.getEntryIndex();
+    public ObjectIndex<String> getStringIndex1() {
+        return inner.getStringIndex1();
     }
 
-    public ObjectIndex<String> getFeatureIndex() {
-        return inner.getFeatureIndex();
+    public ObjectIndex<String> getStringIndex2() {
+        return inner.getStringIndex2();
     }
 
     public boolean isIndexCombined() {
@@ -84,21 +84,21 @@ public class WeightedEntryFeatureVectorSource
         if (next == null)
             readNext();
         Int2DoubleMap features = new Int2DoubleOpenHashMap();
-        Weighted<EntryFeature> start = next;
+        Weighted<TokenPair> start = next;
         int cardinality = 0;
         do {
-            features.put(next.get().getFeatureId(), next.getWeight());
-            cardinality = Math.max(cardinality, next.get().getFeatureId() + 1);
+            features.put(next.get().id2(), next.getWeight());
+            cardinality = Math.max(cardinality, next.get().id2() + 1);
             // XXX position() should not need to be called every iteration
             tell = inner.position();
             readNext();
-        } while (next != null && next.get().getEntryId() == start.get().
-                getEntryId());
+        } while (next != null && next.get().id1() == start.get().
+                id1());
 
         SparseDoubleVector v = SparseVectors.toDoubleVector(features,
                 cardinality);
 
-        return new Indexed<SparseDoubleVector>(start.get().getEntryId(), v);
+        return new Indexed<SparseDoubleVector>(start.get().id1(), v);
     }
 
     @Override

@@ -30,14 +30,14 @@
  */
 package uk.ac.susx.mlcl.byblo.allpairs;
 
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import uk.ac.susx.mlcl.lib.io.Lexer;
-import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureSource;
-import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureVectorSource;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairVectorSource;
 import com.google.common.base.Predicate;
 import uk.ac.susx.mlcl.byblo.measure.Proximity;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.byblo.measure.Jaccard;
-import uk.ac.susx.mlcl.byblo.io.EntryPair;
+import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
@@ -53,28 +53,28 @@ public class NaiveApssTaskTest {
 
     private static final Proximity MEASURE = new Jaccard();
 
-    private static final Predicate<Weighted<EntryPair>> PAIR_FILTER =
+    private static final Predicate<Weighted<TokenPair>> PAIR_FILTER =
             Weighted.greaterThanOrEqualTo(0.1);
 
     /**
      * Test of runTask method, of class AbstractAPSS2.
      */
-    @Test(timeout=10000)
+    @Test(timeout = 10000)
     @SuppressWarnings("unchecked")
     public void testRunTask() throws Exception {
 
         NaiveApssTask<Lexer.Tell> instance = new NaiveApssTask<Lexer.Tell>();
 
-        WeightedEntryFeatureSource mdbsa = new WeightedEntryFeatureSource(
+        WeightedTokenPairSource mdbsa = new WeightedTokenPairSource(
                 TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET);
-        WeightedEntryFeatureVectorSource vsa = mdbsa.getVectorSource();
+        WeightedTokenPairVectorSource vsa = mdbsa.getVectorSource();
 
-        WeightedEntryFeatureSource mdbsb = new WeightedEntryFeatureSource(
+        WeightedTokenPairSource mdbsb = new WeightedTokenPairSource(
                 TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
-                mdbsa.getEntryIndex(), mdbsa.getFeatureIndex());
-        WeightedEntryFeatureVectorSource vsb = mdbsb.getVectorSource();
+                mdbsa.getStringIndex1(), mdbsa.getStringIndex2());
+        WeightedTokenPairVectorSource vsb = mdbsb.getVectorSource();
 
-        List<Weighted<EntryPair>> result = new ArrayList<Weighted<EntryPair>>();
+        List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
 
         instance.setSourceA(vsa);
         instance.setSourceB(vsb);

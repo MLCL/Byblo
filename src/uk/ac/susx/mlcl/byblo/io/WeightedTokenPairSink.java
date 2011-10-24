@@ -33,39 +33,38 @@ package uk.ac.susx.mlcl.byblo.io;
 import uk.ac.susx.mlcl.lib.ObjectIndex;
 import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 
 /**
- * An <tt>WeightedEntryFeatureSink</tt> object is used to store 
- * {@link WeightedEntryFeature} objects in a flat file. 
+ * An <tt>WeightedTokenPairSink</tt> object is used to store 
+ * {@link TokenPair} objects in a flat file. 
  * 
  * <p>The basic file format is Tab-Separated-Values (TSV) where records are 
  * delimited by new-lines, and values are delimited by tabs. Two variants are
- * support: verbose and compact. In verbose mode each 
- * {@link WeightedEntryFeatureSink} corresponds to a single TSV record; i.e one
- * line per object consisting of an entry, a feature, and their weight. In 
+ * supported: verbose and compact. In verbose mode each 
+ * {@link TokenPair} corresponds to a single TSV record; i.e one
+ * line per object consisting of two entries, and their weight. In 
  * compact mode each TSV record consists of a single entry followed by the 
- * feature/weights pairs from all sequentially written 
- * {@link WeightedEntryFeatureSink} objects that share the same entry.</p>
+ * second-entry/weight pairs from all sequentially written 
+ * {@link WeightedEntryFeatureSink} objects that share the same first entry.</p>
  * 
  * Verbose mode example:
  * <pre>
- *      entry1  feature1    weight1
- *      entry1  feature2    weight2
- *      entry2  feature3    weight3
- *      entry3  feature2    weight4
- *      enrty3  feature4    weight5
- *      enrty3  feature1    weight6
+ *      entry1  entry1    weight1
+ *      entry1  entry2    weight2
+ *      entry2  entry3    weight3
+ *      entry3  entry2    weight4
+ *      enrty3  entry4    weight5
+ *      enrty3  entry1    weight6
  * </pre>
  * 
  * Equivalent compact mode example:
  * <pre>
- *      entry1  feature1    weight1 feature2    weight2
- *      entry2  feature3    weight3
- *      entry3  feature2    weight4 feature4    weight5 feature1    weight6
+ *      entry1  entry1    weight1 entry2    weight2
+ *      entry2  entry3    weight3
+ *      entry3  entry2    weight4 entry4    weight5 entry1    weight6
  * </pre>
  * 
  * <p>Compact mode is the default behavior, since it can reduce file sizes by 
@@ -73,50 +72,36 @@ import java.text.DecimalFormat;
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightedEntryFeatureSink extends AbstractTSVSink<Weighted<EntryFeature>> {
+public class WeightedTokenPairSink extends AbstractTSVSink<Weighted<TokenPair>> {
 
     private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
 
-    private final ObjectIndex<String> entryIndex;
+    private final ObjectIndex<String> stringIndex1;
 
-    private final ObjectIndex<String> featureIndex;
+    private final ObjectIndex<String> stringIndex2;
 
     private boolean compactFormatEnabled = false;
 
-    private Weighted<EntryFeature> previousRecord = null;
+    private Weighted<TokenPair> previousRecord = null;
 
-    public WeightedEntryFeatureSink(File file, Charset charset,
-            ObjectIndex<String> entryIndex, ObjectIndex<String> featureIndex)
-            throws FileNotFoundException, IOException {
+    public WeightedTokenPairSink(File file, Charset charset,
+            ObjectIndex<String> strIndex1,
+            ObjectIndex<String> strIndex2) throws IOException {
         super(file, charset);
-        if (entryIndex == null)
-            throw new NullPointerException("entryIndex == null");
-        if (featureIndex == null)
-            throw new NullPointerException("featureIndex == null");
-        this.entryIndex = entryIndex;
-        this.featureIndex = featureIndex;
+        this.stringIndex1 = strIndex1;
+        this.stringIndex2 = strIndex2;
     }
 
-    public WeightedEntryFeatureSink(File file, Charset charset,
-            ObjectIndex<String> combinedIndex)
-            throws FileNotFoundException, IOException {
-        this(file, charset, combinedIndex, combinedIndex);
+    public ObjectIndex<String> getStringIndex1() {
+        return stringIndex1;
     }
 
-    public WeightedEntryFeatureSink(File file, Charset charset) throws FileNotFoundException, IOException {
-        this(file, charset, new ObjectIndex<String>());
-    }
-
-    public final ObjectIndex<String> getEntryIndex() {
-        return entryIndex;
-    }
-
-    public ObjectIndex<String> getFeatureIndex() {
-        return featureIndex;
+    public ObjectIndex<String> getStringIndex2() {
+        return stringIndex2;
     }
 
     public boolean isIndexCombined() {
-        return getEntryIndex() == getFeatureIndex();
+        return stringIndex1 == stringIndex2;
     }
 
     public boolean isCompactFormatEnabled() {
@@ -128,45 +113,44 @@ public class WeightedEntryFeatureSink extends AbstractTSVSink<Weighted<EntryFeat
     }
 
     @Override
-    public void write(Weighted<EntryFeature> record) throws IOException {
+    public void write(Weighted<TokenPair> record) throws IOException {
         if (isCompactFormatEnabled())
             writeCompact(record);
         else
             writeVerbose(record);
     }
 
-    private void writeVerbose(Weighted<EntryFeature> record) throws IOException {
-        writeEntry(record.get().getEntryId());
+    private void writeVerbose(Weighted<TokenPair> record) throws IOException {
+        writeToken1(record.get().id1());
         writeValueDelimiter();
-
-        writeFeature(record.get().getFeatureId());
+        writeToken2(record.get().id2());
         writeValueDelimiter();
-
         writeWeight(record.getWeight());
         writeRecordDelimiter();
     }
 
-    private void writeCompact(final Weighted<EntryFeature> record) throws IOException {
+    private void writeCompact(final Weighted<TokenPair> record) throws IOException {
         if (previousRecord == null) {
-            writeEntry(record.get().getEntryId());
-        } else if (previousRecord.get().getEntryId() != record.get().getEntryId()) {
+            writeToken1(record.get().id1());
+        } else if (previousRecord.get().id1() != record.get().
+                id1()) {
             writeRecordDelimiter();
-            writeEntry(record.get().getEntryId());
+            writeToken1(record.get().id1());
         }
 
         writeValueDelimiter();
-        writeFeature(record.get().getFeatureId());
+        writeToken2(record.get().id2());
         writeValueDelimiter();
         writeWeight(record.getWeight());
         previousRecord = record;
     }
 
-    private void writeEntry(int id) throws IOException {
-        writeString(entryIndex.get(id));
+    private void writeToken1(int id) throws IOException {
+        writeString(stringIndex1.get(id));
     }
 
-    private void writeFeature(int id) throws IOException {
-        writeString(featureIndex.get(id));
+    private void writeToken2(int id) throws IOException {
+        writeString(stringIndex2.get(id));
     }
 
     private void writeWeight(double weight) throws IOException {

@@ -49,12 +49,12 @@ public class EntryFeatureTest {
     public void testEndOfLineTab() throws FileNotFoundException, IOException {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-input-sample");
         Charset charset = Charset.forName("UTF-8");
-        EntryFeatureSource efSrc = new EntryFeatureSource(testSample, charset);
+        TokenPairSource efSrc = new TokenPairSource(testSample, charset);
         assertTrue("EntryFeatureSource is empty", efSrc.hasNext());
 
         while (efSrc.hasNext()) {
             try {
-                EntryFeature ef = efSrc.read();
+                TokenPair ef = efSrc.read();
                 assertNotNull("Found null EntryFeatureRecord", ef);
             } catch (SingletonRecordException ex) {
                 // This is allowed to happen here, because the file explicitly
@@ -66,9 +66,9 @@ public class EntryFeatureTest {
     }
 
     private void copyEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        EntryFeatureSource aSrc = new EntryFeatureSource(a, DEFAULT_CHARSET);
-        EntryFeatureSink bSink = new EntryFeatureSink(b, DEFAULT_CHARSET,
-                aSrc.getEntryIndex(), aSrc.getFeatureIndex());
+        TokenPairSource aSrc = new TokenPairSource(a, DEFAULT_CHARSET);
+        TokenPairSink bSink = new TokenPairSink(b, DEFAULT_CHARSET,
+                aSrc.getStringIndex1(), aSrc.getStringIndex2());
         bSink.setCompactFormatEnabled(compact);
 
         copy(aSrc, bSink);
@@ -85,11 +85,14 @@ public class EntryFeatureTest {
 
         copyEF(a, b, true);
 
-        assertTrue("Compact copy is smaller that verbose source.", b.length() <= a.length());
+        assertTrue("Compact copy is smaller that verbose source.",
+                b.length() <= a.length());
 
         copyEF(b, c, false);
 
-        assertTrue("Verbose copy is smaller that compact source.", c.length() >= b.length());
-        assertTrue("Double converted file is not equal to origion.", Files.equal(a, c));
+        assertTrue("Verbose copy is smaller that compact source.",
+                c.length() >= b.length());
+        assertTrue("Double converted file is not equal to origion.",
+                Files.equal(a, c));
     }
 }

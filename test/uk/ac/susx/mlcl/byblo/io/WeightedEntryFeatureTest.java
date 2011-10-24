@@ -56,11 +56,11 @@ import static uk.ac.susx.mlcl.TestConstants.*;
 public class WeightedEntryFeatureTest {
 
     private void copyWEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        WeightedEntryFeatureSource aSrc = new WeightedEntryFeatureSource(a,
+        WeightedTokenPairSource aSrc = new WeightedTokenPairSource(a,
                 DEFAULT_CHARSET);
-        WeightedEntryFeatureSink bSink = new WeightedEntryFeatureSink(b,
+        WeightedTokenPairSink bSink = new WeightedTokenPairSink(b,
                 DEFAULT_CHARSET,
-                aSrc.getEntryIndex(), aSrc.getFeatureIndex());
+                aSrc.getStringIndex1(), aSrc.getStringIndex2());
         bSink.setCompactFormatEnabled(compact);
 
         copy(aSrc, bSink);
@@ -68,19 +68,17 @@ public class WeightedEntryFeatureTest {
     }
 
     private void copyWEFV(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        WeightedEntryFeatureVectorSource aSrc = new WeightedEntryFeatureVectorSource(
-                new WeightedEntryFeatureSource(a, DEFAULT_CHARSET));
+        WeightedTokenPairVectorSource aSrc = new WeightedTokenPairVectorSource(
+                new WeightedTokenPairSource(a, DEFAULT_CHARSET));
 
         List<Indexed<SparseDoubleVector>> list = readAll(aSrc);
         Collections.sort(list);
 
-        WeightedEntryFeatureSink tmp = new WeightedEntryFeatureSink(b,
-                DEFAULT_CHARSET, aSrc.getEntryIndex(), aSrc.getFeatureIndex());
+        WeightedTokenPairSink tmp = new WeightedTokenPairSink(b,
+                DEFAULT_CHARSET, aSrc.getStringIndex1(), aSrc.getStringIndex2());
         tmp.setCompactFormatEnabled(compact);
 
-
-
-        WeightedEntryFeatureVectorSink bSink = new WeightedEntryFeatureVectorSink(
+        WeightedTokenPairVectorSink bSink = new WeightedTokenPairVectorSink(
                 tmp);
 
         copy(list, bSink);
@@ -141,26 +139,26 @@ public class WeightedEntryFeatureTest {
     public void testLMSample() throws FileNotFoundException, IOException {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-ef-sample");
         Charset charset = Charset.forName("UTF-8");
-        WeightedEntryFeatureSource efSrc = new WeightedEntryFeatureSource(
+        WeightedTokenPairSource efSrc = new WeightedTokenPairSource(
                 testSample, charset);
         assertTrue("EntryFeatureSource is empty", efSrc.hasNext());
 
         while (efSrc.hasNext()) {
-            Weighted<EntryFeature> ef = efSrc.read();
+            Weighted<TokenPair> ef = efSrc.read();
             assertNotNull("Found null EntryFeatureRecord", ef);
         }
     }
 
     public void testRandomAccess(File file) throws FileNotFoundException, IOException {
-        final Map<Tell, Weighted<EntryFeature>> hist =
-                new HashMap<Tell, Weighted<EntryFeature>>();
+        final Map<Tell, Weighted<TokenPair>> hist =
+                new HashMap<Tell, Weighted<TokenPair>>();
 
-        WeightedEntryFeatureSource src =
-                new WeightedEntryFeatureSource(file, DEFAULT_CHARSET);
+        WeightedTokenPairSource src =
+                new WeightedTokenPairSource(file, DEFAULT_CHARSET);
         {
             while (src.hasNext()) {
                 final Tell pos = src.position();
-                final Weighted<EntryFeature> record = src.read();
+                final Weighted<TokenPair> record = src.read();
                 assertNotNull("Found null EntryFeatureRecord", record);
                 hist.put(pos, record);
             }
@@ -172,21 +170,21 @@ public class WeightedEntryFeatureTest {
 
             for (int i = 0; i < 10; i++) {
                 final Tell pos = positions.get(rand.nextInt(positions.size()));
-                final Weighted<EntryFeature> expected = hist.get(pos);
+                final Weighted<TokenPair> expected = hist.get(pos);
 
                 System.out.println("expected tell: " + pos);
                 System.out.println("expected: " + expected.get().toString(src.
-                        getEntryIndex(), src.getFeatureIndex()));
+                        getStringIndex1(), src.getStringIndex2()));
 
                 src.position(pos);
 
                 assertEquals(pos, src.position());
                 assertTrue(src.hasNext());
 
-                Weighted<EntryFeature> actual = src.read();
+                Weighted<TokenPair> actual = src.read();
                 System.out.println("actual tell: " + src.position());
                 System.out.println("actual: " + actual.get().toString(src.
-                        getEntryIndex(), src.getFeatureIndex()));
+                        getStringIndex1(), src.getStringIndex2()));
 
                 assertEquals(expected, actual);
             }

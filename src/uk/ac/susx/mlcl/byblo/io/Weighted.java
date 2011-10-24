@@ -37,13 +37,13 @@ import java.io.Serializable;
 import javax.naming.OperationNotSupportedException;
 
 /**
- * <tt>Entry</tt> objects represent a single instance of a thesaurus
- * entry, with a weighting estimated from the source corpus. The weighting is 
- * usually the entries frequency, but it could be anything.
+ * <tt>Weighted</tt> objects represent a weighting or frequency applied to some
+ * discrete record.
  * 
- * <p>Instances of <tt>Entry</tt> are immutable.<p>
+ * <p>Instances of <tt>Weighted</tt> are immutable.<p>
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @param <T> Type of record being weighted
  */
 public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
 

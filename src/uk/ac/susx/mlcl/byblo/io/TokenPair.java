@@ -38,88 +38,85 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
 import java.util.Comparator;
+import uk.ac.susx.mlcl.lib.Checks;
+import uk.ac.susx.mlcl.lib.ObjectIndex;
 
 /**
- * EntryPair hold the unique ids of two entries, along with a value 
- * indicating the weight of connections between them.
+ * TokenPair holds the unique ids of two indexed strings.
  *
- * <p>Instances of <tt>EntryPair</tt> are immutable.<p>
+ * <p>Instances of <tt>TokenPair</tt> are immutable.<p>
  *
  * @author Hamish Morgan
  */
-public class EntryPair implements
-        Comparable<EntryPair>, Serializable, Cloneable {
+public class TokenPair implements
+        Comparable<TokenPair>, Serializable, Cloneable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 3L;
 
     /**
      * Indexed identifier of the first entry.
      */
-    private final int entry1Id;
+    private final int id1;
 
     /**
      * Indexed identifier of the second entry.
      */
-    private final int entry2Id;
-
+    private final int id2;
 
     /**
      * Constructor used during cloning. Sub-classes should implement a similar
      * constructor and call this one.
      *
      * @throws NullPointerException if the argument is null
-     * @throws IllegalArgumentException if argument weight is NaN
      */
-    protected EntryPair(final EntryPair that)
+    protected TokenPair(final TokenPair that)
             throws NullPointerException, IllegalArgumentException {
-        if (that == null)
-            throw new NullPointerException("that == null");
-
-        this.entry1Id = that.entry1Id;
-        this.entry2Id = that.entry2Id;
+        Checks.checkNotNull("that", that);
+        this.id1 = that.id1();
+        this.id2 = that.id2();
     }
 
     /**
-     * Construct a new weighted pair using the given arguments.
+     * Construct a new pair using the given arguments.
      *
-     * @param entry1Id Indexed identifier of the first item.
-     * @param entry2Id Indexed identifier of the second item.
-     * @param weight The weight of connection between the two items.
-     * @throws IllegalArgumentException if argument weight is NaN
+     * @param id1 Indexed identifier of the first item.
+     * @param id2 Indexed identifier of the second item.
      */
-    public EntryPair(final int entry1Id, final int entry2Id)
-            throws IllegalArgumentException {
-
-        this.entry1Id = entry1Id;
-        this.entry2Id = entry2Id;
+    public TokenPair(final int id1, final int id2) {
+        this.id1 = id1;
+        this.id2 = id2;
     }
 
     /**
      * @return Indexed identifier of the first item.
      */
-    public final int getEntry1Id() {
-        return entry1Id;
+    public final int id1() {
+        return id1;
     }
 
     /**
      * @return Indexed identifier of the second item.
      */
-    public final int getEntry2Id() {
-        return entry2Id;
+    public final int id2() {
+        return id2;
     }
-
-   
 
     @Override
     public String toString() {
         return Objects.toStringHelper(this).
-                add("id1", entry1Id).add("id2", entry2Id).
+                add("id1", id1).add("id2", id2).
+                toString();
+    }
+
+    public String toString(ObjectIndex<String> stringIndex1,
+            ObjectIndex<String> stringIndex2) {
+        return Objects.toStringHelper(this).
+                add("1", stringIndex1.get(id1)).add("2", stringIndex2.get(id2)).
                 toString();
     }
 
     /**
-     * Comparator that orders two pairs: first by the entry1id, second by 
-     * entry2id, and finally by weight.
+     * Comparator that orders two pairs: first by the id1, then by id2.
      *
      * It is entirely consistent with equals() and hashCode().
      *
@@ -128,28 +125,27 @@ public class EntryPair implements
      * @throws NullPointerException if the argument is null
      */
     @Override
-    public int compareTo(final EntryPair that)
+    public int compareTo(final TokenPair that)
             throws NullPointerException {
-        if (that == null)
-            throw new NullPointerException("that == null");
+        Checks.checkNotNull("that", that);
         return ASYMMETRIC_KEY_COMPARATOR.compare(this, that);
     }
 
     @Override
-    protected EntryPair clone() {
-        return new EntryPair(this);
+    protected TokenPair clone() throws CloneNotSupportedException {
+        return new TokenPair(this);
     }
 
     @Override
     public boolean equals(Object obj) {
         return obj != null
                 && getClass() == obj.getClass()
-                && compareTo((EntryPair) obj) == 0;
+                && compareTo((TokenPair) obj) == 0;
     }
 
     @Override
     public int hashCode() {
-        return 13 * (13 * (13 * 3 + this.entry1Id) + this.entry2Id);
+        return 13 * this.id1 + this.id2;
     }
 
     protected final Object writeReplace() {
@@ -161,12 +157,12 @@ public class EntryPair implements
 
         private static final long serialVersionUID = 1;
 
-        private EntryPair pair;
+        private TokenPair pair;
 
         public Serializer() {
         }
 
-        public Serializer(final EntryPair pair) {
+        public Serializer(final TokenPair pair) {
             if (pair == null)
                 throw new NullPointerException("pair == null");
             this.pair = pair;
@@ -175,8 +171,8 @@ public class EntryPair implements
         @Override
         public final void writeExternal(final ObjectOutput out)
                 throws IOException {
-            out.writeInt(pair.entry1Id);
-            out.writeInt(pair.entry2Id);
+            out.writeInt(pair.id1());
+            out.writeInt(pair.id2());
         }
 
         @Override
@@ -184,7 +180,7 @@ public class EntryPair implements
                 throws IOException, ClassNotFoundException {
             final int x_id = in.readInt();
             final int y_id = in.readInt();
-            pair = new EntryPair(x_id, y_id);
+            pair = new TokenPair(x_id, y_id);
         }
 
         protected final Object readResolve() {
@@ -192,12 +188,12 @@ public class EntryPair implements
         }
     }
 
-    public static Predicate<EntryPair> identity() {
-        return new Predicate<EntryPair>() {
+    public static Predicate<TokenPair> identity() {
+        return new Predicate<TokenPair>() {
 
             @Override
-            public boolean apply(EntryPair input) {
-                return input.getEntry1Id() == input.getEntry2Id();
+            public boolean apply(TokenPair input) {
+                return input.id1() == input.id2();
             }
         };
     }
@@ -234,29 +230,28 @@ public class EntryPair implements
 //                            : Double.compare(a.getWeight(), b.getWeight());
 //                }
 //            };
-
-    public static Comparator<EntryPair> ASYMMETRIC_KEY_COMPARATOR =
-            new Comparator<EntryPair>() {
+    public static final Comparator<TokenPair> ASYMMETRIC_KEY_COMPARATOR =
+            new Comparator<TokenPair>() {
 
                 @Override
-                public int compare(EntryPair a, EntryPair b) {
-                    return a.entry1Id < b.entry1Id ? -1
-                            : a.entry1Id > b.entry1Id ? 1
-                            : a.entry2Id < b.entry2Id ? -1
-                            : a.entry2Id > b.entry2Id ? 1
+                public final int compare(final TokenPair a, final TokenPair b) {
+                    return a.id1() < b.id1() ? -1
+                            : a.id1() > b.id1() ? 1
+                            : a.id2() < b.id2() ? -1
+                            : a.id2() > b.id2() ? 1
                             : 0;
                 }
             };
 
-    public static Comparator<EntryPair> SYMMETRIC_KEY_COMPARATOR =
-            new Comparator<EntryPair>() {
+    public static final Comparator<TokenPair> SYMMETRIC_KEY_COMPARATOR =
+            new Comparator<TokenPair>() {
 
                 @Override
-                public int compare(EntryPair a, EntryPair b) {
-                    final int x1 = Math.min(a.entry1Id, a.entry2Id);
-                    final int x2 = Math.min(b.entry1Id, b.entry2Id);
-                    final int y1 = Math.max(a.entry1Id, a.entry2Id);
-                    final int y2 = Math.max(b.entry1Id, b.entry2Id);
+                public final int compare(final TokenPair a, final TokenPair b) {
+                    final int x1 = Math.min(a.id1(), a.id2());
+                    final int x2 = Math.min(b.id1(), b.id2());
+                    final int y1 = Math.max(a.id1(), a.id2());
+                    final int y2 = Math.max(b.id1(), b.id2());
                     return x1 < x2 ? -1
                             : x1 > x2 ? 1
                             : y1 < y2 ? -1

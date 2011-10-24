@@ -33,7 +33,7 @@ package uk.ac.susx.mlcl.byblo.allpairs;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.byblo.io.EntryPair;
+import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -73,7 +73,7 @@ public class InvertedApssTask<S> extends NaiveApssTask<S> {
     protected void computeAllPairs()
             throws IOException {
         final S startB = getSourceB().position();
-        List<Weighted<EntryPair>> pairs = new ArrayList<Weighted<EntryPair>>();
+        List<Weighted<TokenPair>> pairs = new ArrayList<Weighted<TokenPair>>();
 
         while (getSourceB().hasNext()) {
             Indexed<SparseDoubleVector> b = getSourceB().read();
@@ -88,8 +88,8 @@ public class InvertedApssTask<S> extends NaiveApssTask<S> {
                 getStats().incrementCandidatesCount();
 
                 double sim = sim(a, b);
-                Weighted<EntryPair> pair = new Weighted<EntryPair>(
-                        new EntryPair(a.key(), b.key()), sim);
+                Weighted<TokenPair> pair = new Weighted<TokenPair>(
+                        new TokenPair(a.key(), b.key()), sim);
                 if (getProducatePair().apply(pair)) {
                     pairs.add(pair);
                     getStats().incrementProductionCount();

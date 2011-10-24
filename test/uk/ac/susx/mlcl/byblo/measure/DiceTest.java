@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.measure;
 
-import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairSource;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import com.google.common.io.Files;
 import uk.ac.susx.mlcl.byblo.Byblo;
 import java.io.File;
@@ -121,7 +121,7 @@ public class DiceTest {
                     "--output", output2.toString()
                 });
         disableExitTrapping();
-        assertTrue(WeightedEntryPairSource.equal(output1, output2, DEFAULT_CHARSET));
+        assertTrue(WeightedTokenPairSource.equal(output1, output2, DEFAULT_CHARSET));
     }
 
     @Test(timeout = 1000)
@@ -154,6 +154,6 @@ public class DiceTest {
                     "--output", output2.toString()
                 });
         disableExitTrapping();
-        assertTrue(WeightedEntryPairSource.equal(output1, output2, DEFAULT_CHARSET));
+        assertTrue(WeightedTokenPairSource.equal(output1, output2, DEFAULT_CHARSET));
     }
 }

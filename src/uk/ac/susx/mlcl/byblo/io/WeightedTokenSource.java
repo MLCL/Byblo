@@ -44,15 +44,15 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
 
 /**
- * An <tt>EntrySource</tt> object is used to retrieve {@link Entry} 
+ * An <tt>WeightedTokenSource</tt> object is used to retrieve {@link Token} 
  * objects from a flat file. 
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see EntrySink
  */
-public class EntrySource extends AbstractTSVSource<Weighted<Entry>> {
+public class WeightedTokenSource extends AbstractTSVSource<Weighted<Token>> {
 
-    private static final Log LOG = LogFactory.getLog(EntrySource.class);
+    private static final Log LOG = LogFactory.getLog(WeightedTokenSource.class);
 
     private final ObjectIndex<String> stringIndex;
 
@@ -68,9 +68,9 @@ public class EntrySource extends AbstractTSVSource<Weighted<Entry>> {
 
     private int count = 0;
 
-    private Weighted<Entry> previousRecord = null;
+    private Weighted<Token> previousRecord = null;
 
-    public EntrySource(File file, Charset charset,
+    public WeightedTokenSource(File file, Charset charset,
             ObjectIndex<String> stringIndex)
             throws FileNotFoundException, IOException {
         super(file, charset);
@@ -79,7 +79,7 @@ public class EntrySource extends AbstractTSVSource<Weighted<Entry>> {
         this.stringIndex = stringIndex;
     }
 
-    public EntrySource(File file, Charset charset)
+    public WeightedTokenSource(File file, Charset charset)
             throws FileNotFoundException, IOException {
         this(file, charset, new ObjectIndex<String>());
     }
@@ -124,13 +124,13 @@ public class EntrySource extends AbstractTSVSource<Weighted<Entry>> {
     }
 
     @Override
-    public Weighted<Entry> read() throws IOException {
+    public Weighted<Token> read() throws IOException {
         final int entryId;
         if (previousRecord == null) {
             entryId = stringIndex.get(parseString());
             parseValueDelimiter();
         } else {
-            entryId = previousRecord.get().getId();
+            entryId = previousRecord.get().id();
         }
 
         if (!hasNext() || isDelimiterNext()) {
@@ -145,7 +145,7 @@ public class EntrySource extends AbstractTSVSource<Weighted<Entry>> {
         weightSum += weight;
         weightMax = Math.max(weightMax, weight);
         ++count;
-        final Weighted<Entry> record = new Weighted<Entry>(new Entry(entryId), weight);
+        final Weighted<Token> record = new Weighted<Token>(new Token(entryId), weight);
 
         if (isValueDelimiterNext()) {
             parseValueDelimiter();
@@ -163,27 +163,27 @@ public class EntrySource extends AbstractTSVSource<Weighted<Entry>> {
     public Int2DoubleMap readAll() throws IOException {
         Int2DoubleMap entityFrequenciesMap = new Int2DoubleOpenHashMap();
         while (this.hasNext()) {
-            Weighted<Entry> entry = this.read();
-            if (entityFrequenciesMap.containsKey(entry.get().getId())) {
-                // If we encounter the same Entry more than once, it means
+            Weighted<Token> entry = this.read();
+            if (entityFrequenciesMap.containsKey(entry.get().id())) {
+                // If we encounter the same Token more than once, it means
                 // the perl has decided two strings are not-equal, which java
                 // thinks are equal ... so we need to merge the records:
 
                 // TODO: Not true any more.. remove this code?
 
-                final int id = entry.get().getId();
+                final int id = entry.get().id();
                 final double oldFreq = entityFrequenciesMap.get(id);
                 final double newFreq = oldFreq + entry.getWeight();
 
                 if (LOG.isWarnEnabled())
                     LOG.warn("Found duplicate Entry \"" + stringIndex.get(entry.get().
-                            getId()) + "\" (id=" + id
+                            id()) + "\" (id=" + id
                             + ") in entries file. Merging records. Old frequency = "
                             + oldFreq + ", new frequency = " + newFreq + ".");
 
                 entityFrequenciesMap.put(id, newFreq);
             } else {
-                entityFrequenciesMap.put(entry.get().getId(), entry.getWeight());
+                entityFrequenciesMap.put(entry.get().id(), entry.getWeight());
             }
         }
         return entityFrequenciesMap;
@@ -203,13 +203,13 @@ public class EntrySource extends AbstractTSVSource<Weighted<Entry>> {
 
     public static boolean equal(File a, File b, Charset charset) throws IOException {
         final ObjectIndex<String> stringIndex = new ObjectIndex<String>();
-        final EntrySource srcA = new EntrySource(a, charset, stringIndex);
-        final EntrySource srcB = new EntrySource(b, charset, stringIndex);
+        final WeightedTokenSource srcA = new WeightedTokenSource(a, charset, stringIndex);
+        final WeightedTokenSource srcB = new WeightedTokenSource(b, charset, stringIndex);
         boolean equal = true;
         while (equal && srcA.hasNext() && srcB.hasNext()) {
-            final Weighted<Entry> recA = srcA.read();
-            final Weighted<Entry> recB = srcB.read();
-            equal = recA.get().getId() == recB.get().getId()
+            final Weighted<Token> recA = srcA.read();
+            final Weighted<Token> recB = srcB.read();
+            equal = recA.get().id() == recB.get().id()
                     && recA.getWeight() == recB.getWeight();
         }
         return equal && srcA.hasNext() == srcB.hasNext();

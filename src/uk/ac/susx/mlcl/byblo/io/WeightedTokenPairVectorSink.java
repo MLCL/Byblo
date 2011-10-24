@@ -33,6 +33,7 @@ package uk.ac.susx.mlcl.byblo.io;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
+import uk.ac.susx.mlcl.lib.ObjectIndex;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.Sink;
@@ -41,13 +42,25 @@ import uk.ac.susx.mlcl.lib.io.Sink;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightedEntryFeatureVectorSink
+public class WeightedTokenPairVectorSink
         implements Sink<Indexed<SparseDoubleVector>>, Flushable, Closeable {
 
-    private final WeightedEntryFeatureSink inner;
+    private final WeightedTokenPairSink inner;
 
-    public WeightedEntryFeatureVectorSink(WeightedEntryFeatureSink inner) {
+    public WeightedTokenPairVectorSink(WeightedTokenPairSink inner) {
         this.inner = inner;
+    }
+
+    public ObjectIndex<String> getStringIndex1() {
+        return inner.getStringIndex1();
+    }
+
+    public ObjectIndex<String> getStringIndex2() {
+        return inner.getStringIndex2();
+    }
+
+    public boolean isIndexCombined() {
+        return inner.isIndexCombined();
     }
 
     @Override
@@ -55,8 +68,8 @@ public class WeightedEntryFeatureVectorSink
         int entryId = record.key();
         SparseDoubleVector vec = record.value();
         for (int i = 0; i < vec.size; i++) {
-            inner.write(new Weighted<EntryFeature>(
-                    new EntryFeature(entryId, vec.keys[i]), vec.values[i]));
+            inner.write(new Weighted<TokenPair>(
+                    new TokenPair(entryId, vec.keys[i]), vec.values[i]));
         }
     }
 

@@ -31,11 +31,11 @@
 package uk.ac.susx.mlcl.byblo.measure;
 
 import uk.ac.susx.mlcl.byblo.io.Weighted;
-import uk.ac.susx.mlcl.byblo.io.EntryPair;
+import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.Byblo;
 import java.io.File;
 import org.junit.Test;
-import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairSource;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import static uk.ac.susx.mlcl.ExitTrapper.*;
@@ -148,7 +148,7 @@ public class CrMiTest {
                 });
         disableExitTrapping();
 
-        assertTrue(WeightedEntryPairSource.equal(expectedOutput, crmiOutput, DEFAULT_CHARSET));
+        assertTrue(WeightedTokenPairSource.equal(expectedOutput, crmiOutput, DEFAULT_CHARSET));
 
     }
 
@@ -190,7 +190,7 @@ public class CrMiTest {
 
         disableExitTrapping();
 
-        assertTrue(WeightedEntryPairSource.equal(expectedOutput, crmiOutput, DEFAULT_CHARSET));
+        assertTrue(WeightedTokenPairSource.equal(expectedOutput, crmiOutput, DEFAULT_CHARSET));
 
     }
 
@@ -235,16 +235,16 @@ public class CrMiTest {
         // The ranking should be identical, but the absolute similarity values
         // will be different.
         
-        WeightedEntryPairSource expected = new WeightedEntryPairSource(expectedOutput,
+        WeightedTokenPairSource expected = new WeightedTokenPairSource(expectedOutput,
                 DEFAULT_CHARSET);
-        WeightedEntryPairSource actual = new WeightedEntryPairSource(crmiOutput,
+        WeightedTokenPairSource actual = new WeightedTokenPairSource(crmiOutput,
                 DEFAULT_CHARSET);
         
         while(expected.hasNext() && actual.hasNext()) {
-            Weighted<EntryPair> e = expected.read();
-            Weighted<EntryPair> a = actual.read();
-            assertEquals(e.get().getEntry1Id(), a.get().getEntry1Id());
-            assertEquals(e.get().getEntry2Id(), a.get().getEntry2Id());
+            Weighted<TokenPair> e = expected.read();
+            Weighted<TokenPair> a = actual.read();
+            assertEquals(e.get().id1(), a.get().id1());
+            assertEquals(e.get().id2(), a.get().id2());
         }
         
         assertEquals(expected.hasNext(), actual.hasNext());

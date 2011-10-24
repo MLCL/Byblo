@@ -37,89 +37,90 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
- * An <tt>EntryFeatureSource</tt> object is used to retrieve 
- * {@link EntryFeature} objects from a flat file. 
- * 
+ * A <tt>WeightedTokenPairSource</tt> object is used to retrieve
+ * {@link TokenPair} objects from a flat file.
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
- * @see EntryFeatureSink
+ * @see WeightedEntryPairSink
  */
-public class EntryFeatureSource
-        extends AbstractTSVSource<EntryFeature>
-        implements Source<EntryFeature> {
+public class WeightedTokenPairSource
+        extends AbstractTSVSource<Weighted<TokenPair>>
+        implements Source<Weighted<TokenPair>> {
 
-    private static final Log LOG = LogFactory.getLog(EntryFeatureSource.class);
-    
-    private final ObjectIndex<String> entryIndex;
+    private final ObjectIndex<String> stringIndex1;
 
-    private final ObjectIndex<String> featureIndex;
+    private final ObjectIndex<String> stringIndex2;
 
-    private EntryFeature previousRecord = null;
+    private Weighted<TokenPair> previousRecord = null;
 
-    public EntryFeatureSource(
+    private long count = 0;
+
+    public WeightedTokenPairSource(
             File file, Charset charset,
-            ObjectIndex<String> entryIndex,
-            ObjectIndex<String> featureIndex)
+            ObjectIndex<String> stringIndex1, ObjectIndex<String> stringIndex2)
             throws FileNotFoundException, IOException {
         super(file, charset);
-        if (entryIndex == null)
+        if (stringIndex1 == null)
             throw new NullPointerException("entryIndex == null");
-        if (featureIndex == null)
-            throw new NullPointerException("featureIndex == null");
-        this.entryIndex = entryIndex;
-        this.featureIndex = featureIndex;
+        this.stringIndex1 = stringIndex1;
+        this.stringIndex2 = stringIndex2;
     }
 
-    public EntryFeatureSource(File file, Charset charset,
-            ObjectIndex<String> combinedIndex)
+    public WeightedTokenPairSource(
+            File file, Charset charset,
+            ObjectIndex<String> stringIndex)
             throws FileNotFoundException, IOException {
-        this(file, charset, combinedIndex, combinedIndex);
+        this(file, charset, stringIndex, stringIndex);
     }
 
-    public EntryFeatureSource(File file, Charset charset)
+    public WeightedTokenPairSource(File file, Charset charset)
             throws FileNotFoundException, IOException {
         this(file, charset, new ObjectIndex<String>());
     }
 
-    public final ObjectIndex<String> getEntryIndex() {
-        return entryIndex;
+    public final ObjectIndex<String> getStringIndex1() {
+        return stringIndex1;
     }
 
-    public ObjectIndex<String> getFeatureIndex() {
-        return featureIndex;
+    public final ObjectIndex<String> getStringIndex2() {
+        return stringIndex2;
     }
 
     public boolean isIndexCombined() {
-        return getEntryIndex() == getFeatureIndex();
+        return stringIndex1 == stringIndex2;
+    }
+
+    public long getCount() {
+        return count;
     }
 
     @Override
-    public EntryFeature read() throws IOException {
-        final int entryId;
+    public Weighted<TokenPair> read() throws IOException {
+        final int tokenId1;
         if (previousRecord == null) {
-            entryId = readEntry();
+            tokenId1 = readEntry1();
             parseValueDelimiter();
         } else {
-            entryId = previousRecord.getEntryId();
+            tokenId1 = previousRecord.get().id1();
         }
 
         if (!hasNext() || isDelimiterNext()) {
-            // Encountered an entry without any features. This is incoherent wrt
-            // the task at hand, but quite a common scenario in general feature
-            // extraction. Throw an exception which is caught for end user input
             parseRecordDelimiter();
             throw new SingletonRecordException(this,
-                    "Found entry/feature record with no features.");
+                    "Found weighte entry pair record with second entries.");
         }
 
-        final int featureId = readFeature();
-        final EntryFeature record = new EntryFeature(
-                entryId, featureId);
+        final int tokenId2 = readEntry2();
+        parseValueDelimiter();
+        final double weight = readWight();
 
-        if (hasNext() && isValueDelimiterNext()) {
+        final Weighted<TokenPair> record = new Weighted<TokenPair>(
+                new TokenPair(tokenId1, tokenId2), weight);
+        ++count;
+
+        if (isValueDelimiterNext()) {
             parseValueDelimiter();
             previousRecord = record;
         }
@@ -132,35 +133,38 @@ public class EntryFeatureSource
         return record;
     }
 
-    protected final int readEntry() throws IOException {
-        return entryIndex.get(parseString());
+    protected int readEntry1() throws IOException {
+        return stringIndex1.get(parseString());
     }
 
-    protected final int readFeature() throws IOException {
-        return featureIndex.get(parseString());
+    protected int readEntry2() throws IOException {
+        return stringIndex2.get(parseString());
     }
 
-    public static boolean equal(File fileA, File fileB, Charset charset)
-            throws IOException {
+    protected double readWight() throws IOException {
+        return parseDouble();
+    }
+
+    public WeightedTokenPairVectorSource getVectorSource() {
+        return new WeightedTokenPairVectorSource(this);
+    }
+
+    public static boolean equal(File a, File b, Charset charset) throws IOException {
         final ObjectIndex<String> stringIndex = new ObjectIndex<String>();
-        final EntryFeatureSource srcA = new EntryFeatureSource(
-                fileA, charset, stringIndex);
-        final EntryFeatureSource srcB = new EntryFeatureSource(
-                fileB, charset, stringIndex);
+        final WeightedTokenPairSource srcA = new WeightedTokenPairSource(a,
+                charset,
+                stringIndex);
+        final WeightedTokenPairSource srcB = new WeightedTokenPairSource(b,
+                charset,
+                stringIndex);
         boolean equal = true;
         while (equal && srcA.hasNext() && srcB.hasNext()) {
-            final EntryFeature recA = srcA.read();
-            final EntryFeature recB = srcB.read();
-            
-            equal = equal
-                    && recA.getEntryId() == recB.getEntryId()
-                    && recA.getFeatureId() == recB.getFeatureId();
-            
-            if(!equal) {
-                LOG.info(recA  + " | " + recB);
-            }
+            final Weighted<TokenPair> recA = srcA.read();
+            final Weighted<TokenPair> recB = srcB.read();
+            equal = recA.get().id1() == recB.get().id1()
+                    && recA.get().id2() == recB.get().id2()
+                    && recA.getWeight() == recB.getWeight();
         }
-        equal = equal && srcA.hasNext() == srcB.hasNext();
-        return equal;
+        return equal && srcA.hasNext() == srcB.hasNext();
     }
 }
