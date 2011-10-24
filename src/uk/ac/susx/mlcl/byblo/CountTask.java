@@ -32,11 +32,10 @@ package uk.ac.susx.mlcl.byblo;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import uk.ac.susx.mlcl.byblo.io.FeatureRecord;
+import uk.ac.susx.mlcl.byblo.io.Feature;
 import uk.ac.susx.mlcl.byblo.io.FeatureSink;
-import uk.ac.susx.mlcl.byblo.io.EntryRecord;
+import uk.ac.susx.mlcl.byblo.io.Entry;
 import uk.ac.susx.mlcl.byblo.io.EntrySink;
-import uk.ac.susx.mlcl.byblo.io.EntryFeatureRecord;
 import uk.ac.susx.mlcl.byblo.io.EntryFeatureSource;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.MiscUtil;
@@ -44,7 +43,6 @@ import uk.ac.susx.mlcl.lib.ObjectIndex;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntMap.Entry;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -60,7 +58,8 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.SingletonRecordException;
-import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureRecord;
+import uk.ac.susx.mlcl.byblo.io.Weighted;
+import uk.ac.susx.mlcl.byblo.io.EntryFeature;
 import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureSink;
 
 /**
@@ -69,9 +68,8 @@ import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureSink;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(
-commandDescription = "Read in a raw feature instances file, to produce three "
-        + "frequency files: entries, contexts, and features.")
+@Parameters(commandDescription = "Read in a raw feature instances file, to produce three "
++ "frequency files: entries, contexts, and features.")
 public class CountTask extends AbstractTask implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -168,8 +166,8 @@ public class CountTask extends AbstractTask implements Serializable {
 
             final ObjectIndex<String> featureIndex = new ObjectIndex<String>();
 
-            final Object2IntMap<EntryFeatureRecord> entryFeatureFreq =
-                    new Object2IntOpenHashMap<EntryFeatureRecord>();
+            final Object2IntMap<EntryFeature> entryFeatureFreq =
+                    new Object2IntOpenHashMap<EntryFeature>();
             entryFeatureFreq.defaultReturnValue(0);
 
             {
@@ -205,7 +203,7 @@ public class CountTask extends AbstractTask implements Serializable {
     private void countInstances(
             final Int2IntMap entryFreq,
             final Int2IntMap featureFreq,
-            final Object2IntMap<? super EntryFeatureRecord> entryFeatureFreq,
+            final Object2IntMap<? super EntryFeature> entryFeatureFreq,
             final ObjectIndex<String> entryIndex,
             final ObjectIndex<String> featureIndex)
             throws IOException {
@@ -222,14 +220,14 @@ public class CountTask extends AbstractTask implements Serializable {
 
         long i = 0;
         while (instanceSource.hasNext()) {
-            final EntryFeatureRecord instance;
+            final EntryFeature instance;
             try {
                 instance = instanceSource.read();
             } catch (SingletonRecordException ex) {
                 LOG.warn("Badly formed input data: " + ex.getMessage());
                 continue;
             }
-            
+
             final int entry_id = instance.getEntryId();
             final int feature_id = instance.getFeatureId();
 
@@ -263,7 +261,7 @@ public class CountTask extends AbstractTask implements Serializable {
         Collections.sort(entryFreqList, new Comparator<Int2IntMap.Entry>() {
 
             @Override
-            public int compare(Entry o1, Entry o2) {
+            public int compare(Int2IntMap.Entry o1, Int2IntMap.Entry o2) {
                 return entryIndex.get(o1.getIntKey()).compareTo(
                         entryIndex.get(o2.getIntKey()));
             }
@@ -282,10 +280,8 @@ public class CountTask extends AbstractTask implements Serializable {
             entriesink = new EntrySink(entriesFile, charset, entryIndex);
             int i = 0;
             for (final Int2IntMap.Entry entry : entryFreqList) {
-                entriesink.write(new EntryRecord(
-                        entry.getIntKey(),
-                        //                        entry.getIntKey(),
-                        //                        entryUniqueContexts.get(entry.getIntKey()).size(),
+                entriesink.write(new Weighted<Entry>(
+                        new Entry(entry.getIntKey()),
                         entry.getIntValue()));
                 if ((++i % PROGRESS_INTERVAL == 0 || i == n) && LOG.
                         isInfoEnabled())
@@ -313,7 +309,7 @@ public class CountTask extends AbstractTask implements Serializable {
         Collections.sort(contextFreqList, new Comparator<Int2IntMap.Entry>() {
 
             @Override
-            public int compare(Entry o1, Entry o2) {
+            public int compare(Int2IntMap.Entry o1, Int2IntMap.Entry o2) {
                 return featureIdex.get(o1.getIntKey()).compareTo(
                         featureIdex.get(o2.getIntKey()));
             }
@@ -333,8 +329,8 @@ public class CountTask extends AbstractTask implements Serializable {
                     featureIdex);
             int i = 0;
             for (final Int2IntMap.Entry context : contextFreqList) {
-                contextSink.write(new FeatureRecord(
-                        context.getIntKey(),
+                contextSink.write(new Weighted<Feature>(new Feature(
+                        context.getIntKey()),
                         context.getIntValue()));
                 if ((++i % PROGRESS_INTERVAL == 0 || i == n) && LOG.
                         isInfoEnabled())
@@ -350,23 +346,23 @@ public class CountTask extends AbstractTask implements Serializable {
     }
 
     private void writeFeatures(
-            final Object2IntMap<? extends EntryFeatureRecord> entryFeatureFreq,
+            final Object2IntMap<? extends EntryFeature> entryFeatureFreq,
             final ObjectIndex<String> entryIndex,
             final ObjectIndex<String> featureIndex)
             throws FileNotFoundException, IOException {
 
         LOG.info("Sorting feature pairs frequency data.");
 
-        List<Object2IntMap.Entry<? extends EntryFeatureRecord>> contextFreqList =
-                new ArrayList<Object2IntMap.Entry<? extends EntryFeatureRecord>>(entryFeatureFreq.
+        List<Object2IntMap.Entry<? extends EntryFeature>> contextFreqList =
+                new ArrayList<Object2IntMap.Entry<? extends EntryFeature>>(entryFeatureFreq.
                 object2IntEntrySet());
         Collections.sort(contextFreqList,
-                new Comparator<Object2IntMap.Entry<? extends EntryFeatureRecord>>() {
+                new Comparator<Object2IntMap.Entry<? extends EntryFeature>>() {
 
                     @Override
                     public int compare(
-                            Object2IntMap.Entry<? extends EntryFeatureRecord> o1,
-                            Object2IntMap.Entry<? extends EntryFeatureRecord> o2) {
+                            Object2IntMap.Entry<? extends EntryFeature> o1,
+                            Object2IntMap.Entry<? extends EntryFeature> o2) {
                         int v = entryIndex.get(o1.getKey().getEntryId()).
                                 compareTo(
                                 entryIndex.get(o2.getKey().getEntryId()));
@@ -394,11 +390,11 @@ public class CountTask extends AbstractTask implements Serializable {
                     charset, entryIndex,
                     featureIndex);
             int i = 0;
-            for (final Object2IntMap.Entry<? extends EntryFeatureRecord> feature :
+            for (final Object2IntMap.Entry<? extends EntryFeature> feature :
                     contextFreqList) {
-                featureSink.write(new WeightedEntryFeatureRecord(
-                        feature.getKey().getEntryId(),
-                        feature.getKey().getFeatureId(),
+                featureSink.write(new Weighted<EntryFeature>(
+                        new EntryFeature(feature.getKey().getEntryId(),
+                        feature.getKey().getFeatureId()),
                         feature.getIntValue()));
                 if ((++i % PROGRESS_INTERVAL == 0 || i == n) && LOG.
                         isInfoEnabled())

@@ -40,15 +40,15 @@ import java.io.Serializable;
 import java.util.Comparator;
 
 /**
- * WeightedEntryPairRecord hold the unique ids of two entries, along with a value 
+ * EntryPair hold the unique ids of two entries, along with a value 
  * indicating the weight of connections between them.
  *
- * <p>Instances of <tt>WeightedEntryPairRecord</tt> are immutable.<p>
+ * <p>Instances of <tt>EntryPair</tt> are immutable.<p>
  *
  * @author Hamish Morgan
  */
-public class WeightedEntryPairRecord implements
-        Comparable<WeightedEntryPairRecord>, Serializable, Cloneable {
+public class EntryPair implements
+        Comparable<EntryPair>, Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;
 
@@ -62,11 +62,6 @@ public class WeightedEntryPairRecord implements
      */
     private final int entry2Id;
 
-    /**
-     * The weight of connection between the two entry. Can be proximity,
-     * similarity, distance or whatever is required.
-     */
-    private final double weight;
 
     /**
      * Constructor used during cloning. Sub-classes should implement a similar
@@ -75,16 +70,13 @@ public class WeightedEntryPairRecord implements
      * @throws NullPointerException if the argument is null
      * @throws IllegalArgumentException if argument weight is NaN
      */
-    protected WeightedEntryPairRecord(final WeightedEntryPairRecord that)
+    protected EntryPair(final EntryPair that)
             throws NullPointerException, IllegalArgumentException {
         if (that == null)
             throw new NullPointerException("that == null");
-        if (Double.isNaN(that.weight))
-            throw new IllegalArgumentException("proximity == NaN");
 
         this.entry1Id = that.entry1Id;
         this.entry2Id = that.entry2Id;
-        this.weight = that.weight;
     }
 
     /**
@@ -95,15 +87,11 @@ public class WeightedEntryPairRecord implements
      * @param weight The weight of connection between the two items.
      * @throws IllegalArgumentException if argument weight is NaN
      */
-    public WeightedEntryPairRecord(final int entry1Id, final int entry2Id,
-            final double weight)
+    public EntryPair(final int entry1Id, final int entry2Id)
             throws IllegalArgumentException {
-        if (Double.isNaN(weight))
-            throw new IllegalArgumentException("weight == NaN");
 
         this.entry1Id = entry1Id;
         this.entry2Id = entry2Id;
-        this.weight = weight;
     }
 
     /**
@@ -120,18 +108,13 @@ public class WeightedEntryPairRecord implements
         return entry2Id;
     }
 
-    /**
-     * @return The weight of connection between the two items.
-     */
-    public final double getWeight() {
-        return weight;
-    }
+   
 
     @Override
     public String toString() {
         return Objects.toStringHelper(this).
                 add("id1", entry1Id).add("id2", entry2Id).
-                add("weight", weight).toString();
+                toString();
     }
 
     /**
@@ -145,30 +128,28 @@ public class WeightedEntryPairRecord implements
      * @throws NullPointerException if the argument is null
      */
     @Override
-    public int compareTo(final WeightedEntryPairRecord that)
+    public int compareTo(final EntryPair that)
             throws NullPointerException {
         if (that == null)
             throw new NullPointerException("that == null");
-        return ASYMMETRIC_COMPARATOR.compare(this, that);
+        return ASYMMETRIC_KEY_COMPARATOR.compare(this, that);
     }
 
     @Override
-    protected WeightedEntryPairRecord clone() {
-        return new WeightedEntryPairRecord(this);
+    protected EntryPair clone() {
+        return new EntryPair(this);
     }
 
     @Override
     public boolean equals(Object obj) {
         return obj != null
                 && getClass() == obj.getClass()
-                && compareTo((WeightedEntryPairRecord) obj) == 0;
+                && compareTo((EntryPair) obj) == 0;
     }
 
     @Override
     public int hashCode() {
-        final long bits = Double.doubleToLongBits(this.weight);
-        return 13 * (13 * (13 * 3 + this.entry1Id) + this.entry2Id)
-                + (int) (bits ^ (bits >>> 32));
+        return 13 * (13 * (13 * 3 + this.entry1Id) + this.entry2Id);
     }
 
     protected final Object writeReplace() {
@@ -180,12 +161,12 @@ public class WeightedEntryPairRecord implements
 
         private static final long serialVersionUID = 1;
 
-        private WeightedEntryPairRecord pair;
+        private EntryPair pair;
 
         public Serializer() {
         }
 
-        public Serializer(final WeightedEntryPairRecord pair) {
+        public Serializer(final EntryPair pair) {
             if (pair == null)
                 throw new NullPointerException("pair == null");
             this.pair = pair;
@@ -196,7 +177,6 @@ public class WeightedEntryPairRecord implements
                 throws IOException {
             out.writeInt(pair.entry1Id);
             out.writeInt(pair.entry2Id);
-            out.writeDouble(pair.weight);
         }
 
         @Override
@@ -204,10 +184,7 @@ public class WeightedEntryPairRecord implements
                 throws IOException, ClassNotFoundException {
             final int x_id = in.readInt();
             final int y_id = in.readInt();
-            final double weight = in.readDouble();
-            if (Double.isNaN(weight))
-                throw new IllegalArgumentException("proximity == NaN");
-            pair = new WeightedEntryPairRecord(x_id, y_id, weight);
+            pair = new EntryPair(x_id, y_id);
         }
 
         protected final Object readResolve() {
@@ -215,76 +192,54 @@ public class WeightedEntryPairRecord implements
         }
     }
 
-    public static Predicate<WeightedEntryPairRecord> identity() {
-        return new Predicate<WeightedEntryPairRecord>() {
+    public static Predicate<EntryPair> identity() {
+        return new Predicate<EntryPair>() {
 
             @Override
-            public boolean apply(WeightedEntryPairRecord input) {
+            public boolean apply(EntryPair input) {
                 return input.getEntry1Id() == input.getEntry2Id();
             }
         };
     }
 
-    public static Predicate<WeightedEntryPairRecord> similarityGTE(
-            final double minSimilarity) {
-        return new Predicate<WeightedEntryPairRecord>() {
+//
+//    public static Comparator<Weighted<EntryPair>> ASYMMETRIC_COMPARATOR =
+//            new Comparator<Weighted<EntryPair>>() {
+//
+//                @Override
+//                public int compare(Weighted<EntryPair> a,
+//                        Weighted<EntryPair> b) {
+//                    return a.get().entry1Id < b.get().entry1Id ? -1
+//                            : a.get().entry1Id > b.get().entry1Id ? 1
+//                            : a.get().entry2Id < b.get().entry2Id ? -1
+//                            : a.get().entry2Id > b.get().entry2Id ? 1
+//                            : Double.compare(a.getWeight(), b.getWeight());
+//                }
+//            };
+//
+//    public static Comparator<Weighted<EntryPair>> SYMMETRIC_COMPARATOR =
+//            new Comparator<Weighted<EntryPair>>() {
+//
+//                @Override
+//                public int compare(Weighted<EntryPair> a,
+//                        Weighted<EntryPair> b) {
+//                    final int x1 = Math.min(a.get().entry1Id, a.get().entry2Id);
+//                    final int x2 = Math.min(b.get().entry1Id, b.get().entry2Id);
+//                    final int y1 = Math.max(a.get().entry1Id, a.get().entry2Id);
+//                    final int y2 = Math.max(b.get().entry1Id, b.get().entry2Id);
+//                    return x1 < x2 ? -1
+//                            : x1 > x2 ? 1
+//                            : y1 < y2 ? -1
+//                            : y1 > y2 ? 1
+//                            : Double.compare(a.getWeight(), b.getWeight());
+//                }
+//            };
 
-            @Override
-            public boolean apply(WeightedEntryPairRecord pair) {
-                return (pair.getWeight() >= minSimilarity);
-            }
-        };
-    }
-
-    public static Predicate<WeightedEntryPairRecord> similarityLTE(
-            final double maxSimilarity) {
-        return new Predicate<WeightedEntryPairRecord>() {
-
-            @Override
-            public boolean apply(WeightedEntryPairRecord pair) {
-                return (pair.getWeight() <= maxSimilarity);
-            }
-        };
-    }
-
-    public static Comparator<WeightedEntryPairRecord> ASYMMETRIC_COMPARATOR =
-            new Comparator<WeightedEntryPairRecord>() {
-
-                @Override
-                public int compare(WeightedEntryPairRecord a,
-                        WeightedEntryPairRecord b) {
-                    return a.entry1Id < b.entry1Id ? -1
-                            : a.entry1Id > b.entry1Id ? 1
-                            : a.entry2Id < b.entry2Id ? -1
-                            : a.entry2Id > b.entry2Id ? 1
-                            : Double.compare(a.weight, b.weight);
-                }
-            };
-
-    public static Comparator<WeightedEntryPairRecord> SYMMETRIC_COMPARATOR =
-            new Comparator<WeightedEntryPairRecord>() {
+    public static Comparator<EntryPair> ASYMMETRIC_KEY_COMPARATOR =
+            new Comparator<EntryPair>() {
 
                 @Override
-                public int compare(WeightedEntryPairRecord a,
-                        WeightedEntryPairRecord b) {
-                    final int x1 = Math.min(a.entry1Id, a.entry2Id);
-                    final int x2 = Math.min(b.entry1Id, b.entry2Id);
-                    final int y1 = Math.max(a.entry1Id, a.entry2Id);
-                    final int y2 = Math.max(b.entry1Id, b.entry2Id);
-                    return x1 < x2 ? -1
-                            : x1 > x2 ? 1
-                            : y1 < y2 ? -1
-                            : y1 > y2 ? 1
-                            : Double.compare(a.weight, b.weight);
-                }
-            };
-
-    public static Comparator<WeightedEntryPairRecord> ASYMMETRIC_KEY_COMPARATOR =
-            new Comparator<WeightedEntryPairRecord>() {
-
-                @Override
-                public int compare(WeightedEntryPairRecord a,
-                        WeightedEntryPairRecord b) {
+                public int compare(EntryPair a, EntryPair b) {
                     return a.entry1Id < b.entry1Id ? -1
                             : a.entry1Id > b.entry1Id ? 1
                             : a.entry2Id < b.entry2Id ? -1
@@ -293,12 +248,11 @@ public class WeightedEntryPairRecord implements
                 }
             };
 
-    public static Comparator<WeightedEntryPairRecord> SYMMETRIC_KEY_COMPARATOR =
-            new Comparator<WeightedEntryPairRecord>() {
+    public static Comparator<EntryPair> SYMMETRIC_KEY_COMPARATOR =
+            new Comparator<EntryPair>() {
 
                 @Override
-                public int compare(WeightedEntryPairRecord a,
-                        WeightedEntryPairRecord b) {
+                public int compare(EntryPair a, EntryPair b) {
                     final int x1 = Math.min(a.entry1Id, a.entry2Id);
                     final int x2 = Math.min(b.entry1Id, b.entry2Id);
                     final int y1 = Math.max(a.entry1Id, a.entry2Id);

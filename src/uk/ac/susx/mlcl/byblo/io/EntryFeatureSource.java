@@ -42,14 +42,14 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * An <tt>EntryFeatureSource</tt> object is used to retrieve 
- * {@link EntryFeatureRecord} objects from a flat file. 
+ * {@link EntryFeature} objects from a flat file. 
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see EntryFeatureSink
  */
 public class EntryFeatureSource
-        extends AbstractTSVSource<EntryFeatureRecord>
-        implements Source<EntryFeatureRecord> {
+        extends AbstractTSVSource<EntryFeature>
+        implements Source<EntryFeature> {
 
     private static final Log LOG = LogFactory.getLog(EntryFeatureSource.class);
     
@@ -57,7 +57,7 @@ public class EntryFeatureSource
 
     private final ObjectIndex<String> featureIndex;
 
-    private EntryFeatureRecord previousRecord = null;
+    private EntryFeature previousRecord = null;
 
     public EntryFeatureSource(
             File file, Charset charset,
@@ -97,7 +97,7 @@ public class EntryFeatureSource
     }
 
     @Override
-    public EntryFeatureRecord read() throws IOException {
+    public EntryFeature read() throws IOException {
         final int entryId;
         if (previousRecord == null) {
             entryId = readEntry();
@@ -116,7 +116,7 @@ public class EntryFeatureSource
         }
 
         final int featureId = readFeature();
-        final EntryFeatureRecord record = new EntryFeatureRecord(
+        final EntryFeature record = new EntryFeature(
                 entryId, featureId);
 
         if (hasNext() && isValueDelimiterNext()) {
@@ -149,8 +149,8 @@ public class EntryFeatureSource
                 fileB, charset, stringIndex);
         boolean equal = true;
         while (equal && srcA.hasNext() && srcB.hasNext()) {
-            final EntryFeatureRecord recA = srcA.read();
-            final EntryFeatureRecord recB = srcB.read();
+            final EntryFeature recA = srcA.read();
+            final EntryFeature recB = srcB.read();
             
             equal = equal
                     && recA.getEntryId() == recB.getEntryId()

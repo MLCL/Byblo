@@ -54,7 +54,7 @@ public class EntryFeatureTest {
 
         while (efSrc.hasNext()) {
             try {
-                EntryFeatureRecord ef = efSrc.read();
+                EntryFeature ef = efSrc.read();
                 assertNotNull("Found null EntryFeatureRecord", ef);
             } catch (SingletonRecordException ex) {
                 // This is allowed to happen here, because the file explicitly

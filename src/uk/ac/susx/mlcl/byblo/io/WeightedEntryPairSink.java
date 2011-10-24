@@ -32,7 +32,6 @@ package uk.ac.susx.mlcl.byblo.io;
 
 import uk.ac.susx.mlcl.lib.ObjectIndex;
 import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
-import uk.ac.susx.mlcl.lib.io.Sink;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -40,12 +39,12 @@ import java.text.DecimalFormat;
 
 /**
  * An <tt>WeightedEntryPairSink</tt> object is used to store 
- * {@link WeightedEntryPairRecord} objects in a flat file. 
+ * {@link EntryPair} objects in a flat file. 
  * 
  * <p>The basic file format is Tab-Separated-Values (TSV) where records are 
  * delimited by new-lines, and values are delimited by tabs. Two variants are
  * supported: verbose and compact. In verbose mode each 
- * {@link WeightedEntryPairRecord} corresponds to a single TSV record; i.e one
+ * {@link EntryPair} corresponds to a single TSV record; i.e one
  * line per object consisting of two entries, and their weight. In 
  * compact mode each TSV record consists of a single entry followed by the 
  * second-entry/weight pairs from all sequentially written 
@@ -73,9 +72,7 @@ import java.text.DecimalFormat;
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightedEntryPairSink
-        extends AbstractTSVSink<WeightedEntryPairRecord>
-        implements Sink<WeightedEntryPairRecord> {
+public class WeightedEntryPairSink extends AbstractTSVSink<Weighted<EntryPair>> {
 
     private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
 
@@ -85,7 +82,7 @@ public class WeightedEntryPairSink
 
     private boolean compactFormatEnabled = false;
 
-    private WeightedEntryPairRecord previousRecord = null;
+    private Weighted<EntryPair> previousRecord = null;
 
     public WeightedEntryPairSink(File file, Charset charset,
             ObjectIndex<String> strIndexA,
@@ -104,32 +101,33 @@ public class WeightedEntryPairSink
     }
 
     @Override
-    public void write(WeightedEntryPairRecord record) throws IOException {
+    public void write(Weighted<EntryPair> record) throws IOException {
         if (isCompactFormatEnabled())
             writeCompact(record);
         else
             writeVerbose(record);
     }
 
-    private void writeVerbose(WeightedEntryPairRecord record) throws IOException {
-        writeEntryA(record.getEntry1Id());
+    private void writeVerbose(Weighted<EntryPair> record) throws IOException {
+        writeEntryA(record.get().getEntry1Id());
         writeValueDelimiter();
-        writeEntryB(record.getEntry2Id());
+        writeEntryB(record.get().getEntry2Id());
         writeValueDelimiter();
         writeWeight(record.getWeight());
         writeRecordDelimiter();
     }
 
-    private void writeCompact(final WeightedEntryPairRecord record) throws IOException {
+    private void writeCompact(final Weighted<EntryPair> record) throws IOException {
         if (previousRecord == null) {
-            writeEntryA(record.getEntry1Id());
-        } else if (previousRecord.getEntry1Id() != record.getEntry1Id()) {
+            writeEntryA(record.get().getEntry1Id());
+        } else if (previousRecord.get().getEntry1Id() != record.get().
+                getEntry1Id()) {
             writeRecordDelimiter();
-            writeEntryA(record.getEntry1Id());
+            writeEntryA(record.get().getEntry1Id());
         }
 
         writeValueDelimiter();
-        writeEntryB(record.getEntry2Id());
+        writeEntryB(record.get().getEntry2Id());
         writeValueDelimiter();
         writeWeight(record.getWeight());
         previousRecord = record;

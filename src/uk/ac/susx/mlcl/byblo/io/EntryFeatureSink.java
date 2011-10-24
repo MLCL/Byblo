@@ -40,15 +40,15 @@ import java.nio.charset.Charset;
 
 /**
  * An <tt>EntryFeatureSink</tt> object is used to store 
- * {@link EntryFeatureRecord} objects in a flat file. 
+ * {@link EntryFeature} objects in a flat file. 
  * 
  * <p>The basic file format is Tab-Separated-Values (TSV) where records are 
  * delimited by new-lines, and values are delimited by tabs. Two variants are
- * supported: verbose and compact. In verbose mode each {@link EntryFeatureRecord} 
+ * supported: verbose and compact. In verbose mode each {@link EntryFeature} 
  * corresponds to a single TSV record; i.e one line per object consisting of an
  * entry and a feature. In compact mode each TSV record consists of a single 
  * entry followed by the features from all sequentially written 
- * {@link EntryFeatureRecord} objects that share the same entry.</p>
+ * {@link EntryFeature} objects that share the same entry.</p>
  * 
  * Verbose mode example:
  * <pre>
@@ -73,8 +73,8 @@ import java.nio.charset.Charset;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class EntryFeatureSink
-        extends AbstractTSVSink<EntryFeatureRecord>
-        implements Sink<EntryFeatureRecord> {
+        extends AbstractTSVSink<EntryFeature>
+        implements Sink<EntryFeature> {
 
     private final ObjectIndex<String> entryIndex;
 
@@ -82,7 +82,7 @@ public class EntryFeatureSink
 
     private boolean compactFormatEnabled = false;
 
-    private EntryFeatureRecord previousRecord = null;
+    private EntryFeature previousRecord = null;
 
     public EntryFeatureSink(File file, Charset charset,
             ObjectIndex<String> entryIndex, ObjectIndex<String> featureIndex)
@@ -128,21 +128,21 @@ public class EntryFeatureSink
     }
 
     @Override
-    public void write(final EntryFeatureRecord record) throws IOException {
+    public void write(final EntryFeature record) throws IOException {
         if (isCompactFormatEnabled())
             writeCompact(record);
         else
             writeVerbose(record);
     }
 
-    private void writeVerbose(final EntryFeatureRecord record) throws IOException {
+    private void writeVerbose(final EntryFeature record) throws IOException {
         writeEntry(record.getEntryId());
         writeValueDelimiter();
         writeFeature(record.getFeatureId());
         writeRecordDelimiter();
     }
 
-    private void writeCompact(final EntryFeatureRecord record) throws IOException {
+    private void writeCompact(final EntryFeature record) throws IOException {
         if (previousRecord == null) {
             writeEntry(record.getEntryId());
         } else if (previousRecord.getEntryId() != record.getEntryId()) {

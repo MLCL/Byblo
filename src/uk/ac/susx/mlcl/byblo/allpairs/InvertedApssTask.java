@@ -31,9 +31,9 @@
 package uk.ac.susx.mlcl.byblo.allpairs;
 
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.collect.Entry;
+import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairRecord;
+import uk.ac.susx.mlcl.byblo.io.EntryPair;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 
 /**
@@ -54,7 +55,7 @@ import uk.ac.susx.mlcl.lib.io.IOUtil;
  */
 public class InvertedApssTask<S> extends NaiveApssTask<S> {
 
-    private Int2ObjectMap<Set<Entry<SparseDoubleVector>>> index;
+    private Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> index;
 
     public InvertedApssTask() {
         index = null;
@@ -72,23 +73,23 @@ public class InvertedApssTask<S> extends NaiveApssTask<S> {
     protected void computeAllPairs()
             throws IOException {
         final S startB = getSourceB().position();
-        List<WeightedEntryPairRecord> pairs = new ArrayList<WeightedEntryPairRecord>();
+        List<Weighted<EntryPair>> pairs = new ArrayList<Weighted<EntryPair>>();
 
         while (getSourceB().hasNext()) {
-            Entry<SparseDoubleVector> b = getSourceB().read();
+            Indexed<SparseDoubleVector> b = getSourceB().read();
             if (!getProcessRecord().apply(b))
                 continue;
 
-            Set<Entry<SparseDoubleVector>> candidates = findCandidates(b);
+            Set<Indexed<SparseDoubleVector>> candidates = findCandidates(b);
 
-            for (Entry<SparseDoubleVector> a : candidates) {
+            for (Indexed<SparseDoubleVector> a : candidates) {
                 if (!getProcessRecord().apply(a))
                     continue;
                 getStats().incrementCandidatesCount();
 
                 double sim = sim(a, b);
-                WeightedEntryPairRecord pair = new WeightedEntryPairRecord(
-                        a.key(), b.key(), sim);
+                Weighted<EntryPair> pair = new Weighted<EntryPair>(
+                        new EntryPair(a.key(), b.key()), sim);
                 if (getProducatePair().apply(pair)) {
                     pairs.add(pair);
                     getStats().incrementProductionCount();
@@ -103,11 +104,11 @@ public class InvertedApssTask<S> extends NaiveApssTask<S> {
         getSourceB().position(startB);
     }
 
-    protected Set<Entry<SparseDoubleVector>> findCandidates(
-            Entry<SparseDoubleVector> b) {
+    protected Set<Indexed<SparseDoubleVector>> findCandidates(
+            Indexed<SparseDoubleVector> b) {
 
-        final Set<Entry<SparseDoubleVector>> candidates =
-                new ObjectOpenHashSet<Entry<SparseDoubleVector>>();
+        final Set<Indexed<SparseDoubleVector>> candidates =
+                new ObjectOpenHashSet<Indexed<SparseDoubleVector>>();
 
         for (int k : b.value().keys) {
             if (index.containsKey(k)) {
@@ -117,18 +118,18 @@ public class InvertedApssTask<S> extends NaiveApssTask<S> {
         return candidates;
     }
 
-    protected Int2ObjectMap<Set<Entry<SparseDoubleVector>>> buildIndex()
+    protected Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> buildIndex()
             throws IOException {
-        SeekableSource<? extends Entry<SparseDoubleVector>, S> src = getSourceA();
-        final Int2ObjectMap<Set<Entry<SparseDoubleVector>>> result =
-                new Int2ObjectOpenHashMap<Set<Entry<SparseDoubleVector>>>();
+        SeekableSource<? extends Indexed<SparseDoubleVector>, S> src = getSourceA();
+        final Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> result =
+                new Int2ObjectOpenHashMap<Set<Indexed<SparseDoubleVector>>>();
         final S startA = src.position();
         while (src.hasNext()) {
-            final Entry<SparseDoubleVector> a = src.read();
+            final Indexed<SparseDoubleVector> a = src.read();
             for (int k : a.value().keys) {
                 if (!result.containsKey(k)) {
                     result.put(k,
-                            new ObjectOpenHashSet<Entry<SparseDoubleVector>>());
+                            new ObjectOpenHashSet<Indexed<SparseDoubleVector>>());
                 }
                 result.get(k).add(a);
             }
@@ -137,12 +138,12 @@ public class InvertedApssTask<S> extends NaiveApssTask<S> {
         return result;
     }
 
-    protected void setIndex(Int2ObjectMap<Set<Entry<SparseDoubleVector>>> index) {
+    protected void setIndex(Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> index) {
         Checks.checkNotNull("index is null", index);
         this.index = index;
     }
 
-    protected Int2ObjectMap<Set<Entry<SparseDoubleVector>>> getIndex() {
+    protected Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> getIndex() {
         return index;
     }
 

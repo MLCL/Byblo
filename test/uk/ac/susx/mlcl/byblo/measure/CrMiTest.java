@@ -30,8 +30,8 @@
  */
 package uk.ac.susx.mlcl.byblo.measure;
 
-import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairRecord;
-import com.google.common.io.Files;
+import uk.ac.susx.mlcl.byblo.io.Weighted;
+import uk.ac.susx.mlcl.byblo.io.EntryPair;
 import uk.ac.susx.mlcl.byblo.Byblo;
 import java.io.File;
 import org.junit.Test;
@@ -241,10 +241,10 @@ public class CrMiTest {
                 DEFAULT_CHARSET);
         
         while(expected.hasNext() && actual.hasNext()) {
-            WeightedEntryPairRecord e = expected.read();
-            WeightedEntryPairRecord a = actual.read();
-            assertEquals(e.getEntry1Id(), a.getEntry1Id());
-            assertEquals(e.getEntry2Id(), a.getEntry2Id());
+            Weighted<EntryPair> e = expected.read();
+            Weighted<EntryPair> a = actual.read();
+            assertEquals(e.get().getEntry1Id(), a.get().getEntry1Id());
+            assertEquals(e.get().getEntry2Id(), a.get().getEntry2Id());
         }
         
         assertEquals(expected.hasNext(), actual.hasNext());

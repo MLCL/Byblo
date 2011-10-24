@@ -33,7 +33,7 @@ package uk.ac.susx.mlcl.byblo.io;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
-import uk.ac.susx.mlcl.lib.collect.Entry;
+import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.Sink;
 
@@ -42,7 +42,7 @@ import uk.ac.susx.mlcl.lib.io.Sink;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class WeightedEntryFeatureVectorSink
-        implements Sink<Entry<SparseDoubleVector>>, Flushable, Closeable {
+        implements Sink<Indexed<SparseDoubleVector>>, Flushable, Closeable {
 
     private final WeightedEntryFeatureSink inner;
 
@@ -51,12 +51,12 @@ public class WeightedEntryFeatureVectorSink
     }
 
     @Override
-    public void write(Entry<SparseDoubleVector> record) throws IOException {
+    public void write(Indexed<SparseDoubleVector> record) throws IOException {
         int entryId = record.key();
         SparseDoubleVector vec = record.value();
         for (int i = 0; i < vec.size; i++) {
-            inner.write(new WeightedEntryFeatureRecord(
-                    entryId, vec.keys[i], vec.values[i]));
+            inner.write(new Weighted<EntryFeature>(
+                    new EntryFeature(entryId, vec.keys[i]), vec.values[i]));
         }
     }
 

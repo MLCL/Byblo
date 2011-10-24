@@ -83,16 +83,16 @@ public class EntryTest {
     }
 
     public void testRandomAccess(File file) throws FileNotFoundException, IOException {
-        final Map<Tell, EntryRecord> hist =
-                new HashMap<Tell, EntryRecord>();
+        final Map<Tell, Weighted<Entry>> hist =
+                new HashMap<Tell, Weighted<Entry>>();
 
         EntrySource src = new EntrySource(file, DEFAULT_CHARSET);
         {
             while (src.hasNext()) {
                 final Tell pos = src.position();
-                final EntryRecord record = src.read();
+                final Weighted<Entry> record = src.read();
 
-                System.out.println(pos.toString() + ": " + record.toString(src.
+                System.out.println(pos.toString() + ": " + record.get().toString(src.
                         getStringIndex()));
 
                 assertNotNull("Found null EntryRecord", record);
@@ -106,10 +106,10 @@ public class EntryTest {
 
             for (int i = 0; i < 10; i++) {
                 final Tell pos = positions.get(rand.nextInt(positions.size()));
-                final EntryRecord expected = hist.get(pos);
+                final Weighted<Entry> expected = hist.get(pos);
 
                 System.out.println("expected tell: " + pos);
-                System.out.println("expected: " + expected.toString(src.
+                System.out.println("expected: " + expected.get().toString(src.
                         getStringIndex()));
 
                 src.position(pos);
@@ -117,9 +117,9 @@ public class EntryTest {
                 assertTrue(src.hasNext());
                 assertEquals(pos, src.position());
 
-                EntryRecord actual = src.read();
+                Weighted<Entry> actual = src.read();
                 System.out.println("actual tell: " + src.position());
-                System.out.println("actual: " + actual.toString(src.
+                System.out.println("actual: " + actual.get().toString(src.
                         getStringIndex()));
 
                 assertEquals(expected, actual);

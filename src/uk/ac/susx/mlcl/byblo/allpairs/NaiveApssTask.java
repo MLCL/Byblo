@@ -37,9 +37,9 @@ import java.io.IOException;
 import uk.ac.susx.mlcl.byblo.measure.Proximity;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.MiscUtil;
-import uk.ac.susx.mlcl.lib.collect.Entry;
+import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairRecord;
+import uk.ac.susx.mlcl.byblo.io.EntryPair;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
@@ -51,6 +51,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 
 /**
@@ -71,23 +72,23 @@ public class NaiveApssTask<P> extends AbstractTask {
      */
     public static final Proximity DEFAULT_MEASURE = new Jaccard();
 
-    private SeekableSource<Entry<SparseDoubleVector>, P> sourceA;
+    private SeekableSource<Indexed<SparseDoubleVector>, P> sourceA;
 
-    private SeekableSource<Entry<SparseDoubleVector>, P> sourceB;
+    private SeekableSource<Indexed<SparseDoubleVector>, P> sourceB;
 
     private Proximity measure = DEFAULT_MEASURE;
 
-    private Sink<WeightedEntryPairRecord> sink;
+    private Sink<Weighted<EntryPair>> sink;
 
     /**
      * Filters that determine which feature vectors are considered.
      */
-    private Predicate<Entry<SparseDoubleVector>> processRecord = alwaysTrue();
+    private Predicate<Indexed<SparseDoubleVector>> processRecord = alwaysTrue();
 
     /**
      * Filters that determine which resultant pairs are output
      */
-    private Predicate<WeightedEntryPairRecord> pruducePair = alwaysTrue();
+    private Predicate<Weighted<EntryPair>> pruducePair = alwaysTrue();
 
     // Stat collection
     private ApssStats stats = new ApssStats();
@@ -111,9 +112,9 @@ public class NaiveApssTask<P> extends AbstractTask {
      * @param sink
      */
     public NaiveApssTask(
-            SeekableSource<Entry<SparseDoubleVector>, P> Q,
-            SeekableSource<Entry<SparseDoubleVector>, P> R,
-            Sink<WeightedEntryPairRecord> sink) {
+            SeekableSource<Indexed<SparseDoubleVector>, P> Q,
+            SeekableSource<Indexed<SparseDoubleVector>, P> R,
+            Sink<Weighted<EntryPair>> sink) {
         setSourceA(Q);
         setSourceB(R);
         setSink(sink);
@@ -125,21 +126,21 @@ public class NaiveApssTask<P> extends AbstractTask {
     public NaiveApssTask() {
     }
 
-    public Predicate<WeightedEntryPairRecord> getProducatePair() {
+    public Predicate<Weighted<EntryPair>> getProducatePair() {
         return pruducePair;
     }
 
-    public void setProducatePair(Predicate<WeightedEntryPairRecord> pruducePair) {
+    public void setProducatePair(Predicate<Weighted<EntryPair>> pruducePair) {
         Checks.checkNotNull("pruducePair");
         this.pruducePair = pruducePair;
     }
 
-    public Predicate<Entry<SparseDoubleVector>> getProcessRecord() {
+    public Predicate<Indexed<SparseDoubleVector>> getProcessRecord() {
         return processRecord;
     }
 
     public void setProcessRecord(
-            Predicate<Entry<SparseDoubleVector>> processRecord) {
+            Predicate<Indexed<SparseDoubleVector>> processRecord) {
         Checks.checkNotNull("processRecord");
         this.processRecord = processRecord;
     }
@@ -154,7 +155,7 @@ public class NaiveApssTask<P> extends AbstractTask {
     }
 
     public final void setSourceA(
-            SeekableSource<Entry<SparseDoubleVector>, P> A) {
+            SeekableSource<Indexed<SparseDoubleVector>, P> A) {
         if (A == null)
             throw new NullPointerException("sourceA is null");
         if (A == sourceB)
@@ -163,7 +164,7 @@ public class NaiveApssTask<P> extends AbstractTask {
     }
 
     public final void setSourceB(
-            SeekableSource<Entry<SparseDoubleVector>, P> B) {
+            SeekableSource<Indexed<SparseDoubleVector>, P> B) {
         if (B == null)
             throw new NullPointerException("sourceB is null");
         if (sourceA == B)
@@ -171,11 +172,11 @@ public class NaiveApssTask<P> extends AbstractTask {
         this.sourceB = B;
     }
 
-    protected final SeekableSource<Entry<SparseDoubleVector>, P> getSourceA() {
+    protected final SeekableSource<Indexed<SparseDoubleVector>, P> getSourceA() {
         return sourceA;
     }
 
-    protected final SeekableSource<Entry<SparseDoubleVector>, P> getSourceB() {
+    protected final SeekableSource<Indexed<SparseDoubleVector>, P> getSourceB() {
         return sourceB;
     }
 
@@ -189,11 +190,11 @@ public class NaiveApssTask<P> extends AbstractTask {
         this.measure = measure;
     }
 
-    public final Sink<WeightedEntryPairRecord> getSink() {
+    public final Sink<Weighted<EntryPair>> getSink() {
         return sink;
     }
 
-    public final void setSink(Sink<WeightedEntryPairRecord> sink) {
+    public final void setSink(Sink<Weighted<EntryPair>> sink) {
         if (sink == null)
             throw new NullPointerException("handler == null");
         this.sink = sink;
@@ -273,7 +274,7 @@ public class NaiveApssTask<P> extends AbstractTask {
         final P startA = sourceA.position();
         Int2DoubleOpenHashMap result = new Int2DoubleOpenHashMap();
         while (sourceA.hasNext()) {
-            Entry<SparseDoubleVector> p = sourceA.read();
+            Indexed<SparseDoubleVector> p = sourceA.read();
             result.put(p.key(), getMeasure().left(p.value()));
         }
         sourceA.position(startA);
@@ -284,7 +285,7 @@ public class NaiveApssTask<P> extends AbstractTask {
         final P startB = sourceB.position();
         Int2DoubleOpenHashMap result = new Int2DoubleOpenHashMap();
         while (sourceB.hasNext()) {
-            Entry<SparseDoubleVector> p = sourceB.read();
+            Indexed<SparseDoubleVector> p = sourceB.read();
             result.put(p.key(), getMeasure().right(p.value()));
         }
         sourceB.position(startB);
@@ -292,12 +293,12 @@ public class NaiveApssTask<P> extends AbstractTask {
     }
 
     protected void computeAllPairs() throws IOException {
-        List<WeightedEntryPairRecord> pairs = new ArrayList<WeightedEntryPairRecord>();
+        List<Weighted<EntryPair>> pairs = new ArrayList<Weighted<EntryPair>>();
         final P restartB = getSourceB().position();
 
         // for every vector (a) in source A
         while (getSourceA().hasNext()) {
-            Entry<SparseDoubleVector> a = getSourceA().read();
+            Indexed<SparseDoubleVector> a = getSourceA().read();
 
             if (!processRecord.apply(a))
                 continue;
@@ -308,13 +309,13 @@ public class NaiveApssTask<P> extends AbstractTask {
             while (getSourceB().hasNext()) {
                 stats.incrementCandidatesCount();
 
-                Entry<SparseDoubleVector> b = sourceB.read();
+                Indexed<SparseDoubleVector> b = sourceB.read();
                 if (!processRecord.apply(b))
                     continue;
 
                 double sim = sim(a, b);
-                WeightedEntryPairRecord pair = new WeightedEntryPairRecord(
-                        a.key(), b.key(), sim);
+                Weighted<EntryPair> pair = new Weighted<EntryPair>(
+                        new EntryPair(a.key(), b.key()), sim);
                 if (pruducePair.apply(pair)) {
                     pairs.add(pair);
                     stats.incrementProductionCount();
@@ -329,8 +330,8 @@ public class NaiveApssTask<P> extends AbstractTask {
     }
 
     protected final double sim(
-            final Entry<SparseDoubleVector> a,
-            final Entry<SparseDoubleVector> b) {
+            final Indexed<SparseDoubleVector> a,
+            final Indexed<SparseDoubleVector> b) {
         stats.incrementComparisonCount();
         return measure.combine(
                 measure.shared(a.value(), b.value()),

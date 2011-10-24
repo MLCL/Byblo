@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import uk.ac.susx.mlcl.lib.collect.Entry;
+import uk.ac.susx.mlcl.lib.collect.Indexed;
 import java.util.Random;
 import java.util.ArrayList;
 import java.util.Map;
@@ -71,7 +71,7 @@ public class WeightedEntryFeatureTest {
         WeightedEntryFeatureVectorSource aSrc = new WeightedEntryFeatureVectorSource(
                 new WeightedEntryFeatureSource(a, DEFAULT_CHARSET));
 
-        List<Entry<SparseDoubleVector>> list = readAll(aSrc);
+        List<Indexed<SparseDoubleVector>> list = readAll(aSrc);
         Collections.sort(list);
 
         WeightedEntryFeatureSink tmp = new WeightedEntryFeatureSink(b,
@@ -146,21 +146,21 @@ public class WeightedEntryFeatureTest {
         assertTrue("EntryFeatureSource is empty", efSrc.hasNext());
 
         while (efSrc.hasNext()) {
-            WeightedEntryFeatureRecord ef = efSrc.read();
+            Weighted<EntryFeature> ef = efSrc.read();
             assertNotNull("Found null EntryFeatureRecord", ef);
         }
     }
 
     public void testRandomAccess(File file) throws FileNotFoundException, IOException {
-        final Map<Tell, WeightedEntryFeatureRecord> hist =
-                new HashMap<Tell, WeightedEntryFeatureRecord>();
+        final Map<Tell, Weighted<EntryFeature>> hist =
+                new HashMap<Tell, Weighted<EntryFeature>>();
 
         WeightedEntryFeatureSource src =
                 new WeightedEntryFeatureSource(file, DEFAULT_CHARSET);
         {
             while (src.hasNext()) {
                 final Tell pos = src.position();
-                final WeightedEntryFeatureRecord record = src.read();
+                final Weighted<EntryFeature> record = src.read();
                 assertNotNull("Found null EntryFeatureRecord", record);
                 hist.put(pos, record);
             }
@@ -172,10 +172,10 @@ public class WeightedEntryFeatureTest {
 
             for (int i = 0; i < 10; i++) {
                 final Tell pos = positions.get(rand.nextInt(positions.size()));
-                final WeightedEntryFeatureRecord expected = hist.get(pos);
+                final Weighted<EntryFeature> expected = hist.get(pos);
 
                 System.out.println("expected tell: " + pos);
-                System.out.println("expected: " + expected.toString(src.
+                System.out.println("expected: " + expected.get().toString(src.
                         getEntryIndex(), src.getFeatureIndex()));
 
                 src.position(pos);
@@ -183,9 +183,9 @@ public class WeightedEntryFeatureTest {
                 assertEquals(pos, src.position());
                 assertTrue(src.hasNext());
 
-                WeightedEntryFeatureRecord actual = src.read();
+                Weighted<EntryFeature> actual = src.read();
                 System.out.println("actual tell: " + src.position());
-                System.out.println("actual: " + actual.toString(src.
+                System.out.println("actual: " + actual.get().toString(src.
                         getEntryIndex(), src.getFeatureIndex()));
 
                 assertEquals(expected, actual);

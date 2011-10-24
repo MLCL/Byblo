@@ -32,7 +32,6 @@ package uk.ac.susx.mlcl.byblo.io;
 
 import uk.ac.susx.mlcl.lib.ObjectIndex;
 import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
-import uk.ac.susx.mlcl.lib.io.Sink;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -40,16 +39,16 @@ import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 
 /**
- * An <tt>FeatureSink</tt> object is used to store {@link FeatureRecord} objects
+ * An <tt>FeatureSink</tt> object is used to store {@link Feature} objects
  * in a flat file. 
  * 
  * <p>The basic file format is Tab-Separated-Values (TSV) where records are 
  * delimited by new-lines, and values are delimited by tabs. Two variants are
- * supported: verbose and compact. In verbose mode each {@link FeatureRecord} 
+ * supported: verbose and compact. In verbose mode each {@link Feature} 
  * corresponds to a single TSV record; i.e one line per object consisting of an
  * feature and it's weight. In compact mode each TSV record consists of a single
  * feature followed by the weights of all sequentially written 
- * {@link FeatureRecord} objects that share the same feature.</p>
+ * {@link Feature} objects that share the same feature.</p>
  * 
  * Verbose mode example:
  * <pre>
@@ -73,9 +72,7 @@ import java.text.DecimalFormat;
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class FeatureSink
-        extends AbstractTSVSink<FeatureRecord>
-        implements Sink<FeatureRecord> {
+public class FeatureSink extends AbstractTSVSink<Weighted<Feature>> {
 
     private final ObjectIndex<String> stringIndex;
 
@@ -83,7 +80,7 @@ public class FeatureSink
 
     private boolean compactFormatEnabled = false;
 
-    private FeatureRecord previousRecord = null;
+    private Weighted<Feature> previousRecord = null;
 
     public FeatureSink(
             File file, Charset charset, ObjectIndex<String> stringIndex)
@@ -112,26 +109,26 @@ public class FeatureSink
     }
 
     @Override
-    public void write(FeatureRecord record) throws IOException {
+    public void write(Weighted<Feature> record) throws IOException {
         if (isCompactFormatEnabled())
             writeCompact(record);
         else
             writeVerbose(record);
     }
 
-    private void writeVerbose(FeatureRecord record) throws IOException {
-        writeFeature(record.getFeatureId());
+    private void writeVerbose(Weighted<Feature> record) throws IOException {
+        writeFeature(record.get().getId());
         writeValueDelimiter();
         writeWeight(record.getWeight());
         writeRecordDelimiter();
     }
 
-    private void writeCompact(FeatureRecord record) throws IOException {
+    private void writeCompact(Weighted<Feature> record) throws IOException {
         if (previousRecord == null) {
-            writeFeature(record.getFeatureId());
-        } else if (previousRecord.getFeatureId() != record.getFeatureId()) {
+            writeFeature(record.get().getId());
+        } else if (previousRecord.get().getId() != record.get().getId()) {
             writeRecordDelimiter();
-            writeFeature(record.getFeatureId());
+            writeFeature(record.get().getId());
         }
         writeValueDelimiter();
         writeWeight(record.getWeight());

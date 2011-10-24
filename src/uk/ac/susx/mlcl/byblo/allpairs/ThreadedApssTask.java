@@ -31,9 +31,9 @@
 package uk.ac.susx.mlcl.byblo.allpairs;
 
 import uk.ac.susx.mlcl.lib.MiscUtil;
-import uk.ac.susx.mlcl.lib.collect.Entry;
+import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairRecord;
+import uk.ac.susx.mlcl.byblo.io.EntryPair;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.tasks.Task;
@@ -49,6 +49,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.io.Weighted;
 
 /**
  * An all pairs similarity search implementation that parallelises another
@@ -78,9 +79,9 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
     private Semaphore throttle;
 
     public ThreadedApssTask(
-            SeekableSource<Entry<SparseDoubleVector>, S> A,
-            SeekableSource<Entry<SparseDoubleVector>, S> B,
-            Sink<WeightedEntryPairRecord> sink) {
+            SeekableSource<Indexed<SparseDoubleVector>, S> A,
+            SeekableSource<Indexed<SparseDoubleVector>, S> B,
+            Sink<Weighted<EntryPair>> sink) {
         super(A, B, sink);
         setNumThreads(DEFAULT_NUM_THREADS);
     }
@@ -125,24 +126,24 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 LOG.debug(MiscUtil.memoryInfoString());
         }
 
-        Chunker<Entry<SparseDoubleVector>, S> chunkerA =
-                new Chunker<Entry<SparseDoubleVector>, S>(
+        Chunker<Indexed<SparseDoubleVector>, S> chunkerA =
+                new Chunker<Indexed<SparseDoubleVector>, S>(
                 getSourceA(), maxChunkSize);
 
-        Chunker<Entry<SparseDoubleVector>, S> chunkerB =
-                new Chunker<Entry<SparseDoubleVector>, S>(
+        Chunker<Indexed<SparseDoubleVector>, S> chunkerB =
+                new Chunker<Indexed<SparseDoubleVector>, S>(
                 getSourceB(), maxChunkSize);
 
         int nChunks = 0;
         int i = 0;
         while (chunkerA.hasNext()) {
-            Chunk<Entry<SparseDoubleVector>> chunkA = chunkerA.read();
+            Chunk<Indexed<SparseDoubleVector>> chunkA = chunkerA.read();
             i++;
 
             int j = 0;
             S restartPos = chunkerB.position();
             while (chunkerB.hasNext()) {
-                Chunk<Entry<SparseDoubleVector>> chunkB = chunkerB.read();
+                Chunk<Indexed<SparseDoubleVector>> chunkB = chunkerB.read();
                 j++;
 
                 double complete = nChunks == 0 ? 0

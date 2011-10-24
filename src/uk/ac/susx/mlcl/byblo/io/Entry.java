@@ -32,52 +32,43 @@ package uk.ac.susx.mlcl.byblo.io;
 
 import com.google.common.base.Objects;
 import java.io.Serializable;
+import uk.ac.susx.mlcl.lib.ObjectIndex;
 
 /**
- * <tt>FeatureRecord</tt> objects represent a single instance of a feature used
- * to measure the similarity between thesaurus entries. A <tt>FeatureRecord</tt> 
- * consists of a <tt>featureId</tt>, and a <tt>weight</tt> estimated from the 
- * source corpus. The weighting is usually the features frequency, but it could 
- * be anything.
+ * <tt>Entry</tt> objects represent a single instance of a thesaurus
+ * entry, with a weighting estimated from the source corpus. The weighting is 
+ * usually the entries frequency, but it could be anything.
  * 
- * <p>Instances of <tt>FeatureRecord</tt> are immutable.<p>
+ * <p>Instances of <tt>Entry</tt> are immutable.<p>
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class FeatureRecord 
-    implements Serializable, Comparable<FeatureRecord> {
+public class Entry implements Serializable, Comparable<Entry> {
 
-    private static final long serialVersionUID = 63617210012669024L;
+    private static final long serialVersionUID = 1L;
 
-    private int featureId;
+    private int id;
 
-    private double weight;
-
-    public FeatureRecord(final int featureId, final double weight) {
-        this.featureId = featureId;
-        this.weight = weight;
+    public Entry(final int entryId) {
+        this.id = entryId;
     }
 
     /**
      * Constructor used during de-serialization.
      */
-    protected FeatureRecord() {
+    protected Entry() {
     }
 
-
-    public final int getFeatureId() {
-        return featureId;
+    public int getId() {
+        return id;
     }
 
-    public final double getWeight() {
-        return weight;
-    }
 
     /**
      * Indicates whether some other object is "equal to" this one.
      * 
-     * <p>Note that only the <tt>featureId</tt> field is used for equality. I.e 
-     * two objects with the same <tt>featureId</tt>, but differing weights 
+     * <p>Note that only the <tt>entryId</tt> field is used for equality. I.e  
+     * two objects with the same <tt>entryId</tt>, but differing weights 
      * <em>will</em> be consider equal.</p>
      * 
      * @param   obj   the reference object with which to compare.
@@ -86,30 +77,35 @@ public final class FeatureRecord
      */
     @Override
     public boolean equals(Object obj) {
-        if(obj == this)
+        if (obj == this)
             return true;
         if (obj == null || getClass() != obj.getClass())
             return false;
-        return equals((FeatureRecord) obj);
+        return equals((Entry) obj);
     }
-    
-    public boolean equals(FeatureRecord other) {
-        return this.getFeatureId() == other.getFeatureId();
+
+    public boolean equals(Entry other) {
+        return this.getId() == other.getId();
     }
 
     @Override
     public int hashCode() {
-        return featureId;
+        return this.id;
     }
 
     @Override
     public String toString() {
         return Objects.toStringHelper(this).
-                add("id", featureId).add("weight", weight).toString();
+                add("id", id).toString();
+    }
+
+    public String toString(ObjectIndex<String> entryIndex) {
+        return Objects.toStringHelper(this).
+                add("entry", entryIndex.get(id)).toString();
     }
 
     @Override
-    public int compareTo(FeatureRecord that) {
-        return this.getFeatureId() - that.getFeatureId();
+    public int compareTo(Entry that) {
+        return this.getId() - that.getId();
     }
 }

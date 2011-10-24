@@ -40,15 +40,15 @@ import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 
 /**
- * An <tt>EntrySink</tt> object is used to store {@link EntryRecord} objects in 
+ * An <tt>EntrySink</tt> object is used to store {@link Entry} objects in 
  * a flat file. 
  * 
  * <p>The basic file format is Tab-Separated-Values (TSV) where records are 
  * delimited by new-lines, and values are delimited by tabs. Two variants are
- * supported: verbose and compact. In verbose mode each {@link EntryRecord} 
+ * supported: verbose and compact. In verbose mode each {@link Entry} 
  * corresponds to a single TSV record; i.e one line per object consisting of an
  * entry and it's weight. In compact mode each TSV record consists of a single
- * entry followed by the weights of all sequentially written {@link EntryRecord}
+ * entry followed by the weights of all sequentially written {@link Entry}
  * objects that share the same entry.</p>
  * 
  * Verbose mode example:
@@ -73,8 +73,7 @@ import java.text.DecimalFormat;
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class EntrySink extends AbstractTSVSink<EntryRecord>
-        implements Sink<EntryRecord> {
+public class EntrySink extends AbstractTSVSink<Weighted<Entry>> {
 
     private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
 
@@ -82,7 +81,7 @@ public class EntrySink extends AbstractTSVSink<EntryRecord>
 
     private boolean compactFormatEnabled = false;
 
-    private EntryRecord previousRecord = null;
+    private Weighted<Entry> previousRecord = null;
 
     public EntrySink(File file, Charset charset, ObjectIndex<String> stringIndex)
             throws FileNotFoundException, IOException {
@@ -99,7 +98,7 @@ public class EntrySink extends AbstractTSVSink<EntryRecord>
     }
 
     @Override
-    public void write(final EntryRecord record) throws IOException {
+    public void write(final Weighted<Entry> record) throws IOException {
         if (isCompactFormatEnabled())
             writeCompact(record);
         else
@@ -113,19 +112,19 @@ public class EntrySink extends AbstractTSVSink<EntryRecord>
         super.close();
     }
 
-    private void writeVerbose(final EntryRecord record) throws IOException {
-        writeEntry(record.getEntryId());
+    private void writeVerbose(final Weighted<Entry> record) throws IOException {
+        writeEntry(record.get().getId());
         writeValueDelimiter();
         writeWeight(record.getWeight());
         writeRecordDelimiter();
     }
 
-    private void writeCompact(final EntryRecord record) throws IOException {
+    private void writeCompact(final Weighted<Entry> record) throws IOException {
         if (previousRecord == null) {
-            writeEntry(record.getEntryId());
-        } else if (previousRecord.getEntryId() != record.getEntryId()) {
+            writeEntry(record.get().getId());
+        } else if (previousRecord.get().getId() != record.get().getId()) {
             writeRecordDelimiter();
-            writeEntry(record.getEntryId());
+            writeEntry(record.get().getId());
         }
         writeValueDelimiter();
         writeWeight(record.getWeight());

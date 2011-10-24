@@ -42,7 +42,6 @@ import uk.ac.susx.mlcl.byblo.allpairs.ThreadedApssTask;
 import uk.ac.susx.mlcl.byblo.io.FeatureSource;
 import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureSource;
 import uk.ac.susx.mlcl.byblo.io.WeightedEntryFeatureVectorSource;
-import uk.ac.susx.mlcl.byblo.io.EntrySource;
 import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairSink;
 import uk.ac.susx.mlcl.byblo.measure.AbstractMIProximity;
 import uk.ac.susx.mlcl.byblo.measure.CrMi;
@@ -52,7 +51,7 @@ import uk.ac.susx.mlcl.byblo.measure.Lp;
 import uk.ac.susx.mlcl.byblo.measure.Proximity;
 import uk.ac.susx.mlcl.byblo.measure.ReversedProximity;
 import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.byblo.io.WeightedEntryPairRecord;
+import uk.ac.susx.mlcl.byblo.io.EntryPair;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
@@ -66,6 +65,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.io.Weighted;
 
 /**
  *
@@ -282,7 +282,7 @@ public class AllPairsTask extends AbstractTask {
         // Create a sink object that will act as a recipient for all pairs that
         // are produced by the algorithm.
 
-        final Sink<WeightedEntryPairRecord> sink =
+        final Sink<Weighted<EntryPair>> sink =
                 new WeightedEntryPairSink(outputFile, charset, strIndex,
                 strIndex);
 
@@ -293,23 +293,25 @@ public class AllPairsTask extends AbstractTask {
         // Parameterise the all-pairs algorithm
         apss.setNumThreads(nThreads);
         apss.setSink(sink);
-        
+
         prox.setFilteredFeatureId(strIndex.get(FilterTask.FILTERED_STRING));
-        
+
         apss.setMeasure(prox);
         apss.setMaxChunkSize(chunkSize);
 
-        List<Predicate<WeightedEntryPairRecord>> pairFilters =
-                new ArrayList<Predicate<WeightedEntryPairRecord>>();
+        List<Predicate<Weighted<EntryPair>>> pairFilters =
+                new ArrayList<Predicate<Weighted<EntryPair>>>();
 
         if (minSimilarity != Double.NEGATIVE_INFINITY)
-            pairFilters.add(WeightedEntryPairRecord.similarityGTE(minSimilarity));
+            pairFilters.add(Weighted.<EntryPair>greaterThanOrEqualTo(
+                    minSimilarity));
 
         if (maxSimilarity != Double.POSITIVE_INFINITY)
-            pairFilters.add(WeightedEntryPairRecord.similarityLTE(maxSimilarity));
+            pairFilters.add(Weighted.<EntryPair>lessThanOrEqualTo(maxSimilarity));
 
         if (!outputIdentityPairs)
-            pairFilters.add(Predicates.not(WeightedEntryPairRecord.identity()));
+            pairFilters.add(Predicates.not(Predicates.compose(
+                    EntryPair.identity(), Weighted.<EntryPair>record())));
 
         if (pairFilters.size() == 1)
             apss.setProducatePair(pairFilters.get(0));

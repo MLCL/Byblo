@@ -50,7 +50,7 @@ import java.io.Serializable;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T>
  */
-public class Entry<T> extends AbstractEntry
+public class Indexed<T> extends AbstractIndexed
         implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;
@@ -62,7 +62,7 @@ public class Entry<T> extends AbstractEntry
      *
      * @param other IndexEntry to clone.
      */
-    protected Entry(final Entry<T> other) {
+    protected Indexed(final Indexed<T> other) {
         super(other);
         if (other.value == null)
             throw new NullPointerException("other.value == null");
@@ -75,7 +75,7 @@ public class Entry<T> extends AbstractEntry
      * @param key    the unique integer id of this entry
      * @param value the valye of this entry
      */
-    public Entry(final int key, final T value) {
+    public Indexed(final int key, final T value) {
         super(key);
         if (value == null)
             throw new NullPointerException("value == null");
@@ -92,7 +92,7 @@ public class Entry<T> extends AbstractEntry
             return true;
         if (obj == null || getClass() != obj.getClass())
             return false;
-        return this.key() == ((Entry<?>) obj).key();
+        return this.key() == ((Indexed<?>) obj).key();
     }
 
     @Override
@@ -110,8 +110,8 @@ public class Entry<T> extends AbstractEntry
     }
 
     @Override
-    public Entry<T> clone() {
-        return new Entry<T>(this);
+    public Indexed<T> clone() {
+        return new Indexed<T>(this);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class Entry<T> extends AbstractEntry
         return new Serializer<T>(this);
     }
 
-    private static final class Serializer<T> extends AbstractEntry.Serializer implements Externalizable {
+    private static final class Serializer<T> extends AbstractIndexed.Serializer implements Externalizable {
 
         private static final long serialVersionUID = 1;
 
@@ -128,7 +128,7 @@ public class Entry<T> extends AbstractEntry
         public Serializer() {
         }
 
-        public Serializer(final Entry<T> entry) {
+        public Serializer(final Indexed<T> entry) {
             super(entry);
             this.value = entry.value;
         }
@@ -148,7 +148,7 @@ public class Entry<T> extends AbstractEntry
 
         @Override
         protected final Object readResolve() {
-            return new Entry<T>(key, value);
+            return new Indexed<T>(key, value);
         }
     }
 }

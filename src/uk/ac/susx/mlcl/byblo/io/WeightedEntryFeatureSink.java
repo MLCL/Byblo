@@ -37,11 +37,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
-import uk.ac.susx.mlcl.lib.io.Sink;
 
 /**
  * An <tt>WeightedEntryFeatureSink</tt> object is used to store 
- * {@link WeightedEntryFeatureRecord} objects in a flat file. 
+ * {@link WeightedEntryFeature} objects in a flat file. 
  * 
  * <p>The basic file format is Tab-Separated-Values (TSV) where records are 
  * delimited by new-lines, and values are delimited by tabs. Two variants are
@@ -74,9 +73,7 @@ import uk.ac.susx.mlcl.lib.io.Sink;
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightedEntryFeatureSink
-        extends AbstractTSVSink<WeightedEntryFeatureRecord>
-        implements Sink<WeightedEntryFeatureRecord> {
+public class WeightedEntryFeatureSink extends AbstractTSVSink<Weighted<EntryFeature>> {
 
     private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
 
@@ -86,7 +83,7 @@ public class WeightedEntryFeatureSink
 
     private boolean compactFormatEnabled = false;
 
-    private WeightedEntryFeatureRecord previousRecord = null;
+    private Weighted<EntryFeature> previousRecord = null;
 
     public WeightedEntryFeatureSink(File file, Charset charset,
             ObjectIndex<String> entryIndex, ObjectIndex<String> featureIndex)
@@ -131,34 +128,34 @@ public class WeightedEntryFeatureSink
     }
 
     @Override
-    public void write(WeightedEntryFeatureRecord record) throws IOException {
+    public void write(Weighted<EntryFeature> record) throws IOException {
         if (isCompactFormatEnabled())
             writeCompact(record);
         else
             writeVerbose(record);
     }
 
-    private void writeVerbose(WeightedEntryFeatureRecord record) throws IOException {
-        writeEntry(record.getEntryId());
+    private void writeVerbose(Weighted<EntryFeature> record) throws IOException {
+        writeEntry(record.get().getEntryId());
         writeValueDelimiter();
 
-        writeFeature(record.getFeatureId());
+        writeFeature(record.get().getFeatureId());
         writeValueDelimiter();
 
         writeWeight(record.getWeight());
         writeRecordDelimiter();
     }
 
-    private void writeCompact(final WeightedEntryFeatureRecord record) throws IOException {
+    private void writeCompact(final Weighted<EntryFeature> record) throws IOException {
         if (previousRecord == null) {
-            writeEntry(record.getEntryId());
-        } else if (previousRecord.getEntryId() != record.getEntryId()) {
+            writeEntry(record.get().getEntryId());
+        } else if (previousRecord.get().getEntryId() != record.get().getEntryId()) {
             writeRecordDelimiter();
-            writeEntry(record.getEntryId());
+            writeEntry(record.get().getEntryId());
         }
 
         writeValueDelimiter();
-        writeFeature(record.getFeatureId());
+        writeFeature(record.get().getFeatureId());
         writeValueDelimiter();
         writeWeight(record.getWeight());
         previousRecord = record;

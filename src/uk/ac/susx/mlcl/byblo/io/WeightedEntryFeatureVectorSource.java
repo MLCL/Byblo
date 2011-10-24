@@ -31,7 +31,7 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.lib.collect.Entry;
+import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.collect.SparseVectors;
 import uk.ac.susx.mlcl.lib.io.Lexer;
@@ -40,7 +40,6 @@ import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import java.io.IOException;
 import java.nio.charset.CharacterCodingException;
-import uk.ac.susx.mlcl.byblo.FilterTask;
 
 /**
  * Wraps a {@link WeightedEntryFeatureSource} to produce complete feature 
@@ -49,11 +48,11 @@ import uk.ac.susx.mlcl.byblo.FilterTask;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class WeightedEntryFeatureVectorSource
-        implements SeekableSource<Entry<SparseDoubleVector>, Lexer.Tell> {
+        implements SeekableSource<Indexed<SparseDoubleVector>, Lexer.Tell> {
 
     private final WeightedEntryFeatureSource inner;
 
-    private WeightedEntryFeatureRecord next;
+    private Weighted<EntryFeature> next;
 
     private Lexer.Tell tell;
 
@@ -81,31 +80,25 @@ public class WeightedEntryFeatureVectorSource
     }
 
     @Override
-    public Entry<SparseDoubleVector> read() throws IOException {
+    public Indexed<SparseDoubleVector> read() throws IOException {
         if (next == null)
             readNext();
         Int2DoubleMap features = new Int2DoubleOpenHashMap();
-        WeightedEntryFeatureRecord start = next;
+        Weighted<EntryFeature> start = next;
         int cardinality = 0;
         do {
-            features.put(next.getFeatureId(), next.getWeight());
-            cardinality = Math.max(cardinality, next.getFeatureId() + 1);
+            features.put(next.get().getFeatureId(), next.getWeight());
+            cardinality = Math.max(cardinality, next.get().getFeatureId() + 1);
             // XXX position() should not need to be called every iteration
             tell = inner.position();
             readNext();
-        } while (next != null && next.getEntryId() == start.getEntryId());
+        } while (next != null && next.get().getEntryId() == start.get().
+                getEntryId());
 
-        SparseDoubleVector v = SparseVectors.toDoubleVector(features, cardinality);
-        
-        
-//        v.values[v.keys[inner.getFeatureIndex().get(FilterTask.FILTERED_STRING)]] = 0;
-        
-        
-//        double sum = v.sum;
-//        v.set(inner.getFeatureIndex().get(FilterTask.FILTERED_STRING), 0);
-//        v.sum = sum;
-        
-        return new Entry<SparseDoubleVector>(start.getEntryId(), v);
+        SparseDoubleVector v = SparseVectors.toDoubleVector(features,
+                cardinality);
+
+        return new Indexed<SparseDoubleVector>(start.get().getEntryId(), v);
     }
 
     @Override

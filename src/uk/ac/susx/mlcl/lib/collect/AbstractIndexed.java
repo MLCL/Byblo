@@ -43,7 +43,7 @@ import java.util.Comparator;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public abstract class AbstractEntry implements Serializable, Comparable<AbstractEntry> {
+public abstract class AbstractIndexed implements Serializable, Comparable<AbstractIndexed> {
 
     private static final long serialVersionUID = 1L;
 
@@ -54,7 +54,7 @@ public abstract class AbstractEntry implements Serializable, Comparable<Abstract
      *
      * @param other IndexEntry to clone.
      */
-    protected AbstractEntry(final AbstractEntry other) {
+    protected AbstractIndexed(final AbstractIndexed other) {
         if (other == null)
             throw new NullPointerException("other == null");
         if (other.key < 0)
@@ -68,7 +68,7 @@ public abstract class AbstractEntry implements Serializable, Comparable<Abstract
      *
      * @param key    the unique integer id of this entry
      */
-    public AbstractEntry(final int key) {
+    public AbstractIndexed(final int key) {
         if (key < 0)
             throw new IllegalArgumentException("key < 0");
 
@@ -90,7 +90,7 @@ public abstract class AbstractEntry implements Serializable, Comparable<Abstract
         if (getClass() != obj.getClass()) {
             return false;
         }
-        return this.key == ((AbstractEntry) obj).key;
+        return this.key == ((AbstractIndexed) obj).key;
     }
 
     @Override
@@ -104,7 +104,7 @@ public abstract class AbstractEntry implements Serializable, Comparable<Abstract
     }
 
     @Override
-    public int compareTo(AbstractEntry that) {
+    public int compareTo(AbstractIndexed that) {
         return KEY_ASC.compare(this, that);
     }
 
@@ -119,7 +119,7 @@ public abstract class AbstractEntry implements Serializable, Comparable<Abstract
         public Serializer() {
         }
 
-        public Serializer(final AbstractEntry entry) {
+        public Serializer(final AbstractIndexed entry) {
             this.key = entry.key;
         }
 
@@ -138,22 +138,22 @@ public abstract class AbstractEntry implements Serializable, Comparable<Abstract
         protected abstract Object readResolve();
     }
 
-    public static final Comparator<AbstractEntry> KEY_ASC =
-            new Comparator<AbstractEntry>() {
+    public static final Comparator<AbstractIndexed> KEY_ASC =
+            new Comparator<AbstractIndexed>() {
 
                 @Override
-                public final int compare(final AbstractEntry a,
-                                         final AbstractEntry b) {
+                public final int compare(final AbstractIndexed a,
+                                         final AbstractIndexed b) {
                     return a.key < b.key ? -1 : a.key > b.key ? 1 : 0;
                 }
             };
 
-    public static final Comparator<AbstractEntry> KEY_DESC =
-            new Comparator<AbstractEntry>() {
+    public static final Comparator<AbstractIndexed> KEY_DESC =
+            new Comparator<AbstractIndexed>() {
 
                 @Override
-                public final int compare(final AbstractEntry a,
-                                         final AbstractEntry b) {
+                public final int compare(final AbstractIndexed a,
+                                         final AbstractIndexed b) {
                     return a.key < b.key ? 1 : a.key > b.key ? -1 : 0;
                 }
             };
