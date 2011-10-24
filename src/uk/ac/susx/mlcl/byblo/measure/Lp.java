@@ -33,6 +33,16 @@ package uk.ac.susx.mlcl.byblo.measure;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
+ * 
+ * <h4>Notes</h4>
+ * <ul>
+ * <li>All results are inverted to produce proximities rather than distances. 
+ * I.e Values are between 0 and 1 (inclusive) where 0 indicates infinite 
+ * distance, and 1 indicates no distance at all.</li>
+ * <li>L0 is defined as the L0 "norm" (with quotes) by David Donoho. This is
+ * effectively the non-zero cardinality of the absolute difference between 
+ * vectors.</li>
+ * </ul>
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
@@ -59,7 +69,25 @@ public class Lp extends AbstractProximity {
         double shared = 0;
 
         if (p == 0) {
-            throw new UnsupportedOperationException("L_0 isn't implemented yet.");
+            int i = 0, j = 0;
+            while (i < A.size && j < B.size) {
+                if (A.keys[i] < B.keys[j]) {
+                    i++;
+                } else if (A.keys[i] > B.keys[j]) {
+                    j++;
+                } else if (isFiltered(A.keys[i])) {
+                    i++;
+                    j++;
+                } else { // Q.keys[i] == R.keys[j]
+                    final double Qprob = A.values[i] / A.sum;
+                    final double Rprob = B.values[j] / B.sum;
+                    shared += Math.signum(Math.abs(Qprob - Rprob))
+                            - Math.signum(Rprob)
+                            - Math.signum(Qprob);
+                    i++;
+                    j++;
+                }
+            }
         } else if (p == 1) {
             int i = 0, j = 0;
             while (i < A.size && j < B.size) {
@@ -155,7 +183,7 @@ public class Lp extends AbstractProximity {
     @Override
     public double left(SparseDoubleVector A) {
         if (p == 0) {
-            throw new UnsupportedOperationException("L_0 isn't implemented yet.");
+            return A.size;
         } else if (p == 1) {
             return 1;
         } else if (p == 2) {
@@ -182,9 +210,9 @@ public class Lp extends AbstractProximity {
 
     @Override
     public double combine(double shared, double left, double right) {
-        // Low values indicate similarity results are inverted
+        // results are inverted: High values indicate similarity 
         if (p == 0) {
-            throw new UnsupportedOperationException("L_0 isn't implemented yet.");
+            return 1d / (shared + left + right);
         } else if (p == 1) {
             return 1d / (shared + left + right);
         } else if (p == 2) {
