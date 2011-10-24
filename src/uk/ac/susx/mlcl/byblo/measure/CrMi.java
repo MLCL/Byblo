@@ -136,8 +136,10 @@ public class CrMi extends AbstractMIProximity implements Proximity {
 
     @Override
     public boolean isSymmetric() {
-        // TODO: This rather depends on the parameterisation
-        return false;
+        // If gamma = 1.0 then only then harmonic component is used, hense the 
+        // measure is symetric. Otherwise some portion of the arithimentic 
+        // component is used which is symetric only when beta = 0.5.
+        return gamma == 1.0 || beta == 0.5;
     }
 
     @Override
