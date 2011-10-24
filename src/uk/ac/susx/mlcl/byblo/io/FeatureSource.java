@@ -151,8 +151,10 @@ public class FeatureSource extends AbstractTSVSource<FeatureRecord> {
                             + "frequency = " + newFreq + ".");
 
                 featureFrequenciesMap.put(id, newFreq);
+            } else {
+                featureFrequenciesMap.put(entry.getFeatureId(),
+                        entry.getWeight());
             }
-            featureFrequenciesMap.put(entry.getFeatureId(), entry.getWeight());
 
         }
         return featureFrequenciesMap;

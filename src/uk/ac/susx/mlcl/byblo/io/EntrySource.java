@@ -182,8 +182,9 @@ public class EntrySource extends AbstractTSVSource<EntryRecord> {
                             + oldFreq + ", new frequency = " + newFreq + ".");
 
                 entityFrequenciesMap.put(id, newFreq);
+            } else {
+                entityFrequenciesMap.put(entry.getEntryId(), entry.getWeight());
             }
-            entityFrequenciesMap.put(entry.getEntryId(), entry.getWeight());
         }
         return entityFrequenciesMap;
     }
