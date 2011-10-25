@@ -51,10 +51,9 @@ public class WeightedTokenPairVectorSource
         implements SeekableSource<Indexed<SparseDoubleVector>, Lexer.Tell> {
 
     private final WeightedTokenPairSource inner;
-
     private Weighted<TokenPair> next;
-
     private Lexer.Tell tell;
+    private long count = 0;
 
     public WeightedTokenPairVectorSource(WeightedTokenPairSource inner) {
         this.inner = inner;
@@ -81,8 +80,9 @@ public class WeightedTokenPairVectorSource
 
     @Override
     public Indexed<SparseDoubleVector> read() throws IOException {
-        if (next == null)
+        if (next == null) {
             readNext();
+        }
         Int2DoubleMap features = new Int2DoubleOpenHashMap();
         Weighted<TokenPair> start = next;
         int cardinality = 0;
@@ -98,7 +98,12 @@ public class WeightedTokenPairVectorSource
         SparseDoubleVector v = SparseVectors.toDoubleVector(features,
                 cardinality);
 
+        ++count;
         return new Indexed<SparseDoubleVector>(start.get().id1(), v);
+    }
+
+    public long getCount() {
+        return count;
     }
 
     @Override

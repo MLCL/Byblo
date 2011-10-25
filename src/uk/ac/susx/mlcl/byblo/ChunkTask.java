@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.google.common.base.Objects;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
@@ -59,7 +60,7 @@ public class ChunkTask extends AbstractTask {
 
     private static final Log LOG = LogFactory.getLog(ChunkTask.class);
 
-    public static final int DEFAULT_MAX_CHUNK_SIZE = 5000000;
+    public static final int DEFAULT_MAX_CHUNK_SIZE = 10 * (1 << 20);
 
     public static final File DEFAULT_SOURCE_FILE = new File("-");
 
@@ -123,8 +124,17 @@ public class ChunkTask extends AbstractTask {
 
     @Override
     protected void runTask() throws Exception {
+//        // Can't actually do this because it will be deleted later.
+//        // Don't bother chunking if it's smaller than the chunk size
+//        if(sourceFile.length() <= maxChunkSize) {
+//            if(LOG.isDebugEnabled())
+//                LOG.debug("Skipping chunking because source file is smaller than max chunk size.");
+//            dstFileQueue.put(sourceFile);
+//            return;            
+//        }
+        
         if (LOG.isInfoEnabled())
-            LOG.info("Chunking from file \"" + sourceFile + "\"; max-chunk-size=" + MiscUtil.
+            LOG.info("Running chunker on file \"" + sourceFile + "\", max size = " + MiscUtil.
                     humanReadableBytes(getMaxChunkSize()) + ".");
 
         BufferedReader reader = null;
@@ -174,6 +184,8 @@ public class ChunkTask extends AbstractTask {
             if (reader != null)
                 reader.close();
         }
+        if (LOG.isInfoEnabled())
+            LOG.info("Completed chunking task.");
     }
 
     public final void setMaxChunkSize(int maxChunkSize) {
@@ -206,5 +218,14 @@ public class ChunkTask extends AbstractTask {
 
     public void setChunkFileFactory(FileFactory chunkFileFactory) {
         this.chunkFileFactory = chunkFileFactory;
+    }
+
+    @Override
+    protected Objects.ToStringHelper toStringHelper() {
+        return super.toStringHelper().
+                add("in", sourceFile).
+                add("out", chunkFileFactory).
+                add("chunkSize", maxChunkSize).
+                add("charset", charset);
     }
 }

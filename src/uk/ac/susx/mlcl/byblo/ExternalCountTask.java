@@ -33,6 +33,7 @@ package uk.ac.susx.mlcl.byblo;
 import uk.ac.susx.mlcl.lib.io.TempFileFactoryConverter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.google.common.base.Objects;
 import uk.ac.susx.mlcl.byblo.MergeTask.Formatter;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
@@ -51,6 +52,8 @@ import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  *
@@ -59,6 +62,8 @@ import java.util.concurrent.Future;
 @Parameters(
 commandDescription = "Freqency count a structured input instance file.")
 public class ExternalCountTask extends AbstractParallelTask {
+
+    private static final Log LOG = LogFactory.getLog(ExternalCountTask.class);
 
     private static final int DEFAULT_MAX_CHUNK_SIZE = ChunkTask.DEFAULT_MAX_CHUNK_SIZE;
 
@@ -238,9 +243,16 @@ public class ExternalCountTask extends AbstractParallelTask {
 
     @Override
     protected void runTask() throws Exception {
+        if (LOG.isInfoEnabled()) 
+            LOG.info("Running external count on \"" + inputFile + "\".");
+
         map();
         reduce();
         finish();
+
+        if (LOG.isInfoEnabled()) 
+            LOG.info("Completed external count");
+        
     }
 
     protected void map() throws Exception {
@@ -486,5 +498,16 @@ public class ExternalCountTask extends AbstractParallelTask {
             throw new IllegalStateException(
                     "entry-features file does not exists and can not be reated: " + entryFeaturesFile);
         }
+    }
+
+    @Override
+    protected Objects.ToStringHelper toStringHelper() {
+        return super.toStringHelper().
+                add("in", inputFile).
+                add("entriesOut", entriesFile).
+                add("featuresOut", featuresFile).
+                add("eventsOut", entryFeaturesFile).
+                add("tempDir", tempFileFactory).
+                add("charset", charset);
     }
 }

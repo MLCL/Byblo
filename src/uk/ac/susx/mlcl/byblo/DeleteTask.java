@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.google.common.base.Objects;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -90,5 +91,10 @@ public class DeleteTask extends AbstractTask {
         if (file == null)
             throw new NullPointerException("file is null");
         this.file = file;
+    }
+
+    @Override
+    protected Objects.ToStringHelper toStringHelper() {
+        return super.toStringHelper().add("file", file);
     }
 }

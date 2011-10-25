@@ -52,12 +52,10 @@ public class TokenPair implements
         Comparable<TokenPair>, Serializable, Cloneable {
 
     private static final long serialVersionUID = 3L;
-
     /**
      * Indexed identifier of the first entry.
      */
     private final int id1;
-
     /**
      * Indexed identifier of the second entry.
      */
@@ -156,15 +154,15 @@ public class TokenPair implements
             implements Externalizable {
 
         private static final long serialVersionUID = 1;
-
         private TokenPair pair;
 
         public Serializer() {
         }
 
         public Serializer(final TokenPair pair) {
-            if (pair == null)
+            if (pair == null) {
                 throw new NullPointerException("pair == null");
+            }
             this.pair = pair;
         }
 
@@ -195,9 +193,13 @@ public class TokenPair implements
             public boolean apply(TokenPair input) {
                 return input.id1() == input.id2();
             }
+
+            @Override
+            public String toString() {
+                return "identity";
+            }
         };
     }
-
 //
 //    public static Comparator<Weighted<EntryPair>> ASYMMETRIC_COMPARATOR =
 //            new Comparator<Weighted<EntryPair>>() {
@@ -241,8 +243,12 @@ public class TokenPair implements
                             : a.id2() > b.id2() ? 1
                             : 0;
                 }
-            };
 
+                @Override
+                public String toString() {
+                    return "ASYMMETRIC_KEY_COMPARATOR";
+                }
+            };
     public static final Comparator<TokenPair> SYMMETRIC_KEY_COMPARATOR =
             new Comparator<TokenPair>() {
 
@@ -258,6 +264,10 @@ public class TokenPair implements
                             : y1 > y2 ? 1
                             : 0;
                 }
-            };
 
+                @Override
+                public String toString() {
+                    return "SYMMETRIC_KEY_COMPARATOR";
+                }
+            };
 }

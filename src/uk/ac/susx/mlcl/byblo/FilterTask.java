@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import com.google.common.base.Objects.ToStringHelper;
 import uk.ac.susx.mlcl.lib.io.TempFileFactoryConverter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
@@ -78,115 +79,89 @@ import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 public class FilterTask extends AbstractTask implements Serializable {
 
     private static final long serialVersionUID = 1L;
-
     private static final Log LOG = LogFactory.getLog(FilterTask.class);
-
     /**
      * Number of records to read or write between progress updates.
      */
     private static final int PROGRESS_INTERVAL = 1000000;
-
     public static final String FILTERED_STRING = "___FILTERED___";
     /*
      * === INPUT FILES ===
      */
-
     @Parameter(names = {"-ief", "--input-entry-features"}, required = true,
-               description = "Input entry/feature pair frequencies file.")
+    description = "Input entry/feature pair frequencies file.")
     private File inputEntryFeaturesFile;
-
     @Parameter(names = {"-ie", "--input-entries"}, required = true,
-               description = "Input entry frequencies file.")
+    description = "Input entry frequencies file.")
     private File inputEntriesFile;
-
     @Parameter(names = {"-if", "--input-features"}, required = true,
-               description = "Input features frequencies file.")
+    description = "Input features frequencies file.")
     private File inputFeaturesFile;
-
     /*
      * === OUTPUT FILES ===
      */
     @Parameter(names = {"-oef", "--output-entry-features"}, required = true,
-               description = "Output entry/feature pair frequencies file.")
+    description = "Output entry/feature pair frequencies file.")
     private File outputEntryFeaturesFile;
-
     @Parameter(names = {"-oe", "--output-entries"}, required = true,
-               description = "Output entry frequencies file")
+    description = "Output entry frequencies file")
     private File outputEntriesFile;
-
     @Parameter(names = {"-of", "--output-features"}, required = true,
-               description = "Output features frequencies file.")
+    description = "Output features frequencies file.")
     private File outputFeaturesFile;
 
     /*
      * === CHARACTER ENCODING ===
      */
     @Parameter(names = {"-c", "--charset"},
-               description = "Character encoding to use for both input and output.")
+    description = "Character encoding to use for both input and output.")
     private Charset charset = IOUtil.DEFAULT_CHARSET;
 
     /*
      * === FILTER PARAMATERISATION ===
      */
     @Parameter(names = {"-fef", "--filter-entry-freq"},
-               description = "Minimum entry pair frequency threshold.",
-               converter = DoubleConverter.class)
+    description = "Minimum entry pair frequency threshold.",
+    converter = DoubleConverter.class)
     private double filterEntryMinFreq;
-
     @Parameter(names = {"-few", "--filter-entry-whitelist"},
-               description = "Whitelist file containing entries of interest. (All others will be ignored)")
+    description = "Whitelist file containing entries of interest. (All others will be ignored)")
     private File filterEntryWhitelist;
-
     @Parameter(names = {"-fep", "--filter-entry-pattern"},
-               description = "Regular expresion that accepted entries must match.")
+    description = "Regular expresion that accepted entries must match.")
     private String filterEntryPattern;
-
     @Parameter(names = {"-feff", "--filter-entry-feature-freq"},
-               description = "Minimum entry/feature pair frequency threshold.",
-               converter = DoubleConverter.class)
+    description = "Minimum entry/feature pair frequency threshold.",
+    converter = DoubleConverter.class)
     private double filterEntryFeatureMinFreq;
-
     @Parameter(names = {"-fff", "--filter-feature-freq"},
-               description = "Minimum feature pair frequency threshold.",
-               converter = DoubleConverter.class)
+    description = "Minimum feature pair frequency threshold.",
+    converter = DoubleConverter.class)
     private double filterFeatureMinFreq;
-
     @Parameter(names = {"-ffw", "--filter-feature-whitelist"},
-               description = "Whitelist file containing features of interest. (All others will be ignored)")
+    description = "Whitelist file containing features of interest. (All others will be ignored)")
     private File filterFeatureWhitelist;
-
     @Parameter(names = {"-ffp", "--filter-feature-pattern"},
-               description = "Regular expresion that accepted features must match.")
+    description = "Regular expresion that accepted features must match.")
     private String filterFeaturePattern;
-
     @Parameter(names = {"-T", "--temp-dir"},
-               description = "Temorary directory which will be used during filtering.",
-               converter = TempFileFactoryConverter.class)
+    description = "Temorary directory which will be used during filtering.",
+    converter = TempFileFactoryConverter.class)
     private FileFactory tempFiles = new TempFileFactory();
 
     /*
      * === INTERNAL ===
      */
     private Predicate<Weighted<Token>> acceptEntry = alwaysTrue();
-
     private Predicate<Weighted<TokenPair>> acceptEntryFeature = alwaysTrue();
-
     private Predicate<Weighted<Token>> acceptFeature = alwaysTrue();
-
     private boolean entryFilterRequired = false;
-
     private boolean entryFeatureFilterRequired = false;
-
     private boolean featureFilterRequired = false;
-
     final ObjectIndex<String> entryIndex = new ObjectIndex<String>();
-
     final ObjectIndex<String> featureIndex = new ObjectIndex<String>();
-
     private File activeEntryFeaturesFile;
-
     private File activeEntriesFile;
-
     private File activeFeaturesFile;
 
     public FilterTask() {
@@ -209,24 +184,31 @@ public class FilterTask extends AbstractTask implements Serializable {
     @Override
     protected void initialiseTask() throws Exception {
 
-        if (filterFeatureMinFreq > 0)
+        if (filterFeatureMinFreq > 0) {
             addFeaturesMinimumFrequency(filterFeatureMinFreq);
-        if (filterFeaturePattern != null)
+        }
+        if (filterFeaturePattern != null) {
             addFeaturesPattern(filterFeaturePattern);
-        if (filterFeatureWhitelist != null)
+        }
+        if (filterFeatureWhitelist != null) {
             addFeaturesWhitelist(Files.readLines(
                     filterFeatureWhitelist, charset));
+        }
 
-        if (filterEntryMinFreq > 0)
+        if (filterEntryMinFreq > 0) {
             addEntryMinimumFrequency(filterEntryMinFreq);
-        if (filterEntryPattern != null)
+        }
+        if (filterEntryPattern != null) {
             addEntryPattern(filterEntryPattern);
-        if (filterEntryWhitelist != null)
+        }
+        if (filterEntryWhitelist != null) {
             addEntryWhitelist(Files.readLines(
                     filterEntryWhitelist, charset));
+        }
 
-        if (filterEntryFeatureMinFreq > 0)
+        if (filterEntryFeatureMinFreq > 0) {
             addEntryFeatureMinimumFrequency(filterEntryFeatureMinFreq);
+        }
 
         checkState();
         activeEntryFeaturesFile = inputEntryFeaturesFile;
@@ -236,8 +218,9 @@ public class FilterTask extends AbstractTask implements Serializable {
 
     @Override
     protected void runTask() throws Exception {
-        if (LOG.isInfoEnabled())
-            LOG.info("Running " + this + ".");
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Running filtering.");
+        }
 
 
         // Run the filters forwards then backwards. Each filtering step may
@@ -252,55 +235,67 @@ public class FilterTask extends AbstractTask implements Serializable {
                 || featureFilterRequired) {
 
             if (entryFilterRequired || entryFeatureFilterRequired) {
-                if (LOG.isInfoEnabled())
+                if (LOG.isInfoEnabled()) {
                     LOG.info(
                             "Running forwards filtering pass (#" + (++passCount) + ").");
+                }
 
-                if (entryFilterRequired)
+                if (entryFilterRequired) {
                     filterEntries();
+                }
 
-                if (entryFeatureFilterRequired)
+                if (entryFeatureFilterRequired) {
                     filterEntryFeatures();
+                }
 
-                if (featureFilterRequired)
+                if (featureFilterRequired) {
                     filterFeatures();
+                }
             }
 
             if (featureFilterRequired || entryFeatureFilterRequired) {
-                if (LOG.isInfoEnabled())
+                if (LOG.isInfoEnabled()) {
                     LOG.info(
                             "Running backwards filtering pass (#" + (++passCount) + ").");
+                }
 
-                if (featureFilterRequired)
+                if (featureFilterRequired) {
                     filterFeatures();
+                }
 
-                if (entryFeatureFilterRequired)
+                if (entryFeatureFilterRequired) {
                     filterEntryFeatures();
+                }
 
-                if (entryFilterRequired)
+                if (entryFilterRequired) {
                     filterEntries();
+                }
             }
         }
 
         // Finished filtering so copy the results files to the outputs.
 
-        if (LOG.isInfoEnabled())
-            LOG.info("Copying entries from " + activeEntriesFile
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Copying entries from " + activeEntriesFile
                     + " to " + outputEntriesFile + ".");
+        }
         Files.copy(activeEntriesFile, outputEntriesFile);
 
-        if (LOG.isInfoEnabled())
-            LOG.info("Copying features from " + activeEntryFeaturesFile
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Copying features from " + activeEntryFeaturesFile
                     + " to " + outputEntryFeaturesFile + ".");
+        }
         Files.copy(activeEntryFeaturesFile, outputEntryFeaturesFile);
 
-        if (LOG.isInfoEnabled())
-            LOG.info("Copying features from " + activeFeaturesFile
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Copying features from " + activeFeaturesFile
                     + " to " + outputFeaturesFile + ".");
+        }
         Files.copy(activeFeaturesFile, outputFeaturesFile);
 
-        if (LOG.isInfoEnabled())
-            LOG.info("Completed " + this + ".");
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Completed filtering.");
+        }
     }
     // Read the entries file, passing it thought the filter. accepted entries
     // are written out to the output file while rejected entries are stored
@@ -320,12 +315,14 @@ public class FilterTask extends AbstractTask implements Serializable {
         WeightedTokenSink entriesSink = new WeightedTokenSink(outputFile,
                 charset, entryIndex);
 
-        if (LOG.isInfoEnabled())
+        if (LOG.isInfoEnabled()) {
             LOG.info(
                     "Filtering entries from " + activeEntriesFile + " to " + outputFile + ".");
+        }
 
         final int filteredEntry = entryIndex.get(FILTERED_STRING);
         double filteredWeight = 0;
+
 
         while (entriesSource.hasNext()) {
             Weighted<Token> record = entriesSource.read();
@@ -339,13 +336,12 @@ public class FilterTask extends AbstractTask implements Serializable {
                 filteredWeight += record.getWeight();
             }
 
-            if ((entriesSource.getCount() % PROGRESS_INTERVAL == 0 || !entriesSource.
-                    hasNext())
+            if ((entriesSource.getCount() % PROGRESS_INTERVAL == 0 || !entriesSource.hasNext())
                     && LOG.isInfoEnabled()) {
                 LOG.info(
-                        "Read " + entriesSource.getCount()
-                        + " entry entries."
-                        + "(" + (int) entriesSource.percentRead() + "% complete)");
+                        "Accepted " + entriesSink.getCount()
+                        + " of " + entriesSource.getCount()
+                        + " entries. (" + (int) entriesSource.percentRead() + "% complete)");
                 LOG.debug(MiscUtil.memoryInfoString());
             }
         }
@@ -391,9 +387,10 @@ public class FilterTask extends AbstractTask implements Serializable {
                 outputFile, charset,
                 entryIndex, featureIndex);
 
-        if (LOG.isInfoEnabled())
+        if (LOG.isInfoEnabled()) {
             LOG.info("Filtering entry/features pairs from "
                     + activeEntryFeaturesFile + " to " + outputFile + ".");
+        }
 
         // Store the id of the special filtered feature and entry
         final int filteredEntry = entryIndex.get(FILTERED_STRING);
@@ -416,12 +413,13 @@ public class FilterTask extends AbstractTask implements Serializable {
             if (record.get().id1() != currentEntryId) {
 
                 if (currentEntryId != -1 && currentEntryFilteredFeatureWeight != 0) {
-                    if (currentEntryFeatureCount == 0)
+                    if (currentEntryFeatureCount == 0) {
                         filteredEntryWeight += currentEntryFilteredFeatureWeight;
-                    else
+                    } else {
                         efSink.write(new Weighted<TokenPair>(
                                 new TokenPair(currentEntryId, filteredFeature),
                                 currentEntryFilteredFeatureWeight));
+                    }
                 }
 
                 currentEntryId = record.get().id1();
@@ -451,20 +449,20 @@ public class FilterTask extends AbstractTask implements Serializable {
             if ((efSrc.getCount() % PROGRESS_INTERVAL == 0
                     || !efSrc.hasNext()) && LOG.isInfoEnabled()) {
                 LOG.info(
-                        "Read " + efSrc.getCount() + " feature entries."
-                        + "(" + (int) efSrc.percentRead() + "% complete)");
+                        "Accepted " + efSink.getCount() + " of " + efSrc.getCount() + " feature entries. (" + (int) efSrc.percentRead() + "% complete)");
                 LOG.debug(MiscUtil.memoryInfoString());
             }
         }
 
 
         if (currentEntryId != -1 && currentEntryFilteredFeatureWeight != 0) {
-            if (currentEntryFeatureCount == 0)
+            if (currentEntryFeatureCount == 0) {
                 filteredEntryWeight += currentEntryFilteredFeatureWeight;
-            else
+            } else {
                 efSink.write(new Weighted<TokenPair>(
                         new TokenPair(currentEntryId, filteredFeature),
                         currentEntryFilteredFeatureWeight));
+            }
         }
 
         // If there have been entire entries filtered then write their summed
@@ -512,9 +510,10 @@ public class FilterTask extends AbstractTask implements Serializable {
         WeightedTokenSink featureSink = new WeightedTokenSink(
                 outputFile, charset, featureIndex);
 
-        if (LOG.isInfoEnabled())
+        if (LOG.isInfoEnabled()) {
             LOG.info(
                     "Filtering features from " + activeFeaturesFile + " to " + outputFile + ".");
+        }
 
         // Store an filtered wieght here and record it so as to maintain
         // accurate priors for those features that remain
@@ -537,9 +536,8 @@ public class FilterTask extends AbstractTask implements Serializable {
                     || !featureSource.hasNext())
                     && LOG.isInfoEnabled()) {
                 LOG.info(
-                        "Read " + featureSource.getCount()
-                        + " features."
-                        + "(" + (int) featureSource.percentRead() + "% complete)");
+                        "Accepted " + featureSink.getCount() + " of " + featureSource.getCount()
+                        + " features. (" + (int) featureSource.percentRead() + "% complete)");
                 LOG.debug(MiscUtil.memoryInfoString());
             }
         }
@@ -553,6 +551,7 @@ public class FilterTask extends AbstractTask implements Serializable {
         featureFilterRequired = false;
         activeFeaturesFile = outputFile;
 
+
         // Update the feature acceptance predicate
         if (rejectedFeatures.size() > 0) {
 
@@ -562,31 +561,6 @@ public class FilterTask extends AbstractTask implements Serializable {
                     compose(not(in(rejectedFeatures)), entryFeatureFeatureId()));
 
         }
-    }
-
-    @Override
-    public String toString() {
-        return "FilterTask{"
-                + "inputEntryFeaturesFile=" + inputEntryFeaturesFile
-                + ", inputEntriesFile=" + inputEntriesFile
-                + ", inputFeaturesFile=" + inputFeaturesFile
-                + ", outputEntryFeaturesFile=" + outputEntryFeaturesFile
-                + ", outputEntriesFile=" + outputEntriesFile
-                + ", outputFeaturesFile=" + outputFeaturesFile
-                + ", charset=" + charset
-                + ", filters={"
-                + "EntryMinFreq=" + filterEntryMinFreq
-                + ", EntryWhitelist=" + filterEntryWhitelist
-                + ", EntryPattern=" + filterEntryPattern
-                + ", EntryFeatureMinFreq=" + filterEntryFeatureMinFreq
-                + ", FeatureMinFreq=" + filterFeatureMinFreq
-                + ", FeatureWhitelist=" + filterFeatureWhitelist
-                + ", FeaturePattern=" + filterFeaturePattern
-                + "}"
-                + ", acceptEntry=" + acceptEntry
-                + ", acceptEntryFeature=" + acceptEntryFeature
-                + ", acceptFeature=" + acceptFeature
-                + '}';
     }
 
     @Override
@@ -828,40 +802,43 @@ public class FilterTask extends AbstractTask implements Serializable {
                 throw new NullPointerException(entry.getKey() + " is null");
             }
         }
-        if (charset == null)
+        if (charset == null) {
             throw new NullPointerException("charset is null");
+        }
 
         // Check that no two files are the same
         for (Map.Entry<String, File> a : allFiles.entrySet()) {
             for (Map.Entry<String, File> b : allFiles.entrySet()) {
-                if (!a.getKey().equals(b.getKey()) && a.getValue().equals(b.
-                        getValue())) {
-                    throw new IllegalStateException(a.getKey() + " equal to " + b.
-                            getKey());
+                if (!a.getKey().equals(b.getKey()) && a.getValue().equals(b.getValue())) {
+                    throw new IllegalStateException(a.getKey() + " equal to " + b.getKey());
                 }
             }
         }
 
         // Check that the input files exists and is readable
         for (Map.Entry<String, File> entry : inputFiles.entrySet()) {
-            if (!entry.getValue().exists())
+            if (!entry.getValue().exists()) {
                 throw new FileNotFoundException(
                         entry.getKey() + " does not exist: " + entry.getValue());
-            if (!entry.getValue().isFile())
+            }
+            if (!entry.getValue().isFile()) {
                 throw new IllegalStateException(entry.getKey()
                         + " is not a normal data file: " + entry.getValue());
-            if (!entry.getValue().canRead())
+            }
+            if (!entry.getValue().canRead()) {
                 throw new IllegalStateException(
                         entry.getKey() + " is not readable: " + entry.getValue());
+            }
         }
 
         // For each output file, check that either it exists and it writeable,
         // or that it does not exist but is creatable
         for (Map.Entry<String, File> e : outputFiles.entrySet()) {
             if (e.getValue().exists()
-                    && (!e.getValue().isFile() || !e.getValue().canWrite()))
+                    && (!e.getValue().isFile() || !e.getValue().canWrite())) {
                 throw new IllegalStateException(e.getKey()
                         + " exists but is not writable: " + e.getValue());
+            }
             if (!e.getValue().exists()
                     && !e.getValue().getAbsoluteFile().getParentFile().canWrite()) {
                 throw new IllegalStateException(e.getKey()
@@ -993,5 +970,28 @@ public class FilterTask extends AbstractTask implements Serializable {
                 return "EntryFeatureEntryString";
             }
         };
+    }
+
+    @Override
+    protected ToStringHelper toStringHelper() {
+        return super.toStringHelper().
+                add("eventsIn", inputEntryFeaturesFile).
+                add("entriesIn", inputEntriesFile).
+                add("featuresIn", inputFeaturesFile).
+                add("eventsOut", outputEntryFeaturesFile).
+                add("entriesOut", outputEntriesFile).
+                add("featuresOut", outputFeaturesFile).
+                add("charset", charset).
+                add("entryMinFreq", filterEntryMinFreq).
+                add("entryWhitelist", filterEntryWhitelist).
+                add("entryPattern", filterEntryPattern).
+                add("eventMinFreq", filterEntryFeatureMinFreq).
+                add("featureMinFreq", filterFeatureMinFreq).
+                add("featureWhitelist", filterFeatureWhitelist).
+                add("featurePattern", filterFeaturePattern).
+                add("tmp", tempFiles).
+                add("acceptEntry", acceptEntry).
+                add("acceptFeature", acceptFeature).
+                add("acceptEvent", acceptEntryFeature);
     }
 }

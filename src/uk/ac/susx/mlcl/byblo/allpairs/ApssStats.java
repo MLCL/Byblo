@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.allpairs;
 
+import com.google.common.base.Objects;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -45,13 +46,9 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ApssStats implements Serializable {
 
     private static final long serialVersionUID = 4248533084667228992L;
-
     private final AtomicLong candidates;
-
     private final AtomicLong comparisons;
-
     private final AtomicLong productions;
-
     private final AtomicLong srcReads;
 
     /**
@@ -63,7 +60,7 @@ public class ApssStats implements Serializable {
      * @param srcReads      Count of records read.
      */
     protected ApssStats(AtomicLong candidates, AtomicLong comparisons,
-                        AtomicLong productions, AtomicLong srcReads) {
+            AtomicLong productions, AtomicLong srcReads) {
         this.candidates = candidates;
         this.comparisons = comparisons;
         this.productions = productions;
@@ -146,10 +143,14 @@ public class ApssStats implements Serializable {
 
     @Override
     public String toString() {
-        return "ApssStats{" 
-                + "candidates=" + candidates
-                + ", comparisons=" + comparisons
-                + ", productions=" + productions
-                + ", srcReads=" + srcReads + '}';
+        return toStringHelper().toString();
+    }
+
+    protected Objects.ToStringHelper toStringHelper() {
+        return Objects.toStringHelper(this).
+                add("candidates", candidates).
+                add("comparisons", comparisons).
+                add("productions", productions).
+                add("srcReads", srcReads);
     }
 }

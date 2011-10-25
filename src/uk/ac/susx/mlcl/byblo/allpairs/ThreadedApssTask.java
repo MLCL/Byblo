@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.allpairs;
 
+import com.google.common.base.Objects.ToStringHelper;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
@@ -61,21 +62,14 @@ import uk.ac.susx.mlcl.byblo.io.Weighted;
 public class ThreadedApssTask<S> extends NaiveApssTask<S> {
 
     private static final Log LOG = LogFactory.getLog(ThreadedApssTask.class);
-
     private Class<? extends NaiveApssTask> innerAlgorithm = InvertedApssTask.class;
-
     private static final int DEFAULT_NUM_THREADS =
             Runtime.getRuntime().availableProcessors() + 1;
-
     private int nThreads = DEFAULT_NUM_THREADS;
-
     private ExecutorService executor = null;
-
     private Queue<Future<? extends Task>> futureQueue =
             new ArrayDeque<Future<? extends Task>>();
-
     private int maxChunkSize = 500;
-
     private Semaphore throttle;
 
     public ThreadedApssTask(
@@ -120,11 +114,6 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
 
     @Override
     protected void runTask() throws Exception {
-        if (LOG.isInfoEnabled()) {
-            LOG.info("Running all-pairs similarity search: " + this.toString());
-            if (LOG.isDebugEnabled())
-                LOG.debug(MiscUtil.memoryInfoString());
-        }
 
         Chunker<Indexed<SparseDoubleVector>, S> chunkerA =
                 new Chunker<Indexed<SparseDoubleVector>, S>(
@@ -146,11 +135,16 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 Chunk<Indexed<SparseDoubleVector>> chunkB = chunkerB.read();
                 j++;
 
-                double complete = nChunks == 0 ? 0
+
+                double complete = !chunkerA.hasNext() && !chunkerB.hasNext() ? 1
+                        : nChunks == 0 ? 0
                         : (double) (i * nChunks + j) / (double) (nChunks * nChunks);
-                if (LOG.isDebugEnabled())
-                    LOG.debug(
-                            "Creating APSS task on chunk " + i + ":" + j + " (" + (complete == 0 ? "estimating " : complete * 100) + "% complete)");
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("Creating APSS task on chunk " + i + ":" + j + " (" + (complete == 0 ? "estimating " : complete * 100) + "% complete)");
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug(MiscUtil.memoryInfoString());
+                    }
+                }
 
                 @SuppressWarnings("unchecked")
                 NaiveApssTask<Integer> task = innerAlgorithm.newInstance();
@@ -179,11 +173,6 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
         getExecutor().shutdown();
         getExecutor().awaitTermination(1, TimeUnit.DAYS);
 
-        if (LOG.isInfoEnabled()) {
-            LOG.info("Completed all-pairs similarity search: " + this);
-            if (LOG.isDebugEnabled())
-                LOG.debug(MiscUtil.memoryInfoString());
-        }
     }
 
     @Override
@@ -195,8 +184,9 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
     }
 
     protected <T extends Task> Future<T> queueTask(final T task) throws InterruptedException {
-        if (task == null)
+        if (task == null) {
             throw new NullPointerException("task is null");
+        }
 
         throttle.acquire();
         final Runnable wrapper = new Runnable() {
@@ -237,29 +227,20 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
     }
 
     public final void setNumThreads(int nThreads) {
-        if (nThreads < 1)
+        if (nThreads < 1) {
             throw new IllegalArgumentException("nThreads < 1");
+        }
         this.nThreads = nThreads;
     }
 
     @Override
-    public String toString() {
-        return "ThreadedApssTask{"
-                + "sourceA=" + getSourceA()
-                + ", sourceB=" + getSourceB()
-                + ", measure=" + getMeasure()
-                + ", sink=" + getSink()
-                + ", pairFilter=" + getProducatePair()
-                + ", recordFilter=" + getProcessRecord()
-                + ", stats=" + getStats()
-                + ", precalcA=" + getPrecalcA()
-                + ", precalcB=" + getPrecalcB()
-                + ", innerAlgorithm=" + innerAlgorithm
-                + ", nThreads=" + nThreads
-                + ", executor=" + executor
-                + ", futureQueue=" + futureQueue
-                + ", maxChunkSize=" + maxChunkSize
-                + ", throttle=" + throttle
-                + '}';
+    protected ToStringHelper toStringHelper() {
+        return super.toStringHelper().
+                add("innerAlgorithm", innerAlgorithm).
+                add("nThreads", nThreads).
+                add("executor", executor).
+                add("futureQueue", futureQueue).
+                add("maxChunkSize", maxChunkSize).
+                add("throttle", throttle);
     }
 }

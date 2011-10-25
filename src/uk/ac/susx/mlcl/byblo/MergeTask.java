@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.google.common.base.Objects;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
@@ -82,6 +83,17 @@ public class MergeTask extends AbstractTask {
     @Parameter(names = {"-c", "--charset"},
                description = "The character set encoding to use for both input and output files.")
     private Charset charset = IOUtil.DEFAULT_CHARSET;
+
+    @Override
+    protected Objects.ToStringHelper toStringHelper() {
+        return super.toStringHelper().
+                add("charset", charset).
+                add("in1", sourceFileA).
+                add("in2", sourceFileB).
+                add("out", destinationFile).
+                add("formatter", formatter).
+                add("comparator", comparator);
+    }
 
     public MergeTask(File sourceFileA, File sourceFileB, File destination,
             Charset charset) {
@@ -142,6 +154,8 @@ public class MergeTask extends AbstractTask {
 
     @Override
     protected void runTask() throws Exception {
+        if (LOG.isInfoEnabled())
+            LOG.info("Running " + this + ".");
 
         BufferedReader readerA = null;
         BufferedReader readerB = null;
@@ -149,7 +163,8 @@ public class MergeTask extends AbstractTask {
 
         try {
             if (LOG.isInfoEnabled())
-                LOG.info("Merging from files \"" + getSourceFileA() + "\" and \"" + getSourceFileB() + "\" to \"" + getDestFile() + "\".");
+                LOG.info(
+                        "Merging files from \"" + getSourceFileA() + "\" and \"" + getSourceFileB() + "\" to \"" + getDestFile() + "\".");
 
             readerA = IOUtil.openReader(getSourceFileA(), getCharset());
             readerB = IOUtil.openReader(getSourceFileB(), getCharset());
@@ -188,6 +203,8 @@ public class MergeTask extends AbstractTask {
                 writer.close();
             }
         }
+        if (LOG.isInfoEnabled())
+            LOG.info("Completed merging.");
     }
 
     public File getSourceFileA() {

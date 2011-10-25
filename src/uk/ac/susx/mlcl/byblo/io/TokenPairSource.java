@@ -55,6 +55,8 @@ public class TokenPairSource extends AbstractTSVSource<TokenPair> {
     private final ObjectIndex<String> stringIndex2;
 
     private TokenPair previousRecord = null;
+    
+    private long count = 0;
 
     public TokenPairSource(
             File file, Charset charset,
@@ -93,6 +95,10 @@ public class TokenPairSource extends AbstractTSVSource<TokenPair> {
         return getStringIndex1() == getStringIndex2();
     }
 
+    public long getCount() {
+        return count;
+    }
+
     @Override
     public TokenPair read() throws IOException {
         final int id1;
@@ -126,6 +132,7 @@ public class TokenPairSource extends AbstractTSVSource<TokenPair> {
             previousRecord = null;
         }
 
+        ++count;
         return record;
     }
 

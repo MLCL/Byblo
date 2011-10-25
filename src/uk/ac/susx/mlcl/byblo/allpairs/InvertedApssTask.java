@@ -70,7 +70,7 @@ public class InvertedApssTask<S> extends NaiveApssTask<S> {
     }
 
     @Override
-    protected void computeAllPairs()
+    protected void runTask()
             throws IOException {
         final S startB = getSourceB().position();
         List<Weighted<TokenPair>> pairs = new ArrayList<Weighted<TokenPair>>();
@@ -147,16 +147,4 @@ public class InvertedApssTask<S> extends NaiveApssTask<S> {
         return index;
     }
 
-    @Override
-    public String toString() {
-        return "InvertedApssTask{"
-                + "sourceA=" + getSourceA()
-                + ", sourceB=" + getSourceB()
-                + ", measure=" + getMeasure()
-                + ", sink=" + getSink()
-                + ", pairFilter=" + getProducatePair()
-                + ", recordFilter=" + getProcessRecord()
-                + ", stats=" + getStats()
-                + '}';
-    }
 }

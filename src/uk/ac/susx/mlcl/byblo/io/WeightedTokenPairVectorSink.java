@@ -46,6 +46,7 @@ public class WeightedTokenPairVectorSink
         implements Sink<Indexed<SparseDoubleVector>>, Flushable, Closeable {
 
     private final WeightedTokenPairSink inner;
+    private long count = 0;
 
     public WeightedTokenPairVectorSink(WeightedTokenPairSink inner) {
         this.inner = inner;
@@ -71,6 +72,11 @@ public class WeightedTokenPairVectorSink
             inner.write(new Weighted<TokenPair>(
                     new TokenPair(entryId, vec.keys[i]), vec.values[i]));
         }
+        ++count;
+    }
+
+    public long getCount() {
+        return count;
     }
 
     @Override

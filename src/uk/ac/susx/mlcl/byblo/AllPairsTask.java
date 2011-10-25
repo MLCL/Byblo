@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import com.google.common.base.Objects.ToStringHelper;
 import uk.ac.susx.mlcl.lib.DoubleConverter;
 import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.Parameter;
@@ -72,86 +73,69 @@ import uk.ac.susx.mlcl.lib.io.Lexer;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(
-commandDescription = "Perform all-pair similarity search on the given input frequency files.")
+@Parameters(commandDescription = "Perform all-pair similarity search on the given input frequency files.")
 public class AllPairsTask extends AbstractTask {
 
     private static final Log LOG = LogFactory.getLog(AllPairsTask.class);
-
     @Parameter(names = {"-i", "--input"},
-               description = "Entry-feature frequency vectors files.",
-               required = true,
-               validateWith = InputFileValidator.class)
+    description = "Entry-feature frequency vectors files.",
+    required = true,
+    validateWith = InputFileValidator.class)
     private File entryFeaturesFile;
-
     @Parameter(names = {"-if", "--input-features"},
-               description = "Feature frequencies file",
-               validateWith = InputFileValidator.class)
+    description = "Feature frequencies file",
+    validateWith = InputFileValidator.class)
     private File featuresFile;
-
     @Parameter(names = {"-ie", "--input-entries"},
-               description = "Entry frequencies file",
-               validateWith = InputFileValidator.class)
+    description = "Entry frequencies file",
+    validateWith = InputFileValidator.class)
     private File entriesFile;
-
     @Parameter(names = {"-o", "--output"},
-               description = "Output similarity matrix file.",
-               required = true,
-               validateWith = OutputFileValidator.class)
+    description = "Output similarity matrix file.",
+    required = true,
+    validateWith = OutputFileValidator.class)
     private File outputFile;
-
     @Parameter(names = {"-c", "--charset"},
-               description = "Character encoding to use for reading and writing.")
+    description = "Character encoding to use for reading and writing.")
     private Charset charset = IOUtil.DEFAULT_CHARSET;
-
     @Parameter(names = {"-C", "--chunk-size"},
-               description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
+    description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
     private int chunkSize = 5000;
-
     @Parameter(names = {"-t", "--threads"},
-               description = "Number of conccurent processing threads.")
+    description = "Number of conccurent processing threads.")
     private int nThreads = Runtime.getRuntime().availableProcessors() + 1;
-
     @Parameter(names = {"-Smn", "--similarity-min"},
-               description = "Minimum similarity threshold.",
-               converter = DoubleConverter.class)
+    description = "Minimum similarity threshold.",
+    converter = DoubleConverter.class)
     private double minSimilarity = Double.NEGATIVE_INFINITY;
-
     @Parameter(names = {"-Smx", "--similarity-max"},
-               description = "Maximyum similarity threshold.",
-               converter = DoubleConverter.class)
+    description = "Maximyum similarity threshold.",
+    converter = DoubleConverter.class)
     private double maxSimilarity = Double.POSITIVE_INFINITY;
-
     @Parameter(names = {"-ip", "--identity-pairs"},
-               description = "Produce similarity between pair of identical entries.")
+    description = "Produce similarity between pair of identical entries.")
     private boolean outputIdentityPairs = false;
-
     @Parameter(names = {"-m", "--measure"},
-               description = "Similarity measure to use.")
+    description = "Similarity measure to use.")
     private String measureName = "Jaccard";
-
     @Parameter(names = {"--measure-reversed"},
-               description = "Swap similarity measure inputs.")
+    description = "Swap similarity measure inputs.")
     private boolean measureReversed = false;
-
     @Parameter(names = {"--lee-alpha"},
-               description = "Alpha parameter to Lee's alpha-skew divergence measure.",
-               converter = DoubleConverter.class)
+    description = "Alpha parameter to Lee's alpha-skew divergence measure.",
+    converter = DoubleConverter.class)
     private double leeAlpha = Lee.DEFAULT_ALPHA;
-
     @Parameter(names = {"--crmi-beta"},
-               description = "Beta paramter to Weed's CRMI measure.",
-               converter = DoubleConverter.class)
+    description = "Beta paramter to Weed's CRMI measure.",
+    converter = DoubleConverter.class)
     private double crmiBeta = CrMi.DEFAULT_BETA;
-
     @Parameter(names = {"--crmi-gamma"},
-               description = "Gamma paramter to Weed's CRMI measure.",
-               converter = DoubleConverter.class)
+    description = "Gamma paramter to Weed's CRMI measure.",
+    converter = DoubleConverter.class)
     private double crmiGamma = CrMi.DEFAULT_GAMMA;
-
     @Parameter(names = {"--mink-p"},
-               description = "P parameter to Minkowski/Lp space measure.",
-               converter = DoubleConverter.class)
+    description = "P parameter to Minkowski/Lp space measure.",
+    converter = DoubleConverter.class)
     private double minkP = 2;
 
     @Override
@@ -192,9 +176,7 @@ public class AllPairsTask extends AbstractTask {
     protected void runTask() throws Exception {
 
         if (LOG.isInfoEnabled()) {
-            LOG.info("Running All-Pairs Similarity Search Command.");
-            if (LOG.isDebugEnabled())
-                LOG.debug("Command Parameterisation " + this.toString());
+            LOG.info("Running all-pairs similarity search from \"" + entryFeaturesFile + "\" to \"" +outputFile + "\"");
         }
 
 
@@ -234,8 +216,9 @@ public class AllPairsTask extends AbstractTask {
         // if required.
         if (prox instanceof AbstractMIProximity) {
             try {
-                if (LOG.isDebugEnabled())
-                    LOG.debug("Loading features file " + featuresFile);
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("Loading features file " + featuresFile);
+                }
 
                 WeightedTokenSource features = new WeightedTokenSource(
                         featuresFile, charset, strIndex);
@@ -247,12 +230,12 @@ public class AllPairsTask extends AbstractTask {
             } catch (IOException e) {
                 throw e;
             }
-            System.err.println("Loaded features for MI");
         } else if (prox instanceof KendallTau) {
             try {
-                if (LOG.isDebugEnabled())
-                    LOG.debug("Loading entries file for "
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("Loading entries file for "
                             + "KendalTau.numFeatures: " + featuresFile);
+                }
 
                 WeightedTokenSource features = new WeightedTokenSource(
                         featuresFile, charset, strIndex);
@@ -304,29 +287,32 @@ public class AllPairsTask extends AbstractTask {
         List<Predicate<Weighted<TokenPair>>> pairFilters =
                 new ArrayList<Predicate<Weighted<TokenPair>>>();
 
-        if (minSimilarity != Double.NEGATIVE_INFINITY)
+        if (minSimilarity != Double.NEGATIVE_INFINITY) {
             pairFilters.add(Weighted.<TokenPair>greaterThanOrEqualTo(
                     minSimilarity));
+        }
 
-        if (maxSimilarity != Double.POSITIVE_INFINITY)
+        if (maxSimilarity != Double.POSITIVE_INFINITY) {
             pairFilters.add(Weighted.<TokenPair>lessThanOrEqualTo(maxSimilarity));
+        }
 
-        if (!outputIdentityPairs)
+        if (!outputIdentityPairs) {
             pairFilters.add(Predicates.not(Predicates.compose(
                     TokenPair.identity(), Weighted.<TokenPair>record())));
+        }
 
-        if (pairFilters.size() == 1)
+        if (pairFilters.size() == 1) {
             apss.setProducatePair(pairFilters.get(0));
-        else if (pairFilters.size() > 1)
+        } else if (pairFilters.size() > 1) {
             apss.setProducatePair(Predicates.<Weighted<TokenPair>>and(
                     pairFilters));
-
-        if (LOG.isInfoEnabled())
-            LOG.info("Running APSS algorithm.");
+        }
 
         apss.run();
-        if (LOG.isInfoEnabled())
-            LOG.info("Completed All-Pairs Similarity Search.");
+        
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Completed all-pairs similarity search.");
+        }
     }
 
     @Override
@@ -341,18 +327,22 @@ public class AllPairsTask extends AbstractTask {
         @Override
         public void validate(String name, String value) throws ParameterException {
             File file = new File(value);
-            if (!file.exists())
+            if (!file.exists()) {
                 throw new ParameterException(
                         "Input file \"" + value + "\" does not exist.");
-            if (file.isDirectory())
+            }
+            if (file.isDirectory()) {
                 throw new ParameterException(
                         "Input file \"" + value + "\" exists but is a directory.");
-            if (!file.isFile())
+            }
+            if (!file.isFile()) {
                 throw new ParameterException(
                         "Input file \"" + value + "\" is not an ordinary file.");
-            if (!file.canRead())
+            }
+            if (!file.canRead()) {
                 throw new ParameterException(
                         "Input file \"" + value + "\" is not readble.");
+            }
         }
     }
 
@@ -370,46 +360,47 @@ public class AllPairsTask extends AbstractTask {
                 throw new ParameterException(ex);
             }
             if (file.exists()) {
-                if (file.isDirectory())
+                if (file.isDirectory()) {
                     throw new ParameterException(
                             "Output file \"" + value + "\" exists but is a directory.");
-                if (!file.isFile())
+                }
+                if (!file.isFile()) {
                     throw new ParameterException(
                             "Output file \"" + value + "\" exists but is not an ordinary file.");
-                if (!file.canWrite())
+                }
+                if (!file.canWrite()) {
                     throw new ParameterException(
                             "Input file \"" + value + "\" is not writeable.");
+                }
             } else {
 
                 if (file.getParentFile() == null || !file.getParentFile().
-                        canWrite())
+                        canWrite()) {
                     throw new ParameterException(
                             "Output file \"" + value + "\" does not exist and the parent directory is not writable.");
+                }
             }
         }
     }
 
     @Override
-    public String toString() {
-        return "AllPairsCommand{"
-                + "usageRequested=" + isUsageRequested()
-                + ", exceptionThrown=" + isExceptionThrown()
-                + ", entryFeaturesFile=" + entryFeaturesFile
-                + ", featuresFile=" + featuresFile
-                + ", entriesFile=" + entriesFile
-                + ", outputFile=" + outputFile
-                + ", charset=" + charset
-                + ", chunkSize=" + chunkSize
-                + ", nThreads=" + nThreads
-                + ", minSimilarity=" + minSimilarity
-                + ", maxSimilarity=" + maxSimilarity
-                + ", outputIdentityPairs=" + outputIdentityPairs
-                + ", measureName=" + measureName
-                + ", measureReversed=" + measureReversed
-                + ", leeAlpha=" + leeAlpha
-                + ", crmiBeta=" + crmiBeta
-                + ", crmiGamma=" + crmiGamma
-                + ", minkP=" + minkP
-                + '}';
+    protected ToStringHelper toStringHelper() {
+        return super.toStringHelper().
+                add("eventsIn", entryFeaturesFile).
+                add("entriesIn", entriesFile).
+                add("featuresIn", featuresFile).
+                add("simsOut", outputFile).
+                add("charset", charset).
+                add("chunkSize", chunkSize).
+                add("threads", nThreads).
+                add("minSimilarity", minSimilarity).
+                add("maxSimilarity", maxSimilarity).
+                add("outputIdentityPairs", outputIdentityPairs).
+                add("measure", measureName).
+                add("measureReversed", measureReversed).
+                add("leeAlpha", leeAlpha).
+                add("crmiBeta", crmiBeta).
+                add("crmiGamma", crmiGamma).
+                add("minkP", minkP);
     }
 }

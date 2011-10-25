@@ -75,14 +75,11 @@ import java.text.DecimalFormat;
 public class WeightedTokenPairSink extends AbstractTSVSink<Weighted<TokenPair>> {
 
     private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
-
     private final ObjectIndex<String> stringIndex1;
-
     private final ObjectIndex<String> stringIndex2;
-
     private boolean compactFormatEnabled = false;
-
     private Weighted<TokenPair> previousRecord = null;
+    private long count = 0;
 
     public WeightedTokenPairSink(File file, Charset charset,
             ObjectIndex<String> strIndex1,
@@ -112,12 +109,18 @@ public class WeightedTokenPairSink extends AbstractTSVSink<Weighted<TokenPair>> 
         this.compactFormatEnabled = compactFormatEnabled;
     }
 
+    public long getCount() {
+        return count;
+    }
+
     @Override
     public void write(Weighted<TokenPair> record) throws IOException {
-        if (isCompactFormatEnabled())
+        if (isCompactFormatEnabled()) {
             writeCompact(record);
-        else
+        } else {
             writeVerbose(record);
+        }
+        ++count;
     }
 
     private void writeVerbose(Weighted<TokenPair> record) throws IOException {
@@ -154,16 +157,18 @@ public class WeightedTokenPairSink extends AbstractTSVSink<Weighted<TokenPair>> 
     }
 
     private void writeWeight(double weight) throws IOException {
-        if (Double.compare((int) weight, weight) == 0)
+        if (Double.compare((int) weight, weight) == 0) {
             writeInt((int) weight);
-        else
+        } else {
             writeString(f.format(weight));
+        }
     }
 
     @Override
     public void close() throws IOException {
-        if (isCompactFormatEnabled() && previousRecord != null)
+        if (isCompactFormatEnabled() && previousRecord != null) {
             writeRecordDelimiter();
+        }
         super.close();
     }
 }

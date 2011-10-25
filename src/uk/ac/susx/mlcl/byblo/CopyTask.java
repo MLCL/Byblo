@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.google.common.base.Objects;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 import java.io.File;
@@ -107,6 +108,8 @@ public class CopyTask extends AbstractTask {
                 out.close();
             }
         }
+        if (LOG.isInfoEnabled())
+            LOG.info("Completed copy.");
     }
 
     public final File getSrcFile() {
@@ -129,5 +132,12 @@ public class CopyTask extends AbstractTask {
         if (destFile == null)
             throw new NullPointerException("destinationFile is null");
         this.destFile = destFile;
+    }
+
+    @Override
+    protected Objects.ToStringHelper toStringHelper() {
+        return super.toStringHelper().
+                add("in", sourceFile).
+                add("out", destFile);
     }
 }

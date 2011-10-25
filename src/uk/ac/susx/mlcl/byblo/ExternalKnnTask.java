@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.google.common.base.Objects.ToStringHelper;
 import uk.ac.susx.mlcl.lib.tasks.Task;
 import java.io.File;
 import java.nio.charset.Charset;
@@ -43,16 +44,13 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(
-commandDescription = "Perform k-nearest-neighbours on a similarity file.")
+@Parameters(commandDescription = "Perform k-nearest-neighbours on a similarity file.")
 public class ExternalKnnTask extends ExternalSortTask {
 
     private static final Log LOG = LogFactory.getLog(ExternalKnnTask.class);
-
     public static final int DEFAULT_K = 100;
-
     @Parameter(names = {"-k"},
-               description = "The number of neighbours to produce for each base entry.")
+    description = "The number of neighbours to produce for each base entry.")
     private int k = DEFAULT_K;
 
     public ExternalKnnTask(File sourceFile, File destinationFile,
@@ -75,8 +73,9 @@ public class ExternalKnnTask extends ExternalSortTask {
     @Override
     protected void initialiseTask() throws Exception {
         super.initialiseTask();
-        if (getComparator() == null)
+        if (getComparator() == null) {
             throw new NullPointerException();
+        }
 
     }
 
@@ -90,21 +89,29 @@ public class ExternalKnnTask extends ExternalSortTask {
     }
 
     public final void setK(int k) {
-        if (k < 1)
+        if (k < 1) {
             throw new IllegalArgumentException("k < 1");
+        }
         this.k = k;
     }
 
     @Override
     protected void runTask() throws Exception {
 
-        if (LOG.isInfoEnabled())
-            LOG.info("Running KNN externally: from \"" + getSrcFile()
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Running external K-Nearest-Neighbours from \"" + getSrcFile()
                     + "\" to \"" + getDestFile() + "\".");
+        }
 
         map();
         reduce();
         finish();
+
+
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Completed external K-Nearest-Neighbours.");
+        }
+
     }
 
     @Override
@@ -140,5 +147,10 @@ public class ExternalKnnTask extends ExternalSortTask {
                     "Task type " + task.getClass()
                     + " should not have been queued.");
         }
+    }
+
+    @Override
+    protected ToStringHelper toStringHelper() {
+        return super.toStringHelper().add("k", k);
     }
 }

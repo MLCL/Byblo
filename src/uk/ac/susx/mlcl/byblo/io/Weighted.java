@@ -48,9 +48,7 @@ import javax.naming.OperationNotSupportedException;
 public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
 
     private static final long serialVersionUID = 1L;
-
     private double weight;
-
     private T record;
 
     public Weighted(final T record, final double weight) {
@@ -85,10 +83,12 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
+        if (obj == this) {
             return true;
-        if (obj == null || getClass() != obj.getClass())
+        }
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
+        }
         return equals((Weighted<?>) obj);
     }
 
@@ -110,11 +110,12 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
     @Override
     @SuppressWarnings("unchecked")
     public int compareTo(Weighted<T> that) {
-        if (record instanceof Comparable<?>)
+        if (record instanceof Comparable<?>) {
             return ((Comparable<T>) record).compareTo(that.get());
-        else
+        } else {
             throw new RuntimeException(new OperationNotSupportedException(
                     "Comparable not implemented by inner object."));
+        }
     }
 
     public static <T> Predicate<Weighted<T>> greaterThan(final double weight) {
@@ -123,6 +124,11 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
             @Override
             public boolean apply(Weighted<T> pair) {
                 return (pair.getWeight() > weight);
+            }
+
+            @Override
+            public String toString() {
+                return "weight>" + weight;
             }
         };
     }
@@ -135,6 +141,11 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
             public boolean apply(Weighted<T> pair) {
                 return (pair.getWeight() >= weight);
             }
+
+            @Override
+            public String toString() {
+                return "weight>=" + weight;
+            }
         };
     }
 
@@ -144,6 +155,11 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
             @Override
             public boolean apply(Weighted<T> pair) {
                 return (pair.getWeight() == weight);
+            }
+
+            @Override
+            public String toString() {
+                return "weight==" + weight;
             }
         };
     }
@@ -156,6 +172,11 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
             public boolean apply(Weighted<T> pair) {
                 return (pair.getWeight() <= weight);
             }
+
+            @Override
+            public String toString() {
+                return "weight<=" + weight;
+            }
         };
     }
 
@@ -165,6 +186,11 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
             @Override
             public boolean apply(Weighted<T> pair) {
                 return (pair.getWeight() < weight);
+            }
+
+            @Override
+            public String toString() {
+                return "weight<" + weight;
             }
         };
     }

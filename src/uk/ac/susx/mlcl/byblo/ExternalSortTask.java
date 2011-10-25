@@ -33,6 +33,7 @@ package uk.ac.susx.mlcl.byblo;
 import uk.ac.susx.mlcl.lib.io.TempFileFactoryConverter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.google.common.base.Objects.ToStringHelper;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
@@ -59,32 +60,24 @@ import org.apache.commons.logging.LogFactory;
 public class ExternalSortTask extends AbstractParallelTask {
 
     private static final Log LOG = LogFactory.getLog(ExternalSortTask.class);
-
     private static final int DEFAULT_MAX_CHUNK_SIZE = ChunkTask.DEFAULT_MAX_CHUNK_SIZE;
-
     @Parameter(names = {"-C", "--chunk-size"},
-               description = "Number of lines that will be read and sorted in RAM at one time (per thread). Larger values increase memory usage and performace.")
+    description = "Number of lines that will be read and sorted in RAM at one time (per thread). Larger values increase memory usage and performace.")
     private int maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
-
     @Parameter(names = {"-i", "--input"},
-               description = "Source file. If this argument is not given, or if it is \"-\", then stdin will be read.")
+    description = "Source file. If this argument is not given, or if it is \"-\", then stdin will be read.")
     private File sourceFile = IOUtil.STDIN_FILE;
-
     @Parameter(names = {"-o", "--output"},
-               description = "Destination file. If this argument is not given, or if it is \"-\", then stdout will be written to.")
+    description = "Destination file. If this argument is not given, or if it is \"-\", then stdout will be written to.")
     private File destFile = IOUtil.STDOUT_FILE;
-
     @Parameter(names = {"-T", "--temporary-directory"},
-               description = "Directory which will be used for storing temporary files.",
-               converter = TempFileFactoryConverter.class)
+    description = "Directory which will be used for storing temporary files.",
+    converter = TempFileFactoryConverter.class)
     private FileFactory tempFileFactory = new TempFileFactory();
-
     @Parameter(names = {"-c", "--charset"},
-               description = "Character encoding for reading and writing files.")
+    description = "Character encoding for reading and writing files.")
     private Charset charset = IOUtil.DEFAULT_CHARSET;
-
     private Comparator<String> comparator = new NeighbourComparator();
-
     private Queue<File> mergeQueue;
 
     public ExternalSortTask(File src, File dst, Charset charset,
@@ -119,8 +112,9 @@ public class ExternalSortTask extends AbstractParallelTask {
     }
 
     public final void setComparator(Comparator<String> comparator) {
-        if (comparator == null)
+        if (comparator == null) {
             throw new NullPointerException("comparator is null");
+        }
         this.comparator = comparator;
     }
 
@@ -129,8 +123,9 @@ public class ExternalSortTask extends AbstractParallelTask {
     }
 
     public final void setMaxChunkSize(int maxChunkSize) {
-        if (maxChunkSize < 1)
+        if (maxChunkSize < 1) {
             throw new IllegalArgumentException("maxChunkSize < 1");
+        }
         this.maxChunkSize = maxChunkSize;
     }
 
@@ -144,31 +139,41 @@ public class ExternalSortTask extends AbstractParallelTask {
 
     public final void setSourceFile(final File sourceFile)
             throws NullPointerException {
-        if (sourceFile == null)
+        if (sourceFile == null) {
             throw new NullPointerException("sourceFile is null");
+        }
         this.sourceFile = sourceFile;
     }
 
     public final void setDestinationFile(final File destFile)
             throws NullPointerException {
-        if (destFile == null)
+        if (destFile == null) {
             throw new NullPointerException("destinationFile is null");
+        }
         this.destFile = destFile;
     }
 
     @Override
     protected void runTask() throws Exception {
 
-        if (LOG.isInfoEnabled())
+        if (LOG.isInfoEnabled()) {
             LOG.info(
                     "Sorting file externally: from \"" + getSrcFile() + "\" to \"" + getDestFile() + "\".");
+        }
 
-        if (getComparator() == null)
+        if (getComparator() == null) {
             throw new NullPointerException();
+        }
 
         map();
         reduce();
         finish();
+
+
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Completed " + this + ".");
+        }
+
     }
 
     protected void map() throws Exception {
@@ -185,8 +190,9 @@ public class ExternalSortTask extends AbstractParallelTask {
 
         // Immidiately poll the chunk task so we can start handling other
         // completed tasks
-        if (!getFutureQueue().poll().equals(chunkFuture))
+        if (!getFutureQueue().poll().equals(chunkFuture)) {
             throw new AssertionError("Expecting ChunkTask on future queue.");
+        }
 
         while (!chunkFuture.isDone() || !chunkQueue.isEmpty()) {
             if (!getFutureQueue().isEmpty() && getFutureQueue().peek().isDone()) {
@@ -256,5 +262,15 @@ public class ExternalSortTask extends AbstractParallelTask {
         } else {
             return null;
         }
+    }
+
+    @Override
+    protected ToStringHelper toStringHelper() {
+        return super.toStringHelper().
+                add("in", sourceFile).
+                add("out", destFile).
+                add("chunkSize", maxChunkSize).
+                add("temp", tempFileFactory).
+                add("charset", charset);
     }
 }

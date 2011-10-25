@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.lib.tasks;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.google.common.base.Objects;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import org.apache.commons.logging.Log;
@@ -115,8 +116,12 @@ public abstract class AbstractTask implements Task {
 
     @Override
     public String toString() {
-        return "AbstractTask{"
-                + "usageRequested=" + usageRequested
-                + ", exceptions=" + exceptions + '}';
+        return toStringHelper().toString();
+    }
+
+    protected Objects.ToStringHelper toStringHelper() {
+        return Objects.toStringHelper(this).
+                add("usageRequested", isUsageRequested()).
+                add("exceptions", isExceptionThrown());
     }
 }

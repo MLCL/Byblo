@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.google.common.base.Objects;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import java.io.File;
 import java.nio.charset.Charset;
@@ -78,13 +79,17 @@ public class KnnTask extends SortTask {
     @Override
     protected void runTask() throws Exception {
         if (LOG.isInfoEnabled())
-            LOG.info("Running kNN in memory from \"" + getSrcFile()
+            LOG.info("Running memory K-Nearest-Neighbours from \"" + getSrcFile()
                     + "\" to \"" + getDstFile() + "\".");
         final List<String> linesIn = new ArrayList<String>();
         IOUtil.readAllLines(getSrcFile(), getCharset(), linesIn);
         final List<String> linesOut = new ArrayList<String>();
         knnLines(linesIn, linesOut);
         IOUtil.writeAllLines(getDstFile(), getCharset(), linesOut);
+
+        if (LOG.isInfoEnabled())
+            LOG.info("Completed memory K-Nearest-Neighbours.");
+
     }
 
     protected void knnLines(Collection<? extends String> in,
@@ -104,5 +109,11 @@ public class KnnTask extends SortTask {
                 out.add(line);
             }
         }
+    }
+
+    @Override
+    protected Objects.ToStringHelper toStringHelper() {
+        return super.toStringHelper().
+                add("k", k);
     }
 }

@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.allpairs;
 
+import com.google.common.base.Objects;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import java.io.IOException;
 import java.util.AbstractList;
@@ -44,7 +45,6 @@ public class Chunk<T> extends AbstractList<T>
         implements SeekableSource<T, Integer>, Cloneable {
 
     private final List<T> items;
-
     private Integer nextIndex;
 
     public Chunk(List<T> items) {
@@ -100,5 +100,16 @@ public class Chunk<T> extends AbstractList<T>
     @Override
     public Chunk<T> clone() {
         return new Chunk<T>(this);
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper().toString();
+    }
+
+    protected Objects.ToStringHelper toStringHelper() {
+        return Objects.toStringHelper(this).
+                add("size", items.size()).
+                add("nextIndex", nextIndex);
     }
 }

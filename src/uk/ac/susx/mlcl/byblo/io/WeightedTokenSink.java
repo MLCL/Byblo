@@ -75,12 +75,10 @@ import java.text.DecimalFormat;
 public class WeightedTokenSink extends AbstractTSVSink<Weighted<Token>> {
 
     private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
-
     private final ObjectIndex<String> stringIndex;
-
     private boolean compactFormatEnabled = false;
-
     private Weighted<Token> previousRecord = null;
+    private long count = 0;
 
     public WeightedTokenSink(File file, Charset charset, ObjectIndex<String> stringIndex)
             throws FileNotFoundException, IOException {
@@ -98,16 +96,23 @@ public class WeightedTokenSink extends AbstractTSVSink<Weighted<Token>> {
 
     @Override
     public void write(final Weighted<Token> record) throws IOException {
-        if (isCompactFormatEnabled())
+        if (isCompactFormatEnabled()) {
             writeCompact(record);
-        else
+        } else {
             writeVerbose(record);
+        }
+        ++count;
+    }
+
+    public long getCount() {
+        return count;
     }
 
     @Override
     public void close() throws IOException {
-        if (isCompactFormatEnabled() && previousRecord != null)
+        if (isCompactFormatEnabled() && previousRecord != null) {
             writeRecordDelimiter();
+        }
         super.close();
     }
 
@@ -135,9 +140,10 @@ public class WeightedTokenSink extends AbstractTSVSink<Weighted<Token>> {
     }
 
     private void writeWeight(double weight) throws IOException {
-        if (Double.compare((int) weight, weight) == 0)
+        if (Double.compare((int) weight, weight) == 0) {
             super.writeInt((int) weight);
-        else
+        } else {
             super.writeString(f.format(weight));
+        }
     }
 }

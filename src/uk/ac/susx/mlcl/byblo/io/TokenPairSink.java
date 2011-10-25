@@ -75,21 +75,21 @@ import java.nio.charset.Charset;
 public class TokenPairSink extends AbstractTSVSink<TokenPair> {
 
     private final ObjectIndex<String> stringIndex1;
-
     private final ObjectIndex<String> stringIndex2;
-
     private boolean compactFormatEnabled = false;
-
     private TokenPair previousRecord = null;
+    private long count = 0;
 
     public TokenPairSink(File file, Charset charset,
             ObjectIndex<String> stringIndex1, ObjectIndex<String> stringIndex2)
             throws FileNotFoundException, IOException {
         super(file, charset);
-        if (stringIndex1 == null)
+        if (stringIndex1 == null) {
             throw new NullPointerException("entryIndex == null");
-        if (stringIndex2 == null)
+        }
+        if (stringIndex2 == null) {
             throw new NullPointerException("featureIndex == null");
+        }
         this.stringIndex1 = stringIndex1;
         this.stringIndex2 = stringIndex2;
     }
@@ -125,12 +125,18 @@ public class TokenPairSink extends AbstractTSVSink<TokenPair> {
         this.compactFormatEnabled = compactFormatEnabled;
     }
 
+    public long getCount() {
+        return count;
+    }
+
     @Override
     public void write(final TokenPair record) throws IOException {
-        if (isCompactFormatEnabled())
+        if (isCompactFormatEnabled()) {
             writeCompact(record);
-        else
+        } else {
             writeVerbose(record);
+        }
+        ++count;
     }
 
     private void writeVerbose(final TokenPair record) throws IOException {
@@ -162,8 +168,9 @@ public class TokenPairSink extends AbstractTSVSink<TokenPair> {
 
     @Override
     public void close() throws IOException {
-        if (isCompactFormatEnabled() && previousRecord != null)
+        if (isCompactFormatEnabled() && previousRecord != null) {
             writeRecordDelimiter();
+        }
         super.close();
     }
 }

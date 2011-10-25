@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.allpairs;
 
+import com.google.common.base.Objects;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.Seekable;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
@@ -46,11 +47,8 @@ import java.util.List;
 public class Chunker<T, P> implements SeekableSource<Chunk<T>, P>, Closeable {
 
     private static final long DEFAULT_MAX_CHUNK_SIZE = 1000;
-
     private long maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
-
     private final SeekableSource<T, P> inner;
-
     private final boolean seekable;
 
     public Chunker(SeekableSource<T, P> inner, long maxChunkSize) {
@@ -86,25 +84,40 @@ public class Chunker<T, P> implements SeekableSource<Chunk<T>, P>, Closeable {
 
     @Override
     public void position(P offset) throws IOException {
-        if (!seekable)
+        if (!seekable) {
             throw new UnsupportedOperationException(
                     "Not supported by wrapped instance.");
+        }
         ((Seekable<P>) inner).position(offset);
     }
 
     @Override
     public P position() throws IOException {
-        if (!seekable)
+        if (!seekable) {
             throw new UnsupportedOperationException(
                     "Not supported by wrapped instance.");
+        }
         return ((Seekable<P>) inner).position();
     }
 
     @Override
     public void close() throws IOException {
-        if (!(inner instanceof Closeable))
+        if (!(inner instanceof Closeable)) {
             throw new UnsupportedOperationException(
                     "Not supported by wrapped instance.");
+        }
         ((Closeable) inner).close();
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper().toString();
+    }
+
+    protected Objects.ToStringHelper toStringHelper() {
+        return Objects.toStringHelper(this).
+                add("maxChunkSize", maxChunkSize).
+                add("inner", inner).
+                add("seekable", seekable);
     }
 }

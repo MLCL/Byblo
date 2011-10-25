@@ -31,6 +31,7 @@
 package uk.ac.susx.mlcl.lib.tasks;
 
 import com.beust.jcommander.Parameter;
+import com.google.common.base.Objects;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
@@ -50,30 +51,27 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractParallelTask extends AbstractTask {
 
     private static final Log LOG = LogFactory.getLog(AbstractParallelTask.class);
-
     protected static final int DEFAULT_NUM_THREADS =
             Runtime.getRuntime().availableProcessors();
-
     @Parameter(names = {"-t", "--threads"},
-               description = "Number of threads to use.")
+    description = "Number of threads to use.")
     private int nThreads = DEFAULT_NUM_THREADS;
-
     private ExecutorService executor = null;
-
     private Queue<Future<? extends Task>> futureQueue;
 
     public AbstractParallelTask() {
     }
 
     public void setNumThreads(int nThreads) {
-        if (nThreads < 1)
+        if (nThreads < 1) {
             throw new IllegalArgumentException("nThreads < 1");
+        }
 
         if (LOG.isWarnEnabled() && nThreads > Runtime.getRuntime().
-                availableProcessors())
-            LOG.warn("nThreads (" + nThreads + ") > availableProcessors (" + Runtime.
-                    getRuntime().
+                availableProcessors()) {
+            LOG.warn("nThreads (" + nThreads + ") > availableProcessors (" + Runtime.getRuntime().
                     availableProcessors() + ")");
+        }
         if (nThreads != this.nThreads) {
             this.nThreads = nThreads;
         }
@@ -85,9 +83,6 @@ public abstract class AbstractParallelTask extends AbstractTask {
 
     protected synchronized final ExecutorService getExecutor() {
         if (executor == null) {
-            if (LOG.isDebugEnabled())
-                LOG.debug(
-                        "Initialising executor with " + nThreads + " concurrent work threads.");
             // Create a new thread pool using an unbounded queue - throttling will
             // be handled by a semaphore
             final ThreadPoolExecutor tpe = new ThreadPoolExecutor(
@@ -117,8 +112,9 @@ public abstract class AbstractParallelTask extends AbstractTask {
                 List<Runnable> runnables = executor.shutdownNow();
             }
         } catch (InterruptedException ex) {
-            if (LOG.isErrorEnabled())
+            if (LOG.isErrorEnabled()) {
                 LOG.error(null, ex);
+            }
             catchException(ex);
         } finally {
             executor.shutdownNow();
@@ -128,13 +124,15 @@ public abstract class AbstractParallelTask extends AbstractTask {
     @Override
     public void run() {
         try {
-            if (LOG.isDebugEnabled())
+            if (LOG.isDebugEnabled()) {
                 LOG.debug("Initialising task " + this + ".");
+            }
 
             initialiseTask();
 
-            if (LOG.isDebugEnabled())
+            if (LOG.isDebugEnabled()) {
                 LOG.debug("Running task " + this + ".");
+            }
 
             runTask();
 
@@ -144,27 +142,41 @@ public abstract class AbstractParallelTask extends AbstractTask {
             catchException(new RuntimeException(t));
         } finally {
             try {
+
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Finalising task " + this + ".");
+                }
+
                 finaliseTask();
             } catch (Exception ex) {
                 catchException(ex);
             }
 
-            if (LOG.isDebugEnabled())
+            if (LOG.isDebugEnabled()) {
                 LOG.debug("Completed task " + this + ".");
+            }
         }
     }
 
     protected synchronized final Queue<Future<? extends Task>> getFutureQueue() {
-        if (futureQueue == null)
+        if (futureQueue == null) {
             futureQueue = new ArrayDeque<Future<? extends Task>>();
+        }
         return futureQueue;
     }
 
     protected <T extends Task> Future<T> submitTask(T task) {
-        if (task == null)
+        if (task == null) {
             throw new NullPointerException("task is null");
+        }
         Future<T> future = getExecutor().submit(task, task);
         getFutureQueue().offer(future);
         return future;
+    }
+
+    @Override
+    protected Objects.ToStringHelper toStringHelper() {
+        return super.toStringHelper().
+                add("threads", getNumThreads()).add("executor", executor).add("futureQueue", futureQueue);
     }
 }

@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.google.common.base.Objects;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import java.io.File;
@@ -99,11 +100,24 @@ public class SortTask extends CopyTask {
     @Override
     protected void runTask() throws Exception {
         if (LOG.isInfoEnabled())
-            LOG.info("Sorting file in memory, from \"" + getSrcFile()
+            LOG.info("Running memory sort from \"" + getSrcFile()
                     + "\" to \"" + getDstFile() + "\".");
+        
+        
         final List<String> lines = new ArrayList<String>();
         IOUtil.readAllLines(getSrcFile(), getCharset(), lines);
         Collections.sort(lines, getComparator());
         IOUtil.writeAllLines(getDstFile(), getCharset(), lines);
+
+        if (LOG.isInfoEnabled())
+            LOG.info("Completed memory sort.");
+
+    }
+
+    @Override
+    protected Objects.ToStringHelper toStringHelper() {
+        return super.toStringHelper().
+                add("charset", charset).
+                add("comparator", comparator);
     }
 }
