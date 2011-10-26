@@ -91,7 +91,7 @@ public class FilterTaskTest {
 
                
         enableExistTrapping();
-        Byblo.main(args);
+        Main.main(args);
         disableExitTrapping();
         
 

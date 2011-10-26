@@ -28,17 +28,44 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.lib.tasks;
+package uk.ac.susx.mlcl.byblo;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import uk.ac.susx.mlcl.lib.tasks.AbstractCommand;
+import uk.ac.susx.mlcl.lib.tasks.Command;
 
 /**
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public interface Task extends Runnable {
+public class Main extends AbstractCommand {
 
-    Throwable getException();
+    private static final Map<String, Class<? extends Command>> SUBCOMMANDS;
 
-    boolean isExceptionThrown();
+    static {
+        final Map<String, Class<? extends Command>> tmp =
+            new HashMap<String, Class<? extends Command>>();
+        tmp.put("sort", ExternalSortTask.class);
+        tmp.put("merge", MergeTask.class);
+        tmp.put("knn", ExternalKnnTask.class);
+        tmp.put("allpairs", AllPairsTask.class);
+        tmp.put("count", ExternalCountTask.class);
+        tmp.put("filter", FilterTask.class);
+        SUBCOMMANDS = Collections.unmodifiableMap(tmp);
+    }
 
-    void throwException() throws Exception;
+    public Main() {
+        super(SUBCOMMANDS);
+    }
+
+    @Override
+    public void runCommand() throws Exception {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public static void main(final String[] args) throws Exception {
+        new Main().runCommand(args);
+    }
 }

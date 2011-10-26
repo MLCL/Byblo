@@ -42,7 +42,6 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import java.io.Closeable;
@@ -53,6 +52,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
+import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 
 /**
  * The most basic implementation of all-pairs similarity search. Will only 

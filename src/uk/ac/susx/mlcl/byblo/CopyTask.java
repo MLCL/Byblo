@@ -34,12 +34,14 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
-import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
+import uk.ac.susx.mlcl.lib.tasks.AbstractCommandTask;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
+import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
 
 /**
  * Copy a source file to a destination.
@@ -47,18 +49,20 @@ import org.apache.commons.logging.LogFactory;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Copy a file.")
-public class CopyTask extends AbstractTask {
+public class CopyTask extends AbstractCommandTask {
 
     private static final Log LOG = LogFactory.getLog(CopyTask.class);
 
     private static final int BUFFER_SIZE = 100000;
 
     @Parameter(names = {"-i", "--input-file"},
-               description = "Source file that will be read")
+               description = "Source file that will be read", 
+               validateWith=InputFileValidator.class)
     private File sourceFile = IOUtil.STDIN_FILE;
 
     @Parameter(names = {"-o", "--output-file"},
-               description = "Destination file that will be writen to.")
+               description = "Destination file that will be writen to.", 
+               validateWith=OutputFileValidator.class)
     private File destFile = IOUtil.STDOUT_FILE;
 
     public CopyTask(File sourceFile, File destinationFile) {
@@ -68,6 +72,7 @@ public class CopyTask extends AbstractTask {
 
     public CopyTask() {
     }
+
 
     @Override
     protected void initialiseTask() throws Exception {

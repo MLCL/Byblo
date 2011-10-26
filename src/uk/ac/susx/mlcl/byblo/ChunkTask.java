@@ -38,7 +38,7 @@ import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
-import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
+import uk.ac.susx.mlcl.lib.tasks.AbstractCommandTask;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -49,6 +49,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
 
 /**
  *
@@ -56,7 +57,7 @@ import org.apache.commons.logging.LogFactory;
  */
 @Parameters(
 commandDescription = "Split a large file into a number of smaller files.")
-public class ChunkTask extends AbstractTask {
+public class ChunkTask extends AbstractCommandTask {
 
     private static final Log LOG = LogFactory.getLog(ChunkTask.class);
 
@@ -72,7 +73,8 @@ public class ChunkTask extends AbstractTask {
     private int maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
 
     @Parameter(names = {"-i", "--input-file"},
-               description = "Source file. If this argument is not given, or if it is \"-\", then stdin will be read.")
+               description = "Source file. If this argument is not given, or if it is \"-\", then stdin will be read.",
+               validateWith=InputFileValidator.class)
     private File sourceFile = DEFAULT_SOURCE_FILE;
 
     private BlockingQueue<File> dstFileQueue = new LinkedBlockingDeque<File>();
@@ -103,6 +105,8 @@ public class ChunkTask extends AbstractTask {
         setMaxChunkSize(maxChunkSize);
         setCharset(charset);
     }
+
+   
 
     @Override
     protected void initialiseTask() throws Exception {

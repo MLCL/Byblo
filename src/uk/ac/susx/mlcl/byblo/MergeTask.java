@@ -35,7 +35,7 @@ import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
-import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
+import uk.ac.susx.mlcl.lib.tasks.AbstractCommandTask;
 import uk.ac.susx.mlcl.lib.tasks.CaseInsensitiveComparator;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -60,7 +60,7 @@ import org.apache.commons.logging.LogFactory;
  */
 @Parameters(
 commandDescription = "Merges the contents of two sorted source files, line by line, into a destination file.")
-public class MergeTask extends AbstractTask {
+public class MergeTask extends AbstractCommandTask {
 
     private static final Log LOG = LogFactory.getLog(MergeTask.class);
 

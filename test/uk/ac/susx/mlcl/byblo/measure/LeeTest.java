@@ -31,7 +31,7 @@
 package uk.ac.susx.mlcl.byblo.measure;
 
 import org.junit.Ignore;
-import uk.ac.susx.mlcl.byblo.Byblo;
+import uk.ac.susx.mlcl.byblo.Main;
 import java.io.File;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -51,7 +51,7 @@ public class LeeTest {
         output.delete();
 
         enableExistTrapping();
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "Lee",
@@ -75,7 +75,7 @@ public class LeeTest {
 
 
         enableExistTrapping();
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "Lee",
@@ -102,7 +102,7 @@ public class LeeTest {
         output.delete();
 
         enableExistTrapping();
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "Lee",
@@ -125,7 +125,7 @@ public class LeeTest {
         output.delete();
 
         enableExistTrapping();
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "Lee",
@@ -153,7 +153,7 @@ public class LeeTest {
         output.delete();
 
         enableExistTrapping();
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "Lee",

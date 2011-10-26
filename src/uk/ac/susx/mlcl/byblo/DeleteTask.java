@@ -33,7 +33,7 @@ package uk.ac.susx.mlcl.byblo;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
-import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
+import uk.ac.susx.mlcl.lib.tasks.AbstractCommandTask;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -45,7 +45,7 @@ import org.apache.commons.logging.LogFactory;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Delete a file.")
-public class DeleteTask extends AbstractTask {
+public class DeleteTask extends AbstractCommandTask {
 
     private static final Log LOG = LogFactory.getLog(DeleteTask.class);
 

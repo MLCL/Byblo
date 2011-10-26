@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.measure;
 
-import uk.ac.susx.mlcl.byblo.Byblo;
+import uk.ac.susx.mlcl.byblo.Main;
 import java.io.File;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -63,7 +63,7 @@ public class RecallTest {
         };
 
           enableExistTrapping();
-        Byblo.main(args);
+        Main.main(args);
         disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
@@ -92,7 +92,7 @@ public class RecallTest {
 
 
         enableExistTrapping();
-        Byblo.main(args);
+        Main.main(args);
         disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());

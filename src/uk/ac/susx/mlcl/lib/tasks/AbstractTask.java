@@ -30,8 +30,6 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -42,16 +40,19 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-@Parameters()
 public abstract class AbstractTask implements Task {
 
     private static final Log LOG = LogFactory.getLog(AbstractTask.class);
 
-    @Parameter(names = {"-h", "--help"},
-               description = "Display this help message.")
-    private boolean usageRequested = false;
-
     private Queue<Exception> exceptions = null;
+
+    public enum State {
+
+        STOPPED, INITIALISING, RUNNING, FINALISING
+
+    }
+
+    public State state = State.STOPPED;
 
     public AbstractTask() {
     }
@@ -64,23 +65,48 @@ public abstract class AbstractTask implements Task {
 
     @Override
     public void run() {
-        if (LOG.isDebugEnabled())
-            LOG.debug("Running task " + this + ".");
         try {
+            
+            setState(State.INITIALISING);
+            if (LOG.isDebugEnabled())
+                LOG.debug("Initialising task: " + this);
             initialiseTask();
+
+
+            setState(State.RUNNING);
+            if (LOG.isDebugEnabled())
+                LOG.debug("Running task: " + this);
             runTask();
-            finaliseTask();
+
         } catch (Exception ex) {
             catchException(ex);
-        } catch (Error t) {
+        } catch (Throwable t) {
             catchException(new RuntimeException(t));
+        } finally {
+            try {
+
+                setState(State.FINALISING);
+                if (LOG.isDebugEnabled())
+                    LOG.debug("Finalising task: " + this);
+                finaliseTask();
+                
+            } catch (Exception ex) {
+                catchException(ex);
+            }
+
+            setState(State.STOPPED);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Completed task: " + this);
+            }
         }
-        if (LOG.isDebugEnabled())
-            LOG.debug("Completed task " + this + ".");
     }
 
-    public final boolean isUsageRequested() {
-        return usageRequested;
+    public State getState() {
+        return state;
+    }
+
+    private void setState(State state) {
+        this.state = state;
     }
 
     protected final void catchException(Exception throwable) {
@@ -115,13 +141,12 @@ public abstract class AbstractTask implements Task {
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return toStringHelper().toString();
     }
 
     protected Objects.ToStringHelper toStringHelper() {
         return Objects.toStringHelper(this).
-                add("usageRequested", isUsageRequested()).
                 add("exceptions", isExceptionThrown());
     }
 }

@@ -28,17 +28,40 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
 package uk.ac.susx.mlcl.lib.tasks;
+
+import com.beust.jcommander.IParameterValidator;
+import com.beust.jcommander.ParameterException;
+import java.io.File;
+import java.io.IOException;
 
 /**
  *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @author hamish
  */
-public interface Task extends Runnable {
+public class InputFileValidator implements IParameterValidator {
 
-    Throwable getException();
-
-    boolean isExceptionThrown();
-
-    void throwException() throws Exception;
+    @Override
+    public void validate(String name, String value) throws ParameterException {
+        File file;
+        try {
+            file = new File(value).getCanonicalFile();
+        } catch (IOException ex) {
+            throw new ParameterException(ex);
+        }
+        if (!file.exists()) {
+            throw new ParameterException("Input file \"" + value + "\" does not exist.");
+        }
+        if (file.isDirectory()) {
+            throw new ParameterException("Input file \"" + value + "\" exists but is a directory.");
+        }
+        if (!file.isFile()) {
+            throw new ParameterException("Input file \"" + value + "\" is not an ordinary file.");
+        }
+        if (!file.canRead()) {
+            throw new ParameterException("Input file \"" + value + "\" is not readble.");
+        }
+    }
+    
 }

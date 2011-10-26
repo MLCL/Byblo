@@ -31,7 +31,7 @@
 package uk.ac.susx.mlcl.byblo.measure;
 
 import com.google.common.io.Files;
-import uk.ac.susx.mlcl.byblo.Byblo;
+import uk.ac.susx.mlcl.byblo.Main;
 import java.io.File;
 import org.junit.Test;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
@@ -53,7 +53,7 @@ public class CosineTest {
         outputFile.delete();
 
         enableExistTrapping();
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "Cosine",
@@ -78,7 +78,7 @@ public class CosineTest {
         outputFile.delete();
 
         enableExistTrapping();
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "CosineMi",
@@ -106,7 +106,7 @@ public class CosineTest {
 
 
         enableExistTrapping();
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "Cosine",
@@ -115,7 +115,7 @@ public class CosineTest {
                     "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output1.toString()
                 });
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "Cosine",
@@ -140,7 +140,7 @@ public class CosineTest {
         output2.delete();
 
         enableExistTrapping();
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "CosineMi",
@@ -149,7 +149,7 @@ public class CosineTest {
                     "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output1.toString()
                 });
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "CosineMi",

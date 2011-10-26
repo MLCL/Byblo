@@ -33,7 +33,7 @@ package uk.ac.susx.mlcl.byblo.measure;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import org.junit.Ignore;
 import com.google.common.io.Files;
-import uk.ac.susx.mlcl.byblo.Byblo;
+import uk.ac.susx.mlcl.byblo.Main;
 import java.io.File;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -66,7 +66,7 @@ public class LpTest {
         };
 
         enableExistTrapping();
-        Byblo.main(args);
+        Main.main(args);
         disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
@@ -94,7 +94,7 @@ public class LpTest {
         };
 
         enableExistTrapping();
-        Byblo.main(args);
+        Main.main(args);
         disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
@@ -122,7 +122,7 @@ public class LpTest {
         };
 
         enableExistTrapping();
-        Byblo.main(args);
+        Main.main(args);
         disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
@@ -148,7 +148,7 @@ public class LpTest {
         };
 
         enableExistTrapping();
-        Byblo.main(args);
+        Main.main(args);
         disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
@@ -173,7 +173,7 @@ public class LpTest {
         };
 
         enableExistTrapping();
-        Byblo.main(args);
+        Main.main(args);
         disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
@@ -198,7 +198,7 @@ public class LpTest {
         };
 
         enableExistTrapping();
-        Byblo.main(args);
+        Main.main(args);
         disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
@@ -217,7 +217,7 @@ public class LpTest {
             output2.delete();
         enableExistTrapping();
 
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8", "--mink-p", "1",
                     "--measure", "Lp",
@@ -226,7 +226,7 @@ public class LpTest {
                     "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output1.toString()
                 });
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8", "--mink-p", "1",
                     "--measure", "Lp", "--measure-reversed",
@@ -253,7 +253,7 @@ public class LpTest {
             output2.delete();
         enableExistTrapping();
 
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8", "--mink-p", "2",
                     "--measure", "Lp",
@@ -262,7 +262,7 @@ public class LpTest {
                     "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output1.toString()
                 });
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8", "--mink-p", "2",
                     "--measure", "Lp", "--measure-reversed",
@@ -290,7 +290,7 @@ public class LpTest {
             output2.delete();
         enableExistTrapping();
 
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8", "--mink-p", "3",
                     "--measure", "Lp",
@@ -299,7 +299,7 @@ public class LpTest {
                     "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output1.toString()
                 });
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8", "--mink-p", "3",
                     "--measure", "Lp", "--measure-reversed",
@@ -327,7 +327,7 @@ public class LpTest {
             output2.delete();
         enableExistTrapping();
 
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8", "--mink-p", "inf",
                     "--measure", "Lp",
@@ -336,7 +336,7 @@ public class LpTest {
                     "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output1.toString()
                 });
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8", "--mink-p", "+INFIN",
                     "--measure", "Lp", "--measure-reversed",

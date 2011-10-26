@@ -31,7 +31,7 @@
 package uk.ac.susx.mlcl.byblo;
 
 import com.google.common.base.Objects.ToStringHelper;
-import uk.ac.susx.mlcl.lib.io.TempFileFactoryConverter;
+import uk.ac.susx.mlcl.lib.tasks.TempFileFactoryConverter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Function;
@@ -49,7 +49,7 @@ import uk.ac.susx.mlcl.lib.Predicates2;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
-import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
+import uk.ac.susx.mlcl.lib.tasks.AbstractCommandTask;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import java.io.File;
@@ -76,7 +76,7 @@ import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Filter a set of frequency files")
-public class FilterTask extends AbstractTask implements Serializable {
+public class FilterTask extends AbstractCommandTask implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private static final Log LOG = LogFactory.getLog(FilterTask.class);

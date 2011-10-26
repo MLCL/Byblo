@@ -30,6 +30,8 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
+import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
 import com.google.common.base.Objects.ToStringHelper;
 import uk.ac.susx.mlcl.lib.DoubleConverter;
 import com.beust.jcommander.IParameterValidator;
@@ -53,7 +55,6 @@ import uk.ac.susx.mlcl.lib.ObjectIndex;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -68,79 +69,92 @@ import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
 import uk.ac.susx.mlcl.lib.io.Lexer;
+import uk.ac.susx.mlcl.lib.tasks.AbstractCommand;
 
 /**
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Perform all-pair similarity search on the given input frequency files.")
-public class AllPairsTask extends AbstractTask {
+public class AllPairsTask extends AbstractCommand {
 
     private static final Log LOG = LogFactory.getLog(AllPairsTask.class);
-    @Parameter(names = {"-i", "--input"},
-    description = "Entry-feature frequency vectors files.",
-    required = true,
-    validateWith = InputFileValidator.class)
-    private File entryFeaturesFile;
-    @Parameter(names = {"-if", "--input-features"},
-    description = "Feature frequencies file",
-    validateWith = InputFileValidator.class)
-    private File featuresFile;
-    @Parameter(names = {"-ie", "--input-entries"},
-    description = "Entry frequencies file",
-    validateWith = InputFileValidator.class)
-    private File entriesFile;
-    @Parameter(names = {"-o", "--output"},
-    description = "Output similarity matrix file.",
-    required = true,
-    validateWith = OutputFileValidator.class)
-    private File outputFile;
-    @Parameter(names = {"-c", "--charset"},
-    description = "Character encoding to use for reading and writing.")
-    private Charset charset = IOUtil.DEFAULT_CHARSET;
-    @Parameter(names = {"-C", "--chunk-size"},
-    description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
-    private int chunkSize = 5000;
-    @Parameter(names = {"-t", "--threads"},
-    description = "Number of conccurent processing threads.")
-    private int nThreads = Runtime.getRuntime().availableProcessors() + 1;
-    @Parameter(names = {"-Smn", "--similarity-min"},
-    description = "Minimum similarity threshold.",
-    converter = DoubleConverter.class)
-    private double minSimilarity = Double.NEGATIVE_INFINITY;
-    @Parameter(names = {"-Smx", "--similarity-max"},
-    description = "Maximyum similarity threshold.",
-    converter = DoubleConverter.class)
-    private double maxSimilarity = Double.POSITIVE_INFINITY;
-    @Parameter(names = {"-ip", "--identity-pairs"},
-    description = "Produce similarity between pair of identical entries.")
-    private boolean outputIdentityPairs = false;
-    @Parameter(names = {"-m", "--measure"},
-    description = "Similarity measure to use.")
-    private String measureName = "Jaccard";
-    @Parameter(names = {"--measure-reversed"},
-    description = "Swap similarity measure inputs.")
-    private boolean measureReversed = false;
-    @Parameter(names = {"--lee-alpha"},
-    description = "Alpha parameter to Lee's alpha-skew divergence measure.",
-    converter = DoubleConverter.class)
-    private double leeAlpha = Lee.DEFAULT_ALPHA;
-    @Parameter(names = {"--crmi-beta"},
-    description = "Beta paramter to Weed's CRMI measure.",
-    converter = DoubleConverter.class)
-    private double crmiBeta = CrMi.DEFAULT_BETA;
-    @Parameter(names = {"--crmi-gamma"},
-    description = "Gamma paramter to Weed's CRMI measure.",
-    converter = DoubleConverter.class)
-    private double crmiGamma = CrMi.DEFAULT_GAMMA;
-    @Parameter(names = {"--mink-p"},
-    description = "P parameter to Minkowski/Lp space measure.",
-    converter = DoubleConverter.class)
-    private double minkP = 2;
 
-    @Override
-    protected void initialiseTask() throws Exception {
-    }
+    @Parameter(names = {"-i", "--input"},
+               description = "Entry-feature frequency vectors files.",
+               required = true,
+               validateWith = InputFileValidator.class)
+    private File entryFeaturesFile;
+
+    @Parameter(names = {"-if", "--input-features"},
+               description = "Feature frequencies file",
+               validateWith = InputFileValidator.class)
+    private File featuresFile;
+
+    @Parameter(names = {"-ie", "--input-entries"},
+               description = "Entry frequencies file",
+               validateWith = InputFileValidator.class)
+    private File entriesFile;
+
+    @Parameter(names = {"-o", "--output"},
+               description = "Output similarity matrix file.",
+               required = true,
+               validateWith = OutputFileValidator.class)
+    private File outputFile;
+
+    @Parameter(names = {"-c", "--charset"},
+               description = "Character encoding to use for reading and writing.")
+    private Charset charset = IOUtil.DEFAULT_CHARSET;
+
+    @Parameter(names = {"-C", "--chunk-size"},
+               description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
+    private int chunkSize = 5000;
+
+    @Parameter(names = {"-t", "--threads"},
+               description = "Number of conccurent processing threads.")
+    private int nThreads = Runtime.getRuntime().availableProcessors() + 1;
+
+    @Parameter(names = {"-Smn", "--similarity-min"},
+               description = "Minimum similarity threshold.",
+               converter = DoubleConverter.class)
+    private double minSimilarity = Double.NEGATIVE_INFINITY;
+
+    @Parameter(names = {"-Smx", "--similarity-max"},
+               description = "Maximyum similarity threshold.",
+               converter = DoubleConverter.class)
+    private double maxSimilarity = Double.POSITIVE_INFINITY;
+
+    @Parameter(names = {"-ip", "--identity-pairs"},
+               description = "Produce similarity between pair of identical entries.")
+    private boolean outputIdentityPairs = false;
+
+    @Parameter(names = {"-m", "--measure"},
+               description = "Similarity measure to use.")
+    private String measureName = "Jaccard";
+
+    @Parameter(names = {"--measure-reversed"},
+               description = "Swap similarity measure inputs.")
+    private boolean measureReversed = false;
+
+    @Parameter(names = {"--lee-alpha"},
+               description = "Alpha parameter to Lee's alpha-skew divergence measure.",
+               converter = DoubleConverter.class)
+    private double leeAlpha = Lee.DEFAULT_ALPHA;
+
+    @Parameter(names = {"--crmi-beta"},
+               description = "Beta paramter to Weed's CRMI measure.",
+               converter = DoubleConverter.class)
+    private double crmiBeta = CrMi.DEFAULT_BETA;
+
+    @Parameter(names = {"--crmi-gamma"},
+               description = "Gamma paramter to Weed's CRMI measure.",
+               converter = DoubleConverter.class)
+    private double crmiGamma = CrMi.DEFAULT_GAMMA;
+
+    @Parameter(names = {"--mink-p"},
+               description = "P parameter to Minkowski/Lp space measure.",
+               converter = DoubleConverter.class)
+    private double minkP = 2;
 
     private Map<String, Class<? extends Proximity>> buildMeasureClassLookupTable() throws ClassNotFoundException {
 
@@ -173,10 +187,11 @@ public class AllPairsTask extends AbstractTask {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected void runTask() throws Exception {
+    public void runCommand() throws Exception {
 
         if (LOG.isInfoEnabled()) {
-            LOG.info("Running all-pairs similarity search from \"" + entryFeaturesFile + "\" to \"" +outputFile + "\"");
+            LOG.info(
+                    "Running all-pairs similarity search from \"" + entryFeaturesFile + "\" to \"" + outputFile + "\"");
         }
 
 
@@ -268,7 +283,7 @@ public class AllPairsTask extends AbstractTask {
 
         final Sink<Weighted<TokenPair>> sink =
                 new WeightedTokenPairSink(outputFile, charset, strIndex,
-                strIndex);
+                                          strIndex);
 
         // Instantiate the all-pairs algorithm as given on the command line.
         ThreadedApssTask<Lexer.Tell> apss = new ThreadedApssTask<Lexer.Tell>(
@@ -309,77 +324,9 @@ public class AllPairsTask extends AbstractTask {
         }
 
         apss.run();
-        
+
         if (LOG.isInfoEnabled()) {
             LOG.info("Completed all-pairs similarity search.");
-        }
-    }
-
-    @Override
-    protected void finaliseTask() throws Exception {
-    }
-
-    public static class InputFileValidator implements IParameterValidator {
-
-        public InputFileValidator() {
-        }
-
-        @Override
-        public void validate(String name, String value) throws ParameterException {
-            File file = new File(value);
-            if (!file.exists()) {
-                throw new ParameterException(
-                        "Input file \"" + value + "\" does not exist.");
-            }
-            if (file.isDirectory()) {
-                throw new ParameterException(
-                        "Input file \"" + value + "\" exists but is a directory.");
-            }
-            if (!file.isFile()) {
-                throw new ParameterException(
-                        "Input file \"" + value + "\" is not an ordinary file.");
-            }
-            if (!file.canRead()) {
-                throw new ParameterException(
-                        "Input file \"" + value + "\" is not readble.");
-            }
-        }
-    }
-
-    public static class OutputFileValidator implements IParameterValidator {
-
-        public OutputFileValidator() {
-        }
-
-        @Override
-        public void validate(String name, String value) throws ParameterException {
-            File file;
-            try {
-                file = new File(value).getCanonicalFile();
-            } catch (IOException ex) {
-                throw new ParameterException(ex);
-            }
-            if (file.exists()) {
-                if (file.isDirectory()) {
-                    throw new ParameterException(
-                            "Output file \"" + value + "\" exists but is a directory.");
-                }
-                if (!file.isFile()) {
-                    throw new ParameterException(
-                            "Output file \"" + value + "\" exists but is not an ordinary file.");
-                }
-                if (!file.canWrite()) {
-                    throw new ParameterException(
-                            "Input file \"" + value + "\" is not writeable.");
-                }
-            } else {
-
-                if (file.getParentFile() == null || !file.getParentFile().
-                        canWrite()) {
-                    throw new ParameterException(
-                            "Output file \"" + value + "\" does not exist and the parent directory is not writable.");
-                }
-            }
         }
     }
 

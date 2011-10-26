@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
+import com.beust.jcommander.Parameter;
 import com.google.common.base.Objects;
 import java.util.ArrayDeque;
 import java.util.List;
@@ -42,44 +43,49 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.Checks;
 
 /**
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @deprecated temporary class while command and task apis are being separated
  */
-public abstract class AbstractParallelTask extends AbstractTask {
+@Deprecated
+public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
 
-    private static final Log LOG = LogFactory.getLog(AbstractParallelTask.class);
+    private static final Log LOG = LogFactory.getLog(AbstractParallelCommandTask.class);
 
     protected static final int DEFAULT_NUM_THREADS =
             Runtime.getRuntime().availableProcessors();
 
-    private int numThreads = DEFAULT_NUM_THREADS;
+    @Parameter(names = {"-t", "--threads"},
+               description = "Number of threads to use.")
+    private int nThreads = DEFAULT_NUM_THREADS;
 
     private ExecutorService executor = null;
 
     private Queue<Future<? extends Task>> futureQueue;
 
-    public AbstractParallelTask() {
+    public AbstractParallelCommandTask() {
     }
 
-    public void setNumThreads(int numThreads) {
-        Checks.checkRangeIncl(numThreads, 1, Integer.MAX_VALUE);
+    public void setNumThreads(int nThreads) {
+        if (nThreads < 1) {
+            throw new IllegalArgumentException("nThreads < 1");
+        }
 
-        if (LOG.isWarnEnabled() && numThreads 
-                > Runtime.getRuntime().availableProcessors()) {
-            LOG.warn("numThreads (" + numThreads + ") > availableProcessors (" + Runtime.
+        if (LOG.isWarnEnabled() && nThreads > Runtime.getRuntime().
+                availableProcessors()) {
+            LOG.warn("nThreads (" + nThreads + ") > availableProcessors (" + Runtime.
                     getRuntime().
                     availableProcessors() + ")");
         }
-        if (numThreads != this.numThreads) {
-            this.numThreads = numThreads;
+        if (nThreads != this.nThreads) {
+            this.nThreads = nThreads;
         }
     }
 
     public final int getNumThreads() {
-        return numThreads;
+        return nThreads;
     }
 
     protected synchronized final ExecutorService getExecutor() {
@@ -87,7 +93,7 @@ public abstract class AbstractParallelTask extends AbstractTask {
             // Create a new thread pool using an unbounded queue - throttling will
             // be handled by a semaphore
             final ThreadPoolExecutor tpe = new ThreadPoolExecutor(
-                    numThreads, numThreads,
+                    nThreads, nThreads,
                     1L, TimeUnit.MINUTES,
                     new LinkedBlockingQueue<Runnable>());
 
@@ -130,7 +136,6 @@ public abstract class AbstractParallelTask extends AbstractTask {
     }
 
     protected <T extends Task> Future<T> submitTask(T task) {
-        Checks.checkNotNull("task", task);
         if (task == null) {
             throw new NullPointerException("task is null");
         }

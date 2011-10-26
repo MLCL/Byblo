@@ -44,7 +44,7 @@ import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
-import uk.ac.susx.mlcl.byblo.Byblo;
+import uk.ac.susx.mlcl.byblo.Main;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.io.Lexer;
 import static org.junit.Assert.*;
@@ -77,7 +77,7 @@ public class ThreadedApssTaskTest {
             "--measure", "Jaccard",};
 
         enableExistTrapping();
-        Byblo.main(args);
+        Main.main(args);
         disableExitTrapping();
 
 

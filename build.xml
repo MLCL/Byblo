@@ -59,7 +59,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <!-- Misc properties -->
     <property name="source.encoding" value="UTF-8"/>
     <property name="javac.compilerargs" value="-Xlint:all"/>
-    <property name="main.class" value="uk.ac.susx.mlcl.byblo.Byblo"/>
+    <property name="main.class" value="uk.ac.susx.mlcl.byblo.Main"/>
 
 
     <!-- 

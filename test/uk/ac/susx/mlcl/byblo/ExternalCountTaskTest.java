@@ -87,7 +87,7 @@ public class ExternalCountTaskTest {
         };
 
         enableExistTrapping();
-        Byblo.main(args);
+        Main.main(args);
         disableExitTrapping();
 
         assertTrue("Output files not created: " + outE, outE.exists());

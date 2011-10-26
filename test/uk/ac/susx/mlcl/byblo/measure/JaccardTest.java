@@ -32,7 +32,7 @@ package uk.ac.susx.mlcl.byblo.measure;
 
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import com.google.common.io.Files;
-import uk.ac.susx.mlcl.byblo.Byblo;
+import uk.ac.susx.mlcl.byblo.Main;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Set;
@@ -58,7 +58,7 @@ public class JaccardTest {
         output.delete();
 
         enableExistTrapping();
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "Jaccard",
@@ -91,7 +91,7 @@ public class JaccardTest {
         };
 
         enableExistTrapping();
-        Byblo.main(args);
+        Main.main(args);
         disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
@@ -244,7 +244,7 @@ public class JaccardTest {
         output2.delete();
 
         enableExistTrapping();
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "Jaccard",
@@ -253,7 +253,7 @@ public class JaccardTest {
                     "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output1.toString()
                 });
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "Jaccard",
@@ -281,7 +281,7 @@ public class JaccardTest {
 
 
         enableExistTrapping();
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "JaccardMi",
@@ -290,7 +290,7 @@ public class JaccardTest {
                     "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output1.toString()
                 });
-        Byblo.main(new String[]{
+        Main.main(new String[]{
                     "allpairs",
                     "--charset", "UTF-8",
                     "--measure", "JaccardMi",

@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
-import uk.ac.susx.mlcl.lib.io.TempFileFactoryConverter;
+import uk.ac.susx.mlcl.lib.tasks.TempFileFactoryConverter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects.ToStringHelper;
@@ -38,7 +38,7 @@ import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
-import uk.ac.susx.mlcl.lib.tasks.AbstractParallelTask;
+import uk.ac.susx.mlcl.lib.tasks.AbstractParallelCommandTask;
 import uk.ac.susx.mlcl.lib.tasks.Task;
 import java.io.File;
 import java.io.IOException;
@@ -57,7 +57,7 @@ import org.apache.commons.logging.LogFactory;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Sort a file.")
-public class ExternalSortTask extends AbstractParallelTask {
+public class ExternalSortTask extends AbstractParallelCommandTask {
 
     private static final Log LOG = LogFactory.getLog(ExternalSortTask.class);
     private static final int DEFAULT_MAX_CHUNK_SIZE = ChunkTask.DEFAULT_MAX_CHUNK_SIZE;

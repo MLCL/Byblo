@@ -30,15 +30,43 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
+import com.beust.jcommander.IParameterValidator;
+import com.beust.jcommander.ParameterException;
+import java.io.File;
+import java.io.IOException;
+
 /**
- *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * 
+ * @author hamish
  */
-public interface Task extends Runnable {
+public class OutputFileValidator implements IParameterValidator {
 
-    Throwable getException();
+    public OutputFileValidator() {
+    }
 
-    boolean isExceptionThrown();
-
-    void throwException() throws Exception;
+    @Override
+    public void validate(String name, String value) throws ParameterException {
+        File file;
+        try {
+            file = new File(value).getCanonicalFile();
+        } catch (IOException ex) {
+            throw new ParameterException(ex);
+        }
+        if (file.exists()) {
+            if (file.isDirectory()) {
+                throw new ParameterException("Output file \"" + value + "\" exists but is a directory.");
+            }
+            if (!file.isFile()) {
+                throw new ParameterException("Output file \"" + value + "\" exists but is not an ordinary file.");
+            }
+            if (!file.canWrite()) {
+                throw new ParameterException("Output file \"" + value + "\" is not writeable.");
+            }
+        } else {
+            if (file.getParentFile() == null || !file.getParentFile().canWrite()) {
+                throw new ParameterException("Output file \"" + value + "\" does not exist and the parent directory is not writable.");
+            }
+        }
+    }
+    
 }

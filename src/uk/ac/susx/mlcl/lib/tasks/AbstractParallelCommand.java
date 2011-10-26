@@ -28,44 +28,55 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.lib.io;
+package uk.ac.susx.mlcl.lib.tasks;
 
-import com.beust.jcommander.IStringConverter;
-import com.beust.jcommander.ParameterException;
-import com.beust.jcommander.converters.FileConverter;
-import java.io.File;
+import com.beust.jcommander.Parameter;
+import com.google.common.base.Objects;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * An IStringConverter implementation for extending JCommander. Take a string 
- * path and produces a TempFileFactory object for the production of temprory
- * files.
- * 
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
+ *
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class TempFileFactoryConverter implements IStringConverter<TempFileFactory> {
+public abstract class AbstractParallelCommand extends AbstractCommand {
 
     private static final Log LOG = LogFactory.getLog(
-            TempFileFactoryConverter.class);
+            AbstractParallelCommand.class);
 
-    private final FileConverter inner = new FileConverter();
+    protected static final int DEFAULT_NUM_THREADS =
+            Runtime.getRuntime().availableProcessors();
+
+    @Parameter(names = {"-t", "--threads"},
+               description = "Number of threads to use for parallel processing.")
+    private int nThreads = DEFAULT_NUM_THREADS;
+
+    public AbstractParallelCommand() {
+    }
+
+    public void setNumThreads(int nThreads) {
+        if (nThreads < 1) {
+            throw new IllegalArgumentException("nThreads < 1");
+        }
+
+        if (LOG.isWarnEnabled() && nThreads > Runtime.getRuntime().
+                availableProcessors()) {
+            LOG.warn("nThreads (" + nThreads + ") > availableProcessors (" + Runtime.
+                    getRuntime().
+                    availableProcessors() + ")");
+        }
+        if (nThreads != this.nThreads) {
+            this.nThreads = nThreads;
+        }
+    }
+
+    public final int getNumThreads() {
+        return nThreads;
+    }
 
     @Override
-    public TempFileFactory convert(String value) {
-        File tmpDir = inner.convert(value);
-        if (!tmpDir.exists()) {
-            if (LOG.isDebugEnabled())
-                LOG.debug(
-                        "Attempting to create temporary directory: \"" + tmpDir + "\"");
-            if (!tmpDir.mkdirs()) {
-                throw new ParameterException(
-                        "Unable create temporary directory \"" + tmpDir + "\"");
-            }
-        } else if (!tmpDir.isDirectory()) {
-            throw new ParameterException("The given temporary directory \""
-                    + tmpDir + "\" already exists but it is not a directory.");
-        }
-        return new TempFileFactory(tmpDir);
+    protected Objects.ToStringHelper toStringHelper() {
+        return super.toStringHelper().
+                add("threads", getNumThreads());
     }
 }

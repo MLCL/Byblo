@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
-import uk.ac.susx.mlcl.lib.io.TempFileFactoryConverter;
+import uk.ac.susx.mlcl.lib.tasks.TempFileFactoryConverter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
@@ -39,7 +39,7 @@ import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
-import uk.ac.susx.mlcl.lib.tasks.AbstractParallelTask;
+import uk.ac.susx.mlcl.lib.tasks.AbstractParallelCommandTask;
 import uk.ac.susx.mlcl.lib.tasks.Task;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -54,6 +54,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
+import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
 
 /**
  *
@@ -61,7 +63,7 @@ import org.apache.commons.logging.LogFactory;
  */
 @Parameters(
 commandDescription = "Freqency count a structured input instance file.")
-public class ExternalCountTask extends AbstractParallelTask {
+public class ExternalCountTask extends AbstractParallelCommandTask {
 
     private static final Log LOG = LogFactory.getLog(ExternalCountTask.class);
 
@@ -73,28 +75,31 @@ public class ExternalCountTask extends AbstractParallelTask {
 
     @Parameter(names = {"-i", "--input"},
                required = true,
-               description = "Input instances file")
+               description = "Input instances file", 
+               validateWith=InputFileValidator.class)
     private File inputFile;
 
     @Parameter(names = {"-oef", "--output-entry-features"},
                required = true,
-               description = "Output entry-feature frequencies file")
+               description = "Output entry-feature frequencies file",
+               validateWith=OutputFileValidator.class)
     private File entryFeaturesFile = null;
 
     @Parameter(names = {"-oe", "--output-entries"},
                required = true,
-               description = "Output entry frequencies file")
+               description = "Output entry frequencies file",
+               validateWith=OutputFileValidator.class)
     private File entriesFile = null;
 
     @Parameter(names = {"-of", "--output-features"},
                required = true,
-               description = "Output feature frequencies file")
+               description = "Output feature frequencies file",
+               validateWith=OutputFileValidator.class)
     private File featuresFile = null;
 
     @Parameter(names = {"-T", "--temporary-directory"},
-               description = "Directory used for holding temporary files.",
-               converter = TempFileFactoryConverter.class)
-    private FileFactory tempFileFactory = new TempFileFactory();
+               description = "Directory used for holding temporary files.")
+    private TempFileFactory tempFileFactory = new TempFileFactory();
 
     @Parameter(names = {"-c", "--charset"},
                description = "Character encoding to use for reading and writing files.")
