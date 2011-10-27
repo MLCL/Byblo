@@ -173,7 +173,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 <filename name="**/doc-files/**"/>
             </fileset>
         </copy>
-        
+    
     </target>
     
     <!-- 
@@ -182,19 +182,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     ==========================
     -->
 
-    <target name="src-jar" depends="init"  >    
-        <jar jarfile="${dist.dir}/${ant.project.name}-src.jar" 
-            basedir="${src.dir}" >     
-            <manifest>
-                <attribute name="Built-By" value="${user.name}"/>
-                <attribute name="Implementation-Vendor" value="University of Sussex"/>
-                <attribute name="Implementation-Title" value="Byblo"/>
-                <attribute name="Implementation-Version" value="unknown"/>
-            </manifest>
-        </jar>
-    </target>
-    
-    <target name="dist" depends="jar, src-jar, javadoc" description="Generate the binary distribution" >    
+    <target name="dist" depends="jar" description="Generate the binary distribution" >    
 
         <copy todir="${dist.dir}" file="LICENCE" />
         <copy todir="${dist.dir}" file="README.md" />
@@ -213,11 +201,24 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </copy>
 
 
-        <zip zipfile="${dist.dir}/${ant.project.name}-api.zip" 
-            basedir="${javadoc.dir}" />
-
     </target>
 
+    <target name="release" depends="dist, javadoc" description="Create all releasable files including API docus and src bundle." >
+        
+        <jar jarfile="${dist.dir}/${ant.project.name}-src.jar" 
+            basedir="${src.dir}" >     
+            <manifest>
+                <attribute name="Built-By" value="${user.name}"/>
+                <attribute name="Implementation-Vendor" value="University of Sussex"/>
+                <attribute name="Implementation-Title" value="Byblo"/>
+                <attribute name="Implementation-Version" value="unknown"/>
+            </manifest>
+        </jar>
+            
+        <zip zipfile="${dist.dir}/${ant.project.name}-api.zip" 
+            basedir="${javadoc.dir}" />
+    
+    </target>
     
     <!-- 
         ============
@@ -290,7 +291,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     
     </target>
   
-    <target name="all" depends="test, dist" 
+    <target name="all" depends="test, release" 
         description="Build, test, and produce the distribution for the whole project."/>
       
 </project>
