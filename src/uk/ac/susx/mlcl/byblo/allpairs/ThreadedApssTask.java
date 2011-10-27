@@ -148,11 +148,12 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 j++;
 
 
-                double complete = !chunkerA.hasNext() && !chunkerB.hasNext() ? 1
+                double complete = (!chunkerA.hasNext() && !chunkerB.hasNext()) ? 1
                         : nChunks == 0 ? 0
                         : (double) (i * nChunks + j) / (double) (nChunks * nChunks);
                 if (LOG.isInfoEnabled()) {
-                    LOG.info("Creating APSS task on chunk " + i + ":" + j + " (" + (complete == 0 ? "estimating " : complete * 100) + "% complete)");
+                    LOG.info("Creating APSS task on chunk " + i + ":" + j 
+                            + " (" + (complete == 0 ? "estimating " : complete * 100) + "% complete)");
                     if (LOG.isDebugEnabled()) {
                         LOG.debug(MiscUtil.memoryInfoString());
                     }
@@ -167,7 +168,6 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 task.setProcessRecord(getProcessRecord());
                 task.setSink(getSink());
                 task.setStats(getStats());
-
                 queueTask(task);
 
                 // retrieve the results
@@ -179,6 +179,7 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
                     }
                 }
             }
+            
             nChunks = j + 1;
             chunkerB.position(restartPos);
         }

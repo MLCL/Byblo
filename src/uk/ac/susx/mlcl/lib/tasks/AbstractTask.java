@@ -110,8 +110,8 @@ public abstract class AbstractTask implements Task {
     }
 
     protected final void catchException(Exception throwable) {
-        if (LOG.isDebugEnabled())
-            LOG.debug("Exception caught and queued.", throwable);
+        if (LOG.isWarnEnabled())
+            LOG.warn("Exception caught and queued.", throwable);
         if (exceptions == null)
             exceptions = new ArrayDeque<Exception>();
         exceptions.offer(throwable);

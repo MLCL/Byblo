@@ -44,10 +44,12 @@ import java.util.List;
 public class Chunk<T> extends AbstractList<T>
         implements SeekableSource<T, Integer>, Cloneable {
 
+    private final String name;
     private final List<T> items;
     private Integer nextIndex;
 
-    public Chunk(List<T> items) {
+    public Chunk(String name, List<T> items) {
+        this.name = name;
         this.items = items;
         nextIndex = 0;
     }
@@ -58,9 +60,16 @@ public class Chunk<T> extends AbstractList<T>
      * @param other Chunk to clone (using a shallow copy).
      */
     protected Chunk(Chunk<T> other) {
+        this.name = other.name;
         this.items = other.items;
         nextIndex = other.nextIndex;
     }
+
+    public String getName() {
+        return name;
+    }
+    
+    
 
     @Override
     public Iterator<T> iterator() {
@@ -108,8 +117,6 @@ public class Chunk<T> extends AbstractList<T>
     }
 
     protected Objects.ToStringHelper toStringHelper() {
-        return Objects.toStringHelper(this).
-                add("size", items.size()).
-                add("nextIndex", nextIndex);
+        return Objects.toStringHelper(this).addValue(name);
     }
 }

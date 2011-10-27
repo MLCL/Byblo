@@ -43,6 +43,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 
@@ -54,6 +56,7 @@ import uk.ac.susx.mlcl.lib.io.IOUtil;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class InvertedApssTask<S> extends NaiveApssTask<S> {
+    private static final Log LOG = LogFactory.getLog(InvertedApssTask.class);
 
     private Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> index;
 
@@ -72,6 +75,10 @@ public class InvertedApssTask<S> extends NaiveApssTask<S> {
     @Override
     protected void runTask()
             throws IOException {
+
+        
+        LOG.info("Running inverted all-pairs on " + getSourceA() + " and " + getSourceB());
+        
         final S startB = getSourceB().position();
         List<Weighted<TokenPair>> pairs = new ArrayList<Weighted<TokenPair>>();
 
@@ -102,6 +109,9 @@ public class InvertedApssTask<S> extends NaiveApssTask<S> {
                 ((Flushable) getSink()).flush();
         }
         getSourceB().position(startB);
+
+        LOG.info("Completed inverted all-pairs on " + getSourceA() + " and " + getSourceB());
+    
     }
 
     protected Set<Indexed<SparseDoubleVector>> findCandidates(

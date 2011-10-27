@@ -555,9 +555,9 @@ public class Lexer implements RandomAccess {
 
         @Override
         public String toString() {
-            return Objects.toStringHelper(this).add("channelOffset",
-                                                    channelOffset).add(
-                    "bufferOffset", bufferOffset).toString();
+            return Objects.toStringHelper(this).
+                    addValue(channelOffset).
+                    addValue(bufferOffset).toString();
         }
 
         @Override

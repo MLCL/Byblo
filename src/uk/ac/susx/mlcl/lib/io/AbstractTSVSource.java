@@ -126,13 +126,13 @@ public abstract class AbstractTSVSource<T>
     protected void parseRecordDelimiter() throws CharacterCodingException, IOException {
         do {
             parseDelimiter(RECORD_DELIM);
-        } while (hasNext() && isRecordDelimiterNext());
+        } while (isRecordDelimiterNext() && hasNext());
     }
 
     protected void parseValueDelimiter() throws CharacterCodingException, IOException {
         do {
             parseDelimiter(VALUE_DELIM);
-        } while (hasNext() && isValueDelimiterNext());
+        } while (isValueDelimiterNext() && hasNext());
     }
 
     protected String parseString() throws CharacterCodingException, IOException {

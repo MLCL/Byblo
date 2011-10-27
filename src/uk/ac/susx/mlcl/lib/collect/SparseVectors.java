@@ -77,7 +77,7 @@ public final class SparseVectors {
         Collections.sort(entries, new Comparator<Int2DoubleMap.Entry>() {
 
             @Override
-            public int compare(Entry t, Entry t1) {
+            public final int compare(final Entry t, final Entry t1) {
                 return t.getIntKey() - t1.getIntKey();
             }
         });

@@ -71,13 +71,15 @@ public class Chunker<T, P> implements SeekableSource<Chunk<T>, P>, Closeable {
 
     @Override
     public Chunk<T> read() throws IOException {
+        P start = inner.position();
         final List<T> items = new ArrayList<T>();
         int k = 0;
         while (k < maxChunkSize && inner.hasNext()) {
             items.add(inner.read());
             ++k;
         }
-        return new Chunk<T>(items);
+        P end = inner.position();
+        return new Chunk<T>("" + start + ":" + end, items);
     }
 
     @Override
