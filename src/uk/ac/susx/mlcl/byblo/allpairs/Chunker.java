@@ -38,6 +38,8 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
@@ -46,6 +48,7 @@ import java.util.List;
  */
 public class Chunker<T, P> implements SeekableSource<Chunk<T>, P>, Closeable {
 
+    private static final Log LOG = LogFactory.getLog(Chunker.class);
     private static final long DEFAULT_MAX_CHUNK_SIZE = 1000;
     private long maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
     private final SeekableSource<T, P> inner;

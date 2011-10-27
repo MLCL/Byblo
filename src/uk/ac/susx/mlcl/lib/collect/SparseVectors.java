@@ -31,7 +31,12 @@
 package uk.ac.susx.mlcl.lib.collect;
 
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
+import it.unimi.dsi.fastutil.ints.Int2DoubleMap.Entry;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * A collection of static utility functions to convert between sparse vectors
@@ -68,12 +73,24 @@ public final class SparseVectors {
             throw new IllegalArgumentException();
         }
 
-        SparseDoubleVector vec = new SparseDoubleVector(cardinality);
-        ObjectIterator<Int2DoubleMap.Entry> it = map.int2DoubleEntrySet().iterator();
-        while (it.hasNext()) {
-            Int2DoubleMap.Entry entry = it.next();
-            vec.set(entry.getIntKey(), entry.getDoubleValue());
+        List<Int2DoubleMap.Entry> entries = new ArrayList<Int2DoubleMap.Entry>(map.int2DoubleEntrySet());
+        Collections.sort(entries, new Comparator<Int2DoubleMap.Entry>() {
+
+            @Override
+            public int compare(Entry t, Entry t1) {
+                return t.getIntKey() - t1.getIntKey();
+            }
+        });
+
+        int[] keys = new int[entries.size()];
+        double[] values = new double[entries.size()];
+
+        for (int i = 0; i < entries.size(); i++) {
+            keys[i] = entries.get(i).getIntKey();
+            values[i] = entries.get(i).getDoubleValue();
         }
+
+        SparseDoubleVector vec = new SparseDoubleVector(keys, values, cardinality, keys.length);
         vec.compact();
         return vec;
     }

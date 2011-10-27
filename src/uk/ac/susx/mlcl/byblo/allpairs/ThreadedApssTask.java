@@ -115,10 +115,16 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
     @Override
     protected void runTask() throws Exception {
 
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Initialising chunker A.");
+        }
         Chunker<Indexed<SparseDoubleVector>, S> chunkerA =
                 new Chunker<Indexed<SparseDoubleVector>, S>(
                 getSourceA(), maxChunkSize);
 
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Initialising chunker B.");
+        }
         Chunker<Indexed<SparseDoubleVector>, S> chunkerB =
                 new Chunker<Indexed<SparseDoubleVector>, S>(
                 getSourceB(), maxChunkSize);
@@ -126,12 +132,18 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
         int nChunks = 0;
         int i = 0;
         while (chunkerA.hasNext()) {
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Reading chunk A" + i);
+            }
             Chunk<Indexed<SparseDoubleVector>> chunkA = chunkerA.read();
             i++;
 
             int j = 0;
             S restartPos = chunkerB.position();
             while (chunkerB.hasNext()) {
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("Reading chunk B" + j);
+                }
                 Chunk<Indexed<SparseDoubleVector>> chunkB = chunkerB.read();
                 j++;
 
