@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo;
 
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
 import java.io.IOException;
 import java.util.ResourceBundle;
 import java.io.File;
@@ -101,7 +102,7 @@ public class CopyTaskTest {
         out.delete();
     }
 
-    @Test(timeout=1000)
+    @Test(timeout=1000, expected=ParameterException.class)
     public void testCLI() throws IOException {
         System.out.println("Testing command line usage.");
         File x = new File("x"), y = new File("y");
