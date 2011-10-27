@@ -83,7 +83,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
     /**
      * Number of records to read or write between progress updates.
      */
-    private static final int PROGRESS_INTERVAL = 1000000;
+    private static final int PROGRESS_INTERVAL = 10000000;
     public static final String FILTERED_STRING = "___FILTERED___";
     /*
      * === INPUT FILES ===
