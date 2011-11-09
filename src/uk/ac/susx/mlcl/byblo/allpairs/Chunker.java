@@ -36,6 +36,7 @@ import uk.ac.susx.mlcl.lib.io.Seekable;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import java.io.Closeable;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.logging.Log;
@@ -49,9 +50,13 @@ import org.apache.commons.logging.LogFactory;
 public class Chunker<T, P> implements SeekableSource<Chunk<T>, P>, Closeable {
 
     private static final Log LOG = LogFactory.getLog(Chunker.class);
+
     private static final long DEFAULT_MAX_CHUNK_SIZE = 1000;
+
     private long maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
+
     private final SeekableSource<T, P> inner;
+
     private final boolean seekable;
 
     public Chunker(SeekableSource<T, P> inner, long maxChunkSize) {
@@ -79,7 +84,9 @@ public class Chunker<T, P> implements SeekableSource<Chunk<T>, P>, Closeable {
             ++k;
         }
         P end = inner.position();
-        return new Chunk<T>("" + start + ":" + end, items);
+        return new Chunk<T>(
+                MessageFormat.format("{0} to {1}", new Object[]{start, end}),
+                items);
     }
 
     @Override

@@ -42,6 +42,7 @@ import java.util.NoSuchElementException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import java.util.RandomAccess;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -229,8 +230,8 @@ public class Lexer implements RandomAccess {
     }
 
     public Lexer(File file, Charset charset) throws FileNotFoundException, NullPointerException, IOException {
-        this(new CharFileChannel( new FileInputStream(file).getChannel(),
-                IOUtil.DEFAULT_CHARSET));
+        this(new CharFileChannel(new FileInputStream(file).getChannel(),
+                                 IOUtil.DEFAULT_CHARSET));
     }
 
     public void setDelimiterMatcher(CharMatcher delimiterMatcher) {
@@ -555,9 +556,9 @@ public class Lexer implements RandomAccess {
 
         @Override
         public String toString() {
-            return Objects.toStringHelper(this).
-                    addValue(channelOffset).
-                    addValue(bufferOffset).toString();
+            return MessageFormat.format(
+                    "{0,number,integer}/{1,number,integer}",
+                    new Object[]{channelOffset, bufferOffset});
         }
 
         @Override

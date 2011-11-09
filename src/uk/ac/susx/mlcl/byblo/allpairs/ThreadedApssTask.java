@@ -39,6 +39,7 @@ import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.tasks.Task;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
@@ -57,19 +58,27 @@ import uk.ac.susx.mlcl.byblo.io.Weighted;
  * implementation. This is achieved by breaking the work down into chunks that
  * are run concurrently.
  *
+ * @param <S> Type of "tell" object used to seek into the data source.
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class ThreadedApssTask<S> extends NaiveApssTask<S> {
 
     private static final Log LOG = LogFactory.getLog(ThreadedApssTask.class);
+
     private Class<? extends NaiveApssTask> innerAlgorithm = InvertedApssTask.class;
+
     private static final int DEFAULT_NUM_THREADS =
             Runtime.getRuntime().availableProcessors() + 1;
+
     private int nThreads = DEFAULT_NUM_THREADS;
+
     private ExecutorService executor = null;
+
     private Queue<Future<? extends Task>> futureQueue =
             new ArrayDeque<Future<? extends Task>>();
+
     private int maxChunkSize = 500;
+
     private Semaphore throttle;
 
     public ThreadedApssTask(
@@ -98,7 +107,7 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
         return innerAlgorithm;
     }
 
-    public void setInnerAlgorithm(Class<? extends NaiveApssTask> innerAlgorithm) {
+    public void setInnerAlgorithm(Class<? extends NaiveApssTask<? extends S>> innerAlgorithm) {
         this.innerAlgorithm = innerAlgorithm;
     }
 
@@ -137,6 +146,7 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
             }
             Chunk<Indexed<SparseDoubleVector>> chunkA = chunkerA.read();
             i++;
+            chunkA.setName(Integer.toString(i));
 
             int j = 0;
             S restartPos = chunkerB.position();
@@ -146,14 +156,15 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 }
                 Chunk<Indexed<SparseDoubleVector>> chunkB = chunkerB.read();
                 j++;
-
+                chunkB.setName(Integer.toString(j));
 
                 double complete = (!chunkerA.hasNext() && !chunkerB.hasNext()) ? 1
                         : nChunks == 0 ? 0
                         : (double) (i * nChunks + j) / (double) (nChunks * nChunks);
                 if (LOG.isInfoEnabled()) {
-                    LOG.info("Creating APSS task on chunk " + i + ":" + j 
-                            + " (" + (complete == 0 ? "estimating " : complete * 100) + "% complete)");
+                    LOG.info(MessageFormat.format(
+                            "Creating APSS task on chunks {0,number} and {1,number} ({2,number,percent} complete)",
+                            new Object[]{i, j, complete}));
                     if (LOG.isDebugEnabled()) {
                         LOG.debug(MiscUtil.memoryInfoString());
                     }
@@ -179,7 +190,7 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
                     }
                 }
             }
-            
+
             nChunks = j + 1;
             chunkerB.position(restartPos);
         }

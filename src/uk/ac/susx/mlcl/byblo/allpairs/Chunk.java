@@ -44,7 +44,7 @@ import java.util.List;
 public class Chunk<T> extends AbstractList<T>
         implements SeekableSource<T, Integer>, Cloneable {
 
-    private final String name;
+    private String name;
     private final List<T> items;
     private Integer nextIndex;
 
@@ -65,6 +65,11 @@ public class Chunk<T> extends AbstractList<T>
         nextIndex = other.nextIndex;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    
     public String getName() {
         return name;
     }
