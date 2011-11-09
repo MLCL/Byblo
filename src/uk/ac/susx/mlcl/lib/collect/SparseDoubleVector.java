@@ -36,6 +36,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import java.util.Arrays;
+import uk.ac.susx.mlcl.lib.Arrays2;
 
 /**
  * Store a sparse vector of double precision values as an ordered array non-zero
@@ -69,10 +70,7 @@ public final class SparseDoubleVector
             throw new IllegalArgumentException("value.length != keys.length");
 
         this.values = values;
-        sum = 0;
-        for (int i = 0; i < size; i++) {
-            sum += values[i];
-        }
+        this.sum = Arrays2.sum(values, 0, size);
     }
 
     public SparseDoubleVector(final SparseDoubleVector other) {
@@ -205,277 +203,9 @@ public final class SparseDoubleVector
     public final SparseDoubleVector slice(final int fromIndex) {
         return slice(fromIndex, cardinality);
     }
-//
-//
-//    public final  TIntDoubleIterator entryIterator() {
-//        return new TIntDoubleEntryIterator(this, Direction.FORWARDS);
-//    }
-//
-//    public final TIntDoubleIterator entryIterator(final Direction dir) {
-//        return new TIntDoubleEntryIterator(this, dir);
-//    }
-//
-//    private static class TIntDoubleEntryIterator implements TIntDoubleIterator {
-//
-//        private final SparseDoubleVector vector;
-//        private final Direction dir;
-//        private final int end;
-//        private int index;
-//
-//        public TIntDoubleEntryIterator(final SparseDoubleVector vector,
-//                final Direction dir) {
-//            this.vector = vector;
-//            this.dir = dir;
-//            if (dir == Direction.FORWARDS) {
-//                index = -1;
-//                end = vector.size - 1;
-//            } else if (dir == Direction.BACKWARDS) {
-//                index = vector.size;
-//                end = 0;
-//            } else {
-//                throw new IllegalArgumentException();
-//            }
-//        }
-//
-//        @Override
-//        public final int key() {
-//            return vector.keys[index];
-//        }
-//
-//        @Override
-//        public final double value() {
-//            return vector.values[index];
-//        }
-//
-//        @Override
-//        public final double setValue(double val) {
-//            final double prev = vector.values[index];
-//            if (val == 0)
-//                remove();
-//            else
-//                vector.values[index] = val;
-//            return prev;
-//        }
-//
-//        @Override
-//        public final void advance() {
-////            if (!hasNext())
-////                throw new NoSuchElementException();
-//            index += dir.step();
-//        }
-//
-//        @Override
-//        public final boolean hasNext() {
-//            return index != end;
-//        }
-//
-//        @Override
-//        public final void remove() {
-//            vector.remove(index);
-//            index -= dir.step();
-//        }
-//    }
-//
-//    public final double dot(final SparseDoubleVector that) {
-//        checkNotNull(that);
-////        checkArgument(this.cardinality == that.cardinality, "Vectors must be the same size.");
-//
-//        if (this.size == 0 || that.size == 0) {
-//            return 0;
-//        }
-//
-//        double prod = 0;
-//        int i = 0;
-//        int j = 0;
-//        while (i < this.size && j < that.size) {
-//            if (this.keys[i] == that.keys[j]) {
-//                prod += this.values[i] * that.values[j];
-//                i++;
-//                j++;
-//            } else if (this.keys[i] < that.keys[j]) {
-//                i++;
-//            } else {
-//                j++;
-//            }
-//        }
-//        return prod;
-//    }
-//
-//    public final double distance(final SparseDoubleVector that, double p) {
-//        checkNotNull(that);
-//
-//        if (this.size == 0 || that.size == 0) {
-//            return 0;
-//        }
-//
-//        double distance = 0;
-//        int i = 0;
-//        int j = 0;
-//        while (i < this.size && j < that.size) {
-//            if (this.keys[i] == that.keys[j]) {
-//                distance += Math.pow(Math.abs(this.values[i] - that.values[j]),
-//                        p);
-//                i++;
-//                j++;
-//            } else if (this.keys[i] < that.keys[j]) {
-//                distance += Math.pow(this.values[i], p);
-//                i++;
-//            } else {
-//                distance += Math.pow(that.values[i], p);
-//                j++;
-//            }
-//        }
-//        return Math.pow(distance, 1d / p);
-//    }
-//
-//    public final SparseDoubleVector intersection(SparseDoubleVector that) {
-//        checkNotNull(that);
-//
-//        if (this.size == 0 || that.size == 0) {
-//            return new SparseDoubleVector(0);
-//        }
-//        final SparseDoubleVector min = new SparseDoubleVector(
-//                Math.min(this.size, that.size));
-//
-//        int i = 0;
-//        int j = 0;
-//        while (i < this.size && j < that.size) {
-//            if (this.keys[i] == that.keys[j]) {
-//                min.set(this.keys[i], Math.min(this.values[i], that.values[j]));
-//                i++;
-//                j++;
-//            } else if (this.keys[i] < that.keys[j]) {
-//                i++;
-//            } else {
-//                j++;
-//            }
-//        }
-//        min.compact();
-//        return min;
-//    }
-//
-//    public final double intersectionSum(SparseDoubleVector that) {
-//        checkNotNull(that);
-//
-//        if (this.size == 0 || that.size == 0) {
-//            return 0;
-//        }
-//        double intSize = 0;
-//        int i = 0;
-//        int j = 0;
-//        while (i < this.size && j < that.size) {
-//            if (this.keys[i] == that.keys[j])
-//                intSize += Math.min(this.values[i++], that.values[j++]);
-//            else if (this.keys[i] < that.keys[j])
-//                i++;
-//            else
-//                j++;
-//
-//        }
-//        return intSize;
-//    }
-//
-//    public final SparseDoubleVector union(SparseDoubleVector that) {
-//        checkNotNull(that);
-//
-//        if (this.size == 0 && that.size == 0) {
-//            return new SparseDoubleVector(0);
-//        }
-//        final SparseDoubleVector max = new SparseDoubleVector(
-//                this.size + that.size);
-//
-//        int i = 0;
-//        int j = 0;
-//        while (i < this.size && j < that.size) {
-//            if (this.keys[i] == that.keys[j]) {
-//                max.set(this.keys[i], Math.max(this.values[i], that.values[j]));
-//                i++;
-//                j++;
-//            } else if (this.keys[i] < that.keys[j]) {
-//                max.set(this.keys[i], this.values[i]);
-//                i++;
-//            } else {
-//                max.set(this.keys[i], that.values[j]);
-//                j++;
-//            }
-//        }
-//        max.compact();
-//        return max;
-//    }
-//
-//    public final double unionSum(SparseDoubleVector that) {
-//        checkNotNull(that);
-//
-//        if (this.size == 0 && that.size == 0) {
-//            return 0;
-//        }
-//        double unionSize = 0;
-//
-//        int i = 0;
-//        int j = 0;
-//        while (i < this.size && j < that.size) {
-//            if (this.keys[i] == that.keys[j])
-//                unionSize += Math.max(this.values[i++], that.values[j++]);
-//            else if (this.keys[i] < that.keys[j])
-//                unionSize += this.values[i++];
-//            else
-//                unionSize += that.values[j++];
-//        }
-//        return unionSize;
-//    }
-//
-//    public final double dot(final double[] arr) {
-//        checkNotNull(arr);
-////        checkArgument(this.cardinality == arr.length,
-////                "Vectors must be the same size; expected" + cardinality + ", but found " + arr.length);
-//
-//        if (size == 0 || arr.length == 0) {
-//            return 0;
-//        }
-//
-//        double prod = 0;
-//        for (int i = 0; i < size; i++) {
-//            prod += values[i] * arr[keys[i]];
-//        }
-//        return prod;
-//    }
 
-//    public final double sum() {
-//        return sum;
-//        double sum = 0;
-//        for (int i = 0; i < size; i++) {
-//            sum += values[i];
-//        }
-//        return sum;
-//    }
-//
-//    public final double min() {
-//        double min = values[0];
-//        for (int j = 1; j < size; j++) {
-//            if (Double.isNaN(values[j])) {
-//                return Double.NaN;
-//            }
-//            if (values[j] < min) {
-//                min = values[j];
-//            }
-//        }
-//        return (size < cardinality) ? Math.min(min, 0) : min;
-//    }
-//
-//    public final double max() {
-//        // Finds and returns max
-//        double max = values[0];
-//        for (int j = 1; j < size; j++) {
-//            if (Double.isNaN(values[j])) {
-//                return Double.NaN;
-//            }
-//            if (values[j] > max) {
-//                max = values[j];
-//            }
-//        }
-//        return (size < cardinality) ? Math.max(max, 0) : max;
-//    }
     public final double magnitude() {
+        
         double sqr_sum = 0;
         for (int i = 0; i < size; i++) {
             sqr_sum += values[i] * values[i];
@@ -528,36 +258,7 @@ public final class SparseDoubleVector
     }
 
     public final boolean contains(final double entry) {
-        for (int i = 0; i < size; i++) {
-            if (values[i] == entry) {
-                return true;
-            }
-        }
-        return false;
+        return Arrays2.contains(values, entry, 0, size);
     }
-//
-//    @Override
-//    public String toString() {
-//        final StringBuilder buf = new StringBuilder();
-//        buf.append(super.toString());
-//
-//        final TIntDoubleIterator it = entryIterator();
-//        if (it.hasNext()) {
-//            it.advance();
-//            buf.append(it.key());
-//            buf.append(":");
-//            buf.append(it.value());
-//
-//        }
-//        while (it.hasNext()) {
-//            it.advance();
-//            buf.append(", ");
-//            buf.append(it.key());
-//            buf.append(":");
-//            buf.append(it.value());
-//        }
-//        buf.append("}");
-//
-//        return buf.toString();
-//    }
+
 }

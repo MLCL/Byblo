@@ -94,43 +94,7 @@ public final class SparseVectors {
         vec.compact();
         return vec;
     }
-//
 
-//    public static SparseDoubleVector toDoubleVector(TIntDoubleMap map, int cardinality) {
-//        if (map == null) {
-//            throw new NullPointerException();
-//        }
-//        if (cardinality < 0) {
-//            throw new IllegalArgumentException();
-//        }
-//
-//        SparseDoubleVector vec = new SparseDoubleVector(cardinality);
-//        TIntDoubleIterator it = map.iterator();
-//        while (it.hasNext()) {
-//            it.advance();
-//            vec.set(it.key(), it.value());
-//        }
-//        vec.compact();
-//        return vec;
-//    }
-//
-//    public static SparseDoubleVector toDoubleVector(TIntIntMap map, int size) {
-//        if (map == null) {
-//            throw new NullPointerException();
-//        }
-//        if (size < 0) {
-//            throw new IllegalArgumentException();
-//        }
-//
-//        SparseDoubleVector vec = new SparseDoubleVector(size);
-//        TIntIntIterator it = map.iterator();
-//        while (it.hasNext()) {
-//            it.advance();
-//            vec.set(it.key(), it.value());
-//        }
-//        vec.compact();
-//        return vec;
-//    }
     public static SparseDoubleVector toDoubleVector(String chars, int offset,
             int length, int vecsize) {
         SparseDoubleVector vec = new SparseDoubleVector(vecsize);
