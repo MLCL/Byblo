@@ -69,7 +69,7 @@
 #$ -w e
 
 # Merge stdout and stderr streams: yes/no
-# -j no
+#$ -j yes
 
 
 # ====================================
