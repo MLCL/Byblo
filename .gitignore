@@ -1,0 +1,59 @@
+# Eclipse
+.settings
+.metadata
+Servers
+bin
+target
+
+
+# SpringSource Tool Suite
+.springBeans
+
+
+# Netbeans
+/build/
+/dist/
+/nbproject/
+/nbproject/*
+nbbuild.xml
+manifest.mf
+/libs/*.jar
+
+
+# Emacs
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+.elc
+auto-save-list
+tramp
+
+
+# Vim
+*.swp
+*.swo
+
+
+# Textmate
+*.tmproj
+tmtags
+
+
+# OS generated files
+.DS_Store
+ehthumbs.db
+Icon?
+Thumbs.db
+._*
+.Spotlight-V100
+.Trashes
+Desktop.ini
+.*
+!.gitignore
+*~
+*.sw[a-p]
+# KDE
+.directory
+
+
+
