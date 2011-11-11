@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, University of Sussex
+ * Copyright (c) 2010-2011, MLCL, University of Sussex
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -28,13 +28,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.lib;
+package uk.ac.susx.mlcl.lib.collect;
 
 import java.util.Comparator;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.HashMap;
 import java.util.Map;
+import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Checks;
 
 /**

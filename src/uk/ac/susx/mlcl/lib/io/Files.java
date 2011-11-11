@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2011, Sussex University.
+ * Copyright (c) 2011, MLCL, Sussex University.
  * All rights reserverd.
  */
-package uk.ac.susx.mlcl.lib;
+package uk.ac.susx.mlcl.lib.io;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -37,56 +37,12 @@ import java.util.zip.GZIPOutputStream;
 /**
  * Static utility class for file manipulation.
  * 
- * @author Simon Wibberley
+ * @author Simon Wibberley &lt;simon.wibberley@sussex.ac.uk&gt;
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class Files {
 
     private Files() {
-    }
-
-    @Deprecated
-    public static void catFiles(String inputDir, String suffix, String outputDir,
-                                String name) throws IOException, InterruptedException {
-        catFiles(inputDir, suffix, outputDir, name, true);
-    }
-
-    @Deprecated
-    public static void catFiles(String inputDir, String suffix, String outputDir,
-                                String name, boolean rm)
-            throws IOException, InterruptedException {
-
-        String input = String.format("%s/*%s", inputDir, suffix);
-        String output = String.format("%s/%s", outputDir, name);
-        String cmdStr = String.format("/bin/cat %s > %s", input, output);
-        Files.exec(cmdStr);
-        if (rm) {
-            Files.exec(String.format("rm %s/*%s", inputDir, suffix));
-        }
-    }
-
-    public static void exec(String command) throws IOException, InterruptedException {
-        System.err.println(command);
-        Process child = Runtime.getRuntime().exec(
-                new String[]{"/bin/bash", "-c", command});
-
-        child.waitFor();
-
-        BufferedReader input = new BufferedReader(new InputStreamReader(child.getInputStream()));
-        String line;
-
-        while ((line = input.readLine()) != null) {
-            System.err.println(line);
-        }
-
-        int exitVal = child.waitFor();
-        if (exitVal > 0) {
-            System.err.println("Exited with error code " + exitVal);
-            input = new BufferedReader(new InputStreamReader(child.getErrorStream()));
-
-            while ((line = input.readLine()) != null) {
-                System.err.println(line);
-            }
-        }
     }
 
     public static List<String> getFileList(String path, final String suffix) {
