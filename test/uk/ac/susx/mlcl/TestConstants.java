@@ -30,21 +30,14 @@
  */
 package uk.ac.susx.mlcl;
 
-import uk.ac.susx.mlcl.lib.Files;
-import java.util.Collection;
-import java.util.ArrayList;
-import java.util.List;
+import uk.ac.susx.mlcl.lib.io.Files;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.Flushable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Random;
-import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.io.Source;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -114,6 +107,5 @@ public class TestConstants {
         out.close();
         return file;
     }
-
 
 }

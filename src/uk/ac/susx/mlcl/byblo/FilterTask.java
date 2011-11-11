@@ -64,7 +64,7 @@ import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
-import uk.ac.susx.mlcl.lib.Files;
+import uk.ac.susx.mlcl.lib.io.Files;
 
 /**
  *
@@ -352,13 +352,13 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
         while (entriesSource.hasNext()) {
             Weighted<Token> record = entriesSource.read();
 
-            if (record.get().id() == filteredEntry) {
-                filteredWeight += record.getWeight();
+            if (record.record().id() == filteredEntry) {
+                filteredWeight += record.weight();
             } else if (acceptEntry.apply(record)) {
                 entriesSink.write(record);
             } else {
-                rejected.add(record.get().id());
-                filteredWeight += record.getWeight();
+                rejected.add(record.record().id());
+                filteredWeight += record.weight();
             }
 
             if ((entriesSource.getCount() % PROGRESS_INTERVAL == 0 || !entriesSource.hasNext())
@@ -430,12 +430,12 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
         while (efSrc.hasNext()) {
             Weighted<TokenPair> record = efSrc.read();
 
-            if (record.get().id1() == filteredEntry) {
-                filteredEntryWeight += record.getWeight();
+            if (record.record().id1() == filteredEntry) {
+                filteredEntryWeight += record.weight();
                 continue;
             }
 
-            if (record.get().id1() != currentEntryId) {
+            if (record.record().id1() != currentEntryId) {
 
                 if (currentEntryId != -1 && currentEntryFilteredFeatureWeight != 0) {
                     if (currentEntryFeatureCount == 0) {
@@ -447,27 +447,27 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
                     }
                 }
 
-                currentEntryId = record.get().id1();
+                currentEntryId = record.record().id1();
                 currentEntryFilteredFeatureWeight = 0;
                 currentEntryFeatureCount = 0;
             }
 
-            if (record.get().id2() == filteredFeature) {
+            if (record.record().id2() == filteredFeature) {
 
-                currentEntryFilteredFeatureWeight += record.getWeight();
+                currentEntryFilteredFeatureWeight += record.weight();
 
             } else if (acceptEntryFeature.apply(record)) {
 
                 efSink.write(record);
-                acceptedEntries.add(record.get().id1());
-                acceptedFeatures.add(record.get().id2());
+                acceptedEntries.add(record.record().id1());
+                acceptedFeatures.add(record.record().id2());
                 ++currentEntryFeatureCount;
 
             } else {
-                rejectedEntries.add(record.get().id1());
-                rejectedFeatures.add(record.get().id2());
+                rejectedEntries.add(record.record().id1());
+                rejectedFeatures.add(record.record().id2());
 
-                currentEntryFilteredFeatureWeight += record.getWeight();
+                currentEntryFilteredFeatureWeight += record.weight();
             }
 
 
@@ -548,13 +548,13 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
         while (featureSource.hasNext()) {
             Weighted<Token> feature = featureSource.read();
 
-            if (feature.get().id() == filteredId) {
-                filteredWeight += feature.getWeight();
+            if (feature.record().id() == filteredId) {
+                filteredWeight += feature.weight();
             } else if (acceptFeature.apply(feature)) {
                 featureSink.write(feature);
             } else {
-                rejectedFeatures.add(feature.get().id());
-                filteredWeight += feature.getWeight();
+                rejectedFeatures.add(feature.record().id());
+                filteredWeight += feature.weight();
             }
 
             if ((featureSource.getCount() % PROGRESS_INTERVAL == 0
@@ -882,7 +882,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
 
             @Override
             public Double apply(Weighted<T> input) {
-                return input.getWeight();
+                return input.weight();
             }
 
             @Override
@@ -898,7 +898,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
 
             @Override
             public Integer apply(Weighted<Token> input) {
-                return input.get().id();
+                return input.record().id();
             }
 
             @Override
@@ -914,7 +914,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
 
             @Override
             public String apply(Weighted<Token> input) {
-                return entryIndex.get(input.get().id());
+                return entryIndex.get(input.record().id());
             }
 
             @Override
@@ -930,7 +930,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
 
             @Override
             public String apply(Weighted<Token> input) {
-                return featureIndex.get(input.get().id());
+                return featureIndex.get(input.record().id());
             }
 
             @Override
@@ -946,7 +946,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
 
             @Override
             public Integer apply(Weighted<TokenPair> input) {
-                return input.get().id1();
+                return input.record().id1();
             }
 
             @Override
@@ -962,7 +962,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
 
             @Override
             public Integer apply(Weighted<TokenPair> input) {
-                return input.get().id2();
+                return input.record().id2();
             }
 
             @Override
@@ -978,7 +978,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
 
             @Override
             public String apply(Weighted<TokenPair> input) {
-                return featureIndex.get(input.get().id2());
+                return featureIndex.get(input.record().id2());
             }
 
             @Override
@@ -994,7 +994,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
 
             @Override
             public String apply(Weighted<TokenPair> input) {
-                return entryIndex.get(input.get().id1());
+                return entryIndex.get(input.record().id1());
             }
 
             @Override

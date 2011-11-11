@@ -42,7 +42,7 @@ import java.util.Comparator;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.Files;
+import uk.ac.susx.mlcl.lib.io.Files;
 
 /**
  * Task that takes a single input file and sorts it according to some comparator,

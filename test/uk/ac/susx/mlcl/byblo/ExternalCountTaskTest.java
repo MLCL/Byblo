@@ -37,7 +37,7 @@ import org.junit.Test;
 import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import static uk.ac.susx.mlcl.ExitTrapper.*;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
  *

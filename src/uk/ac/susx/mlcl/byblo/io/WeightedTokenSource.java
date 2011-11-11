@@ -130,7 +130,7 @@ public class WeightedTokenSource extends AbstractTSVSource<Weighted<Token>> {
             entryId = stringIndex.get(parseString());
             parseValueDelimiter();
         } else {
-            entryId = previousRecord.get().id();
+            entryId = previousRecord.record().id();
         }
 
         if (!hasNext() || isDelimiterNext()) {
@@ -164,26 +164,26 @@ public class WeightedTokenSource extends AbstractTSVSource<Weighted<Token>> {
         Int2DoubleMap entityFrequenciesMap = new Int2DoubleOpenHashMap();
         while (this.hasNext()) {
             Weighted<Token> entry = this.read();
-            if (entityFrequenciesMap.containsKey(entry.get().id())) {
+            if (entityFrequenciesMap.containsKey(entry.record().id())) {
                 // If we encounter the same Token more than once, it means
                 // the perl has decided two strings are not-equal, which java
                 // thinks are equal ... so we need to merge the records:
 
                 // TODO: Not true any more.. remove this code?
 
-                final int id = entry.get().id();
+                final int id = entry.record().id();
                 final double oldFreq = entityFrequenciesMap.get(id);
-                final double newFreq = oldFreq + entry.getWeight();
+                final double newFreq = oldFreq + entry.weight();
 
                 if (LOG.isWarnEnabled())
-                    LOG.warn("Found duplicate Entry \"" + stringIndex.get(entry.get().
+                    LOG.warn("Found duplicate Entry \"" + stringIndex.get(entry.record().
                             id()) + "\" (id=" + id
                             + ") in entries file. Merging records. Old frequency = "
                             + oldFreq + ", new frequency = " + newFreq + ".");
 
                 entityFrequenciesMap.put(id, newFreq);
             } else {
-                entityFrequenciesMap.put(entry.get().id(), entry.getWeight());
+                entityFrequenciesMap.put(entry.record().id(), entry.weight());
             }
         }
         return entityFrequenciesMap;
@@ -209,8 +209,8 @@ public class WeightedTokenSource extends AbstractTSVSource<Weighted<Token>> {
         while (equal && srcA.hasNext() && srcB.hasNext()) {
             final Weighted<Token> recA = srcA.read();
             final Weighted<Token> recB = srcB.read();
-            equal = recA.get().id() == recB.get().id()
-                    && recA.getWeight() == recB.getWeight();
+            equal = recA.record().id() == recB.record().id()
+                    && recA.weight() == recB.weight();
         }
         return equal && srcA.hasNext() == srcB.hasNext();
     }

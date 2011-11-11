@@ -34,7 +34,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import java.io.Serializable;
-import javax.naming.OperationNotSupportedException;
 
 /**
  * <tt>Weighted</tt> objects represent a weighting or frequency applied to some
@@ -48,7 +47,9 @@ import javax.naming.OperationNotSupportedException;
 public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
 
     private static final long serialVersionUID = 1L;
+
     private double weight;
+
     private T record;
 
     public Weighted(final T record, final double weight) {
@@ -62,11 +63,11 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
     protected Weighted() {
     }
 
-    public double getWeight() {
+    public double weight() {
         return weight;
     }
 
-    public T get() {
+    public T record() {
         return record;
     }
 
@@ -93,7 +94,7 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
     }
 
     public boolean equals(Weighted<?> other) {
-        return record.equals(other.get());
+        return record.equals(other.record());
     }
 
     @Override
@@ -111,9 +112,9 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
     @SuppressWarnings("unchecked")
     public int compareTo(Weighted<T> that) {
         if (record instanceof Comparable<?>) {
-            return ((Comparable<T>) record).compareTo(that.get());
+            return ((Comparable<T>) record).compareTo(that.record());
         } else {
-            throw new RuntimeException(new OperationNotSupportedException(
+            throw new RuntimeException(new UnsupportedOperationException(
                     "Comparable not implemented by inner object."));
         }
     }
@@ -123,13 +124,14 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
 
             @Override
             public boolean apply(Weighted<T> pair) {
-                return (pair.getWeight() > weight);
+                return (pair.weight() > weight);
             }
 
             @Override
             public String toString() {
                 return "weight>" + weight;
             }
+
         };
     }
 
@@ -139,13 +141,14 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
 
             @Override
             public boolean apply(Weighted<T> pair) {
-                return (pair.getWeight() >= weight);
+                return (pair.weight() >= weight);
             }
 
             @Override
             public String toString() {
                 return "weight>=" + weight;
             }
+
         };
     }
 
@@ -154,13 +157,14 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
 
             @Override
             public boolean apply(Weighted<T> pair) {
-                return (pair.getWeight() == weight);
+                return (pair.weight() == weight);
             }
 
             @Override
             public String toString() {
                 return "weight==" + weight;
             }
+
         };
     }
 
@@ -170,13 +174,14 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
 
             @Override
             public boolean apply(Weighted<T> pair) {
-                return (pair.getWeight() <= weight);
+                return (pair.weight() <= weight);
             }
 
             @Override
             public String toString() {
                 return "weight<=" + weight;
             }
+
         };
     }
 
@@ -185,28 +190,31 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
 
             @Override
             public boolean apply(Weighted<T> pair) {
-                return (pair.getWeight() < weight);
+                return (pair.weight() < weight);
             }
 
             @Override
             public String toString() {
                 return "weight<" + weight;
             }
+
         };
     }
 
-    public static <T> Function<Weighted<T>, T> record() {
+    public static <T> Function<Weighted<T>, T> recordFunction() {
         return new Function<Weighted<T>, T>() {
 
             @Override
             public final T apply(final Weighted<T> input) {
-                return input.get();
+                return input.record();
             }
 
             @Override
             public final String toString() {
                 return "Record";
             }
+
         };
     }
+
 }

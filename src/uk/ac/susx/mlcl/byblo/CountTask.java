@@ -60,7 +60,7 @@ import uk.ac.susx.mlcl.byblo.io.SingletonRecordException;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
-import uk.ac.susx.mlcl.lib.Files;
+import uk.ac.susx.mlcl.lib.io.Files;
 import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
 import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
 

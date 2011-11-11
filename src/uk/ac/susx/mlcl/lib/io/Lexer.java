@@ -45,7 +45,6 @@ import java.text.MessageFormat;
 import java.util.RandomAccess;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.Files;
 
 /**
  * <p>A {@link Lexer} performs lexical analysis of some delimited input file. It
@@ -471,8 +470,7 @@ public class Lexer implements RandomAccess {
                                              cbuf.capacity() + required - available);
 
             if (LOG.isTraceEnabled()) {
-                LOG.trace("Growing character buffer from length " + cbuf.
-                        capacity() + " to " + newCapacity);
+                LOG.trace("Growing character buffer from length " + cbuf.capacity() + " to " + newCapacity);
             }
 
             final CharBuffer src = cbuf;
@@ -565,6 +563,7 @@ public class Lexer implements RandomAccess {
         protected Tell clone() {
             return new Tell(this.channelOffset, this.bufferOffset);
         }
+
     }
 
     /**
@@ -601,10 +600,8 @@ public class Lexer implements RandomAccess {
         start = offset.bufferOffset;
         end = offset.bufferOffset;
 
-
         if (hasNext())
             advance();
-
     }
 
     /**
@@ -629,4 +626,5 @@ public class Lexer implements RandomAccess {
     private void unread(final int num) {
         cbuf.position(cbuf.position() - num);
     }
+
 }

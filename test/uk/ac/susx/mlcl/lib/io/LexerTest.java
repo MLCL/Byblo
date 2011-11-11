@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
-import uk.ac.susx.mlcl.lib.Files;
 import java.util.ArrayList;
 import java.util.List;
 import com.google.common.base.CharMatcher;

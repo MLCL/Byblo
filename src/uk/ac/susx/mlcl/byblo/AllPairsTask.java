@@ -65,7 +65,7 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
-import uk.ac.susx.mlcl.lib.Files;
+import uk.ac.susx.mlcl.lib.io.Files;
 import uk.ac.susx.mlcl.lib.io.Lexer;
 import uk.ac.susx.mlcl.lib.tasks.AbstractCommand;
 
@@ -311,7 +311,7 @@ public class AllPairsTask extends AbstractCommand {
 
         if (!outputIdentityPairs) {
             pairFilters.add(Predicates.not(Predicates.compose(
-                    TokenPair.identity(), Weighted.<TokenPair>record())));
+                    TokenPair.identity(), Weighted.<TokenPair>recordFunction())));
         }
 
         if (pairFilters.size() == 1) {

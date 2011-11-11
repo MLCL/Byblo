@@ -103,7 +103,7 @@ public class WeightedTokenPairSource
             tokenId1 = readEntry1();
             parseValueDelimiter();
         } else {
-            tokenId1 = previousRecord.get().id1();
+            tokenId1 = previousRecord.record().id1();
         }
 
         if (!hasNext() || isDelimiterNext()) {
@@ -161,9 +161,9 @@ public class WeightedTokenPairSource
         while (equal && srcA.hasNext() && srcB.hasNext()) {
             final Weighted<TokenPair> recA = srcA.read();
             final Weighted<TokenPair> recB = srcB.read();
-            equal = recA.get().id1() == recB.get().id1()
-                    && recA.get().id2() == recB.get().id2()
-                    && recA.getWeight() == recB.getWeight();
+            equal = recA.record().id1() == recB.record().id1()
+                    && recA.record().id2() == recB.record().id2()
+                    && recA.weight() == recB.weight();
         }
         return equal && srcA.hasNext() == srcB.hasNext();
     }

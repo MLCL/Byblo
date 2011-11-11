@@ -124,27 +124,27 @@ public class WeightedTokenPairSink extends AbstractTSVSink<Weighted<TokenPair>> 
     }
 
     private void writeVerbose(Weighted<TokenPair> record) throws IOException {
-        writeToken1(record.get().id1());
+        writeToken1(record.record().id1());
         writeValueDelimiter();
-        writeToken2(record.get().id2());
+        writeToken2(record.record().id2());
         writeValueDelimiter();
-        writeWeight(record.getWeight());
+        writeWeight(record.weight());
         writeRecordDelimiter();
     }
 
     private void writeCompact(final Weighted<TokenPair> record) throws IOException {
         if (previousRecord == null) {
-            writeToken1(record.get().id1());
-        } else if (previousRecord.get().id1() != record.get().
+            writeToken1(record.record().id1());
+        } else if (previousRecord.record().id1() != record.record().
                 id1()) {
             writeRecordDelimiter();
-            writeToken1(record.get().id1());
+            writeToken1(record.record().id1());
         }
 
         writeValueDelimiter();
-        writeToken2(record.get().id2());
+        writeToken2(record.record().id2());
         writeValueDelimiter();
-        writeWeight(record.getWeight());
+        writeWeight(record.weight());
         previousRecord = record;
     }
 

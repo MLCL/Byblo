@@ -174,7 +174,7 @@ public class WeightedEntryFeatureTest {
                 final Weighted<TokenPair> expected = hist.get(pos);
 
                 System.out.println("expected tell: " + pos);
-                System.out.println("expected: " + expected.get().toString(src.getStringIndex1(), src.getStringIndex2()));
+                System.out.println("expected: " + expected.record().toString(src.getStringIndex1(), src.getStringIndex2()));
 
                 src.position(pos);
 
@@ -183,7 +183,7 @@ public class WeightedEntryFeatureTest {
 
                 Weighted<TokenPair> actual = src.read();
                 System.out.println("actual tell: " + src.position());
-                System.out.println("actual: " + actual.get().toString(src.getStringIndex1(), src.getStringIndex2()));
+                System.out.println("actual: " + actual.record().toString(src.getStringIndex1(), src.getStringIndex2()));
 
                 assertEquals(expected, actual);
             }

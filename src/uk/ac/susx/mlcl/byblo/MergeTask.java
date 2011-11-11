@@ -44,7 +44,7 @@ import java.nio.charset.Charset;
 import java.util.Comparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.Files;
+import uk.ac.susx.mlcl.lib.io.Files;
 
 /**
  * Merges the contents of two sorted source files, line by line, into a

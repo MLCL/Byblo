@@ -30,16 +30,19 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import uk.ac.susx.mlcl.lib.io.Lexer;
 import uk.ac.susx.mlcl.lib.ObjectIndex;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.collect.SparseVectors;
-import uk.ac.susx.mlcl.lib.io.Lexer;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import java.io.IOException;
 import java.nio.charset.CharacterCodingException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Wraps a {@link WeightedEntryFeatureSource} to produce complete feature 
@@ -51,8 +54,11 @@ public class WeightedTokenPairVectorSource
         implements SeekableSource<Indexed<SparseDoubleVector>, Lexer.Tell> {
 
     private final WeightedTokenPairSource inner;
+
     private Weighted<TokenPair> next;
+
     private Lexer.Tell tell;
+
     private long count = 0;
 
     public WeightedTokenPairVectorSource(WeightedTokenPairSource inner) {
@@ -87,19 +93,18 @@ public class WeightedTokenPairVectorSource
         Weighted<TokenPair> start = next;
         int cardinality = 0;
         do {
-            features.put(next.get().id2(), next.getWeight());
-            cardinality = Math.max(cardinality, next.get().id2() + 1);
+            features.put(next.record().id2(), next.weight());
+            cardinality = Math.max(cardinality, next.record().id2() + 1);
             // XXX position() should not need to be called every iteration
             tell = inner.position();
             readNext();
-        } while (next != null && next.get().id1() == start.get().
+        } while (next != null && next.record().id1() == start.record().
                 id1());
 
-        SparseDoubleVector v = SparseVectors.toDoubleVector(features,
-                cardinality);
+        SparseDoubleVector v = toDoubleVector(features, cardinality);
 
         ++count;
-        return new Indexed<SparseDoubleVector>(start.get().id1(), v);
+        return new Indexed<SparseDoubleVector>(start.record().id1(), v);
     }
 
     public long getCount() {
@@ -126,4 +131,36 @@ public class WeightedTokenPairVectorSource
             throw e;
         }
     }
+
+    public static SparseDoubleVector toDoubleVector(Int2DoubleMap map, int cardinality) {
+        if (map == null) {
+            throw new NullPointerException();
+        }
+        if (cardinality < 0) {
+            throw new IllegalArgumentException();
+        }
+
+        List<Int2DoubleMap.Entry> entries = new ArrayList<Int2DoubleMap.Entry>(map.int2DoubleEntrySet());
+        Collections.sort(entries, new Comparator<Int2DoubleMap.Entry>() {
+
+            @Override
+            public final int compare(final Int2DoubleMap.Entry t, final Int2DoubleMap.Entry t1) {
+                return t.getIntKey() - t1.getIntKey();
+            }
+
+        });
+
+        int[] keys = new int[entries.size()];
+        double[] values = new double[entries.size()];
+
+        for (int i = 0; i < entries.size(); i++) {
+            keys[i] = entries.get(i).getIntKey();
+            values[i] = entries.get(i).getDoubleValue();
+        }
+
+        SparseDoubleVector vec = new SparseDoubleVector(keys, values, cardinality, keys.length);
+        vec.compact();
+        return vec;
+    }
+
 }

@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
-import uk.ac.susx.mlcl.lib.Files;
+import uk.ac.susx.mlcl.lib.io.Files;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import com.beust.jcommander.JCommander;

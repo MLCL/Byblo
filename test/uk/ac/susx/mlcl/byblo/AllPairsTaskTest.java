@@ -10,7 +10,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import uk.ac.susx.mlcl.ExitTrapper;
+import uk.ac.susx.mlcl.lib.test.ExitTrapper;
 import static org.junit.Assert.*;
 
 /**

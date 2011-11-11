@@ -31,18 +31,16 @@
 package uk.ac.susx.mlcl.byblo.measure;
 
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
-import com.google.common.io.Files;
 import uk.ac.susx.mlcl.byblo.Main;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Set;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.collect.SparseVectors;
 import java.util.HashSet;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import static uk.ac.susx.mlcl.ExitTrapper.*;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
  *
@@ -114,12 +112,12 @@ public class JaccardTest {
         double jaccardDistance = (double) (q + r) / (double) (p + q + r);
         double jaccardCoef = (double) p / (double) (p + q + r);
 
-        SparseDoubleVector vecA = SparseVectors.toDoubleVector(objectA);
-        SparseDoubleVector vecB = SparseVectors.toDoubleVector(objectB);
+        SparseDoubleVector vecA = SparseDoubleVector.from(objectA);
+        SparseDoubleVector vecB = SparseDoubleVector.from(objectB);
 
         Jaccard instance = new Jaccard();
         double result = instance.combine(instance.shared(vecA, vecB),
-                instance.left(vecA), instance.left(vecB));
+                                         instance.left(vecA), instance.left(vecB));
 
         assertEquals(jaccardCoef, result, 0.0001);
     }
@@ -158,7 +156,7 @@ public class JaccardTest {
 
         Jaccard instance = new Jaccard();
         double result = instance.combine(instance.shared(vecA, vecB),
-                instance.left(vecA), instance.left(vecB));
+                                         instance.left(vecA), instance.left(vecB));
 
         assertEquals(jaccardCoef, result, 0.0001);
     }
@@ -169,9 +167,9 @@ public class JaccardTest {
     @Test(timeout = 1000)
     public void testShared() {
         System.out.println("Testing shared()");
-        SparseDoubleVector Q = SparseVectors.toDoubleVector(
+        SparseDoubleVector Q = SparseDoubleVector.from(
                 new double[]{0, 1, 0, 1, 0, 1, 0, 1, 1, 1});
-        SparseDoubleVector R = SparseVectors.toDoubleVector(
+        SparseDoubleVector R = SparseDoubleVector.from(
                 new double[]{1, 0, 1, 0, 1, 0, 1, 1, 1, 0});
         double expResult = 2.0;
         Jaccard instance = new Jaccard();
@@ -185,7 +183,7 @@ public class JaccardTest {
     @Test(timeout = 1000)
     public void testLeft() {
         System.out.println("Testing left()");
-        SparseDoubleVector Q = SparseVectors.toDoubleVector(
+        SparseDoubleVector Q = SparseDoubleVector.from(
                 new double[]{0, 1, 0, 1, 0, 1, 0, 1, 1, 1});
         double expResult = 6.0;
         Jaccard instance = new Jaccard();
@@ -199,7 +197,7 @@ public class JaccardTest {
     @Test(timeout = 1000)
     public void testRight() {
         System.out.println("Testing right()");
-        SparseDoubleVector R = SparseVectors.toDoubleVector(
+        SparseDoubleVector R = SparseDoubleVector.from(
                 new double[]{0, 1, 0, 1, 0, 1, 0, 1, 1, 1});
         double expResult = 6.0;
         Jaccard instance = new Jaccard();
@@ -305,4 +303,5 @@ public class JaccardTest {
 
         assertTrue(WeightedTokenPairSource.equal(output1, output2, DEFAULT_CHARSET));
     }
+
 }

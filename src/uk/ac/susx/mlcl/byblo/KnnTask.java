@@ -41,7 +41,7 @@ import java.util.Comparator;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.Files;
+import uk.ac.susx.mlcl.lib.io.Files;
 
 /**
  * Task that read in a file and produces the k-nearest-neighbors for each base 

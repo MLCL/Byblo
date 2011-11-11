@@ -38,7 +38,7 @@ import org.junit.Test;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import static uk.ac.susx.mlcl.ExitTrapper.*;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
  *
@@ -243,8 +243,8 @@ public class CrMiTest {
         while(expected.hasNext() && actual.hasNext()) {
             Weighted<TokenPair> e = expected.read();
             Weighted<TokenPair> a = actual.read();
-            assertEquals(e.get().id1(), a.get().id1());
-            assertEquals(e.get().id2(), a.get().id2());
+            assertEquals(e.record().id1(), a.record().id1());
+            assertEquals(e.record().id2(), a.record().id2());
         }
         
         assertEquals(expected.hasNext(), actual.hasNext());

@@ -117,21 +117,21 @@ public class WeightedTokenSink extends AbstractTSVSink<Weighted<Token>> {
     }
 
     private void writeVerbose(final Weighted<Token> record) throws IOException {
-        writeEntry(record.get().id());
+        writeEntry(record.record().id());
         writeValueDelimiter();
-        writeWeight(record.getWeight());
+        writeWeight(record.weight());
         writeRecordDelimiter();
     }
 
     private void writeCompact(final Weighted<Token> record) throws IOException {
         if (previousRecord == null) {
-            writeEntry(record.get().id());
-        } else if (previousRecord.get().id() != record.get().id()) {
+            writeEntry(record.record().id());
+        } else if (previousRecord.record().id() != record.record().id()) {
             writeRecordDelimiter();
-            writeEntry(record.get().id());
+            writeEntry(record.record().id());
         }
         writeValueDelimiter();
-        writeWeight(record.getWeight());
+        writeWeight(record.weight());
         previousRecord = record;
     }
 

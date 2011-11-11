@@ -51,7 +51,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.Files;
+import uk.ac.susx.mlcl.lib.io.Files;
 import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
 import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
 

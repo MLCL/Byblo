@@ -36,7 +36,7 @@ import java.io.File;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import static uk.ac.susx.mlcl.ExitTrapper.*;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
  *

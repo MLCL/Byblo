@@ -93,7 +93,7 @@ public class EntryTest {
                 final Tell pos = src.position();
                 final Weighted<Token> record = src.read();
 
-                System.out.println(pos.toString() + ": " + record.get().toString(src.
+                System.out.println(pos.toString() + ": " + record.record().toString(src.
                         getStringIndex()));
 
                 assertNotNull("Found null EntryRecord", record);
@@ -110,7 +110,7 @@ public class EntryTest {
                 final Weighted<Token> expected = hist.get(pos);
 
                 System.out.println("expected tell: " + pos);
-                System.out.println("expected: " + expected.get().toString(src.
+                System.out.println("expected: " + expected.record().toString(src.
                         getStringIndex()));
 
                 src.position(pos);
@@ -120,7 +120,7 @@ public class EntryTest {
 
                 Weighted<Token> actual = src.read();
                 System.out.println("actual tell: " + src.position());
-                System.out.println("actual: " + actual.get().toString(src.
+                System.out.println("actual: " + actual.record().toString(src.
                         getStringIndex()));
 
                 assertEquals(expected, actual);
