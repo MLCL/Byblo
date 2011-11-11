@@ -31,7 +31,8 @@
 package uk.ac.susx.mlcl.lib;
 
 /**
- *
+ * Static utility class used for checking method arguments.
+ * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class Checks {

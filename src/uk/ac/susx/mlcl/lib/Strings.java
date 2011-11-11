@@ -56,25 +56,58 @@ public class Strings {
      * @return escaped character string
      */
     public static String escape(final char ch) {
-        if (ch >= 32)
-            return Character.toString(ch);
+        final StringBuilder sb = new StringBuilder();
+        try {
+            escape(ch, sb);
+        } catch (IOException ex) {
+            throw new AssertionError(ex);
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Append to the given destination a String representation of the given 
+     * character as an ASCII escape sequence.
+     * 
+     * If the given character is one of the standard non-printable characters 
+     * then return a string contain a single backslash, followed by the 
+     * characters escape. For example new-line character will return the 2
+     * character string "\n". Otherwise the character is escaped using it's
+     * UTF character code escape sequence.
+     * 
+     * @param ch character to escape
+     * @param dst destination to write escaped character sequence
+     * @throws IOException if {@link Appendable#append(java.lang.CharSequence)
+     *                  throws an IOException.
+     */
+    public static void escape(final char ch, final Appendable dst)
+            throws IOException {
+        if (ch >= 32 && ch < 128 && ch != '\\')
+            dst.append(ch);
         switch (ch) {
             case '\b':
-                return "\\b";
+                dst.append("\\b");
+                break;
             case '\t':
-                return "\\t";
+                dst.append("\\t");
+                break;
             case '\n':
-                return "\\n";
+                dst.append("\\n");
+                break;
             case '\f':
-                return "\\f";
+                dst.append("\\f");
+                break;
             case '\r':
-                return "\\r";
+                dst.append("\\r");
+                break;
             case '\\':
-                return "\\";
+                dst.append("\\\\");
+                break;
             case '\0':
-                return "\\0";
+                dst.append("\\0");
+                break;
             default:
-                return String.format("\\u%4d", (int) ch);
+                dst.append(String.format("\\u%04x", (int) ch));
         }
     }
 
@@ -180,13 +213,159 @@ public class Strings {
             i++;
         }
         dst.append(src, 0, i);
+
         while (i < toIndex) {
-            if (src.charAt(i) >= 32)
-                dst.append(src.charAt(i));
+
+            if (src.charAt(i) < 32 || src.charAt(i) == '\\' || src.charAt(i) > 127)
+                escape(src.charAt(i), dst);
             else
-                dst.append(escape(src.charAt(i)));
+                dst.append(src.charAt(i));
             i++;
         }
+    }
+
+    /**
+     * 
+     * @param src source sequence to read characters from
+     * @return unescaped string
+     */
+    public static String unescape(final CharSequence src) {
+        return unescape(src, 0, src.length());
+    }
+
+    /**
+     * 
+     * @param src source sequence to read characters from
+     * @param fromIndex index of first character to unescape (inclusive)
+     * @return unescaped string
+     */
+    public static String unescape(final CharSequence src, final int fromIndex) {
+        return unescape(src, fromIndex, src.length());
+    }
+
+    /**
+     * 
+     * @param src source sequence to read characters from
+     * @param fromIndex index of first character to unescape (inclusive)
+     * @param toIndex index of last character to unescape (exclusive)
+     * @return unescaped string
+     */
+    public static String unescape(final CharSequence src, final int fromIndex, final int toIndex) {
+        final StringBuilder sb = new StringBuilder();
+        try {
+            unescape(src, fromIndex, toIndex, sb);
+        } catch (IOException ex) {
+            // StringBuilder appendable will never throw an IOException
+            throw new AssertionError(ex);
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 
+     * @param src source sequence to read characters from
+     * @param dst destination to write unescaped character sequence
+     * @throws IOException if {@link Appendable#append(java.lang.CharSequence)
+     *                  throws an IOException.
+     */
+    public static void unescape(final CharSequence src, final Appendable dst)
+            throws IOException {
+        unescape(src, 0, src.length(), dst);
+    }
+
+    /**
+     * 
+     * @param src source sequence to read characters from
+     * @param fromIndex index of first character to unescape (inclusive)
+     * @param dst destination to write unescaped character sequence
+     * @throws IOException if {@link Appendable#append(java.lang.CharSequence)
+     *                  throws an IOException.
+     */
+    public static void unescape(final CharSequence src, final int fromIndex, final Appendable dst)
+            throws IOException {
+        unescape(src, fromIndex, src.length(), dst);
+    }
+
+    /**
+     * 
+     * @param src source sequence to read characters from
+     * @param fromIndex index of first character to unescape (inclusive)
+     * @param toIndex index of last character to unescape (exclusive)
+     * @param dst destination to write unescaped character sequence
+     * @throws IOException if {@link Appendable#append(java.lang.CharSequence)
+     *                  throws an IOException.
+     */
+    public static void unescape(final CharSequence src, final int fromIndex,
+                                final int toIndex, final Appendable dst)
+            throws IOException {
+        int i = fromIndex;
+        char c;
+        while (i < toIndex) {
+            if ((c = src.charAt(i++)) == '\\') {
+                final char escCode = src.charAt(i);
+                i++;
+                if (isOctalDigit(escCode)) {
+                    int octal = escCode;
+                    int count = 1;
+                    while (i < toIndex && count < 3 && isOctalDigit(src.charAt(i))) {
+                        octal = (8 * octal) + src.charAt(i);
+                        i++;
+                        count++;
+                    }
+                    dst.append((char) octal);
+                } else {
+                    switch (escCode) {
+                        case 'a':
+                            dst.append((char) 7);
+                            break;
+                        case 'b':
+                            dst.append('\b');
+                            break;
+                        case 't':
+                            dst.append('\t');
+                            break;
+                        case 'v':
+                            dst.append((char) 11);
+                            break;
+                        case 'n':
+                            dst.append('\n');
+                            break;
+                        case 'f':
+                            dst.append('\f');
+                            break;
+                        case 'r':
+                            dst.append('\r');
+                            break;
+                        case 'u': // utf code point
+                            dst.append((char) Integer.parseInt(
+                                    src.subSequence(i, i + 4).toString(), 16));
+                            i += 4;
+                            break;
+                        case 'x': // ascii hex code
+                            dst.append((char) Integer.parseInt(
+                                    src.subSequence(i, i + 2).toString(), 16));
+                            i += 2;
+                            break;
+                        default:
+                            dst.append(escCode);
+                    }
+                }
+            } else {
+                dst.append(c);
+            }
+
+        }
+    }
+
+    /**
+     * Return true if the given character is an octal digit (i.e in the range
+     * '0' to '7' inclusive.
+     * 
+     * @param c character to check
+     * @return true if character is an octal digit, false otherwise
+     */
+    private static boolean isOctalDigit(final char c) {
+        return c >= '0' && c <= '7';
     }
 
 }
