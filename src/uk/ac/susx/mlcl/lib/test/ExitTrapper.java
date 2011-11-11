@@ -33,10 +33,14 @@ package uk.ac.susx.mlcl.lib.test;
 import java.security.Permission;
 
 /**
- * Static utility class that allows calls to System.exit() to be intercepted
- * when running under unit tests. Makes direct testing of main methods
- * possible, since all calls to System.exit result in a runtime ExitException,
+ * Static utility class that allows calls to System.exit() to be intercepted. 
+ * This makes direct testing of <tt>main</tt> methods possible, since all calls
+ * to {@link System#exit(int) } result in a runtime {@link ExitException},
  * rather than simply terminating the forked VM (passing the test).
+ * 
+ * <p>Note that this class will obliterate whatever SecurityManager is installed
+ * if it can. The previously install SecurityManager will however be reinstated
+ * when trapping is disabled.</p>
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -48,7 +52,8 @@ public class ExitTrapper {
     private static SecurityManager noExitSM;
 
     /**
-     * Store the previously installed secutity manager.
+     * Store the previously installed security manager. This will be re-instated
+     * when trapping is disabled.
      */
     private static SecurityManager previousSM;
 
@@ -94,7 +99,7 @@ public class ExitTrapper {
                 ? previousSM
                 : noExitSM);
     }
-    
+
     /**
      * Return whether or not exit trapping is enabled.
      * 
@@ -116,12 +121,17 @@ public class ExitTrapper {
         /**
          * Exit status code that was trapped.
          */
-        public final int status;
+        private final int status;
 
         public ExitException(int status) {
-            super("Call to System.exit(" + status + ") trapped during testing.");
+            super("Call to System.exit(" + status + ") trapped.");
             this.status = status;
         }
+
+        public int getStatus() {
+            return status;
+        }
+
     }
 
     /**
@@ -145,5 +155,6 @@ public class ExitTrapper {
             super.checkExit(status);
             throw new ExitException(status);
         }
+
     }
 }
