@@ -35,8 +35,6 @@ This section details how build the project from with Netbeans 7. First acquire t
 
 5. To *Source Package Folders* click *Add Folder* and select `src`. To *Test Package Folders* click *Add Folder* and select `test`. Click *Next* then *Finish*.
 
-From here you can run the project by clicking *Run -> Run Main Project* from the menu bar, and selecting `uk.ac.susx.mlcl.byblo.Byblo` as the main class.
-
 ## Attribution 
 
 This project is partially supported a TSB (Technology Strategy Board) grant reference GCL-100934, and by the [EPSRC Doctoral Training Account Scheme](http://www.epsrc.ac.uk/funding/students/dta).
@@ -49,7 +47,7 @@ To contributed to the project you should fork the git repository. First click th
 
 ```sh
 $ git clone git@github.com:[your-user-name]/MLCLLib.git
-$ cd Byblo
+$ cd MLCLLib
 $ git remote add upsteam git@github.com:MLCL/MLCLLib.git
 $ git fetch upstream
 ```
