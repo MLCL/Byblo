@@ -69,7 +69,7 @@ public final class SparseDoubleVector
             throw new IllegalArgumentException("value.length != keys.length");
 
         this.values = values;
-        this.sum = Arrays2.sum(values, 0, size);
+        this.sum = ArrayMath.sum(values, 0, size);
     }
 
     public SparseDoubleVector(final SparseDoubleVector other) {
@@ -269,7 +269,7 @@ public final class SparseDoubleVector
     }
 
     public final boolean contains(final double entry) {
-        return Arrays2.contains(values, entry, 0, size);
+        return ArrayUtil.contains(values, entry, 0, size);
     }
 
 }
