@@ -31,7 +31,6 @@
 package uk.ac.susx.mlcl.lib.io;
 
 import com.google.common.base.CharMatcher;
-import com.google.common.base.Objects;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
@@ -46,6 +45,7 @@ import java.text.MessageFormat;
 import java.util.RandomAccess;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.Files;
 
 /**
  * <p>A {@link Lexer} performs lexical analysis of some delimited input file. It
@@ -231,7 +231,7 @@ public class Lexer implements RandomAccess {
 
     public Lexer(File file, Charset charset) throws FileNotFoundException, NullPointerException, IOException {
         this(new CharFileChannel(new FileInputStream(file).getChannel(),
-                                 IOUtil.DEFAULT_CHARSET));
+                                 Files.DEFAULT_CHARSET));
     }
 
     public void setDelimiterMatcher(CharMatcher delimiterMatcher) {

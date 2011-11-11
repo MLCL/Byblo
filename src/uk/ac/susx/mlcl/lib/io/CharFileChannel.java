@@ -47,6 +47,7 @@ import java.nio.charset.MalformedInputException;
 import java.nio.charset.UnmappableCharacterException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.Files;
 
 /**
  * <p>A class that gets round the problem of very large, seekable character files
@@ -160,7 +161,7 @@ public class CharFileChannel
      */
     public CharFileChannel(FileChannel fileChannel, Charset charset)
             throws NullPointerException {
-        this(fileChannel, IOUtil.decoderFor(charset));
+        this(fileChannel, Files.decoderFor(charset));
     }
 
     /**
@@ -173,7 +174,7 @@ public class CharFileChannel
      */
     public CharFileChannel(FileChannel fileChannel)
             throws NullPointerException {
-        this(fileChannel, IOUtil.DEFAULT_CHARSET);
+        this(fileChannel, Files.DEFAULT_CHARSET);
     }
 
     /**

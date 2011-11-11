@@ -33,13 +33,13 @@ package uk.ac.susx.mlcl.byblo;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.tasks.AbstractCommandTask;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.Files;
 import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
 import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
 
@@ -58,12 +58,12 @@ public class CopyTask extends AbstractCommandTask {
     @Parameter(names = {"-i", "--input-file"},
                description = "Source file that will be read", 
                validateWith=InputFileValidator.class)
-    private File sourceFile = IOUtil.STDIN_FILE;
+    private File sourceFile = Files.STDIN_FILE;
 
     @Parameter(names = {"-o", "--output-file"},
                description = "Destination file that will be writen to.", 
                validateWith=OutputFileValidator.class)
-    private File destFile = IOUtil.STDOUT_FILE;
+    private File destFile = Files.STDOUT_FILE;
 
     public CopyTask(File sourceFile, File destinationFile) {
         setSrcFile(sourceFile);
@@ -89,14 +89,14 @@ public class CopyTask extends AbstractCommandTask {
                     + getDstFile() + "\".");
 
         // Check the configuration state
-        if (sourceFile.equals(destFile) && !IOUtil.isStdin(sourceFile))
+        if (sourceFile.equals(destFile) && !Files.isStdin(sourceFile))
             throw new IllegalStateException("sourceFile equals destinationFile");
 
         InputStream in = null;
         OutputStream out = null;
         try {
-            in = IOUtil.openInputStream(getSrcFile());
-            out = IOUtil.openOutputStream(getDstFile());
+            in = Files.openInputStream(getSrcFile());
+            out = Files.openOutputStream(getDstFile());
 
             byte[] b = new byte[BUFFER_SIZE];
             int i = in.read(b);

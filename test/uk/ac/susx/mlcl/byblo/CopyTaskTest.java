@@ -30,16 +30,14 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
-import uk.ac.susx.mlcl.lib.io.IOUtil;
+import uk.ac.susx.mlcl.lib.Files;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import java.io.IOException;
-import java.util.ResourceBundle;
 import java.io.File;
 import java.io.FileNotFoundException;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static uk.ac.susx.mlcl.TestConstants.*;
 
 /**
  *
@@ -74,7 +72,7 @@ public class CopyTaskTest {
         System.out.println("Testing run() -- expecting success");
         File in = File.createTempFile(getClass().getName(), "in");
         String str = "blah blah yackaty schmackaty";
-        IOUtil.writeAll(in, IOUtil.DEFAULT_CHARSET, str);
+        Files.writeAll(in, Files.DEFAULT_CHARSET, str);
         File out = File.createTempFile(getClass().getName(), "out");
         CopyTask instance = new CopyTask(in, out);
         instance.run();
@@ -83,7 +81,7 @@ public class CopyTaskTest {
         assertEquals(in.length(), out.length());
 
         StringBuilder sb = new StringBuilder();
-        IOUtil.readAll(out, IOUtil.DEFAULT_CHARSET, sb);
+        Files.readAll(out, Files.DEFAULT_CHARSET, sb);
         assertEquals(str, sb.toString());
         in.delete();
         out.delete();

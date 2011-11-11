@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import java.util.Random;
 import java.util.ArrayList;
@@ -57,13 +58,13 @@ public class WeightedEntryFeatureTest {
 
     private void copyWEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
         WeightedTokenPairSource aSrc = new WeightedTokenPairSource(a,
-                DEFAULT_CHARSET);
+                                                                   DEFAULT_CHARSET);
         WeightedTokenPairSink bSink = new WeightedTokenPairSink(b,
-                DEFAULT_CHARSET,
-                aSrc.getStringIndex1(), aSrc.getStringIndex2());
+                                                                DEFAULT_CHARSET,
+                                                                aSrc.getStringIndex1(), aSrc.getStringIndex2());
         bSink.setCompactFormatEnabled(compact);
 
-        copy(aSrc, bSink);
+        IOUtil.copy(aSrc, bSink);
         bSink.close();
     }
 
@@ -71,17 +72,17 @@ public class WeightedEntryFeatureTest {
         WeightedTokenPairVectorSource aSrc = new WeightedTokenPairVectorSource(
                 new WeightedTokenPairSource(a, DEFAULT_CHARSET));
 
-        List<Indexed<SparseDoubleVector>> list = readAll(aSrc);
+        List<Indexed<SparseDoubleVector>> list = IOUtil.readAll(aSrc);
         Collections.sort(list);
 
         WeightedTokenPairSink tmp = new WeightedTokenPairSink(b,
-                DEFAULT_CHARSET, aSrc.getStringIndex1(), aSrc.getStringIndex2());
+                                                              DEFAULT_CHARSET, aSrc.getStringIndex1(), aSrc.getStringIndex2());
         tmp.setCompactFormatEnabled(compact);
 
         WeightedTokenPairVectorSink bSink = new WeightedTokenPairVectorSink(
                 tmp);
 
-        copy(list, bSink);
+        IOUtil.copy(list, bSink);
 
         bSink.close();
     }
@@ -90,22 +91,22 @@ public class WeightedEntryFeatureTest {
     public void testWeightedEntryFeaturesConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_ENTRY_FEATURES;
         File b = new File(TEST_OUTPUT_DIR,
-                TEST_FRUIT_ENTRY_FEATURES.getName() + ".compact");
+                          TEST_FRUIT_ENTRY_FEATURES.getName() + ".compact");
         File c = new File(TEST_OUTPUT_DIR,
-                TEST_FRUIT_ENTRY_FEATURES.getName() + ".verbose");
+                          TEST_FRUIT_ENTRY_FEATURES.getName() + ".verbose");
 
         copyWEF(a, b, true);
 
         assertTrue("Compact copy is smaller that verbose source.",
-                b.length() <= a.length());
+                   b.length() <= a.length());
 
         copyWEF(b, c, false);
 
 
         assertTrue("Verbose copy is smaller that compact source.",
-                c.length() >= b.length());
+                   c.length() >= b.length());
         assertTrue("Double converted file is not equal to origion.",
-                Files.equal(a, c));
+                   Files.equal(a, c));
     }
 
     @Test
@@ -113,26 +114,26 @@ public class WeightedEntryFeatureTest {
     public void testWeightedEntryFeatureVectorsConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_ENTRY_FEATURES;
         File b = new File(TEST_OUTPUT_DIR,
-                TEST_FRUIT_ENTRY_FEATURES.getName() + ".vecs.compact");
+                          TEST_FRUIT_ENTRY_FEATURES.getName() + ".vecs.compact");
         File c = new File(TEST_OUTPUT_DIR,
-                TEST_FRUIT_ENTRY_FEATURES.getName() + ".vecs.verbose");
+                          TEST_FRUIT_ENTRY_FEATURES.getName() + ".vecs.verbose");
 
         copyWEFV(a, b, true);
 
         assertTrue("Compact copy is smaller that verbose source.",
-                b.length() <= a.length());
+                   b.length() <= a.length());
 
         copyWEFV(b, c, false);
 
 
         assertTrue("Verbose copy is smaller that compact source.",
-                c.length() >= b.length());
+                   c.length() >= b.length());
 
 
 
 
         assertTrue("Double converted file is not equal to origion.",
-                Files.equal(a, c));
+                   Files.equal(a, c));
     }
 
     @Test
@@ -173,8 +174,7 @@ public class WeightedEntryFeatureTest {
                 final Weighted<TokenPair> expected = hist.get(pos);
 
                 System.out.println("expected tell: " + pos);
-                System.out.println("expected: " + expected.get().toString(src.
-                        getStringIndex1(), src.getStringIndex2()));
+                System.out.println("expected: " + expected.get().toString(src.getStringIndex1(), src.getStringIndex2()));
 
                 src.position(pos);
 
@@ -183,8 +183,7 @@ public class WeightedEntryFeatureTest {
 
                 Weighted<TokenPair> actual = src.read();
                 System.out.println("actual tell: " + src.position());
-                System.out.println("actual: " + actual.get().toString(src.
-                        getStringIndex1(), src.getStringIndex2()));
+                System.out.println("actual: " + actual.get().toString(src.getStringIndex1(), src.getStringIndex2()));
 
                 assertEquals(expected, actual);
             }
@@ -195,4 +194,5 @@ public class WeightedEntryFeatureTest {
     public void testRandomAccess() throws FileNotFoundException, IOException {
         testRandomAccess(TEST_FRUIT_ENTRY_FEATURES);
     }
+
 }

@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl;
 
+import uk.ac.susx.mlcl.lib.Files;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +42,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Random;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.io.Source;
 import static org.junit.Assert.*;
@@ -53,9 +53,6 @@ import static org.junit.Assert.*;
 public class TestConstants {
 
     public static final File TEST_DATA_DIR = new File("testdata");
-
-    public static final File TEST_CHARSETS_DIR =
-            new File(TEST_DATA_DIR, "charsets");
 
     public static final File TEST_FRUIT_DIR =
             new File(TEST_DATA_DIR, "fruit");
@@ -75,16 +72,14 @@ public class TestConstants {
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".entryFeatures");
 
     public static final File TEST_FRUIT_ENTRIES_FILTERED =
-            new File(TEST_FRUIT_ENTRIES.getParentFile(), TEST_FRUIT_ENTRIES.
-            getName() + ".filtered");
+            new File(TEST_FRUIT_ENTRIES.getParentFile(), TEST_FRUIT_ENTRIES.getName() + ".filtered");
 
     public static final File TEST_FRUIT_FEATURES_FILTERED =
-            new File(TEST_FRUIT_FEATURES.getParentFile(), TEST_FRUIT_FEATURES.
-            getName() + ".filtered");
+            new File(TEST_FRUIT_FEATURES.getParentFile(), TEST_FRUIT_FEATURES.getName() + ".filtered");
 
     public static final File TEST_FRUIT_ENTRY_FEATURES_FILTERED =
             new File(TEST_FRUIT_ENTRY_FEATURES.getParentFile(),
-            TEST_FRUIT_ENTRY_FEATURES.getName() + ".filtered");
+                     TEST_FRUIT_ENTRY_FEATURES.getName() + ".filtered");
 
     public static final File TEST_FRUIT_SIMS =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".sims");
@@ -94,7 +89,7 @@ public class TestConstants {
 
     public static final File TEST_OUTPUT_DIR = new File(TEST_DATA_DIR, "out");
 
-    public static final Charset DEFAULT_CHARSET = IOUtil.DEFAULT_CHARSET;
+    public static final Charset DEFAULT_CHARSET = Files.DEFAULT_CHARSET;
 
     ;
 
@@ -105,7 +100,7 @@ public class TestConstants {
 
     public static File makeTempFile(int size) throws IOException {
         final File file = File.createTempFile(TestConstants.class.getName(),
-                ".tmp");
+                                              ".tmp");
         final OutputStream out = new BufferedOutputStream(
                 new FileOutputStream(file));
         byte[] data = new byte[1024];
@@ -120,32 +115,5 @@ public class TestConstants {
         return file;
     }
 
-    public static <T> void copy(Source<T> src, Sink<T> sink) throws IOException {
-        assertTrue("EntryFeatureSource is empty", src.hasNext());
-        while (src.hasNext()) {
-            sink.write(src.read());
-        }
-        if (sink instanceof Flushable)
-            ((Flushable) sink).flush();
-    }
 
-    public static <T> void copy(Source<? extends T> src,
-            Collection<? super T> dest) throws IOException {
-        while (src.hasNext()) {
-            dest.add(src.read());
-        }
-    }
-
-    public static <T> void copy(Iterable<? extends T> src, Sink<? super T> sink) throws IOException {
-        for (T item : src) {
-            sink.write(item);
-        }
-    }
-
-    public static <T> List<T> readAll(Source<T> src) throws IOException {
-        @SuppressWarnings("unchecked")
-        List<T> result = (List<T>) new ArrayList<Object>();
-        copy(src, result);
-        return result;
-    }
 }

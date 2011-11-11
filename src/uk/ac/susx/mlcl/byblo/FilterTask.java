@@ -38,7 +38,6 @@ import com.google.common.base.Function;
 import static com.google.common.base.Preconditions.*;
 import com.google.common.base.Predicate;
 import static uk.ac.susx.mlcl.lib.Predicates2.*;
-import com.google.common.io.Files;
 import uk.ac.susx.mlcl.lib.DoubleConverter;
 import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSink;
@@ -47,7 +46,6 @@ import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.ObjectIndex;
 import uk.ac.susx.mlcl.lib.Predicates2;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import uk.ac.susx.mlcl.lib.tasks.AbstractCommandTask;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
@@ -66,6 +64,7 @@ import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
+import uk.ac.susx.mlcl.lib.Files;
 
 /**
  *
@@ -79,33 +78,42 @@ import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 public class FilterTask extends AbstractCommandTask implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
     private static final Log LOG = LogFactory.getLog(FilterTask.class);
+
     /**
      * Number of records to read or write between progress updates.
      */
     private static final int PROGRESS_INTERVAL = 10000000;
+
     public static final String FILTERED_STRING = "___FILTERED___";
     /*
      * === INPUT FILES ===
      */
+
     @Parameter(names = {"-ief", "--input-entry-features"}, required = true,
     description = "Input entry/feature pair frequencies file.")
     private File inputEntryFeaturesFile;
+
     @Parameter(names = {"-ie", "--input-entries"}, required = true,
     description = "Input entry frequencies file.")
     private File inputEntriesFile;
+
     @Parameter(names = {"-if", "--input-features"}, required = true,
     description = "Input features frequencies file.")
     private File inputFeaturesFile;
     /*
      * === OUTPUT FILES ===
      */
+
     @Parameter(names = {"-oef", "--output-entry-features"}, required = true,
     description = "Output entry/feature pair frequencies file.")
     private File outputEntryFeaturesFile;
+
     @Parameter(names = {"-oe", "--output-entries"}, required = true,
     description = "Output entry frequencies file")
     private File outputEntriesFile;
+
     @Parameter(names = {"-of", "--output-features"}, required = true,
     description = "Output features frequencies file.")
     private File outputFeaturesFile;
@@ -115,7 +123,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
      */
     @Parameter(names = {"-c", "--charset"},
     description = "Character encoding to use for both input and output.")
-    private Charset charset = IOUtil.DEFAULT_CHARSET;
+    private Charset charset = Files.DEFAULT_CHARSET;
 
     /*
      * === FILTER PARAMATERISATION ===
@@ -124,26 +132,33 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
     description = "Minimum entry pair frequency threshold.",
     converter = DoubleConverter.class)
     private double filterEntryMinFreq;
+
     @Parameter(names = {"-few", "--filter-entry-whitelist"},
     description = "Whitelist file containing entries of interest. (All others will be ignored)")
     private File filterEntryWhitelist;
+
     @Parameter(names = {"-fep", "--filter-entry-pattern"},
     description = "Regular expresion that accepted entries must match.")
     private String filterEntryPattern;
+
     @Parameter(names = {"-feff", "--filter-entry-feature-freq"},
     description = "Minimum entry/feature pair frequency threshold.",
     converter = DoubleConverter.class)
     private double filterEntryFeatureMinFreq;
+
     @Parameter(names = {"-fff", "--filter-feature-freq"},
     description = "Minimum feature pair frequency threshold.",
     converter = DoubleConverter.class)
     private double filterFeatureMinFreq;
+
     @Parameter(names = {"-ffw", "--filter-feature-whitelist"},
     description = "Whitelist file containing features of interest. (All others will be ignored)")
     private File filterFeatureWhitelist;
+
     @Parameter(names = {"-ffp", "--filter-feature-pattern"},
     description = "Regular expresion that accepted features must match.")
     private String filterFeaturePattern;
+
     @Parameter(names = {"-T", "--temp-dir"},
     description = "Temorary directory which will be used during filtering.",
     converter = TempFileFactoryConverter.class)
@@ -153,15 +168,25 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
      * === INTERNAL ===
      */
     private Predicate<Weighted<Token>> acceptEntry = alwaysTrue();
+
     private Predicate<Weighted<TokenPair>> acceptEntryFeature = alwaysTrue();
+
     private Predicate<Weighted<Token>> acceptFeature = alwaysTrue();
+
     private boolean entryFilterRequired = false;
+
     private boolean entryFeatureFilterRequired = false;
+
     private boolean featureFilterRequired = false;
+
     final ObjectIndex<String> entryIndex = new ObjectIndex<String>();
+
     final ObjectIndex<String> featureIndex = new ObjectIndex<String>();
+
     private File activeEntryFeaturesFile;
+
     private File activeEntriesFile;
+
     private File activeFeaturesFile;
 
     public FilterTask() {
@@ -191,7 +216,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
             addFeaturesPattern(filterFeaturePattern);
         }
         if (filterFeatureWhitelist != null) {
-            addFeaturesWhitelist(Files.readLines(
+            addFeaturesWhitelist(com.google.common.io.Files.readLines(
                     filterFeatureWhitelist, charset));
         }
 
@@ -202,7 +227,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
             addEntryPattern(filterEntryPattern);
         }
         if (filterEntryWhitelist != null) {
-            addEntryWhitelist(Files.readLines(
+            addEntryWhitelist(com.google.common.io.Files.readLines(
                     filterEntryWhitelist, charset));
         }
 
@@ -279,19 +304,19 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
             LOG.debug("Copying entries from " + activeEntriesFile
                     + " to " + outputEntriesFile + ".");
         }
-        Files.copy(activeEntriesFile, outputEntriesFile);
+        com.google.common.io.Files.copy(activeEntriesFile, outputEntriesFile);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Copying features from " + activeEntryFeaturesFile
                     + " to " + outputEntryFeaturesFile + ".");
         }
-        Files.copy(activeEntryFeaturesFile, outputEntryFeaturesFile);
+        com.google.common.io.Files.copy(activeEntryFeaturesFile, outputEntryFeaturesFile);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Copying features from " + activeFeaturesFile
                     + " to " + outputFeaturesFile + ".");
         }
-        Files.copy(activeFeaturesFile, outputFeaturesFile);
+        com.google.common.io.Files.copy(activeFeaturesFile, outputFeaturesFile);
 
         if (LOG.isInfoEnabled()) {
             LOG.info("Completed filtering.");
@@ -313,7 +338,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
         outputFile.deleteOnExit();
 
         WeightedTokenSink entriesSink = new WeightedTokenSink(outputFile,
-                charset, entryIndex);
+                                                              charset, entryIndex);
 
         if (LOG.isInfoEnabled()) {
             LOG.info(
@@ -348,7 +373,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
 
         if (filteredWeight != 0) {
             entriesSink.write(new Weighted<Token>(new Token(filteredEntry),
-                    filteredWeight));
+                                                  filteredWeight));
         }
 
         entriesSink.flush();
@@ -360,8 +385,8 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
         if (rejected.size() > 0) {
             entryFeatureFilterRequired = true;
             acceptEntryFeature = and(acceptEntryFeature,
-                    compose(not(in(rejected)),
-                    entryFeatureEntryId()));
+                                     compose(not(in(rejected)),
+                                             entryFeatureEntryId()));
         }
     }
 
@@ -483,13 +508,13 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
 
         if (rejectedEntries.size() > 0) {
             acceptEntry = and(acceptEntry,
-                    compose(not(in(rejectedEntries)), id()));
+                              compose(not(in(rejectedEntries)), id()));
             entryFilterRequired = true;
         }
 
         if (rejectedFeatures.size() > 0) {
             acceptFeature = and(acceptFeature,
-                    not(compose(in(rejectedFeatures), id())));
+                                not(compose(in(rejectedFeatures), id())));
             featureFilterRequired = true;
 
         }
@@ -544,7 +569,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
 
         if (filteredWeight != 0) {
             featureSink.write(new Weighted<Token>(new Token(filteredId),
-                    filteredWeight));
+                                                  filteredWeight));
         }
         featureSink.flush();
         featureSink.close();
@@ -864,6 +889,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
             public String toString() {
                 return "Weight";
             }
+
         };
     }
 
@@ -879,6 +905,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
             public String toString() {
                 return "ID";
             }
+
         };
     }
 
@@ -894,6 +921,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
             public String toString() {
                 return "EntriesString";
             }
+
         };
     }
 
@@ -909,6 +937,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
             public String toString() {
                 return "FeatureString";
             }
+
         };
     }
 
@@ -924,6 +953,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
             public String toString() {
                 return "FeatureEntryID";
             }
+
         };
     }
 
@@ -939,6 +969,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
             public String toString() {
                 return "EntryFeatureID";
             }
+
         };
     }
 
@@ -954,6 +985,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
             public String toString() {
                 return "EntryFeatureFeatureString";
             }
+
         };
     }
 
@@ -969,6 +1001,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
             public String toString() {
                 return "EntryFeatureEntryString";
             }
+
         };
     }
 
@@ -994,4 +1027,5 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
                 add("acceptFeature", acceptFeature).
                 add("acceptEvent", acceptEntryFeature);
     }
+
 }

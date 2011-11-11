@@ -36,7 +36,6 @@ import com.google.common.base.Objects;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import uk.ac.susx.mlcl.lib.tasks.AbstractCommandTask;
 import java.io.BufferedReader;
@@ -49,6 +48,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.Files;
 import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
 
 /**
@@ -81,7 +81,7 @@ public class ChunkTask extends AbstractCommandTask {
 
     @Parameter(names = {"-c", "--charset"},
                description = "Character encoding to use.")
-    private Charset charset = IOUtil.DEFAULT_CHARSET;
+    private Charset charset = Files.DEFAULT_CHARSET;
 
     public final Charset getCharset() {
         return charset;
@@ -148,7 +148,7 @@ public class ChunkTask extends AbstractCommandTask {
         final int nlBytes = System.getProperty("line.separator").getBytes().length;
 
         try {
-            reader = IOUtil.openReader(sourceFile, charset);
+            reader = Files.openReader(sourceFile, charset);
             int chunk = 1;
             int chunkBytesWritten = 0;
             String line = reader.readLine();
@@ -162,7 +162,7 @@ public class ChunkTask extends AbstractCommandTask {
                     if (LOG.isDebugEnabled())
                         LOG.debug("Producing chunk " + chunk + " to file \"" + tmp
                                 + "\".");
-                    writer = IOUtil.openWriter(tmp, charset);
+                    writer = Files.openWriter(tmp, charset);
 
                     do {
                         writer.write(line);

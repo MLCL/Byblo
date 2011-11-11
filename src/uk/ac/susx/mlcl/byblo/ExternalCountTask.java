@@ -30,14 +30,11 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
-import uk.ac.susx.mlcl.lib.tasks.TempFileFactoryConverter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
 import uk.ac.susx.mlcl.byblo.MergeTask.Formatter;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.io.FileFactory;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import uk.ac.susx.mlcl.lib.tasks.AbstractParallelCommandTask;
 import uk.ac.susx.mlcl.lib.tasks.Task;
@@ -54,6 +51,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.Files;
 import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
 import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
 
@@ -103,7 +101,7 @@ public class ExternalCountTask extends AbstractParallelCommandTask {
 
     @Parameter(names = {"-c", "--charset"},
                description = "Character encoding to use for reading and writing files.")
-    private Charset charset = IOUtil.DEFAULT_CHARSET;
+    private Charset charset = Files.DEFAULT_CHARSET;
 
     private Comparator<String> comparator = new Comparator<String>() {
 

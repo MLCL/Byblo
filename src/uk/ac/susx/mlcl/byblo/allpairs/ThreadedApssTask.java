@@ -107,7 +107,7 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
         return innerAlgorithm;
     }
 
-    public void setInnerAlgorithm(Class<? extends NaiveApssTask<? extends S>> innerAlgorithm) {
+    public void setInnerAlgorithm(Class<? extends NaiveApssTask> innerAlgorithm) {
         this.innerAlgorithm = innerAlgorithm;
     }
 

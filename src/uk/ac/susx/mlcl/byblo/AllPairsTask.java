@@ -34,9 +34,7 @@ import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
 import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
 import com.google.common.base.Objects.ToStringHelper;
 import uk.ac.susx.mlcl.lib.DoubleConverter;
-import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -53,7 +51,6 @@ import uk.ac.susx.mlcl.byblo.measure.Proximity;
 import uk.ac.susx.mlcl.byblo.measure.ReversedProximity;
 import uk.ac.susx.mlcl.lib.ObjectIndex;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import java.io.File;
 import java.io.IOException;
@@ -68,6 +65,7 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
+import uk.ac.susx.mlcl.lib.Files;
 import uk.ac.susx.mlcl.lib.io.Lexer;
 import uk.ac.susx.mlcl.lib.tasks.AbstractCommand;
 
@@ -104,7 +102,7 @@ public class AllPairsTask extends AbstractCommand {
 
     @Parameter(names = {"-c", "--charset"},
                description = "Character encoding to use for reading and writing.")
-    private Charset charset = IOUtil.DEFAULT_CHARSET;
+    private Charset charset = Files.DEFAULT_CHARSET;
 
     @Parameter(names = {"-C", "--chunk-size"},
                description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")

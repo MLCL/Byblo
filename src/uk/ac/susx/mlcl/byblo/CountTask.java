@@ -60,6 +60,7 @@ import uk.ac.susx.mlcl.byblo.io.SingletonRecordException;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
+import uk.ac.susx.mlcl.lib.Files;
 import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
 import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
 
@@ -108,7 +109,7 @@ public class CountTask extends AbstractCommandTask implements Serializable {
 
     @Parameter(names = {"-c", "--charset"},
                description = "Character encoding to use for input and output.")
-    private Charset charset = IOUtil.DEFAULT_CHARSET;
+    private Charset charset = Files.DEFAULT_CHARSET;
 
     /**
      * Dependency injection constructor with all fields parameterised.

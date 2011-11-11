@@ -41,8 +41,9 @@ import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * A simple of bi-map for indexing complex objects (usually strings).
+ * A simple of bimap for indexing complex objects (usually strings).
  *
+ * @param <T> type of object being indexed.
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class ObjectIndex<T> implements Serializable {
@@ -67,13 +68,7 @@ public final class ObjectIndex<T> implements Serializable {
 
         final int result = objToIndex.getInt(obj);
         return (result == objToIndex.defaultReturnValue())
-                ? get0(obj) : result;
-
-//        if (objToIndex.containsKey(obj)) {
-//            return objToIndex.getInt(obj);
-//        } else {
-//            return get0(obj);
-//        }
+               ? get0(obj) : result;
     }
 
     private synchronized int get0(final T obj) {
@@ -113,4 +108,5 @@ public final class ObjectIndex<T> implements Serializable {
     public String toString() {
         return objToIndex.toString();
     }
+
 }

@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import uk.ac.susx.mlcl.lib.io.IOUtil;
 import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -46,12 +47,12 @@ public class WeightedEntryPairTest {
 
     private void copyWEP(File a, File b, boolean compact) throws FileNotFoundException, IOException {
         WeightedTokenPairSource aSrc = new WeightedTokenPairSource(a,
-                DEFAULT_CHARSET);
+                                                                   DEFAULT_CHARSET);
         WeightedTokenPairSink bSink = new WeightedTokenPairSink(b,
-                DEFAULT_CHARSET, aSrc.getStringIndex1(), aSrc.getStringIndex2());
+                                                                DEFAULT_CHARSET, aSrc.getStringIndex1(), aSrc.getStringIndex2());
         bSink.setCompactFormatEnabled(compact);
 
-        copy(aSrc, bSink);
+        IOUtil.copy(aSrc, bSink);
         bSink.close();
     }
 
@@ -59,21 +60,22 @@ public class WeightedEntryPairTest {
     public void testWeightedEntryFeaturesConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_SIMS;
         File b = new File(TEST_OUTPUT_DIR,
-                TEST_FRUIT_SIMS.getName() + ".compact");
+                          TEST_FRUIT_SIMS.getName() + ".compact");
         File c = new File(TEST_OUTPUT_DIR,
-                TEST_FRUIT_SIMS.getName() + ".verbose");
+                          TEST_FRUIT_SIMS.getName() + ".verbose");
 
         copyWEP(a, b, true);
 
         assertTrue("Compact copy is smaller that verbose source.",
-                b.length() <= a.length());
+                   b.length() <= a.length());
 
         copyWEP(b, c, false);
 
 
         assertTrue("Verbose copy is smaller that compact source.",
-                c.length() >= b.length());
+                   c.length() >= b.length());
         assertTrue("Double converted file is not equal to origion.",
-                Files.equal(a, c));
+                   Files.equal(a, c));
     }
+
 }

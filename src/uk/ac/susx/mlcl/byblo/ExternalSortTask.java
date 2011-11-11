@@ -36,7 +36,6 @@ import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects.ToStringHelper;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import uk.ac.susx.mlcl.lib.tasks.AbstractParallelCommandTask;
 import uk.ac.susx.mlcl.lib.tasks.Task;
@@ -51,6 +50,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.Files;
 
 /**
  *
@@ -66,17 +66,17 @@ public class ExternalSortTask extends AbstractParallelCommandTask {
     private int maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
     @Parameter(names = {"-i", "--input"},
     description = "Source file. If this argument is not given, or if it is \"-\", then stdin will be read.")
-    private File sourceFile = IOUtil.STDIN_FILE;
+    private File sourceFile = Files.STDIN_FILE;
     @Parameter(names = {"-o", "--output"},
     description = "Destination file. If this argument is not given, or if it is \"-\", then stdout will be written to.")
-    private File destFile = IOUtil.STDOUT_FILE;
+    private File destFile = Files.STDOUT_FILE;
     @Parameter(names = {"-T", "--temporary-directory"},
     description = "Directory which will be used for storing temporary files.",
     converter = TempFileFactoryConverter.class)
     private FileFactory tempFileFactory = new TempFileFactory();
     @Parameter(names = {"-c", "--charset"},
     description = "Character encoding for reading and writing files.")
-    private Charset charset = IOUtil.DEFAULT_CHARSET;
+    private Charset charset = Files.DEFAULT_CHARSET;
     private Comparator<String> comparator = new NeighbourComparator();
     private Queue<File> mergeQueue;
 

@@ -33,7 +33,6 @@ package uk.ac.susx.mlcl.byblo;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -42,6 +41,7 @@ import java.util.Comparator;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.Files;
 
 /**
  * Task that read in a file and produces the k-nearest-neighbors for each base 
@@ -82,10 +82,10 @@ public class KnnTask extends SortTask {
             LOG.info("Running memory K-Nearest-Neighbours from \"" + getSrcFile()
                     + "\" to \"" + getDstFile() + "\".");
         final List<String> linesIn = new ArrayList<String>();
-        IOUtil.readAllLines(getSrcFile(), getCharset(), linesIn);
+        Files.readAllLines(getSrcFile(), getCharset(), linesIn);
         final List<String> linesOut = new ArrayList<String>();
         knnLines(linesIn, linesOut);
-        IOUtil.writeAllLines(getDstFile(), getCharset(), linesOut);
+        Files.writeAllLines(getDstFile(), getCharset(), linesOut);
 
         if (LOG.isInfoEnabled())
             LOG.info("Completed memory K-Nearest-Neighbours.");

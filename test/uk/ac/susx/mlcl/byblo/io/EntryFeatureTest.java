@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import uk.ac.susx.mlcl.lib.io.IOUtil;
 import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -71,7 +72,7 @@ public class EntryFeatureTest {
                 aSrc.getStringIndex1(), aSrc.getStringIndex2());
         bSink.setCompactFormatEnabled(compact);
 
-        copy(aSrc, bSink);
+        IOUtil.copy(aSrc, bSink);
         bSink.close();
     }
 

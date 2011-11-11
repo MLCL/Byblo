@@ -34,7 +34,6 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.tasks.AbstractCommandTask;
 import uk.ac.susx.mlcl.lib.tasks.CaseInsensitiveComparator;
 import java.io.BufferedReader;
@@ -45,6 +44,7 @@ import java.nio.charset.Charset;
 import java.util.Comparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.Files;
 
 /**
  * Merges the contents of two sorted source files, line by line, into a
@@ -82,7 +82,7 @@ public class MergeTask extends AbstractCommandTask {
 
     @Parameter(names = {"-c", "--charset"},
                description = "The character set encoding to use for both input and output files.")
-    private Charset charset = IOUtil.DEFAULT_CHARSET;
+    private Charset charset = Files.DEFAULT_CHARSET;
 
     @Override
     protected Objects.ToStringHelper toStringHelper() {
@@ -166,9 +166,9 @@ public class MergeTask extends AbstractCommandTask {
                 LOG.info(
                         "Merging files from \"" + getSourceFileA() + "\" and \"" + getSourceFileB() + "\" to \"" + getDestFile() + "\".");
 
-            readerA = IOUtil.openReader(getSourceFileA(), getCharset());
-            readerB = IOUtil.openReader(getSourceFileB(), getCharset());
-            writer = IOUtil.openWriter(getDestFile(), getCharset());
+            readerA = Files.openReader(getSourceFileA(), getCharset());
+            readerB = Files.openReader(getSourceFileB(), getCharset());
+            writer = Files.openWriter(getDestFile(), getCharset());
             String lineA = readerA.readLine();
             String lineB = readerB.readLine();
             while (lineA != null && lineB != null) {

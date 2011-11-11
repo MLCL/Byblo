@@ -30,12 +30,11 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import uk.ac.susx.mlcl.lib.Files;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import com.beust.jcommander.JCommander;
 import java.io.IOException;
-import java.util.ResourceBundle;
 import java.io.File;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -62,7 +61,7 @@ public class ChunkTaskTest {
         FileFactory fileFactory = new TempFileFactory();
 
         File in = File.createTempFile(getClass().getName(), "in");
-        IOUtil.writeAll(in, DEFAULT_CHARSET, str);
+        Files.writeAll(in, DEFAULT_CHARSET, str);
 
         ChunkTask instance = new ChunkTask();
         instance.setSrcFile(in);
@@ -75,7 +74,7 @@ public class ChunkTaskTest {
         int i = 0;
         for (File out : instance.getDestFiles()) {
             StringBuilder sb = new StringBuilder();
-            IOUtil.readAll(out, DEFAULT_CHARSET, sb);
+            Files.readAll(out, DEFAULT_CHARSET, sb);
             assertEquals(expectedResult[i] + "\n", sb.toString());
             i++;
             out.delete();

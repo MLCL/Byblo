@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import uk.ac.susx.mlcl.lib.io.IOUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,7 +57,7 @@ public class EntryTest {
                 aSrc.getStringIndex());
         bSink.setCompactFormatEnabled(compact);
 
-        copy(aSrc, bSink);
+        IOUtil.copy(aSrc, bSink);
         bSink.close();
     }
 

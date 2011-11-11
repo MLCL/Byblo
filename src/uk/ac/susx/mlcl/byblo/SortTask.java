@@ -34,7 +34,6 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -43,6 +42,7 @@ import java.util.Comparator;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.Files;
 
 /**
  * Task that takes a single input file and sorts it according to some comparator,
@@ -59,7 +59,7 @@ public class SortTask extends CopyTask {
 
     @Parameter(names = {"-c", "--charset"},
                description = "The character set encoding to use for both input and output files.")
-    private Charset charset = IOUtil.DEFAULT_CHARSET;
+    private Charset charset = Files.DEFAULT_CHARSET;
 
     public SortTask(File sourceFile, File destinationFile, Charset charset,
             Comparator<String> comparator) {
@@ -73,7 +73,7 @@ public class SortTask extends CopyTask {
     }
 
     public SortTask(File sourceFile, File destinationFile) {
-        this(sourceFile, destinationFile, IOUtil.DEFAULT_CHARSET);
+        this(sourceFile, destinationFile, Files.DEFAULT_CHARSET);
     }
 
     public final Charset getCharset() {
@@ -105,9 +105,9 @@ public class SortTask extends CopyTask {
         
         
         final List<String> lines = new ArrayList<String>();
-        IOUtil.readAllLines(getSrcFile(), getCharset(), lines);
+        Files.readAllLines(getSrcFile(), getCharset(), lines);
         Collections.sort(lines, getComparator());
-        IOUtil.writeAllLines(getDstFile(), getCharset(), lines);
+        Files.writeAllLines(getDstFile(), getCharset(), lines);
 
         if (LOG.isInfoEnabled())
             LOG.info("Completed memory sort.");

@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
+import uk.ac.susx.mlcl.lib.Files;
 import java.util.ArrayList;
 import java.util.List;
 import com.google.common.base.CharMatcher;
@@ -121,7 +122,7 @@ public class LexerTest {
         System.out.println("basicTest");
 
 
-        Charset charset = IOUtil.DEFAULT_CHARSET;
+        Charset charset = Files.DEFAULT_CHARSET;
         File tmp = makeTmpData(CFB);
 
         Lexer lexer = new Lexer(tmp, charset);
@@ -158,7 +159,7 @@ public class LexerTest {
     public void seekTest() throws FileNotFoundException, IOException {
         System.out.println("seekTest");
 
-        Charset charset = IOUtil.DEFAULT_CHARSET;
+        Charset charset = Files.DEFAULT_CHARSET;
         File tmp = makeTmpData(CFB);
 
         Lexer lexer = new Lexer(tmp, charset);
@@ -225,7 +226,7 @@ public class LexerTest {
     public void seekTest(File file) throws FileNotFoundException, IOException {
         System.out.println("Test Lexer seek with " + file.toString() + "");
 
-        Charset charset = IOUtil.DEFAULT_CHARSET;
+        Charset charset = Files.DEFAULT_CHARSET;
 
         Lexer lexer = new Lexer(file, charset);
 

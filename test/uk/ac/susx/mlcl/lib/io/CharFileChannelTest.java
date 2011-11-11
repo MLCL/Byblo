@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
+import uk.ac.susx.mlcl.lib.Files;
 import java.io.RandomAccessFile;
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -178,7 +179,7 @@ public class CharFileChannelTest {
 
         CharFileChannel instance = new CharFileChannel(
                 new FileInputStream(SMALL_SAMPLE_FILE).getChannel(),
-                IOUtil.DEFAULT_CHARSET);
+                Files.DEFAULT_CHARSET);
 
         assertEquals(true, instance.isOpen());
         instance.close();
@@ -217,7 +218,7 @@ public class CharFileChannelTest {
 
         CharFileChannel instance = new CharFileChannel(
                 new FileInputStream(tmp).getChannel(),
-                IOUtil.DEFAULT_CHARSET);
+                Files.DEFAULT_CHARSET);
         instance.setMaxMappedBytes(1000000);
 
         assertEquals(true, instance.isOpen());
