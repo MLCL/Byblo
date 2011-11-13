@@ -31,9 +31,11 @@ This section details how build the project from with Netbeans 7. First acquire t
 
 1. Start Netbeans and select "File -> New Project" from the menu bar. Select *Java / Java Project with Existing Sources* and click *Next*.
 
-4. Enter the *Project Name* as "MLCLLib", and select the *Project Folder* as the location of the project source code (the parent directory that contains the `build.xml` file.) Click *Next*.
+4. Enter the *Project Name* as "MLCLLib", and select the *Project Folder* as the location of the project source code (the parent directory that contains the `build.xml` file.). At this point NetBeans will suggest a build file called nbbuild.xml, let it be as is. Click *Next*.
 
 5. To *Source Package Folders* click *Add Folder* and select `src`. To *Test Package Folders* click *Add Folder* and select `test`. Click *Next* then *Finish*.
+
+6. Once the project is created navigate to *Project Folder/nbproject* and open the project.properties file in a text editor. Find the line (should be around 17) that says *buildfile=nbbuild.xml* and change it to *buildfile=build.xml*. Save the file and you're done. 
 
 ## Attribution 
 
