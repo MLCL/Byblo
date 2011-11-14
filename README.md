@@ -112,7 +112,7 @@ Special thanks to all members of the Machine Learning and Computational Linguist
 
 ## Contributing
 
-To contributed to the project you should fork the git repository. First click the "Fork" button on github. Then open a console and type the following:
+To contribute to the project you should fork the git repository. First click the "Fork" button on github. Then open a console and type the following:
 
 ```sh
 $ git clone git@github.com:[your-user-name]/Byblo.git
@@ -121,7 +121,7 @@ $ git remote add upsteam git@github.com:hamishmorgan/Byblo.git
 $ git fetch upstream
 ```
 
-If you have changes to contribute back to the main project, send me a pull request by clicking the "Pull Request" button my fork of the repository.
+If you have changes to contribute back to the main project, send me a pull request by clicking the "Pull Request" button in your fork of the repository. For a detailed description click [here](http://help.github.com/send-pull-requests/).
 
 ## Licence
 
