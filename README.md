@@ -6,29 +6,29 @@ Byblo is a software package for the construction of large-scale *distributional 
 
 ### Informally
 
-Naively, a distribution thesaurus can be thought of much like a tradition thesauri. It allows one to lookup a word to return a list of synonyms. Unlike a traditional thesauri, however, the synonyms aren't manually curated by a human, they are calculated using a statistical model estimated from a text corpus. The similarity between two terms might be calculated from the intersection of the features of the terms, extracted from to corpus. For example if the phrases "christmas holiday" and "xmas holiday" occur very frequently in the corpus, the model might indicate that *christmas* and *xmas* are similar. Here we have decided that co-occurrent words are features, both *christmas* and *xmas* share the feature *holiday*, so they are similar. 
+Naively, a distribution thesaurus can be thought of much like a tradition thesaurus. It allows one to look up a word and return a list of synonyms. Unlike a traditional thesauri, however, the synonyms are not manually curated by a human, they are calculated using a statistical model estimated from a text corpus. The similarity between two terms might be calculated from the intersection of the features of the terms, extracted from a large corpus of text. For example if the phrases "christmas holiday" and "xmas holiday" occur very frequently in the corpus, the model might indicate that *christmas* and *xmas* are similar. Here we have decided that co-occurrent words are features, both *christmas* and *xmas* share the feature *holiday*, so they are similar. 
 
 ### Less Informally
 
-Unfortunately, a distribution thesauri is actually not at all like a manually curated one. Fundamentally we are defining a notions of similarity that is wholly different from synonymy. Worse still is that it changes depending on the corpus, features selection and similarity measure. The previous paragraph is there to give a ludicrously high level overview of the project purpose, to those who are only mildly curious. For those who are intent on using the software, let me start again:
+Unfortunately, a distribution thesaurus is actually not at all like a manually curated one. Fundamentally we are defining a notion of similarity that is wholly different from synonymy. Worse still is that it changes depend on the corpus, feature selection and similarity measure. The previous paragraph is there to give a ludicrously high level overview of the project purpose, to those who are only mildly curious. For those who are intent on using the software, let me start again:
 
-A distributional thesaurus is a resource that contains the estimated *substitutability* of *entries*. Typically these entries are terms or phrases. The thesaurus can be queried with an entry (the *base entry*) and returns a list of other entries (the base entry's *neighbours*). These neighbours can be used as part of an external text-processing pipeline, such as to expand queries during information retrieval. The entries are extracted from a text corpus, along with features of each entry. The similarity of entries is calculated as a function of their features. Underpinning this process is Harris' *Distribution Hypothesis*: "a word is characterised by the company it keeps". As mentioned above, it's hard to pin down the precise notion of similarity used because there are so many variable. 
+A distributional thesaurus is a resource that contains the estimated *substitutability* of *entries*. Typically these entries are terms or phrases. The thesaurus can be queried with an entry (the *base entry*) and returns a list of other entries (the base entry's *neighbours*). These neighbours can be used as a part of an external text-processing pipeline, such as to expand queries during information retrieval. The entries are extracted from a text corpus, along with features of each entry. The similarity of entries is calculated as a function of their features. Underpinning this process is Harris' *Distribution Hypothesis*: "a word is characterised by the company it keeps". As mentioned above, it is hard to pin down the precise notion of similarity used because there are so many variables. 
 
 ### Example Build Process
 
 To provide an intuition, here is an example:
 
-Take as our input corpus a balanced collection of English language text (such as Wikipedia). Let our entries be all unique terms in the corpus. We shall select the features of a base-entry as the frequency of all terms that co-occur in the corpus within a window of ±1 terms. Finally, the similarity function will be Cosine, which represents the feature sets as high dimensional vectors. Cosine calculates the similarity as being inversely proportional to the orthogonality of vectors. The thesaurus build process proceeds as follows:
+Take as our input corpus a balanced collection of English language text (such as Wikipedia). Let our entries be all unique terms in the corpus. We shall select the features of a base-entry as the frequency of all terms that co-occur in the corpus within a window of ±1 terms. Finally, the similarity function will be Cosine, which represents the feature sets as high dimensional vectors. Cosine calculates the similarity as being inversely proportional to the �degree of orthogonality� of vectors. The thesaurus build process proceeds as follows:
 
- 1. Tokenise the corpus, extracting a list of all unique terms. For each entry record occurrences of all the others entries within a window of ±1. E.g if we encounter the string "the big red bus", the entry-features produced are the:big, big:the, big:red, red:big, red:bus, and bus:red. Note that this process is not yet covered by the provided software.
+ 1. Tokenise the corpus, extracting a list of all unique terms. For each entry record occurrences of all the other entries within a window of ±1. For example, if we encounter the string "the big red bus", the entry-features produced are the:big, big:the, big:red, red:big, red:bus, and bus:red. Note that this process is not yet covered by the provided software.
 
- 2. Count the occurrences of each unique feature with each unique entry. So we may find that the string "red bus" occurs 100 times in the corpus, and that "bus red" occurs 2 times. In this case we produce the features bus:red:102 and red:bus:102, because remember the feature windows is 1 term before and after. For each entry construct a multi-set of all features is occurs with.
+ 2. Count the occurrences of each unique feature with each unique entry. So we may find that the string "red bus" occurs 100 times in the corpus, and that "bus red" occurs 2 times. In this case we produce the features bus:red:102 and red:bus:102 (remember the feature windows is 1 term before and after). For each entry construct a multi-set of all features is occurs with.
 
  3. Convert the feature multi-set for each entry to a vector, where each features is a dimension, and the magnitude along a dimension is the frequency.
 
- 4. For all pair-wise combinations of entries calculate their similarity as the cosine of the angle between their feature vectors.
+ 4. For all pairs of entries calculate their similarity as the cosine of the angle between their feature vectors.
 
- 5. For each base entry, select as it's neighbours the top k highest similarity entries.
+ 5. For each base entry, select as its neighbours the top k highest similarity entries.
 
 The resultant thesaurus will have a highly semantic notion of similarity. The neighbours of a word are likely to be strongly related in terms of meaning and topic, but not at all in terms of syntax. So for example the top neighbours of *happy* could be *pleased*, *impressed*, *satisfied*, *surprised*, *disappointed*, *thrilled*, *upset*, and *glad*. Notice that while some words - such as the adjectival sense of *pleased* - are good synonyms, there are some antonymic words such as *disappointed*.
 
@@ -41,7 +41,7 @@ The source code can be acquired from the [github repository](https://github.com/
 
 The project requires [Java 6](http://www.oracle.com/technetwork/java/javase/downloads/index.html) installed on the system. It also requires a unix command-line such as Linux or Mac OS X. Windows users may get it to work through [Cygwin](http://www.cygwin.com). The software is compiled using an [Apache Ant](http://ant.apache.org) script. In addition the following Java libraries are required:
 
- * [Google Guava r09](http://code.google.com/p/guava-libraries/) -- A library containing numerous useful features and tools; mostly the kind of thing that should have been included with Java in the first place.
+ * [Google Guava r09](http://code.google.com/p/guava-libraries/) -- A library containing numerous useful features and tools; mostly the kind of things that should have been included with Java in the first place.
 
  * [JCommander 1.1.7](http://github.com/cbeust/jcommander) --- A framework for parsing command line arguments in a very elegant way.
 
