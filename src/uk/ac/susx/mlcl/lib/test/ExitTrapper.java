@@ -30,6 +30,8 @@
  */
 package uk.ac.susx.mlcl.lib.test;
 
+import java.io.FileDescriptor;
+import java.net.InetAddress;
 import java.security.Permission;
 
 /**
@@ -38,24 +40,27 @@ import java.security.Permission;
  * to {@link System#exit(int) } result in a runtime {@link ExitException},
  * rather than simply terminating the forked VM (passing the test).
  * 
- * <p>Note that this class will obliterate whatever SecurityManager is installed
- * if it can. The previously install SecurityManager will however be reinstated
- * when trapping is disabled.</p>
+ * <p>This class will temporarily encapsulate whatever SecurityManager is 
+ * installed, over-riding checkExit. It will pass all other security related
+ * checks to the previously installed manager (if there was one). When disabled
+ * the previously installed manager will be re-instated.</p>
+ * 
+ * <p>Take care that there are guarantees in place to insure ExitTrapper is 
+ * disabled when not required, otherwise it's functionality will bleed into
+ * other area of VM. To insure ExitTrapper is disabled enclosed it in a
+ * <tt>try/finally</tt> block:</p>
+ * <pre>
+ *  try {
+ *      ExitTrapper.enableExistTrapping();
+ *      // Do trapped stuff here
+ *  } finally {
+ *      ExitTrapper.disableExitTrapping();
+ *  }
+ * </pre>
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class ExitTrapper {
-
-    /**
-     * Store an instance of the security manager.
-     */
-    private static SecurityManager noExitSM;
-
-    /**
-     * Store the previously installed security manager. This will be re-instated
-     * when trapping is disabled.
-     */
-    private static SecurityManager previousSM;
 
     /**
      * Static utility class can't be constructed
@@ -64,20 +69,12 @@ public class ExitTrapper {
     }
 
     /**
-     * Initialise the class - instantiate the exception object.
-     */
-    private static synchronized void initExitTrapper() {
-        if (noExitSM == null)
-            noExitSM = new NoExitSecurityManager();
-    }
-
-    /**
      * Turn on exit trapping if it's off
      */
     public static synchronized void enableExistTrapping() {
         if (!isExitTrappingEnabled()) {
-            previousSM = System.getSecurityManager();
-            System.setSecurityManager(noExitSM);
+            System.setSecurityManager(
+                    new NoExitSecurityManager(System.getSecurityManager()));
         }
     }
 
@@ -86,7 +83,9 @@ public class ExitTrapper {
      */
     public static synchronized void disableExitTrapping() {
         if (isExitTrappingEnabled()) {
-            System.setSecurityManager(previousSM);
+            System.setSecurityManager(
+                    ((NoExitSecurityManager) System.getSecurityManager()).
+                    getInner());
         }
     }
 
@@ -94,10 +93,10 @@ public class ExitTrapper {
      * Turn off exit trapping if it's on, otherwise turn it on
      */
     public static synchronized void toggleExitTrapping() {
-        System.setSecurityManager(
-                isExitTrappingEnabled()
-                ? previousSM
-                : noExitSM);
+        if (isExitTrappingEnabled())
+            disableExitTrapping();
+        else
+            enableExistTrapping();
     }
 
     /**
@@ -106,8 +105,8 @@ public class ExitTrapper {
      * @return true if exit trapping is enabled, false otherwise
      */
     public static synchronized boolean isExitTrappingEnabled() {
-        initExitTrapper();
-        return System.getSecurityManager() == noExitSM;
+        final SecurityManager currentSM = System.getSecurityManager();
+        return currentSM != null && currentSM instanceof NoExitSecurityManager;
     }
 
     /**
@@ -131,23 +130,21 @@ public class ExitTrapper {
         public int getStatus() {
             return status;
         }
-
     }
 
     /**
      * Security manager instance that will throw exceptions when System.exit is
      * called.
      */
-    private static final class NoExitSecurityManager extends SecurityManager {
+    private static final class NoExitSecurityManager
+            extends SecurityManagerDecoratorAdapter {
 
-        @Override
-        public void checkPermission(Permission perm) {
-            // allow everything.
+        private NoExitSecurityManager(SecurityManager inner) {
+            super(inner);
         }
 
-        @Override
-        public void checkPermission(Permission perm, Object context) {
-            // allow everything.
+        private NoExitSecurityManager() {
+            super();
         }
 
         @Override
@@ -156,5 +153,313 @@ public class ExitTrapper {
             throw new ExitException(status);
         }
 
+        @Override
+        public void checkPermission(Permission perm) {
+            if (isInnerSet())
+                getInner().checkPermission(perm);
+        }
+
+        @Override
+        public void checkPermission(Permission perm, Object context) {
+            if (isInnerSet())
+                getInner().checkPermission(perm, context);
+        }
+    }
+
+    /**
+     * SecurityManagerDecoratorAdapter wraps a given security manager, 
+     * delegating all calls to the inner class. This class is intended to be
+     * extended, with only a subset of the method overridden.
+     */
+    private static abstract class SecurityManagerDecoratorAdapter
+            extends SecurityManager {
+
+        private final SecurityManager inner;
+
+        private SecurityManagerDecoratorAdapter(SecurityManager inner) {
+            this.inner = inner;
+        }
+
+        private SecurityManagerDecoratorAdapter() {
+            this(null);
+        }
+
+        public SecurityManager getInner() {
+            return inner;
+        }
+
+        public boolean isInnerSet() {
+            return inner != null;
+        }
+
+        @Override
+        public void checkExit(int status) {
+            if (isInnerSet())
+                inner.checkExit(status);
+            else
+                super.checkExit(status);
+        }
+
+        @Override
+        public void checkPermission(Permission perm) {
+            if (isInnerSet())
+                inner.checkPermission(perm);
+            else
+                super.checkPermission(perm);
+        }
+
+        @Override
+        public void checkPermission(Permission perm, Object context) {
+            if (isInnerSet())
+                inner.checkPermission(perm, context);
+            else
+                super.checkPermission(perm, context);
+        }
+
+        @Override
+        public ThreadGroup getThreadGroup() {
+            return !isInnerSet() 
+                    ? super.getThreadGroup()
+                    : inner.getThreadGroup();
+        }
+
+        @Override
+        public Object getSecurityContext() {
+            return !isInnerSet() 
+                    ? super.getSecurityContext()
+                    : inner.getSecurityContext();
+        }
+
+        @Override
+        @Deprecated
+        public boolean getInCheck() {
+            return !isInnerSet() 
+                    ? super.getInCheck()
+                    : inner.getInCheck();
+        }
+
+        @Override
+        public void checkWrite(String file) {
+            if (isInnerSet())
+                inner.checkWrite(file);
+            else
+                super.checkWrite(file);
+        }
+
+        @Override
+        public void checkWrite(FileDescriptor fd) {
+            if (isInnerSet())
+                inner.checkWrite(fd);
+            else
+                super.checkWrite(fd);
+        }
+
+        @Override
+        public boolean checkTopLevelWindow(Object window) {
+            return !isInnerSet()
+                    ? super.checkTopLevelWindow(window)
+                    : inner.checkTopLevelWindow(window);
+        }
+
+        @Override
+        public void checkSystemClipboardAccess() {
+            if (isInnerSet())
+                inner.checkSystemClipboardAccess();
+            else
+                super.checkSystemClipboardAccess();
+        }
+
+        @Override
+        public void checkSetFactory() {
+            if (isInnerSet())
+                inner.checkSetFactory();
+            else
+                super.checkSetFactory();
+        }
+
+        @Override
+        public void checkSecurityAccess(String target) {
+            if (isInnerSet())
+                inner.checkSecurityAccess(target);
+            else
+                super.checkSecurityAccess(target);
+        }
+
+        @Override
+        public void checkRead(String file, Object context) {
+            if (isInnerSet())
+                inner.checkRead(file, context);
+            else
+                super.checkRead(file, context);
+        }
+
+        @Override
+        public void checkRead(String file) {
+            if (isInnerSet())
+                inner.checkRead(file);
+            else
+                super.checkRead(file);
+        }
+
+        @Override
+        public void checkRead(FileDescriptor fd) {
+            if (isInnerSet())
+                inner.checkRead(fd);
+            else
+                super.checkRead(fd);
+        }
+
+        @Override
+        public void checkPropertyAccess(String key) {
+            if (isInnerSet())
+                inner.checkPropertyAccess(key);
+            else
+                super.checkPropertyAccess(key);
+        }
+
+        @Override
+        public void checkPropertiesAccess() {
+            if (isInnerSet())
+                inner.checkPropertiesAccess();
+            else
+                super.checkPropertiesAccess();
+        }
+
+        @Override
+        public void checkPrintJobAccess() {
+            if (isInnerSet())
+                inner.checkPrintJobAccess();
+            else
+                super.checkPrintJobAccess();
+        }
+
+        @Override
+        public void checkPackageDefinition(String pkg) {
+            if (isInnerSet())
+                inner.checkPackageDefinition(pkg);
+            else
+                super.checkPackageDefinition(pkg);
+        }
+
+        @Override
+        public void checkPackageAccess(String pkg) {
+            if (isInnerSet())
+                inner.checkPackageAccess(pkg);
+            else
+                super.checkPackageAccess(pkg);
+        }
+
+        @Override
+        @Deprecated
+        public void checkMulticast(InetAddress maddr, byte ttl) {
+            if (isInnerSet())
+                inner.checkMulticast(maddr, ttl);
+            else
+                super.checkMulticast(maddr, ttl);
+        }
+
+        @Override
+        public void checkMulticast(InetAddress maddr) {
+            if (isInnerSet())
+                inner.checkMulticast(maddr);
+            else
+                super.checkMulticast(maddr);
+        }
+
+        @Override
+        public void checkMemberAccess(Class<?> clazz, int which) {
+            if (isInnerSet())
+                inner.checkMemberAccess(clazz, which);
+            else
+                super.checkMemberAccess(clazz, which);
+        }
+
+        @Override
+        public void checkListen(int port) {
+            if (isInnerSet())
+                inner.checkListen(port);
+            else
+                super.checkListen(port);
+        }
+
+        @Override
+        public void checkLink(String lib) {
+            if (isInnerSet())
+                inner.checkLink(lib);
+            else
+                super.checkLink(lib);
+        }
+
+        @Override
+        public void checkExec(String cmd) {
+            if (isInnerSet())
+                inner.checkExec(cmd);
+            else
+                super.checkExec(cmd);
+        }
+
+        @Override
+        public void checkDelete(String file) {
+            if (isInnerSet())
+                inner.checkDelete(file);
+            else
+                super.checkDelete(file);
+        }
+
+        @Override
+        public void checkCreateClassLoader() {
+            if (isInnerSet())
+                inner.checkCreateClassLoader();
+            else
+                super.checkCreateClassLoader();
+        }
+
+        @Override
+        public void checkConnect(String host, int port, Object context) {
+            if (isInnerSet())
+                inner.checkConnect(host, port, context);
+            else
+                super.checkConnect(host, port, context);
+        }
+
+        @Override
+        public void checkConnect(String host, int port) {
+            if (isInnerSet())
+                inner.checkConnect(host, port);
+            else
+                super.checkConnect(host, port);
+        }
+
+        @Override
+        public void checkAwtEventQueueAccess() {
+            if (isInnerSet())
+                inner.checkAwtEventQueueAccess();
+            else
+                super.checkAwtEventQueueAccess();
+        }
+
+        @Override
+        public void checkAccess(ThreadGroup g) {
+            if (isInnerSet())
+                inner.checkAccess(g);
+            else
+                super.checkAccess(g);
+        }
+
+        @Override
+        public void checkAccess(Thread t) {
+            if (isInnerSet())
+                inner.checkAccess(t);
+            else
+                super.checkAccess(t);
+        }
+
+        @Override
+        public void checkAccept(String host, int port) {
+            if (isInnerSet())
+                inner.checkAccept(host, port);
+            else
+                super.checkAccept(host, port);
+        }
     }
 }
