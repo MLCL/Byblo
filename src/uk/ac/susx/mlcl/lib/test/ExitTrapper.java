@@ -33,17 +33,21 @@ package uk.ac.susx.mlcl.lib.test;
 import java.io.FileDescriptor;
 import java.net.InetAddress;
 import java.security.Permission;
+import java.text.MessageFormat;
 
 /**
- * Static utility class that allows calls to System.exit() to be intercepted. 
- * This makes direct testing of <tt>main</tt> methods possible, since all calls
- * to {@link System#exit(int) } result in a runtime {@link ExitException},
- * rather than simply terminating the forked VM (passing the test).
+ * Static utility class that allows calls to {@link java.lang.System#exit(int)}
+ * to be intercepted.  This makes direct testing of <tt>main</tt> methods 
+ * possible, since all calls to {@link System#exit(int) } result in a runtime 
+ * {@link ExitException}, rather than simply terminating the forked VM (passing
+ * the test).
  * 
- * <p>This class will temporarily encapsulate whatever SecurityManager is 
- * installed, over-riding checkExit. It will pass all other security related
- * checks to the previously installed manager (if there was one). When disabled
- * the previously installed manager will be re-instated.</p>
+ * <p>When exit trapping is enabled, the previously installed 
+ * {@link java.lang.SecurityManager} will be temporarily encapsulate, 
+ * over-riding {@link java.lang.SecurityManager#checkExit(int)}. It will pass 
+ * all other security related checks to the encapsulated security manager (if 
+ * there was one). When trapping is disabled the previously installed manager 
+ * will be re-instated.</p>
  * 
  * <p>Take care that there are guarantees in place to insure ExitTrapper is 
  * disabled when not required, otherwise it's functionality will bleed into
@@ -52,8 +56,14 @@ import java.security.Permission;
  * <pre>
  *  try {
  *      ExitTrapper.enableExistTrapping();
- *      // Do trapped stuff here
- *  } finally {
+ * 
+ *      // Do trapped stuff here...
+ * 
+ *  } catch(ExitException ex) {
+ *      // System.exit() was called
+ *      int status = ex.getStatus();
+ *      // Handle exception here
+ *  }finally {
  *      ExitTrapper.disableExitTrapping();
  *  }
  * </pre>
@@ -69,7 +79,7 @@ public class ExitTrapper {
     }
 
     /**
-     * Turn on exit trapping if it's off
+     * Turn on exit trapping if it's currently off
      */
     public static synchronized void enableExistTrapping() {
         if (!isExitTrappingEnabled()) {
@@ -79,7 +89,7 @@ public class ExitTrapper {
     }
 
     /**
-     * Turn off exit trapping if it's on
+     * Turn off exit trapping if it's currently on
      */
     public static synchronized void disableExitTrapping() {
         if (isExitTrappingEnabled()) {
@@ -90,7 +100,7 @@ public class ExitTrapper {
     }
 
     /**
-     * Turn off exit trapping if it's on, otherwise turn it on
+     * Turn off exit trapping if it's currently on, otherwise turn it on
      */
     public static synchronized void toggleExitTrapping() {
         if (isExitTrappingEnabled())
@@ -110,24 +120,38 @@ public class ExitTrapper {
     }
 
     /**
-     * Instances of this RuntimeException will be thrown when calls to 
-     * System.exit are made and trapping is enabled.
+     * <tt>ExitException</tt> is a {@link hava.lang.SecurityException } that 
+     * will be thrown when {@link java.lang.System#exit(int)} is called and 
+     * trapping is enabled.
      */
     public static final class ExitException extends SecurityException {
 
         private static final long serialVersionUID = 1L;
+
+        private static final String MESSAGE =
+                "Call to System.exit({0,number,integer}) trapped.";
 
         /**
          * Exit status code that was trapped.
          */
         private final int status;
 
+        /**
+         * Construct a new ExitException with the given exit status code.
+         * 
+         * @param status Code passed to {@link java.lang.System#exit(int)}
+         */
         public ExitException(int status) {
-            super("Call to System.exit(" + status + ") trapped.");
+            super(MessageFormat.format(MESSAGE, status));
             this.status = status;
         }
 
-        public int getStatus() {
+        /**
+         * The status code that was passed to {@link java.lang.System#exit(int)}
+         * 
+         * @return The status code of trapped exit.
+         */
+        public final int getStatus() {
             return status;
         }
     }
@@ -148,7 +172,7 @@ public class ExitTrapper {
         }
 
         @Override
-        public void checkExit(int status) {
+        public void checkExit(int status) throws ExitException {
             super.checkExit(status);
             throw new ExitException(status);
         }
@@ -218,14 +242,14 @@ public class ExitTrapper {
 
         @Override
         public ThreadGroup getThreadGroup() {
-            return !isInnerSet() 
+            return !isInnerSet()
                     ? super.getThreadGroup()
                     : inner.getThreadGroup();
         }
 
         @Override
         public Object getSecurityContext() {
-            return !isInnerSet() 
+            return !isInnerSet()
                     ? super.getSecurityContext()
                     : inner.getSecurityContext();
         }
@@ -233,7 +257,7 @@ public class ExitTrapper {
         @Override
         @Deprecated
         public boolean getInCheck() {
-            return !isInnerSet() 
+            return !isInnerSet()
                     ? super.getInCheck()
                     : inner.getInCheck();
         }
