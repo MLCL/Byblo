@@ -158,7 +158,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     -->
 
     <target name="dist" depends="jar" description="Generate the binary distribution" >    
-        <copy todir="${dist.dir}" file="LICENCE" />
+        <copy todir="${dist.dir}" file="LICENSE" />
         <copy todir="${dist.dir}" file="README.md" />
     </target>
 
