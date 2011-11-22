@@ -51,6 +51,8 @@ import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.io.Files;
+import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
+import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
 
 /**
  *
@@ -60,29 +62,41 @@ import uk.ac.susx.mlcl.lib.io.Files;
 public class ExternalSortTask extends AbstractParallelCommandTask {
 
     private static final Log LOG = LogFactory.getLog(ExternalSortTask.class);
+
     private static final int DEFAULT_MAX_CHUNK_SIZE = ChunkTask.DEFAULT_MAX_CHUNK_SIZE;
+
     @Parameter(names = {"-C", "--chunk-size"},
-    description = "Number of lines that will be read and sorted in RAM at one time (per thread). Larger values increase memory usage and performace.")
+               description = "Number of lines that will be read and sorted in RAM at one time (per thread). Larger values increase memory usage and performace.")
     private int maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
+
     @Parameter(names = {"-i", "--input"},
-    description = "Source file. If this argument is not given, or if it is \"-\", then stdin will be read.")
-    private File sourceFile = Files.STDIN_FILE;
+               description = "Source file. If this argument is not given, or if it is \"-\", then stdin will be read.",
+               validateWith = InputFileValidator.class,
+               required=true)
+    private File sourceFile;
+
     @Parameter(names = {"-o", "--output"},
-    description = "Destination file. If this argument is not given, or if it is \"-\", then stdout will be written to.")
-    private File destFile = Files.STDOUT_FILE;
+               description = "Destination file. If this argument is not given, or if it is \"-\", then stdout will be written to.",
+               validateWith = OutputFileValidator.class,
+               required=true)
+    private File destFile;
+
     @Parameter(names = {"-T", "--temporary-directory"},
-    description = "Directory which will be used for storing temporary files.",
-    converter = TempFileFactoryConverter.class)
+               description = "Directory which will be used for storing temporary files.",
+               converter = TempFileFactoryConverter.class)
     private FileFactory tempFileFactory = new TempFileFactory();
+
     @Parameter(names = {"-c", "--charset"},
-    description = "Character encoding for reading and writing files.")
+               description = "Character encoding for reading and writing files.")
     private Charset charset = Files.DEFAULT_CHARSET;
+
     private Comparator<String> comparator = new NeighbourComparator();
+
     private Queue<File> mergeQueue;
 
     public ExternalSortTask(File src, File dst, Charset charset,
-            Comparator<String> comparator,
-            int maxChunkSize) {
+                            Comparator<String> comparator,
+                            int maxChunkSize) {
         this(src, dst, charset);
         setComparator(comparator);
         setMaxChunkSize(maxChunkSize);
@@ -183,7 +197,7 @@ public class ExternalSortTask extends AbstractParallelCommandTask {
         BlockingQueue<File> chunkQueue = new ArrayBlockingQueue<File>(2);
 
         ChunkTask chunkTask = new ChunkTask(getSrcFile(), getCharset(),
-                getMaxChunkSize());
+                                            getMaxChunkSize());
         chunkTask.setDstFileQueue(chunkQueue);
         chunkTask.setChunkFileFactory(tempFileFactory);
         Future<ChunkTask> chunkFuture = submitTask(chunkTask);
@@ -203,7 +217,7 @@ public class ExternalSortTask extends AbstractParallelCommandTask {
 
                 File chunk = chunkQueue.take();
                 submitTask(new SortTask(chunk, chunk, getCharset(),
-                        getComparator()));
+                                        getComparator()));
 
             }
 

@@ -57,13 +57,15 @@ public class CopyTask extends AbstractCommandTask {
 
     @Parameter(names = {"-i", "--input-file"},
                description = "Source file that will be read", 
-               validateWith=InputFileValidator.class)
-    private File sourceFile = Files.STDIN_FILE;
+               validateWith=InputFileValidator.class,
+               required=true)
+    private File sourceFile;
 
     @Parameter(names = {"-o", "--output-file"},
                description = "Destination file that will be writen to.", 
-               validateWith=OutputFileValidator.class)
-    private File destFile = Files.STDOUT_FILE;
+               validateWith=OutputFileValidator.class,
+               required=true)
+    private File destFile;
 
     public CopyTask(File sourceFile, File destinationFile) {
         setSrcFile(sourceFile);

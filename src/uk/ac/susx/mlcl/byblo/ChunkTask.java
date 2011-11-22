@@ -63,8 +63,6 @@ public class ChunkTask extends AbstractCommandTask {
 
     public static final int DEFAULT_MAX_CHUNK_SIZE = 10 * (1 << 20);
 
-    public static final File DEFAULT_SOURCE_FILE = new File("-");
-
     private FileFactory chunkFileFactory =
             new TempFileFactory();
 
@@ -74,8 +72,9 @@ public class ChunkTask extends AbstractCommandTask {
 
     @Parameter(names = {"-i", "--input-file"},
                description = "Source file. If this argument is not given, or if it is \"-\", then stdin will be read.",
-               validateWith=InputFileValidator.class)
-    private File sourceFile = DEFAULT_SOURCE_FILE;
+               validateWith=InputFileValidator.class,
+               required=true)
+    private File sourceFile;
 
     private BlockingQueue<File> dstFileQueue = new LinkedBlockingDeque<File>();
 

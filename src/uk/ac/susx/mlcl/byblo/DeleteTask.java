@@ -39,6 +39,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
 
 /**
  *
@@ -50,7 +51,8 @@ public class DeleteTask extends AbstractCommandTask {
     private static final Log LOG = LogFactory.getLog(DeleteTask.class);
 
     @Parameter(names = {"-f", "--file"},
-               description = "File to deleted")
+               description = "File to deleted",
+               validateWith = InputFileValidator.class, required=true)
     private File file;
 
     public DeleteTask(File file) {

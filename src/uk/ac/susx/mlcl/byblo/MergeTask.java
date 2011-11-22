@@ -45,6 +45,8 @@ import java.util.Comparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.io.Files;
+import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
+import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
 
 /**
  * Merges the contents of two sorted source files, line by line, into a
@@ -69,15 +71,18 @@ public class MergeTask extends AbstractCommandTask {
     private Formatter formatter = new DefaultFormatter();
 
     @Parameter(names = {"-ifa", "--input-file-a"}, required = true,
-               description = "The first file to merge.")
+               description = "The first file to merge.",
+               validateWith = InputFileValidator.class)
     private File sourceFileA;
 
     @Parameter(names = {"-ifb", "--input-file-b"}, required = true,
-               description = "The second file to merge.")
+               description = "The second file to merge.",
+               validateWith = InputFileValidator.class)
     private File sourceFileB;
 
     @Parameter(names = {"-of", "--output-file"},
-               description = "The output file to which both input will be merged.")
+               description = "The output file to which both input will be merged.",
+               validateWith = OutputFileValidator.class)
     private File destinationFile;
 
     @Parameter(names = {"-c", "--charset"},
