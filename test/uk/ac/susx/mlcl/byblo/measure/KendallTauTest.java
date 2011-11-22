@@ -45,32 +45,36 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
  */
 public class KendallTauTest {
 
-    @Test(timeout=10000)
+    @Test(timeout = 10000)
     public void testKendallTauCLI() throws Exception {
         System.out.println("Testing KentalTau from main method.");
 
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".KendalTau");
         output.delete();
 
-        enableExistTrapping();
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "KendalTau",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output.toString(),
-                    "--chunk-size", "5"
-                });
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "KendalTau",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output.toString(),
+                        "--chunk-size", "5"
+                    });
+        } finally {
+            disableExitTrapping();
+        }
+
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout=10000)
-    @Ignore(value="Test ignored because it takes too long.")
+    @Test(timeout = 10000)
+    @Ignore(value = "Test ignored because it takes too long.")
     public void testKendalTau_Symmetry() throws Exception {
         System.out.println("Testing KendalTau symmetry.");
 
@@ -79,27 +83,30 @@ public class KendallTauTest {
         output1.delete();
         output2.delete();
 
-        enableExistTrapping();
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "KendalTau",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output1.toString(),
-                });
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "KendalTau",
-                    "--measure-reversed",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output2.toString(),
-                });
-        disableExitTrapping();
-        assertTrue(WeightedTokenPairSource.equal(output1, output2, DEFAULT_CHARSET));
+        try {
+            enableExistTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "KendalTau",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output1.toString(),});
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "KendalTau",
+                        "--measure-reversed",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output2.toString(),});
+        } finally {
+            disableExitTrapping();
+        }
+
+        assertTrue(WeightedTokenPairSource.equal(output1, output2,
+                                                 DEFAULT_CHARSET));
     }
 }

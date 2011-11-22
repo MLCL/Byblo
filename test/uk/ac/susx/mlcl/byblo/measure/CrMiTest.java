@@ -51,22 +51,26 @@ public class CrMiTest {
                 "Testing CrMi (beta=" + beta + ", gamma=" + gamma + ") from main method.");
 
         File output = new File(TEST_OUTPUT_DIR,
-                FRUIT_NAME + ".CrMi-beta_" + beta + "-gamma_" + gamma + "");
+                               FRUIT_NAME + ".CrMi-beta_" + beta + "-gamma_" + gamma + "");
         output.delete();
 
-        enableExistTrapping();
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "CrMi",
-                    "--crmi-beta", "" + beta,
-                    "--crmi-gamma", "" + gamma,
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output.toString()
-                });
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "CrMi",
+                        "--crmi-beta", "" + beta,
+                        "--crmi-gamma", "" + gamma,
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output.toString()
+                    });
+        } finally {
+            disableExitTrapping();
+        }
+
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
@@ -118,37 +122,42 @@ public class CrMiTest {
                 "Testing CrMi(beta=0, gamma=0) equals RecallMi from main method.");
 
         File expectedOutput = new File(TEST_OUTPUT_DIR,
-                FRUIT_NAME + ".CrMi-recall-expected");
+                                       FRUIT_NAME + ".CrMi-recall-expected");
         File crmiOutput = new File(TEST_OUTPUT_DIR,
-                FRUIT_NAME + ".CrMi-recall-actual");
+                                   FRUIT_NAME + ".CrMi-recall-actual");
 
         crmiOutput.delete();
         expectedOutput.delete();
 
-        enableExistTrapping();
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "RecallMi",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", expectedOutput.toString()
-                });
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "CrMi",
-                    "--crmi-beta", "0.00",
-                    "--crmi-gamma", "0.00",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", crmiOutput.toString()
-                });
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "RecallMi",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", expectedOutput.toString()
+                    });
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "CrMi",
+                        "--crmi-beta", "0.00",
+                        "--crmi-gamma", "0.00",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", crmiOutput.toString()
+                    });
+        } finally {
+            disableExitTrapping();
+        }
 
-        assertTrue(WeightedTokenPairSource.equal(expectedOutput, crmiOutput, DEFAULT_CHARSET));
+
+        assertTrue(WeightedTokenPairSource.equal(expectedOutput, crmiOutput,
+                                                 DEFAULT_CHARSET));
 
     }
 
@@ -158,39 +167,44 @@ public class CrMiTest {
                 "Testing CrMi(beta=1, gamma=0) equals PrecisionMi from main method.");
 
         File expectedOutput = new File(TEST_OUTPUT_DIR,
-                FRUIT_NAME + ".CrMi-precision-expected");
+                                       FRUIT_NAME + ".CrMi-precision-expected");
         File crmiOutput = new File(TEST_OUTPUT_DIR,
-                FRUIT_NAME + ".CrMi-precision-actual");
+                                   FRUIT_NAME + ".CrMi-precision-actual");
 
         crmiOutput.delete();
         expectedOutput.delete();
 
-        enableExistTrapping();
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "RecallMi",
-                    "--measure-reversed",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", expectedOutput.toString()
-                });
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "CrMi",
-                    "--crmi-beta", "1.00",
-                    "--crmi-gamma", "0.00",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", crmiOutput.toString()
-                });
+        try {
+            enableExistTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "RecallMi",
+                        "--measure-reversed",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", expectedOutput.toString()
+                    });
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "CrMi",
+                        "--crmi-beta", "1.00",
+                        "--crmi-gamma", "0.00",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", crmiOutput.toString()
+                    });
 
-        disableExitTrapping();
+        } finally {
+            disableExitTrapping();
+        }
 
-        assertTrue(WeightedTokenPairSource.equal(expectedOutput, crmiOutput, DEFAULT_CHARSET));
+
+        assertTrue(WeightedTokenPairSource.equal(expectedOutput, crmiOutput,
+                                                 DEFAULT_CHARSET));
 
     }
 
@@ -200,53 +214,58 @@ public class CrMiTest {
                 "Testing CrMi(beta=NA, gamma=1) \"harmonic mean\" equals DiceMi  from main method.");
 
         File expectedOutput = new File(TEST_OUTPUT_DIR,
-                FRUIT_NAME + ".CrMi-dice-expected");
+                                       FRUIT_NAME + ".CrMi-dice-expected");
         File crmiOutput = new File(TEST_OUTPUT_DIR,
-                FRUIT_NAME + ".CrMi-dice-actual");
+                                   FRUIT_NAME + ".CrMi-dice-actual");
 
         crmiOutput.delete();
         expectedOutput.delete();
 
-        enableExistTrapping();
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "DiceMi",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", expectedOutput.toString()
-                });
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "CrMi",
-                    "--crmi-beta", "0.00",
-                    "--crmi-gamma", "1.00",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", crmiOutput.toString()
-                });
+        try {
+            enableExistTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "DiceMi",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", expectedOutput.toString()
+                    });
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "CrMi",
+                        "--crmi-beta", "0.00",
+                        "--crmi-gamma", "1.00",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", crmiOutput.toString()
+                    });
 
-        disableExitTrapping();
+        } finally {
+            disableExitTrapping();
+        }
+
 
 
         // The ranking should be identical, but the absolute similarity values
         // will be different.
-        
-        WeightedTokenPairSource expected = new WeightedTokenPairSource(expectedOutput,
-                DEFAULT_CHARSET);
+
+        WeightedTokenPairSource expected = new WeightedTokenPairSource(
+                expectedOutput,
+                                                                       DEFAULT_CHARSET);
         WeightedTokenPairSource actual = new WeightedTokenPairSource(crmiOutput,
-                DEFAULT_CHARSET);
-        
-        while(expected.hasNext() && actual.hasNext()) {
+                                                                     DEFAULT_CHARSET);
+
+        while (expected.hasNext() && actual.hasNext()) {
             Weighted<TokenPair> e = expected.read();
             Weighted<TokenPair> a = actual.read();
             assertEquals(e.record().id1(), a.record().id1());
             assertEquals(e.record().id2(), a.record().id2());
         }
-        
+
         assertEquals(expected.hasNext(), actual.hasNext());
     }
 }

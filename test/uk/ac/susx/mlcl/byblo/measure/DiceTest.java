@@ -31,7 +31,6 @@
 package uk.ac.susx.mlcl.byblo.measure;
 
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
-import com.google.common.io.Files;
 import uk.ac.susx.mlcl.byblo.Main;
 import java.io.File;
 import org.junit.Test;
@@ -52,17 +51,21 @@ public class DiceTest {
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Dice");
         output.delete();
 
-        enableExistTrapping();
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "Dice",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output.toString()
-                });
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "Dice",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output.toString()
+                    });
+        } finally {
+            disableExitTrapping();
+        }
+
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
@@ -75,17 +78,21 @@ public class DiceTest {
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".DiceMi");
         output.delete();
 
-        enableExistTrapping();
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "DiceMi",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output.toString()
-                });
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "DiceMi",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output.toString()
+                    });
+        } finally {
+            disableExitTrapping();
+        }
+
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
@@ -100,28 +107,33 @@ public class DiceTest {
         output1.delete();
         output2.delete();
 
-        enableExistTrapping();
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "Dice",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output1.toString()
-                });
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "Dice",
-                    "--measure-reversed",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output2.toString()
-                });
-        disableExitTrapping();
-        assertTrue(WeightedTokenPairSource.equal(output1, output2, DEFAULT_CHARSET));
+        try {
+            enableExistTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "Dice",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output1.toString()
+                    });
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "Dice",
+                        "--measure-reversed",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output2.toString()
+                    });
+        } finally {
+            disableExitTrapping();
+        }
+
+        assertTrue(WeightedTokenPairSource.equal(output1, output2,
+                                                 DEFAULT_CHARSET));
     }
 
     @Test(timeout = 1000)
@@ -133,27 +145,32 @@ public class DiceTest {
         output1.delete();
         output2.delete();
 
-        enableExistTrapping();
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "DiceMi",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output1.toString()
-                });
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "DiceMi",
-                    "--measure-reversed",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output2.toString()
-                });
-        disableExitTrapping();
-        assertTrue(WeightedTokenPairSource.equal(output1, output2, DEFAULT_CHARSET));
+        try {
+            enableExistTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "DiceMi",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output1.toString()
+                    });
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "DiceMi",
+                        "--measure-reversed",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output2.toString()
+                    });
+        } finally {
+            disableExitTrapping();
+        }
+
+        assertTrue(WeightedTokenPairSource.equal(output1, output2,
+                                                 DEFAULT_CHARSET));
     }
 }

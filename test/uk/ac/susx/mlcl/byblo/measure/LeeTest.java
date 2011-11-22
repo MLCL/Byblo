@@ -43,56 +43,63 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
  */
 public class LeeTest {
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testLee_alpha_0_00() throws Exception {
         System.out.println("Testing Lee (alpha=0.00) from main method.");
 
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Lee-alpha-0_00");
         output.delete();
 
-        enableExistTrapping();
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "Lee",
-                    "--lee-alpha", "0.00",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output.toString()
-                });
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "Lee",
+                        "--lee-alpha", "0.00",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output.toString()
+                    });
+        } finally {
+            disableExitTrapping();
+        }
+
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testMainMethodRun_alpha_0_01() throws Exception {
         System.out.println("Testing Lee (alpha=0.01) from main method.");
 
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Lee-alpha-0_01");
         output.delete();
 
+        try {
+            enableExistTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "Lee",
+                        "--lee-alpha", "0.01",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output.toString()
+                    });
+        } finally {
+            disableExitTrapping();
+        }
 
-        enableExistTrapping();
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "Lee",
-                    "--lee-alpha", "0.01",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output.toString()
-                });
-        disableExitTrapping();
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
 
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testMainMethodRun_alpha_0_50() throws Exception {
         System.out.println("Testing Lee (alpha=0.50) from main method.");
 
@@ -101,48 +108,56 @@ public class LeeTest {
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Lee-alpha-0_50");
         output.delete();
 
-        enableExistTrapping();
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "Lee",
-                    "--lee-alpha", "0.50",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output.toString()
-                });
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "Lee",
+                        "--lee-alpha", "0.50",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output.toString()
+                    });
+        } finally {
+            disableExitTrapping();
+        }
+
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testMainMethodRun_alpha_0_99() throws Exception {
         System.out.println("Testing Lee (alpha=0.99) from main method.");
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Lee-alpha-0_99");
         output.delete();
 
-        enableExistTrapping();
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "Lee",
-                    "--lee-alpha", "0.99",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output.toString()
-                });
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "Lee",
+                        "--lee-alpha", "0.99",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output.toString()
+                    });
+        } finally {
+            disableExitTrapping();
+        }
+
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
 
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     @Ignore(value = "Fails - presumably due to the log(0) statement.")
     public void testLee_alpha_1_00() throws Exception {
         System.out.println("Testing Lee (alpha=1.00) from main method.");
@@ -152,18 +167,21 @@ public class LeeTest {
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Lee-alpha-1_00");
         output.delete();
 
-        enableExistTrapping();
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "Lee",
-                    "--lee-alpha", "1.00",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output.toString()
-                });
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "Lee",
+                        "--lee-alpha", "1.00",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output.toString()
+                    });
+        } finally {
+            disableExitTrapping();
+        }
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);

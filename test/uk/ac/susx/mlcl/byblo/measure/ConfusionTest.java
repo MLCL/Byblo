@@ -50,6 +50,7 @@ public class ConfusionTest {
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Confusion");
         output.delete();
 
+        try {
         enableExistTrapping();
         Main.main(new String[]{
                     "allpairs",
@@ -60,7 +61,9 @@ public class ConfusionTest {
                     "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                     "--output", output.toString()
                 });
-        disableExitTrapping();
+        } finally {
+            disableExitTrapping();
+        }
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);

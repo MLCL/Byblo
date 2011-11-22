@@ -32,7 +32,6 @@ package uk.ac.susx.mlcl.byblo.measure;
 
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import org.junit.Ignore;
-import com.google.common.io.Files;
 import uk.ac.susx.mlcl.byblo.Main;
 import java.io.File;
 import org.junit.Test;
@@ -46,7 +45,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
  */
 public class LpTest {
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     @Ignore(value = "Fails due to not yet being implemented.")
     public void testMainMethodRun_L0() throws Exception {
         System.out.println("Testing L0 from main method.");
@@ -65,9 +64,13 @@ public class LpTest {
             "--output", output.toString()
         };
 
-        enableExistTrapping();
-        Main.main(args);
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(args);
+        } finally {
+            disableExitTrapping();
+        }
+
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
@@ -75,7 +78,7 @@ public class LpTest {
 
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testMainMethodRun_L1() throws Exception {
         System.out.println("Testing L1 from main method.");
 
@@ -93,9 +96,13 @@ public class LpTest {
             "--output", output.toString()
         };
 
-        enableExistTrapping();
-        Main.main(args);
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(args);
+        } finally {
+            disableExitTrapping();
+        }
+
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
@@ -103,7 +110,7 @@ public class LpTest {
 
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testMainMethodRun_L2() throws Exception {
         System.out.println("Testing L2 from main method.");
 
@@ -121,15 +128,19 @@ public class LpTest {
             "--output", output.toString()
         };
 
-        enableExistTrapping();
-        Main.main(args);
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(args);
+        } finally {
+            disableExitTrapping();
+        }
+
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testMainMethodRun_L3() throws Exception {
         System.out.println("Testing L3 from main method.");
 
@@ -147,15 +158,19 @@ public class LpTest {
             "--output", output.toString()
         };
 
-        enableExistTrapping();
-        Main.main(args);
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(args);
+        } finally {
+            disableExitTrapping();
+        }
+
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testMainMethodRun_L_e() throws Exception {
         System.out.println("Testing L_e from main method.");
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Le");
@@ -172,15 +187,19 @@ public class LpTest {
             "--output", output.toString()
         };
 
-        enableExistTrapping();
-        Main.main(args);
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(args);
+        } finally {
+            disableExitTrapping();
+        }
+
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testMainMethodRun_LInf() throws Exception {
         System.out.println("Testing LInf from main method.");
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".inf");
@@ -197,15 +216,19 @@ public class LpTest {
             "--output", output.toString()
         };
 
-        enableExistTrapping();
-        Main.main(args);
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(args);
+        } finally {
+            disableExitTrapping();
+        }
+
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void test_L1_Symmetry() throws Exception {
         System.out.println("Testing symmetry.");
 
@@ -215,32 +238,38 @@ public class LpTest {
             output1.delete();
         if (output2.exists())
             output2.delete();
-        enableExistTrapping();
 
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8", "--mink-p", "1",
-                    "--measure", "Lp",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output1.toString()
-                });
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8", "--mink-p", "1",
-                    "--measure", "Lp", "--measure-reversed",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output2.toString()
-                });
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
 
-        assertTrue(WeightedTokenPairSource.equal(output1, output2, DEFAULT_CHARSET));
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8", "--mink-p", "1",
+                        "--measure", "Lp",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output1.toString()
+                    });
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8", "--mink-p", "1",
+                        "--measure", "Lp", "--measure-reversed",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output2.toString()
+                    });
+        } finally {
+            disableExitTrapping();
+        }
+
+
+        assertTrue(WeightedTokenPairSource.equal(output1, output2,
+                                                 DEFAULT_CHARSET));
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void test_L2_Symmetry() throws Exception {
         System.out.println("Testing symmetry.");
 
@@ -251,33 +280,38 @@ public class LpTest {
             output1.delete();
         if (output2.exists())
             output2.delete();
-        enableExistTrapping();
+        try {
+            enableExistTrapping();
 
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8", "--mink-p", "2",
-                    "--measure", "Lp",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output1.toString()
-                });
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8", "--mink-p", "2",
-                    "--measure", "Lp", "--measure-reversed",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output2.toString()
-                });
-        disableExitTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8", "--mink-p", "2",
+                        "--measure", "Lp",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output1.toString()
+                    });
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8", "--mink-p", "2",
+                        "--measure", "Lp", "--measure-reversed",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output2.toString()
+                    });
+        } finally {
+            disableExitTrapping();
+        }
 
-        assertTrue(WeightedTokenPairSource.equal(output1, output2, DEFAULT_CHARSET));
+
+        assertTrue(WeightedTokenPairSource.equal(output1, output2,
+                                                 DEFAULT_CHARSET));
 
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void test_L3_Symmetry() throws Exception {
         System.out.println("Testing symmetry.");
 
@@ -288,32 +322,37 @@ public class LpTest {
             output1.delete();
         if (output2.exists())
             output2.delete();
-        enableExistTrapping();
+        try {
+            enableExistTrapping();
 
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8", "--mink-p", "3",
-                    "--measure", "Lp",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output1.toString()
-                });
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8", "--mink-p", "3",
-                    "--measure", "Lp", "--measure-reversed",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output2.toString()
-                });
-        disableExitTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8", "--mink-p", "3",
+                        "--measure", "Lp",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output1.toString()
+                    });
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8", "--mink-p", "3",
+                        "--measure", "Lp", "--measure-reversed",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output2.toString()
+                    });
+        } finally {
+            disableExitTrapping();
+        }
 
-        assertTrue(WeightedTokenPairSource.equal(output1, output2, DEFAULT_CHARSET));
+
+        assertTrue(WeightedTokenPairSource.equal(output1, output2,
+                                                 DEFAULT_CHARSET));
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void test_LInf_Symmetry() throws Exception {
         System.out.println("Testing symmetry.");
 
@@ -325,28 +364,33 @@ public class LpTest {
             output1.delete();
         if (output2.exists())
             output2.delete();
-        enableExistTrapping();
+        try {
+            enableExistTrapping();
 
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8", "--mink-p", "inf",
-                    "--measure", "Lp",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output1.toString()
-                });
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8", "--mink-p", "+INFIN",
-                    "--measure", "Lp", "--measure-reversed",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output2.toString()
-                });
-        disableExitTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8", "--mink-p", "inf",
+                        "--measure", "Lp",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output1.toString()
+                    });
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8", "--mink-p", "+INFIN",
+                        "--measure", "Lp", "--measure-reversed",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output2.toString()
+                    });
+        } finally {
+            disableExitTrapping();
+        }
 
-        assertTrue(WeightedTokenPairSource.equal(output1, output2, DEFAULT_CHARSET));
+
+        assertTrue(WeightedTokenPairSource.equal(output1, output2,
+                                                 DEFAULT_CHARSET));
     }
 }

@@ -67,7 +67,7 @@ public class ThreadedApssTaskTest {
     @Test(timeout = 1000)
     public void testCLI() throws Exception {
         String output = new File(TEST_OUTPUT_DIR,
-                TEST_FRUIT_INPUT.getName() + ".sims").toString();
+                                 TEST_FRUIT_INPUT.getName() + ".sims").toString();
         String[] args = {
             "allpairs",
             "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
@@ -76,9 +76,13 @@ public class ThreadedApssTaskTest {
             "--output", output,
             "--measure", "Jaccard",};
 
-        enableExistTrapping();
-        Main.main(args);
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(args);
+        } finally {
+            disableExitTrapping();
+        }
+
 
 
     }

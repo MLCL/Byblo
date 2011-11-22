@@ -55,17 +55,21 @@ public class JaccardTest {
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Jaccard");
         output.delete();
 
-        enableExistTrapping();
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "Jaccard",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output.toString()
-                });
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "Jaccard",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output.toString()
+                    });
+        } finally {
+            disableExitTrapping();
+        }
+
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
@@ -88,9 +92,13 @@ public class JaccardTest {
             "--output", output.toString()
         };
 
-        enableExistTrapping();
-        Main.main(args);
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(args);
+        } finally {
+            disableExitTrapping();
+        }
+
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
@@ -117,7 +125,8 @@ public class JaccardTest {
 
         Jaccard instance = new Jaccard();
         double result = instance.combine(instance.shared(vecA, vecB),
-                                         instance.left(vecA), instance.left(vecB));
+                                         instance.left(vecA),
+                                         instance.left(vecB));
 
         assertEquals(jaccardCoef, result, 0.0001);
     }
@@ -156,7 +165,8 @@ public class JaccardTest {
 
         Jaccard instance = new Jaccard();
         double result = instance.combine(instance.shared(vecA, vecB),
-                                         instance.left(vecA), instance.left(vecB));
+                                         instance.left(vecA),
+                                         instance.left(vecB));
 
         assertEquals(jaccardCoef, result, 0.0001);
     }
@@ -241,29 +251,34 @@ public class JaccardTest {
         output1.delete();
         output2.delete();
 
-        enableExistTrapping();
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "Jaccard",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output1.toString()
-                });
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "Jaccard",
-                    "--measure-reversed",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output2.toString()
-                });
+        try {
+            enableExistTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "Jaccard",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output1.toString()
+                    });
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "Jaccard",
+                        "--measure-reversed",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output2.toString()
+                    });
 
-        disableExitTrapping();
-        assertTrue(WeightedTokenPairSource.equal(output1, output2, DEFAULT_CHARSET));
+        } finally {
+            disableExitTrapping();
+        }
+
+        assertTrue(WeightedTokenPairSource.equal(output1, output2,
+                                                 DEFAULT_CHARSET));
     }
 
     @Test(timeout = 1000)
@@ -278,30 +293,34 @@ public class JaccardTest {
         output2.delete();
 
 
-        enableExistTrapping();
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "JaccardMi",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output1.toString()
-                });
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "JaccardMi",
-                    "--measure-reversed",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output2.toString()
-                });
+        try {
+            enableExistTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "JaccardMi",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output1.toString()
+                    });
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "JaccardMi",
+                        "--measure-reversed",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output2.toString()
+                    });
 
-        disableExitTrapping();
+        } finally {
+            disableExitTrapping();
+        }
 
-        assertTrue(WeightedTokenPairSource.equal(output1, output2, DEFAULT_CHARSET));
+
+        assertTrue(WeightedTokenPairSource.equal(output1, output2,
+                                                 DEFAULT_CHARSET));
     }
-
 }

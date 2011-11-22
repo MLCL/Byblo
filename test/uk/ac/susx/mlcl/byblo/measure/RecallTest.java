@@ -43,7 +43,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
  */
 public class RecallTest {
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testMainMethodRun_RecallMI() throws Exception {
         System.out.println("Testing RecallMI from main method.");
 
@@ -62,16 +62,20 @@ public class RecallTest {
             "--output", output.toString()
         };
 
-          enableExistTrapping();
-        Main.main(args);
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(args);
+        } finally {
+            disableExitTrapping();
+        }
+
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
 
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testMainMethodRun_PrecisionMI() throws Exception {
         System.out.println("Testing PrecisionMI from main method.");
 
@@ -91,9 +95,13 @@ public class RecallTest {
         };
 
 
-        enableExistTrapping();
-        Main.main(args);
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(args);
+        } finally {
+            disableExitTrapping();
+        }
+
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);

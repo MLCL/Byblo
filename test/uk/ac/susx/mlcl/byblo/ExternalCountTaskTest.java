@@ -48,7 +48,7 @@ public class ExternalCountTaskTest {
     private static final String subject = ExternalCountTask.class.getName();
 
     private void runWithAPI(File inInst, File outE, File outF,
-            File outEF, Charset charset, int chunkSize)
+                            File outEF, Charset charset, int chunkSize)
             throws Exception {
         final ExternalCountTask countTask = new ExternalCountTask();
         countTask.setInstancesFile(inInst);
@@ -72,8 +72,8 @@ public class ExternalCountTaskTest {
     }
 
     private void runwithCLI(File inInst, File outE, File outF,
-            File outEF,
-            Charset charset, int chunkSize)
+                            File outEF,
+                            Charset charset, int chunkSize)
             throws Exception {
 
         String[] args = {
@@ -86,9 +86,13 @@ public class ExternalCountTaskTest {
             "--chunk-size", "" + chunkSize
         };
 
-        enableExistTrapping();
-        Main.main(args);
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(args);
+        } finally {
+            disableExitTrapping();
+        }
+
 
         assertTrue("Output files not created: " + outE, outE.exists());
         assertTrue("Output files not created: " + outF, outF.exists());
@@ -100,7 +104,7 @@ public class ExternalCountTaskTest {
     }
 
     private void runExpectingNullPointer(File inInst, File outE, File outF,
-            File outEF, Charset charset) throws Exception {
+                                         File outEF, Charset charset) throws Exception {
         try {
             runWithAPI(inInst, outE, outF, outEF, charset, 10000);
             fail("NullPointerException should have been thrown.");
@@ -110,7 +114,7 @@ public class ExternalCountTaskTest {
     }
 
     private void runExpectingIllegalState(File inInst, File outE, File outF,
-            File outEF, Charset charset) throws Exception {
+                                          File outEF, Charset charset) throws Exception {
         try {
             runWithAPI(inInst, outE, outF, outEF, charset, 10000);
             fail("IllegalStateException should have been thrown.");
@@ -127,24 +131,24 @@ public class ExternalCountTaskTest {
         final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
         final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
         final File efActual = new File(TEST_OUTPUT_DIR,
-                fruitPrefix + ".entryFeatures");
+                                       fruitPrefix + ".entryFeatures");
 
         eActual.delete();
         fActual.delete();
         efActual.delete();
 
         runWithAPI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
-                DEFAULT_CHARSET, 1000000);
+                   DEFAULT_CHARSET, 1000000);
 
         assertTrue("Output entries file differs from sampledata file.",
-                WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
-                DEFAULT_CHARSET));
+                   WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
+                                             DEFAULT_CHARSET));
         assertTrue("Output features file differs from test data file.",
-                WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
-                DEFAULT_CHARSET));
+                   WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
+                                             DEFAULT_CHARSET));
         assertTrue("Output entry/features file differs from test data file.",
-                TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
-                DEFAULT_CHARSET));
+                   TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
+                                         DEFAULT_CHARSET));
     }
 
     @Test(timeout = 20000)
@@ -153,25 +157,25 @@ public class ExternalCountTaskTest {
 
         final String fruitPrefix = TEST_FRUIT_INPUT.getName();
         final File eActual = new File(TEST_OUTPUT_DIR,
-                fruitPrefix + ".entries" + ".tiny");
+                                      fruitPrefix + ".entries" + ".tiny");
         final File fActual = new File(TEST_OUTPUT_DIR,
-                fruitPrefix + ".features" + ".tiny");
+                                      fruitPrefix + ".features" + ".tiny");
         final File efActual = new File(TEST_OUTPUT_DIR,
-                fruitPrefix + ".entryFeatures" + ".tiny");
+                                       fruitPrefix + ".entryFeatures" + ".tiny");
 
         eActual.delete();
         fActual.delete();
         efActual.delete();
 
         runWithAPI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
-                DEFAULT_CHARSET, 10000);
+                   DEFAULT_CHARSET, 10000);
 
         assertTrue("Output entries file differs from sampledata file.",
-                WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
-                DEFAULT_CHARSET));
+                   WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
+                                             DEFAULT_CHARSET));
         assertTrue("Output features file differs from test data file.",
-                WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
-                DEFAULT_CHARSET));
+                   WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
+                                             DEFAULT_CHARSET));
 //        assertTrue("Output entry/features file differs from test data file.",
 //                TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
 //                DEFAULT_CHARSET));
@@ -186,25 +190,25 @@ public class ExternalCountTaskTest {
         final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
         final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
         final File efActual = new File(TEST_OUTPUT_DIR,
-                fruitPrefix + ".entryFeatures");
+                                       fruitPrefix + ".entryFeatures");
 
         eActual.delete();
         fActual.delete();
         efActual.delete();
 
         runwithCLI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
-                DEFAULT_CHARSET, 1000000);
+                   DEFAULT_CHARSET, 1000000);
 
 
         assertTrue("Output entries file differs from sampledata file.",
-                WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
-                DEFAULT_CHARSET));
+                   WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
+                                             DEFAULT_CHARSET));
         assertTrue("Output features file differs from test data file.",
-                WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
-                DEFAULT_CHARSET));
+                   WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
+                                             DEFAULT_CHARSET));
         assertTrue("Output entry/features file differs from test data file.",
-                TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
-                DEFAULT_CHARSET));
+                   TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
+                                         DEFAULT_CHARSET));
     }
 
     @Test(timeout = 1000)
@@ -216,7 +220,7 @@ public class ExternalCountTaskTest {
         final File eOut = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
         final File fOut = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
         final File efOut = new File(TEST_OUTPUT_DIR,
-                fruitPrefix + ".entryFeatures");
+                                    fruitPrefix + ".entryFeatures");
 
         runExpectingNullPointer(null, eOut, fOut, efOut, DEFAULT_CHARSET);
         runExpectingNullPointer(instIn, null, fOut, efOut, DEFAULT_CHARSET);

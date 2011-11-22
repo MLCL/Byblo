@@ -44,7 +44,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
  */
 public class OverlapTest {
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testMainMethodRun() throws Exception {
         System.out.println("Testing Overlap from main method.");
 
@@ -62,45 +62,54 @@ public class OverlapTest {
             "--output", output.toString()
         };
 
-        enableExistTrapping();
-        Main.main(args);
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(args);
+        } finally {
+            disableExitTrapping();
+        }
+
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void test_Overlap_Symmetry() throws Exception {
         System.out.println("Testing symmetry.");
 
         File output1 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Overlap-1");
         File output2 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Overlap-2");
-            output1.delete();
-            output2.delete();
+        output1.delete();
+        output2.delete();
 
-        enableExistTrapping();
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "Overlap",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output1.toString()
-                });
-        Main.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "Overlap", "--measure-reversed",
-                    "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output2.toString()
-                });
-        disableExitTrapping();
+        try {
+            enableExistTrapping();
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "Overlap",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output1.toString()
+                    });
+            Main.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "Overlap", "--measure-reversed",
+                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output2.toString()
+                    });
+        } finally {
+            disableExitTrapping();
+        }
 
-        assertTrue(WeightedTokenPairSource.equal(output1, output2, DEFAULT_CHARSET));
+
+        assertTrue(WeightedTokenPairSource.equal(output1, output2,
+                                                 DEFAULT_CHARSET));
 
     }
 }

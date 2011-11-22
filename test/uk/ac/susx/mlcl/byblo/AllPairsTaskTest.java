@@ -64,12 +64,14 @@ public class AllPairsTaskTest {
 
     @Test
     public void testMainRun() throws Exception {
-        ExitTrapper.enableExistTrapping();
-        Main.main(new String[]{"allpairs",
-                    "-i", "testdata/fruit/bnc-gramrels-fruit.entryFeatures",
-                    "-o", "testdata/out/bnc-gramrels-fruit.out",
-                    "-C", "500"});
-        ExitTrapper.disableExitTrapping();
+        try {
+            ExitTrapper.enableExistTrapping();
+            Main.main(new String[]{"allpairs",
+                        "-i", "testdata/fruit/bnc-gramrels-fruit.entryFeatures",
+                        "-o", "testdata/out/bnc-gramrels-fruit.out",
+                        "-C", "500"});
+        } finally {
+            ExitTrapper.disableExitTrapping();
+        }
     }
-
 }

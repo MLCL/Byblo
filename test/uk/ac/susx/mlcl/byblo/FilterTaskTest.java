@@ -30,8 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import com.google.common.io.Files;
 import java.nio.charset.Charset;
 import org.junit.After;
@@ -51,16 +49,17 @@ public class FilterTaskTest {
     private static final String SUBJECT = FilterTask.class.getName();
 
     private final static File OUTPUT_ENTRIES = new File(TEST_OUTPUT_DIR,
-            TEST_FRUIT_ENTRIES_FILTERED.getName());
+                                                        TEST_FRUIT_ENTRIES_FILTERED.
+            getName());
 
     private final static File OUTPUT_FEATURES = new File(TEST_OUTPUT_DIR,
-            TEST_FRUIT_FEATURES_FILTERED.getName());
+                                                         TEST_FRUIT_FEATURES_FILTERED.
+            getName());
 
     private final static File OUTPUT_ENTRY_FEATURES = new File(TEST_OUTPUT_DIR,
-            TEST_FRUIT_ENTRY_FEATURES_FILTERED.getName());
+                                                               TEST_FRUIT_ENTRY_FEATURES_FILTERED.
+            getName());
 
- 
-    
     @Before
     public void setUp() {
         OUTPUT_ENTRIES.delete();
@@ -72,7 +71,6 @@ public class FilterTaskTest {
     public void tearDown() {
     }
 
-    
     private void runWithCLI(String[] runArgs) throws Exception {
 
         String[] commonArgs = {
@@ -89,22 +87,26 @@ public class FilterTaskTest {
         System.arraycopy(commonArgs, 0, args, 0, commonArgs.length);
         System.arraycopy(runArgs, 0, args, commonArgs.length, runArgs.length);
 
-               
-        enableExistTrapping();
-        Main.main(args);
-        disableExitTrapping();
-        
+
+        try {
+            enableExistTrapping();
+            Main.main(args);
+        } finally {
+            disableExitTrapping();
+        }
+
+
 
 
         assertTrue("Output file " + OUTPUT_ENTRIES + " does not exist.",
-                OUTPUT_ENTRIES.exists());
+                   OUTPUT_ENTRIES.exists());
         assertTrue("Output file " + OUTPUT_FEATURES + " does not exist.",
-                OUTPUT_FEATURES.exists());
+                   OUTPUT_FEATURES.exists());
         assertTrue("Output file " + OUTPUT_ENTRY_FEATURES + " does not exist.",
-                OUTPUT_ENTRY_FEATURES.exists());
+                   OUTPUT_ENTRY_FEATURES.exists());
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testMainMethodRun_fruit_entryFreqFilter() throws Exception {
         System.out.println(
                 "Testing " + SUBJECT + ": on fruit, from main method, filter by Entry freqency.");
@@ -112,7 +114,7 @@ public class FilterTaskTest {
         runWithCLI(new String[]{"--filter-entry-freq", "50"});
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testMainMethodRun_fruit_featureFreqFilter() throws Exception {
         System.out.println(
                 "Testing " + SUBJECT + " on fruit from main method, filter by context freqency.");
@@ -120,7 +122,7 @@ public class FilterTaskTest {
         runWithCLI(new String[]{"--filter-feature-freq", "50"});
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testMainMethodRun_fruit_entryFeatureFreqFilter() throws Exception {
         System.out.println(
                 "Testing FilterTask on fruit from main method, filter by feature freqency.");
@@ -128,13 +130,13 @@ public class FilterTaskTest {
         runWithCLI(new String[]{"--filter-entry-feature-freq", "5"});
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testMainMethodRun_fruit_EntryWhitelistFilter() throws Exception {
         System.out.println(
                 "Testing FilterTask: on fruit, from main method, filter by entry word list.");
 
         File entryWorldList = new File(TEST_OUTPUT_DIR,
-                TEST_FRUIT_INPUT.getName() + ".entry-whitelist");
+                                       TEST_FRUIT_INPUT.getName() + ".entry-whitelist");
 
         Files.write("apple\norange\npear\nbanana", entryWorldList, Charset.
                 forName("UTF-8"));
@@ -143,7 +145,7 @@ public class FilterTaskTest {
                     entryWorldList.toString()});
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testMainMethodRun_fruit_featureWhitelistFilter() throws Exception {
         System.out.println(
                 "Testing FilterTask: on fruit, from main method, filter by context word list.");
@@ -152,13 +154,13 @@ public class FilterTaskTest {
                 getName() + ".contextWordList");
 
         Files.write("det:the\ndet:a\niobj:of\nncmod:back\nncmod:for\npassive",
-                contextWorldList, Charset.forName("UTF-8"));
+                    contextWorldList, Charset.forName("UTF-8"));
 
         runWithCLI(new String[]{"--filter-feature-whitelist", contextWorldList.
                     toString()});
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testMainMethodRun_fruit_entryPatternFilter() throws Exception {
         System.out.println(
                 "Testing FilterTask: on fruit, from main method, filter by entry pattern.");
@@ -166,7 +168,7 @@ public class FilterTaskTest {
         runWithCLI(new String[]{"--filter-entry-pattern", "^.{0,5}$"});
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testMainMethodRun_fruit_contextPatternFilter() throws Exception {
         System.out.println(
                 "Testing FilterTask: on fruit, from main method, filter by context pattern.");
@@ -174,15 +176,15 @@ public class FilterTaskTest {
         runWithCLI(new String[]{"--filter-feature-pattern", "det:.*"});
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testMainMethodRun_fruit_allFilters() throws Exception {
         System.out.println(
                 "Testing FilterTask: on fruit, from main method, using all filters.");
 
         File entryWorldList = new File(TEST_OUTPUT_DIR,
-                FRUIT_NAME + ".allFilters-EntryList");
+                                       FRUIT_NAME + ".allFilters-EntryList");
         File contextWorldList = new File(TEST_OUTPUT_DIR,
-                FRUIT_NAME + ".allFilters-contextWordList");
+                                         FRUIT_NAME + ".allFilters-contextWordList");
 
         Files.write("apple\napricot\navocado\nbanana\nbilberry\nblackberry\n"
                 + "blackcap\nblackcurrant\nblueberry\ncantaloupe\ncherry\n"
@@ -191,7 +193,7 @@ public class FilterTaskTest {
                 + "kumquat", entryWorldList, Charset.forName("UTF-8"));
 
         Files.write("det:the\ndet:a\niobj:of\nncmod:back\nncmod:for\npassive",
-                contextWorldList, Charset.forName("UTF-8"));
+                    contextWorldList, Charset.forName("UTF-8"));
 
         runWithCLI(new String[]{
                     "--filter-entry-whitelist", entryWorldList.toString(), // a-k
@@ -203,5 +205,4 @@ public class FilterTaskTest {
                     "--filter-entry-pattern", "a"
                 });
     }
-    
 }
