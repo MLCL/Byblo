@@ -51,142 +51,188 @@ function die {
     exit 1;
 }
 
-#
 # Download and build JCommander
-#
- 
+function download_jcommander {
+    jc=jcommander
+    jc_version=jcommander-1.19
 
-jc=jcommander
-jc_version=jcommander-1.17
-
-echo "[${jc}] Starting"
-which -s mvn || die "Can't find maven"
-which -s javac || die "Can't find javac"
-which -s unzip || die "Can't find unzip"
-which -s curl || die "Can't find curl"
+    echo "[${jc}] Starting"
+    which -s mvn || die "Can't find maven"
+    which -s javac || die "Can't find javac"
+    which -s unzip || die "Can't find unzip"
+    which -s curl || die "Can't find curl"
 
 
-jc_url="http://github.com/cbeust/jcommander/zipball/${jc_version}"
-jc_dl_file=`mktemp -t ${jc_version}-download`
-echo "[${jc}] Downloading from ${jc_url} to $jc_dl_file"
-curl -L "${jc_url}" > "${jc_dl_file}" || die
+    jc_url="http://github.com/cbeust/jcommander/zipball/${jc_version}"
+    jc_dl_file=`mktemp -t ${jc_version}-download`
+    echo "[${jc}] Downloading from ${jc_url} to $jc_dl_file"
+    curl -L "${jc_url}" > "${jc_dl_file}" || die
 
-jc_ext_dir=`mktemp -dt ${jc_version}-extracted`
-echo "[${jc}] Extracting to ${jc_ext_dir}"
-unzip -q "${jc_dl_file}" -d "${jc_ext_dir}" || die
+    jc_ext_dir=`mktemp -dt ${jc_version}-extracted`
+    echo "[${jc}] Extracting to ${jc_ext_dir}"
+    unzip -q "${jc_dl_file}" -d "${jc_ext_dir}" || die
 
-echo "[${jc}] Buildings"
-cd ${jc_ext_dir}/`ls ${jc_ext_dir}`
-mvn clean package || die
-cp "target/${jc_version}.jar" "$libs_dir" || die
+    echo "[${jc}] Buildings"
+    cd ${jc_ext_dir}/`ls ${jc_ext_dir}`
+    mvn clean package || die
+    cp "target/${jc_version}.jar" "$libs_dir" || die
 
-echo "[${jc}] Cleaning temporary files"
-rm -rf "$jc_ext_dir"
-rm -f "$jc_dl_file"
+    echo "[${jc}] Cleaning temporary files"
+    rm -rf "$jc_ext_dir"
+    rm -f "$jc_dl_file"
 
-cd "$libs_dir"
+    cd "$libs_dir"
 
-echo "[${jc}] Done"
+    echo "[${jc}] Done"
+}
 
-#
 # Download binary distribution of fastutil
-#
+function download_fastutil {
+    fu=fastutil
+    fu_version=fastutil-6.4.1
 
-fu=fastutil
-fu_version=fastutil-6.4.1
+    echo "[${fu}] Starting"
+    which -s tar || die "Can't find tar"
+    which -s gzip || die "Can't find gzip"
+    which -s curl || die "Can't find curl"
 
-echo "[${fu}] Starting"
-which -s tar || die "Can't find tar"
-which -s gzip || die "Can't find gzip"
-which -s curl || die "Can't find curl"
+    fu_url=http://fastutil.dsi.unimi.it/${fu_version}-bin.tar.gz
+    fu_dl_file=`mktemp -t ${fu_version}-download`
+    echo "[${fu}] Downloading from ${fu_url} to $fu_dl_file"
+    curl -L "${fu_url}" > "${fu_dl_file}" || die
 
-fu_url=http://fastutil.dsi.unimi.it/${fu_version}-bin.tar.gz
-fu_dl_file=`mktemp -t ${fu_version}-download`
-echo "[${fu}] Downloading from ${fu_url} to $fu_dl_file"
-curl -L "${fu_url}" > "${fu_dl_file}" || die
+    fu_ext_dir=`mktemp -dt ${fu_version}-extracted`
+    echo "[${fu}] Extracting to ${fu_ext_dir}"
+    tar xfz "${fu_dl_file}" -C "${fu_ext_dir}"  || die
+    cp "${fu_ext_dir}/${fu_version}/${fu_version}.jar" "$libs_dir" || die
 
-fu_ext_dir=`mktemp -dt ${fu_version}-extracted`
-echo "[${fu}] Extracting to ${fu_ext_dir}"
-tar xfz "${fu_dl_file}" -C "${fu_ext_dir}"  || die
-cp "${fu_ext_dir}/${fu_version}/${fu_version}.jar" "$libs_dir" || die
+    echo "[${fu}] Cleaning temporary files"
+    rm -rf "$fu_ext_dir"
+    rm -f "$fu_dl_file"
 
-echo "[${fu}] Cleaning temporary files"
-rm -rf "$fu_ext_dir"
-rm -f "$fu_dl_file"
+    echo "[${fu}] Done"
+}
 
-echo "[${fu}] Done"
-
-#
 # Download binary distribution of commons logging
-#
+function download_commons_logging {
+    cl=commons-logging
+    cl_version=commons-logging-1.1.1
 
-cl=commons-logging
-cl_version=commons-logging-1.1.1
+    echo "[${cl}] Starting"
+    which -s tar || die "Can't find tar"
+    which -s gzip || die "Can't find gzip"
+    which -s curl || die "Can't find curl"
+    which -s grep || die "Can't find grep"
+    which -s head || die "Can't find head"
 
-echo "[${cl}] Starting"
-which -s tar || die "Can't find tar"
-which -s gzip || die "Can't find gzip"
-which -s curl || die "Can't find curl"
-which -s grep || die "Can't find grep"
-which -s head || die "Can't find head"
+    echo "[${cl}] Selecting apache mirror"
+    cl_url_file="commons/logging/binaries/${cl_version}-bin.tar.gz"
+    cl_url_mirror=`curl -s http://www.apache.org/dyn/closer.cgi/${cl_url_file} | grep mirror | grep -oE "http://[^\"<]*${cl_url_file}" | head -n 1`
 
-echo "[${cl}] Selecting apache mirror"
-cl_url_file="commons/logging/binaries/${cl_version}-bin.tar.gz"
-cl_url_mirror=`curl -s http://www.apache.org/dyn/closer.cgi/${cl_url_file} | grep mirror | grep -oE "http://[^\"<]*${cl_url_file}" | head -n 1`
-	
-cl_dl_file=`mktemp -t ${cl_version}-download`
-echo "[${cl}] Downloading from ${cl_url_mirror} to $cl_dl_file"
-curl -L "${cl_url_mirror}" > "${cl_dl_file}" || die
+    cl_dl_file=`mktemp -t ${cl_version}-download`
+    echo "[${cl}] Downloading from ${cl_url_mirror} to $cl_dl_file"
+    curl -L "${cl_url_mirror}" > "${cl_dl_file}" || die
 
-echo "[${cl}] Extracting to ${cl_ext_dir}"
-cl_ext_dir=`mktemp -dt ${cl_version}-extracted`
-tar xfz "${cl_dl_file}" -C "${cl_ext_dir}"  || die
-cp "${cl_ext_dir}/${cl_version}/${cl_version}.jar" "$libs_dir" || die
+    echo "[${cl}] Extracting to ${cl_ext_dir}"
+    cl_ext_dir=`mktemp -dt ${cl_version}-extracted`
+    tar xfz "${cl_dl_file}" -C "${cl_ext_dir}"  || die
+    cp "${cl_ext_dir}/${cl_version}/${cl_version}.jar" "$libs_dir" || die
 
-echo "[${cl}] Cleaning temporary files"
-rm -rf "$fu_ext_dir"
-rm -f "$fu_dl_file"
+    echo "[${cl}] Cleaning temporary files"
+    rm -rf "$fu_ext_dir"
+    rm -f "$fu_dl_file"
 
-cd "$libs_dir"
+    cd "$libs_dir"
 
-echo "[${cl}] Done"
+    echo "[${cl}] Done"
+}
 
-#
 # Download binary distribution of google guava
-# Requires: unzip, curl
-#
+function download_google_guava {
+    gg=google-guava
+    gg_version=guava-10.0.1
 
-gg=google-guava
-gg_version=guava-10.0.1
+    echo "[${gg}] Starting"
+    which -s unzip || die "Can't find unzip"
+    which -s curl || die "Can't find curl"
 
-echo "[${gg}] Starting"
-which -s unzip || die "Can't find unzip"
-which -s curl || die "Can't find curl"
-
-gg_url=http://search.maven.org/remotecontent?filepath=com/google/guava/guava/10.0.1/${gg_version}.jar
-gg_dl_file=${gg_version}.jar
-echo "[${gg}] Downloading from ${gg_url} to $gg_dl_file"
-curl -L "${gg_url}" > "${gg_dl_file}" || die
-echo "[${gg}] Done"
-
+    gg_url=http://search.maven.org/remotecontent?filepath=com/google/guava/guava/10.0.1/${gg_version}.jar
+    gg_dl_file=${gg_version}.jar
+    echo "[${gg}] Downloading from ${gg_url} to $gg_dl_file"
+    curl -L "${gg_url}" > "${gg_dl_file}" || die
+    echo "[${gg}] Done"
+}
 
 #
 # Download binary distribution of junit
 # Requires: curl
 #
 
-ju=junit
-ju_version=junit-4.10
 
-echo "[${ju}] Starting"
-which -s curl || die "Can't find curl"
+function download_junit {
+    ju=junit
+    ju_version=junit-4.10
 
-ju_url=https://github.com/downloads/KentBeck/junit/${ju_version}.jar
-ju_dl_file=${ju_version}.jar
-echo "[${ju}] Downloading from ${ju_url} to $ju_dl_file"
-curl -L "${ju_url}" > "${ju_dl_file}" || die
-echo "[${ju}] Done"
+    echo "[${ju}] Starting"
+    which -s curl || die "Can't find curl"
+
+    ju_url=https://github.com/downloads/KentBeck/junit/${ju_version}.jar
+    ju_dl_file=${ju_version}.jar
+
+    echo "[${ju}] Downloading from ${ju_url} to $ju_dl_file"
+    curl -L "${ju_url}" > "${ju_dl_file}" || die
+    echo "[${ju}] Done"
+}
+
+
+function download_mlcllib {
+    ml=mlcllib
+    ml_version=6bed5beddb511027610c1cd811e060f2118025eb
+
+    echo "[${ml}] Starting"
+    which -s curl || die "Can't find curl"
+    which -s unzip || die "Can't find unzip"
+
+    ml_url=https://github.com/MLCL/MLCLLib/zipball/${ml_version}
+    ml_dl_file=${ju_version}.zip
+    echo "[${ml}] Downloading from ${ml_url} to $ml_dl_file"
+    curl -L "${ml_url}" > "${ml_dl_file}" || die
+
+    ml_ext_dir=`mktemp -dt ${ml_version}-extracted`
+    echo "[${ml}] Extracting to ${ml_ext_dir}"
+    unzip -q "${ml_dl_file}" -d "${ml_ext_dir}" || die
+
+    echo "[${ml}] Buildings"
+    cd ${ml_ext_dir}/`ls ${ml_ext_dir}`
+    ant clean jar || die
+
+    cp "dist/MLCLLib.jar" "$libs_dir" || die
+
+
+    echo "[${ml}] Cleaning temporary files"
+    rm -rf "$ml_ext_dir"
+    rm -f "$ml_dl_file"
+
+    cd "$libs_dir"
+
+    echo "[${ml}] Done"
+}
+
+
+function download_all {
+    download_jcommander
+
+    #download_fastutil
+
+    #download_commons_logging
+
+    #download_google_guava 
+
+    #download_junit 
+
+   # download_mlcllib
+}
 
 
 
-
+download_all

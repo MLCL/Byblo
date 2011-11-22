@@ -83,6 +83,7 @@ public abstract class AbstractCommand implements Command {
         jc.setProgramName(this.getClass().getSimpleName());
         jc.addConverterFactory(new ConverterFactory());
         jc.addObject(this);
+        
 
         // If sub-commands have been set then instantiate all the objects
         // and pass them to JCommander
@@ -117,9 +118,10 @@ public abstract class AbstractCommand implements Command {
             System.err.println(ex.getMessage());
             StringBuilder sb = new StringBuilder();
 
-            jc.usage(sb);
 
-            if (jc.getParsedCommand() != null) {
+            if (jc.getParsedCommand() == null) {
+                jc.usage(sb);
+            } else {
                 jc.usage(jc.getParsedCommand(), sb);
             }
 
@@ -132,9 +134,9 @@ public abstract class AbstractCommand implements Command {
             if (LOG.isTraceEnabled())
                 LOG.trace("Printing usage.");
 
-            jc.usage();
-
-            if (jc.getParsedCommand() != null) {
+            if (jc.getParsedCommand() == null) {
+                jc.usage();
+            } else {
                 jc.usage(jc.getParsedCommand());
             }
 
@@ -148,7 +150,7 @@ public abstract class AbstractCommand implements Command {
             jc.usage(sb);
             System.err.println(sb);
             System.exit(-1);
-            
+
         } else {
 
             if (jc.getParsedCommand() != null) {
