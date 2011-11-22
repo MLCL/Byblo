@@ -30,12 +30,14 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import java.io.File;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import uk.ac.susx.mlcl.lib.test.ExitTrapper;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -64,12 +66,25 @@ public class AllPairsTaskTest {
 
     @Test
     public void testMainRun() throws Exception {
+        new File("testdata","out").mkdir();
         try {
             ExitTrapper.enableExistTrapping();
             Main.main(new String[]{"allpairs",
                         "-i", "testdata/fruit/bnc-gramrels-fruit.entryFeatures",
                         "-o", "testdata/out/bnc-gramrels-fruit.out",
                         "-C", "500"});
+        } finally {
+            ExitTrapper.disableExitTrapping();
+        }
+    }
+
+    @Test
+    public void testExitStatus() throws Exception {
+        try {
+            ExitTrapper.enableExistTrapping();
+            Main.main(new String[]{"allpairs"});
+        } catch (ExitTrapper.ExitException ex) {
+            assertTrue("Expecting non-zero exit status.", ex.getStatus() != 0);
         } finally {
             ExitTrapper.disableExitTrapping();
         }

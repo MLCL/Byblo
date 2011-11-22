@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import uk.ac.susx.mlcl.lib.test.ExitTrapper;
 import java.io.File;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -43,13 +44,13 @@ public class ExternalKnnTaskTest {
 
     private static final String subject = ExternalCountTask.class.getName();
 
-    @Test(timeout=2000)
+    @Test(timeout = 2000)
     public void testRunOnFruit() throws Exception {
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
 
         final File in = TEST_FRUIT_SIMS;
         final File out = new File(TEST_OUTPUT_DIR,
-                FRUIT_NAME + ".neighs");
+                                  FRUIT_NAME + ".neighs");
 
         final ExternalKnnTask knnTask = new ExternalKnnTask(
                 in, out, DEFAULT_CHARSET, 2);
@@ -62,5 +63,17 @@ public class ExternalKnnTaskTest {
 
         assertTrue("Output files not created.", out.exists());
         assertTrue("Empty output file found.", out.length() > 0);
+    }
+
+    @Test
+    public void testExitStatus() throws Exception {
+        try {
+            ExitTrapper.enableExistTrapping();
+            Main.main(new String[]{"knn"});
+        } catch (ExitTrapper.ExitException ex) {
+            assertTrue("Expecting non-zero exit status.", ex.getStatus() != 0);
+        } finally {
+            ExitTrapper.disableExitTrapping();
+        }
     }
 }

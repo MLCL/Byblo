@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import uk.ac.susx.mlcl.lib.test.ExitTrapper;
 import com.google.common.io.Files;
 import java.nio.charset.Charset;
 import org.junit.After;
@@ -204,5 +205,18 @@ public class FilterTaskTest {
                     "--filter-feature-whitelist", contextWorldList.toString(),
                     "--filter-entry-pattern", "a"
                 });
+    }
+    
+    
+    @Test
+    public void testExitStatus() throws Exception {
+        try {
+            ExitTrapper.enableExistTrapping();
+            Main.main(new String[]{"filter"});
+        } catch (ExitTrapper.ExitException ex) {
+            assertTrue("Expecting non-zero exit status.", ex.getStatus() != 0);
+        } finally {
+            ExitTrapper.disableExitTrapping();
+        }
     }
 }

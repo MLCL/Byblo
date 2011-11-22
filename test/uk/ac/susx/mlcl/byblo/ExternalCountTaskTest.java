@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import uk.ac.susx.mlcl.lib.test.ExitTrapper;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
 import java.io.File;
 import java.nio.charset.Charset;
@@ -233,5 +234,17 @@ public class ExternalCountTaskTest {
         runExpectingIllegalState(instIn, dir, fOut, efOut, DEFAULT_CHARSET);
         runExpectingIllegalState(instIn, eOut, dir, efOut, DEFAULT_CHARSET);
         runExpectingIllegalState(instIn, eOut, fOut, dir, DEFAULT_CHARSET);
+    }
+
+    @Test
+    public void testExitStatus() throws Exception {
+        try {
+            ExitTrapper.enableExistTrapping();
+            Main.main(new String[]{"count"});
+        } catch (ExitTrapper.ExitException ex) {
+            assertTrue("Expecting non-zero exit status.", ex.getStatus() != 0);
+        } finally {
+            ExitTrapper.disableExitTrapping();
+        }
     }
 }

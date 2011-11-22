@@ -529,7 +529,8 @@ function neighbours {
         --temporary-directory "$tempdir" \
         --chunk-size $sortChunkSize \
         --input "$pairsFile" \
-        --output "$neighsFile"
+        --output "$neighsFile" \
+        || die >&2
 
     debug "Finished generating neighbours file - `date`"
 }
