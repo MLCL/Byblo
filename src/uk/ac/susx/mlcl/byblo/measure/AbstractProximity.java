@@ -30,16 +30,11 @@
  */
 package uk.ac.susx.mlcl.byblo.measure;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public abstract class AbstractProximity implements Proximity {
-
-    private static final Log LOG = LogFactory.getLog(AbstractProximity.class);
 
     private int filteredFeatureId = -1;
 
