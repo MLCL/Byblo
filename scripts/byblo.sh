@@ -291,7 +291,8 @@ function checkOutputFiles {
             [[ -f "$1" ]] || die "Output file '$1' is not a regular file."
             [[ -w "$1" ]] || die "Output file '$1' is not writeable."
         else
-            checkOutputDirs `dirname $1`
+            tmp=`dirname "$1"`
+            checkOutputDirs "$tmp"
         fi
         shift
     done
@@ -412,12 +413,12 @@ function count {
     [[ -e $entryFeaturesFile ]] && warn "Overwriting features file '$entryFeaturesFile'."
 
     $JAVA_CMD count \
-        --charset $charset \
-        --input $inputFile \
-        --output-entries $entriesFile \
-        --output-features $featuresFile \
-        --output-entry-features $entryFeaturesFile \
-        --temporary-directory $tempdir \
+        --charset "$charset" \
+        --input "$inputFile" \
+        --output-entries "$entriesFile" \
+        --output-features "$featuresFile" \
+        --output-entry-features "$entryFeaturesFile" \
+        --temporary-directory "$tempdir" \
         || die >&2
 
     info "Finished counting raw instances - `date`"
@@ -444,14 +445,14 @@ function filter {
     [[ -e $entryFeaturesFile${FILTERED_SUFFIX} ]] && \
         warn "Overwriting entry-features file '$entryFeaturesFile${FILTERED_SUFFIX}'."
 
-    $JAVA_CMD filter $filters \
-        -T $tempdir \
-        --input-entries $entriesFile \
-        --input-features $featuresFile \
-        --input-entry-features $entryFeaturesFile \
-        --output-entries $entriesFile${FILTERED_SUFFIX} \
-        --output-features $featuresFile${FILTERED_SUFFIX} \
-        --output-entry-features $entryFeaturesFile${FILTERED_SUFFIX} \
+    $JAVA_CMD filter "$filters" \
+        -T "$tempdir" \
+        --input-entries "$entriesFile" \
+        --input-features "$featuresFile" \
+        --input-entry-features "$entryFeaturesFile" \
+        --output-entries "$entriesFile${FILTERED_SUFFIX}" \
+        --output-features "$featuresFile${FILTERED_SUFFIX}" \
+        --output-entry-features "$entryFeaturesFile${FILTERED_SUFFIX}" \
         --charset $charset \
         || die >&2
 
@@ -486,10 +487,10 @@ function allpairs {
     [[ -e $pairsFile ]] && warn "Overwriting pairs file '$pairsFile'."
 
     $JAVA_CMD allpairs $apssArgs \
-            --input $entryFeaturesFile \
-            --input-entries $entriesFile \
-            --input-features $featuresFile \
-            --output $pairsFile \
+            --input "$entryFeaturesFile" \
+            --input-entries "$entriesFile" \
+            --input-features "$featuresFile" \
+            --output "$pairsFile" \
             --charset $charset \
             --measure $measure \
             --chunk-size $allpairsChunkSize \
@@ -525,10 +526,10 @@ function neighbours {
     $JAVA_CMD knn $sortArgs \
         --charset $charset \
         -k $sortK \
-        --temporary-directory $tempdir \
+        --temporary-directory "$tempdir" \
         --chunk-size $sortChunkSize \
-        --input $pairsFile \
-        --output $neighsFile
+        --input "$pairsFile" \
+        --output "$neighsFile"
 
     debug "Finished generating neighbours file - `date`"
 }
@@ -537,7 +538,7 @@ function neighbours {
 # Process command line arguments
 # ====================================
 
-parseArgs $@
+parseArgs "$@"
 
 
 # ====================================
@@ -546,11 +547,11 @@ parseArgs $@
 
 
 # Check input file exists and is readable
-checkInputFiles $inputFile
+checkInputFiles "$inputFile"
 
 (( "${#inputFile}" > 0 && "${#outputDir}" == 0 )) &&
-    outputDir=`dirname $inputFile`
-checkOutputDirs $outputDir
+    outputDir=`dirname "$inputFile"`
+checkOutputDirs "$outputDir"
 
 
 (( "${#inputFile}" > 0 )) || die "No input file give."
@@ -561,7 +562,7 @@ checkOutputDirs $outputDir
     die "Expecting no. threads >= 1, found '$threads'."
 
 [[ "$tempdir" ]] || die "Temp dir '$tempdir' is not set."
-checkOutputDirs $tempdir
+checkOutputDirs "$tempdir"
 
 #test filters ???
 
@@ -598,7 +599,7 @@ checkOutputDirs $tempdir
 # ====================================
 
 
-inputFileName=`basename $inputFile`
+inputFileName=`basename "$inputFile"`
 
 entriesFile=${outputDir}/${inputFileName}${ENTRIES_SUFFIX}
 featuresFile=${outputDir}/${inputFileName}${FEATURES_SUFFIX}
@@ -606,8 +607,8 @@ entryFeaturesFile=${outputDir}/${inputFileName}${ENTRY_FEATURES_SUFFIX}
 pairsFile=${outputDir}/${inputFileName}${PAIRS_SUFFIX}-$measure
 neighsFile=${pairsFile}${NEIGHBOURS_SUFFIX}-${sortK}nn
 
-checkOutputFiles $entriesFile $featuresFile \
-    $entryFeaturesFile $pairsFile $neighsFile
+checkOutputFiles "$entriesFile" "$featuresFile" \
+    "$entryFeaturesFile" "$pairsFile" "$neighsFile"
 #
 # ====================================
 # Run the task
