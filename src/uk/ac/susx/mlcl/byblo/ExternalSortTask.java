@@ -72,13 +72,13 @@ public class ExternalSortTask extends AbstractParallelCommandTask {
     @Parameter(names = {"-i", "--input"},
                description = "Source file. If this argument is not given, or if it is \"-\", then stdin will be read.",
                validateWith = InputFileValidator.class,
-               required=true)
+               required = true)
     private File sourceFile;
 
     @Parameter(names = {"-o", "--output"},
                description = "Destination file. If this argument is not given, or if it is \"-\", then stdout will be written to.",
                validateWith = OutputFileValidator.class,
-               required=true)
+               required = true)
     private File destFile;
 
     @Parameter(names = {"-T", "--temporary-directory"},
