@@ -55,8 +55,7 @@ import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(
-commandDescription = "Split a large file into a number of smaller files.")
+@Parameters(commandDescription = "Split a large file into a number of smaller files.")
 public class ChunkTask extends AbstractCommandTask {
 
     private static final Log LOG = LogFactory.getLog(ChunkTask.class);
@@ -72,8 +71,8 @@ public class ChunkTask extends AbstractCommandTask {
 
     @Parameter(names = {"-i", "--input-file"},
                description = "Source file. If this argument is not given, or if it is \"-\", then stdin will be read.",
-               validateWith=InputFileValidator.class,
-               required=true)
+               validateWith = InputFileValidator.class,
+               required = true)
     private File sourceFile;
 
     private BlockingQueue<File> dstFileQueue = new LinkedBlockingDeque<File>();
@@ -105,8 +104,6 @@ public class ChunkTask extends AbstractCommandTask {
         setCharset(charset);
     }
 
-   
-
     @Override
     protected void initialiseTask() throws Exception {
     }
@@ -135,7 +132,20 @@ public class ChunkTask extends AbstractCommandTask {
 //            dstFileQueue.put(sourceFile);
 //            return;            
 //        }
-        
+
+        // So instead of the (above) fast solution to a small (or empty) input
+        // file, just quickly copy the file.
+        if (sourceFile.length() <= maxChunkSize) {
+            if (LOG.isDebugEnabled())
+                LOG.debug("Input is smaller than chunk size, copying.");
+            File tmp = chunkFileFactory.createFile();
+            CopyTask ct = new CopyTask(sourceFile, tmp);
+            ct.runCommand();
+            dstFileQueue.put(tmp);
+            return;
+        }
+
+
         if (LOG.isInfoEnabled())
             LOG.info("Running chunker on file \"" + sourceFile + "\", max size = " + MiscUtil.
                     humanReadableBytes(getMaxChunkSize()) + ".");

@@ -33,6 +33,7 @@ package uk.ac.susx.mlcl.byblo;
 import uk.ac.susx.mlcl.lib.test.ExitTrapper;
 import java.io.File;
 import org.junit.Test;
+import uk.ac.susx.mlcl.TestConstants;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 
@@ -72,6 +73,23 @@ public class ExternalKnnTaskTest {
             Main.main(new String[]{"knn"});
         } catch (ExitTrapper.ExitException ex) {
             assertTrue("Expecting non-zero exit status.", ex.getStatus() != 0);
+        } finally {
+            ExitTrapper.disableExitTrapping();
+        }
+    }
+
+    @Test
+    public void testEmptyInputFile() throws Exception {
+        try {
+            File in = new File(TestConstants.TEST_OUTPUT_DIR, "in");
+            in.createNewFile();
+            File out = new File(TestConstants.TEST_OUTPUT_DIR, "out");
+            
+            ExitTrapper.enableExistTrapping();
+            Main.main(new String[]{"knn", "-i", in.toString(), 
+                "-o", out.toString()});
+        } catch (ExitTrapper.ExitException ex) {
+            assertTrue("Expecting non-zero exit status.", ex.getStatus() == 0);
         } finally {
             ExitTrapper.disableExitTrapping();
         }
