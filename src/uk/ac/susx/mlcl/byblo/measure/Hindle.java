@@ -35,7 +35,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 /**
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-public class Hindle extends AbstractMIProximity implements Proximity {
+public class Hindle extends AbstractMIProximity {
 
     @Override
     public double shared(SparseDoubleVector A, SparseDoubleVector B) {
@@ -53,12 +53,12 @@ public class Hindle extends AbstractMIProximity implements Proximity {
                 i++;
                 j++;
             } else { // Q.keys[i] == R.keys[j]
-                final double Cprob = featurePrior(A.keys[i]);
-                final double Qprob = prob(A, i);
-                if (Qprob > Cprob) {
-                    final double Rprob = prob(B, j);
-                    if (Rprob > Cprob) {
-                        sim += Math.log(Math.min(Qprob / Cprob, Rprob / Cprob));
+                final double pC = featurePrior(A.keys[i]);
+                final double pA = prob(A, i);
+                if (pA > pC) {
+                    final double pB = prob(B, j);
+                    if (pB > pC) {
+                        sim += Math.log(Math.min(pA / pC, pB / pC));
                     }
                 }
                 i++;

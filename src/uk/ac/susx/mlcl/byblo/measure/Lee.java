@@ -82,11 +82,11 @@ public class Lee extends AbstractProximity {
                 i++;
                 j++;
             } else {
-                final double Qprob = A.values[i] / A.sum;
-                final double Rprob = (B.values[j] / B.sum);
-                sim += Qprob * (2 * Math.log(Qprob)
-                        - Math.log(Rprob * alpha + Qprob * (1 - alpha))
-                        + Math.log((1.0 - alpha)));
+                final double pA = A.values[i] / A.sum;
+                final double pB = (B.values[j] / B.sum);
+                sim += pA * (2 * Math.log(pA)
+                             - Math.log(pB * alpha + pA * (1 - alpha))
+                             + Math.log((1.0 - alpha)));
                 i++;
                 j++;
             }
@@ -98,9 +98,9 @@ public class Lee extends AbstractProximity {
     public double left(SparseDoubleVector A) {
         double left = 0;
         for (int i = 0; i < A.size; i++) {
-            final double Qprob = A.values[i] / A.sum;
-            left += Qprob * (Math.log(Qprob)
-                    - Math.log(Qprob * (1.0 - alpha)));
+            final double pA = A.values[i] / A.sum;
+            left += pA * (Math.log(pA)
+                          - Math.log(pA * (1.0 - alpha)));
         }
         return left;
     }

@@ -65,11 +65,11 @@ public class Jensen extends AbstractProximity {
                 i++;
                 j++;
             } else {
-                final double Qprob = A.values[i] / A.sum;
-                final double Rprob = B.values[j] / B.sum;
-                final double avprob = Math.log(Qprob + Rprob) - LN2;
-                comp += Qprob * (2 * Math.log(Qprob) - avprob - LN2)
-                        + Rprob * (2 * Math.log(Rprob) - avprob - LN2);
+                final double pA = A.values[i] / A.sum;
+                final double pB = B.values[j] / B.sum;
+                final double pAv = Math.log(pA + pB) - LN2;
+                comp += pA * (2 * Math.log(pA) - pAv - LN2)
+                        + pB * (2 * Math.log(pB) - pAv - LN2);
                 i++;
                 j++;
             }
@@ -82,8 +82,8 @@ public class Jensen extends AbstractProximity {
     public double left(SparseDoubleVector A) {
         double comp = 0;
         for (int i = 0; i < A.size; i++) {
-            final double Qprob = A.values[i] / A.sum;
-            comp += Qprob * (-((Qprob - 1) * Math.log(Qprob) - Qprob * LN2));
+            final double pA = A.values[i] / A.sum;
+            comp += pA * (-((pA - 1) * Math.log(pA) - pA * LN2));
         }
         return comp;
     }

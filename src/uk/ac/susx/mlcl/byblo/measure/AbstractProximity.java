@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.measure;
 
-import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -42,7 +41,8 @@ public abstract class AbstractProximity implements Proximity {
 
     private static final Log LOG = LogFactory.getLog(AbstractProximity.class);
 
-    int filteredFeatureId  = -1;
+    private int filteredFeatureId = -1;
+
     /**
      * 
      */
@@ -57,7 +57,7 @@ public abstract class AbstractProximity implements Proximity {
     public int getFilteredFeatureId() {
         return filteredFeatureId;
     }
-    
+
     public boolean isFiltered(int featureId) {
         return filteredFeatureId == featureId;
     }

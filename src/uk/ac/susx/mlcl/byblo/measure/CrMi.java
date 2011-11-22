@@ -52,7 +52,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-public class CrMi extends AbstractMIProximity implements Proximity {
+public class CrMi extends AbstractMIProximity {
 
     public static final double DEFAULT_BETA = 0.5;
 

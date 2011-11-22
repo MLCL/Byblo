@@ -60,41 +60,43 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-public class RecallMi extends AbstractMIProximity implements Proximity {
-
-    public RecallMi() {
-    }
+public class RecallMi extends AbstractMIProximity {
 
     @Override
-    public double shared(SparseDoubleVector Q, SparseDoubleVector R) {
+    public double shared(SparseDoubleVector A, SparseDoubleVector B) {
         double numerator = 0.0;
 
-        int i = 0, j = 0;
-        while (i < Q.size && j < R.size) {
-            if (Q.keys[i] < R.keys[j]) {
-                i++;
-            } else if (Q.keys[i] > R.keys[j]) {
-                j++;
-            } else if (isFiltered(Q.keys[i])) {
+        int i = 0;
+        int j = 0;
+        while (i < A.size && j < B.size) {
+            if (A.keys[i] < B.keys[j]) {
+                ++i;
+            } else if (A.keys[i] > B.keys[j]) {
+                ++j;
+            } else if (isFiltered(A.keys[i])) {
                 i++;
                 j++;
             } else {
-                if (posInf(R, j) > 0) {
-                    numerator += posInf(Q, i);
+                if (posInf(B, j) > 0) {
+                    numerator += posInf(A, i);
                 }
-                i++;
-                j++;
+                
+                ++i;
+                ++j;
             }
         }
+        
         return numerator;
     }
 
     @Override
     public double left(SparseDoubleVector A) {
-        double denominator = 0;
+        double denominator = 0.0;
+        
         for (int i = 0; i < A.size; i++) {
             denominator += posInf(A, i);
         }
+        
         return denominator;
     }
 

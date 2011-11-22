@@ -35,7 +35,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 /**
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-public class CosineMi extends AbstractMIProximity implements Proximity {
+public class CosineMi extends AbstractMIProximity {
 
     @Override
     public double shared(SparseDoubleVector A, SparseDoubleVector B) {
@@ -62,14 +62,14 @@ public class CosineMi extends AbstractMIProximity implements Proximity {
 
     @Override
     public double left(SparseDoubleVector A) {
-        double Qdenominator = 0;
+        double denominatorA = 0;
         for (int i = 0; i < A.size; i++) {
             final double Qinf = posInf(A, i);
             if (Qinf > 0) {
-                Qdenominator += Qinf * Qinf;
+                denominatorA += Qinf * Qinf;
             }
         }
-        return Qdenominator;
+        return denominatorA;
     }
 
     @Override

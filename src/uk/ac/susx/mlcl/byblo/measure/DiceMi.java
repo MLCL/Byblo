@@ -35,7 +35,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 /**
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-public class DiceMi extends AbstractMIProximity implements Proximity {
+public class DiceMi extends AbstractMIProximity {
 
     @Override
     public double shared(SparseDoubleVector A, SparseDoubleVector B) {

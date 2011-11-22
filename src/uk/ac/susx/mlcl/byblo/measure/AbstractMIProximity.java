@@ -179,10 +179,10 @@ public abstract class AbstractMIProximity extends AbstractProximity {
 
     // Calculate if the features would both have positive
     // information content w.r.t the feature data.
-    public boolean hasPosInf(final SparseDoubleVector Q, final int i,
-                             final SparseDoubleVector R, final int j) {
-        final double vprob = featurePrior(Q.keys[i]);
-        return prob(Q, i) > vprob && prob(R, j) > vprob;
+    public boolean hasPosInf(final SparseDoubleVector A, final int i,
+                             final SparseDoubleVector B, final int j) {
+        final double pC = featurePrior(A.keys[i]);
+        return prob(A, i) > pC && prob(B, j) > pC;
     }
 
     protected final double prob(final SparseDoubleVector V, final int k) {

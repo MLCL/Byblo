@@ -71,146 +71,146 @@ public class KendallTau extends AbstractProximity {
     }
 
     @Override
-    public double shared(SparseDoubleVector Q, SparseDoubleVector R) {
+    public double shared(SparseDoubleVector A, SparseDoubleVector B) {
         checkState();
 
         int sum = 0;
         int intersectionSize = 0;
         int unionSize = 0;
-        int qi = 0;
-        int ri = 0;
+        int ai = 0;
+        int bi = 0;
 
-        while (qi < Q.size && ri < R.size) {
+        while (ai < A.size && bi < B.size) {
             ++unionSize;
-            if (Q.keys[qi] < R.keys[ri]) {
-                int qj = qi + 1;
-                int rj = ri;
-                while (qj < Q.size && rj < R.size) {
-                    if (Q.keys[qj] < R.keys[rj]) {
-                        ++qj;
-                    } else if (Q.keys[qj] > R.keys[rj]) {
+            if (A.keys[ai] < B.keys[bi]) {
+                int aj = ai + 1;
+                int bj = bi;
+                while (aj < A.size && bj < B.size) {
+                    if (A.keys[aj] < B.keys[bj]) {
+                        ++aj;
+                    } else if (A.keys[aj] > B.keys[bj]) {
                         --sum;
-                        ++rj;
+                        ++bj;
                     } else {
-                        if (Q.values[qi] < Q.values[qj])
+                        if (A.values[ai] < A.values[aj])
                             ++sum;
-                        else if (Q.values[qi] > Q.values[qj])
+                        else if (A.values[ai] > A.values[aj])
                             --sum;
-                        ++qj;
-                        ++rj;
+                        ++aj;
+                        ++bj;
                     }
                 }
-                sum -= R.size - rj;
-                ++qi;
-            } else if (Q.keys[qi] > R.keys[ri]) {
-                int qj = qi;
-                int rj = ri + 1;
-                while (qj < Q.size && rj < R.size) {
-                    if (Q.keys[qj] < R.keys[rj]) {
+                sum -= B.size - bj;
+                ++ai;
+            } else if (A.keys[ai] > B.keys[bi]) {
+                int aj = ai;
+                int bj = bi + 1;
+                while (aj < A.size && bj < B.size) {
+                    if (A.keys[aj] < B.keys[bj]) {
                         --sum;
-                        ++qj;
-                    } else if (Q.keys[qj] > R.keys[rj]) {
-                        ++rj;
+                        ++aj;
+                    } else if (A.keys[aj] > B.keys[bj]) {
+                        ++bj;
                     } else {
-                        if (R.values[ri] < R.values[rj])
+                        if (B.values[bi] < B.values[bj])
                             ++sum;
-                        else if (R.values[ri] > R.values[rj])
+                        else if (B.values[bi] > B.values[bj])
                             --sum;
-                        ++qj;
-                        ++rj;
+                        ++aj;
+                        ++bj;
                     }
                 }
-                sum -= Q.size - qj;
-                ++ri;
+                sum -= A.size - aj;
+                ++bi;
             } else {
                 ++intersectionSize;
-                int qj = qi + 1;
-                int rj = ri + 1;
-                while (qj < Q.size && rj < R.size) {
-                    if (Q.keys[qj] < R.keys[rj]) {
-                        if (Q.values[qi] < Q.values[qj])
+                int aj = ai + 1;
+                int bj = bi + 1;
+                while (aj < A.size && bj < B.size) {
+                    if (A.keys[aj] < B.keys[bj]) {
+                        if (A.values[ai] < A.values[aj])
                             --sum;
-                        else if (Q.values[qi] > Q.values[qj])
+                        else if (A.values[ai] > A.values[aj])
                             ++sum;
-                        ++qj;
-                    } else if (Q.keys[qj] > R.keys[rj]) {
-                        if (R.values[ri] < R.values[rj])
+                        ++aj;
+                    } else if (A.keys[aj] > B.keys[bj]) {
+                        if (B.values[bi] < B.values[bj])
                             --sum;
-                        else if (R.values[ri] > R.values[rj])
+                        else if (B.values[bi] > B.values[bj])
                             ++sum;
-                        ++rj;
+                        ++bj;
                     } else {
-                        final double diff = (Q.values[qi] - Q.values[qj])
-                                * (R.values[ri] - R.values[rj]);
+                        final double diff = (A.values[ai] - A.values[aj])
+                                * (B.values[bi] - B.values[bj]);
                         if (diff < 0)
                             --sum;
                         else if (diff > 0)
                             ++sum;
-                        ++qj;
-                        ++rj;
+                        ++aj;
+                        ++bj;
                     }
                 }
-                while (qj < Q.size) {
-                    if (Q.values[qi] < Q.values[qj])
+                while (aj < A.size) {
+                    if (A.values[ai] < A.values[aj])
                         --sum;
-                    else if (Q.values[qi] > Q.values[qj])
+                    else if (A.values[ai] > A.values[aj])
                         ++sum;
-                    ++qj;
+                    ++aj;
                 }
-                while (rj < R.size) {
-                    if (R.values[ri] < R.values[rj])
+                while (bj < B.size) {
+                    if (B.values[bi] < B.values[bj])
                         --sum;
-                    else if (R.values[ri] > R.values[rj])
+                    else if (B.values[bi] > B.values[bj])
                         ++sum;
-                    ++rj;
+                    ++bj;
                 }
-                ++qi;
-                ++ri;
+                ++ai;
+                ++bi;
             }
         }
-        while (qi < Q.size) {
+        while (ai < A.size) {
             ++unionSize;
-            int qj = qi + 1;
-            int rj = ri;
-            while (qj < Q.size && rj < R.size) {
-                if (Q.keys[qj] < R.keys[rj]) {
-                    ++qj;
-                } else if (Q.keys[qj] > R.keys[rj]) {
+            int aj = ai + 1;
+            int bj = bi;
+            while (aj < A.size && bj < B.size) {
+                if (A.keys[aj] < B.keys[bj]) {
+                    ++aj;
+                } else if (A.keys[aj] > B.keys[bj]) {
                     --sum;
-                    ++rj;
+                    ++bj;
                 } else {
-                    if (Q.values[qi] < Q.values[qj])
+                    if (A.values[ai] < A.values[aj])
                         ++sum;
-                    else if (Q.values[qi] > Q.values[qj])
+                    else if (A.values[ai] > A.values[aj])
                         --sum;
-                    ++qj;
-                    ++rj;
+                    ++aj;
+                    ++bj;
                 }
             }
-            sum -= R.size - rj;
-            ++qi;
+            sum -= B.size - bj;
+            ++ai;
         }
-        while (ri < R.size) {
+        while (bi < B.size) {
             ++unionSize;
-            int qj = qi;
-            int rj = ri + 1;
-            while (qj < Q.size && rj < R.size) {
-                if (Q.keys[qj] < R.keys[rj]) {
+            int aj = ai;
+            int bj = bi + 1;
+            while (aj < A.size && bj < B.size) {
+                if (A.keys[aj] < B.keys[bj]) {
                     --sum;
-                    ++qj;
-                } else if (Q.keys[qj] > R.keys[rj]) {
-                    ++rj;
+                    ++aj;
+                } else if (A.keys[aj] > B.keys[bj]) {
+                    ++bj;
                 } else {
-                    if (R.values[ri] < R.values[rj])
+                    if (B.values[bi] < B.values[bj])
                         ++sum;
-                    else if (R.values[ri] > R.values[rj])
+                    else if (B.values[bi] > B.values[bj])
                         --sum;
-                    ++qj;
-                    ++rj;
+                    ++aj;
+                    ++bj;
                 }
             }
-            sum -= Q.size - qj;
-            ++ri;
+            sum -= A.size - aj;
+            ++bi;
         }
 
         // Comparisons are only done in one direction so double the result
@@ -228,12 +228,12 @@ public class KendallTau extends AbstractProximity {
     }
 
     @Override
-    public double left(SparseDoubleVector Q) {
+    public double left(SparseDoubleVector A) {
         return 0;
     }
 
     @Override
-    public double right(SparseDoubleVector R) {
+    public double right(SparseDoubleVector B) {
         return 0;
     }
 

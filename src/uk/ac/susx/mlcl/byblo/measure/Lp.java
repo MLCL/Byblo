@@ -79,11 +79,11 @@ public class Lp extends AbstractProximity {
                     i++;
                     j++;
                 } else { // Q.keys[i] == R.keys[j]
-                    final double Qprob = A.values[i] / A.sum;
-                    final double Rprob = B.values[j] / B.sum;
-                    shared += Math.signum(Math.abs(Qprob - Rprob))
-                            - Math.signum(Rprob)
-                            - Math.signum(Qprob);
+                    final double pA = A.values[i] / A.sum;
+                    final double pB = B.values[j] / B.sum;
+                    shared += Math.signum(Math.abs(pA - pB))
+                            - Math.signum(pB)
+                            - Math.signum(pA);
                     i++;
                     j++;
                 }
@@ -99,11 +99,11 @@ public class Lp extends AbstractProximity {
                     i++;
                     j++;
                 } else { // Q.keys[i] == R.keys[j]
-                    final double Qprob = A.values[i] / A.sum;
-                    final double Rprob = B.values[j] / B.sum;
-                    shared += Math.abs(Qprob - Rprob)
-                            - Rprob
-                            - Qprob;
+                    final double pA = A.values[i] / A.sum;
+                    final double pB = B.values[j] / B.sum;
+                    shared += Math.abs(pA - pB)
+                            - pB
+                            - pA;
                     i++;
                     j++;
                 }
@@ -119,11 +119,11 @@ public class Lp extends AbstractProximity {
                     i++;
                     j++;
                 } else {
-                    final double Qprob = A.values[i] / A.sum;
-                    final double Rprob = B.values[j] / B.sum;
-                    shared += (Qprob - Rprob) * (Qprob - Rprob)
-                            - Rprob * Rprob
-                            - Qprob * Qprob;
+                    final double pA = A.values[i] / A.sum;
+                    final double pB = B.values[j] / B.sum;
+                    shared += (pA - pB) * (pA - pB)
+                            - pB * pB
+                            - pA * pA;
                     i++;
                     j++;
                 }
@@ -168,10 +168,10 @@ public class Lp extends AbstractProximity {
                     i++;
                     j++;
                 } else {
-                    final double Qprob = A.values[i] / A.sum;
-                    final double Rprob = B.values[j] / B.sum;
-                    shared += Math.pow(Math.abs(Qprob - Rprob), p)
-                            - (Math.pow(Rprob, p) + Math.pow(Qprob, p));
+                    final double pA = A.values[i] / A.sum;
+                    final double pB = B.values[j] / B.sum;
+                    shared += Math.pow(Math.abs(pA - pB), p)
+                            - (Math.pow(pB, p) + Math.pow(pA, p));
                     i++;
                     j++;
                 }

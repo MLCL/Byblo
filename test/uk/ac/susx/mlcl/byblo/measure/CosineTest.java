@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.measure;
 
-import com.google.common.io.Files;
 import uk.ac.susx.mlcl.byblo.Main;
 import java.io.File;
 import org.junit.Test;

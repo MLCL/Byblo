@@ -53,11 +53,11 @@ public class Lin extends AbstractMIProximity {
                 i++;
                 j++;
             } else {
-                final double Qinf = posInf(A, i);
-                if (Qinf > 0) {
-                    final double Rinf = posInf(B, j);
-                    if (Rinf > 0) {
-                        numerator += Qinf + Rinf;
+                final double infA = posInf(A, i);
+                if (infA > 0) {
+                    final double infB = posInf(B, j);
+                    if (infB > 0) {
+                        numerator += infA + infB;
                     }
                 }
 
