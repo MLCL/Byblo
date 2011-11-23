@@ -219,8 +219,10 @@ public final class Files {
         return createTempDir(prefix, suffix, null);
     }
 
+    @Deprecated
     public static final File STDIN_FILE = new File("-");
 
+    @Deprecated
     public static final File STDOUT_FILE = new File("-");
 
     public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");// Charset.defaultCharset();
@@ -233,10 +235,12 @@ public final class Files {
 
     public static CodingErrorAction UNMAPPABLE_CHARACTER_ACTION = CodingErrorAction.REPLACE;
 
+    @Deprecated
     public static boolean isStdin(File file) {
         return file.getName().equals(STDIN_FILE.getName());
     }
 
+    @Deprecated
     public static boolean isStdout(File file) {
         return file.getName().equals(STDOUT_FILE.getName());
     }
