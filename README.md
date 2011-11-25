@@ -18,7 +18,7 @@ A distributional thesaurus is a resource that contains the estimated *substituta
 
 To provide an intuition, here is an example:
 
-Take as our input corpus a balanced collection of English language text (such as Wikipedia). Let our entries be all unique terms in the corpus. We shall select the features of a base-entry as the frequency of all terms that co-occur in the corpus within a window of Â±1 terms. Finally, the similarity function will be Cosine, which represents the feature sets as high dimensional vectors. Cosine calculates the similarity as being inversely proportional to the “degree of orthogonality” of vectors. The thesaurus build process proceeds as follows:
+Take as our input corpus a balanced collection of English language text (such as Wikipedia). Let our entries be all unique terms in the corpus. We shall select the features of a base-entry as the frequency of all terms that co-occur in the corpus within a window of Â±1 terms. Finally, the similarity function will be Cosine, which represents the feature sets as high dimensional vectors. Cosine calculates the similarity as being inversely proportional to the degree of orthogonality between vectors. The thesaurus build process proceeds as follows:
 
  1. Tokenise the corpus, extracting a list of all unique terms. For each entry record occurrences of all the other entries within a window of Â±1. For example, if we encounter the string "the big red bus", the entry-features produced are the:big, big:the, big:red, red:big, red:bus, and bus:red. Note that this process is not yet covered by the provided software.
 
