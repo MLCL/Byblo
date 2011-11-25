@@ -117,7 +117,7 @@ To contribute to the project you should fork the git repository. First click the
 ```sh
 $ git clone git@github.com:[your-user-name]/Byblo.git
 $ cd Byblo
-$ git remote add upsteam git@github.com:hamishmorgan/Byblo.git
+$ git remote add upsteam git@github.com:MLCL/Byblo.git
 $ git fetch upstream
 ```
 
