@@ -445,7 +445,7 @@ function filter {
     [[ -e $entryFeaturesFile${FILTERED_SUFFIX} ]] && \
         warn "Overwriting entry-features file '$entryFeaturesFile${FILTERED_SUFFIX}'."
 
-    $JAVA_CMD filter "$filters" \
+    $JAVA_CMD filter $filters \
         -T "$tempdir" \
         --input-entries "$entriesFile" \
         --input-features "$featuresFile" \
