@@ -30,7 +30,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 <project name="MLCLLib" default="all" basedir=".">
     <description >
-        Builds and tests the MLCLLib project.
+        Builds and tests the Byblo project.
     </description>
 
     <!-- 
@@ -41,25 +41,19 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
     <!-- Input paths -->
     <property name="src.dir"      location="${basedir}/src" />
-    <property name="libs.dir"      location="${basedir}/libs" />
-<!--    <property name="scripts.dir"      location="${basedir}/scripts" />-->
     <property name="test.src.dir" location="${basedir}/test" />
     <property name="test.data.dir" location="${basedir}/test_data" />    
 
     <!-- Output paths -->
     <property name="build.dir" location="${basedir}/build"/>
     <property name="dist.dir" location="${basedir}/dist"/>
-    <property name="dist.libs.dir" location="${dist.dir}/libs"/>
     <property name="javadoc.dir" location="${build.dir}/javadoc"/>
     <property name="test.output.dir" location="${test.data.dir}/out" />
     <property name="test.report.dir"  location="${build.dir}/test-report"/>
 
-
-    
     <!-- Misc properties -->
     <property name="source.encoding" value="UTF-8"/>
     <property name="javac.compilerargs" value="-Xlint:all"/>
-<!--    <property name="main.class" value="uk.ac.susx.mlcl.byblo.Main"/>-->
 
 
     <!-- 
@@ -74,11 +68,6 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         
         <property name="build.classes.dir" location="${build.dir}/classes"/>
         <property name="test.classes.dir" location="${build.dir}/tests" />
-        
-        <path id="classpath">
-            <fileset dir="${libs.dir}" includes="**/*.jar"/>
-        </path>
-        
         <path id="application" location="${dist.dir}/${ant.project.name}.jar" />
         
     </target>
@@ -97,7 +86,6 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 
        <!-- Compile all java sources to classes dir -->
         <javac srcdir="${src.dir}" destdir="${build.classes.dir}"  
-                classpathref="classpath" 
                 includeantruntime="false" >
             <compilerarg line="${javac.compilerargs}" />
         </javac>
@@ -111,26 +99,14 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
     <target name="jar" depends="compile" description="Build JAR" >    
 
-        <!-- Convert the libraries classpath to space separated list suitable
-            for the jar manifest attribute. -->
-        <pathconvert pathsep=" " property="jar.classpath" refid="classpath">
-            <chainedmapper>
-                <flattenmapper/>
-                <globmapper from="*" to="libs/*"/>
-            </chainedmapper>
-        </pathconvert>
-        
         <jar jarfile="${dist.dir}/${ant.project.name}.jar" 
             basedir="${build.classes.dir}" >     
             <manifest>
                 <attribute name="Built-By" value="${user.name}"/>
                 
-                <attribute name="Implementation-Vendor" value="University of Sussex"/>
+                <attribute name="Implementation-Vendor" value="MLCLLib, University of Sussex"/>
                 <attribute name="Implementation-Title" value="MLCLLib"/>
                 <attribute name="Implementation-Version" value="unknown"/>
-                
-                <attribute name="Class-Path" value="${jar.classpath}" />
-<!--                <attribute name="Main-Class" value="${main.class}"/>-->
             </manifest>
         </jar>
     </target>
@@ -162,7 +138,6 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 version="true" 
                 windowtitle="">
                     
-            <classpath refid="classpath" />
             <fileset dir="${src.dir}" excludes="*.java" includes="**">
                 <filename name="**/*.java"/>
             </fileset>
@@ -183,33 +158,16 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     -->
 
     <target name="dist" depends="jar" description="Generate the binary distribution" >    
-
-        <copy todir="${dist.dir}" file="LICENSE" />
+        <copy todir="${dist.dir}" file="LICENCE" />
         <copy todir="${dist.dir}" file="README.md" />
-        
-<!--        <copy todir="${dist.dir}" >
-            <fileset dir="${scripts.dir}" includes="**/*.sh" />
-        </copy>-->
-
-<!--        <chmod perm="a+x">
-            <fileset dir="${dist.dir}" includes="**/*.sh" />            
-        </chmod>-->
-        
-        <mkdir dir="${dist.libs.dir}" />
-        <copy todir="${dist.libs.dir}" >
-            <fileset dir="${libs.dir}" includes="**/*.jar" excludes="**junit*.jar"/>
-        </copy>
-
-
     </target>
 
     <target name="release" depends="dist, javadoc" description="Create all releasable files including API docus and src bundle." >
-        
         <jar jarfile="${dist.dir}/${ant.project.name}-src.jar" 
             basedir="${src.dir}" >     
             <manifest>
                 <attribute name="Built-By" value="${user.name}"/>
-                <attribute name="Implementation-Vendor" value="MLCL Lab, University of Sussex"/>
+                <attribute name="Implementation-Vendor" value="MLCL, University of Sussex"/>
                 <attribute name="Implementation-Title" value="MLCLLib"/>
                 <attribute name="Implementation-Version" value="unknown"/>
             </manifest>
@@ -234,7 +192,6 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}"  
                 includeantruntime="false" >
             <classpath>
-                <path refid="classpath" />
                 <pathelement path="${build.classes.dir}"/>
             </classpath>            
             <compilerarg line="${javac.compilerargs}" />
