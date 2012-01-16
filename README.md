@@ -49,6 +49,8 @@ The project requires [Java 6](http://www.oracle.com/technetwork/java/javase/down
 
  * [Commons Logging 1.1.1](http://commons.apache.org/logging/) --- A very light weight wrapper API that enables logging frameworks to be configured and "plugged in" at runtime. 
 
+ * [MLCL Lib 0.1.0](https://github.com/MLCL/MLCLLib) --- A collection of generic Java utilities and classes developed by the authors of Byblo, for use in this and other projects.
+
 In addition to the above, [JUnit 4](http://www.junit.org/) is required for unit testing the project.
 
 All except JCommander are available in pre-compiled binary form. Simply place the `.jar` files in the `/libs/` directory. In the case JCommander you must compile it first using [maven](http://maven.apache.org/).
