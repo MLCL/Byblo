@@ -187,7 +187,7 @@ function download_junit {
 
 function download_mlcllib {
     ml=mlcllib
-    ml_version=6bed5beddb511027610c1cd811e060f2118025eb
+    ml_version=mlcllib-0.1.0
 
     echo "[${ml}] Starting"
     which -s curl || die "Can't find curl"
