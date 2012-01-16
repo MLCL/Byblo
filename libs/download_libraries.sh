@@ -222,15 +222,15 @@ function download_mlcllib {
 function download_all {
     download_jcommander
 
-    #download_fastutil
+    download_fastutil
 
-    #download_commons_logging
+    download_commons_logging
 
-    #download_google_guava 
+    download_google_guava 
 
-    #download_junit 
+    download_junit 
 
-   # download_mlcllib
+    download_mlcllib
 }
 
 
