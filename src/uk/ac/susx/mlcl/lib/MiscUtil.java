@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, MLCL Lab, University of Sussex
+ * Copyright (c) 2010-2012, MLCL Lab, University of Sussex
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -212,4 +212,45 @@ public class MiscUtil {
                     humanReadableBytes(allocatedMemory()),
                     humanReadableBytes(maxMemory())});
     }
+    
+    
+    /**
+     * Formals character names table for 0...32. Where a more recognizable 
+     * pseudonym exists, the formal abbreviation has been replaced..
+     */
+    private static final String[] UTF8_CHAR_NAMES = {
+        "Null", "SOH", "STX", "ETX",
+        "EOT", "ENQ", "ACK", "Bell",
+        "Backspace", "HT", "New-Line", "Tab",
+        "FF", "Carriage-Return", "SO", "SI",
+        "DLE", "DC1", "DC2", "DC3",
+        "DC4", "NAK", "SYN", "ETB",
+        "CAN", "EM", "SUB", "Escape",
+        "FS", "GS", "RS", "US",
+        "Space"};
+
+    /**
+     * Produces a string representation of <tt>ch</tt> that should be printable,
+     * and human readable.
+     * <p />
+     * For example, when <tt>ch</tt> is the horizontal-tab character (0x9), the
+     * function produces the String <tt>"Tab"</tt>.
+     * <p />
+     * The motivation for this function is a parser, where errors need to 
+     * display something sensible like <tt>"expecting Tab but found 
+     * New-line"</tt>.
+     * 
+     * @param ch character to print
+     * @return printable representation
+     */
+    public static String printableUTF8(char ch) {
+        if (ch >= 0 && ch <= 32) {
+            return UTF8_CHAR_NAMES[ch];
+        } else if (ch == 127) {
+            return "Delete";
+        } else {
+            return Character.toString(ch);
+        }
+    }
+
 }
