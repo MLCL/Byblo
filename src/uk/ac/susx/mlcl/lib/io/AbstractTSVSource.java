@@ -37,6 +37,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
+import uk.ac.susx.mlcl.lib.MiscUtil;
 
 /**
  * Abstract class that holds functionality to read a Tab Separated Values file.
@@ -178,6 +179,7 @@ public abstract class AbstractTSVSource<T>
     private void expectDelim(char expected, char actual) throws TSVDataFormatException {
         if (expected != actual)
             throw new TSVDataFormatException(this, "Expecting delimiter "
-                    + (int) expected + " but found " + (int) actual);
+                    + MiscUtil.printableUTF8(expected) + " but found " 
+                    + MiscUtil.printableUTF8(actual));
     }
 }
