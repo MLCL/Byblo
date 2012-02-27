@@ -43,6 +43,11 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 public abstract class AbstractMIProximity extends AbstractProximity {
 
     /**
+     * For conversion to base 2 logs
+     */
+    private static final double LOG_2 = Math.log(2.0);
+    
+    /**
      * A mapping from feature id to frequency, stored as a double because it
      * may have been waited in a pre-processing stage.
      */
@@ -142,7 +147,7 @@ public abstract class AbstractMIProximity extends AbstractProximity {
      * @return information content of V at i
      */
     protected final double inf(final SparseDoubleVector V, final int i) {
-        return Math.log((V.values[i] / V.sum) / featurePrior(V.keys[i]));
+        return (Math.log((V.values[i] / V.sum) / LOG_2) / featurePrior(V.keys[i]));
     }
 
     /**
@@ -156,7 +161,7 @@ public abstract class AbstractMIProximity extends AbstractProximity {
      */
     protected final double posInf(final SparseDoubleVector V, final int i) {
         final double tmp = (V.values[i] / V.sum) / featurePrior(V.keys[i]);
-        return tmp > 1 ? Math.log(tmp) : 0;
+        return tmp > 1 ? (Math.log(tmp) / LOG_2) : 0;
     }
 
     public boolean hasPosInf(final SparseDoubleVector V, final int i) {
