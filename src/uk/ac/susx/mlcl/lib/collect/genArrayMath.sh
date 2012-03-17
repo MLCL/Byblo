@@ -409,9 +409,76 @@ cat << "---EOF---" \
     }
 
 
-    public static PRIMTYP mean(PRIMTYP[] values) {
-        return (PRIMTYP)(sum(values) / values.length);
+    public static PRIMTYP mean(PRIMTYP[] values, int fromIndex, int toIndex) {
+        return (PRIMTYP)(sum(values, fromIndex, toIndex) / (toIndex - fromIndex));
     }
+
+    public static PRIMTYP mean(PRIMTYP[] values, int fromIndex) {
+		return (PRIMTYP)mean(values, fromIndex, values.length);
+    }
+
+    public static PRIMTYP mean(PRIMTYP[] values) {
+		return (PRIMTYP)mean(values, 0, values.length);
+    }
+
+    public static PRIMTYP variance(PRIMTYP[] values, int fromIndex, int toIndex) {
+		PRIMTYP u = mean(values, fromIndex, toIndex);
+		PRIMTYP s2 = 0;
+		for(int i = fromIndex; i < toIndex; i++) 
+			s2 += (values[i] - u) * (values[i] - u);
+		return (PRIMTYP)(s2 / (toIndex - fromIndex));
+    }
+
+    public static PRIMTYP variance(PRIMTYP[] values, int fromIndex) {
+		return (PRIMTYP)variance(values, fromIndex, values.length);
+	}
+    
+    public static PRIMTYP variance(PRIMTYP[] values) {
+		return (PRIMTYP)variance(values, 0, values.length);
+	}
+	
+    public static PRIMTYP stddev(PRIMTYP[] values, int fromIndex, int toIndex) {
+		return (PRIMTYP)Math.sqrt(variance(values, fromIndex, toIndex));
+    }
+
+    public static PRIMTYP stddev(PRIMTYP[] values, int fromIndex) {
+		return (PRIMTYP)Math.sqrt(variance(values, fromIndex));
+	}
+    
+    public static PRIMTYP stddev(PRIMTYP[] values) {
+		return (PRIMTYP)Math.sqrt(variance(values));
+	}
+	
+
+    public static PRIMTYP sampleVariance(PRIMTYP[] values, int fromIndex, int toIndex) {
+		PRIMTYP u = mean(values, fromIndex, toIndex);
+		PRIMTYP s2 = 0;
+		for(int i = fromIndex; i < toIndex; i++) 
+			s2 += (values[i] - u) * (values[i] - u);
+		return (PRIMTYP)(s2 / ((toIndex - fromIndex) - 1));
+    }
+
+    public static PRIMTYP sampleVariance(PRIMTYP[] values, int fromIndex) {
+		return (PRIMTYP)sampleVariance(values, fromIndex, values.length);
+	}
+    
+    public static PRIMTYP sampleVariance(PRIMTYP[] values) {
+		return (PRIMTYP)sampleVariance(values, 0, values.length);
+	}
+	
+    public static PRIMTYP sampleStddev(PRIMTYP[] values, int fromIndex, int toIndex) {
+		return (PRIMTYP)Math.sqrt(sampleVariance(values, fromIndex, toIndex));
+    }
+
+    public static PRIMTYP sampleStddev(PRIMTYP[] values, int fromIndex) {
+		return (PRIMTYP)Math.sqrt(sampleVariance(values, fromIndex));
+	}
+    
+    public static PRIMTYP sampleStddev(PRIMTYP[] values) {
+		return (PRIMTYP)Math.sqrt(sampleVariance(values));
+	}
+	
+		
     
     /**
      * Return the median average of the values passed as argument.
