@@ -93,7 +93,7 @@ readonly PAIRS_SUFFIX=".pairs"
 readonly NEIGHBOURS_SUFFIX=".neighs"
 
 readonly JAVA_ARGS="-Xmx16g"
-readonly JAVA_CMD="java $JAVA_ARGS -cp Byblo.jar:libs/* uk.ac.susx.mlcl.byblo.Main"
+readonly JAVA_CMD="java $JAVA_ARGS -cp .:Byblo.jar:libs/* uk.ac.susx.mlcl.byblo.Main"
 
 
 # ====================================
