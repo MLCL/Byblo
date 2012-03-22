@@ -30,13 +30,13 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import java.io.File;
+import java.io.Closeable;
 import java.io.FileNotFoundException;
+import java.io.Flushable;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.SimpleEnumerator;
-import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
+import uk.ac.susx.mlcl.lib.io.Sink;
+import uk.ac.susx.mlcl.lib.io.TSVSink;
 
 /**
  * An <tt>TokenPairSink</tt> object is used to store
@@ -72,7 +72,7 @@ import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class TokenPairSink extends AbstractTSVSink<TokenPair> {
+public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
 
     private final Enumerator<String> stringIndex1;
 
@@ -84,10 +84,13 @@ public class TokenPairSink extends AbstractTSVSink<TokenPair> {
 
     private long count = 0;
 
-    public TokenPairSink(File file, Charset charset,
-                         Enumerator<String> stringIndex1, Enumerator<String> stringIndex2)
+    private final TSVSink inner;
+
+    public TokenPairSink(TSVSink inner,
+                         Enumerator<String> stringIndex1,
+                         Enumerator<String> stringIndex2)
             throws FileNotFoundException, IOException {
-        super(file, charset);
+        this.inner = inner;
         if (stringIndex1 == null) {
             throw new NullPointerException("entryIndex == null");
         }
@@ -98,15 +101,10 @@ public class TokenPairSink extends AbstractTSVSink<TokenPair> {
         this.stringIndex2 = stringIndex2;
     }
 
-    public TokenPairSink(File file, Charset charset,
+    public TokenPairSink(TSVSink inner,
                          Enumerator<String> combinedIndex)
             throws FileNotFoundException, IOException {
-        this(file, charset, combinedIndex, combinedIndex);
-    }
-
-    public TokenPairSink(File file, Charset charset)
-            throws FileNotFoundException, IOException {
-        this(file, charset, new SimpleEnumerator<String>());
+        this(inner, combinedIndex, combinedIndex);
     }
 
     public final Enumerator<String> getStringIndex1() {
@@ -145,37 +143,42 @@ public class TokenPairSink extends AbstractTSVSink<TokenPair> {
 
     private void writeVerbose(final TokenPair record) throws IOException {
         write1(record.id1());
-        writeValueDelimiter();
+        inner.writeValueDelimiter();
         write2(record.id2());
-        writeRecordDelimiter();
+        inner.writeRecordDelimiter();
     }
 
     private void writeCompact(final TokenPair record) throws IOException {
         if (previousRecord == null) {
             write1(record.id1());
         } else if (previousRecord.id1() != record.id1()) {
-            writeRecordDelimiter();
+            inner.writeRecordDelimiter();
             write1(record.id1());
         }
-        writeValueDelimiter();
+        inner.writeValueDelimiter();
         write2(record.id2());
         previousRecord = record;
     }
 
     protected final void write1(final int entryId) throws IOException {
-        writeString(stringIndex1.value(entryId));
+        inner.writeString(stringIndex1.value(entryId));
     }
 
     protected final void write2(final int featureId) throws IOException {
-        writeString(stringIndex2.value(featureId));
+        inner.writeString(stringIndex2.value(featureId));
     }
 
     @Override
     public void close() throws IOException {
         if (isCompactFormatEnabled() && previousRecord != null) {
-            writeRecordDelimiter();
+            inner.writeRecordDelimiter();
         }
-        super.close();
+        inner.close();
+    }
+
+    @Override
+    public void flush() throws IOException {
+        inner.flush();
     }
 
 }

@@ -44,6 +44,8 @@ import java.io.IOException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.lib.io.TSVSink;
+import uk.ac.susx.mlcl.lib.io.TSVSource;
 
 /**
  *
@@ -52,8 +54,8 @@ import static uk.ac.susx.mlcl.TestConstants.*;
 public class EntryTest {
 
     private void copyE(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        WeightedTokenSource aSrc = new WeightedTokenSource(a, DEFAULT_CHARSET);
-        WeightedTokenSink bSink = new WeightedTokenSink(b, DEFAULT_CHARSET,
+        WeightedTokenSource aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET));
+        WeightedTokenSink bSink = new WeightedTokenSink(new TSVSink(b, DEFAULT_CHARSET),
                 aSrc.getStringIndex());
         bSink.setCompactFormatEnabled(compact);
 
@@ -87,7 +89,7 @@ public class EntryTest {
         final Map<Tell, Weighted<Token>> hist =
                 new HashMap<Tell, Weighted<Token>>();
 
-        WeightedTokenSource src = new WeightedTokenSource(file, DEFAULT_CHARSET);
+        WeightedTokenSource src = new WeightedTokenSource(new TSVSource(file, DEFAULT_CHARSET));
         {
             while (src.hasNext()) {
                 final Tell pos = src.position();

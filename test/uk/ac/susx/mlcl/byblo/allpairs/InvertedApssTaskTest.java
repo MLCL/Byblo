@@ -44,6 +44,7 @@ import java.util.List;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.lib.io.TSVSource;
 
 /**
  *
@@ -66,11 +67,11 @@ public class InvertedApssTaskTest {
         InvertedApssTask<Lexer.Tell> instance = new InvertedApssTask<Lexer.Tell>();
 
         WeightedTokenPairSource mdbsa = new WeightedTokenPairSource(
-                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET);
+                new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET));
         WeightedTokenPairVectorSource vsa = mdbsa.getVectorSource();
 
         WeightedTokenPairSource mdbsb = new WeightedTokenPairSource(
-                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
+                new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET),
                 mdbsa.getStringIndex1(), mdbsa.getStringIndex2());
         WeightedTokenPairVectorSource vsb = mdbsb.getVectorSource();
 
@@ -86,4 +87,5 @@ public class InvertedApssTaskTest {
 
         assertTrue(!result.isEmpty());
     }
+
 }

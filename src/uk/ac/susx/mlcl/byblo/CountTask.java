@@ -55,6 +55,8 @@ import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.SimpleEnumerator;
 import uk.ac.susx.mlcl.lib.io.Files;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
+import uk.ac.susx.mlcl.lib.io.TSVSink;
+import uk.ac.susx.mlcl.lib.io.TSVSource;
 import uk.ac.susx.mlcl.lib.tasks.AbstractCommandTask;
 import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
 import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
@@ -211,9 +213,8 @@ public class CountTask extends AbstractCommandTask implements Serializable {
             final Enumerator<String> featureIndex)
             throws IOException {
 
-        final TokenPairSource instanceSource =
-                new TokenPairSource(inputFile, charset, entryIndex,
-                                    featureIndex);
+        final TokenPairSource instanceSource = new TokenPairSource(
+                new TSVSource(inputFile, charset), entryIndex, featureIndex);
 
         if (!instanceSource.hasNext() && LOG.isWarnEnabled()) {
             LOG.warn("Events file is empty.");
@@ -282,7 +283,8 @@ public class CountTask extends AbstractCommandTask implements Serializable {
         WeightedTokenSink entriesink = null;
         final int n = entryFreqList.size();
         try {
-            entriesink = new WeightedTokenSink(entriesFile, charset, entryIndex);
+            entriesink = new WeightedTokenSink(
+                    new TSVSink(entriesFile, charset), entryIndex);
             int i = 0;
             for (final Int2IntMap.Entry entry : entryFreqList) {
                 entriesink.write(new Weighted<Token>(
@@ -331,8 +333,8 @@ public class CountTask extends AbstractCommandTask implements Serializable {
         WeightedTokenSink featureSink = null;
         final int n = contextFreqList.size();
         try {
-            featureSink = new WeightedTokenSink(featuresFile, charset,
-                                                featureIdex);
+            featureSink = new WeightedTokenSink(
+                    new TSVSink(featuresFile, charset), featureIdex);
             int i = 0;
             for (final Int2IntMap.Entry context : contextFreqList) {
                 featureSink.write(new Weighted<Token>(new Token(
@@ -394,9 +396,9 @@ public class CountTask extends AbstractCommandTask implements Serializable {
         WeightedTokenPairSink featureSink = null;
         final int n = contextFreqList.size();
         try {
-            featureSink = new WeightedTokenPairSink(entryFeaturesFile,
-                                                    charset, entryIndex,
-                                                    featureIndex);
+            featureSink = new WeightedTokenPairSink(
+                    new TSVSink(entryFeaturesFile, charset),
+                    entryIndex, featureIndex);
             int i = 0;
             for (final Object2IntMap.Entry<? extends TokenPair> feature : contextFreqList) {
                 featureSink.write(new Weighted<TokenPair>(

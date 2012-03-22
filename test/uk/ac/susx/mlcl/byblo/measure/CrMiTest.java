@@ -38,6 +38,7 @@ import org.junit.Test;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.lib.io.TSVSource;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
@@ -254,10 +255,9 @@ public class CrMiTest {
         // will be different.
 
         WeightedTokenPairSource expected = new WeightedTokenPairSource(
-                expectedOutput,
-                                                                       DEFAULT_CHARSET);
-        WeightedTokenPairSource actual = new WeightedTokenPairSource(crmiOutput,
-                                                                     DEFAULT_CHARSET);
+                new TSVSource(expectedOutput, DEFAULT_CHARSET));
+        WeightedTokenPairSource actual = new WeightedTokenPairSource(
+                new TSVSource(crmiOutput, DEFAULT_CHARSET));
 
         while (expected.hasNext() && actual.hasNext()) {
             Weighted<TokenPair> e = expected.read();
@@ -268,4 +268,5 @@ public class CrMiTest {
 
         assertEquals(expected.hasNext(), actual.hasNext());
     }
+
 }

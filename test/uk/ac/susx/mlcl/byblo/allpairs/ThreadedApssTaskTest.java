@@ -51,6 +51,7 @@ import uk.ac.susx.mlcl.lib.SimpleEnumerator;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.Lexer;
 import uk.ac.susx.mlcl.lib.io.Sink;
+import uk.ac.susx.mlcl.lib.io.TSVSource;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.disableExitTrapping;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.enableExistTrapping;
 
@@ -101,11 +102,11 @@ public class ThreadedApssTaskTest {
 
         WeightedTokenPairVectorSource vsa =
                 new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
-                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
+                new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), stringIndex));
 
         WeightedTokenPairVectorSource vsb =
                 new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
-                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
+                new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), stringIndex));
 
         List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
         Sink<Weighted<TokenPair>> sink = IOUtil.asSink(result);
@@ -135,11 +136,11 @@ public class ThreadedApssTaskTest {
 
         WeightedTokenPairVectorSource vsa =
                 new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
-                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
+                new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), stringIndex));
 
         WeightedTokenPairVectorSource vsb =
                 new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
-                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
+                new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), stringIndex));
 
         List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
         Sink<Weighted<TokenPair>> sink = IOUtil.asSink(result);
@@ -173,11 +174,11 @@ public class ThreadedApssTaskTest {
 
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
+                    new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), stringIndex));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
+                    new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), stringIndex));
 
 
             List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
@@ -200,11 +201,11 @@ public class ThreadedApssTaskTest {
             Enumerator<String> stringIndex = new SimpleEnumerator<String>();
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
+                    new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), stringIndex));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
+                    new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), stringIndex));
 
 
             List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
@@ -242,11 +243,11 @@ public class ThreadedApssTaskTest {
 
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
+                    new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), stringIndex));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
+                    new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), stringIndex));
 
 
             Sink<Weighted<TokenPair>> sink = IOUtil.asSink(threadedResults);
@@ -271,11 +272,11 @@ public class ThreadedApssTaskTest {
 
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
+                    new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), stringIndex));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
+                    new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), stringIndex));
 
             instance.setSourceA(vsa);
             instance.setSourceB(vsb);
@@ -308,11 +309,11 @@ public class ThreadedApssTaskTest {
 
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
+                    new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), stringIndex));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
+                    new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), stringIndex));
 
             Sink<Weighted<TokenPair>> sink = IOUtil.asSink(threadedResults);
             ThreadedApssTask<Lexer.Tell> instance = new ThreadedApssTask<Lexer.Tell>(
@@ -336,11 +337,11 @@ public class ThreadedApssTaskTest {
 
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
+                    new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), stringIndex));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
+                    new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), stringIndex));
 
             instance.setSourceA(vsa);
             instance.setSourceB(vsb);

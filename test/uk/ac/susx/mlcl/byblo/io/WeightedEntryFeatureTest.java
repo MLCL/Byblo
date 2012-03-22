@@ -49,6 +49,8 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.lib.io.TSVSink;
+import uk.ac.susx.mlcl.lib.io.TSVSource;
 
 /**
  *
@@ -57,11 +59,11 @@ import static uk.ac.susx.mlcl.TestConstants.*;
 public class WeightedEntryFeatureTest {
 
     private void copyWEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        WeightedTokenPairSource aSrc = new WeightedTokenPairSource(a,
-                                                                   DEFAULT_CHARSET);
-        WeightedTokenPairSink bSink = new WeightedTokenPairSink(b,
-                                                                DEFAULT_CHARSET,
-                                                                aSrc.getStringIndex1(), aSrc.getStringIndex2());
+        WeightedTokenPairSource aSrc = new WeightedTokenPairSource(new TSVSource(a,
+                                                                   DEFAULT_CHARSET));
+        WeightedTokenPairSink bSink = new WeightedTokenPairSink(
+                new TSVSink(b, DEFAULT_CHARSET),
+                aSrc.getStringIndex1(), aSrc.getStringIndex2());
         bSink.setCompactFormatEnabled(compact);
 
         IOUtil.copy(aSrc, bSink);
@@ -70,13 +72,14 @@ public class WeightedEntryFeatureTest {
 
     private void copyWEFV(File a, File b, boolean compact) throws FileNotFoundException, IOException {
         WeightedTokenPairVectorSource aSrc = new WeightedTokenPairVectorSource(
-                new WeightedTokenPairSource(a, DEFAULT_CHARSET));
+                new WeightedTokenPairSource(new TSVSource(a, DEFAULT_CHARSET)));
 
         List<Indexed<SparseDoubleVector>> list = IOUtil.readAll(aSrc);
         Collections.sort(list);
 
-        WeightedTokenPairSink tmp = new WeightedTokenPairSink(b,
-                                                              DEFAULT_CHARSET, aSrc.getStringIndex1(), aSrc.getStringIndex2());
+        WeightedTokenPairSink tmp = new WeightedTokenPairSink(
+                new TSVSink(b, DEFAULT_CHARSET),
+                aSrc.getStringIndex1(), aSrc.getStringIndex2());
         tmp.setCompactFormatEnabled(compact);
 
         WeightedTokenPairVectorSink bSink = new WeightedTokenPairVectorSink(
@@ -141,7 +144,7 @@ public class WeightedEntryFeatureTest {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-ef-sample");
         Charset charset = Charset.forName("UTF-8");
         WeightedTokenPairSource efSrc = new WeightedTokenPairSource(
-                testSample, charset);
+                new TSVSource(testSample, charset));
         assertTrue("EntryFeatureSource is empty", efSrc.hasNext());
 
         while (efSrc.hasNext()) {
@@ -155,7 +158,8 @@ public class WeightedEntryFeatureTest {
                 new HashMap<Tell, Weighted<TokenPair>>();
 
         WeightedTokenPairSource src =
-                new WeightedTokenPairSource(file, DEFAULT_CHARSET);
+                new WeightedTokenPairSource(
+                new TSVSource(file, DEFAULT_CHARSET));
         {
             while (src.hasNext()) {
                 final Tell pos = src.position();

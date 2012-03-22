@@ -48,9 +48,7 @@ import uk.ac.susx.mlcl.byblo.measure.*;
 import uk.ac.susx.mlcl.lib.DoubleConverter;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.SimpleEnumerator;
-import uk.ac.susx.mlcl.lib.io.Files;
-import uk.ac.susx.mlcl.lib.io.Lexer;
-import uk.ac.susx.mlcl.lib.io.Sink;
+import uk.ac.susx.mlcl.lib.io.*;
 import uk.ac.susx.mlcl.lib.tasks.AbstractCommand;
 import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
 import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
@@ -220,7 +218,7 @@ public class AllPairsTask extends AbstractCommand {
                 }
 
                 WeightedTokenSource features = new WeightedTokenSource(
-                        featuresFile, charset, strIndex);
+                        new TSVSource(featuresFile, charset), strIndex);
                 AbstractMIProximity bmip = ((AbstractMIProximity) prox);
                 bmip.setFeatureFrequencies(features.readAllAsArray());
                 bmip.setFeatureFrequencySum(features.getWeightSum());
@@ -237,7 +235,7 @@ public class AllPairsTask extends AbstractCommand {
                 }
 
                 WeightedTokenSource features = new WeightedTokenSource(
-                        featuresFile, charset, strIndex);
+                        new TSVSource(featuresFile, charset), strIndex);
                 features.readAll();
 
                 ((KendallTau) prox).setNumFeatures(features.getCardinality());
@@ -258,16 +256,17 @@ public class AllPairsTask extends AbstractCommand {
         // in the file. Also this allows for the possibility of having differnt
         // files, e.g compare fruit words with cake words
         final WeightedTokenPairVectorSource sourceA = new WeightedTokenPairSource(
-                entryFeaturesFile, charset, strIndex).getVectorSource();
+                new TSVSource(entryFeaturesFile, charset), strIndex).getVectorSource();
         final WeightedTokenPairVectorSource sourceB = new WeightedTokenPairSource(
-                entryFeaturesFile, charset, strIndex).getVectorSource();
+                new TSVSource(entryFeaturesFile, charset), strIndex).getVectorSource();
 
         // Create a sink object that will act as a recipient for all pairs that
         // are produced by the algorithm.
 
         final Sink<Weighted<TokenPair>> sink =
-                new WeightedTokenPairSink(outputFile, charset, strIndex,
-                                          strIndex);
+                new WeightedTokenPairSink(
+                new TSVSink(outputFile, charset),
+                strIndex, strIndex);
 
         // Instantiate the all-pairs algorithm as given on the command line.
         ThreadedApssTask<Lexer.Tell> apss = new ThreadedApssTask<Lexer.Tell>(

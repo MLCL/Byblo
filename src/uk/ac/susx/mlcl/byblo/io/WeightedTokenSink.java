@@ -30,13 +30,11 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.charset.Charset;
+import java.io.*;
 import java.text.DecimalFormat;
 import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
+import uk.ac.susx.mlcl.lib.io.Sink;
+import uk.ac.susx.mlcl.lib.io.TSVSink;
 
 /**
  * An <tt>WeightedTokenSink</tt> object is used to store {@link Token} objects
@@ -72,7 +70,7 @@ import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightedTokenSink extends AbstractTSVSink<Weighted<Token>> {
+public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flushable {
 
     private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
 
@@ -84,9 +82,11 @@ public class WeightedTokenSink extends AbstractTSVSink<Weighted<Token>> {
 
     private long count = 0;
 
-    public WeightedTokenSink(File file, Charset charset, Enumerator<String> stringIndex)
+    private TSVSink inner;
+
+    public WeightedTokenSink(TSVSink inner, Enumerator<String> stringIndex)
             throws FileNotFoundException, IOException {
-        super(file, charset);
+        this.inner = inner;
         this.stringIndex = stringIndex;
     }
 
@@ -96,6 +96,10 @@ public class WeightedTokenSink extends AbstractTSVSink<Weighted<Token>> {
 
     public void setCompactFormatEnabled(boolean compactFormatEnabled) {
         this.compactFormatEnabled = compactFormatEnabled;
+    }
+
+    public Enumerator<String> getStringIndex() {
+        return stringIndex;
     }
 
     @Override
@@ -115,40 +119,45 @@ public class WeightedTokenSink extends AbstractTSVSink<Weighted<Token>> {
     @Override
     public void close() throws IOException {
         if (isCompactFormatEnabled() && previousRecord != null) {
-            writeRecordDelimiter();
+            inner.writeRecordDelimiter();
         }
-        super.close();
+        inner.close();
     }
 
     private void writeVerbose(final Weighted<Token> record) throws IOException {
         writeEntry(record.record().id());
-        writeValueDelimiter();
+        inner.writeValueDelimiter();
         writeWeight(record.weight());
-        writeRecordDelimiter();
+        inner.writeRecordDelimiter();
     }
 
     private void writeCompact(final Weighted<Token> record) throws IOException {
         if (previousRecord == null) {
             writeEntry(record.record().id());
         } else if (previousRecord.record().id() != record.record().id()) {
-            writeRecordDelimiter();
+            inner.writeRecordDelimiter();
             writeEntry(record.record().id());
         }
-        writeValueDelimiter();
+        inner.writeValueDelimiter();
         writeWeight(record.weight());
         previousRecord = record;
     }
 
     private void writeEntry(int id) throws IOException {
-        writeString(stringIndex.value(id));
+        inner.writeString(stringIndex.value(id));
     }
 
     private void writeWeight(double weight) throws IOException {
         if (Double.compare((int) weight, weight) == 0) {
-            super.writeInt((int) weight);
+            inner.writeInt((int) weight);
         } else {
-            super.writeString(f.format(weight));
+            inner.writeString(f.format(weight));
         }
+    }
+
+    @Override
+    public void flush() throws IOException {
+        inner.flush();
     }
 
 }

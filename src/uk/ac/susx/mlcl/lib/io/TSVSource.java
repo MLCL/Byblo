@@ -31,22 +31,22 @@
 package uk.ac.susx.mlcl.lib.io;
 
 import com.google.common.base.CharMatcher;
-import uk.ac.susx.mlcl.lib.io.Lexer.Type;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 
 /**
- * Abstract class that holds functionality to read a Tab Separated Values file.
+ * Class that holds functionality to read a Tab Separated Values file.
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T>
  */
-public abstract class AbstractTSVSource<T>
-        implements SeekableSource<T, Lexer.Tell> {
+public class TSVSource implements SeekableSource<Iterable<String>, Lexer.Tell> {
 
     private static final char RECORD_DELIM = '\n';
 
@@ -56,7 +56,7 @@ public abstract class AbstractTSVSource<T>
 
     private final File file;
 
-    public AbstractTSVSource(File file, Charset charset) throws FileNotFoundException, IOException {
+    public TSVSource(File file, Charset charset) throws FileNotFoundException, IOException {
         if (file == null)
             throw new NullPointerException("file == null");
         if (!file.exists())
@@ -80,8 +80,6 @@ public abstract class AbstractTSVSource<T>
         return file;
     }
 
-    @Override
-    public abstract T read() throws IOException;
 
     @Override
     public void position(Lexer.Tell offset) throws IOException {
@@ -107,45 +105,45 @@ public abstract class AbstractTSVSource<T>
     }
 
     protected void skipWhitespace() throws CharacterCodingException, IOException {
-        while (lexer.type() == Type.Whitespace && lexer.hasNext()) {
+        while (lexer.type() == Lexer.Type.Whitespace && lexer.hasNext()) {
             lexer.advance();
         }
     }
 
-    protected boolean isRecordDelimiterNext() throws CharacterCodingException, IOException {
+    public boolean isRecordDelimiterNext() throws CharacterCodingException, IOException {
         return isDelimiterNext() && lexer.charAt(0) == RECORD_DELIM;
     }
 
-    protected boolean isValueDelimiterNext() throws CharacterCodingException, IOException {
+    public boolean isValueDelimiterNext() throws CharacterCodingException, IOException {
         return isDelimiterNext() && lexer.charAt(0) == VALUE_DELIM;
     }
 
-    protected boolean isDelimiterNext() throws CharacterCodingException, IOException {
-        return lexer.type() == Type.Delimiter;
+    public boolean isDelimiterNext() throws CharacterCodingException, IOException {
+        return lexer.type() == Lexer.Type.Delimiter;
     }
 
-    protected void parseRecordDelimiter() throws CharacterCodingException, IOException {
+    public void parseRecordDelimiter() throws CharacterCodingException, IOException {
         do {
             parseDelimiter(RECORD_DELIM);
         } while (isRecordDelimiterNext() && hasNext());
     }
 
-    protected void parseValueDelimiter() throws CharacterCodingException, IOException {
+    public void parseValueDelimiter() throws CharacterCodingException, IOException {
         do {
             parseDelimiter(VALUE_DELIM);
         } while (isValueDelimiterNext() && hasNext());
     }
 
-    protected String parseString() throws CharacterCodingException, IOException {
+    public String parseString() throws CharacterCodingException, IOException {
         skipWhitespace();
-        expectType(Type.Value, lexer.type());
+        expectType(Lexer.Type.Value, lexer.type());
         final String str = lexer.value().toString();
         if (lexer.hasNext())
             lexer.advance();
         return str;
     }
 
-    protected double parseDouble() throws CharacterCodingException, IOException {
+    public double parseDouble() throws CharacterCodingException, IOException {
         try {
             return Double.valueOf(parseString());
         } catch (NumberFormatException nfe) {
@@ -153,7 +151,7 @@ public abstract class AbstractTSVSource<T>
         }
     }
 
-    protected int parseInt() throws CharacterCodingException, IOException {
+    public int parseInt() throws CharacterCodingException, IOException {
         try {
             return Integer.parseInt(parseString());
         } catch (NumberFormatException nfe) {
@@ -163,13 +161,13 @@ public abstract class AbstractTSVSource<T>
 
     private void parseDelimiter(char delim) throws CharacterCodingException, IOException {
         skipWhitespace();
-        expectType(Type.Delimiter, lexer.type());
+        expectType(Lexer.Type.Delimiter, lexer.type());
         expectDelim(delim, lexer.charAt(0));
         if (lexer.hasNext())
             lexer.advance();
     }
 
-    private void expectType(Type expected, Type actual) throws TSVDataFormatException {
+    private void expectType(Lexer.Type expected, Lexer.Type actual) throws TSVDataFormatException {
         if (expected != actual) {
             throw new TSVDataFormatException(this,
                     "Expecting type " + expected + " but found " + actual);
@@ -182,4 +180,19 @@ public abstract class AbstractTSVSource<T>
                     + MiscUtil.printableUTF8(expected) + " but found " 
                     + MiscUtil.printableUTF8(actual));
     }
+
+
+    @Override
+    public Iterable<String> read() throws IOException {
+        List<String> record = new ArrayList<String>();
+        boolean first = true;
+        while (!isRecordDelimiterNext()) {
+            if (!first)
+                parseValueDelimiter();
+            record.add(parseString());
+        }
+        parseRecordDelimiter();
+        return record;
+    }
+
 }

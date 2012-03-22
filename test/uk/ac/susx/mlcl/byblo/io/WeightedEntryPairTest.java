@@ -38,6 +38,8 @@ import java.io.IOException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.lib.io.TSVSink;
+import uk.ac.susx.mlcl.lib.io.TSVSource;
 
 /**
  *
@@ -46,10 +48,10 @@ import static uk.ac.susx.mlcl.TestConstants.*;
 public class WeightedEntryPairTest {
 
     private void copyWEP(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        WeightedTokenPairSource aSrc = new WeightedTokenPairSource(a,
-                                                                   DEFAULT_CHARSET);
-        WeightedTokenPairSink bSink = new WeightedTokenPairSink(b,
-                                                                DEFAULT_CHARSET, aSrc.getStringIndex1(), aSrc.getStringIndex2());
+        WeightedTokenPairSource aSrc = new WeightedTokenPairSource(
+                new TSVSource(a, DEFAULT_CHARSET));
+        WeightedTokenPairSink bSink = new WeightedTokenPairSink(
+                new TSVSink(b, DEFAULT_CHARSET), aSrc.getStringIndex1(), aSrc.getStringIndex2());
         bSink.setCompactFormatEnabled(compact);
 
         IOUtil.copy(aSrc, bSink);

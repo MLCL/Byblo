@@ -30,12 +30,13 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import java.io.File;
+import java.io.Closeable;
+import java.io.Flushable;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
+import uk.ac.susx.mlcl.lib.io.Sink;
+import uk.ac.susx.mlcl.lib.io.TSVSink;
 
 /**
  * An <tt>WeightedTokenPairSink</tt> object is used to store
@@ -72,13 +73,9 @@ import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightedTokenPairSink extends AbstractTSVSink<Weighted<TokenPair>> {
+public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeable, Flushable {
 
     private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
-
-    private final Enumerator<String> stringIndex1;
-
-    private final Enumerator<String> stringIndex2;
 
     private boolean compactFormatEnabled = false;
 
@@ -86,12 +83,20 @@ public class WeightedTokenPairSink extends AbstractTSVSink<Weighted<TokenPair>> 
 
     private long count = 0;
 
-    public WeightedTokenPairSink(File file, Charset charset,
-                                 Enumerator<String> strIndex1,
-                                 Enumerator<String> strIndex2) throws IOException {
-        super(file, charset);
-        this.stringIndex1 = strIndex1;
-        this.stringIndex2 = strIndex2;
+    private TSVSink inner;
+
+    private Enumerator<String> stringIndex1;
+
+    private Enumerator<String> stringIndex2;
+
+    public WeightedTokenPairSink(TSVSink inner, Enumerator<String> stringIndex1, Enumerator<String> stringIndex2) {
+        this.inner = inner;
+        this.stringIndex1 = stringIndex1;
+        this.stringIndex2 = stringIndex2;
+    }
+
+    public WeightedTokenPairSink(TSVSink inner, Enumerator<String> combinedIndex) {
+        this(inner, combinedIndex, combinedIndex);
     }
 
     public Enumerator<String> getStringIndex1() {
@@ -103,7 +108,7 @@ public class WeightedTokenPairSink extends AbstractTSVSink<Weighted<TokenPair>> 
     }
 
     public boolean isIndexCombined() {
-        return stringIndex1 == stringIndex2;
+        return getStringIndex1() == getStringIndex2();
     }
 
     public boolean isCompactFormatEnabled() {
@@ -129,52 +134,49 @@ public class WeightedTokenPairSink extends AbstractTSVSink<Weighted<TokenPair>> 
     }
 
     private void writeVerbose(Weighted<TokenPair> record) throws IOException {
-        writeToken1(record.record().id1());
-        writeValueDelimiter();
-        writeToken2(record.record().id2());
-        writeValueDelimiter();
+        inner.writeString(stringIndex1.value(record.record().id1()));
+        inner.writeValueDelimiter();
+        inner.writeString(stringIndex2.value(record.record().id2()));
+        inner.writeValueDelimiter();
         writeWeight(record.weight());
-        writeRecordDelimiter();
+        inner.writeRecordDelimiter();
     }
 
     private void writeCompact(final Weighted<TokenPair> record) throws IOException {
         if (previousRecord == null) {
-            writeToken1(record.record().id1());
+            inner.writeString(stringIndex1.value(record.record().id1()));
         } else if (previousRecord.record().id1() != record.record().
                 id1()) {
-            writeRecordDelimiter();
-            writeToken1(record.record().id1());
+            inner.writeRecordDelimiter();
+            inner.writeString(stringIndex1.value(record.record().id1()));
         }
 
-        writeValueDelimiter();
-        writeToken2(record.record().id2());
-        writeValueDelimiter();
+        inner.writeValueDelimiter();
+        inner.writeString(stringIndex2.value(record.record().id2()));
+        inner.writeValueDelimiter();
         writeWeight(record.weight());
         previousRecord = record;
     }
 
-    private void writeToken1(int id) throws IOException {
-        writeString(stringIndex1.value(id));
-    }
-
-    private void writeToken2(int id) throws IOException {
-        writeString(stringIndex2.value(id));
-    }
-
     private void writeWeight(double weight) throws IOException {
         if (Double.compare((int) weight, weight) == 0) {
-            writeInt((int) weight);
+            inner.writeInt((int) weight);
         } else {
-            writeString(f.format(weight));
+            inner.writeString(f.format(weight));
         }
     }
 
     @Override
     public void close() throws IOException {
         if (isCompactFormatEnabled() && previousRecord != null) {
-            writeRecordDelimiter();
+            inner.writeRecordDelimiter();
         }
-        super.close();
+        inner.close();
+    }
+
+    @Override
+    public void flush() throws IOException {
+        inner.flush();
     }
 
 }

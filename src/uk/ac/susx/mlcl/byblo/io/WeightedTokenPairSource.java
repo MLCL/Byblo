@@ -36,8 +36,10 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.SimpleEnumerator;
-import uk.ac.susx.mlcl.lib.io.AbstractTSVSource;
-import uk.ac.susx.mlcl.lib.io.Source;
+import uk.ac.susx.mlcl.lib.io.Lexer;
+import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
+import uk.ac.susx.mlcl.lib.io.SeekableSource;
+import uk.ac.susx.mlcl.lib.io.TSVSource;
 
 /**
  * A <tt>WeightedTokenPairSource</tt> object is used to retrieve
@@ -47,8 +49,7 @@ import uk.ac.susx.mlcl.lib.io.Source;
  * @see WeightedEntryPairSink
  */
 public class WeightedTokenPairSource
-        extends AbstractTSVSource<Weighted<TokenPair>>
-        implements Source<Weighted<TokenPair>> {
+        implements SeekableSource<Weighted<TokenPair>, Lexer.Tell> {
 
     private final Enumerator<String> stringIndex1;
 
@@ -58,11 +59,13 @@ public class WeightedTokenPairSource
 
     private long count = 0;
 
+    private final TSVSource inner;
+
     public WeightedTokenPairSource(
-            File file, Charset charset,
+            TSVSource inner,
             Enumerator<String> stringIndex1, Enumerator<String> stringIndex2)
             throws FileNotFoundException, IOException {
-        super(file, charset);
+        this.inner = inner;
         if (stringIndex1 == null)
             throw new NullPointerException("entryIndex == null");
         this.stringIndex1 = stringIndex1;
@@ -70,15 +73,15 @@ public class WeightedTokenPairSource
     }
 
     public WeightedTokenPairSource(
-            File file, Charset charset,
+            TSVSource inner,
             Enumerator<String> stringIndex)
             throws FileNotFoundException, IOException {
-        this(file, charset, stringIndex, stringIndex);
+        this(inner, stringIndex, stringIndex);
     }
 
-    public WeightedTokenPairSource(File file, Charset charset)
+    public WeightedTokenPairSource(TSVSource inner)
             throws FileNotFoundException, IOException {
-        this(file, charset, new SimpleEnumerator<String>());
+        this(inner, new SimpleEnumerator<String>());
     }
 
     public final Enumerator<String> getStringIndex1() {
@@ -102,32 +105,32 @@ public class WeightedTokenPairSource
         final int tokenId1;
         if (previousRecord == null) {
             tokenId1 = readEntry1();
-            parseValueDelimiter();
+            inner.parseValueDelimiter();
         } else {
             tokenId1 = previousRecord.record().id1();
         }
 
-        if (!hasNext() || isDelimiterNext()) {
-            parseRecordDelimiter();
-            throw new SingletonRecordException(this,
+        if (!hasNext() || inner.isDelimiterNext()) {
+            inner.parseRecordDelimiter();
+            throw new SingletonRecordException(inner,
                                                "Found weighte entry pair record with second entries.");
         }
 
         final int tokenId2 = readEntry2();
-        parseValueDelimiter();
+        inner.parseValueDelimiter();
         final double weight = readWight();
 
         final Weighted<TokenPair> record = new Weighted<TokenPair>(
                 new TokenPair(tokenId1, tokenId2), weight);
         ++count;
 
-        if (isValueDelimiterNext()) {
-            parseValueDelimiter();
+        if (inner.isValueDelimiterNext()) {
+            inner.parseValueDelimiter();
             previousRecord = record;
         }
 
-        if (hasNext() && isRecordDelimiterNext()) {
-            parseRecordDelimiter();
+        if (inner.hasNext() && inner.isRecordDelimiterNext()) {
+            inner.parseRecordDelimiter();
             previousRecord = null;
         }
 
@@ -135,15 +138,15 @@ public class WeightedTokenPairSource
     }
 
     protected int readEntry1() throws IOException {
-        return stringIndex1.index(parseString());
+        return stringIndex1.index(inner.parseString());
     }
 
     protected int readEntry2() throws IOException {
-        return stringIndex2.index(parseString());
+        return stringIndex2.index(inner.parseString());
     }
 
     protected double readWight() throws IOException {
-        return parseDouble();
+        return inner.parseDouble();
     }
 
     public WeightedTokenPairVectorSource getVectorSource() {
@@ -152,12 +155,10 @@ public class WeightedTokenPairSource
 
     public static boolean equal(File a, File b, Charset charset) throws IOException {
         final SimpleEnumerator<String> stringIndex = new SimpleEnumerator<String>();
-        final WeightedTokenPairSource srcA = new WeightedTokenPairSource(a,
-                                                                         charset,
-                                                                         stringIndex);
-        final WeightedTokenPairSource srcB = new WeightedTokenPairSource(b,
-                                                                         charset,
-                                                                         stringIndex);
+        final WeightedTokenPairSource srcA = new WeightedTokenPairSource(
+                new TSVSource(a, charset), stringIndex);
+        final WeightedTokenPairSource srcB = new WeightedTokenPairSource(
+                new TSVSource(b, charset), stringIndex);
         boolean equal = true;
         while (equal && srcA.hasNext() && srcB.hasNext()) {
             final Weighted<TokenPair> recA = srcA.read();
@@ -167,6 +168,25 @@ public class WeightedTokenPairSource
                     && recA.weight() == recB.weight();
         }
         return equal && srcA.hasNext() == srcB.hasNext();
+    }
+
+    @Override
+    public boolean hasNext() throws IOException {
+        return inner.hasNext();
+    }
+
+    @Override
+    public void position(Tell p) throws IOException {
+        inner.position(p);
+    }
+
+    @Override
+    public Tell position() throws IOException {
+        return inner.position();
+    }
+
+    public double percentRead() throws IOException {
+        return inner.percentRead();
     }
 
 }

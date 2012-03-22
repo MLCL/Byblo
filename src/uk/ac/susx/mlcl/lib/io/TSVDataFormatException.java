@@ -50,24 +50,24 @@ public class TSVDataFormatException extends IOException {
 
     private final File file;
 
-    public TSVDataFormatException(AbstractTSVSource<?> src, final String message) {
+    public TSVDataFormatException(TSVSource src, final String message) {
         super(message);
         offset = src.roughPosition();
         file = src.getFile();
     }
 
-    public TSVDataFormatException(AbstractTSVSource<?> src, String message,
-            Throwable cause) {
+    public TSVDataFormatException(TSVSource src, String message,
+                                  Throwable cause) {
         super(message, cause);
         offset = src.roughPosition();
         file = src.getFile();
     }
 
-    public TSVDataFormatException(AbstractTSVSource<?> src) {
+    public TSVDataFormatException(TSVSource src) {
         this(src, DEFAULT_MESSAGE);
     }
 
-    public TSVDataFormatException(AbstractTSVSource<?> src, Throwable cause) {
+    public TSVDataFormatException(TSVSource src, Throwable cause) {
         this(src, DEFAULT_MESSAGE, cause);
     }
 
@@ -102,4 +102,5 @@ public class TSVDataFormatException extends IOException {
         in.close();
         return new String(bytes);
     }
+
 }

@@ -38,7 +38,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.SimpleEnumerator;
-import uk.ac.susx.mlcl.lib.io.AbstractTSVSource;
+import uk.ac.susx.mlcl.lib.io.Lexer;
+import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
+import uk.ac.susx.mlcl.lib.io.SeekableSource;
+import uk.ac.susx.mlcl.lib.io.TSVSource;
 
 /**
  * An <tt>TokenPairSource</tt> object is used to retrieve
@@ -47,7 +50,7 @@ import uk.ac.susx.mlcl.lib.io.AbstractTSVSource;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see EntryFeatureSink
  */
-public class TokenPairSource extends AbstractTSVSource<TokenPair> {
+public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell> {
 
     private static final Log LOG = LogFactory.getLog(TokenPairSource.class);
 
@@ -59,12 +62,14 @@ public class TokenPairSource extends AbstractTSVSource<TokenPair> {
 
     private long count = 0;
 
+    private final TSVSource inner;
+
     public TokenPairSource(
-            File file, Charset charset,
+            TSVSource inner,
             Enumerator<String> entryIndex,
             Enumerator<String> featureIndex)
             throws FileNotFoundException, IOException {
-        super(file, charset);
+        this.inner = inner;
         if (entryIndex == null)
             throw new NullPointerException("stringIndex1 == null");
         if (featureIndex == null)
@@ -73,15 +78,15 @@ public class TokenPairSource extends AbstractTSVSource<TokenPair> {
         this.stringIndex2 = featureIndex;
     }
 
-    public TokenPairSource(File file, Charset charset,
+    public TokenPairSource(TSVSource inner,
                            Enumerator<String> combinedIndex)
             throws FileNotFoundException, IOException {
-        this(file, charset, combinedIndex, combinedIndex);
+        this(inner, combinedIndex, combinedIndex);
     }
 
-    public TokenPairSource(File file, Charset charset)
+    public TokenPairSource(TSVSource inner)
             throws FileNotFoundException, IOException {
-        this(file, charset, new SimpleEnumerator<String>());
+        this(inner, new SimpleEnumerator<String>());
     }
 
     public Enumerator<String> getStringIndex1() {
@@ -105,17 +110,17 @@ public class TokenPairSource extends AbstractTSVSource<TokenPair> {
         final int id1;
         if (previousRecord == null) {
             id1 = readHead();
-            parseValueDelimiter();
+            inner.parseValueDelimiter();
         } else {
             id1 = previousRecord.id1();
         }
 
-        if (!hasNext() || isDelimiterNext()) {
+        if (!hasNext() || inner.isDelimiterNext()) {
             // Encountered an entry without any features. This is incoherent wrt
             // the task at hand, but quite a common scenario in general feature
             // extraction. Throw an exception which is caught for end user input
-            parseRecordDelimiter();
-            throw new SingletonRecordException(this,
+            inner.parseRecordDelimiter();
+            throw new SingletonRecordException(inner,
                                                "Found entry/feature record with no features.");
         }
 
@@ -123,13 +128,13 @@ public class TokenPairSource extends AbstractTSVSource<TokenPair> {
         final TokenPair record = new TokenPair(
                 id1, id2);
 
-        if (hasNext() && isValueDelimiterNext()) {
-            parseValueDelimiter();
+        if (hasNext() && inner.isValueDelimiterNext()) {
+            inner.parseValueDelimiter();
             previousRecord = record;
         }
 
-        if (hasNext() && isRecordDelimiterNext()) {
-            parseRecordDelimiter();
+        if (hasNext() && inner.isRecordDelimiterNext()) {
+            inner.parseRecordDelimiter();
             previousRecord = null;
         }
 
@@ -138,20 +143,20 @@ public class TokenPairSource extends AbstractTSVSource<TokenPair> {
     }
 
     protected final int readHead() throws IOException {
-        return stringIndex1.index(parseString());
+        return stringIndex1.index(inner.parseString());
     }
 
     protected final int readTail() throws IOException {
-        return stringIndex2.index(parseString());
+        return stringIndex2.index(inner.parseString());
     }
 
     public static boolean equal(File fileA, File fileB, Charset charset)
             throws IOException {
         final Enumerator<String> stringIndex = new SimpleEnumerator<String>();
         final TokenPairSource srcA = new TokenPairSource(
-                fileA, charset, stringIndex);
+                new TSVSource(fileA, charset), stringIndex);
         final TokenPairSource srcB = new TokenPairSource(
-                fileB, charset, stringIndex);
+                new TSVSource(fileB, charset), stringIndex);
         boolean equal = true;
         while (equal && srcA.hasNext() && srcB.hasNext()) {
             final TokenPair recA = srcA.read();
@@ -167,6 +172,25 @@ public class TokenPairSource extends AbstractTSVSource<TokenPair> {
         }
         equal = equal && srcA.hasNext() == srcB.hasNext();
         return equal;
+    }
+
+    @Override
+    public boolean hasNext() throws IOException {
+        return inner.hasNext();
+    }
+
+    @Override
+    public void position(Tell p) throws IOException {
+        inner.position(p);
+    }
+
+    @Override
+    public Tell position() throws IOException {
+        return inner.position();
+    }
+
+    public double percentRead() throws IOException {
+        return inner.percentRead();
     }
 
 }

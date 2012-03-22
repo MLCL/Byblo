@@ -51,9 +51,7 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.*;
 import static uk.ac.susx.mlcl.lib.Predicates2.*;
 import uk.ac.susx.mlcl.lib.*;
-import uk.ac.susx.mlcl.lib.io.FileFactory;
-import uk.ac.susx.mlcl.lib.io.Files;
-import uk.ac.susx.mlcl.lib.io.TempFileFactory;
+import uk.ac.susx.mlcl.lib.io.*;
 import uk.ac.susx.mlcl.lib.tasks.AbstractCommandTask;
 import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
 import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
@@ -340,14 +338,13 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
         final IntSet rejected = new IntOpenHashSet();
 
         WeightedTokenSource entriesSource = new WeightedTokenSource(
-                activeEntriesFile, charset, entryIndex);
+                new TSVSource(activeEntriesFile, charset), entryIndex);
 
         File outputFile = tempFiles.createFile();
         outputFile.deleteOnExit();
 
-        WeightedTokenSink entriesSink = new WeightedTokenSink(outputFile,
-                                                              charset,
-                                                              entryIndex);
+        WeightedTokenSink entriesSink = new WeightedTokenSink(
+                new TSVSink(outputFile, charset), entryIndex);
 
         if (LOG.isInfoEnabled()) {
             LOG.info(
@@ -412,13 +409,14 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
         IntSet acceptedFeatures = new IntOpenHashSet();
 
         WeightedTokenPairSource efSrc = new WeightedTokenPairSource(
-                activeEntryFeaturesFile, charset, entryIndex, featureIndex);
+                new TSVSource(activeEntryFeaturesFile, charset),
+                entryIndex, featureIndex);
 
         File outputFile = tempFiles.createFile();
         outputFile.deleteOnExit();
 
         WeightedTokenPairSink efSink = new WeightedTokenPairSink(
-                outputFile, charset,
+                new TSVSink(outputFile, charset),
                 entryIndex, featureIndex);
 
         if (LOG.isInfoEnabled()) {
@@ -536,13 +534,13 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
         IntSet rejectedFeatures = new IntOpenHashSet();
 
         WeightedTokenSource featureSource = new WeightedTokenSource(
-                activeFeaturesFile, charset, featureIndex);
+                new TSVSource(activeFeaturesFile, charset), featureIndex);
 
         File outputFile = tempFiles.createFile();
         outputFile.deleteOnExit();
 
         WeightedTokenSink featureSink = new WeightedTokenSink(
-                outputFile, charset, featureIndex);
+                new TSVSink(outputFile, charset), featureIndex);
 
         if (LOG.isInfoEnabled()) {
             LOG.info(

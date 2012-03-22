@@ -30,29 +30,20 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
-import java.io.BufferedWriter;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.Flushable;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.*;
 import java.nio.charset.Charset;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Abstract class that holds functionality to read a Tab Separated Values file.
+ * Class that holds functionality to read a Tab Separated Values file.
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T>
  */
-public abstract class AbstractTSVSink<T>
-        implements Sink<T>, Closeable, Flushable {
+public final class TSVSink implements Sink<Iterable<String>>, Closeable, Flushable {
 
-    private static final Log LOG = LogFactory.getLog(AbstractTSVSink.class);
+    private static final Log LOG = LogFactory.getLog(TSVSink.class);
 
     private static final char RECORD_DELIM = '\n';
 
@@ -60,7 +51,8 @@ public abstract class AbstractTSVSink<T>
 
     private final Writer out;
 
-    public AbstractTSVSink(File file, Charset charset) throws FileNotFoundException, IOException {
+    public TSVSink(File file, Charset charset)
+            throws FileNotFoundException, IOException {
         if (file == null)
             throw new NullPointerException("file == null");
         if (LOG.isDebugEnabled())
@@ -71,23 +63,23 @@ public abstract class AbstractTSVSink<T>
 
     }
 
-    protected void writeRecordDelimiter() throws IOException {
+    public void writeRecordDelimiter() throws IOException {
         out.append(RECORD_DELIM);
     }
 
-    protected void writeValueDelimiter() throws IOException {
+    public void writeValueDelimiter() throws IOException {
         out.append(VALUE_DELIM);
     }
 
-    protected void writeString(String str) throws IOException {
+    public void writeString(String str) throws IOException {
         out.write(str);
     }
 
-    protected void writeInt(int val) throws IOException {
+    public void writeInt(int val) throws IOException {
         writeString(Integer.toString(val));
     }
 
-    protected void writeDouble(double val) throws IOException {
+    public void writeDouble(double val) throws IOException {
         writeString(Double.toString(val));
     }
 
@@ -108,4 +100,17 @@ public abstract class AbstractTSVSink<T>
         close();
         super.finalize();
     }
+
+    @Override
+    public void write(Iterable<String> record) throws IOException {
+        boolean first = true;
+        for (String v : record) {
+            if (!first)
+                writeValueDelimiter();
+            writeString(v);
+            first = false;
+        }
+        writeRecordDelimiter();
+    }
+
 }

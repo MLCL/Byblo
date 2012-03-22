@@ -30,8 +30,8 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import uk.ac.susx.mlcl.lib.io.AbstractTSVSource;
 import uk.ac.susx.mlcl.lib.io.TSVDataFormatException;
+import uk.ac.susx.mlcl.lib.io.TSVSource;
 
 /**
  *
@@ -44,20 +44,21 @@ public class SingletonRecordException extends TSVDataFormatException {
     private static final String DEFAULT_MESSAGE =
             "Found singleton value record in input file.";
 
-    public SingletonRecordException(AbstractTSVSource<?> src, Throwable cause) {
+    public SingletonRecordException(TSVSource src, Throwable cause) {
         super(src, DEFAULT_MESSAGE, cause);
     }
 
-    public SingletonRecordException(AbstractTSVSource<?> src) {
+    public SingletonRecordException(TSVSource src) {
         super(src, DEFAULT_MESSAGE);
     }
 
-    public SingletonRecordException(AbstractTSVSource<?> src, String message,
-            Throwable cause) {
+    public SingletonRecordException(TSVSource src, String message,
+                                    Throwable cause) {
         super(src, message, cause);
     }
 
-    public SingletonRecordException(AbstractTSVSource<?> src, String message) {
+    public SingletonRecordException(TSVSource src, String message) {
         super(src, message);
     }
+
 }

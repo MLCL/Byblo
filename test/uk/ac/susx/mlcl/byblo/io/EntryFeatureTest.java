@@ -39,6 +39,8 @@ import java.nio.charset.Charset;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.lib.io.TSVSink;
+import uk.ac.susx.mlcl.lib.io.TSVSource;
 
 /**
  *
@@ -50,7 +52,7 @@ public class EntryFeatureTest {
     public void testEndOfLineTab() throws FileNotFoundException, IOException {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-input-sample");
         Charset charset = Charset.forName("UTF-8");
-        TokenPairSource efSrc = new TokenPairSource(testSample, charset);
+        TokenPairSource efSrc = new TokenPairSource(new TSVSource(testSample, charset));
         assertTrue("EntryFeatureSource is empty", efSrc.hasNext());
 
         while (efSrc.hasNext()) {
@@ -67,8 +69,8 @@ public class EntryFeatureTest {
     }
 
     private void copyEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        TokenPairSource aSrc = new TokenPairSource(a, DEFAULT_CHARSET);
-        TokenPairSink bSink = new TokenPairSink(b, DEFAULT_CHARSET,
+        TokenPairSource aSrc = new TokenPairSource(new TSVSource(a, DEFAULT_CHARSET));
+        TokenPairSink bSink = new TokenPairSink(new TSVSink(b, DEFAULT_CHARSET),
                 aSrc.getStringIndex1(), aSrc.getStringIndex2());
         bSink.setCompactFormatEnabled(compact);
 
