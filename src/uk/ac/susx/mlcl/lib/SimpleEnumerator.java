@@ -32,15 +32,15 @@ package uk.ac.susx.mlcl.lib;
 
 import com.sun.jmx.snmp.Enumerated;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
+import uk.ac.susx.mlcl.byblo.io.TokenPair;
 
 /**
  * A simple of bimap for indexing complex objects (usually strings).
@@ -56,11 +56,16 @@ public final class SimpleEnumerator<T> implements Serializable, Enumerator<T> {
 
     private final Object2IntMap<T> objToIndex;
 
-    private final AtomicInteger nextId = new AtomicInteger(0);
+    private final AtomicInteger nextId;
+
+    private SimpleEnumerator(ObjectList<T> indexToObj, Object2IntMap<T> objToIndex, AtomicInteger nextId) {
+        this.indexToObj = indexToObj;
+        this.objToIndex = objToIndex;
+        this.nextId = nextId;
+    }
 
     public SimpleEnumerator() {
-        indexToObj = new ObjectArrayList<T>();
-        objToIndex = new Object2IntOpenHashMap<T>();
+        this(new ObjectArrayList<T>(), new Object2IntOpenHashMap<T>(), new AtomicInteger(0));
         objToIndex.defaultReturnValue(-1);
     }
 
@@ -92,26 +97,59 @@ public final class SimpleEnumerator<T> implements Serializable, Enumerator<T> {
         return indexToObj.get(id);
     }
 
-    private void writeObject(final ObjectOutputStream out)
-            throws IOException {
-        out.writeInt(nextId.get());
-        out.writeObject(indexToObj);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void readObject(final ObjectInputStream in)
-            throws IOException, ClassNotFoundException {
-        nextId.set(in.readInt());
-        indexToObj.addAll((ObjectList<T>) in.readObject());
-        for (int i = 0; i < indexToObj.size(); i++) {
-            objToIndex.put(indexToObj.get(i), i);
-        }
-    }
-
     @Override
     public String toString() {
         return objToIndex.toString();
     }
-    
 
+    @Override
+    public Iterator<Object2IntMap.Entry<T>> iterator() {
+        return objToIndex.object2IntEntrySet().iterator();
+    }
+
+    protected final Object writeReplace() {
+        return new Serializer<T>(this);
+    }
+
+    private static final class Serializer<T> implements Externalizable {
+
+        private static final long serialVersionUID = 1;
+
+        private SimpleEnumerator<T> se;
+
+        public Serializer() {
+        }
+
+        public Serializer(final SimpleEnumerator<T> se) {
+            if (se == null) {
+                throw new NullPointerException("se == null");
+            }
+            this.se = se;
+        }
+
+        @Override
+        public final void writeExternal(final ObjectOutput out)
+                throws IOException {
+            out.writeInt(se.nextId.get());
+            out.writeObject(se.indexToObj);
+        }
+
+        @Override
+        public final void readExternal(final ObjectInput in)
+                throws IOException, ClassNotFoundException {
+            AtomicInteger nextId = new AtomicInteger(0);
+            nextId.set(in.readInt());
+            ObjectList<T> indexToObj = (ObjectList<T>) in.readObject();
+            Object2IntMap<T> objToIndex = new Object2IntOpenHashMap<T>();
+            for (int i = 0; i < indexToObj.size(); i++) {
+                objToIndex.put(indexToObj.get(i), i);
+            }
+            this.se = new SimpleEnumerator<T>(indexToObj, objToIndex, nextId);
+        }
+
+        protected final Object readResolve() {
+            return se;
+        }
+
+    }
 }

@@ -40,6 +40,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.SimpleEnumerator;
 import uk.ac.susx.mlcl.lib.io.TSVSink;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
@@ -106,19 +107,23 @@ public class EntryFeatureTest {
     
     
     @Test
-    public void testEntryPairEnumeratorConversion() throws FileNotFoundException, IOException {
+    public void testEntryPairEnumeratorConversion() throws FileNotFoundException, IOException, ClassNotFoundException {
         File a = TEST_FRUIT_INPUT;
         File b = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_INPUT.getName() + ".enum");
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_INPUT.getName() + ".str");
+        File idxFile = new File(TEST_OUTPUT_DIR,
+                          TEST_FRUIT_INPUT.getName() + ".index");
 
-        Enumerator<String> idx = new SimpleEnumerator<String>();
 
         {
+            Enumerator<String> idx = new SimpleEnumerator<String>();
             TokenPairSource aSrc = new TokenPairSource(new TSVSource(a, DEFAULT_CHARSET), idx, idx);
             TokenPairSink bSink = new TokenPairSink(new TSVSink(b, DEFAULT_CHARSET));
             IOUtil.copy(aSrc, bSink);
+            Enumerators.saveStringEnumerator(idx, idxFile);
+            
             bSink.close();
         }
 
@@ -126,6 +131,7 @@ public class EntryFeatureTest {
                    b.length() <= a.length());
 
         {
+            Enumerator<String> idx = (Enumerator<String>)Enumerators.loadStringEnumerator(idxFile);
             TokenPairSource bSrc = new TokenPairSource(new TSVSource(b, DEFAULT_CHARSET));
             TokenPairSink cSink = new TokenPairSink(new TSVSink(c, DEFAULT_CHARSET), idx,idx);
             IOUtil.copy(bSrc, cSink);
