@@ -30,19 +30,20 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.lib.io.AbstractTSVSource;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.SimpleEnumerator;
+import uk.ac.susx.mlcl.lib.io.AbstractTSVSource;
 
 /**
- * An <tt>TokenPairSource</tt> object is used to retrieve 
- * {@link EntryFeature} objects from a flat file. 
- * 
+ * An <tt>TokenPairSource</tt> object is used to retrieve
+ * {@link EntryFeature} objects from a flat file.
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see EntryFeatureSink
  */
@@ -50,18 +51,18 @@ public class TokenPairSource extends AbstractTSVSource<TokenPair> {
 
     private static final Log LOG = LogFactory.getLog(TokenPairSource.class);
 
-    private final ObjectIndex<String> stringIndex1;
+    private final Enumerator<String> stringIndex1;
 
-    private final ObjectIndex<String> stringIndex2;
+    private final Enumerator<String> stringIndex2;
 
     private TokenPair previousRecord = null;
-    
+
     private long count = 0;
 
     public TokenPairSource(
             File file, Charset charset,
-            ObjectIndex<String> entryIndex,
-            ObjectIndex<String> featureIndex)
+            Enumerator<String> entryIndex,
+            Enumerator<String> featureIndex)
             throws FileNotFoundException, IOException {
         super(file, charset);
         if (entryIndex == null)
@@ -73,21 +74,21 @@ public class TokenPairSource extends AbstractTSVSource<TokenPair> {
     }
 
     public TokenPairSource(File file, Charset charset,
-            ObjectIndex<String> combinedIndex)
+                           Enumerator<String> combinedIndex)
             throws FileNotFoundException, IOException {
         this(file, charset, combinedIndex, combinedIndex);
     }
 
     public TokenPairSource(File file, Charset charset)
             throws FileNotFoundException, IOException {
-        this(file, charset, new ObjectIndex<String>());
+        this(file, charset, new SimpleEnumerator<String>());
     }
 
-    public ObjectIndex<String> getStringIndex1() {
+    public Enumerator<String> getStringIndex1() {
         return stringIndex1;
     }
 
-    public ObjectIndex<String> getStringIndex2() {
+    public Enumerator<String> getStringIndex2() {
         return stringIndex2;
     }
 
@@ -115,7 +116,7 @@ public class TokenPairSource extends AbstractTSVSource<TokenPair> {
             // extraction. Throw an exception which is caught for end user input
             parseRecordDelimiter();
             throw new SingletonRecordException(this,
-                    "Found entry/feature record with no features.");
+                                               "Found entry/feature record with no features.");
         }
 
         final int id2 = readTail();
@@ -137,16 +138,16 @@ public class TokenPairSource extends AbstractTSVSource<TokenPair> {
     }
 
     protected final int readHead() throws IOException {
-        return stringIndex1.get(parseString());
+        return stringIndex1.index(parseString());
     }
 
     protected final int readTail() throws IOException {
-        return stringIndex2.get(parseString());
+        return stringIndex2.index(parseString());
     }
 
     public static boolean equal(File fileA, File fileB, Charset charset)
             throws IOException {
-        final ObjectIndex<String> stringIndex = new ObjectIndex<String>();
+        final Enumerator<String> stringIndex = new SimpleEnumerator<String>();
         final TokenPairSource srcA = new TokenPairSource(
                 fileA, charset, stringIndex);
         final TokenPairSource srcB = new TokenPairSource(
@@ -167,4 +168,5 @@ public class TokenPairSource extends AbstractTSVSource<TokenPair> {
         equal = equal && srcA.hasNext() == srcB.hasNext();
         return equal;
     }
+
 }

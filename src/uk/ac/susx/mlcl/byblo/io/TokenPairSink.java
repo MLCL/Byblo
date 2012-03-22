@@ -30,26 +30,26 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
-import uk.ac.susx.mlcl.lib.io.Sink;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.SimpleEnumerator;
+import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
 
 /**
- * An <tt>TokenPairSink</tt> object is used to store 
- * {@link EntryFeature} objects in a flat file. 
- * 
- * <p>The basic file format is Tab-Separated-Values (TSV) where records are 
+ * An <tt>TokenPairSink</tt> object is used to store
+ * {@link EntryFeature} objects in a flat file.
+ *
+ * <p>The basic file format is Tab-Separated-Values (TSV) where records are
  * delimited by new-lines, and values are delimited by tabs. Two variants are
- * supported: verbose and compact. In verbose mode each {@link EntryFeature} 
+ * supported: verbose and compact. In verbose mode each {@link EntryFeature}
  * corresponds to a single TSV record; i.e one line per object consisting of an
- * entry and a feature. In compact mode each TSV record consists of a single 
- * entry followed by the features from all sequentially written 
+ * entry and a feature. In compact mode each TSV record consists of a single
+ * entry followed by the features from all sequentially written
  * {@link EntryFeature} objects that share the same entry.</p>
- * 
+ *
  * Verbose mode example:
  * <pre>
  *      entry1  feature1
@@ -59,29 +59,33 @@ import java.nio.charset.Charset;
  *      enrty3  feature4
  *      enrty3  feature1
  * </pre>
- * 
+ *
  * Equivalent compact mode example:
  * <pre>
  *      entry1  feature1 feature2
  *      entry2  feature3
  *      entry3  feature2 feature4 feature1
  * </pre>
- * 
- * <p>Compact mode is the default behavior, since it can reduce file sizes by 
+ *
+ * <p>Compact mode is the default behavior, since it can reduce file sizes by
  * approximately 50%, with corresponding reductions in I/O overhead.</p>
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class TokenPairSink extends AbstractTSVSink<TokenPair> {
 
-    private final ObjectIndex<String> stringIndex1;
-    private final ObjectIndex<String> stringIndex2;
+    private final Enumerator<String> stringIndex1;
+
+    private final Enumerator<String> stringIndex2;
+
     private boolean compactFormatEnabled = false;
+
     private TokenPair previousRecord = null;
+
     private long count = 0;
 
     public TokenPairSink(File file, Charset charset,
-            ObjectIndex<String> stringIndex1, ObjectIndex<String> stringIndex2)
+                         Enumerator<String> stringIndex1, Enumerator<String> stringIndex2)
             throws FileNotFoundException, IOException {
         super(file, charset);
         if (stringIndex1 == null) {
@@ -95,21 +99,21 @@ public class TokenPairSink extends AbstractTSVSink<TokenPair> {
     }
 
     public TokenPairSink(File file, Charset charset,
-            ObjectIndex<String> combinedIndex)
+                         Enumerator<String> combinedIndex)
             throws FileNotFoundException, IOException {
         this(file, charset, combinedIndex, combinedIndex);
     }
 
     public TokenPairSink(File file, Charset charset)
             throws FileNotFoundException, IOException {
-        this(file, charset, new ObjectIndex<String>());
+        this(file, charset, new SimpleEnumerator<String>());
     }
 
-    public final ObjectIndex<String> getStringIndex1() {
+    public final Enumerator<String> getStringIndex1() {
         return stringIndex1;
     }
 
-    public ObjectIndex<String> getStringindex2() {
+    public Enumerator<String> getStringindex2() {
         return stringIndex2;
     }
 
@@ -159,11 +163,11 @@ public class TokenPairSink extends AbstractTSVSink<TokenPair> {
     }
 
     protected final void write1(final int entryId) throws IOException {
-        writeString(stringIndex1.get(entryId));
+        writeString(stringIndex1.value(entryId));
     }
 
     protected final void write2(final int featureId) throws IOException {
-        writeString(stringIndex2.get(featureId));
+        writeString(stringIndex2.value(featureId));
     }
 
     @Override
@@ -173,4 +177,5 @@ public class TokenPairSink extends AbstractTSVSink<TokenPair> {
         }
         super.close();
     }
+
 }

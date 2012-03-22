@@ -30,26 +30,26 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
+import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
 
 /**
- * An <tt>WeightedTokenSink</tt> object is used to store {@link Token} objects in 
- * a flat file. 
- * 
- * <p>The basic file format is Tab-Separated-Values (TSV) where records are 
+ * An <tt>WeightedTokenSink</tt> object is used to store {@link Token} objects
+ * in a flat file.
+ *
+ * <p>The basic file format is Tab-Separated-Values (TSV) where records are
  * delimited by new-lines, and values are delimited by tabs. Two variants are
- * supported: verbose and compact. In verbose mode each {@link Token} 
+ * supported: verbose and compact. In verbose mode each {@link Token}
  * corresponds to a single TSV record; i.e one line per object consisting of an
  * entry and it's weight. In compact mode each TSV record consists of a single
  * entry followed by the weights of all sequentially written {@link Token}
  * objects that share the same entry.</p>
- * 
+ *
  * Verbose mode example:
  * <pre>
  *      entry1  weight1
@@ -59,28 +59,32 @@ import java.text.DecimalFormat;
  *      enrty3  weight5
  *      enrty3  weight6
  * </pre>
- * 
+ *
  * Equivalent compact mode example:
  * <pre>
  *      entry1  weight1 weight2
  *      entry2  weight3
  *      entry3  weight4 weight5 weight6
  * </pre>
- * 
- * <p>Compact mode is the default behavior, since it can reduce file sizes by 
+ *
+ * <p>Compact mode is the default behavior, since it can reduce file sizes by
  * approximately 50%, with corresponding reductions in I/O overhead.</p>
- * 
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class WeightedTokenSink extends AbstractTSVSink<Weighted<Token>> {
 
     private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
-    private final ObjectIndex<String> stringIndex;
+
+    private final Enumerator<String> stringIndex;
+
     private boolean compactFormatEnabled = false;
+
     private Weighted<Token> previousRecord = null;
+
     private long count = 0;
 
-    public WeightedTokenSink(File file, Charset charset, ObjectIndex<String> stringIndex)
+    public WeightedTokenSink(File file, Charset charset, Enumerator<String> stringIndex)
             throws FileNotFoundException, IOException {
         super(file, charset);
         this.stringIndex = stringIndex;
@@ -136,7 +140,7 @@ public class WeightedTokenSink extends AbstractTSVSink<Weighted<Token>> {
     }
 
     private void writeEntry(int id) throws IOException {
-        writeString(stringIndex.get(id));
+        writeString(stringIndex.value(id));
     }
 
     private void writeWeight(double weight) throws IOException {
@@ -146,4 +150,5 @@ public class WeightedTokenSink extends AbstractTSVSink<Weighted<Token>> {
             super.writeString(f.format(weight));
         }
     }
+
 }

@@ -32,14 +32,10 @@ package uk.ac.susx.mlcl.byblo.io;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.io.Serializable;
+import java.io.*;
 import java.util.Comparator;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.ObjectIndex;
+import uk.ac.susx.mlcl.lib.Enumerator;
 
 /**
  * TokenPair holds the unique ids of two indexed strings.
@@ -52,10 +48,12 @@ public class TokenPair implements
         Comparable<TokenPair>, Serializable, Cloneable {
 
     private static final long serialVersionUID = 3L;
+
     /**
      * Indexed identifier of the first entry.
      */
     private final int id1;
+
     /**
      * Indexed identifier of the second entry.
      */
@@ -106,10 +104,10 @@ public class TokenPair implements
                 toString();
     }
 
-    public String toString(ObjectIndex<String> stringIndex1,
-            ObjectIndex<String> stringIndex2) {
+    public String toString(Enumerator<String> stringIndex1,
+                           Enumerator<String> stringIndex2) {
         return Objects.toStringHelper(this).
-                add("1", stringIndex1.get(id1)).add("2", stringIndex2.get(id2)).
+                add("1", stringIndex1.value(id1)).add("2", stringIndex2.value(id2)).
                 toString();
     }
 
@@ -154,6 +152,7 @@ public class TokenPair implements
             implements Externalizable {
 
         private static final long serialVersionUID = 1;
+
         private TokenPair pair;
 
         public Serializer() {
@@ -184,6 +183,7 @@ public class TokenPair implements
         protected final Object readResolve() {
             return pair;
         }
+
     }
 
     public static Predicate<TokenPair> identity() {
@@ -198,6 +198,7 @@ public class TokenPair implements
             public String toString() {
                 return "identity";
             }
+
         };
     }
 //
@@ -232,23 +233,26 @@ public class TokenPair implements
 //                            : Double.compare(a.getWeight(), b.getWeight());
 //                }
 //            };
+
     public static final Comparator<TokenPair> ASYMMETRIC_KEY_COMPARATOR =
             new Comparator<TokenPair>() {
 
                 @Override
                 public final int compare(final TokenPair a, final TokenPair b) {
                     return a.id1() < b.id1() ? -1
-                            : a.id1() > b.id1() ? 1
-                            : a.id2() < b.id2() ? -1
-                            : a.id2() > b.id2() ? 1
-                            : 0;
+                           : a.id1() > b.id1() ? 1
+                             : a.id2() < b.id2() ? -1
+                               : a.id2() > b.id2() ? 1
+                                 : 0;
                 }
 
                 @Override
                 public String toString() {
                     return "ASYMMETRIC_KEY_COMPARATOR";
                 }
+
             };
+
     public static final Comparator<TokenPair> SYMMETRIC_KEY_COMPARATOR =
             new Comparator<TokenPair>() {
 
@@ -259,15 +263,17 @@ public class TokenPair implements
                     final int y1 = Math.max(a.id1(), a.id2());
                     final int y2 = Math.max(b.id1(), b.id2());
                     return x1 < x2 ? -1
-                            : x1 > x2 ? 1
-                            : y1 < y2 ? -1
-                            : y1 > y2 ? 1
-                            : 0;
+                           : x1 > x2 ? 1
+                             : y1 < y2 ? -1
+                               : y1 > y2 ? 1
+                                 : 0;
                 }
 
                 @Override
                 public String toString() {
                     return "SYMMETRIC_KEY_COMPARATOR";
                 }
+
             };
+
 }

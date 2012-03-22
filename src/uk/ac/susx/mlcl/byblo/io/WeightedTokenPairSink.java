@@ -30,26 +30,26 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
+import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
 
 /**
- * An <tt>WeightedTokenPairSink</tt> object is used to store 
- * {@link TokenPair} objects in a flat file. 
- * 
- * <p>The basic file format is Tab-Separated-Values (TSV) where records are 
+ * An <tt>WeightedTokenPairSink</tt> object is used to store
+ * {@link TokenPair} objects in a flat file.
+ *
+ * <p>The basic file format is Tab-Separated-Values (TSV) where records are
  * delimited by new-lines, and values are delimited by tabs. Two variants are
- * supported: verbose and compact. In verbose mode each 
- * {@link TokenPair} corresponds to a single TSV record; i.e one
- * line per object consisting of two entries, and their weight. In 
- * compact mode each TSV record consists of a single entry followed by the 
- * second-entry/weight pairs from all sequentially written 
+ * supported: verbose and compact. In verbose mode each
+ * {@link TokenPair} corresponds to a single TSV record; i.e one line per object
+ * consisting of two entries, and their weight. In compact mode each TSV record
+ * consists of a single entry followed by the second-entry/weight pairs from all
+ * sequentially written
  * {@link WeightedEntryFeatureSink} objects that share the same first entry.</p>
- * 
+ *
  * Verbose mode example:
  * <pre>
  *      entry1  entry1    weight1
@@ -59,41 +59,46 @@ import java.text.DecimalFormat;
  *      enrty3  entry4    weight5
  *      enrty3  entry1    weight6
  * </pre>
- * 
+ *
  * Equivalent compact mode example:
  * <pre>
  *      entry1  entry1    weight1 entry2    weight2
  *      entry2  entry3    weight3
  *      entry3  entry2    weight4 entry4    weight5 entry1    weight6
  * </pre>
- * 
- * <p>Compact mode is the default behavior, since it can reduce file sizes by 
+ *
+ * <p>Compact mode is the default behavior, since it can reduce file sizes by
  * approximately 50%, with corresponding reductions in I/O overhead.</p>
- * 
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class WeightedTokenPairSink extends AbstractTSVSink<Weighted<TokenPair>> {
 
     private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
-    private final ObjectIndex<String> stringIndex1;
-    private final ObjectIndex<String> stringIndex2;
+
+    private final Enumerator<String> stringIndex1;
+
+    private final Enumerator<String> stringIndex2;
+
     private boolean compactFormatEnabled = false;
+
     private Weighted<TokenPair> previousRecord = null;
+
     private long count = 0;
 
     public WeightedTokenPairSink(File file, Charset charset,
-            ObjectIndex<String> strIndex1,
-            ObjectIndex<String> strIndex2) throws IOException {
+                                 Enumerator<String> strIndex1,
+                                 Enumerator<String> strIndex2) throws IOException {
         super(file, charset);
         this.stringIndex1 = strIndex1;
         this.stringIndex2 = strIndex2;
     }
 
-    public ObjectIndex<String> getStringIndex1() {
+    public Enumerator<String> getStringIndex1() {
         return stringIndex1;
     }
 
-    public ObjectIndex<String> getStringIndex2() {
+    public Enumerator<String> getStringIndex2() {
         return stringIndex2;
     }
 
@@ -149,11 +154,11 @@ public class WeightedTokenPairSink extends AbstractTSVSink<Weighted<TokenPair>> 
     }
 
     private void writeToken1(int id) throws IOException {
-        writeString(stringIndex1.get(id));
+        writeString(stringIndex1.value(id));
     }
 
     private void writeToken2(int id) throws IOException {
-        writeString(stringIndex2.get(id));
+        writeString(stringIndex2.value(id));
     }
 
     private void writeWeight(double weight) throws IOException {
@@ -171,4 +176,5 @@ public class WeightedTokenPairSink extends AbstractTSVSink<Weighted<TokenPair>> 
         }
         super.close();
     }
+
 }

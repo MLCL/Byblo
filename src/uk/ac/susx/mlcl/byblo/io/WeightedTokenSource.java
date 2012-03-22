@@ -30,8 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.lib.io.AbstractTSVSource;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -41,12 +39,15 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.SimpleEnumerator;
+import uk.ac.susx.mlcl.lib.io.AbstractTSVSource;
 import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
 
 /**
- * An <tt>WeightedTokenSource</tt> object is used to retrieve {@link Token} 
- * objects from a flat file. 
- * 
+ * An <tt>WeightedTokenSource</tt> object is used to retrieve {@link Token}
+ * objects from a flat file.
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see EntrySink
  */
@@ -54,7 +55,7 @@ public class WeightedTokenSource extends AbstractTSVSource<Weighted<Token>> {
 
     private static final Log LOG = LogFactory.getLog(WeightedTokenSource.class);
 
-    private final ObjectIndex<String> stringIndex;
+    private final Enumerator<String> stringIndex;
 
     private double weightSum = 0;
 
@@ -71,7 +72,7 @@ public class WeightedTokenSource extends AbstractTSVSource<Weighted<Token>> {
     private Weighted<Token> previousRecord = null;
 
     public WeightedTokenSource(File file, Charset charset,
-            ObjectIndex<String> stringIndex)
+                               Enumerator<String> stringIndex)
             throws FileNotFoundException, IOException {
         super(file, charset);
         if (stringIndex == null)
@@ -81,10 +82,10 @@ public class WeightedTokenSource extends AbstractTSVSource<Weighted<Token>> {
 
     public WeightedTokenSource(File file, Charset charset)
             throws FileNotFoundException, IOException {
-        this(file, charset, new ObjectIndex<String>());
+        this(file, charset, new SimpleEnumerator<String>());
     }
 
-    public ObjectIndex<String> getStringIndex() {
+    public Enumerator<String> getStringIndex() {
         return stringIndex;
     }
 
@@ -127,7 +128,7 @@ public class WeightedTokenSource extends AbstractTSVSource<Weighted<Token>> {
     public Weighted<Token> read() throws IOException {
         final int entryId;
         if (previousRecord == null) {
-            entryId = stringIndex.get(parseString());
+            entryId = stringIndex.index(parseString());
             parseValueDelimiter();
         } else {
             entryId = previousRecord.record().id();
@@ -136,7 +137,7 @@ public class WeightedTokenSource extends AbstractTSVSource<Weighted<Token>> {
         if (!hasNext() || isDelimiterNext()) {
             parseRecordDelimiter();
             throw new SingletonRecordException(this,
-                    "Found entry record with no weights.");
+                                               "Found entry record with no weights.");
         }
 
         final double weight = parseDouble();
@@ -176,7 +177,7 @@ public class WeightedTokenSource extends AbstractTSVSource<Weighted<Token>> {
                 final double newFreq = oldFreq + entry.weight();
 
                 if (LOG.isWarnEnabled())
-                    LOG.warn("Found duplicate Entry \"" + stringIndex.get(entry.record().
+                    LOG.warn("Found duplicate Entry \"" + stringIndex.value(entry.record().
                             id()) + "\" (id=" + id
                             + ") in entries file. Merging records. Old frequency = "
                             + oldFreq + ", new frequency = " + newFreq + ".");
@@ -202,7 +203,7 @@ public class WeightedTokenSource extends AbstractTSVSource<Weighted<Token>> {
     }
 
     public static boolean equal(File a, File b, Charset charset) throws IOException {
-        final ObjectIndex<String> stringIndex = new ObjectIndex<String>();
+        final Enumerator<String> stringIndex = new SimpleEnumerator<String>();
         final WeightedTokenSource srcA = new WeightedTokenSource(a, charset, stringIndex);
         final WeightedTokenSource srcB = new WeightedTokenSource(b, charset, stringIndex);
         boolean equal = true;
@@ -214,4 +215,5 @@ public class WeightedTokenSource extends AbstractTSVSource<Weighted<Token>> {
         }
         return equal && srcA.hasNext() == srcB.hasNext();
     }
+
 }

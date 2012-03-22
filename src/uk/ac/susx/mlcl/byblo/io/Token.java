@@ -31,18 +31,14 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import com.google.common.base.Objects;
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.io.Serializable;
-import uk.ac.susx.mlcl.lib.ObjectIndex;
+import java.io.*;
+import uk.ac.susx.mlcl.lib.Enumerator;
 
 /**
  * <tt>Token</tt> objects represent a single instance of an indexed string.
- * 
+ *
  * <p>Instances of <tt>Token</tt> are immutable.<p>
- * 
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class Token implements Serializable, Comparable<Token>, Cloneable {
@@ -59,21 +55,21 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
         this.id = other.id();
     }
 
-
     public int id() {
         return id;
     }
 
     /**
      * Indicates whether some other object is "equal to" this one.
-     * 
-     * <p>Note that only the <tt>entryId</tt> field is used for equality. I.e  
-     * two objects with the same <tt>entryId</tt>, but differing weights 
+     *
+     * <p>Note that only the <tt>entryId</tt> field is used for equality. I.e
+     * two objects with the same <tt>entryId</tt>, but differing weights
      * <em>will</em> be consider equal.</p>
-     * 
-     * @param   obj   the reference object with which to compare.
-     * @return  <code>true</code> if this object is the same as the obj
-     *          argument; <code>false</code> otherwise.
+     *
+     * @param obj the reference object with which to compare.
+     * @return
+     * <code>true</code> if this object is the same as the obj argument;
+     * <code>false</code> otherwise.
      */
     @Override
     public boolean equals(Object obj) {
@@ -100,10 +96,10 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
                 toString();
     }
 
-    public String toString(ObjectIndex<String> stringIndex) {
+    public String toString(Enumerator<String> stringIndex) {
         return Objects.toStringHelper(this).
                 add("id", id).
-                add("string", stringIndex.get(id)).
+                add("string", stringIndex.value(id)).
                 toString();
     }
 
@@ -116,8 +112,7 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
     protected Token clone() throws CloneNotSupportedException {
         return new Token(this);
     }
-    
-    
+
     protected final Object writeReplace() {
         return new Serializer(this);
     }
@@ -154,5 +149,6 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
         protected final Object readResolve() {
             return token;
         }
+
     }
 }

@@ -30,26 +30,29 @@
  */
 package uk.ac.susx.mlcl.byblo.allpairs;
 
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
-import java.io.File;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairVectorSource;
 import com.google.common.base.Predicate;
-import uk.ac.susx.mlcl.byblo.measure.Proximity;
-import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.ObjectIndex;
-import java.util.Collections;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
-import uk.ac.susx.mlcl.byblo.measure.Jaccard;
-import uk.ac.susx.mlcl.byblo.io.TokenPair;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import uk.ac.susx.mlcl.byblo.Main;
-import uk.ac.susx.mlcl.byblo.io.Weighted;
-import uk.ac.susx.mlcl.lib.io.Lexer;
-import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
+import uk.ac.susx.mlcl.byblo.Main;
+import uk.ac.susx.mlcl.byblo.io.TokenPair;
+import uk.ac.susx.mlcl.byblo.io.Weighted;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairVectorSource;
+import uk.ac.susx.mlcl.byblo.measure.Jaccard;
+import uk.ac.susx.mlcl.byblo.measure.Proximity;
+import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.SimpleEnumerator;
+import uk.ac.susx.mlcl.lib.io.IOUtil;
+import uk.ac.susx.mlcl.lib.io.Lexer;
+import uk.ac.susx.mlcl.lib.io.Sink;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.disableExitTrapping;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.enableExistTrapping;
 
 /**
  *
@@ -94,7 +97,7 @@ public class ThreadedApssTaskTest {
     public void testNaive() throws Exception {
         System.out.println("Testing " + subject + " Naive");
 
-        ObjectIndex<String> stringIndex = new ObjectIndex<String>();
+        Enumerator<String> stringIndex = new SimpleEnumerator<String>();
 
         WeightedTokenPairVectorSource vsa =
                 new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
@@ -128,7 +131,7 @@ public class ThreadedApssTaskTest {
     @Test(timeout = 1000)
     public void testInverted() throws Exception {
         System.out.println("Testing " + subject + " Inverted");
-        ObjectIndex<String> stringIndex = new ObjectIndex<String>();
+        Enumerator<String> stringIndex = new SimpleEnumerator<String>();
 
         WeightedTokenPairVectorSource vsa =
                 new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
@@ -166,7 +169,7 @@ public class ThreadedApssTaskTest {
         List<Weighted<TokenPair>> invertedResults = new ArrayList<Weighted<TokenPair>>();
 
         {
-            ObjectIndex<String> stringIndex = new ObjectIndex<String>();
+            Enumerator<String> stringIndex = new SimpleEnumerator<String>();
 
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
@@ -194,7 +197,7 @@ public class ThreadedApssTaskTest {
         }
 
         {
-            ObjectIndex<String> stringIndex = new ObjectIndex<String>();
+            Enumerator<String> stringIndex = new SimpleEnumerator<String>();
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
                     TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, stringIndex));
@@ -235,7 +238,7 @@ public class ThreadedApssTaskTest {
         List<Weighted<TokenPair>> nonThreadedResults = new ArrayList<Weighted<TokenPair>>();
 
         {
-            ObjectIndex<String> stringIndex = new ObjectIndex<String>();
+            Enumerator<String> stringIndex = new SimpleEnumerator<String>();
 
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
@@ -264,7 +267,7 @@ public class ThreadedApssTaskTest {
         {
             NaiveApssTask<Lexer.Tell> instance = new NaiveApssTask<Lexer.Tell>();
 
-            ObjectIndex<String> stringIndex = new ObjectIndex<String>();
+            Enumerator<String> stringIndex = new SimpleEnumerator<String>();
 
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
@@ -301,7 +304,7 @@ public class ThreadedApssTaskTest {
         List<Weighted<TokenPair>> nonThreadedResults = new ArrayList<Weighted<TokenPair>>();
 
         {
-            ObjectIndex<String> stringIndex = new ObjectIndex<String>();
+            Enumerator<String> stringIndex = new SimpleEnumerator<String>();
 
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
@@ -329,7 +332,7 @@ public class ThreadedApssTaskTest {
         {
             InvertedApssTask<Lexer.Tell> instance = new InvertedApssTask<Lexer.Tell>();
 
-            ObjectIndex<String> stringIndex = new ObjectIndex<String>();
+            Enumerator<String> stringIndex = new SimpleEnumerator<String>();
 
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
@@ -356,4 +359,5 @@ public class ThreadedApssTaskTest {
 
         assertEquals(threadedResults, nonThreadedResults);
     }
+
 }

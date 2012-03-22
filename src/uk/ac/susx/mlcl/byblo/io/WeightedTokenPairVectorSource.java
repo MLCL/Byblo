@@ -30,11 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import uk.ac.susx.mlcl.lib.io.Lexer;
-import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.lib.collect.Indexed;
-import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import java.io.IOException;
@@ -43,11 +38,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.collect.Indexed;
+import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+import uk.ac.susx.mlcl.lib.io.Lexer;
+import uk.ac.susx.mlcl.lib.io.SeekableSource;
 
 /**
- * Wraps a {@link WeightedEntryFeatureSource} to produce complete feature 
+ * Wraps a {@link WeightedEntryFeatureSource} to produce complete feature
  * vectors instead of just individual entry/feature records.
- * 
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class WeightedTokenPairVectorSource
@@ -67,11 +67,11 @@ public class WeightedTokenPairVectorSource
         next = null;
     }
 
-    public ObjectIndex<String> getStringIndex1() {
+    public Enumerator<String> getStringIndex1() {
         return inner.getStringIndex1();
     }
 
-    public ObjectIndex<String> getStringIndex2() {
+    public Enumerator<String> getStringIndex2() {
         return inner.getStringIndex2();
     }
 

@@ -28,66 +28,33 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo.io;
-
-import java.io.Closeable;
-import java.io.Flushable;
-import java.io.IOException;
-import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.collect.Indexed;
-import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.io.Sink;
+package uk.ac.susx.mlcl.lib;
 
 /**
+ * Interface defining a unique indexing complex objects (usually strings).
+ * 
+ * Implementations of this interface are expected to assocciate each unique 
+ * object with an integer value. 
  *
+ * @param <T> type of object being indexed.
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightedTokenPairVectorSink
-        implements Sink<Indexed<SparseDoubleVector>>, Flushable, Closeable {
+public interface Enumerator<T> {
 
-    private final WeightedTokenPairSink inner;
+    /**
+     * Get the unique id for the given object.
+     * 
+     * @param obj object to index
+     * @return the index
+     */
+    int index(final T obj);
 
-    private long count = 0;
-
-    public WeightedTokenPairVectorSink(WeightedTokenPairSink inner) {
-        this.inner = inner;
-    }
-
-    public Enumerator<String> getStringIndex1() {
-        return inner.getStringIndex1();
-    }
-
-    public Enumerator<String> getStringIndex2() {
-        return inner.getStringIndex2();
-    }
-
-    public boolean isIndexCombined() {
-        return inner.isIndexCombined();
-    }
-
-    @Override
-    public void write(Indexed<SparseDoubleVector> record) throws IOException {
-        int entryId = record.key();
-        SparseDoubleVector vec = record.value();
-        for (int i = 0; i < vec.size; i++) {
-            inner.write(new Weighted<TokenPair>(
-                    new TokenPair(entryId, vec.keys[i]), vec.values[i]));
-        }
-        ++count;
-    }
-
-    public long getCount() {
-        return count;
-    }
-
-    @Override
-    public void flush() throws IOException {
-        inner.flush();
-    }
-
-    @Override
-    public void close() throws IOException {
-        inner.close();
-    }
-
+    /**
+     * Get the object for the given unique id.
+     * 
+     * @param id index of object to retrieve
+     * @return the object
+     */
+    T value(final int id);
+    
 }

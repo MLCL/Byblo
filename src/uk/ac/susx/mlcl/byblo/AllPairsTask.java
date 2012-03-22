@@ -30,44 +30,30 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
-import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
-import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
-import com.google.common.base.Objects.ToStringHelper;
-import uk.ac.susx.mlcl.lib.DoubleConverter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.google.common.base.Objects.ToStringHelper;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import uk.ac.susx.mlcl.byblo.allpairs.InvertedApssTask;
-import uk.ac.susx.mlcl.byblo.allpairs.ThreadedApssTask;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairVectorSource;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
-import uk.ac.susx.mlcl.byblo.measure.AbstractMIProximity;
-import uk.ac.susx.mlcl.byblo.measure.CrMi;
-import uk.ac.susx.mlcl.byblo.measure.KendallTau;
-import uk.ac.susx.mlcl.byblo.measure.Lee;
-import uk.ac.susx.mlcl.byblo.measure.Lp;
-import uk.ac.susx.mlcl.byblo.measure.Proximity;
-import uk.ac.susx.mlcl.byblo.measure.ReversedProximity;
-import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.byblo.io.TokenPair;
-import uk.ac.susx.mlcl.lib.io.Sink;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.io.Weighted;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
+import uk.ac.susx.mlcl.byblo.allpairs.InvertedApssTask;
+import uk.ac.susx.mlcl.byblo.allpairs.ThreadedApssTask;
+import uk.ac.susx.mlcl.byblo.io.*;
+import uk.ac.susx.mlcl.byblo.measure.*;
+import uk.ac.susx.mlcl.lib.DoubleConverter;
+import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.SimpleEnumerator;
 import uk.ac.susx.mlcl.lib.io.Files;
 import uk.ac.susx.mlcl.lib.io.Lexer;
+import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.tasks.AbstractCommand;
+import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
+import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
 
 /**
  *
@@ -79,79 +65,79 @@ public class AllPairsTask extends AbstractCommand {
     private static final Log LOG = LogFactory.getLog(AllPairsTask.class);
 
     @Parameter(names = {"-i", "--input"},
-               description = "Entry-feature frequency vectors files.",
-               required = true,
-               validateWith = InputFileValidator.class)
+    description = "Entry-feature frequency vectors files.",
+    required = true,
+    validateWith = InputFileValidator.class)
     private File entryFeaturesFile;
 
     @Parameter(names = {"-if", "--input-features"},
-               description = "Feature frequencies file",
-               validateWith = InputFileValidator.class)
+    description = "Feature frequencies file",
+    validateWith = InputFileValidator.class)
     private File featuresFile;
 
     @Parameter(names = {"-ie", "--input-entries"},
-               description = "Entry frequencies file",
-               validateWith = InputFileValidator.class)
+    description = "Entry frequencies file",
+    validateWith = InputFileValidator.class)
     private File entriesFile;
 
     @Parameter(names = {"-o", "--output"},
-               description = "Output similarity matrix file.",
-               required = true,
-               validateWith = OutputFileValidator.class)
+    description = "Output similarity matrix file.",
+    required = true,
+    validateWith = OutputFileValidator.class)
     private File outputFile;
 
     @Parameter(names = {"-c", "--charset"},
-               description = "Character encoding to use for reading and writing.")
+    description = "Character encoding to use for reading and writing.")
     private Charset charset = Files.DEFAULT_CHARSET;
 
     @Parameter(names = {"-C", "--chunk-size"},
-               description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
+    description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
     private int chunkSize = 5000;
 
     @Parameter(names = {"-t", "--threads"},
-               description = "Number of conccurent processing threads.")
+    description = "Number of conccurent processing threads.")
     private int nThreads = Runtime.getRuntime().availableProcessors() + 1;
 
     @Parameter(names = {"-Smn", "--similarity-min"},
-               description = "Minimum similarity threshold.",
-               converter = DoubleConverter.class)
+    description = "Minimum similarity threshold.",
+    converter = DoubleConverter.class)
     private double minSimilarity = Double.NEGATIVE_INFINITY;
 
     @Parameter(names = {"-Smx", "--similarity-max"},
-               description = "Maximyum similarity threshold.",
-               converter = DoubleConverter.class)
+    description = "Maximyum similarity threshold.",
+    converter = DoubleConverter.class)
     private double maxSimilarity = Double.POSITIVE_INFINITY;
 
     @Parameter(names = {"-ip", "--identity-pairs"},
-               description = "Produce similarity between pair of identical entries.")
+    description = "Produce similarity between pair of identical entries.")
     private boolean outputIdentityPairs = false;
 
     @Parameter(names = {"-m", "--measure"},
-               description = "Similarity measure to use.")
+    description = "Similarity measure to use.")
     private String measureName = "Jaccard";
 
     @Parameter(names = {"--measure-reversed"},
-               description = "Swap similarity measure inputs.")
+    description = "Swap similarity measure inputs.")
     private boolean measureReversed = false;
 
     @Parameter(names = {"--lee-alpha"},
-               description = "Alpha parameter to Lee's alpha-skew divergence measure.",
-               converter = DoubleConverter.class)
+    description = "Alpha parameter to Lee's alpha-skew divergence measure.",
+    converter = DoubleConverter.class)
     private double leeAlpha = Lee.DEFAULT_ALPHA;
 
     @Parameter(names = {"--crmi-beta"},
-               description = "Beta paramter to Weed's CRMI measure.",
-               converter = DoubleConverter.class)
+    description = "Beta paramter to Weed's CRMI measure.",
+    converter = DoubleConverter.class)
     private double crmiBeta = CrMi.DEFAULT_BETA;
 
     @Parameter(names = {"--crmi-gamma"},
-               description = "Gamma paramter to Weed's CRMI measure.",
-               converter = DoubleConverter.class)
+    description = "Gamma paramter to Weed's CRMI measure.",
+    converter = DoubleConverter.class)
     private double crmiGamma = CrMi.DEFAULT_GAMMA;
 
     @Parameter(names = {"--mink-p"},
-               description = "P parameter to Minkowski/Lp space measure.",
-               converter = DoubleConverter.class)
+    description = "P parameter to Minkowski/Lp space measure.",
+    converter = DoubleConverter.class)
     private double minkP = 2;
 
     private Map<String, Class<? extends Proximity>> buildMeasureClassLookupTable() throws ClassNotFoundException {
@@ -219,7 +205,7 @@ public class AllPairsTask extends AbstractCommand {
             ((CrMi) prox).setGamma(crmiGamma);
         }
 
-        ObjectIndex<String> strIndex = new ObjectIndex<String>();
+        Enumerator<String> strIndex = new SimpleEnumerator<String>();
 
         // Entry index is not really required for the core algorithm
         // implementation but is used to filter Entries
@@ -292,7 +278,7 @@ public class AllPairsTask extends AbstractCommand {
         apss.setNumThreads(nThreads);
         apss.setSink(sink);
 
-        prox.setFilteredFeatureId(strIndex.get(FilterTask.FILTERED_STRING));
+        prox.setFilteredFeatureId(strIndex.index(FilterTask.FILTERED_STRING));
 
         apss.setMeasure(prox);
         apss.setMaxChunkSize(chunkSize);
@@ -348,4 +334,5 @@ public class AllPairsTask extends AbstractCommand {
                 add("crmiGamma", crmiGamma).
                 add("minkP", minkP);
     }
+
 }

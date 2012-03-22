@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.lib;
 
+import com.sun.jmx.snmp.Enumerated;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -38,6 +39,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Hashtable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -46,7 +48,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @param <T> type of object being indexed.
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class ObjectIndex<T> implements Serializable {
+public final class SimpleEnumerator<T> implements Serializable, Enumerator<T> {
 
     private static final long serialVersionUID = 2L;
 
@@ -56,13 +58,14 @@ public final class ObjectIndex<T> implements Serializable {
 
     private final AtomicInteger nextId = new AtomicInteger(0);
 
-    public ObjectIndex() {
+    public SimpleEnumerator() {
         indexToObj = new ObjectArrayList<T>();
         objToIndex = new Object2IntOpenHashMap<T>();
         objToIndex.defaultReturnValue(-1);
     }
 
-    public final int get(final T obj) {
+    @Override
+    public final int index(final T obj) {
         if (obj == null)
             throw new NullPointerException("obj is null");
 
@@ -84,7 +87,8 @@ public final class ObjectIndex<T> implements Serializable {
         }
     }
 
-    public final T get(final int id) {
+    @Override
+    public final T value(final int id) {
         return indexToObj.get(id);
     }
 
