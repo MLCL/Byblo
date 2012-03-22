@@ -53,18 +53,18 @@ public class WeightedTokenPairVectorSink
         this.inner = inner;
     }
 
-    public Enumerator<String> getStringIndex1() {
-        return inner.getStringIndex1();
+    public Enumerator<String> getEnumerator1() {
+        return inner.getEnumerator1();
     }
 
-    public Enumerator<String> getStringIndex2() {
-        return inner.getStringIndex2();
+    public Enumerator<String> getEnumerator2() {
+        return inner.getEnumerator2();
     }
 
-    public boolean isIndexCombined() {
-        return inner.isIndexCombined();
+    public boolean isEnumeratorsCombined() {
+        return inner.isEnumeratorsCombined();
     }
-
+    
     @Override
     public void write(Indexed<SparseDoubleVector> record) throws IOException {
         int entryId = record.key();

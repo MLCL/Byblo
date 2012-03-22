@@ -74,7 +74,7 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
 
     private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
 
-    private final Enumerator<String> stringIndex;
+    private final Enumerator<String> enumerator;
 
     private boolean compactFormatEnabled = false;
 
@@ -87,7 +87,13 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
     public WeightedTokenSink(TSVSink inner, Enumerator<String> stringIndex)
             throws FileNotFoundException, IOException {
         this.inner = inner;
-        this.stringIndex = stringIndex;
+        this.enumerator = stringIndex;
+    }
+
+    public WeightedTokenSink(TSVSink inner)
+            throws FileNotFoundException, IOException {
+        this.inner = inner;
+        this.enumerator = null;
     }
 
     public boolean isCompactFormatEnabled() {
@@ -98,8 +104,8 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
         this.compactFormatEnabled = compactFormatEnabled;
     }
 
-    public Enumerator<String> getStringIndex() {
-        return stringIndex;
+    public Enumerator<String> getEnumerator() {
+        return enumerator;
     }
 
     @Override
@@ -116,33 +122,28 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
         return count;
     }
 
-    @Override
-    public void close() throws IOException {
-        if (isCompactFormatEnabled() && previousRecord != null) {
-            inner.endOfRecord();
-        }
-        inner.close();
-    }
-
     private void writeVerbose(final Weighted<Token> record) throws IOException {
-        writeEntry(record.record().id());
+        writeString(record.record().id());
         writeWeight(record.weight());
         inner.endOfRecord();
     }
 
     private void writeCompact(final Weighted<Token> record) throws IOException {
         if (previousRecord == null) {
-            writeEntry(record.record().id());
+            writeString(record.record().id());
         } else if (previousRecord.record().id() != record.record().id()) {
             inner.endOfRecord();
-            writeEntry(record.record().id());
+            writeString(record.record().id());
         }
         writeWeight(record.weight());
         previousRecord = record;
     }
 
-    private void writeEntry(int id) throws IOException {
-        inner.writeString(stringIndex.value(id));
+    private void writeString(int id) throws IOException {
+        if (enumerator == null)
+            inner.writeInt(id);
+        else
+            inner.writeString(enumerator.value(id));
     }
 
     private void writeWeight(double weight) throws IOException {
@@ -156,6 +157,14 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
     @Override
     public void flush() throws IOException {
         inner.flush();
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (isCompactFormatEnabled() && previousRecord != null) {
+            inner.endOfRecord();
+        }
+        inner.close();
     }
 
 }

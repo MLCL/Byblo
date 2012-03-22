@@ -85,30 +85,31 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
 
     private TSVSink inner;
 
-    private Enumerator<String> stringIndex1;
+    private Enumerator<String> enumerator1;
 
-    private Enumerator<String> stringIndex2;
+    private Enumerator<String> enumerator2;
 
     public WeightedTokenPairSink(TSVSink inner, Enumerator<String> stringIndex1, Enumerator<String> stringIndex2) {
         this.inner = inner;
-        this.stringIndex1 = stringIndex1;
-        this.stringIndex2 = stringIndex2;
+        this.enumerator1 = stringIndex1;
+        this.enumerator2 = stringIndex2;
+    }
+    public WeightedTokenPairSink(TSVSink inner) {
+        this.inner = inner;
+        this.enumerator1 = null;
+        this.enumerator2 = null;
     }
 
-    public WeightedTokenPairSink(TSVSink inner, Enumerator<String> combinedIndex) {
-        this(inner, combinedIndex, combinedIndex);
+    public Enumerator<String> getEnumerator1() {
+        return enumerator1;
     }
 
-    public Enumerator<String> getStringIndex1() {
-        return stringIndex1;
+    public Enumerator<String> getEnumerator2() {
+        return enumerator2;
     }
 
-    public Enumerator<String> getStringIndex2() {
-        return stringIndex2;
-    }
-
-    public boolean isIndexCombined() {
-        return getStringIndex1() == getStringIndex2();
+    public boolean isEnumeratorsCombined() {
+        return getEnumerator1() == getEnumerator2();
     }
 
     public boolean isCompactFormatEnabled() {
@@ -134,24 +135,38 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
     }
 
     private void writeVerbose(Weighted<TokenPair> record) throws IOException {
-        inner.writeString(stringIndex1.value(record.record().id1()));
-        inner.writeString(stringIndex2.value(record.record().id2()));
+        writeString1(record.record().id1());
+        writeString2(record.record().id2());
         writeWeight(record.weight());
         inner.endOfRecord();
     }
 
     private void writeCompact(final Weighted<TokenPair> record) throws IOException {
         if (previousRecord == null) {
-            inner.writeString(stringIndex1.value(record.record().id1()));
+            writeString1(record.record().id1());
         } else if (previousRecord.record().id1() != record.record().
                 id1()) {
             inner.endOfRecord();
-            inner.writeString(stringIndex1.value(record.record().id1()));
+            writeString1(record.record().id1());
         }
 
-        inner.writeString(stringIndex2.value(record.record().id2()));
+        writeString2(record.record().id2());
         writeWeight(record.weight());
         previousRecord = record;
+    }
+
+    private void writeString1(int stringId) throws IOException {
+        if (enumerator1 == null)
+            inner.writeInt(stringId);
+        else
+            inner.writeString(enumerator1.value(stringId));
+    }
+
+    private void writeString2(int stringId) throws IOException {
+        if (enumerator2 == null)
+            inner.writeInt(stringId);
+        else
+            inner.writeString(enumerator2.value(stringId));
     }
 
     private void writeWeight(double weight) throws IOException {

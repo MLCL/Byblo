@@ -54,9 +54,9 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell> {
 
     private static final Log LOG = LogFactory.getLog(TokenPairSource.class);
 
-    private final Enumerator<String> stringIndex1;
+    private final Enumerator<String> enumerator1;
 
-    private final Enumerator<String> stringIndex2;
+    private final Enumerator<String> enumerator2;
 
     private TokenPair previousRecord = null;
 
@@ -70,31 +70,21 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell> {
             Enumerator<String> featureIndex)
             throws FileNotFoundException, IOException {
         this.inner = inner;
-        if (entryIndex == null)
-            throw new NullPointerException("stringIndex1 == null");
-        if (featureIndex == null)
-            throw new NullPointerException("stringIndex2 == null");
-        this.stringIndex1 = entryIndex;
-        this.stringIndex2 = featureIndex;
-    }
-
-    public TokenPairSource(TSVSource inner,
-                           Enumerator<String> combinedIndex)
-            throws FileNotFoundException, IOException {
-        this(inner, combinedIndex, combinedIndex);
+        this.enumerator1 = entryIndex;
+        this.enumerator2 = featureIndex;
     }
 
     public TokenPairSource(TSVSource inner)
             throws FileNotFoundException, IOException {
-        this(inner, new SimpleEnumerator<String>());
+        this(inner, null, null);
     }
 
     public Enumerator<String> getStringIndex1() {
-        return stringIndex1;
+        return enumerator1;
     }
 
     public Enumerator<String> getStringIndex2() {
-        return stringIndex2;
+        return enumerator2;
     }
 
     public boolean isIndexCombined() {
@@ -141,20 +131,26 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell> {
     }
 
     protected final int readHead() throws IOException {
-        return stringIndex1.index(inner.readString());
+        if (enumerator1 == null)
+            return inner.readInt();
+        else
+            return enumerator1.index(inner.readString());
     }
 
     protected final int readTail() throws IOException {
-        return stringIndex2.index(inner.readString());
+        if (enumerator2 == null)
+            return inner.readInt();
+        else
+            return enumerator2.index(inner.readString());
     }
 
     public static boolean equal(File fileA, File fileB, Charset charset)
             throws IOException {
         final Enumerator<String> stringIndex = new SimpleEnumerator<String>();
         final TokenPairSource srcA = new TokenPairSource(
-                new TSVSource(fileA, charset), stringIndex);
+                new TSVSource(fileA, charset), stringIndex, stringIndex);
         final TokenPairSource srcB = new TokenPairSource(
-                new TSVSource(fileB, charset), stringIndex);
+                new TSVSource(fileB, charset), stringIndex, stringIndex);
         boolean equal = true;
         while (equal && srcA.hasNext() && srcB.hasNext()) {
             final TokenPair recA = srcA.read();

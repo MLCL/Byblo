@@ -57,7 +57,7 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
 
     private static final Log LOG = LogFactory.getLog(WeightedTokenSource.class);
 
-    private final Enumerator<String> stringIndex;
+    private final Enumerator<String> enumerator;
 
     private double weightSum = 0;
 
@@ -75,22 +75,20 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
 
     private final TSVSource inner;
 
-    public WeightedTokenSource(TSVSource inner,
-                               Enumerator<String> stringIndex)
+    public WeightedTokenSource(TSVSource inner, Enumerator<String> enumeration)
             throws FileNotFoundException, IOException {
         this.inner = inner;
-        if (stringIndex == null)
-            throw new NullPointerException("stringIndex == null");
-        this.stringIndex = stringIndex;
+        this.enumerator = enumeration;
     }
 
     public WeightedTokenSource(TSVSource inner)
             throws FileNotFoundException, IOException {
-        this(inner, new SimpleEnumerator<String>());
+        this.inner = inner;
+        this.enumerator = null;
     }
 
-    public Enumerator<String> getStringIndex() {
-        return stringIndex;
+    public Enumerator<String> getEnumerator() {
+        return enumerator;
     }
 
     public double getWeightSum() {
@@ -128,13 +126,20 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
         return inner.position();
     }
 
+    private int readString() throws IOException {
+        if (enumerator == null)
+            return inner.readInt();
+        else
+            return enumerator.index(inner.readString());
+    }
+
     @Override
     public Weighted<Token> read() throws IOException {
-        final int entryId;
+        final int tokenId;
         if (previousRecord == null) {
-            entryId = stringIndex.index(inner.readString());
+            tokenId = readString();
         } else {
-            entryId = previousRecord.record().id();
+            tokenId = previousRecord.record().id();
         }
 
         if (!hasNext() || inner.isEndOfRecordNext()) {
@@ -145,11 +150,11 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
 
         final double weight = inner.readDouble();
 
-        cardinality = Math.max(cardinality, entryId + 1);
+        cardinality = Math.max(cardinality, tokenId + 1);
         weightSum += weight;
         weightMax = Math.max(weightMax, weight);
         ++count;
-        final Weighted<Token> record = new Weighted<Token>(new Token(entryId), weight);
+        final Weighted<Token> record = new Weighted<Token>(new Token(tokenId), weight);
 
         if (inner.hasNext() && !inner.isEndOfRecordNext()) {
             previousRecord = record;
@@ -179,8 +184,9 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
                 final double newFreq = oldFreq + entry.weight();
 
                 if (LOG.isWarnEnabled())
-                    LOG.warn("Found duplicate Entry \"" + stringIndex.value(entry.record().
-                            id()) + "\" (id=" + id
+                    LOG.warn("Found duplicate Entry \""
+                            + (enumerator == null ? entry.record().id() : enumerator.value(entry.record().id()))
+                            + "\" (id=" + id
                             + ") in entries file. Merging records. Old frequency = "
                             + oldFreq + ", new frequency = " + newFreq + ".");
 
@@ -226,4 +232,5 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
     public double percentRead() throws IOException {
         return inner.percentRead();
     }
+
 }

@@ -44,6 +44,8 @@ import java.util.List;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.SimpleEnumerator;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
 
 /**
@@ -66,13 +68,14 @@ public class InvertedApssTaskTest {
 
         InvertedApssTask<Lexer.Tell> instance = new InvertedApssTask<Lexer.Tell>();
 
+        Enumerator<String> idx = new SimpleEnumerator<String>();
         WeightedTokenPairSource mdbsa = new WeightedTokenPairSource(
-                new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET));
+                new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), idx,idx);
         WeightedTokenPairVectorSource vsa = mdbsa.getVectorSource();
 
         WeightedTokenPairSource mdbsb = new WeightedTokenPairSource(
                 new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET),
-                mdbsa.getStringIndex1(), mdbsa.getStringIndex2());
+                mdbsa.getEnumerator1(), mdbsa.getEnumerator2());
         WeightedTokenPairVectorSource vsb = mdbsb.getVectorSource();
 
         List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();

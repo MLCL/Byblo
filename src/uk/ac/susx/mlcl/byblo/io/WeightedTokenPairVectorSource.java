@@ -67,12 +67,12 @@ public class WeightedTokenPairVectorSource
         next = null;
     }
 
-    public Enumerator<String> getStringIndex1() {
-        return inner.getStringIndex1();
+    public Enumerator<String> getEnumeration1() {
+        return inner.getEnumerator1();
     }
 
-    public Enumerator<String> getStringIndex2() {
-        return inner.getStringIndex2();
+    public Enumerator<String> getEnumeration2() {
+        return inner.getEnumerator2();
     }
 
     public boolean isIndexCombined() {

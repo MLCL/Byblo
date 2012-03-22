@@ -550,7 +550,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
         // Store an filtered wieght here and record it so as to maintain
         // accurate priors for those features that remain
         double filteredWeight = 0;
-        int filteredId = featureSource.getStringIndex().index(FILTERED_STRING);
+        int filteredId = featureSource.getEnumerator().index(FILTERED_STRING);
 
         while (featureSource.hasNext()) {
             Weighted<Token> feature = featureSource.read();

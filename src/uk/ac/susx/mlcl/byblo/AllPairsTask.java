@@ -256,9 +256,9 @@ public class AllPairsTask extends AbstractCommand {
         // in the file. Also this allows for the possibility of having differnt
         // files, e.g compare fruit words with cake words
         final WeightedTokenPairVectorSource sourceA = new WeightedTokenPairSource(
-                new TSVSource(entryFeaturesFile, charset), strIndex).getVectorSource();
+                new TSVSource(entryFeaturesFile, charset), strIndex, strIndex).getVectorSource();
         final WeightedTokenPairVectorSource sourceB = new WeightedTokenPairSource(
-                new TSVSource(entryFeaturesFile, charset), strIndex).getVectorSource();
+                new TSVSource(entryFeaturesFile, charset), strIndex, strIndex).getVectorSource();
 
         // Create a sink object that will act as a recipient for all pairs that
         // are produced by the algorithm.

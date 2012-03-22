@@ -44,6 +44,8 @@ import java.io.IOException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.SimpleEnumerator;
 import uk.ac.susx.mlcl.lib.io.TSVSink;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
 
@@ -53,10 +55,22 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
  */
 public class EntryTest {
 
-    private void copyE(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        WeightedTokenSource aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET));
-        WeightedTokenSink bSink = new WeightedTokenSink(new TSVSink(b, DEFAULT_CHARSET),
-                aSrc.getStringIndex());
+    private void copyE(File a, File b, boolean compact, boolean enumIn, boolean enumOut)
+            throws FileNotFoundException, IOException {
+
+        Enumerator<String> idx = new SimpleEnumerator<String>();
+        WeightedTokenSource aSrc;
+        WeightedTokenSink bSink;
+        if (enumIn)
+            aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET), idx);
+        else
+            aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET));
+
+        if (enumOut)
+            bSink = new WeightedTokenSink(
+                    new TSVSink(b, DEFAULT_CHARSET), idx);
+        else
+            bSink = new WeightedTokenSink(new TSVSink(b, DEFAULT_CHARSET));
         bSink.setCompactFormatEnabled(compact);
 
         IOUtil.copy(aSrc, bSink);
@@ -64,39 +78,72 @@ public class EntryTest {
     }
 
     @Test
-    public void testEntriesConversion() throws FileNotFoundException, IOException {
+    public void testEntriesCompactConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_ENTRIES;
         File b = new File(TEST_OUTPUT_DIR,
-                TEST_FRUIT_ENTRIES.getName() + ".compact");
+                          TEST_FRUIT_ENTRIES.getName() + ".compact");
         File c = new File(TEST_OUTPUT_DIR,
-                TEST_FRUIT_ENTRIES.getName() + ".verbose");
+                          TEST_FRUIT_ENTRIES.getName() + ".verbose");
 
-        copyE(a, b, true);
+        copyE(a, b, true, true, true);
 
         assertTrue("Compact copy is smaller that verbose source.",
-                b.length() <= a.length());
+                   b.length() <= a.length());
 
-        copyE(b, c, false);
+        copyE(b, c, false, true, true);
 
 
         assertTrue("Verbose copy is smaller that compact source.",
-                c.length() >= b.length());
+                   c.length() >= b.length());
         assertTrue("Double converted file is not equal to origion.",
-                Files.equal(a, c));
+                   Files.equal(a, c));
+    }
+
+    @Test
+    public void testEntriesEnumeratorConversion() throws FileNotFoundException, IOException {
+        File a = TEST_FRUIT_ENTRIES;
+        File b = new File(TEST_OUTPUT_DIR,
+                          TEST_FRUIT_ENTRIES.getName() + ".enum");
+        File c = new File(TEST_OUTPUT_DIR,
+                          TEST_FRUIT_ENTRIES.getName() + ".str");
+
+        Enumerator<String> idx = new SimpleEnumerator<String>();
+
+        {
+            WeightedTokenSource aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET), idx);
+            WeightedTokenSink bSink = new WeightedTokenSink(new TSVSink(b, DEFAULT_CHARSET));
+            IOUtil.copy(aSrc, bSink);
+            bSink.close();
+        }
+
+        assertTrue("Compact copy is smaller that verbose source.",
+                   b.length() <= a.length());
+
+        {
+            WeightedTokenSource bSrc = new WeightedTokenSource(new TSVSource(b, DEFAULT_CHARSET));
+            WeightedTokenSink cSink = new WeightedTokenSink(new TSVSink(c, DEFAULT_CHARSET), idx);
+            IOUtil.copy(bSrc, cSink);
+            cSink.close();
+        }
+
+        assertTrue("Verbose copy is smaller that compact source.",
+                   c.length() >= b.length());
+        assertTrue("Double converted file is not equal to origion.",
+                   Files.equal(a, c));
     }
 
     public void testRandomAccess(File file) throws FileNotFoundException, IOException {
         final Map<Tell, Weighted<Token>> hist =
                 new HashMap<Tell, Weighted<Token>>();
 
-        WeightedTokenSource src = new WeightedTokenSource(new TSVSource(file, DEFAULT_CHARSET));
+        WeightedTokenSource src = new WeightedTokenSource(new TSVSource(file, DEFAULT_CHARSET),
+                                                          new SimpleEnumerator<String>());
         {
             while (src.hasNext()) {
                 final Tell pos = src.position();
                 final Weighted<Token> record = src.read();
 
-                System.out.println(pos.toString() + ": " + record.record().toString(src.
-                        getStringIndex()));
+                System.out.println(pos.toString() + ": " + record.record().toString(src.getEnumerator()));
 
                 assertNotNull("Found null EntryRecord", record);
                 hist.put(pos, record);
@@ -112,8 +159,7 @@ public class EntryTest {
                 final Weighted<Token> expected = hist.get(pos);
 
                 System.out.println("expected tell: " + pos);
-                System.out.println("expected: " + expected.record().toString(src.
-                        getStringIndex()));
+                System.out.println("expected: " + expected.record().toString(src.getEnumerator()));
 
                 src.position(pos);
 
@@ -122,8 +168,7 @@ public class EntryTest {
 
                 Weighted<Token> actual = src.read();
                 System.out.println("actual tell: " + src.position());
-                System.out.println("actual: " + actual.record().toString(src.
-                        getStringIndex()));
+                System.out.println("actual: " + actual.record().toString(src.getEnumerator()));
 
                 assertEquals(expected, actual);
             }
@@ -135,4 +180,5 @@ public class EntryTest {
             throws FileNotFoundException, IOException {
         testRandomAccess(TEST_FRUIT_ENTRIES);
     }
+
 }

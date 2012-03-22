@@ -74,9 +74,9 @@ import uk.ac.susx.mlcl.lib.io.TSVSink;
  */
 public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
 
-    private final Enumerator<String> stringIndex1;
+    private final Enumerator<String> enumerator1;
 
-    private final Enumerator<String> stringIndex2;
+    private final Enumerator<String> enumerator2;
 
     private boolean compactFormatEnabled = false;
 
@@ -91,32 +91,27 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
                          Enumerator<String> stringIndex2)
             throws FileNotFoundException, IOException {
         this.inner = inner;
-        if (stringIndex1 == null) {
-            throw new NullPointerException("entryIndex == null");
-        }
-        if (stringIndex2 == null) {
-            throw new NullPointerException("featureIndex == null");
-        }
-        this.stringIndex1 = stringIndex1;
-        this.stringIndex2 = stringIndex2;
+        this.enumerator1 = stringIndex1;
+        this.enumerator2 = stringIndex2;
     }
 
-    public TokenPairSink(TSVSink inner,
-                         Enumerator<String> combinedIndex)
+    public TokenPairSink(TSVSink inner)
             throws FileNotFoundException, IOException {
-        this(inner, combinedIndex, combinedIndex);
+        this.inner = inner;
+        this.enumerator1 = null;
+        this.enumerator2 = null;
     }
 
-    public final Enumerator<String> getStringIndex1() {
-        return stringIndex1;
+    public final Enumerator<String> getEnumerator1() {
+        return enumerator1;
     }
 
-    public Enumerator<String> getStringindex2() {
-        return stringIndex2;
+    public Enumerator<String> getEnumerator2() {
+        return enumerator2;
     }
 
     public boolean isIndexCombined() {
-        return getStringindex2() == getStringIndex1();
+        return getEnumerator2() == getEnumerator1();
     }
 
     public boolean isCompactFormatEnabled() {
@@ -159,11 +154,17 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
     }
 
     protected final void write1(final int entryId) throws IOException {
-        inner.writeString(stringIndex1.value(entryId));
+        if (enumerator1 == null)
+            inner.writeInt(entryId);
+        else
+            inner.writeString(enumerator1.value(entryId));
     }
 
     protected final void write2(final int featureId) throws IOException {
-        inner.writeString(stringIndex2.value(featureId));
+        if (enumerator2 == null)
+            inner.writeInt(featureId);
+        else
+            inner.writeString(enumerator2.value(featureId));
     }
 
     @Override

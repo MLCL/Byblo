@@ -38,6 +38,8 @@ import java.io.IOException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.SimpleEnumerator;
 import uk.ac.susx.mlcl.lib.io.TSVSink;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
 
@@ -48,10 +50,12 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
 public class WeightedEntryPairTest {
 
     private void copyWEP(File a, File b, boolean compact) throws FileNotFoundException, IOException {
+        Enumerator<String> idx = new SimpleEnumerator<String>();
+
         WeightedTokenPairSource aSrc = new WeightedTokenPairSource(
-                new TSVSource(a, DEFAULT_CHARSET));
+                new TSVSource(a, DEFAULT_CHARSET), idx, idx);
         WeightedTokenPairSink bSink = new WeightedTokenPairSink(
-                new TSVSink(b, DEFAULT_CHARSET), aSrc.getStringIndex1(), aSrc.getStringIndex2());
+                new TSVSink(b, DEFAULT_CHARSET), aSrc.getEnumerator1(), aSrc.getEnumerator2());
         bSink.setCompactFormatEnabled(compact);
 
         IOUtil.copy(aSrc, bSink);
@@ -73,6 +77,39 @@ public class WeightedEntryPairTest {
 
         copyWEP(b, c, false);
 
+
+        assertTrue("Verbose copy is smaller that compact source.",
+                   c.length() >= b.length());
+        assertTrue("Double converted file is not equal to origion.",
+                   Files.equal(a, c));
+    }
+
+    @Test
+    public void testEntryPairEnumeratorConversion() throws FileNotFoundException, IOException {
+        File a = TEST_FRUIT_SIMS;
+        File b = new File(TEST_OUTPUT_DIR,
+                          TEST_FRUIT_SIMS.getName() + ".enum");
+        File c = new File(TEST_OUTPUT_DIR,
+                          TEST_FRUIT_SIMS.getName() + ".str");
+
+        Enumerator<String> idx = new SimpleEnumerator<String>();
+
+        {
+            WeightedTokenPairSource aSrc = new WeightedTokenPairSource(new TSVSource(a, DEFAULT_CHARSET), idx, idx);
+            WeightedTokenPairSink bSink = new WeightedTokenPairSink(new TSVSink(b, DEFAULT_CHARSET));
+            IOUtil.copy(aSrc, bSink);
+            bSink.close();
+        }
+
+        assertTrue("Compact copy is smaller that verbose source.",
+                   b.length() <= a.length());
+
+        {
+            WeightedTokenPairSource bSrc = new WeightedTokenPairSource(new TSVSource(b, DEFAULT_CHARSET));
+            WeightedTokenPairSink cSink = new WeightedTokenPairSink(new TSVSink(c, DEFAULT_CHARSET), idx,idx);
+            IOUtil.copy(bSrc, cSink);
+            cSink.close();
+        }
 
         assertTrue("Verbose copy is smaller that compact source.",
                    c.length() >= b.length());

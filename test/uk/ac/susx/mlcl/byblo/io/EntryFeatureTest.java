@@ -39,6 +39,8 @@ import java.nio.charset.Charset;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.SimpleEnumerator;
 import uk.ac.susx.mlcl.lib.io.TSVSink;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
 
@@ -52,7 +54,8 @@ public class EntryFeatureTest {
     public void testLMMedlineSample() throws FileNotFoundException, IOException {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-input-sample");
         Charset charset = Charset.forName("UTF-8");
-        TokenPairSource efSrc = new TokenPairSource(new TSVSource(testSample, charset));
+        Enumerator<String> idx = new SimpleEnumerator<String>();
+        TokenPairSource efSrc = new TokenPairSource(new TSVSource(testSample, charset),idx,idx);
         assertTrue("EntryFeatureSource is empty", efSrc.hasNext());
 
         while (efSrc.hasNext()) {
@@ -69,7 +72,8 @@ public class EntryFeatureTest {
     }
 
     private void copyEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        TokenPairSource aSrc = new TokenPairSource(new TSVSource(a, DEFAULT_CHARSET));
+        Enumerator<String> idx = new SimpleEnumerator<String>();
+        TokenPairSource aSrc = new TokenPairSource(new TSVSource(a, DEFAULT_CHARSET),idx,idx);
         TokenPairSink bSink = new TokenPairSink(new TSVSink(b, DEFAULT_CHARSET),
                 aSrc.getStringIndex1(), aSrc.getStringIndex2());
         bSink.setCompactFormatEnabled(compact);
@@ -97,5 +101,40 @@ public class EntryFeatureTest {
                 c.length() >= b.length());
         assertTrue("Double converted file is not equal to origion.",
                 Files.equal(a, c));
+    }
+    
+    
+    
+    @Test
+    public void testEntryPairEnumeratorConversion() throws FileNotFoundException, IOException {
+        File a = TEST_FRUIT_INPUT;
+        File b = new File(TEST_OUTPUT_DIR,
+                          TEST_FRUIT_INPUT.getName() + ".enum");
+        File c = new File(TEST_OUTPUT_DIR,
+                          TEST_FRUIT_INPUT.getName() + ".str");
+
+        Enumerator<String> idx = new SimpleEnumerator<String>();
+
+        {
+            TokenPairSource aSrc = new TokenPairSource(new TSVSource(a, DEFAULT_CHARSET), idx, idx);
+            TokenPairSink bSink = new TokenPairSink(new TSVSink(b, DEFAULT_CHARSET));
+            IOUtil.copy(aSrc, bSink);
+            bSink.close();
+        }
+
+        assertTrue("Compact copy is smaller that verbose source.",
+                   b.length() <= a.length());
+
+        {
+            TokenPairSource bSrc = new TokenPairSource(new TSVSource(b, DEFAULT_CHARSET));
+            TokenPairSink cSink = new TokenPairSink(new TSVSink(c, DEFAULT_CHARSET), idx,idx);
+            IOUtil.copy(bSrc, cSink);
+            cSink.close();
+        }
+
+        assertTrue("Verbose copy is smaller that compact source.",
+                   c.length() >= b.length());
+        assertTrue("Double converted file is not equal to origion.",
+                   Files.equal(a, c));
     }
 }

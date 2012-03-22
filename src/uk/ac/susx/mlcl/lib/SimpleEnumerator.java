@@ -112,5 +112,6 @@ public final class SimpleEnumerator<T> implements Serializable, Enumerator<T> {
     public String toString() {
         return objToIndex.toString();
     }
+    
 
 }
