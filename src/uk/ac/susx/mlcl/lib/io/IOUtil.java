@@ -30,8 +30,7 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
-import java.io.Flushable;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -160,4 +159,5 @@ public class IOUtil {
         return result;
     }
 
+  
 }
