@@ -49,7 +49,7 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
 public class EntryFeatureTest {
 
     @Test
-    public void testEndOfLineTab() throws FileNotFoundException, IOException {
+    public void testLMMedlineSample() throws FileNotFoundException, IOException {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-input-sample");
         Charset charset = Charset.forName("UTF-8");
         TokenPairSource efSrc = new TokenPairSource(new TSVSource(testSample, charset));

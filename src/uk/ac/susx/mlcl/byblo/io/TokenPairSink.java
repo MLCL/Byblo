@@ -143,19 +143,17 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
 
     private void writeVerbose(final TokenPair record) throws IOException {
         write1(record.id1());
-        inner.writeValueDelimiter();
         write2(record.id2());
-        inner.writeRecordDelimiter();
+        inner.endOfRecord();
     }
 
     private void writeCompact(final TokenPair record) throws IOException {
         if (previousRecord == null) {
             write1(record.id1());
         } else if (previousRecord.id1() != record.id1()) {
-            inner.writeRecordDelimiter();
+            inner.endOfRecord();
             write1(record.id1());
         }
-        inner.writeValueDelimiter();
         write2(record.id2());
         previousRecord = record;
     }
@@ -171,7 +169,7 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
     @Override
     public void close() throws IOException {
         if (isCompactFormatEnabled() && previousRecord != null) {
-            inner.writeRecordDelimiter();
+            inner.endOfRecord();
         }
         inner.close();
     }

@@ -132,19 +132,18 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
     public Weighted<Token> read() throws IOException {
         final int entryId;
         if (previousRecord == null) {
-            entryId = stringIndex.index(inner.parseString());
-            inner.parseValueDelimiter();
+            entryId = stringIndex.index(inner.readString());
         } else {
             entryId = previousRecord.record().id();
         }
 
-        if (!hasNext() || inner.isDelimiterNext()) {
-            inner.parseRecordDelimiter();
+        if (!hasNext() || inner.isEndOfRecordNext()) {
+            inner.endOfRecord();
             throw new SingletonRecordException(inner,
                                                "Found entry record with no weights.");
         }
 
-        final double weight = inner.parseDouble();
+        final double weight = inner.readDouble();
 
         cardinality = Math.max(cardinality, entryId + 1);
         weightSum += weight;
@@ -152,13 +151,12 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
         ++count;
         final Weighted<Token> record = new Weighted<Token>(new Token(entryId), weight);
 
-        if (inner.isValueDelimiterNext()) {
-            inner.parseValueDelimiter();
+        if (inner.hasNext() && !inner.isEndOfRecordNext()) {
             previousRecord = record;
         }
 
-        if (hasNext() && inner.isRecordDelimiterNext()) {
-            inner.parseRecordDelimiter();
+        if (hasNext() && inner.isEndOfRecordNext()) {
+            inner.endOfRecord();
             previousRecord = null;
         }
 

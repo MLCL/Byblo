@@ -135,11 +135,9 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
 
     private void writeVerbose(Weighted<TokenPair> record) throws IOException {
         inner.writeString(stringIndex1.value(record.record().id1()));
-        inner.writeValueDelimiter();
         inner.writeString(stringIndex2.value(record.record().id2()));
-        inner.writeValueDelimiter();
         writeWeight(record.weight());
-        inner.writeRecordDelimiter();
+        inner.endOfRecord();
     }
 
     private void writeCompact(final Weighted<TokenPair> record) throws IOException {
@@ -147,13 +145,11 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
             inner.writeString(stringIndex1.value(record.record().id1()));
         } else if (previousRecord.record().id1() != record.record().
                 id1()) {
-            inner.writeRecordDelimiter();
+            inner.endOfRecord();
             inner.writeString(stringIndex1.value(record.record().id1()));
         }
 
-        inner.writeValueDelimiter();
         inner.writeString(stringIndex2.value(record.record().id2()));
-        inner.writeValueDelimiter();
         writeWeight(record.weight());
         previousRecord = record;
     }
@@ -169,7 +165,7 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
     @Override
     public void close() throws IOException {
         if (isCompactFormatEnabled() && previousRecord != null) {
-            inner.writeRecordDelimiter();
+            inner.endOfRecord();
         }
         inner.close();
     }

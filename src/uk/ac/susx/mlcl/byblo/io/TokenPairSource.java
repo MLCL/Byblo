@@ -110,16 +110,15 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell> {
         final int id1;
         if (previousRecord == null) {
             id1 = readHead();
-            inner.parseValueDelimiter();
         } else {
             id1 = previousRecord.id1();
         }
 
-        if (!hasNext() || inner.isDelimiterNext()) {
+        if (!hasNext() || inner.isEndOfRecordNext()) {
             // Encountered an entry without any features. This is incoherent wrt
             // the task at hand, but quite a common scenario in general feature
             // extraction. Throw an exception which is caught for end user input
-            inner.parseRecordDelimiter();
+            inner.endOfRecord();
             throw new SingletonRecordException(inner,
                                                "Found entry/feature record with no features.");
         }
@@ -128,13 +127,12 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell> {
         final TokenPair record = new TokenPair(
                 id1, id2);
 
-        if (hasNext() && inner.isValueDelimiterNext()) {
-            inner.parseValueDelimiter();
+        if (hasNext() && !inner.isEndOfRecordNext()) {
             previousRecord = record;
         }
 
-        if (hasNext() && inner.isRecordDelimiterNext()) {
-            inner.parseRecordDelimiter();
+        if (hasNext() && inner.isEndOfRecordNext()) {
+            inner.endOfRecord();
             previousRecord = null;
         }
 
@@ -143,11 +141,11 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell> {
     }
 
     protected final int readHead() throws IOException {
-        return stringIndex1.index(inner.parseString());
+        return stringIndex1.index(inner.readString());
     }
 
     protected final int readTail() throws IOException {
-        return stringIndex2.index(inner.parseString());
+        return stringIndex2.index(inner.readString());
     }
 
     public static boolean equal(File fileA, File fileB, Charset charset)

@@ -119,26 +119,24 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
     @Override
     public void close() throws IOException {
         if (isCompactFormatEnabled() && previousRecord != null) {
-            inner.writeRecordDelimiter();
+            inner.endOfRecord();
         }
         inner.close();
     }
 
     private void writeVerbose(final Weighted<Token> record) throws IOException {
         writeEntry(record.record().id());
-        inner.writeValueDelimiter();
         writeWeight(record.weight());
-        inner.writeRecordDelimiter();
+        inner.endOfRecord();
     }
 
     private void writeCompact(final Weighted<Token> record) throws IOException {
         if (previousRecord == null) {
             writeEntry(record.record().id());
         } else if (previousRecord.record().id() != record.record().id()) {
-            inner.writeRecordDelimiter();
+            inner.endOfRecord();
             writeEntry(record.record().id());
         }
-        inner.writeValueDelimiter();
         writeWeight(record.weight());
         previousRecord = record;
     }

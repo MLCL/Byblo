@@ -39,7 +39,6 @@ import org.apache.commons.logging.LogFactory;
  * Class that holds functionality to read a Tab Separated Values file.
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
- * @param <T>
  */
 public final class TSVSink implements Sink<Iterable<String>>, Closeable, Flushable {
 
@@ -51,6 +50,10 @@ public final class TSVSink implements Sink<Iterable<String>>, Closeable, Flushab
 
     private final Writer out;
 
+    private long row;
+
+    private long column;
+
     public TSVSink(File file, Charset charset)
             throws FileNotFoundException, IOException {
         if (file == null)
@@ -60,27 +63,41 @@ public final class TSVSink implements Sink<Iterable<String>>, Closeable, Flushab
         out = new BufferedWriter(
                 new OutputStreamWriter(
                 new FileOutputStream(file), charset));
+        row = 0;
+        column = 0;
 
     }
 
-    public void writeRecordDelimiter() throws IOException {
+    
+    public void endOfRecord() throws IOException {
+        writeRecordDelimiter();
+    }
+    
+    private void writeRecordDelimiter() throws IOException {
         out.append(RECORD_DELIM);
+        ++row;
+        column = 0;
     }
 
-    public void writeValueDelimiter() throws IOException {
+    private void writeValueDelimiter() throws IOException {
         out.append(VALUE_DELIM);
     }
 
     public void writeString(String str) throws IOException {
+        if(column > 0)
+            writeValueDelimiter();
         out.write(str);
+        ++column;
     }
 
     public void writeInt(int val) throws IOException {
         writeString(Integer.toString(val));
+        ++column;
     }
 
     public void writeDouble(double val) throws IOException {
         writeString(Double.toString(val));
+        ++column;
     }
 
     @Override

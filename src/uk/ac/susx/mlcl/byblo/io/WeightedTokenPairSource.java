@@ -105,32 +105,29 @@ public class WeightedTokenPairSource
         final int tokenId1;
         if (previousRecord == null) {
             tokenId1 = readEntry1();
-            inner.parseValueDelimiter();
         } else {
             tokenId1 = previousRecord.record().id1();
         }
 
-        if (!hasNext() || inner.isDelimiterNext()) {
-            inner.parseRecordDelimiter();
+        if (!hasNext() || inner.isEndOfRecordNext()) {
+            inner.endOfRecord();
             throw new SingletonRecordException(inner,
                                                "Found weighte entry pair record with second entries.");
         }
 
         final int tokenId2 = readEntry2();
-        inner.parseValueDelimiter();
         final double weight = readWight();
 
         final Weighted<TokenPair> record = new Weighted<TokenPair>(
                 new TokenPair(tokenId1, tokenId2), weight);
         ++count;
 
-        if (inner.isValueDelimiterNext()) {
-            inner.parseValueDelimiter();
+        if (inner.hasNext() && !inner.isEndOfRecordNext()) {
             previousRecord = record;
         }
 
-        if (inner.hasNext() && inner.isRecordDelimiterNext()) {
-            inner.parseRecordDelimiter();
+        if (inner.hasNext() && inner.isEndOfRecordNext()) {
+            inner.endOfRecord();
             previousRecord = null;
         }
 
@@ -138,15 +135,15 @@ public class WeightedTokenPairSource
     }
 
     protected int readEntry1() throws IOException {
-        return stringIndex1.index(inner.parseString());
+        return stringIndex1.index(inner.readString());
     }
 
     protected int readEntry2() throws IOException {
-        return stringIndex2.index(inner.parseString());
+        return stringIndex2.index(inner.readString());
     }
 
     protected double readWight() throws IOException {
-        return inner.parseDouble();
+        return inner.readDouble();
     }
 
     public WeightedTokenPairVectorSource getVectorSource() {

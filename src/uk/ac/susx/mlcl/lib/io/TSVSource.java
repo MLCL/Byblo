@@ -44,9 +44,8 @@ import uk.ac.susx.mlcl.lib.MiscUtil;
  * Class that holds functionality to read a Tab Separated Values file.
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
- * @param <T>
  */
-public class TSVSource implements SeekableSource<Iterable<String>, Lexer.Tell> {
+public final class TSVSource implements SeekableSource<Iterable<String>, Lexer.Tell> {
 
     private static final char RECORD_DELIM = '\n';
 
@@ -55,6 +54,10 @@ public class TSVSource implements SeekableSource<Iterable<String>, Lexer.Tell> {
     private final Lexer lexer;
 
     private final File file;
+
+    private long row;
+
+    private long column;
 
     public TSVSource(File file, Charset charset) throws FileNotFoundException, IOException {
         if (file == null)
@@ -74,16 +77,19 @@ public class TSVSource implements SeekableSource<Iterable<String>, Lexer.Tell> {
         if (lexer.hasNext())
             lexer.advance();
         this.file = file;
+        row = 0;
+        column = 0;
     }
 
     public File getFile() {
         return file;
     }
 
-
     @Override
     public void position(Lexer.Tell offset) throws IOException {
         lexer.seek(offset);
+        row = 0;
+        column = 0;
     }
 
     public double percentRead() throws IOException {
@@ -110,50 +116,58 @@ public class TSVSource implements SeekableSource<Iterable<String>, Lexer.Tell> {
         }
     }
 
-    public boolean isRecordDelimiterNext() throws CharacterCodingException, IOException {
+    public boolean isEndOfRecordNext() throws CharacterCodingException, IOException {
         return isDelimiterNext() && lexer.charAt(0) == RECORD_DELIM;
     }
 
-    public boolean isValueDelimiterNext() throws CharacterCodingException, IOException {
+    private boolean isValueDelimiterNext() throws CharacterCodingException, IOException {
         return isDelimiterNext() && lexer.charAt(0) == VALUE_DELIM;
     }
 
-    public boolean isDelimiterNext() throws CharacterCodingException, IOException {
+    private boolean isDelimiterNext() throws CharacterCodingException, IOException {
         return lexer.type() == Lexer.Type.Delimiter;
     }
 
-    public void parseRecordDelimiter() throws CharacterCodingException, IOException {
+
+    public void endOfRecord() throws CharacterCodingException, IOException {
         do {
             parseDelimiter(RECORD_DELIM);
-        } while (isRecordDelimiterNext() && hasNext());
+            ++row;
+        } while (isEndOfRecordNext() && hasNext());
+        column = 0;
     }
 
-    public void parseValueDelimiter() throws CharacterCodingException, IOException {
+    private void parseValueDelimiter() throws CharacterCodingException, IOException {
         do {
             parseDelimiter(VALUE_DELIM);
         } while (isValueDelimiterNext() && hasNext());
     }
 
-    public String parseString() throws CharacterCodingException, IOException {
+    public String readString() throws CharacterCodingException, IOException {
+        if (column > 0)
+            parseValueDelimiter();
+        
         skipWhitespace();
         expectType(Lexer.Type.Value, lexer.type());
         final String str = lexer.value().toString();
         if (lexer.hasNext())
             lexer.advance();
+
+        ++column;
         return str;
     }
 
-    public double parseDouble() throws CharacterCodingException, IOException {
+    public double readDouble() throws CharacterCodingException, IOException {
         try {
-            return Double.valueOf(parseString());
+            return Double.valueOf(readString());
         } catch (NumberFormatException nfe) {
             throw new TSVDataFormatException(this, nfe);
         }
     }
 
-    public int parseInt() throws CharacterCodingException, IOException {
+    public int readInt() throws CharacterCodingException, IOException {
         try {
-            return Integer.parseInt(parseString());
+            return Integer.parseInt(readString());
         } catch (NumberFormatException nfe) {
             throw new TSVDataFormatException(this, nfe);
         }
@@ -170,28 +184,27 @@ public class TSVSource implements SeekableSource<Iterable<String>, Lexer.Tell> {
     private void expectType(Lexer.Type expected, Lexer.Type actual) throws TSVDataFormatException {
         if (expected != actual) {
             throw new TSVDataFormatException(this,
-                    "Expecting type " + expected + " but found " + actual);
+                                             "Expecting type " + expected + " but found " + actual);
         }
     }
 
     private void expectDelim(char expected, char actual) throws TSVDataFormatException {
         if (expected != actual)
             throw new TSVDataFormatException(this, "Expecting delimiter "
-                    + MiscUtil.printableUTF8(expected) + " but found " 
+                    + MiscUtil.printableUTF8(expected) + " but found "
                     + MiscUtil.printableUTF8(actual));
     }
-
 
     @Override
     public Iterable<String> read() throws IOException {
         List<String> record = new ArrayList<String>();
         boolean first = true;
-        while (!isRecordDelimiterNext()) {
+        while (!isEndOfRecordNext()) {
             if (!first)
                 parseValueDelimiter();
-            record.add(parseString());
+            record.add(readString());
         }
-        parseRecordDelimiter();
+        endOfRecord();
         return record;
     }
 
