@@ -214,7 +214,9 @@ public class CountTask extends AbstractCommandTask implements Serializable {
             throws IOException {
 
         final TokenPairSource instanceSource = new TokenPairSource(
-                new TSVSource(inputFile, charset), entryIndex, featureIndex);
+                new TSVSource(inputFile, charset),
+                Token.stringDecoder(entryIndex),
+                Token.stringDecoder(featureIndex));
 
         if (!instanceSource.hasNext() && LOG.isWarnEnabled()) {
             LOG.warn("Events file is empty.");
@@ -284,7 +286,8 @@ public class CountTask extends AbstractCommandTask implements Serializable {
         final int n = entryFreqList.size();
         try {
             entriesink = new WeightedTokenSink(
-                    new TSVSink(entriesFile, charset), entryIndex);
+                    new TSVSink(entriesFile, charset),
+                    Token.stringEncoder(entryIndex));
             int i = 0;
             for (final Int2IntMap.Entry entry : entryFreqList) {
                 entriesink.write(new Weighted<Token>(
@@ -334,7 +337,8 @@ public class CountTask extends AbstractCommandTask implements Serializable {
         final int n = contextFreqList.size();
         try {
             featureSink = new WeightedTokenSink(
-                    new TSVSink(featuresFile, charset), featureIdex);
+                    new TSVSink(featuresFile, charset), 
+                    Token.stringEncoder(featureIdex));
             int i = 0;
             for (final Int2IntMap.Entry context : contextFreqList) {
                 featureSink.write(new Weighted<Token>(new Token(
@@ -398,7 +402,8 @@ public class CountTask extends AbstractCommandTask implements Serializable {
         try {
             featureSink = new WeightedTokenPairSink(
                     new TSVSink(entryFeaturesFile, charset),
-                    entryIndex, featureIndex);
+                    Token.stringEncoder(entryIndex),
+                    Token.stringEncoder(featureIndex));
             int i = 0;
             for (final Object2IntMap.Entry<? extends TokenPair> feature : contextFreqList) {
                 featureSink.write(new Weighted<TokenPair>(

@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import com.google.common.base.Function;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -51,9 +52,9 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
 public class WeightedTokenPairSource
         implements SeekableSource<Weighted<TokenPair>, Lexer.Tell> {
 
-    private final Enumerator<String> enumerator1;
+    private final Function<String, Integer> tokenDecoder1;
 
-    private final Enumerator<String> enumerator2;
+    private final Function<String, Integer> tokenDecoder2;
 
     private Weighted<TokenPair> previousRecord = null;
 
@@ -63,30 +64,27 @@ public class WeightedTokenPairSource
 
     public WeightedTokenPairSource(
             TSVSource inner,
-            Enumerator<String> stringIndex1, Enumerator<String> stringIndex2)
+            Function<String, Integer> tokenDecoder1,
+            Function<String, Integer> tokenDecoder2)
             throws FileNotFoundException, IOException {
         this.inner = inner;
-        this.enumerator1 = stringIndex1;
-        this.enumerator2 = stringIndex2;
+        this.tokenDecoder1 = tokenDecoder1;
+        this.tokenDecoder2 = tokenDecoder2;
     }
 
     public WeightedTokenPairSource(TSVSource inner)
             throws FileNotFoundException, IOException {
         this.inner = inner;
-        this.enumerator1 = null;
-        this.enumerator2 = null;
+        this.tokenDecoder1 = Token.enumeratedDecoder();
+        this.tokenDecoder2 = Token.enumeratedDecoder();
     }
 
-    public final Enumerator<String> getEnumerator1() {
-        return enumerator1;
+    public Function<String, Integer> getTokenDecoder2() {
+        return tokenDecoder2;
     }
 
-    public final Enumerator<String> getEnumerator2() {
-        return enumerator2;
-    }
-
-    public boolean isIndexCombined() {
-        return enumerator1 == enumerator2;
+    public Function<String, Integer> getTokenDecoder1() {
+        return tokenDecoder1;
     }
 
     public long getCount() {
@@ -97,7 +95,7 @@ public class WeightedTokenPairSource
     public Weighted<TokenPair> read() throws IOException {
         final int tokenId1;
         if (previousRecord == null) {
-            tokenId1 = readEntry1();
+            tokenId1 = readToken1();
         } else {
             tokenId1 = previousRecord.record().id1();
         }
@@ -108,7 +106,7 @@ public class WeightedTokenPairSource
                                                "Found weighte entry pair record with second entries.");
         }
 
-        final int tokenId2 = readEntry2();
+        final int tokenId2 = readToken2();
         final double weight = readWight();
 
         final Weighted<TokenPair> record = new Weighted<TokenPair>(
@@ -127,18 +125,12 @@ public class WeightedTokenPairSource
         return record;
     }
 
-    protected int readEntry1() throws IOException {
-        if (enumerator1 == null)
-            return inner.readInt();
-        else
-            return enumerator1.index(inner.readString());
+    protected int readToken1() throws IOException {
+        return tokenDecoder1.apply(inner.readString());
     }
 
-    protected int readEntry2() throws IOException {
-        if (enumerator2 == null)
-            return inner.readInt();
-        else
-            return enumerator2.index(inner.readString());
+    protected int readToken2() throws IOException {
+        return tokenDecoder2.apply(inner.readString());
     }
 
     protected double readWight() throws IOException {
@@ -152,9 +144,13 @@ public class WeightedTokenPairSource
     public static boolean equal(File a, File b, Charset charset) throws IOException {
         final SimpleEnumerator<String> stringIndex = new SimpleEnumerator<String>();
         final WeightedTokenPairSource srcA = new WeightedTokenPairSource(
-                new TSVSource(a, charset), stringIndex, stringIndex);
+                new TSVSource(a, charset),
+                Token.stringDecoder(stringIndex),
+                Token.stringDecoder(stringIndex));
         final WeightedTokenPairSource srcB = new WeightedTokenPairSource(
-                new TSVSource(b, charset), stringIndex, stringIndex);
+                new TSVSource(b, charset),
+                Token.stringDecoder(stringIndex),
+                Token.stringDecoder(stringIndex));
         boolean equal = true;
         while (equal && srcA.hasNext() && srcB.hasNext()) {
             final Weighted<TokenPair> recA = srcA.read();

@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import java.io.*;
 import uk.ac.susx.mlcl.lib.Enumerator;
@@ -151,4 +152,49 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
         }
 
     }
+
+    public static Function<Integer, String> enumeratedEncoder() {
+        return new Function<Integer, String>() {
+
+            @Override
+            public String apply(Integer token) {
+                return Integer.toString(token);
+            }
+
+        };
+    }
+
+    public static Function<String, Integer> enumeratedDecoder() {
+        return new Function<String, Integer>() {
+
+            @Override
+            public Integer apply(String str) {
+                return Integer.parseInt(str);
+            }
+
+        };
+    }
+
+    public static Function<Integer, String> stringEncoder(final Enumerator<String> strEnum) {
+        return new Function<Integer, String>() {
+
+            @Override
+            public String apply(Integer token) {
+                return strEnum.value(token);
+            }
+
+        };
+    }
+
+    public static Function<String, Integer> stringDecoder(final Enumerator<String> strEnum) {
+        return new Function<String, Integer>() {
+
+            @Override
+            public Integer apply(String str) {
+                return strEnum.index(str);
+            }
+
+        };
+    }
+
 }

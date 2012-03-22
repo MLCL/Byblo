@@ -30,13 +30,14 @@
  */
 package uk.ac.susx.mlcl.lib;
 
+import com.google.common.base.Function;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 
 /**
  * Interface defining a unique indexing complex objects (usually strings).
- * 
- * Implementations of this interface are expected to assocciate each unique 
- * object with an integer value. 
+ *
+ * Implementations of this interface are expected to assocciate each unique
+ * object with an integer value.
  *
  * @param <T> type of object being indexed.
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
@@ -45,7 +46,7 @@ public interface Enumerator<T> extends Iterable<Object2IntMap.Entry<T>> {
 
     /**
      * Get the unique id for the given object.
-     * 
+     *
      * @param obj object to index
      * @return the index
      */
@@ -53,12 +54,12 @@ public interface Enumerator<T> extends Iterable<Object2IntMap.Entry<T>> {
 
     /**
      * Get the object for the given unique id.
-     * 
+     *
      * @param id index of object to retrieve
      * @return the object
      */
     T value(final int id);
-    
+
     
     
     

@@ -338,13 +338,15 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
         final IntSet rejected = new IntOpenHashSet();
 
         WeightedTokenSource entriesSource = new WeightedTokenSource(
-                new TSVSource(activeEntriesFile, charset), entryIndex);
+                new TSVSource(activeEntriesFile, charset), 
+                Token.stringDecoder(entryIndex));
 
         File outputFile = tempFiles.createFile();
         outputFile.deleteOnExit();
 
         WeightedTokenSink entriesSink = new WeightedTokenSink(
-                new TSVSink(outputFile, charset), entryIndex);
+                new TSVSink(outputFile, charset), 
+                Token.stringEncoder(entryIndex));
 
         if (LOG.isInfoEnabled()) {
             LOG.info(
@@ -410,14 +412,16 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
 
         WeightedTokenPairSource efSrc = new WeightedTokenPairSource(
                 new TSVSource(activeEntryFeaturesFile, charset),
-                entryIndex, featureIndex);
+                Token.stringDecoder(entryIndex),
+                Token.stringDecoder(featureIndex));
 
         File outputFile = tempFiles.createFile();
         outputFile.deleteOnExit();
 
         WeightedTokenPairSink efSink = new WeightedTokenPairSink(
                 new TSVSink(outputFile, charset),
-                entryIndex, featureIndex);
+                Token.stringEncoder(entryIndex), 
+                Token.stringEncoder(featureIndex));
 
         if (LOG.isInfoEnabled()) {
             LOG.info("Filtering entry/features pairs from "
@@ -534,13 +538,15 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
         IntSet rejectedFeatures = new IntOpenHashSet();
 
         WeightedTokenSource featureSource = new WeightedTokenSource(
-                new TSVSource(activeFeaturesFile, charset), featureIndex);
+                new TSVSource(activeFeaturesFile, charset),
+                Token.stringDecoder(featureIndex));
 
         File outputFile = tempFiles.createFile();
         outputFile.deleteOnExit();
 
         WeightedTokenSink featureSink = new WeightedTokenSink(
-                new TSVSink(outputFile, charset), featureIndex);
+                new TSVSink(outputFile, charset), 
+                Token.stringEncoder(featureIndex));
 
         if (LOG.isInfoEnabled()) {
             LOG.info(
@@ -550,7 +556,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
         // Store an filtered wieght here and record it so as to maintain
         // accurate priors for those features that remain
         double filteredWeight = 0;
-        int filteredId = featureSource.getEnumerator().index(FILTERED_STRING);
+        int filteredId = featureIndex.index(FILTERED_STRING);
 
         while (featureSource.hasNext()) {
             Weighted<Token> feature = featureSource.read();

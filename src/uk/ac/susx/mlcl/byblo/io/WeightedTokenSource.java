@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import com.google.common.base.Function;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -57,7 +58,7 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
 
     private static final Log LOG = LogFactory.getLog(WeightedTokenSource.class);
 
-    private final Enumerator<String> enumerator;
+    private final Function<String, Integer> tokenDecoder;
 
     private double weightSum = 0;
 
@@ -75,20 +76,20 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
 
     private final TSVSource inner;
 
-    public WeightedTokenSource(TSVSource inner, Enumerator<String> enumeration)
+    public WeightedTokenSource(TSVSource inner, Function<String, Integer> tokenDecoder)
             throws FileNotFoundException, IOException {
         this.inner = inner;
-        this.enumerator = enumeration;
+        this.tokenDecoder = tokenDecoder;
     }
 
     public WeightedTokenSource(TSVSource inner)
             throws FileNotFoundException, IOException {
         this.inner = inner;
-        this.enumerator = null;
+        this.tokenDecoder = Token.enumeratedDecoder();
     }
 
-    public Enumerator<String> getEnumerator() {
-        return enumerator;
+    public Function<String, Integer> getTokenDecoder() {
+        return tokenDecoder;
     }
 
     public double getWeightSum() {
@@ -127,10 +128,7 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
     }
 
     private int readString() throws IOException {
-        if (enumerator == null)
-            return inner.readInt();
-        else
-            return enumerator.index(inner.readString());
+        return tokenDecoder.apply(inner.readString());
     }
 
     @Override
@@ -185,7 +183,7 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
 
                 if (LOG.isWarnEnabled())
                     LOG.warn("Found duplicate Entry \""
-                            + (enumerator == null ? entry.record().id() : enumerator.value(entry.record().id()))
+                            + (tokenDecoder.apply("" + entry.record().id()))
                             + "\" (id=" + id
                             + ") in entries file. Merging records. Old frequency = "
                             + oldFreq + ", new frequency = " + newFreq + ".");
@@ -212,8 +210,12 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
 
     public static boolean equal(File a, File b, Charset charset) throws IOException {
         final Enumerator<String> stringIndex = new SimpleEnumerator<String>();
-        final WeightedTokenSource srcA = new WeightedTokenSource(new TSVSource(a, charset), stringIndex);
-        final WeightedTokenSource srcB = new WeightedTokenSource(new TSVSource(b, charset), stringIndex);
+        final WeightedTokenSource srcA = new WeightedTokenSource(
+                new TSVSource(a, charset),
+                Token.stringDecoder(stringIndex));
+        final WeightedTokenSource srcB = new WeightedTokenSource(
+                new TSVSource(b, charset),
+                Token.stringDecoder(stringIndex));
         boolean equal = true;
         while (equal && srcA.hasNext() && srcB.hasNext()) {
             final Weighted<Token> recA = srcA.read();

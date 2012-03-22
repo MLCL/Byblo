@@ -50,10 +50,13 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
 public class FeatureTest {
 
     private void copyF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        WeightedTokenSource aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET),
-                new SimpleEnumerator<String>());
-        WeightedTokenSink bSink = new WeightedTokenSink(new TSVSink(b, DEFAULT_CHARSET),
-                aSrc.getEnumerator());
+        Enumerator<String> idx = new SimpleEnumerator<String>();
+        WeightedTokenSource aSrc = new WeightedTokenSource(
+                new TSVSource(a, DEFAULT_CHARSET),
+                Token.stringDecoder(idx));
+        WeightedTokenSink bSink = new WeightedTokenSink(
+                new TSVSink(b, DEFAULT_CHARSET),
+                Token.stringEncoder(idx));
         bSink.setCompactFormatEnabled(compact);
 
         IOUtil.copy(aSrc, bSink);
@@ -64,26 +67,24 @@ public class FeatureTest {
     public void testFeaturesConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_FEATURES;
         File b = new File(TEST_OUTPUT_DIR,
-                TEST_FRUIT_FEATURES.getName() + ".compact");
+                          TEST_FRUIT_FEATURES.getName() + ".compact");
         File c = new File(TEST_OUTPUT_DIR,
-                TEST_FRUIT_FEATURES.getName() + ".verbose");
+                          TEST_FRUIT_FEATURES.getName() + ".verbose");
 
         copyF(a, b, true);
 
         assertTrue("Compact copy is smaller that verbose source.",
-                b.length() <= a.length());
+                   b.length() <= a.length());
 
         copyF(b, c, false);
 
 
         assertTrue("Verbose copy is smaller that compact source.",
-                c.length() >= b.length());
+                   c.length() >= b.length());
         assertTrue("Double converted file is not equal to origion.",
-                Files.equal(a, c));
+                   Files.equal(a, c));
     }
-    
-    
-    
+
     @Test
     public void testFeaturesEnumeratorConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_FEATURES;
@@ -95,7 +96,7 @@ public class FeatureTest {
         Enumerator<String> idx = new SimpleEnumerator<String>();
 
         {
-            WeightedTokenSource aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET), idx);
+            WeightedTokenSource aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET), Token.stringDecoder(idx));
             WeightedTokenSink bSink = new WeightedTokenSink(new TSVSink(b, DEFAULT_CHARSET));
             IOUtil.copy(aSrc, bSink);
             bSink.close();
@@ -106,7 +107,7 @@ public class FeatureTest {
 
         {
             WeightedTokenSource bSrc = new WeightedTokenSource(new TSVSource(b, DEFAULT_CHARSET));
-            WeightedTokenSink cSink = new WeightedTokenSink(new TSVSink(c, DEFAULT_CHARSET), idx);
+            WeightedTokenSink cSink = new WeightedTokenSink(new TSVSink(c, DEFAULT_CHARSET), Token.stringEncoder(idx));
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }
@@ -116,4 +117,5 @@ public class FeatureTest {
         assertTrue("Double converted file is not equal to origion.",
                    Files.equal(a, c));
     }
+
 }

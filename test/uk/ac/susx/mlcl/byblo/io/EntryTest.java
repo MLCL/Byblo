@@ -62,13 +62,13 @@ public class EntryTest {
         WeightedTokenSource aSrc;
         WeightedTokenSink bSink;
         if (enumIn)
-            aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET), idx);
+            aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET), Token.stringDecoder(idx));
         else
             aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET));
 
         if (enumOut)
             bSink = new WeightedTokenSink(
-                    new TSVSink(b, DEFAULT_CHARSET), idx);
+                    new TSVSink(b, DEFAULT_CHARSET), Token.stringEncoder(idx));
         else
             bSink = new WeightedTokenSink(new TSVSink(b, DEFAULT_CHARSET));
         bSink.setCompactFormatEnabled(compact);
@@ -110,8 +110,11 @@ public class EntryTest {
         Enumerator<String> idx = new SimpleEnumerator<String>();
 
         {
-            WeightedTokenSource aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET), idx);
-            WeightedTokenSink bSink = new WeightedTokenSink(new TSVSink(b, DEFAULT_CHARSET));
+            WeightedTokenSource aSrc = new WeightedTokenSource(
+                    new TSVSource(a, DEFAULT_CHARSET), 
+                    Token.stringDecoder(idx));
+            WeightedTokenSink bSink = new WeightedTokenSink(
+                    new TSVSink(b, DEFAULT_CHARSET));
             IOUtil.copy(aSrc, bSink);
             bSink.close();
         }
@@ -120,8 +123,11 @@ public class EntryTest {
                    b.length() <= a.length());
 
         {
-            WeightedTokenSource bSrc = new WeightedTokenSource(new TSVSource(b, DEFAULT_CHARSET));
-            WeightedTokenSink cSink = new WeightedTokenSink(new TSVSink(c, DEFAULT_CHARSET), idx);
+            WeightedTokenSource bSrc = new WeightedTokenSource(
+                    new TSVSource(b, DEFAULT_CHARSET));
+            WeightedTokenSink cSink = new WeightedTokenSink(
+                    new TSVSink(c, DEFAULT_CHARSET),
+                    Token.stringEncoder(idx));
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }
@@ -136,14 +142,16 @@ public class EntryTest {
         final Map<Tell, Weighted<Token>> hist =
                 new HashMap<Tell, Weighted<Token>>();
 
-        WeightedTokenSource src = new WeightedTokenSource(new TSVSource(file, DEFAULT_CHARSET),
-                                                          new SimpleEnumerator<String>());
+        Enumerator<String> idx = new SimpleEnumerator<String>();
+        WeightedTokenSource src = new WeightedTokenSource(
+                new TSVSource(file, DEFAULT_CHARSET),
+                  Token.stringDecoder(idx ));
         {
             while (src.hasNext()) {
                 final Tell pos = src.position();
                 final Weighted<Token> record = src.read();
 
-                System.out.println(pos.toString() + ": " + record.record().toString(src.getEnumerator()));
+                System.out.println(pos.toString() + ": " + record.record().toString(idx));
 
                 assertNotNull("Found null EntryRecord", record);
                 hist.put(pos, record);
@@ -159,7 +167,7 @@ public class EntryTest {
                 final Weighted<Token> expected = hist.get(pos);
 
                 System.out.println("expected tell: " + pos);
-                System.out.println("expected: " + expected.record().toString(src.getEnumerator()));
+                System.out.println("expected: " + expected.record().toString(idx));
 
                 src.position(pos);
 
@@ -168,7 +176,7 @@ public class EntryTest {
 
                 Weighted<Token> actual = src.read();
                 System.out.println("actual tell: " + src.position());
-                System.out.println("actual: " + actual.record().toString(src.getEnumerator()));
+                System.out.println("actual: " + actual.record().toString(idx));
 
                 assertEquals(expected, actual);
             }

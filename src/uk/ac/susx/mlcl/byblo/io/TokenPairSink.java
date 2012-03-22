@@ -30,11 +30,11 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import com.google.common.base.Function;
 import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.Flushable;
 import java.io.IOException;
-import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.io.TSVSink;
 
@@ -74,9 +74,9 @@ import uk.ac.susx.mlcl.lib.io.TSVSink;
  */
 public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
 
-    private final Enumerator<String> enumerator1;
+    private final Function<Integer, String> tokenEncoder1;
 
-    private final Enumerator<String> enumerator2;
+    private final Function<Integer, String> tokenEncoder2;
 
     private boolean compactFormatEnabled = false;
 
@@ -87,31 +87,27 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
     private final TSVSink inner;
 
     public TokenPairSink(TSVSink inner,
-                         Enumerator<String> stringIndex1,
-                         Enumerator<String> stringIndex2)
+                         Function<Integer, String> tokenEncoder1,
+                         Function<Integer, String> tokenEncoder2)
             throws FileNotFoundException, IOException {
         this.inner = inner;
-        this.enumerator1 = stringIndex1;
-        this.enumerator2 = stringIndex2;
+        this.tokenEncoder1 = tokenEncoder1;
+        this.tokenEncoder2 = tokenEncoder2;
     }
 
     public TokenPairSink(TSVSink inner)
             throws FileNotFoundException, IOException {
         this.inner = inner;
-        this.enumerator1 = null;
-        this.enumerator2 = null;
+        this.tokenEncoder1 = Token.enumeratedEncoder();
+        this.tokenEncoder2 = Token.enumeratedEncoder();
     }
 
-    public final Enumerator<String> getEnumerator1() {
-        return enumerator1;
+    public Function<Integer, String> getTokenEncoder1() {
+        return tokenEncoder1;
     }
 
-    public Enumerator<String> getEnumerator2() {
-        return enumerator2;
-    }
-
-    public boolean isIndexCombined() {
-        return getEnumerator2() == getEnumerator1();
+    public Function<Integer, String> getTokenEncoder2() {
+        return tokenEncoder2;
     }
 
     public boolean isCompactFormatEnabled() {
@@ -137,34 +133,28 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
     }
 
     private void writeVerbose(final TokenPair record) throws IOException {
-        write1(record.id1());
-        write2(record.id2());
+        writeString1(record.id1());
+        writeString2(record.id2());
         inner.endOfRecord();
     }
 
     private void writeCompact(final TokenPair record) throws IOException {
         if (previousRecord == null) {
-            write1(record.id1());
+            writeString1(record.id1());
         } else if (previousRecord.id1() != record.id1()) {
             inner.endOfRecord();
-            write1(record.id1());
+            writeString1(record.id1());
         }
-        write2(record.id2());
+        writeString2(record.id2());
         previousRecord = record;
     }
 
-    protected final void write1(final int entryId) throws IOException {
-        if (enumerator1 == null)
-            inner.writeInt(entryId);
-        else
-            inner.writeString(enumerator1.value(entryId));
+    private void writeString1(int stringId) throws IOException {
+        inner.writeString(tokenEncoder1.apply(stringId));
     }
 
-    protected final void write2(final int featureId) throws IOException {
-        if (enumerator2 == null)
-            inner.writeInt(featureId);
-        else
-            inner.writeString(enumerator2.value(featureId));
+    private void writeString2(int stringId) throws IOException {
+        inner.writeString(tokenEncoder2.apply(stringId));
     }
 
     @Override

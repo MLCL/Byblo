@@ -30,8 +30,10 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import com.google.common.base.Function;
 import java.io.*;
 import java.text.DecimalFormat;
+import sun.security.krb5.internal.crypto.EType;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.io.TSVSink;
@@ -74,7 +76,7 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
 
     private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
 
-    private final Enumerator<String> enumerator;
+    private final Function<Integer, String> tokenEncoder;
 
     private boolean compactFormatEnabled = false;
 
@@ -84,16 +86,16 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
 
     private TSVSink inner;
 
-    public WeightedTokenSink(TSVSink inner, Enumerator<String> stringIndex)
+    public WeightedTokenSink(TSVSink inner, Function<Integer, String> tokenEncoder)
             throws FileNotFoundException, IOException {
         this.inner = inner;
-        this.enumerator = stringIndex;
+        this.tokenEncoder = tokenEncoder;
     }
 
     public WeightedTokenSink(TSVSink inner)
             throws FileNotFoundException, IOException {
         this.inner = inner;
-        this.enumerator = null;
+        this.tokenEncoder = Token.enumeratedEncoder();
     }
 
     public boolean isCompactFormatEnabled() {
@@ -104,8 +106,8 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
         this.compactFormatEnabled = compactFormatEnabled;
     }
 
-    public Enumerator<String> getEnumerator() {
-        return enumerator;
+    public Function<Integer, String> getTokenEncoder() {
+        return tokenEncoder;
     }
 
     @Override
@@ -140,10 +142,7 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
     }
 
     private void writeString(int id) throws IOException {
-        if (enumerator == null)
-            inner.writeInt(id);
-        else
-            inner.writeString(enumerator.value(id));
+        inner.writeString(tokenEncoder.apply(id));
     }
 
     private void writeWeight(double weight) throws IOException {

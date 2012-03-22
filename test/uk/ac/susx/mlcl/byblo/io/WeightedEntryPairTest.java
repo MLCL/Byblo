@@ -53,9 +53,9 @@ public class WeightedEntryPairTest {
         Enumerator<String> idx = new SimpleEnumerator<String>();
 
         WeightedTokenPairSource aSrc = new WeightedTokenPairSource(
-                new TSVSource(a, DEFAULT_CHARSET), idx, idx);
+                new TSVSource(a, DEFAULT_CHARSET), Token.stringDecoder(idx),Token.stringDecoder(idx));
         WeightedTokenPairSink bSink = new WeightedTokenPairSink(
-                new TSVSink(b, DEFAULT_CHARSET), aSrc.getEnumerator1(), aSrc.getEnumerator2());
+                new TSVSink(b, DEFAULT_CHARSET),Token.stringEncoder(idx), Token.stringEncoder(idx));
         bSink.setCompactFormatEnabled(compact);
 
         IOUtil.copy(aSrc, bSink);
@@ -95,8 +95,12 @@ public class WeightedEntryPairTest {
         Enumerator<String> idx = new SimpleEnumerator<String>();
 
         {
-            WeightedTokenPairSource aSrc = new WeightedTokenPairSource(new TSVSource(a, DEFAULT_CHARSET), idx, idx);
-            WeightedTokenPairSink bSink = new WeightedTokenPairSink(new TSVSink(b, DEFAULT_CHARSET));
+            WeightedTokenPairSource aSrc = new WeightedTokenPairSource(
+                    new TSVSource(a, DEFAULT_CHARSET), 
+                    Token.stringDecoder(idx), 
+                    Token.stringDecoder(idx));
+            WeightedTokenPairSink bSink = new WeightedTokenPairSink(
+                    new TSVSink(b, DEFAULT_CHARSET));
             IOUtil.copy(aSrc, bSink);
             bSink.close();
         }
@@ -106,7 +110,9 @@ public class WeightedEntryPairTest {
 
         {
             WeightedTokenPairSource bSrc = new WeightedTokenPairSource(new TSVSource(b, DEFAULT_CHARSET));
-            WeightedTokenPairSink cSink = new WeightedTokenPairSink(new TSVSink(c, DEFAULT_CHARSET), idx,idx);
+            WeightedTokenPairSink cSink = new WeightedTokenPairSink(
+                    new TSVSink(c, DEFAULT_CHARSET), 
+                    Token.stringEncoder(idx), Token.stringEncoder(idx));
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }

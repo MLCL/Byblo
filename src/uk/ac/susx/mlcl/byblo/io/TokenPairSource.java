@@ -30,9 +30,11 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import com.google.common.base.Function;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,9 +56,9 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell> {
 
     private static final Log LOG = LogFactory.getLog(TokenPairSource.class);
 
-    private final Enumerator<String> enumerator1;
+    private final Function<String, Integer> tokenDecoder1;
 
-    private final Enumerator<String> enumerator2;
+    private final Function<String, Integer> tokenDecoder2;
 
     private TokenPair previousRecord = null;
 
@@ -66,29 +68,25 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell> {
 
     public TokenPairSource(
             TSVSource inner,
-            Enumerator<String> entryIndex,
-            Enumerator<String> featureIndex)
+            Function<String, Integer> tokenDecoder1,
+            Function<String, Integer> tokenDecoder2)
             throws FileNotFoundException, IOException {
         this.inner = inner;
-        this.enumerator1 = entryIndex;
-        this.enumerator2 = featureIndex;
+        this.tokenDecoder1 = tokenDecoder1;
+        this.tokenDecoder2 = tokenDecoder2;
     }
 
     public TokenPairSource(TSVSource inner)
             throws FileNotFoundException, IOException {
-        this(inner, null, null);
+        this(inner, Token.enumeratedDecoder(), Token.enumeratedDecoder());
     }
 
-    public Enumerator<String> getStringIndex1() {
-        return enumerator1;
+    public Function<String, Integer> getTokenDecoder1() {
+        return tokenDecoder1;
     }
 
-    public Enumerator<String> getStringIndex2() {
-        return enumerator2;
-    }
-
-    public boolean isIndexCombined() {
-        return getStringIndex1() == getStringIndex2();
+    public Function<String, Integer> getTokenDecoder2() {
+        return tokenDecoder2;
     }
 
     public long getCount() {
@@ -99,7 +97,7 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell> {
     public TokenPair read() throws IOException {
         final int id1;
         if (previousRecord == null) {
-            id1 = readHead();
+            id1 = readToken1();
         } else {
             id1 = previousRecord.id1();
         }
@@ -113,9 +111,8 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell> {
                                                "Found entry/feature record with no features.");
         }
 
-        final int id2 = readTail();
-        final TokenPair record = new TokenPair(
-                id1, id2);
+        final int id2 = readToken2();
+        final TokenPair record = new TokenPair(id1, id2);
 
         if (hasNext() && !inner.isEndOfRecordNext()) {
             previousRecord = record;
@@ -130,27 +127,25 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell> {
         return record;
     }
 
-    protected final int readHead() throws IOException {
-        if (enumerator1 == null)
-            return inner.readInt();
-        else
-            return enumerator1.index(inner.readString());
+    private int readToken1() throws CharacterCodingException, IOException {
+        return tokenDecoder1.apply(inner.readString());
     }
 
-    protected final int readTail() throws IOException {
-        if (enumerator2 == null)
-            return inner.readInt();
-        else
-            return enumerator2.index(inner.readString());
+    private int readToken2() throws CharacterCodingException, IOException {
+        return tokenDecoder2.apply(inner.readString());
     }
 
     public static boolean equal(File fileA, File fileB, Charset charset)
             throws IOException {
         final Enumerator<String> stringIndex = new SimpleEnumerator<String>();
         final TokenPairSource srcA = new TokenPairSource(
-                new TSVSource(fileA, charset), stringIndex, stringIndex);
+                new TSVSource(fileA, charset),
+                Token.stringDecoder(stringIndex),
+                Token.stringDecoder(stringIndex));
         final TokenPairSource srcB = new TokenPairSource(
-                new TSVSource(fileB, charset), stringIndex, stringIndex);
+                new TSVSource(fileB, charset),
+                Token.stringDecoder(stringIndex),
+                Token.stringDecoder(stringIndex));
         boolean equal = true;
         while (equal && srcA.hasNext() && srcB.hasNext()) {
             final TokenPair recA = srcA.read();

@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import com.google.common.base.Function;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import java.io.IOException;
@@ -38,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.Lexer;
@@ -67,16 +67,12 @@ public class WeightedTokenPairVectorSource
         next = null;
     }
 
-    public Enumerator<String> getEnumeration1() {
-        return inner.getEnumerator1();
+    public Function<String, Integer> getTokenDecoder2() {
+        return inner.getTokenDecoder2();
     }
 
-    public Enumerator<String> getEnumeration2() {
-        return inner.getEnumerator2();
-    }
-
-    public boolean isIndexCombined() {
-        return inner.isIndexCombined();
+    public Function<String, Integer> getTokenDecoder1() {
+        return inner.getTokenDecoder1();
     }
 
     @Override

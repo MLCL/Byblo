@@ -38,6 +38,7 @@ import org.junit.Test;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.SimpleEnumerator;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
@@ -256,12 +257,12 @@ public class CrMiTest {
         // The ranking should be identical, but the absolute similarity values
         // will be different.
 
-        
-        Enumerator<String> idx= new SimpleEnumerator<String>();
+
+        Enumerator<String> idx = new SimpleEnumerator<String>();
         WeightedTokenPairSource expected = new WeightedTokenPairSource(
-                new TSVSource(expectedOutput, DEFAULT_CHARSET),idx,idx);
+                new TSVSource(expectedOutput, DEFAULT_CHARSET), Token.stringDecoder(idx), Token.stringDecoder(idx));
         WeightedTokenPairSource actual = new WeightedTokenPairSource(
-                new TSVSource(crmiOutput, DEFAULT_CHARSET), idx,idx);
+                new TSVSource(crmiOutput, DEFAULT_CHARSET), Token.stringDecoder(idx), Token.stringDecoder(idx));
 
         while (expected.hasNext() && actual.hasNext()) {
             Weighted<TokenPair> e = expected.read();

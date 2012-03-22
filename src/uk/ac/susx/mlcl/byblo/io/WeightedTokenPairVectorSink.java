@@ -30,10 +30,10 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import com.google.common.base.Function;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
-import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.Sink;
@@ -53,18 +53,6 @@ public class WeightedTokenPairVectorSink
         this.inner = inner;
     }
 
-    public Enumerator<String> getEnumerator1() {
-        return inner.getEnumerator1();
-    }
-
-    public Enumerator<String> getEnumerator2() {
-        return inner.getEnumerator2();
-    }
-
-    public boolean isEnumeratorsCombined() {
-        return inner.isEnumeratorsCombined();
-    }
-    
     @Override
     public void write(Indexed<SparseDoubleVector> record) throws IOException {
         int entryId = record.key();
@@ -74,6 +62,14 @@ public class WeightedTokenPairVectorSink
                     new TokenPair(entryId, vec.keys[i]), vec.values[i]));
         }
         ++count;
+    }
+
+    public Function<Integer, String> getTokenEncoder1() {
+        return inner.getTokenEncoder1();
+    }
+
+    public Function<Integer, String> getTokenEncoder2() {
+        return inner.getTokenEncoder2();
     }
 
     public long getCount() {

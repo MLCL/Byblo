@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import com.google.common.base.Function;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
@@ -85,31 +86,27 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
 
     private TSVSink inner;
 
-    private Enumerator<String> enumerator1;
+    private final Function<Integer, String> tokenEncoder1;
 
-    private Enumerator<String> enumerator2;
-
-    public WeightedTokenPairSink(TSVSink inner, Enumerator<String> stringIndex1, Enumerator<String> stringIndex2) {
+    private final Function<Integer, String> tokenEncoder2;
+    
+    public WeightedTokenPairSink(TSVSink inner,Function<Integer, String> tokenEncoder1, Function<Integer, String> tokenEncoder2) {
         this.inner = inner;
-        this.enumerator1 = stringIndex1;
-        this.enumerator2 = stringIndex2;
+        this.tokenEncoder1 = tokenEncoder1;
+        this.tokenEncoder2 = tokenEncoder2;
     }
     public WeightedTokenPairSink(TSVSink inner) {
         this.inner = inner;
-        this.enumerator1 = null;
-        this.enumerator2 = null;
+        this.tokenEncoder1 = Token.enumeratedEncoder();
+        this.tokenEncoder2 = Token.enumeratedEncoder();
     }
 
-    public Enumerator<String> getEnumerator1() {
-        return enumerator1;
+    public Function<Integer, String> getTokenEncoder1() {
+        return tokenEncoder1;
     }
 
-    public Enumerator<String> getEnumerator2() {
-        return enumerator2;
-    }
-
-    public boolean isEnumeratorsCombined() {
-        return getEnumerator1() == getEnumerator2();
+    public Function<Integer, String> getTokenEncoder2() {
+        return tokenEncoder2;
     }
 
     public boolean isCompactFormatEnabled() {
@@ -135,38 +132,32 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
     }
 
     private void writeVerbose(Weighted<TokenPair> record) throws IOException {
-        writeString1(record.record().id1());
-        writeString2(record.record().id2());
+        writeToken1(record.record().id1());
+        writeToken2(record.record().id2());
         writeWeight(record.weight());
         inner.endOfRecord();
     }
 
     private void writeCompact(final Weighted<TokenPair> record) throws IOException {
         if (previousRecord == null) {
-            writeString1(record.record().id1());
+            writeToken1(record.record().id1());
         } else if (previousRecord.record().id1() != record.record().
                 id1()) {
             inner.endOfRecord();
-            writeString1(record.record().id1());
+            writeToken1(record.record().id1());
         }
 
-        writeString2(record.record().id2());
+        writeToken2(record.record().id2());
         writeWeight(record.weight());
         previousRecord = record;
     }
 
-    private void writeString1(int stringId) throws IOException {
-        if (enumerator1 == null)
-            inner.writeInt(stringId);
-        else
-            inner.writeString(enumerator1.value(stringId));
+    private void writeToken1(int tokenId) throws IOException {
+        inner.writeString(tokenEncoder1.apply(tokenId));
     }
 
-    private void writeString2(int stringId) throws IOException {
-        if (enumerator2 == null)
-            inner.writeInt(stringId);
-        else
-            inner.writeString(enumerator2.value(stringId));
+    private void writeToken2(int tokenId) throws IOException {
+        inner.writeString(tokenEncoder2.apply(tokenId));
     }
 
     private void writeWeight(double weight) throws IOException {

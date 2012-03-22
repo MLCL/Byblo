@@ -218,7 +218,8 @@ public class AllPairsTask extends AbstractCommand {
                 }
 
                 WeightedTokenSource features = new WeightedTokenSource(
-                        new TSVSource(featuresFile, charset), strIndex);
+                        new TSVSource(featuresFile, charset),
+                        Token.stringDecoder(strIndex));
                 AbstractMIProximity bmip = ((AbstractMIProximity) prox);
                 bmip.setFeatureFrequencies(features.readAllAsArray());
                 bmip.setFeatureFrequencySum(features.getWeightSum());
@@ -235,7 +236,8 @@ public class AllPairsTask extends AbstractCommand {
                 }
 
                 WeightedTokenSource features = new WeightedTokenSource(
-                        new TSVSource(featuresFile, charset), strIndex);
+                        new TSVSource(featuresFile, charset), 
+                        Token.stringDecoder(strIndex));
                 features.readAll();
 
                 ((KendallTau) prox).setNumFeatures(features.getCardinality());
@@ -256,9 +258,13 @@ public class AllPairsTask extends AbstractCommand {
         // in the file. Also this allows for the possibility of having differnt
         // files, e.g compare fruit words with cake words
         final WeightedTokenPairVectorSource sourceA = new WeightedTokenPairSource(
-                new TSVSource(entryFeaturesFile, charset), strIndex, strIndex).getVectorSource();
+                new TSVSource(entryFeaturesFile, charset),
+                Token.stringDecoder(strIndex), 
+                Token.stringDecoder(strIndex)).getVectorSource();
         final WeightedTokenPairVectorSource sourceB = new WeightedTokenPairSource(
-                new TSVSource(entryFeaturesFile, charset), strIndex, strIndex).getVectorSource();
+                new TSVSource(entryFeaturesFile, charset),
+                Token.stringDecoder(strIndex),
+                Token.stringDecoder(strIndex)).getVectorSource();
 
         // Create a sink object that will act as a recipient for all pairs that
         // are produced by the algorithm.
@@ -266,7 +272,8 @@ public class AllPairsTask extends AbstractCommand {
         final Sink<Weighted<TokenPair>> sink =
                 new WeightedTokenPairSink(
                 new TSVSink(outputFile, charset),
-                strIndex, strIndex);
+                Token.stringEncoder(strIndex),
+                Token.stringEncoder(strIndex));
 
         // Instantiate the all-pairs algorithm as given on the command line.
         ThreadedApssTask<Lexer.Tell> apss = new ThreadedApssTask<Lexer.Tell>(
