@@ -5,9 +5,16 @@
 package uk.ac.susx.mlcl.lib;
 
 import com.google.common.base.Function;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectList;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.util.concurrent.atomic.AtomicInteger;
 import uk.ac.susx.mlcl.lib.io.Files;
+import uk.ac.susx.mlcl.lib.io.TSVSink;
+import uk.ac.susx.mlcl.lib.io.TSVSource;
 
 /**
  *
@@ -23,12 +30,45 @@ public class Enumerators {
     }
 
     public static void saveStringEnumerator(Enumerator<String> strEnum, File file) throws IOException {
-        Files.writeSerialized(strEnum, file, true);
+//        Files.writeSerialized(strEnum, file, true);
+        
+        TSVSink out = new TSVSink(file, Files.DEFAULT_CHARSET);
+        
+        for(Object2IntMap.Entry<String> e : strEnum) {
+            out.writeInt(e.getIntValue());
+            out.writeString(e.getKey());
+            out.endOfRecord();
+        }
+        out.flush();
+        out.close();
     }
 
     @SuppressWarnings("unchecked")
     public static Enumerator<String> loadStringEnumerator(File file) throws IOException, ClassNotFoundException {
-        return (Enumerator<String>) Files.readSerialized(file, true);
+        
+        ObjectList<String> indexToObj = new ObjectArrayList<String>();
+        Object2IntMap<String> objToIndex = new Object2IntOpenHashMap<String>();
+        AtomicInteger nextId = new AtomicInteger(0);
+        
+        TSVSource in = new TSVSource(file, Files.DEFAULT_CHARSET);
+        while(in.hasNext()) {
+            int id = in.readInt();
+            String s = in.readString();
+            in.endOfRecord();
+            
+            if(nextId.get() <= id)
+                nextId.set(id+1);
+            
+            objToIndex.put(s, id);
+            while(id < indexToObj.size())
+                indexToObj.add(null);
+            
+            indexToObj.set(id, s);
+        }
+        
+        return new SimpleEnumerator<String>(indexToObj, objToIndex, nextId);
+        
+//        return (Enumerator<String>) Files.readSerialized(file, true);
     }
 
     public static <T> Function<T, Integer> encoder(final Enumerator<T> en) {

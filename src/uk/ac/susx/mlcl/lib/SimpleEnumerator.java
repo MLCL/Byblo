@@ -58,7 +58,7 @@ public final class SimpleEnumerator<T> implements Serializable, Enumerator<T> {
 
     private final AtomicInteger nextId;
 
-    private SimpleEnumerator(ObjectList<T> indexToObj, Object2IntMap<T> objToIndex, AtomicInteger nextId) {
+    protected SimpleEnumerator(ObjectList<T> indexToObj, Object2IntMap<T> objToIndex, AtomicInteger nextId) {
         this.indexToObj = indexToObj;
         this.objToIndex = objToIndex;
         this.nextId = nextId;
@@ -104,7 +104,54 @@ public final class SimpleEnumerator<T> implements Serializable, Enumerator<T> {
 
     @Override
     public Iterator<Object2IntMap.Entry<T>> iterator() {
-        return objToIndex.object2IntEntrySet().iterator();
+        return new Iterator<Entry<T>>() {
+
+            int nextIndex = 0;
+            @Override
+            public boolean hasNext() {
+                return nextIndex < indexToObj.size();
+            }
+
+            @Override
+            public Object2IntMap.Entry<T> next() {
+                final Object2IntMap.Entry<T> e = new Object2IntMap.Entry<T>() {
+
+                    final int index = nextIndex;
+                    
+                    @Override
+                    public int setValue(int i) {
+                        throw new UnsupportedOperationException("Not supported yet.");
+                    }
+
+                    @Override
+                    public int getIntValue() {
+                        return index;
+                    }
+
+                    @Override
+                    public T getKey() {
+                        return indexToObj.get(index);
+                    }
+
+                    @Override
+                    public Integer getValue() {
+                        return index;
+                    }
+
+                    @Override
+                    public Integer setValue(Integer v) {
+                        throw new UnsupportedOperationException("Not supported yet.");
+                    }
+                };
+                nextIndex++;
+                return e;
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        };
     }
 
     protected final Object writeReplace() {
