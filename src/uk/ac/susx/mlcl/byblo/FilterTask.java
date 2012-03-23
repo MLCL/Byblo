@@ -168,7 +168,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
     description = "Temorary directory which will be used during filtering.",
     converter = TempFileFactoryConverter.class)
     private FileFactory tempFiles = new TempFileFactory();
-
+    
     /*
      * === INTERNAL ===
      */
@@ -338,14 +338,14 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
         final IntSet rejected = new IntOpenHashSet();
 
         WeightedTokenSource entriesSource = new WeightedTokenSource(
-                new TSVSource(activeEntriesFile, charset), 
+                new TSVSource(activeEntriesFile, charset),
                 Token.stringDecoder(entryIndex));
 
         File outputFile = tempFiles.createFile();
         outputFile.deleteOnExit();
 
         WeightedTokenSink entriesSink = new WeightedTokenSink(
-                new TSVSink(outputFile, charset), 
+                new TSVSink(outputFile, charset),
                 Token.stringEncoder(entryIndex));
 
         if (LOG.isInfoEnabled()) {
@@ -420,7 +420,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
 
         WeightedTokenPairSink efSink = new WeightedTokenPairSink(
                 new TSVSink(outputFile, charset),
-                Token.stringEncoder(entryIndex), 
+                Token.stringEncoder(entryIndex),
                 Token.stringEncoder(featureIndex));
 
         if (LOG.isInfoEnabled()) {
@@ -545,7 +545,7 @@ public class FilterTask extends AbstractCommandTask implements Serializable {
         outputFile.deleteOnExit();
 
         WeightedTokenSink featureSink = new WeightedTokenSink(
-                new TSVSink(outputFile, charset), 
+                new TSVSink(outputFile, charset),
                 Token.stringEncoder(featureIndex));
 
         if (LOG.isInfoEnabled()) {

@@ -103,6 +103,15 @@ public class ExternalCountTask extends AbstractParallelCommandTask {
                description = "Character encoding to use for reading and writing files.")
     private Charset charset = Files.DEFAULT_CHARSET;
 
+
+    @Parameter(names = {"-pe", "--preindexed-entries"},
+    description = "Whether entries in the input events file are already indexed.")
+    private boolean preindexedEntries = false;
+
+    @Parameter(names = {"-pf", "--preindexed-features"},
+    description = "Whether features in the input events file are already indexed.")
+    private boolean preindexedFeatures = false;
+    
     private Comparator<String> comparator = new Comparator<String>() {
 
         @Override
@@ -175,6 +184,23 @@ public class ExternalCountTask extends AbstractParallelCommandTask {
         super();
     }
 
+    public boolean isPreindexedEntries() {
+        return preindexedEntries;
+    }
+
+    public void setPreindexedEntries(boolean preindexedEntries) {
+        this.preindexedEntries = preindexedEntries;
+    }
+
+    public boolean isPreindexedFeatures() {
+        return preindexedFeatures;
+    }
+
+    public void setPreindexedFeatures(boolean preindexedFeatures) {
+        this.preindexedFeatures = preindexedFeatures;
+    }
+
+    
     public final Charset getCharset() {
         return charset;
     }
@@ -295,8 +321,12 @@ public class ExternalCountTask extends AbstractParallelCommandTask {
                 File chunk_entryFeaturesFile = new File(chunk.getParentFile(),
                         chunk.getName() + ENTRY_FEATURES_FILE_SUFFIX);
 
-                submitTask(new CountTask(chunk, chunk_entryFeaturesFile,
-                        chunk_entriesFile, chunk_featuresFile, getCharset()));
+                CountTask ct = new CountTask(chunk, chunk_entryFeaturesFile,
+                        chunk_entriesFile, chunk_featuresFile, getCharset());
+                ct.setPreindexedEntries(this.isPreindexedEntries());
+                ct.setPreindexedFeatures(this.isPreindexedFeatures());
+                
+                submitTask(ct);
             }
 
             // XXX: Nasty hack to stop it tight looping when both queues are empty
