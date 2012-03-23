@@ -64,7 +64,7 @@ public abstract class AbstractTask implements Task {
     protected abstract void finaliseTask() throws Exception;
 
     @Override
-    public void run() {
+    public final void run() {
         try {
             
             setState(State.INITIALISING);
