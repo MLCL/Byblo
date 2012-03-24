@@ -67,7 +67,8 @@ public final class Files {
             throw new IllegalArgumentException("path does not exist: " + path);
         }
         if (!path.isDirectory()) {
-            throw new IllegalArgumentException("path is not a directory: " + path);
+            throw new IllegalArgumentException(
+                    "path is not a directory: " + path);
         }
         if (!path.canRead()) {
             throw new IllegalArgumentException("path is not readable: " + path);
@@ -102,7 +103,6 @@ public final class Files {
                 }
 
             }
-
         };
 
         fileList.addAll(Arrays.asList(path.list(filter)));
@@ -162,8 +162,8 @@ public final class Files {
         final StringBuilder strbfr = new StringBuilder();
         try {
             final BufferedReader br = (in instanceof BufferedReader)
-                                      ? ((BufferedReader) in)
-                                      : new BufferedReader(in);
+                    ? ((BufferedReader) in)
+                    : new BufferedReader(in);
             String tmpStr;
             while ((tmpStr = br.readLine()) != null) {
                 strbfr.append(tmpStr);
@@ -184,8 +184,8 @@ public final class Files {
 
     public static int countLines(Reader in) throws IOException {
         final BufferedReader br = (in instanceof BufferedReader)
-                                  ? ((BufferedReader) in)
-                                  : new BufferedReader(in);
+                ? ((BufferedReader) in)
+                : new BufferedReader(in);
         int count = 0;
         while (br.readLine() != null) {
             ++count;
@@ -326,8 +326,8 @@ public final class Files {
     public static String fileName(final File file, Object thing) {
         if (file == null || file.getName().equals("-")) {
             return (thing instanceof Readable || thing instanceof InputStream) ? "stdin"
-                   : (thing instanceof Appendable || thing instanceof OutputStream) ? "stdout"
-                     : "file";
+                    : (thing instanceof Appendable || thing instanceof OutputStream) ? "stdout"
+                    : "file";
         } else {
             return file.getName();
         }
@@ -336,13 +336,43 @@ public final class Files {
     public static void readAllLines(File file, Charset charset,
                                     Collection<? super String> lines)
             throws FileNotFoundException, IOException {
+        readLines(file, charset, lines);
+    }
+
+    public static List<String> readLines(
+            File file, Charset charset)
+            throws FileNotFoundException, IOException {
+        return readLines(file, charset, Integer.MAX_VALUE);
+    }
+
+    public static List<String> readLines(
+            File file, Charset charset, int limit)
+            throws FileNotFoundException, IOException {
+        final ArrayList<String> lines = new ArrayList<String>();
+        readLines(file, charset, lines, limit);
+        return lines;
+    }
+
+    public static void readLines(
+            File file, Charset charset,
+            Collection<? super String> lines)
+            throws FileNotFoundException, IOException {
+        readLines(file, charset, lines, Integer.MAX_VALUE);
+    }
+
+    public static void readLines(File file, Charset charset,
+                                 Collection<? super String> lines,
+                                 int limit)
+            throws FileNotFoundException, IOException {
         BufferedReader reader = null;
+        int count = 0;
         try {
             reader = openReader(file, charset);
             String line = reader.readLine();
-            while (line != null) {
+            while (line != null && count < limit) {
                 lines.add(line);
                 line = reader.readLine();
+                ++count;
             }
         } finally {
             if (reader != null)
@@ -411,8 +441,10 @@ public final class Files {
         ObjectOutputStream oos = null;
         try {
             oos = compressed
-                  ? new ObjectOutputStream(new GZIPOutputStream(new FileOutputStream(file)))
-                  : new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+                    ? new ObjectOutputStream(new GZIPOutputStream(new FileOutputStream(
+                    file)))
+                    : new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(
+                    file)));
             writeSerialized(obj, oos);
         } finally {
             if (oos != null) {
@@ -428,8 +460,8 @@ public final class Files {
         ObjectOutputStream oos = null;
         try {
             oos = (os instanceof ObjectOutputStream)
-                  ? (ObjectOutputStream) os
-                  : new ObjectOutputStream(os);
+                    ? (ObjectOutputStream) os
+                    : new ObjectOutputStream(os);
             oos.writeObject(obj);
         } finally {
             oos.flush();
@@ -447,8 +479,10 @@ public final class Files {
         ObjectInputStream ois = null;
         try {
             ois = compressed
-                  ? new ObjectInputStream(new GZIPInputStream(new FileInputStream(file)))
-                  : new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
+                    ? new ObjectInputStream(new GZIPInputStream(new FileInputStream(
+                    file)))
+                    : new ObjectInputStream(new BufferedInputStream(new FileInputStream(
+                    file)));
             return readSerialized(ois);
         } finally {
             if (ois != null)
@@ -459,10 +493,9 @@ public final class Files {
     public static Object readSerialized(InputStream is) throws IOException, ClassNotFoundException {
         Checks.checkNotNull("is", is);
         ObjectInputStream ois = (is instanceof ObjectInputStream)
-                                ? (ObjectInputStream) is
-                                : new ObjectInputStream(is);
+                ? (ObjectInputStream) is
+                : new ObjectInputStream(is);
         return ois.readObject();
 
     }
-
 }
