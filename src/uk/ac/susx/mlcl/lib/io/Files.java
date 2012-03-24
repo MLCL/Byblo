@@ -4,22 +4,7 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
+import java.io.*;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
@@ -33,10 +18,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import uk.ac.susx.mlcl.lib.Checks;
 
 /**
  * Static utility class for file manipulation.
- * 
+ *
  * @author Simon Wibberley &lt;simon.wibberley@sussex.ac.uk&gt;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -228,7 +214,7 @@ public final class Files {
     public static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");// Charset.defaultCharset();
 
     /*
-     * XXX: The following fields are not final because they are changed to 
+     * XXX: The following fields are not final because they are changed to
      * "REPORT" during unit tests. Obviously this is not ideal.
      */
     public static CodingErrorAction MALFORMED_INPUT_ACTION = CodingErrorAction.REPLACE;
@@ -411,6 +397,72 @@ public final class Files {
                 writer.close();
             }
         }
+    }
+
+    public static void writeSerialized(Object obj, File file)
+            throws IOException {
+        writeSerialized(obj, file, false);
+    }
+
+    public static void writeSerialized(Object obj, File file, boolean compressed)
+            throws IOException {
+        Checks.checkNotNull("obj", obj);
+        Checks.checkNotNull("file", file);
+        ObjectOutputStream oos = null;
+        try {
+            oos = compressed
+                  ? new ObjectOutputStream(new GZIPOutputStream(new FileOutputStream(file)))
+                  : new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)));
+            writeSerialized(obj, oos);
+        } finally {
+            if (oos != null) {
+                oos.close();
+            }
+        }
+    }
+
+    public static void writeSerialized(Object obj, OutputStream os)
+            throws IOException {
+        Checks.checkNotNull("obj", obj);
+        Checks.checkNotNull("os", os);
+        ObjectOutputStream oos = null;
+        try {
+            oos = (os instanceof ObjectOutputStream)
+                  ? (ObjectOutputStream) os
+                  : new ObjectOutputStream(os);
+            oos.writeObject(obj);
+        } finally {
+            oos.flush();
+        }
+    }
+
+    public static Object readSerialized(File file)
+            throws IOException, ClassNotFoundException {
+        return readSerialized(file, false);
+    }
+
+    public static Object readSerialized(File file, boolean compressed)
+            throws IOException, ClassNotFoundException {
+        Checks.checkNotNull("file", file);
+        ObjectInputStream ois = null;
+        try {
+            ois = compressed
+                  ? new ObjectInputStream(new GZIPInputStream(new FileInputStream(file)))
+                  : new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
+            return readSerialized(ois);
+        } finally {
+            if (ois != null)
+                ois.close();
+        }
+    }
+
+    public static Object readSerialized(InputStream is) throws IOException, ClassNotFoundException {
+        Checks.checkNotNull("is", is);
+        ObjectInputStream ois = (is instanceof ObjectInputStream)
+                                ? (ObjectInputStream) is
+                                : new ObjectInputStream(is);
+        return ois.readObject();
+
     }
 
 }
