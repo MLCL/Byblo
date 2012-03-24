@@ -350,7 +350,7 @@ public class ExternalCountTask extends AbstractParallelCommandTask {
                     countTask.getCharset(),
                     countTask.isPreindexedEntries());
             sortEntTask.setComparator(Weighted.recordOrder(Token.indexOrder()));
-            sortEntTask.setIndex(getIndex1());
+            sortEntTask.setIndex(countTask.getIndex1());
             submitTask(sortEntTask);
 
             SortTask.EventFreqsSortTask sortEventTask = new SortTask.EventFreqsSortTask(
@@ -361,8 +361,8 @@ public class ExternalCountTask extends AbstractParallelCommandTask {
                     countTask.isPreindexedFeatures());
             sortEventTask.setComparator(Weighted.recordOrder(TokenPair.
                     indexOrder()));
-            sortEventTask.setIndex1(getIndex1());
-            sortEventTask.setIndex2(getIndex2());
+            sortEventTask.setIndex1(countTask.getIndex1());
+            sortEventTask.setIndex2(countTask.getIndex2());
             submitTask(sortEventTask);
 
             SortTask.FeatureFreqsSortTask sortFeatTask = new SortTask.FeatureFreqsSortTask(
@@ -371,7 +371,7 @@ public class ExternalCountTask extends AbstractParallelCommandTask {
                     countTask.getCharset(),
                     countTask.isPreindexedFeatures());
             sortFeatTask.setComparator(Weighted.recordOrder(Token.indexOrder()));
-            sortFeatTask.setIndex(getIndex2());
+            sortFeatTask.setIndex(countTask.getIndex2());
             submitTask(sortFeatTask);
 
             if (!DEBUG)

@@ -35,12 +35,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
+import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.Lexer;
 import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
+import uk.ac.susx.mlcl.lib.tasks.FallbackComparator;
 
 /**
  * A <tt>WeightedTokenPairSource</tt> object is used to retrieve
@@ -142,7 +147,8 @@ public class WeightedTokenPairSource
     }
 
     public static boolean equal(File a, File b, Charset charset) throws IOException {
-        final Enumerator<String> stringIndex = Enumerators.newDefaultStringEnumerator();
+        final Enumerator<String> stringIndex = Enumerators.
+                newDefaultStringEnumerator();
         final WeightedTokenPairSource srcA = new WeightedTokenPairSource(
                 new TSVSource(a, charset),
                 Token.stringDecoder(stringIndex),
@@ -151,15 +157,27 @@ public class WeightedTokenPairSource
                 new TSVSource(b, charset),
                 Token.stringDecoder(stringIndex),
                 Token.stringDecoder(stringIndex));
-        boolean equal = true;
-        while (equal && srcA.hasNext() && srcB.hasNext()) {
-            final Weighted<TokenPair> recA = srcA.read();
-            final Weighted<TokenPair> recB = srcB.read();
-            equal = recA.record().id1() == recB.record().id1()
-                    && recA.record().id2() == recB.record().id2()
-                    && recA.weight() == recB.weight();
-        }
-        return equal && srcA.hasNext() == srcB.hasNext();
+
+
+        List<Weighted<TokenPair>> listA = IOUtil.readAll(srcA);
+        List<Weighted<TokenPair>> listB = IOUtil.readAll(srcB);
+        Comparator<Weighted<TokenPair>> c =
+                new FallbackComparator<Weighted<TokenPair>>(
+                Weighted.recordOrder(TokenPair.indexOrder()),
+                Weighted.<TokenPair>weightOrder());
+        Collections.sort(listA, c);
+        Collections.sort(listB, c);
+        return listA.equals(listB);
+//
+//        boolean equal = true;
+//        while (equal && srcA.hasNext() && srcB.hasNext()) {
+//            final Weighted<TokenPair> recA = srcA.read();
+//            final Weighted<TokenPair> recB = srcB.read();
+//            equal = recA.record().id1() == recB.record().id1()
+//                    && recA.record().id2() == recB.record().id2()
+//                    && recA.weight() == recB.weight();
+//        }
+//        return equal && srcA.hasNext() == srcB.hasNext();
     }
 
     @Override
@@ -180,5 +198,4 @@ public class WeightedTokenPairSource
     public double percentRead() throws IOException {
         return inner.percentRead();
     }
-
 }

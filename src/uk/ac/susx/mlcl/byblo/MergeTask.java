@@ -192,10 +192,10 @@ public abstract class MergeTask<T> extends AbstractCommandTask {
 
         while (a != null && b != null) {
             final int c = comp.compare(a, b);
-            if (c > 0) {
+            if (c < 0) {
                 reducer.reduce(dst, a);
                 a = srcA.hasNext() ? srcA.read() : null;
-            } else if (c < 0) {
+            } else if (c > 0) {
                 reducer.reduce(dst, b);
                 b = srcB.hasNext() ? srcB.read() : null;
             } else {

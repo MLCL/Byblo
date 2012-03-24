@@ -36,15 +36,20 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.SimpleEnumerator;
+import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.Lexer;
 import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
+import uk.ac.susx.mlcl.lib.tasks.FallbackComparator;
 
 /**
  * An <tt>TokenPairSource</tt> object is used to retrieve
@@ -148,21 +153,30 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell> {
                 new TSVSource(fileB, charset),
                 Token.stringDecoder(stringIndex),
                 Token.stringDecoder(stringIndex));
-        boolean equal = true;
-        while (equal && srcA.hasNext() && srcB.hasNext()) {
-            final TokenPair recA = srcA.read();
-            final TokenPair recB = srcB.read();
 
-            equal = equal
-                    && recA.id1() == recB.id1()
-                    && recA.id2() == recB.id2();
-
-            if (!equal) {
-                LOG.info(recA + " | " + recB);
-            }
-        }
-        equal = equal && srcA.hasNext() == srcB.hasNext();
-        return equal;
+        
+        List<TokenPair> listA = IOUtil.readAll(srcA);
+        List<TokenPair> listB = IOUtil.readAll(srcB);
+        Comparator<TokenPair> c = TokenPair.indexOrder();
+        Collections.sort(listA, c);
+        Collections.sort(listB, c);
+        return listA.equals(listB);
+//        
+//        boolean equal = true;
+//        while (equal && srcA.hasNext() && srcB.hasNext()) {
+//            final TokenPair recA = srcA.read();
+//            final TokenPair recB = srcB.read();
+//
+//            equal = equal
+//                    && recA.id1() == recB.id1()
+//                    && recA.id2() == recB.id2();
+//
+//            if (!equal) {
+//                LOG.info(recA + " | " + recB);
+//            }
+//        }
+//        equal = equal && srcA.hasNext() == srcB.hasNext();
+//        return equal;
     }
 
     @Override

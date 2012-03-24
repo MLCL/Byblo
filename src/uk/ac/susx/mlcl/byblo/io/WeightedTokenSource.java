@@ -39,15 +39,19 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
-import uk.ac.susx.mlcl.lib.SimpleEnumerator;
+import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.Lexer;
 import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
+import uk.ac.susx.mlcl.lib.tasks.FallbackComparator;
 
 /**
  * An <tt>WeightedTokenSource</tt> object is used to retrieve {@link Token}
@@ -218,14 +222,24 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
         final WeightedTokenSource srcB = new WeightedTokenSource(
                 new TSVSource(b, charset),
                 Token.stringDecoder(stringIndex));
-        boolean equal = true;
-        while (equal && srcA.hasNext() && srcB.hasNext()) {
-            final Weighted<Token> recA = srcA.read();
-            final Weighted<Token> recB = srcB.read();
-            equal = recA.record().id() == recB.record().id()
-                    && recA.weight() == recB.weight();
-        }
-        return equal && srcA.hasNext() == srcB.hasNext();
+        
+        List<Weighted<Token>> listA = IOUtil.readAll(srcA);
+        List<Weighted<Token>> listB = IOUtil.readAll(srcB);
+        Comparator<Weighted<Token>> c = new FallbackComparator<Weighted<Token>>(
+            Weighted.recordOrder(Token.indexOrder()),
+            Weighted.<Token>weightOrder());
+        Collections.sort(listA, c);
+        Collections.sort(listB, c);
+        return listA.equals(listB);
+//        
+//        boolean equal = true;
+//        while (equal && srcA.hasNext() && srcB.hasNext()) {
+//            final Weighted<Token> recA = srcA.read();
+//            final Weighted<Token> recB = srcB.read();
+//            equal = recA.record().id() == recB.record().id()
+//                    && recA.weight() == recB.weight();
+//        }
+//        return equal && srcA.hasNext() == srcB.hasNext();
     }
 
     @Override
