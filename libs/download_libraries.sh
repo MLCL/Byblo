@@ -54,7 +54,7 @@ function die {
 # Download and build JCommander
 function download_jcommander {
     jc=jcommander
-    jc_version=jcommander-1.19
+    jc_version=jcommander-1.23
 
     echo "[${jc}] Starting"
     which -s mvn || die "Can't find maven"
