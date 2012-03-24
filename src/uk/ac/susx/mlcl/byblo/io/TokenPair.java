@@ -275,5 +275,16 @@ public class TokenPair implements
                 }
 
             };
+//
+    public static final Comparator<TokenPair> INDEX_ORDER =
+            new Comparator<TokenPair>() {
+
+                @Override
+                public int compare(TokenPair t, TokenPair t1) {
+                    int c = t.id1() - t1.id1();
+                    return c != 0 ? c : t.id2() - t1.id2();
+                }
+
+            };
 
 }

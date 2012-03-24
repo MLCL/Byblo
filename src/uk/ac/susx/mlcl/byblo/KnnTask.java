@@ -32,38 +32,66 @@ package uk.ac.susx.mlcl.byblo;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.io.Files;
+import uk.ac.susx.mlcl.byblo.io.*;
+import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.SimpleEnumerator;
+import uk.ac.susx.mlcl.lib.io.*;
+import uk.ac.susx.mlcl.lib.tasks.FallbackComparator;
+import uk.ac.susx.mlcl.lib.tasks.ReverseComparator;
 
 /**
- * Task that read in a file and produces the k-nearest-neighbors for each base 
+ * Task that read in a file and produces the k-nearest-neighbors for each base
  * entry. Assumes the file is composed of entry, entry, weight triples that are
  * delimited by tabs.
- * 
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(
-commandDescription = "Perform k-nearest-neighbours on a similarity file.")
-public class KnnTask extends SortTask {
+@Parameters(commandDescription = "Perform k-nearest-neighbours on a similarity file.")
+public class KnnTask extends SortTask.SimsSortTask {
 
     private static final Log LOG = LogFactory.getLog(KnnTask.class);
 
     @Parameter(names = {"-k"},
-               description = "The maximum number of neighbours to produce per word.")
+    description = "The maximum number of neighbours to produce per word.")
     private int k = ExternalKnnTask.DEFAULT_K;
 
+    private Comparator<Weighted<TokenPair>> classComparator =
+            Weighted.recordOrder(TokenPair.INDEX_ORDER);
+
+    private Comparator<Weighted<TokenPair>> nearnessComparator =
+            new ReverseComparator(Weighted.weightOrder());
+
     public KnnTask(File sourceFile, File destinationFile, Charset charset,
-            Comparator<String> comparator, int k) {
-        super(sourceFile, destinationFile, charset, comparator);
+                   boolean preindexedTokens1, boolean preindexedTokens2, int k) {
+        super(sourceFile, destinationFile, charset, preindexedTokens1, preindexedTokens2);
+        setComparator(new FallbackComparator<Weighted<TokenPair>>(classComparator, nearnessComparator));
         this.k = k;
+    }
+
+    public Comparator<Weighted<TokenPair>> getClassComparator() {
+        return classComparator;
+    }
+
+    public void setClassComparator(Comparator<Weighted<TokenPair>> classComparator) {
+        this.classComparator = classComparator;
+        setComparator(new FallbackComparator<Weighted<TokenPair>>(classComparator, nearnessComparator));
+    }
+
+    public Comparator<Weighted<TokenPair>> getNearnessComparator() {
+        return nearnessComparator;
+    }
+
+    public void setNearnessComparator(Comparator<Weighted<TokenPair>> nearnessComparator) {
+        this.nearnessComparator = nearnessComparator;
+        setComparator(new FallbackComparator<Weighted<TokenPair>>(classComparator, nearnessComparator));
     }
 
     public final int getK() {
@@ -81,32 +109,67 @@ public class KnnTask extends SortTask {
         if (LOG.isInfoEnabled())
             LOG.info("Running memory K-Nearest-Neighbours from \"" + getSrcFile()
                     + "\" to \"" + getDstFile() + "\".");
-        final List<String> linesIn = new ArrayList<String>();
-        Files.readAllLines(getSrcFile(), getCharset(), linesIn);
-        final List<String> linesOut = new ArrayList<String>();
-        knnLines(linesIn, linesOut);
-        Files.writeAllLines(getDstFile(), getCharset(), linesOut);
+
+        final Function<String, Integer> decoder1;
+        final Function<String, Integer> decoder2;
+        final Function<Integer, String> encoder1;
+        final Function<Integer, String> encoder2;
+
+        if (!isPreindexedTokens1()) {
+            final Enumerator<String> entryIndex = new SimpleEnumerator<String>();
+
+            decoder1 = Token.stringDecoder(entryIndex);
+            encoder1 = Token.stringEncoder(entryIndex);
+        } else {
+            decoder1 = Token.enumeratedDecoder();
+            encoder1 = Token.enumeratedEncoder();
+        }
+
+        if (!isPreindexedTokens2()) {
+            final Enumerator<String> featureIndex = new SimpleEnumerator<String>();
+            decoder2 = Token.stringDecoder(featureIndex);
+            encoder2 = Token.stringEncoder(featureIndex);
+
+        } else {
+            decoder2 = Token.enumeratedDecoder();
+            encoder2 = Token.enumeratedEncoder();
+        }
+
+        Source<Weighted<TokenPair>> src = new WeightedTokenPairSource(
+                new TSVSource(getSrcFile(), getCharset()),
+                decoder1, decoder2);
+
+        final List<Weighted<TokenPair>> items = IOUtil.readAll(src);
+        Collections.sort(items, getComparator());
+
+
+        Sink<Weighted<TokenPair>> snk = new WeightedTokenPairSink(
+                new TSVSink(getDstFile(), getCharset()),
+                encoder1, encoder2);
+
+        knnLines(items, snk);
 
         if (LOG.isInfoEnabled())
             LOG.info("Completed memory K-Nearest-Neighbours.");
 
     }
 
-    protected void knnLines(Collection<? extends String> in,
-            Collection<? super String> out) {
-        String currentWord = null;
+    protected void knnLines(
+            Collection<Weighted<TokenPair>> in,
+            Sink<Weighted<TokenPair>> out)
+            throws IOException {
+        
+        Weighted<TokenPair> currentClass = null;
         int count = 0;
-        for (String line : in) {
-            String[] parts = line.split("\t");
-            String word = parts[0];
-            if (!word.equals(currentWord)) {
-                currentWord = word;
+        for (Weighted<TokenPair> item : in) {
+            if (classComparator.compare(item, currentClass) != 0) {
+                currentClass = item;
                 count = 1;
             } else {
                 count++;
             }
             if (count <= k) {
-                out.add(line);
+                out.write(item);
             }
         }
     }
@@ -116,4 +179,5 @@ public class KnnTask extends SortTask {
         return super.toStringHelper().
                 add("k", k);
     }
+
 }

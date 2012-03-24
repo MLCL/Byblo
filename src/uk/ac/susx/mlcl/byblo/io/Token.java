@@ -32,7 +32,9 @@ package uk.ac.susx.mlcl.byblo.io;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import java.io.*;
+import java.util.Comparator;
 import uk.ac.susx.mlcl.lib.Enumerator;
 
 /**
@@ -196,5 +198,15 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
 
         };
     }
+
+    public static final Comparator<Token> INDEX_ORDER =
+            new Comparator<Token>() {
+
+                @Override
+                public int compare(Token t, Token t1) {
+                    return t.id() - t1.id();
+                }
+
+            };
 
 }
