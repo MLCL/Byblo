@@ -34,15 +34,14 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * A file {@link FileFactory} implementation that creates temporary files
- * using {@link File#createTempFile(java.lang.String, java.lang.String) to 
+ * A file {@link FileFactory} implementation that creates temporary files using {@link File#createTempFile(java.lang.String, java.lang.String) to
  * produce new files.
- * 
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class TempFileFactory implements FileFactory {
 
-    public static final String DEFAULT_PREFIX =  "tmp";
+    public static final String DEFAULT_PREFIX = "tmp";
 
     public static final String DEFAULT_SUFFIX = "-tmp";
 
@@ -83,7 +82,12 @@ public class TempFileFactory implements FileFactory {
 
     @Override
     public File createFile() throws IOException {
-        return File.createTempFile(/*callingClass() +*/ prefix, suffix, directory);
+        return File.createTempFile(prefix, suffix, directory);
+    }
+
+    @Override
+    public File createFile(String pref, String suff) throws IOException {
+        return File.createTempFile(pref + prefix, suffix + suff, directory);
     }
 
     private String callingClass() {
@@ -103,10 +107,10 @@ public class TempFileFactory implements FileFactory {
         if (i < ste.length)
             className = ste[i].getClassName();
 
-        
-        if(className.length() > 10)
+
+        if (className.length() > 10)
             className = className.substring(0, 10);
-        
+
         return className;
     }
 
@@ -138,6 +142,4 @@ public class TempFileFactory implements FileFactory {
     public String toString() {
         return DEFAULT_DIRECTORY.toString();
     }
-
-
 }

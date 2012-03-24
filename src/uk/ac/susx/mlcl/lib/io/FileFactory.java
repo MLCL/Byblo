@@ -47,4 +47,15 @@ public interface FileFactory {
      * @throws IOException if some I/O error occurs
      */
     public File createFile() throws IOException;
+
+    /**
+     * Create a new file and return a reference to it. The file name should
+     * include the given prefix and suffix strings.
+     *
+     * @param pref Prefix to be inserted at the beginning of the file name
+     * @param suff Suffix to be inserted at the end of the file name
+     * @return the File object representing the newly created file
+     * @throws IOException if some I/O error occurs
+     */
+    public File createFile(String pref, String suff) throws IOException;
 }
