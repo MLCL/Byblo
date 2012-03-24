@@ -35,7 +35,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import uk.ac.susx.mlcl.lib.SimpleEnumerator;
+import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.io.Lexer;
 import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
@@ -141,7 +142,7 @@ public class WeightedTokenPairSource
     }
 
     public static boolean equal(File a, File b, Charset charset) throws IOException {
-        final SimpleEnumerator<String> stringIndex = new SimpleEnumerator<String>();
+        final Enumerator<String> stringIndex = Enumerators.newDefaultStringEnumerator();
         final WeightedTokenPairSource srcA = new WeightedTokenPairSource(
                 new TSVSource(a, charset),
                 Token.stringDecoder(stringIndex),

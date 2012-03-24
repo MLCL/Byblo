@@ -50,6 +50,7 @@ import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.SimpleEnumerator;
 import uk.ac.susx.mlcl.lib.io.TSVSink;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
@@ -61,7 +62,7 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
 public class WeightedEntryFeatureTest {
 
     private void copyWEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        Enumerator<String> idx = new SimpleEnumerator<String>();
+        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
         WeightedTokenPairSource aSrc = new WeightedTokenPairSource(
                 new TSVSource(a, DEFAULT_CHARSET),
                 Token.stringDecoder(idx),
@@ -76,7 +77,7 @@ public class WeightedEntryFeatureTest {
     }
 
     private void copyWEFV(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        Enumerator<String> idx = new SimpleEnumerator<String>();
+        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
         WeightedTokenPairVectorSource aSrc = new WeightedTokenPairVectorSource(
                 new WeightedTokenPairSource(
                 new TSVSource(a, DEFAULT_CHARSET),
@@ -153,7 +154,7 @@ public class WeightedEntryFeatureTest {
     public void testLMSample() throws FileNotFoundException, IOException {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-ef-sample");
         Charset charset = Charset.forName("UTF-8");
-        Enumerator<String> idx = new SimpleEnumerator<String>();
+        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
         WeightedTokenPairSource efSrc = new WeightedTokenPairSource(
                 new TSVSource(testSample, charset), Token.stringDecoder(idx), Token.stringDecoder(idx));
         assertTrue("EntryFeatureSource is empty", efSrc.hasNext());
@@ -168,7 +169,7 @@ public class WeightedEntryFeatureTest {
         final Map<Tell, Weighted<TokenPair>> hist =
                 new HashMap<Tell, Weighted<TokenPair>>();
 
-        Enumerator<String> idx = new SimpleEnumerator<String>();
+        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
         WeightedTokenPairSource src =
                 new WeightedTokenPairSource(
                 new TSVSource(file, DEFAULT_CHARSET), Token.stringDecoder(idx), Token.stringDecoder(idx));
@@ -219,7 +220,7 @@ public class WeightedEntryFeatureTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_ENTRY_FEATURES.getName() + ".str");
 
-        Enumerator<String> idx = new SimpleEnumerator<String>();
+        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
 
         {
             WeightedTokenPairSource aSrc = new WeightedTokenPairSource(
@@ -257,7 +258,7 @@ public class WeightedEntryFeatureTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_ENTRY_FEATURES.getName() + ".enum.compact.str");
 
-        Enumerator<String> idx = new SimpleEnumerator<String>();
+        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
 
         {
             WeightedTokenPairSource aSrc = new WeightedTokenPairSource(new TSVSource(a, DEFAULT_CHARSET), 

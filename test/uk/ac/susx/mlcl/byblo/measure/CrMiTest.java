@@ -40,6 +40,7 @@ import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.SimpleEnumerator;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
@@ -258,7 +259,7 @@ public class CrMiTest {
         // will be different.
 
 
-        Enumerator<String> idx = new SimpleEnumerator<String>();
+        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
         WeightedTokenPairSource expected = new WeightedTokenPairSource(
                 new TSVSource(expectedOutput, DEFAULT_CHARSET), Token.stringDecoder(idx), Token.stringDecoder(idx));
         WeightedTokenPairSource actual = new WeightedTokenPairSource(

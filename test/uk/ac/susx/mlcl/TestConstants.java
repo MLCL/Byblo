@@ -55,6 +55,15 @@ public class TestConstants {
     public static final File TEST_FRUIT_INPUT =
             new File(TEST_FRUIT_DIR, FRUIT_NAME);
 
+    public static final File TEST_FRUIT_INPUT_INDEXED =
+            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed");
+
+    public static final File TEST_FRUIT_ENTRY_INDEX =
+            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".entry-index");
+
+    public static final File TEST_FRUIT_FEATURE_INDEX =
+            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".feature-index");
+
     public static final File TEST_FRUIT_ENTRIES =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".entries");
 
@@ -63,6 +72,15 @@ public class TestConstants {
 
     public static final File TEST_FRUIT_ENTRY_FEATURES =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".entryFeatures");
+
+    public static final File TEST_FRUIT_INDEXED_ENTRIES =
+            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.entries");
+
+    public static final File TEST_FRUIT_INDEXED_FEATURES =
+            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.features");
+
+    public static final File TEST_FRUIT_INDEXED_ENTRY_FEATURES =
+            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.entryFeatures");
 
     public static final File TEST_FRUIT_ENTRIES_FILTERED =
             new File(TEST_FRUIT_ENTRIES.getParentFile(), TEST_FRUIT_ENTRIES.getName() + ".filtered");
@@ -81,6 +99,7 @@ public class TestConstants {
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".neighs");
 
     public static final File TEST_OUTPUT_DIR = new File(TEST_DATA_DIR, "out");
+    public static final File TEST_TMP_DIR = new File(TEST_OUTPUT_DIR, "tmp");
 
     public static final Charset DEFAULT_CHARSET = Files.DEFAULT_CHARSET;
 
@@ -88,7 +107,7 @@ public class TestConstants {
 
     static {
         TEST_OUTPUT_DIR.mkdir();
-        TEST_OUTPUT_DIR.deleteOnExit();
+        TEST_TMP_DIR.mkdir();
     }
 
     public static File makeTempFile(int size) throws IOException {

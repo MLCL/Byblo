@@ -25,9 +25,22 @@ public class Enumerators {
     private Enumerators() {
     }
 
-    public static Enumerator<String> newSimpleStringEnumerator() {
-        return new SimpleEnumerator<String>();
+    private static final class InstanceHolder {
+        private static final Enumerator<String> onTheFlyStringEnumerator 
+                = new SimpleEnumerator<String>();
+
+        private InstanceHolder() {
+        }
     }
+    
+    
+    public static Enumerator<String> newDefaultStringEnumerator() {
+//        return InstanceHolder.onTheFlyStringEnumerator;
+        return new SimpleEnumerator<String>();
+    } 
+//    public static Enumerator<String> newSimpleStringEnumerator() {
+//        return new SimpleEnumerator<String>();
+//    }
 
     public static void saveStringEnumerator(Enumerator<String> strEnum, File file) throws IOException {
 //        Files.writeSerialized(strEnum, file, true);

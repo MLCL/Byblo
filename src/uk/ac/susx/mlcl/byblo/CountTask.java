@@ -50,10 +50,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.*;
-import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.MiscUtil;
-import uk.ac.susx.mlcl.lib.SimpleEnumerator;
+import uk.ac.susx.mlcl.lib.*;
 import uk.ac.susx.mlcl.lib.io.Files;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.TSVSink;
@@ -82,41 +79,49 @@ public class CountTask extends AbstractCommandTask implements Serializable {
     private static final int PROGRESS_INTERVAL = 1000000;
 
     @Parameter(names = {"-i", "--input"},
-    required = true,
-    description = "Source instances file",
-    validateWith = InputFileValidator.class)
+               required = true,
+               description = "Source instances file",
+               validateWith = InputFileValidator.class)
     private File inputFile;
 
     @Parameter(names = {"-oef", "--output-entry-features"},
-    required = true,
-    description = "Entry-feature-pair frequencies destination file",
-    validateWith = OutputFileValidator.class)
+               required = true,
+               description = "Entry-feature-pair frequencies destination file",
+               validateWith = OutputFileValidator.class)
     private File entryFeaturesFile = null;
 
     @Parameter(names = {"-oe", "--output-entries"},
-    required = true,
-    description = "Entry frequencies destination file",
-    validateWith = OutputFileValidator.class)
+               required = true,
+               description = "Entry frequencies destination file",
+               validateWith = OutputFileValidator.class)
     private File entriesFile = null;
 
     @Parameter(names = {"-of", "--output-features"},
-    required = true,
-    description = "Feature frequencies destination file.",
-    validateWith = OutputFileValidator.class)
+               required = true,
+               description = "Feature frequencies destination file.",
+               validateWith = OutputFileValidator.class)
     private File featuresFile = null;
 
     @Parameter(names = {"-c", "--charset"},
-    description = "Character encoding to use for input and output.")
+               description = "Character encoding to use for input and output.")
     private Charset charset = Files.DEFAULT_CHARSET;
 
     @Parameter(names = {"-pe", "--preindexed-entries"},
-    description = "Whether entries in the input events file are already indexed.")
+               description = "Whether entries in the input events file are already indexed.")
     private boolean preindexedEntries = false;
 
     @Parameter(names = {"-pf", "--preindexed-features"},
-    description = "Whether features in the input events file are already indexed.")
+               description = "Whether features in the input events file are already indexed.")
     private boolean preindexedFeatures = false;
 
+    private Comparator<Weighted<Token>> entryOrder =
+            Weighted.recordOrder(Token.indexOrder());
+
+    private Comparator<Weighted<Token>> featureOrder =
+            Weighted.recordOrder(Token.indexOrder());
+
+    private Comparator<Weighted<TokenPair>> eventOrder =
+            Weighted.recordOrder(TokenPair.indexOrder());
 
     /**
      * Dependency injection constructor with all fields parameterised.
@@ -179,6 +184,30 @@ public class CountTask extends AbstractCommandTask implements Serializable {
     public CountTask() {
     }
 
+    private Enumerator<String> index1 = null;
+
+    private Enumerator<String> index2 = null;
+
+    public Enumerator<String> getIndex1() {
+        if (index1 == null)
+            index1 = Enumerators.newDefaultStringEnumerator();
+        return index1;
+    }
+
+    public void setIndex1(Enumerator<String> entryIndex) {
+        this.index1 = entryIndex;
+    }
+
+    public Enumerator<String> getIndex2() {
+        if (index2 == null)
+            index2 = Enumerators.newDefaultStringEnumerator();
+        return index2;
+    }
+
+    public void setIndex2(Enumerator<String> featureIndex) {
+        this.index2 = featureIndex;
+    }
+
     @Override
     protected void initialiseTask() throws Exception {
         checkState();
@@ -190,54 +219,54 @@ public class CountTask extends AbstractCommandTask implements Serializable {
             LOG.info("Running memory count on \"" + inputFile + "\".");
         }
 
-
         final Function<String, Integer> entryDecoder;
         final Function<String, Integer> featureDecoder;
         final Function<Integer, String> entryEncoder;
         final Function<Integer, String> featureEncoder;
 
         if (!preindexedEntries) {
-            final Enumerator<String> entryIndex = new SimpleEnumerator<String>();
-
-            entryDecoder = Token.stringDecoder(entryIndex);
-            entryEncoder = Token.stringEncoder(entryIndex);
+            entryDecoder = Token.stringDecoder(getIndex1());
+            entryEncoder = Token.stringEncoder(getIndex1());
+            entryOrder = Weighted.recordOrder(Token.stringOrder(entryEncoder));
         } else {
             entryDecoder = Token.enumeratedDecoder();
             entryEncoder = Token.enumeratedEncoder();
+            entryOrder = Weighted.recordOrder(Token.indexOrder());
         }
 
         if (!preindexedFeatures) {
-            final Enumerator<String> featureIndex = new SimpleEnumerator<String>();
-            featureDecoder = Token.stringDecoder(featureIndex);
-            featureEncoder = Token.stringEncoder(featureIndex);
-
+            featureDecoder = Token.stringDecoder(getIndex2());
+            featureEncoder = Token.stringEncoder(getIndex2());
+            featureOrder = Weighted.recordOrder(
+                    Token.stringOrder(featureEncoder));
         } else {
             featureDecoder = Token.enumeratedDecoder();
             featureEncoder = Token.enumeratedEncoder();
+            featureOrder = Weighted.recordOrder(Token.indexOrder());
+        }
+
+        if (!preindexedEntries || !preindexedEntries) {
+            eventOrder = Weighted.recordOrder(TokenPair.stringOrder(
+                    entryEncoder, featureEncoder));
+        } else {
+            eventOrder = Weighted.recordOrder(TokenPair.indexOrder());
         }
 
         final Object2IntMap<TokenPair> entryFeatureFreq =
                 new Object2IntOpenHashMap<TokenPair>();
         entryFeatureFreq.defaultReturnValue(0);
 
-        {
-            final Int2IntMap featureFreq = new Int2IntOpenHashMap();
-            featureFreq.defaultReturnValue(0);
+        final Int2IntMap featureFreq = new Int2IntOpenHashMap();
+        featureFreq.defaultReturnValue(0);
 
-            {
-                final Int2IntMap entryFreq = new Int2IntOpenHashMap();
-                entryFreq.defaultReturnValue(0);
+        final Int2IntMap entryFreq = new Int2IntOpenHashMap();
+        entryFreq.defaultReturnValue(0);
 
-                countEvents(entryFreq, featureFreq,
-                            entryFeatureFreq, entryDecoder, featureDecoder);
+        countEvents(entryFreq, featureFreq,
+                    entryFeatureFreq, entryDecoder, featureDecoder);
 
-                writeEntries(entryFreq, entryEncoder);
-            }
-
-            writeFeatures(featureFreq, featureEncoder);
-        }
-
-
+        writeEntries(entryFreq, entryEncoder);
+        writeFeatures(featureFreq, featureEncoder);
         writeEvents(entryFeatureFreq, entryEncoder, featureEncoder);
 
         if (LOG.isInfoEnabled()) {
@@ -287,7 +316,8 @@ public class CountTask extends AbstractCommandTask implements Serializable {
                 LOG.info("Read " + i + " events. Found "
                         + entryFreq.size() + " entries, " + featureFreq.size()
                         + " features, and " + entryFeatureFreq.size()
-                        + " entry-features. (" + (int) instanceSource.percentRead()
+                        + " entry-features. (" + (int) instanceSource.
+                        percentRead()
                         + "% complete)");
                 LOG.debug(MiscUtil.memoryInfoString());
             }
@@ -300,8 +330,27 @@ public class CountTask extends AbstractCommandTask implements Serializable {
         public int compare(Int2IntMap.Entry o1, Int2IntMap.Entry o2) {
             return o1.getIntKey() - o2.getIntKey();
         }
-
     };
+
+    private List<Weighted<Token>> mapToWeightedTokens(Int2IntMap map) {
+        List<Weighted<Token>> out = new ArrayList<Weighted<Token>>(map.size());
+        for (Int2IntMap.Entry e : map.int2IntEntrySet()) {
+            out.add(new Weighted<Token>(
+                    new Token(e.getIntKey()), e.getIntValue()));
+        }
+        return out;
+    }
+
+    private List<Weighted<TokenPair>> mapToWeightedTokenPairs(
+            Object2IntMap<TokenPair> map) {
+        List<Weighted<TokenPair>> out = new ArrayList<Weighted<TokenPair>>(map.
+                size());
+        for (Object2IntMap.Entry<TokenPair> e : map.object2IntEntrySet()) {
+            out.add(new Weighted<TokenPair>(
+                    e.getKey(), e.getIntValue()));
+        }
+        return out;
+    }
 
     private void writeEntries(
             final Int2IntMap entryFreq,
@@ -312,36 +361,34 @@ public class CountTask extends AbstractCommandTask implements Serializable {
             LOG.debug("Sorting entries frequency data.");
 
 
-        List<Int2IntMap.Entry> entryFreqList =
-                new ArrayList<Int2IntMap.Entry>(entryFreq.int2IntEntrySet());
-        Collections.sort(entryFreqList, TOKEN_ID_ORDER);
-
+        List<Weighted<Token>> tokens = mapToWeightedTokens(entryFreq);
+        Collections.sort(tokens, entryOrder);
 
         if (LOG.isDebugEnabled())
-            LOG.debug("Writing entries frequency data to file \"" + entriesFile + "\".");
+            LOG.debug(
+                    "Writing entries frequency data to file \"" + entriesFile + "\".");
 
         if (entriesFile.exists() && LOG.isWarnEnabled())
             LOG.warn("The entries file already exists and will be overwritten.");
 
-        WeightedTokenSink entriesink = null;
-        final int n = entryFreqList.size();
+        WeightedTokenSink entrySink = null;
+        final int n = tokens.size();
         try {
-            entriesink = new WeightedTokenSink(
+            entrySink = new WeightedTokenSink(
                     new TSVSink(entriesFile, charset), entryEncoder);
             int i = 0;
-            for (final Int2IntMap.Entry entry : entryFreqList) {
-                entriesink.write(new Weighted<Token>(
-                        new Token(entry.getIntKey()),
-                        entry.getIntValue()));
-                if ((++i % PROGRESS_INTERVAL == 0 || i == n) && LOG.isInfoEnabled()) {
+            for (final Weighted<Token> tok : tokens) {
+                entrySink.write(tok);
+                if ((++i % PROGRESS_INTERVAL == 0 || i == n) && LOG.
+                        isInfoEnabled()) {
                     LOG.info("Wrote " + i + "/" + n + " entries. ("
                             + (int) (i * 100d / n) + "% complete)");
                 }
             }
         } finally {
-            if (entriesink != null) {
-                entriesink.flush();
-                entriesink.close();
+            if (entrySink != null) {
+                entrySink.flush();
+                entrySink.close();
             }
         }
     }
@@ -355,9 +402,8 @@ public class CountTask extends AbstractCommandTask implements Serializable {
             LOG.debug("Sorting context frequency data.");
         }
 
-        List<Int2IntMap.Entry> contextFreqList =
-                new ArrayList<Int2IntMap.Entry>(featureFreq.int2IntEntrySet());
-        Collections.sort(contextFreqList, TOKEN_ID_ORDER);
+        List<Weighted<Token>> tokens = mapToWeightedTokens(featureFreq);
+        Collections.sort(tokens, featureOrder);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Writing context frequency data to " + featuresFile + ".");
@@ -367,16 +413,15 @@ public class CountTask extends AbstractCommandTask implements Serializable {
         }
 
         WeightedTokenSink featureSink = null;
-        final int n = contextFreqList.size();
+        final int n = tokens.size();
         try {
             featureSink = new WeightedTokenSink(
                     new TSVSink(featuresFile, charset), featureEncoder);
             int i = 0;
-            for (final Int2IntMap.Entry context : contextFreqList) {
-                featureSink.write(new Weighted<Token>(new Token(
-                        context.getIntKey()),
-                                                      context.getIntValue()));
-                if ((++i % PROGRESS_INTERVAL == 0 || i == n) && LOG.isInfoEnabled()) {
+            for (final Weighted<Token> tok : tokens) {
+                featureSink.write(tok);
+                if ((++i % PROGRESS_INTERVAL == 0 || i == n) && LOG.
+                        isInfoEnabled()) {
                     LOG.info("Wrote " + i + "/" + n + " contexts. ("
                             + (int) (i * 100d / n) + "% complete)");
                 }
@@ -389,30 +434,30 @@ public class CountTask extends AbstractCommandTask implements Serializable {
         }
     }
 
-    private final Comparator<Object2IntMap.Entry<? extends TokenPair>> TOKEN_PAIR_ID_ORDER =
-            new Comparator<Object2IntMap.Entry<? extends TokenPair>>() {
+    private static <T> Comparator<Object2IntMap.Entry<T>> keyOrder(
+            final Comparator<T> inner) {
+        return new Comparator<Object2IntMap.Entry<T>>() {
 
-                @Override
-                public int compare(
-                        Object2IntMap.Entry<? extends TokenPair> o1,
-                        Object2IntMap.Entry<? extends TokenPair> o2) {
-                    final int x = o1.getKey().id1() - o2.getKey().id1();
-                    return x != 0 ? x : o1.getKey().id2() - o2.getKey().id2();
-                }
-
-            };
+            @Override
+            public int compare(
+                    Object2IntMap.Entry<T> o1,
+                    Object2IntMap.Entry<T> o2) {
+                return inner.compare(o1.getKey(), o2.getKey());
+            }
+        };
+    }
 
     private void writeEvents(
-            final Object2IntMap<? extends TokenPair> entryFeatureFreq,
+            final Object2IntMap<TokenPair> entryFeatureFreq,
             final Function<Integer, String> entryEncoder,
             final Function<Integer, String> featureEncoder)
             throws FileNotFoundException, IOException {
 
         LOG.debug("Sorting feature pairs frequency data.");
 
-        List<Object2IntMap.Entry<? extends TokenPair>> contextFreqList =
-                new ArrayList<Object2IntMap.Entry<? extends TokenPair>>(entryFeatureFreq.object2IntEntrySet());
-        Collections.sort(contextFreqList, TOKEN_PAIR_ID_ORDER);
+        List<Weighted<TokenPair>> tokens = mapToWeightedTokenPairs(
+                entryFeatureFreq);
+        Collections.sort(tokens, eventOrder);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug(
@@ -423,18 +468,16 @@ public class CountTask extends AbstractCommandTask implements Serializable {
         }
 
         WeightedTokenPairSink featureSink = null;
-        final int n = contextFreqList.size();
+        final int n = tokens.size();
         try {
             featureSink = new WeightedTokenPairSink(
                     new TSVSink(entryFeaturesFile, charset),
                     entryEncoder, featureEncoder);
             int i = 0;
-            for (final Object2IntMap.Entry<? extends TokenPair> feature : contextFreqList) {
-                featureSink.write(new Weighted<TokenPair>(
-                        new TokenPair(feature.getKey().id1(),
-                                      feature.getKey().id2()),
-                        feature.getIntValue()));
-                if ((++i % PROGRESS_INTERVAL == 0 || i == n) && LOG.isInfoEnabled()) {
+            for (final Weighted<TokenPair> tok : tokens) {
+                featureSink.write(tok);
+                if ((++i % PROGRESS_INTERVAL == 0 || i == n) && LOG.
+                        isInfoEnabled()) {
                     LOG.info("Wrote " + i + "/" + n + " features. ("
                             + (int) (i * 100d / n) + "% complete)");
                 }
@@ -567,7 +610,8 @@ public class CountTask extends AbstractCommandTask implements Serializable {
 
         // For each output file, check that either it exists and it writeable,
         // or that it does not exist but is creatable
-        if (entriesFile.exists() && (!entriesFile.isFile() || !entriesFile.canWrite())) {
+        if (entriesFile.exists() && (!entriesFile.isFile() || !entriesFile.
+                                     canWrite())) {
             throw new IllegalStateException(
                     "entries file exists but is not writable: " + entriesFile);
         }
@@ -577,7 +621,8 @@ public class CountTask extends AbstractCommandTask implements Serializable {
             throw new IllegalStateException(
                     "entries file does not exists and can not be reated: " + entriesFile);
         }
-        if (featuresFile.exists() && (!featuresFile.isFile() || !featuresFile.canWrite())) {
+        if (featuresFile.exists() && (!featuresFile.isFile() || !featuresFile.
+                                      canWrite())) {
             throw new IllegalStateException(
                     "features file exists but is not writable: " + featuresFile);
         }
@@ -587,7 +632,8 @@ public class CountTask extends AbstractCommandTask implements Serializable {
             throw new IllegalStateException(
                     "features file does not exists and can not be reated: " + featuresFile);
         }
-        if (entryFeaturesFile.exists() && (!entryFeaturesFile.isFile() || !entryFeaturesFile.canWrite())) {
+        if (entryFeaturesFile.exists() && (!entryFeaturesFile.isFile() || !entryFeaturesFile.
+                                           canWrite())) {
             throw new IllegalStateException(
                     "entry-features file exists but is not writable: " + entryFeaturesFile);
         }
@@ -609,8 +655,7 @@ public class CountTask extends AbstractCommandTask implements Serializable {
                 add("charset", charset);
     }
 
-    
-     public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
         new CountTask().runCommand(args);
     }
 }

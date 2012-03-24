@@ -45,6 +45,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.SimpleEnumerator;
 import uk.ac.susx.mlcl.lib.io.TSVSink;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
@@ -55,14 +56,16 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
  */
 public class EntryTest {
 
-    private void copyE(File a, File b, boolean compact, boolean enumIn, boolean enumOut)
+    private void copyE(File a, File b, boolean compact, boolean enumIn,
+                       boolean enumOut)
             throws FileNotFoundException, IOException {
 
-        Enumerator<String> idx = new SimpleEnumerator<String>();
+        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
         WeightedTokenSource aSrc;
         WeightedTokenSink bSink;
         if (enumIn)
-            aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET), Token.stringDecoder(idx));
+            aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET),
+                                           Token.stringDecoder(idx));
         else
             aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET));
 
@@ -107,11 +110,11 @@ public class EntryTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_ENTRIES.getName() + ".str");
 
-        Enumerator<String> idx = new SimpleEnumerator<String>();
+        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
 
         {
             WeightedTokenSource aSrc = new WeightedTokenSource(
-                    new TSVSource(a, DEFAULT_CHARSET), 
+                    new TSVSource(a, DEFAULT_CHARSET),
                     Token.stringDecoder(idx));
             WeightedTokenSink bSink = new WeightedTokenSink(
                     new TSVSink(b, DEFAULT_CHARSET));
@@ -142,16 +145,17 @@ public class EntryTest {
         final Map<Tell, Weighted<Token>> hist =
                 new HashMap<Tell, Weighted<Token>>();
 
-        Enumerator<String> idx = new SimpleEnumerator<String>();
+        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
         WeightedTokenSource src = new WeightedTokenSource(
                 new TSVSource(file, DEFAULT_CHARSET),
-                  Token.stringDecoder(idx ));
+                Token.stringDecoder(idx));
         {
             while (src.hasNext()) {
                 final Tell pos = src.position();
                 final Weighted<Token> record = src.read();
 
-                System.out.println(pos.toString() + ": " + record.record().toString(idx));
+                System.out.println(pos.toString() + ": " + record.record().
+                        toString(idx));
 
                 assertNotNull("Found null EntryRecord", record);
                 hist.put(pos, record);
@@ -167,7 +171,8 @@ public class EntryTest {
                 final Weighted<Token> expected = hist.get(pos);
 
                 System.out.println("expected tell: " + pos);
-                System.out.println("expected: " + expected.record().toString(idx));
+                System.out.println(
+                        "expected: " + expected.record().toString(idx));
 
                 src.position(pos);
 
@@ -188,5 +193,4 @@ public class EntryTest {
             throws FileNotFoundException, IOException {
         testRandomAccess(TEST_FRUIT_ENTRIES);
     }
-
 }

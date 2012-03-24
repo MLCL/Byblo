@@ -39,6 +39,7 @@ import java.nio.charset.Charset;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.SimpleEnumerator;
 import uk.ac.susx.mlcl.lib.io.Lexer;
 import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
@@ -137,7 +138,8 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell> {
 
     public static boolean equal(File fileA, File fileB, Charset charset)
             throws IOException {
-        final Enumerator<String> stringIndex = new SimpleEnumerator<String>();
+        final Enumerator<String> stringIndex = Enumerators.
+                newDefaultStringEnumerator();
         final TokenPairSource srcA = new TokenPairSource(
                 new TSVSource(fileA, charset),
                 Token.stringDecoder(stringIndex),
@@ -181,5 +183,4 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell> {
     public double percentRead() throws IOException {
         return inner.percentRead();
     }
-
 }

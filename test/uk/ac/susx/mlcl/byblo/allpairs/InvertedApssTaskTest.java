@@ -46,6 +46,7 @@ import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.SimpleEnumerator;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
 
@@ -69,7 +70,7 @@ public class InvertedApssTaskTest {
 
         InvertedApssTask<Lexer.Tell> instance = new InvertedApssTask<Lexer.Tell>();
 
-        Enumerator<String> idx = new SimpleEnumerator<String>();
+        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
         WeightedTokenPairSource mdbsa = new WeightedTokenPairSource(
                 new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), 
                 Token.stringDecoder(idx),Token.stringDecoder(idx));

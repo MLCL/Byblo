@@ -56,11 +56,11 @@ public class ExternalKnnTask extends ExternalSortTask.SimsExternalSortTask {
     public static final int DEFAULT_K = 100;
 
     @Parameter(names = {"-k"},
-    description = "The number of neighbours to produce for each base entry.")
+               description = "The number of neighbours to produce for each base entry.")
     private int k = DEFAULT_K;
 
     private Comparator<Weighted<TokenPair>> classComparator =
-            Weighted.recordOrder(TokenPair.INDEX_ORDER);
+            Weighted.recordOrder(TokenPair.indexOrder());
 
     private Comparator<Weighted<TokenPair>> nearnessComparator =
             new ReverseComparator(Weighted.weightOrder());
@@ -68,38 +68,50 @@ public class ExternalKnnTask extends ExternalSortTask.SimsExternalSortTask {
     public ExternalKnnTask(File sourceFile, File destinationFile,
                            Charset charset, int maxChunkSize, int k,
                            boolean preindexedTokens1, boolean preindexedTokens2) {
-        super(sourceFile, destinationFile, charset, preindexedTokens1, preindexedTokens2);
+        super(sourceFile, destinationFile, charset, preindexedTokens1,
+              preindexedTokens2);
         setMaxChunkSize(maxChunkSize);
-        setComparator(new FallbackComparator<Weighted<TokenPair>>(classComparator, nearnessComparator));
+        updateCombinedComparator();
         setK(k);
     }
 
     public ExternalKnnTask(File sourceFile, File destinationFile,
-                           Charset charset, int k, boolean preindexedTokens1, boolean preindexedTokens2) {
-        super(sourceFile, destinationFile, charset, preindexedTokens1, preindexedTokens2);
+                           Charset charset, int k, boolean preindexedTokens1,
+                           boolean preindexedTokens2) {
+        super(sourceFile, destinationFile, charset, preindexedTokens1,
+              preindexedTokens2);
+        updateCombinedComparator();
         setK(k);
     }
 
     public ExternalKnnTask() {
         super();
+        updateCombinedComparator();
     }
 
     public Comparator<Weighted<TokenPair>> getClassComparator() {
         return classComparator;
     }
 
-    public void setClassComparator(Comparator<Weighted<TokenPair>> classComparator) {
+    public void setClassComparator(
+            Comparator<Weighted<TokenPair>> classComparator) {
         this.classComparator = classComparator;
-        setComparator(new FallbackComparator<Weighted<TokenPair>>(classComparator, nearnessComparator));
+        updateCombinedComparator();
     }
 
     public Comparator<Weighted<TokenPair>> getNearnessComparator() {
         return nearnessComparator;
     }
 
-    public void setNearnessComparator(Comparator<Weighted<TokenPair>> nearnessComparator) {
+    public void setNearnessComparator(
+            Comparator<Weighted<TokenPair>> nearnessComparator) {
         this.nearnessComparator = nearnessComparator;
-        setComparator(new FallbackComparator<Weighted<TokenPair>>(classComparator, nearnessComparator));
+        updateCombinedComparator();
+    }
+
+    private void updateCombinedComparator() {
+        setComparator(new FallbackComparator<Weighted<TokenPair>>(
+                classComparator, nearnessComparator));
     }
 
     @Override
@@ -197,5 +209,4 @@ public class ExternalKnnTask extends ExternalSortTask.SimsExternalSortTask {
     protected ToStringHelper toStringHelper() {
         return super.toStringHelper().add("k", k);
     }
-
 }

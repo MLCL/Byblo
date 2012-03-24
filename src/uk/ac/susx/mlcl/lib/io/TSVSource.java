@@ -31,6 +31,7 @@
 package uk.ac.susx.mlcl.lib.io;
 
 import com.google.common.base.CharMatcher;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -45,7 +46,7 @@ import uk.ac.susx.mlcl.lib.MiscUtil;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class TSVSource implements SeekableSource<Iterable<String>, Lexer.Tell> {
+public final class TSVSource implements SeekableSource<Iterable<String>, Lexer.Tell>, Closeable {
 
     private static final char RECORD_DELIM = '\n';
 
@@ -128,7 +129,6 @@ public final class TSVSource implements SeekableSource<Iterable<String>, Lexer.T
         return lexer.type() == Lexer.Type.Delimiter;
     }
 
-
     public void endOfRecord() throws CharacterCodingException, IOException {
         do {
             parseDelimiter(RECORD_DELIM);
@@ -146,7 +146,7 @@ public final class TSVSource implements SeekableSource<Iterable<String>, Lexer.T
     public String readString() throws CharacterCodingException, IOException {
         if (column > 0)
             parseValueDelimiter();
-        
+
         skipWhitespace();
         expectType(Lexer.Type.Value, lexer.type());
         final String str = lexer.value().toString();
@@ -158,10 +158,14 @@ public final class TSVSource implements SeekableSource<Iterable<String>, Lexer.T
     }
 
     public double readDouble() throws CharacterCodingException, IOException {
+        String str = readString();
         try {
-            return Double.valueOf(readString());
+            return Double.valueOf(str);
         } catch (NumberFormatException nfe) {
-            throw new TSVDataFormatException(this, nfe);
+            throw new TSVDataFormatException(
+                    this,
+                    "Caused by NumberFormatException parsing string \"" + str + "\"",
+                    nfe);
         }
     }
 
@@ -208,4 +212,8 @@ public final class TSVSource implements SeekableSource<Iterable<String>, Lexer.T
         return record;
     }
 
+    @Override
+    public void close() throws IOException {
+        lexer.close();
+    }
 }

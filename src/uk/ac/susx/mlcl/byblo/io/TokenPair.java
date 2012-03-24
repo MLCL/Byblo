@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import java.io.*;
@@ -48,6 +49,8 @@ public class TokenPair implements
         Comparable<TokenPair>, Serializable, Cloneable {
 
     private static final long serialVersionUID = 3L;
+
+    private static final Comparator<TokenPair> NATURAL_ORDER = indexOrder();
 
     /**
      * Indexed identifier of the first entry.
@@ -107,7 +110,8 @@ public class TokenPair implements
     public String toString(Enumerator<String> stringIndex1,
                            Enumerator<String> stringIndex2) {
         return Objects.toStringHelper(this).
-                add("1", stringIndex1.value(id1)).add("2", stringIndex2.value(id2)).
+                add("1", stringIndex1.value(id1)).add("2", stringIndex2.value(
+                id2)).
                 toString();
     }
 
@@ -124,7 +128,7 @@ public class TokenPair implements
     public int compareTo(final TokenPair that)
             throws NullPointerException {
         Checks.checkNotNull("that", that);
-        return ASYMMETRIC_KEY_COMPARATOR.compare(this, that);
+        return NATURAL_ORDER.compare(this, that);
     }
 
     @Override
@@ -183,7 +187,6 @@ public class TokenPair implements
         protected final Object readResolve() {
             return pair;
         }
-
     }
 
     public static Predicate<TokenPair> identity() {
@@ -198,7 +201,6 @@ public class TokenPair implements
             public String toString() {
                 return "identity";
             }
-
         };
     }
 //
@@ -233,58 +235,71 @@ public class TokenPair implements
 //                            : Double.compare(a.getWeight(), b.getWeight());
 //                }
 //            };
-
-    public static final Comparator<TokenPair> ASYMMETRIC_KEY_COMPARATOR =
-            new Comparator<TokenPair>() {
-
-                @Override
-                public final int compare(final TokenPair a, final TokenPair b) {
-                    return a.id1() < b.id1() ? -1
-                           : a.id1() > b.id1() ? 1
-                             : a.id2() < b.id2() ? -1
-                               : a.id2() > b.id2() ? 1
-                                 : 0;
-                }
-
-                @Override
-                public String toString() {
-                    return "ASYMMETRIC_KEY_COMPARATOR";
-                }
-
-            };
-
-    public static final Comparator<TokenPair> SYMMETRIC_KEY_COMPARATOR =
-            new Comparator<TokenPair>() {
-
-                @Override
-                public final int compare(final TokenPair a, final TokenPair b) {
-                    final int x1 = Math.min(a.id1(), a.id2());
-                    final int x2 = Math.min(b.id1(), b.id2());
-                    final int y1 = Math.max(a.id1(), a.id2());
-                    final int y2 = Math.max(b.id1(), b.id2());
-                    return x1 < x2 ? -1
-                           : x1 > x2 ? 1
-                             : y1 < y2 ? -1
-                               : y1 > y2 ? 1
-                                 : 0;
-                }
-
-                @Override
-                public String toString() {
-                    return "SYMMETRIC_KEY_COMPARATOR";
-                }
-
-            };
 //
-    public static final Comparator<TokenPair> INDEX_ORDER =
-            new Comparator<TokenPair>() {
+//    public static final Comparator<TokenPair> ASYMMETRIC_KEY_COMPARATOR =
+//            new Comparator<TokenPair>() {
+//
+//                @Override
+//                public final int compare(final TokenPair a, final TokenPair b) {
+//                    return a.id1() < b.id1() ? -1
+//                            : a.id1() > b.id1() ? 1
+//                            : a.id2() < b.id2() ? -1
+//                            : a.id2() > b.id2() ? 1
+//                            : 0;
+//                }
+//
+//                @Override
+//                public String toString() {
+//                    return "ASYMMETRIC_KEY_COMPARATOR";
+//                }
+//            };
+//
+//    public static final Comparator<TokenPair> SYMMETRIC_KEY_COMPARATOR =
+//            new Comparator<TokenPair>() {
+//
+//                @Override
+//                public final int compare(final TokenPair a, final TokenPair b) {
+//                    final int x1 = Math.min(a.id1(), a.id2());
+//                    final int x2 = Math.min(b.id1(), b.id2());
+//                    final int y1 = Math.max(a.id1(), a.id2());
+//                    final int y2 = Math.max(b.id1(), b.id2());
+//                    return x1 < x2 ? -1
+//                            : x1 > x2 ? 1
+//                            : y1 < y2 ? -1
+//                            : y1 > y2 ? 1
+//                            : 0;
+//                }
+//
+//                @Override
+//                public String toString() {
+//                    return "SYMMETRIC_KEY_COMPARATOR";
+//                }
+//            };
+////
 
-                @Override
-                public int compare(TokenPair t, TokenPair t1) {
-                    int c = t.id1() - t1.id1();
-                    return c != 0 ? c : t.id2() - t1.id2();
-                }
+    public static Comparator<TokenPair> indexOrder() {
+        return new Comparator<TokenPair>() {
 
-            };
+            @Override
+            public int compare(TokenPair a, TokenPair b) {
+                int c = a.id1() - b.id1();
+                return c != 0 ? c : a.id2() - b.id2();
+            }
+        };
+    }
 
+    public static Comparator<TokenPair> stringOrder(
+            final Function<Integer, String> encoder1,
+            final Function<Integer, String> encoder2) {
+        return new Comparator<TokenPair>() {
+
+            @Override
+            public int compare(final TokenPair a, final TokenPair b) {
+                int c = encoder1.apply(a.id1()).compareTo(
+                        encoder1.apply(b.id1()));
+                return c != 0 ? c : encoder2.apply(a.id2()).compareTo(
+                        encoder2.apply(b.id2()));
+            }
+        };
+    }
 }

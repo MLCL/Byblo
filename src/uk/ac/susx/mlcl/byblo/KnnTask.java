@@ -42,6 +42,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.SimpleEnumerator;
 import uk.ac.susx.mlcl.lib.io.*;
 import uk.ac.susx.mlcl.lib.tasks.FallbackComparator;
@@ -60,19 +61,21 @@ public class KnnTask extends SortTask.SimsSortTask {
     private static final Log LOG = LogFactory.getLog(KnnTask.class);
 
     @Parameter(names = {"-k"},
-    description = "The maximum number of neighbours to produce per word.")
+               description = "The maximum number of neighbours to produce per word.")
     private int k = ExternalKnnTask.DEFAULT_K;
 
     private Comparator<Weighted<TokenPair>> classComparator =
-            Weighted.recordOrder(TokenPair.INDEX_ORDER);
+            Weighted.recordOrder(TokenPair.indexOrder());
 
     private Comparator<Weighted<TokenPair>> nearnessComparator =
             new ReverseComparator(Weighted.weightOrder());
 
     public KnnTask(File sourceFile, File destinationFile, Charset charset,
                    boolean preindexedTokens1, boolean preindexedTokens2, int k) {
-        super(sourceFile, destinationFile, charset, preindexedTokens1, preindexedTokens2);
-        setComparator(new FallbackComparator<Weighted<TokenPair>>(classComparator, nearnessComparator));
+        super(sourceFile, destinationFile, charset, preindexedTokens1,
+              preindexedTokens2);
+        setComparator(new FallbackComparator<Weighted<TokenPair>>(
+                classComparator, nearnessComparator));
         this.k = k;
     }
 
@@ -80,18 +83,22 @@ public class KnnTask extends SortTask.SimsSortTask {
         return classComparator;
     }
 
-    public void setClassComparator(Comparator<Weighted<TokenPair>> classComparator) {
+    public void setClassComparator(
+            Comparator<Weighted<TokenPair>> classComparator) {
         this.classComparator = classComparator;
-        setComparator(new FallbackComparator<Weighted<TokenPair>>(classComparator, nearnessComparator));
+        setComparator(new FallbackComparator<Weighted<TokenPair>>(
+                classComparator, nearnessComparator));
     }
 
     public Comparator<Weighted<TokenPair>> getNearnessComparator() {
         return nearnessComparator;
     }
 
-    public void setNearnessComparator(Comparator<Weighted<TokenPair>> nearnessComparator) {
+    public void setNearnessComparator(
+            Comparator<Weighted<TokenPair>> nearnessComparator) {
         this.nearnessComparator = nearnessComparator;
-        setComparator(new FallbackComparator<Weighted<TokenPair>>(classComparator, nearnessComparator));
+        setComparator(new FallbackComparator<Weighted<TokenPair>>(
+                classComparator, nearnessComparator));
     }
 
     public final int getK() {
@@ -116,7 +123,8 @@ public class KnnTask extends SortTask.SimsSortTask {
         final Function<Integer, String> encoder2;
 
         if (!isPreindexedTokens1()) {
-            final Enumerator<String> entryIndex = new SimpleEnumerator<String>();
+            final Enumerator<String> entryIndex = Enumerators.
+                    newDefaultStringEnumerator();
 
             decoder1 = Token.stringDecoder(entryIndex);
             encoder1 = Token.stringEncoder(entryIndex);
@@ -126,7 +134,8 @@ public class KnnTask extends SortTask.SimsSortTask {
         }
 
         if (!isPreindexedTokens2()) {
-            final Enumerator<String> featureIndex = new SimpleEnumerator<String>();
+            final Enumerator<String> featureIndex = Enumerators.
+                    newDefaultStringEnumerator();
             decoder2 = Token.stringDecoder(featureIndex);
             encoder2 = Token.stringEncoder(featureIndex);
 
@@ -158,7 +167,7 @@ public class KnnTask extends SortTask.SimsSortTask {
             Collection<Weighted<TokenPair>> in,
             Sink<Weighted<TokenPair>> out)
             throws IOException {
-        
+
         Weighted<TokenPair> currentClass = null;
         int count = 0;
         for (Weighted<TokenPair> item : in) {
@@ -179,5 +188,4 @@ public class KnnTask extends SortTask.SimsSortTask {
         return super.toStringHelper().
                 add("k", k);
     }
-
 }

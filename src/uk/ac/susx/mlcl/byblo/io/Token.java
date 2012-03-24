@@ -32,7 +32,6 @@ package uk.ac.susx.mlcl.byblo.io;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import java.io.*;
 import java.util.Comparator;
 import uk.ac.susx.mlcl.lib.Enumerator;
@@ -47,6 +46,8 @@ import uk.ac.susx.mlcl.lib.Enumerator;
 public class Token implements Serializable, Comparable<Token>, Cloneable {
 
     private static final long serialVersionUID = 2L;
+
+    private static final Comparator<Token> NATURAL_ORDER = indexOrder();
 
     private final int id;
 
@@ -108,7 +109,7 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
 
     @Override
     public int compareTo(Token that) {
-        return this.id() - that.id();
+        return NATURAL_ORDER.compare(this, that);
     }
 
     @Override
@@ -152,7 +153,6 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
         protected final Object readResolve() {
             return token;
         }
-
     }
 
     public static Function<Integer, String> enumeratedEncoder() {
@@ -162,7 +162,6 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
             public String apply(Integer token) {
                 return Integer.toString(token);
             }
-
         };
     }
 
@@ -173,40 +172,50 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
             public Integer apply(String str) {
                 return Integer.parseInt(str);
             }
-
         };
     }
 
-    public static Function<Integer, String> stringEncoder(final Enumerator<String> strEnum) {
+    public static Function<Integer, String> stringEncoder(
+            final Enumerator<String> strEnum) {
         return new Function<Integer, String>() {
 
             @Override
             public String apply(Integer token) {
                 return strEnum.value(token);
             }
-
         };
     }
 
-    public static Function<String, Integer> stringDecoder(final Enumerator<String> strEnum) {
+    public static Function<String, Integer> stringDecoder(
+            final Enumerator<String> strEnum) {
         return new Function<String, Integer>() {
 
             @Override
             public Integer apply(String str) {
                 return strEnum.index(str);
             }
-
         };
     }
 
-    public static final Comparator<Token> INDEX_ORDER =
-            new Comparator<Token>() {
+    public static Comparator<Token> indexOrder() {
+        return new Comparator<Token>() {
 
-                @Override
-                public int compare(Token t, Token t1) {
-                    return t.id() - t1.id();
-                }
+            @Override
+            public int compare(final Token a, final Token b) {
+                return a.id() - b.id();
+            }
+        };
+    }
 
-            };
+    public static Comparator<Token> stringOrder(
+            final Function<Integer, String> encoder) {
+        return new Comparator<Token>() {
 
+            @Override
+            public int compare(final Token a, final Token b) {
+                return encoder.apply(a.id()).compareTo(
+                        encoder.apply(b.id()));
+            }
+        };
+    }
 }

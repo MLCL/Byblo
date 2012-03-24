@@ -39,6 +39,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.SimpleEnumerator;
 import uk.ac.susx.mlcl.lib.io.TSVSink;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
@@ -50,7 +51,7 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
 public class FeatureTest {
 
     private void copyF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        Enumerator<String> idx = new SimpleEnumerator<String>();
+        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
         WeightedTokenSource aSrc = new WeightedTokenSource(
                 new TSVSource(a, DEFAULT_CHARSET),
                 Token.stringDecoder(idx));
@@ -93,7 +94,7 @@ public class FeatureTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_FEATURES.getName() + ".str");
 
-        Enumerator<String> idx = new SimpleEnumerator<String>();
+        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
 
         {
             WeightedTokenSource aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET), Token.stringDecoder(idx));

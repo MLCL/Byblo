@@ -120,7 +120,7 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
             }
         } catch (InterruptedException ex) {
             if (LOG.isErrorEnabled()) {
-                LOG.error(null, ex);
+                LOG.error("Finalization interupted", ex);
             }
             catchException(ex);
         } finally {

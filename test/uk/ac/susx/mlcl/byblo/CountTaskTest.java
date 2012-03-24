@@ -33,10 +33,15 @@ package uk.ac.susx.mlcl.byblo;
 import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.Test;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.lib.collect.ArrayUtil;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
  *
@@ -47,7 +52,8 @@ public class CountTaskTest {
     private static final String subject = CountTask.class.getName();
 
     private void runWithAPI(File inInst, File outE, File outF, File outEF,
-            Charset charset)
+                            Charset charset, boolean preIndexEntries,
+                            boolean preIndexFeatures)
             throws Exception {
         final CountTask countTask = new CountTask();
         countTask.setInstancesFile(inInst);
@@ -55,6 +61,8 @@ public class CountTaskTest {
         countTask.setFeaturesFile(outF);
         countTask.setEntryFeaturesFile(outEF);
         countTask.setCharset(charset);
+        countTask.setPreindexedEntries(preIndexEntries);
+        countTask.setPreindexedFeatures(preIndexFeatures);
         countTask.run();
         while (countTask.isExceptionThrown()) {
             countTask.throwException();
@@ -69,10 +77,54 @@ public class CountTaskTest {
         assertTrue("Empty output file found: " + outEF, outEF.length() > 0);
     }
 
-    private void runExpectingNullPointer(File inInst, File outE, File outF,
-            File outEF, Charset charset) throws Exception {
+    private void runWithCLI(
+            File inInst, File outE, File outF, File outEF, Charset charset,
+            boolean preindexedEntries, boolean preindexedFeatures)
+            throws Exception {
+
+        String[] args = {
+            "--input", inInst.toString(),
+            "--output-entries", outE.toString(),
+            "--output-features", outF.toString(),
+            "--output-entry-features", outEF.toString(),
+            "--charset", charset.name()
+        };
+
+        if (preindexedEntries) {
+            List<String> tmp = new ArrayList<String>(Arrays.asList(args));
+            tmp.add("--preindexed-entries");
+            args = tmp.toArray(new String[0]);
+        }
+        if (preindexedFeatures) {
+            List<String> tmp = new ArrayList<String>(Arrays.asList(args));
+            tmp.add("--preindexed-features");
+            args = tmp.toArray(new String[0]);
+        }
+
         try {
-            runWithAPI(inInst, outE, outF, outEF, charset);
+            enableExistTrapping();
+            CountTask.main(args);
+        } finally {
+            disableExitTrapping();
+        }
+
+
+        assertTrue("Output files not created: " + outE, outE.exists());
+        assertTrue("Output files not created: " + outF, outF.exists());
+        assertTrue("Output files not created: " + outEF, outEF.exists());
+
+        assertTrue("Empty output file found: " + outE, outE.length() > 0);
+        assertTrue("Empty output file found: " + outF, outF.length() > 0);
+        assertTrue("Empty output file found: " + outEF, outEF.length() > 0);
+    }
+
+    private void runExpectingNullPointer(File inInst, File outE, File outF,
+                                         File outEF, Charset charset,
+                                         boolean preIndexEntries,
+                                         boolean preIndexFeatures) throws Exception {
+        try {
+            runWithAPI(inInst, outE, outF, outEF, charset, preIndexEntries,
+                       preIndexFeatures);
             fail("NullPointerException should have been thrown.");
         } catch (NullPointerException ex) {
             // pass
@@ -80,9 +132,12 @@ public class CountTaskTest {
     }
 
     private void runExpectingIllegalState(File inInst, File outE, File outF,
-            File outEF, Charset charset) throws Exception {
+                                          File outEF, Charset charset,
+                                          boolean preIndexEntries,
+                                          boolean preIndexFeatures) throws Exception {
         try {
-            runWithAPI(inInst, outE, outF, outEF, charset);
+            runWithAPI(inInst, outE, outF, outEF, charset, preIndexEntries,
+                       preIndexFeatures);
             fail("IllegalStateException should have been thrown.");
         } catch (IllegalStateException ex) {
             // pass 
@@ -97,24 +152,116 @@ public class CountTaskTest {
         final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
         final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
         final File efActual = new File(TEST_OUTPUT_DIR,
-                fruitPrefix + ".entryFeatures");
+                                       fruitPrefix + ".entryFeatures");
 
         eActual.delete();
         fActual.delete();
         efActual.delete();
 
         runWithAPI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
-                DEFAULT_CHARSET);
+                   DEFAULT_CHARSET, false, false);
 
         assertTrue("Output entries file differs from sampledata file.",
-                WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
-                DEFAULT_CHARSET));
+                   WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
+                                             DEFAULT_CHARSET));
         assertTrue("Output features file differs from test data file.",
-                WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
-                DEFAULT_CHARSET));
+                   WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
+                                             DEFAULT_CHARSET));
         assertTrue("Output entry/features file differs from test data file.",
-                TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
-                DEFAULT_CHARSET));
+                   TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
+                                         DEFAULT_CHARSET));
+    }
+
+    @Test
+    public void testRunOnFruitCLI() throws Exception {
+        System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
+
+        final String fruitPrefix = TEST_FRUIT_INPUT.getName();
+        final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
+        final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
+        final File efActual = new File(TEST_OUTPUT_DIR,
+                                       fruitPrefix + ".entryFeatures");
+
+        eActual.delete();
+        fActual.delete();
+        efActual.delete();
+
+        runWithCLI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
+                   DEFAULT_CHARSET, false, false);
+
+        assertTrue("Output entries file differs from sampledata file.",
+                   WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
+                                             DEFAULT_CHARSET));
+        assertTrue("Output features file differs from test data file.",
+                   WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
+                                             DEFAULT_CHARSET));
+        assertTrue("Output entry/features file differs from test data file.",
+                   TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
+                                         DEFAULT_CHARSET));
+    }
+
+    @Test
+    public void testRunOnFruitAPI_Indexed() throws Exception {
+        System.out.println(
+                "Testing " + subject + " on " + TEST_FRUIT_INPUT_INDEXED + " (Indexed)");
+
+        final String fruitPrefix = TEST_FRUIT_INPUT_INDEXED.getName();
+        final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
+        final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
+        final File efActual = new File(TEST_OUTPUT_DIR,
+                                       fruitPrefix + ".entryFeatures");
+
+        eActual.delete();
+        fActual.delete();
+        efActual.delete();
+
+        runWithAPI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
+                   DEFAULT_CHARSET, true, true);
+
+        assertTrue("Output entries file differs from sampledata file.",
+                   WeightedTokenSource.equal(eActual,
+                                             TEST_FRUIT_INDEXED_ENTRIES,
+                                             DEFAULT_CHARSET));
+        assertTrue("Output features file differs from test data file.",
+                   WeightedTokenSource.equal(fActual,
+                                             TEST_FRUIT_INDEXED_FEATURES,
+                                             DEFAULT_CHARSET));
+        assertTrue("Output entry/features file differs from test data file.",
+                   TokenPairSource.equal(efActual,
+                                         TEST_FRUIT_INDEXED_ENTRY_FEATURES,
+                                         DEFAULT_CHARSET));
+    }
+
+    @Test
+    public void testRunOnFruitCLI_Indexed() throws Exception {
+        System.out.println(
+                "Testing " + subject + " on " + TEST_FRUIT_INPUT_INDEXED + " (Indexed)");
+
+        final String fruitPrefix = TEST_FRUIT_INPUT_INDEXED.getName();
+        final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
+        final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
+        final File efActual = new File(TEST_OUTPUT_DIR,
+                                       fruitPrefix + ".entryFeatures");
+
+        eActual.delete();
+        fActual.delete();
+        efActual.delete();
+
+        runWithCLI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
+                   DEFAULT_CHARSET, true, true);
+
+        assertTrue("Output entries file differs from sampledata file.",
+                   WeightedTokenSource.equal(eActual,
+                                             TEST_FRUIT_INDEXED_ENTRIES,
+                                             DEFAULT_CHARSET));
+        assertTrue("Output features file differs from test data file.",
+                   WeightedTokenSource.equal(fActual,
+                                             TEST_FRUIT_INDEXED_FEATURES,
+                                             DEFAULT_CHARSET));
+        assertTrue("Output entry/features file differs from test data file.",
+                   TokenPairSource.equal(efActual,
+                                         TEST_FRUIT_INDEXED_ENTRY_FEATURES,
+                                         DEFAULT_CHARSET));
     }
 
     @Test(timeout = 1000)
@@ -126,18 +273,26 @@ public class CountTaskTest {
         final File eOut = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
         final File fOut = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
         final File efOut = new File(TEST_OUTPUT_DIR,
-                fruitPrefix + ".entryFeatures");
+                                    fruitPrefix + ".entryFeatures");
 
-        runExpectingNullPointer(null, eOut, fOut, efOut, DEFAULT_CHARSET);
-        runExpectingNullPointer(instIn, null, fOut, efOut, DEFAULT_CHARSET);
-        runExpectingNullPointer(instIn, eOut, null, efOut, DEFAULT_CHARSET);
-        runExpectingNullPointer(instIn, eOut, fOut, null, DEFAULT_CHARSET);
-        runExpectingNullPointer(instIn, eOut, fOut, efOut, null);
+        runExpectingNullPointer(null, eOut, fOut, efOut, DEFAULT_CHARSET, false,
+                                false);
+        runExpectingNullPointer(instIn, null, fOut, efOut, DEFAULT_CHARSET,
+                                false, false);
+        runExpectingNullPointer(instIn, eOut, null, efOut, DEFAULT_CHARSET,
+                                false, false);
+        runExpectingNullPointer(instIn, eOut, fOut, null, DEFAULT_CHARSET, false,
+                                false);
+        runExpectingNullPointer(instIn, eOut, fOut, efOut, null, false, false);
 
         File dir = TEST_OUTPUT_DIR;
-        runExpectingIllegalState(dir, eOut, fOut, efOut, DEFAULT_CHARSET);
-        runExpectingIllegalState(instIn, dir, fOut, efOut, DEFAULT_CHARSET);
-        runExpectingIllegalState(instIn, eOut, dir, efOut, DEFAULT_CHARSET);
-        runExpectingIllegalState(instIn, eOut, fOut, dir, DEFAULT_CHARSET);
+        runExpectingIllegalState(dir, eOut, fOut, efOut, DEFAULT_CHARSET, false,
+                                 false);
+        runExpectingIllegalState(instIn, dir, fOut, efOut, DEFAULT_CHARSET,
+                                 false, false);
+        runExpectingIllegalState(instIn, eOut, dir, efOut, DEFAULT_CHARSET,
+                                 false, false);
+        runExpectingIllegalState(instIn, eOut, fOut, dir, DEFAULT_CHARSET, false,
+                                 false);
     }
 }

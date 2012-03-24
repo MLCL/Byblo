@@ -34,7 +34,9 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import java.io.Closeable;
 import java.io.File;
+import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Comparator;
@@ -43,6 +45,7 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.SimpleEnumerator;
 import uk.ac.susx.mlcl.lib.io.*;
 import uk.ac.susx.mlcl.lib.tasks.AbstractCommandTask;
@@ -71,26 +74,26 @@ public abstract class MergeTask<T> extends AbstractCommandTask {
     private Reducer<T> reducer = new DefaultReducer<T>();
 
     @Parameter(names = {"-ifa", "--input-file-a"}, required = true,
-    description = "The first file to merge.",
-    validateWith = InputFileValidator.class)
+               description = "The first file to merge.",
+               validateWith = InputFileValidator.class)
     private File sourceFileA;
 
     @Parameter(names = {"-ifb", "--input-file-b"}, required = true,
-    description = "The second file to merge.",
-    validateWith = InputFileValidator.class)
+               description = "The second file to merge.",
+               validateWith = InputFileValidator.class)
     private File sourceFileB;
 
     @Parameter(names = {"-of", "--output-file"},
-    description = "The output file to which both input will be merged.",
-    validateWith = OutputFileValidator.class)
+               description = "The output file to which both input will be merged.",
+               validateWith = OutputFileValidator.class)
     private File destinationFile;
 
     @Parameter(names = {"-c", "--charset"},
-    description = "The character set encoding to use for both input and output files.")
+               description = "The character set encoding to use for both input and output files.")
     private Charset charset = Files.DEFAULT_CHARSET;
 
     @Parameter(names = {"-r", "--reverse"},
-    description = "Reverse the result of comparisons.")
+               description = "Reverse the result of comparisons.")
     private boolean reverse = false;
 
     public MergeTask(File sourceFileA, File sourceFileB, File destination,
@@ -148,30 +151,38 @@ public abstract class MergeTask<T> extends AbstractCommandTask {
 
     public interface Reducer<T> {
 
-        void reduce(Sink<T> dst, T... items) throws IOException;
+        void reduce(Sink<T> dst, T a, T b) throws IOException;
 
+        void reduce(Sink<T> dst, T item) throws IOException;
     }
 
     public static class DefaultReducer<T> implements Reducer<T> {
 
         @Override
-        public void reduce(Sink<T> dst, T... items) throws IOException {
-            for (T x : items)
-                dst.write(x);
+        public void reduce(Sink<T> dst, T a, T b) throws IOException {
+            dst.write(a);
+            dst.write(b);
         }
 
+        @Override
+        public void reduce(Sink<T> dst, T item) throws IOException {
+            dst.write(item);
+        }
     }
 
     public static class WeightSumReducer<T> implements Reducer<Weighted<T>> {
 
         @Override
-        public void reduce(Sink<Weighted<T>> dst, Weighted<T>... items) throws IOException {
-            double weight = 0;
-            for (Weighted<T> x : items)
-                weight += x.weight();
-            dst.write(new Weighted<T>(items[0].record(), weight));
+        public void reduce(Sink<Weighted<T>> dst, Weighted<T> a, Weighted<T> b)
+                throws IOException {
+            dst.write(new Weighted<T>(a.record(), a.weight() + b.weight()));
         }
 
+        @Override
+        public void reduce(Sink<Weighted<T>> dst,
+                           Weighted<T> item) throws IOException {
+            dst.write(item);
+        }
     }
 
     protected void merge(Source<T> srcA, Source<T> srcB, Sink<T> dst) throws IOException {
@@ -186,7 +197,6 @@ public abstract class MergeTask<T> extends AbstractCommandTask {
                 a = srcA.hasNext() ? srcA.read() : null;
             } else if (c < 0) {
                 reducer.reduce(dst, b);
-                dst.write(b);
                 b = srcB.hasNext() ? srcB.read() : null;
             } else {
                 reducer.reduce(dst, a, b);
@@ -259,17 +269,36 @@ public abstract class MergeTask<T> extends AbstractCommandTask {
 
     public abstract static class WeightedTokenMergeTask extends MergeTask<Weighted<Token>> {
 
-        private static final Log LOG = LogFactory.getLog(WeightedTokenMergeTask.class);
+        private static final Log LOG = LogFactory.getLog(
+                WeightedTokenMergeTask.class);
 
         @Parameter(names = {"-p", "--preindexed"},
-        description = "Whether tokens in the input events file are indexed.")
+                   description = "Whether tokens in the input events file are indexed.")
         private boolean preindexedTokens = false;
 
         public WeightedTokenMergeTask(
-                File sourceFileA, File sourceFileB, File destinationFile, Charset charset, boolean preindexed) {
+                File sourceFileA, File sourceFileB, File destinationFile,
+                Charset charset, boolean preindexed) {
             super(sourceFileA, sourceFileB, destinationFile, charset,
-                  Weighted.recordOrder(Token.INDEX_ORDER));
+                  Weighted.recordOrder(Token.indexOrder()));
             setPreindexedTokens(preindexed);
+            checkState();
+        }
+
+        public WeightedTokenMergeTask() {
+        }
+
+        private Enumerator<String> index = null;
+
+
+        public Enumerator<String> getIndex() {
+            if (index == null)
+                index = Enumerators.newDefaultStringEnumerator();
+            return index;
+        }
+
+        public void setIndex(Enumerator<String> entryIndex) {
+            this.index = entryIndex;
         }
 
         public final boolean isPreindexedTokens() {
@@ -278,6 +307,33 @@ public abstract class MergeTask<T> extends AbstractCommandTask {
 
         public final void setPreindexedTokens(boolean preindexedTokens) {
             this.preindexedTokens = preindexedTokens;
+        }
+
+        @Override
+        protected void initialiseTask() throws Exception {
+            super.initialiseTask();
+            checkState();
+        }
+
+        private void checkState() {
+//            try {
+//                if (!Files.readLines(getSourceFileA(), getCharset(), 1).get(0).
+//                        matches("^[^\t]+\t[^\t]+$")) {
+//                    throw new IllegalArgumentException(
+//                            "The source file A does not appear to be composed of tripples: " + getSourceFileA());
+//
+//                }
+//                if (!Files.readLines(getSourceFileB(), getCharset(), 1).get(0).
+//                        matches("^[^\t]+\t[^\t]+$")) {
+//                    throw new IllegalArgumentException(
+//                            "The source file B does not appear to be composed of tripples: " + getSourceFileB());
+//
+//                }
+//            } catch (FileNotFoundException ex) {
+//                throw new RuntimeException(ex);
+//            } catch (IOException ex) {
+//                throw new RuntimeException(ex);
+//            }
         }
 
         @Override
@@ -291,10 +347,8 @@ public abstract class MergeTask<T> extends AbstractCommandTask {
             final Function<Integer, String> encoder;
 
             if (!preindexedTokens) {
-                final Enumerator<String> entryIndex = new SimpleEnumerator<String>();
-
-                decoder = Token.stringDecoder(entryIndex);
-                encoder = Token.stringEncoder(entryIndex);
+                decoder = Token.stringDecoder(getIndex());
+                encoder = Token.stringEncoder(getIndex());
             } else {
                 decoder = Token.enumeratedDecoder();
                 encoder = Token.enumeratedEncoder();
@@ -311,22 +365,33 @@ public abstract class MergeTask<T> extends AbstractCommandTask {
 
             merge(srcA, srcB, snk);
 
+            if (snk instanceof Flushable)
+                ((Flushable) snk).flush();
+
+
+            if(srcA instanceof Closeable) 
+                ((Closeable)srcA).close();
+            if(srcB instanceof Closeable) 
+                ((Closeable)srcB).close();
+            if(snk instanceof Closeable) 
+                ((Closeable)snk).close();
+
             if (LOG.isInfoEnabled())
                 LOG.info("Completed merge.");
         }
-
     }
 
     public abstract static class TokenPairMergeTask extends MergeTask<TokenPair> {
 
-        private static final Log LOG = LogFactory.getLog(TokenPairMergeTask.class);
+        private static final Log LOG = LogFactory.getLog(
+                TokenPairMergeTask.class);
 
         @Parameter(names = {"-p1", "--preindexed1"},
-        description = "Whether tokens in the first column of the input file are indexed.")
+                   description = "Whether tokens in the first column of the input file are indexed.")
         private boolean preindexedTokens1 = false;
 
         @Parameter(names = {"-p2", "--preindexed2"},
-        description = "Whether entries in the second column of the input file are indexed.")
+                   description = "Whether entries in the second column of the input file are indexed.")
         private boolean preindexedTokens2 = false;
 
         public TokenPairMergeTask(
@@ -334,9 +399,37 @@ public abstract class MergeTask<T> extends AbstractCommandTask {
                 Charset charset,
                 boolean preindexedTokens1, boolean preindexedTokens2) {
             super(sourceFileA, sourceFileB, destinationFile, charset,
-                  TokenPair.INDEX_ORDER);
+                  TokenPair.indexOrder());
             setPreindexedTokens1(preindexedTokens1);
             setPreindexedTokens2(preindexedTokens2);
+            checkState();
+        }
+
+        public TokenPairMergeTask() {
+        }
+
+        private Enumerator<String> index1 = null;
+
+        private Enumerator<String> index2 = null;
+
+        public Enumerator<String> getIndex1() {
+            if (index1 == null)
+                index1 = Enumerators.newDefaultStringEnumerator();
+            return index1;
+        }
+
+        public void setIndex1(Enumerator<String> entryIndex) {
+            this.index1 = entryIndex;
+        }
+
+        public Enumerator<String> getIndex2() {
+            if (index2 == null)
+                index2 = Enumerators.newDefaultStringEnumerator();
+            return index2;
+        }
+
+        public void setIndex2(Enumerator<String> featureIndex) {
+            this.index2 = featureIndex;
         }
 
         public final boolean isPreindexedTokens1() {
@@ -356,6 +449,33 @@ public abstract class MergeTask<T> extends AbstractCommandTask {
         }
 
         @Override
+        protected void initialiseTask() throws Exception {
+            super.initialiseTask();
+            checkState();
+        }
+
+        private void checkState() {
+//            try {
+//                if (!Files.readLines(getSourceFileA(), getCharset(), 1).get(0).
+//                        matches("^[^\t]+\t[^\t]+$")) {
+//                    throw new IllegalArgumentException(
+//                            "The source file A does not appear to be composed of tripples: " + getSourceFileA());
+//
+//                }
+//                if (!Files.readLines(getSourceFileB(), getCharset(), 1).get(0).
+//                        matches("^[^\t]+\t[^\t]+$")) {
+//                    throw new IllegalArgumentException(
+//                            "The source file B does not appear to be composed of tripples: " + getSourceFileB());
+//
+//                }
+//            } catch (FileNotFoundException ex) {
+//                throw new RuntimeException(ex);
+//            } catch (IOException ex) {
+//                throw new RuntimeException(ex);
+//            }
+        }
+
+        @Override
         protected void runTask() throws Exception {
             if (LOG.isInfoEnabled())
                 LOG.info("Running merge from \"" + getSourceFileA()
@@ -368,19 +488,18 @@ public abstract class MergeTask<T> extends AbstractCommandTask {
             final Function<Integer, String> encoder2;
 
             if (!preindexedTokens1) {
-                final Enumerator<String> entryIndex = new SimpleEnumerator<String>();
-
-                decoder1 = Token.stringDecoder(entryIndex);
-                encoder1 = Token.stringEncoder(entryIndex);
+                decoder1 = Token.stringDecoder(getIndex1());
+                encoder1 = Token.stringEncoder(getIndex1());
             } else {
                 decoder1 = Token.enumeratedDecoder();
                 encoder1 = Token.enumeratedEncoder();
             }
 
             if (!preindexedTokens2) {
-                final Enumerator<String> featureIndex = new SimpleEnumerator<String>();
-                decoder2 = Token.stringDecoder(featureIndex);
-                encoder2 = Token.stringEncoder(featureIndex);
+                final Enumerator<String> featureIndex = Enumerators.
+                        newDefaultStringEnumerator();
+                decoder2 = Token.stringDecoder(getIndex2());
+                encoder2 = Token.stringEncoder(getIndex2());
 
             } else {
                 decoder2 = Token.enumeratedDecoder();
@@ -401,22 +520,33 @@ public abstract class MergeTask<T> extends AbstractCommandTask {
 
             merge(srcA, srcB, snk);
 
+            if (snk instanceof Flushable)
+                ((Flushable) snk).flush();
+
+            if(srcA instanceof Closeable) 
+                ((Closeable)srcA).close();
+            if(srcB instanceof Closeable) 
+                ((Closeable)srcB).close();
+            if(snk instanceof Closeable) 
+                ((Closeable)snk).close();
+            
+
             if (LOG.isInfoEnabled())
                 LOG.info("Completed merge.");
         }
-
     }
 
     public abstract static class WeightedTokenPairMergeTask extends MergeTask<Weighted<TokenPair>> {
 
-        private static final Log LOG = LogFactory.getLog(WeightedTokenPairMergeTask.class);
+        private static final Log LOG = LogFactory.getLog(
+                WeightedTokenPairMergeTask.class);
 
         @Parameter(names = {"-p1", "--preindexed1"},
-        description = "Whether tokens in the first column of the input file are indexed.")
+                   description = "Whether tokens in the first column of the input file are indexed.")
         private boolean preindexedTokens1 = false;
 
         @Parameter(names = {"-p2", "--preindexed2"},
-        description = "Whether entries in the second column of the input file are indexed.")
+                   description = "Whether entries in the second column of the input file are indexed.")
         private boolean preindexedTokens2 = false;
 
         public WeightedTokenPairMergeTask(
@@ -424,9 +554,37 @@ public abstract class MergeTask<T> extends AbstractCommandTask {
                 Charset charset,
                 boolean preindexedTokens1, boolean preindexedTokens2) {
             super(sourceFileA, sourceFileB, destinationFile, charset,
-                  Weighted.recordOrder(TokenPair.INDEX_ORDER));
+                  Weighted.recordOrder(TokenPair.indexOrder()));
             setPreindexedTokens1(preindexedTokens1);
             setPreindexedTokens2(preindexedTokens2);
+            checkState();
+        }
+
+        public WeightedTokenPairMergeTask() {
+        }
+
+        private Enumerator<String> index1 = null;
+
+        private Enumerator<String> index2 = null;
+
+        public Enumerator<String> getIndex1() {
+            if (index1 == null)
+                index1 = Enumerators.newDefaultStringEnumerator();
+            return index1;
+        }
+
+        public void setIndex1(Enumerator<String> entryIndex) {
+            this.index1 = entryIndex;
+        }
+
+        public Enumerator<String> getIndex2() {
+            if (index2 == null)
+                index2 = Enumerators.newDefaultStringEnumerator();
+            return index2;
+        }
+
+        public void setIndex2(Enumerator<String> featureIndex) {
+            this.index2 = featureIndex;
         }
 
         public final boolean isPreindexedTokens1() {
@@ -446,6 +604,33 @@ public abstract class MergeTask<T> extends AbstractCommandTask {
         }
 
         @Override
+        protected void initialiseTask() throws Exception {
+            super.initialiseTask();
+            checkState();
+        }
+
+        private void checkState() {
+//            try {
+//                if (!Files.readLines(getSourceFileA(), getCharset(), 1).get(0).
+//                        matches("^[^\t]+\t[^\t]+\t[^\t]+$")) {
+//                    throw new IllegalArgumentException(
+//                            "The source file A does not appear to be composed of tripples: " + getSourceFileA());
+//
+//                }
+//                if (!Files.readLines(getSourceFileB(), getCharset(), 1).get(0).
+//                        matches("^[^\t]+\t[^\t]+\t[^\t]+$")) {
+//                    throw new IllegalArgumentException(
+//                            "The source file B does not appear to be composed of tripples: " + getSourceFileB());
+//
+//                }
+//            } catch (FileNotFoundException ex) {
+//                throw new RuntimeException(ex);
+//            } catch (IOException ex) {
+//                throw new RuntimeException(ex);
+//            }
+        }
+
+        @Override
         protected void runTask() throws Exception {
             if (LOG.isInfoEnabled())
                 LOG.info("Running merge from \"" + getSourceFileA()
@@ -458,19 +643,16 @@ public abstract class MergeTask<T> extends AbstractCommandTask {
             final Function<Integer, String> encoder2;
 
             if (!preindexedTokens1) {
-                final Enumerator<String> entryIndex = new SimpleEnumerator<String>();
-
-                decoder1 = Token.stringDecoder(entryIndex);
-                encoder1 = Token.stringEncoder(entryIndex);
+                decoder1 = Token.stringDecoder(getIndex1());
+                encoder1 = Token.stringEncoder(getIndex1());
             } else {
                 decoder1 = Token.enumeratedDecoder();
                 encoder1 = Token.enumeratedEncoder();
             }
 
             if (!preindexedTokens2) {
-                final Enumerator<String> featureIndex = new SimpleEnumerator<String>();
-                decoder2 = Token.stringDecoder(featureIndex);
-                encoder2 = Token.stringEncoder(featureIndex);
+                decoder2 = Token.stringDecoder(getIndex2());
+                encoder2 = Token.stringEncoder(getIndex2());
 
             } else {
                 decoder2 = Token.enumeratedDecoder();
@@ -491,49 +673,84 @@ public abstract class MergeTask<T> extends AbstractCommandTask {
 
             merge(srcA, srcB, snk);
 
+            if (snk instanceof Flushable)
+                ((Flushable) snk).flush();
+
+            if(srcA instanceof Closeable) 
+                ((Closeable)srcA).close();
+            if(srcB instanceof Closeable) 
+                ((Closeable)srcB).close();
+            if(snk instanceof Closeable) 
+                ((Closeable)snk).close();
+
             if (LOG.isInfoEnabled())
                 LOG.info("Completed merge.");
         }
-
     }
 
     public static class EntryFreqsMergeTask extends MergeTask.WeightedTokenMergeTask {
 
-        public EntryFreqsMergeTask(File sourceFileA, File sourceFileB, File destinationFile, Charset charset, boolean preindexed) {
+        public EntryFreqsMergeTask(File sourceFileA, File sourceFileB,
+                                   File destinationFile, Charset charset,
+                                   boolean preindexed) {
             super(sourceFileA, sourceFileB, destinationFile, charset, preindexed);
         }
 
+        public EntryFreqsMergeTask() {
+        }
     }
 
     public static class FeatureFreqsMergeTask extends MergeTask.WeightedTokenMergeTask {
 
-        public FeatureFreqsMergeTask(File sourceFileA, File sourceFileB, File destinationFile, Charset charset, boolean preindexed) {
+        public FeatureFreqsMergeTask(File sourceFileA, File sourceFileB,
+                                     File destinationFile, Charset charset,
+                                     boolean preindexed) {
             super(sourceFileA, sourceFileB, destinationFile, charset, preindexed);
         }
 
+        public FeatureFreqsMergeTask() {
+        }
     }
 
     public static class EventFreqsMergeTask extends MergeTask.WeightedTokenPairMergeTask {
 
-        public EventFreqsMergeTask(File sourceFileA, File sourceFileB, File destinationFile, Charset charset, boolean preindexedTokens1, boolean preindexedTokens2) {
-            super(sourceFileA, sourceFileB, destinationFile, charset, preindexedTokens1, preindexedTokens2);
+        public EventFreqsMergeTask(File sourceFileA, File sourceFileB,
+                                   File destinationFile, Charset charset,
+                                   boolean preindexedTokens1,
+                                   boolean preindexedTokens2) {
+            super(sourceFileA, sourceFileB, destinationFile, charset,
+                  preindexedTokens1, preindexedTokens2);
         }
 
+        public EventFreqsMergeTask() {
+        }
     }
 
     public static class EventMergeTask extends MergeTask.TokenPairMergeTask {
 
-        public EventMergeTask(File sourceFileA, File sourceFileB, File destinationFile, Charset charset, boolean preindexedTokens1, boolean preindexedTokens2) {
-            super(sourceFileA, sourceFileB, destinationFile, charset, preindexedTokens1, preindexedTokens2);
+        public EventMergeTask(File sourceFileA, File sourceFileB,
+                              File destinationFile, Charset charset,
+                              boolean preindexedTokens1,
+                              boolean preindexedTokens2) {
+            super(sourceFileA, sourceFileB, destinationFile, charset,
+                  preindexedTokens1, preindexedTokens2);
         }
 
+        public EventMergeTask() {
+        }
     }
 
     public static class SimsMergeTask extends MergeTask.WeightedTokenPairMergeTask {
 
-        public SimsMergeTask(File sourceFileA, File sourceFileB, File destinationFile, Charset charset, boolean preindexedTokens1, boolean preindexedTokens2) {
-            super(sourceFileA, sourceFileB, destinationFile, charset, preindexedTokens1, preindexedTokens2);
+        public SimsMergeTask(File sourceFileA, File sourceFileB,
+                             File destinationFile, Charset charset,
+                             boolean preindexedTokens1,
+                             boolean preindexedTokens2) {
+            super(sourceFileA, sourceFileB, destinationFile, charset,
+                  preindexedTokens1, preindexedTokens2);
         }
 
+        public SimsMergeTask() {
+        }
     }
 }

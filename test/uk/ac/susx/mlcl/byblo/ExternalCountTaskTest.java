@@ -34,10 +34,15 @@ import uk.ac.susx.mlcl.lib.test.ExitTrapper;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.Test;
 import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
@@ -48,8 +53,10 @@ public class ExternalCountTaskTest {
 
     private static final String subject = ExternalCountTask.class.getName();
 
-    private void runWithAPI(File inInst, File outE, File outF,
-                            File outEF, Charset charset, int chunkSize)
+    private void runWithAPI(
+            File inInst, File outE, File outF,
+            File outEF, Charset charset, int chunkSize,
+            boolean preindexedEntries, boolean preindexedFeatures)
             throws Exception {
         final ExternalCountTask countTask = new ExternalCountTask();
         countTask.setInstancesFile(inInst);
@@ -58,6 +65,10 @@ public class ExternalCountTaskTest {
         countTask.setEntryFeaturesFile(outEF);
         countTask.setCharset(charset);
         countTask.setMaxChunkSize(chunkSize);
+        countTask.setPreindexedEntries(preindexedEntries);
+        countTask.setPreindexedFeatures(preindexedFeatures);
+        countTask.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
+        
         countTask.run();
         while (countTask.isExceptionThrown()) {
             countTask.throwException();
@@ -72,9 +83,10 @@ public class ExternalCountTaskTest {
         assertTrue("Empty output file found: " + outEF, outEF.length() > 0);
     }
 
-    private void runwithCLI(File inInst, File outE, File outF,
-                            File outEF,
-                            Charset charset, int chunkSize)
+    private void runwithCLI(
+            File inInst, File outE, File outF,
+            File outEF, Charset charset, int chunkSize,
+            boolean preindexedEntries, boolean preindexedFeatures)
             throws Exception {
 
         String[] args = {
@@ -84,8 +96,20 @@ public class ExternalCountTaskTest {
             "--output-features", outF.toString(),
             "--output-entry-features", outEF.toString(),
             "--charset", charset.name(),
-            "--chunk-size", "" + chunkSize
+            "--chunk-size", "" + chunkSize,
+            "--temporary-directory", TEST_TMP_DIR.toString()
         };
+
+        if (preindexedEntries) {
+            List<String> tmp = new ArrayList<String>(Arrays.asList(args));
+            tmp.add("--preindexed-entries");
+            args = tmp.toArray(new String[0]);
+        }
+        if (preindexedFeatures) {
+            List<String> tmp = new ArrayList<String>(Arrays.asList(args));
+            tmp.add("--preindexed-features");
+            args = tmp.toArray(new String[0]);
+        }
 
         try {
             enableExistTrapping();
@@ -104,27 +128,33 @@ public class ExternalCountTaskTest {
         assertTrue("Empty output file found: " + outEF, outEF.length() > 0);
     }
 
-    private void runExpectingNullPointer(File inInst, File outE, File outF,
-                                         File outEF, Charset charset) throws Exception {
+    private void runExpectingNullPointer(
+            File inInst, File outE, File outF,
+            File outEF, Charset charset,
+            boolean preindexedEntries, boolean preindexedFeatures) throws Exception {
         try {
-            runWithAPI(inInst, outE, outF, outEF, charset, 10000);
+            runWithAPI(inInst, outE, outF, outEF, charset, 10000,
+                       preindexedEntries, preindexedFeatures);
             fail("NullPointerException should have been thrown.");
         } catch (NullPointerException ex) {
             // pass
         }
     }
 
-    private void runExpectingIllegalState(File inInst, File outE, File outF,
-                                          File outEF, Charset charset) throws Exception {
+    private void runExpectingIllegalState(
+            File inInst, File outE, File outF,
+            File outEF, Charset charset,
+            boolean preindexedEntries, boolean preindexedFeatures) throws Exception {
         try {
-            runWithAPI(inInst, outE, outF, outEF, charset, 10000);
+            runWithAPI(inInst, outE, outF, outEF, charset, 10000,
+                       preindexedEntries, preindexedFeatures);
             fail("IllegalStateException should have been thrown.");
         } catch (IllegalStateException ex) {
             // pass 
         }
     }
 
-    @Test(timeout = 2000)
+    @Test
     public void testRunOnFruitAPI() throws Exception {
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
 
@@ -139,7 +169,7 @@ public class ExternalCountTaskTest {
         efActual.delete();
 
         runWithAPI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
-                   DEFAULT_CHARSET, 1000000);
+                   DEFAULT_CHARSET, 1000000, false, false);
 
         assertTrue("Output entries file differs from sampledata file.",
                    WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
@@ -152,7 +182,7 @@ public class ExternalCountTaskTest {
                                          DEFAULT_CHARSET));
     }
 
-    @Test(timeout = 20000)
+    @Test(timeout = 2000)
     public void testRunOnFruitAPITinyChunk() throws Exception {
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
 
@@ -169,7 +199,7 @@ public class ExternalCountTaskTest {
         efActual.delete();
 
         runWithAPI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
-                   DEFAULT_CHARSET, 10000);
+                   DEFAULT_CHARSET, 100000, false, false);
 
         assertTrue("Output entries file differs from sampledata file.",
                    WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
@@ -198,7 +228,7 @@ public class ExternalCountTaskTest {
         efActual.delete();
 
         runwithCLI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
-                   DEFAULT_CHARSET, 1000000);
+                   DEFAULT_CHARSET, 1000000, false, false);
 
 
         assertTrue("Output entries file differs from sampledata file.",
@@ -223,17 +253,25 @@ public class ExternalCountTaskTest {
         final File efOut = new File(TEST_OUTPUT_DIR,
                                     fruitPrefix + ".entryFeatures");
 
-        runExpectingNullPointer(null, eOut, fOut, efOut, DEFAULT_CHARSET);
-        runExpectingNullPointer(instIn, null, fOut, efOut, DEFAULT_CHARSET);
-        runExpectingNullPointer(instIn, eOut, null, efOut, DEFAULT_CHARSET);
-        runExpectingNullPointer(instIn, eOut, fOut, null, DEFAULT_CHARSET);
-        runExpectingNullPointer(instIn, eOut, fOut, efOut, null);
+        runExpectingNullPointer(null, eOut, fOut, efOut, DEFAULT_CHARSET, false,
+                                false);
+        runExpectingNullPointer(instIn, null, fOut, efOut, DEFAULT_CHARSET,
+                                false, false);
+        runExpectingNullPointer(instIn, eOut, null, efOut, DEFAULT_CHARSET,
+                                false, false);
+        runExpectingNullPointer(instIn, eOut, fOut, null, DEFAULT_CHARSET, false,
+                                false);
+        runExpectingNullPointer(instIn, eOut, fOut, efOut, null, false, false);
 
         File dir = TEST_OUTPUT_DIR;
-        runExpectingIllegalState(dir, eOut, fOut, efOut, DEFAULT_CHARSET);
-        runExpectingIllegalState(instIn, dir, fOut, efOut, DEFAULT_CHARSET);
-        runExpectingIllegalState(instIn, eOut, dir, efOut, DEFAULT_CHARSET);
-        runExpectingIllegalState(instIn, eOut, fOut, dir, DEFAULT_CHARSET);
+        runExpectingIllegalState(dir, eOut, fOut, efOut, DEFAULT_CHARSET, false,
+                                 false);
+        runExpectingIllegalState(instIn, dir, fOut, efOut, DEFAULT_CHARSET,
+                                 false, false);
+        runExpectingIllegalState(instIn, eOut, dir, efOut, DEFAULT_CHARSET,
+                                 false, false);
+        runExpectingIllegalState(instIn, eOut, fOut, dir, DEFAULT_CHARSET, false,
+                                 false);
     }
 
     @Test

@@ -34,6 +34,7 @@ import com.google.common.base.Function;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -41,6 +42,7 @@ import java.nio.charset.Charset;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.SimpleEnumerator;
 import uk.ac.susx.mlcl.lib.io.Lexer;
 import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
@@ -54,7 +56,7 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see EntrySink
  */
-public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexer.Tell> {
+public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexer.Tell>, Closeable {
 
     private static final Log LOG = LogFactory.getLog(WeightedTokenSource.class);
 
@@ -209,7 +211,7 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
     }
 
     public static boolean equal(File a, File b, Charset charset) throws IOException {
-        final Enumerator<String> stringIndex = new SimpleEnumerator<String>();
+        final Enumerator<String> stringIndex = Enumerators.newDefaultStringEnumerator();
         final WeightedTokenSource srcA = new WeightedTokenSource(
                 new TSVSource(a, charset),
                 Token.stringDecoder(stringIndex));
@@ -233,6 +235,11 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
 
     public double percentRead() throws IOException {
         return inner.percentRead();
+    }
+
+    @Override
+    public void close() throws IOException {
+        inner.close();
     }
 
 }

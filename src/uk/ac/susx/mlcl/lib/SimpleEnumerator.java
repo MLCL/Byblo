@@ -64,7 +64,7 @@ public final class SimpleEnumerator<T> implements Serializable, Enumerator<T> {
         this.nextId = nextId;
     }
 
-    public SimpleEnumerator() {
+    protected SimpleEnumerator() {
         this(new ObjectArrayList<T>(), new Object2IntOpenHashMap<T>(), new AtomicInteger(0));
         objToIndex.defaultReturnValue(-1);
     }

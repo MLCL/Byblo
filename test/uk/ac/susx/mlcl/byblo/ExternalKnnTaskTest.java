@@ -54,7 +54,7 @@ public class ExternalKnnTaskTest {
                                   FRUIT_NAME + ".neighs");
 
         final ExternalKnnTask knnTask = new ExternalKnnTask(
-                in, out, DEFAULT_CHARSET, 2);
+                in, out, DEFAULT_CHARSET, 2, false,false);
         knnTask.setMaxChunkSize(1000);
         knnTask.run();
 

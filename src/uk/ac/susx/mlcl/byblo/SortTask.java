@@ -34,6 +34,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import java.io.Closeable;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.Collections;
@@ -44,7 +45,7 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.SimpleEnumerator;
+import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.io.*;
 import uk.ac.susx.mlcl.lib.tasks.ReverseComparator;
 
@@ -62,11 +63,11 @@ public abstract class SortTask<T> extends CopyTask {
     private Comparator<T> comparator;
 
     @Parameter(names = {"-c", "--charset"},
-    description = "The character set encoding to use for both input and output files.")
+               description = "The character set encoding to use for both input and output files.")
     private Charset charset = Files.DEFAULT_CHARSET;
 
     @Parameter(names = {"-r", "--reverse"},
-    description = "Reverse the result of comparisons.")
+               description = "Reverse the result of comparisons.")
     private boolean reverse = false;
 
     public SortTask(File sourceFile, File destinationFile, Charset charset,
@@ -138,17 +139,31 @@ public abstract class SortTask<T> extends CopyTask {
 
     public abstract static class WeightedTokenSortTask extends SortTask<Weighted<Token>> {
 
-        private static final Log LOG = LogFactory.getLog(WeightedTokenSortTask.class);
+        private static final Log LOG = LogFactory.getLog(
+                WeightedTokenSortTask.class);
 
         @Parameter(names = {"-p", "--preindexed"},
-        description = "Whether tokens in the input events file are indexed.")
+                   description = "Whether tokens in the input events file are indexed.")
         private boolean preindexedTokens = false;
 
         public WeightedTokenSortTask(
-                File sourceFile, File destinationFile, Charset charset, boolean preindexed) {
+                File sourceFile, File destinationFile, Charset charset,
+                boolean preindexed) {
             super(sourceFile, destinationFile, charset,
-                  Weighted.recordOrder(Token.INDEX_ORDER));
+                  Weighted.recordOrder(Token.indexOrder()));
             setPreindexedTokens(preindexed);
+        }
+
+        private Enumerator<String> index = null;
+
+        public Enumerator<String> getIndex() {
+            if (index == null)
+                index = Enumerators.newDefaultStringEnumerator();
+            return index;
+        }
+
+        public void setIndex(Enumerator<String> entryIndex) {
+            this.index = entryIndex;
         }
 
         public final boolean isPreindexedTokens() {
@@ -169,53 +184,83 @@ public abstract class SortTask<T> extends CopyTask {
             final Function<Integer, String> encoder;
 
             if (!preindexedTokens) {
-                final Enumerator<String> entryIndex = new SimpleEnumerator<String>();
-
-                decoder = Token.stringDecoder(entryIndex);
-                encoder = Token.stringEncoder(entryIndex);
+                decoder = Token.stringDecoder(getIndex());
+                encoder = Token.stringEncoder(getIndex());
             } else {
                 decoder = Token.enumeratedDecoder();
                 encoder = Token.enumeratedEncoder();
             }
 
 
-            Source<Weighted<Token>> src = new WeightedTokenSource(
+            WeightedTokenSource src = new WeightedTokenSource(
                     new TSVSource(getSrcFile(), getCharset()),
                     decoder);
-
             final List<Weighted<Token>> items = IOUtil.readAll(src);
+
+            if (src instanceof Closeable)
+                ((Closeable) src).close();
+
             Collections.sort(items, getComparator());
 
-            Sink<Weighted<Token>> snk = new WeightedTokenSink(
+            WeightedTokenSink snk = new WeightedTokenSink(
                     new TSVSink(getDstFile(), getCharset()),
                     encoder);
 
-            IOUtil.copy(items, snk);
+            int i = IOUtil.copy(items, snk);
+            assert i == items.size();
+
+            snk.flush();
+            snk.close();
 
             if (LOG.isInfoEnabled())
                 LOG.info("Completed memory sort.");
         }
-
     }
 
     public abstract static class WeightedTokenPairSortTask extends SortTask<Weighted<TokenPair>> {
 
-        private static final Log LOG = LogFactory.getLog(WeightedTokenSortTask.class);
+        private static final Log LOG = LogFactory.getLog(
+                WeightedTokenSortTask.class);
 
         @Parameter(names = {"-p1", "--preindexed1"},
-        description = "Whether tokens in the first column of the input file are indexed.")
+                   description = "Whether tokens in the first column of the input file are indexed.")
         private boolean preindexedTokens1 = false;
 
         @Parameter(names = {"-p2", "--preindexed2"},
-        description = "Whether entries in the second column of the input file are indexed.")
+                   description = "Whether entries in the second column of the input file are indexed.")
         private boolean preindexedTokens2 = false;
 
         public WeightedTokenPairSortTask(
-                File sourceFile, File destinationFile, Charset charset, boolean preindexedTokens1, boolean preindexedTokens2) {
+                File sourceFile, File destinationFile, Charset charset,
+                boolean preindexedTokens1, boolean preindexedTokens2) {
             super(sourceFile, destinationFile, charset,
-                  Weighted.recordOrder(TokenPair.INDEX_ORDER));
+                  Weighted.recordOrder(TokenPair.indexOrder()));
             setPreindexedTokens1(preindexedTokens1);
             setPreindexedTokens2(preindexedTokens2);
+        }
+
+        private Enumerator<String> index1 = null;
+
+        private Enumerator<String> index2 = null;
+
+        public Enumerator<String> getIndex1() {
+            if (index1 == null)
+                index1 = Enumerators.newDefaultStringEnumerator();
+            return index1;
+        }
+
+        public void setIndex1(Enumerator<String> entryIndex) {
+            this.index1 = entryIndex;
+        }
+
+        public Enumerator<String> getIndex2() {
+            if (index2 == null)
+                index2 = Enumerators.newDefaultStringEnumerator();
+            return index2;
+        }
+
+        public void setIndex2(Enumerator<String> featureIndex) {
+            this.index2 = featureIndex;
         }
 
         public final boolean isPreindexedTokens1() {
@@ -246,19 +291,16 @@ public abstract class SortTask<T> extends CopyTask {
             final Function<Integer, String> encoder2;
 
             if (!preindexedTokens1) {
-                final Enumerator<String> entryIndex = new SimpleEnumerator<String>();
-
-                decoder1 = Token.stringDecoder(entryIndex);
-                encoder1 = Token.stringEncoder(entryIndex);
+                decoder1 = Token.stringDecoder(getIndex1());
+                encoder1 = Token.stringEncoder(getIndex1());
             } else {
                 decoder1 = Token.enumeratedDecoder();
                 encoder1 = Token.enumeratedEncoder();
             }
 
             if (!preindexedTokens2) {
-                final Enumerator<String> featureIndex = new SimpleEnumerator<String>();
-                decoder2 = Token.stringDecoder(featureIndex);
-                encoder2 = Token.stringEncoder(featureIndex);
+                decoder2 = Token.stringDecoder(getIndex2());
+                encoder2 = Token.stringEncoder(getIndex2());
 
             } else {
                 decoder2 = Token.enumeratedDecoder();
@@ -270,37 +312,70 @@ public abstract class SortTask<T> extends CopyTask {
                     decoder1, decoder2);
 
             final List<Weighted<TokenPair>> items = IOUtil.readAll(src);
+
+            if (src instanceof Closeable)
+                ((Closeable) src).close();
+
             Collections.sort(items, getComparator());
 
-            Sink<Weighted<TokenPair>> snk = new WeightedTokenPairSink(
+            WeightedTokenPairSink snk = new WeightedTokenPairSink(
                     new TSVSink(getDstFile(), getCharset()),
                     encoder1, encoder2);
 
             IOUtil.copy(items, snk);
 
+
+            snk.flush();
+            snk.close();
+
             if (LOG.isInfoEnabled())
                 LOG.info("Completed memory sort.");
         }
-
     }
 
     public abstract static class TokenPairSortTask extends SortTask<TokenPair> {
 
-        private static final Log LOG = LogFactory.getLog(WeightedTokenSortTask.class);
+        private static final Log LOG = LogFactory.getLog(
+                WeightedTokenSortTask.class);
 
         @Parameter(names = {"-p1", "--preindexed1"},
-        description = "Whether tokens in the first column of the input file are indexed.")
+                   description = "Whether tokens in the first column of the input file are indexed.")
         private boolean preindexedTokens1 = false;
 
         @Parameter(names = {"-p2", "--preindexed2"},
-        description = "Whether entries in the second column of the input file are indexed.")
+                   description = "Whether entries in the second column of the input file are indexed.")
         private boolean preindexedTokens2 = false;
 
         public TokenPairSortTask(
-                File sourceFile, File destinationFile, Charset charset, boolean preindexedTokens1, boolean preindexedTokens2) {
-            super(sourceFile, destinationFile, charset, TokenPair.INDEX_ORDER);
+                File sourceFile, File destinationFile, Charset charset,
+                boolean preindexedTokens1, boolean preindexedTokens2) {
+            super(sourceFile, destinationFile, charset, TokenPair.indexOrder());
             setPreindexedTokens1(preindexedTokens1);
             setPreindexedTokens2(preindexedTokens2);
+        }
+
+        private Enumerator<String> entryIndex = null;
+
+        private Enumerator<String> featureIndex = null;
+
+        public Enumerator<String> getIndex1() {
+            if (entryIndex == null)
+                entryIndex = Enumerators.newDefaultStringEnumerator();
+            return entryIndex;
+        }
+
+        public void setIndex1(Enumerator<String> entryIndex) {
+            this.entryIndex = entryIndex;
+        }
+
+        public Enumerator<String> getIndex2() {
+            if (featureIndex == null)
+                featureIndex = Enumerators.newDefaultStringEnumerator();
+            return featureIndex;
+        }
+
+        public void setIndex2(Enumerator<String> featureIndex) {
+            this.featureIndex = featureIndex;
         }
 
         public final boolean isPreindexedTokens1() {
@@ -331,19 +406,16 @@ public abstract class SortTask<T> extends CopyTask {
             final Function<Integer, String> encoder2;
 
             if (!preindexedTokens1) {
-                final Enumerator<String> entryIndex = new SimpleEnumerator<String>();
-
-                decoder1 = Token.stringDecoder(entryIndex);
-                encoder1 = Token.stringEncoder(entryIndex);
+                decoder1 = Token.stringDecoder(getIndex1());
+                encoder1 = Token.stringEncoder(getIndex1());
             } else {
                 decoder1 = Token.enumeratedDecoder();
                 encoder1 = Token.enumeratedEncoder();
             }
 
             if (!preindexedTokens2) {
-                final Enumerator<String> featureIndex = new SimpleEnumerator<String>();
-                decoder2 = Token.stringDecoder(featureIndex);
-                encoder2 = Token.stringEncoder(featureIndex);
+                decoder2 = Token.stringDecoder(getIndex2());
+                encoder2 = Token.stringEncoder(getIndex2());
 
             } else {
                 decoder2 = Token.enumeratedDecoder();
@@ -353,59 +425,74 @@ public abstract class SortTask<T> extends CopyTask {
             Source<TokenPair> src = new TokenPairSource(
                     new TSVSource(getSrcFile(), getCharset()),
                     decoder1, decoder2);
+            if (src instanceof Closeable) {
+                ((Closeable) src).close();
+            }
 
             final List<TokenPair> items = IOUtil.readAll(src);
+
+            if (src instanceof Closeable)
+                ((Closeable) src).close();
+            
             Collections.sort(items, getComparator());
 
-            Sink<TokenPair> snk = new TokenPairSink(
+            TokenPairSink snk = new TokenPairSink(
                     new TSVSink(getDstFile(), getCharset()),
                     encoder1, encoder2);
 
             IOUtil.copy(items, snk);
 
+            snk.flush();
+            snk.close();
+
             if (LOG.isInfoEnabled())
                 LOG.info("Completed memory sort.");
         }
-
     }
 
     public static class EntryFreqsSortTask extends WeightedTokenSortTask {
 
-        public EntryFreqsSortTask(File sourceFile, File destinationFile, Charset charset, boolean preindexed) {
+        public EntryFreqsSortTask(File sourceFile, File destinationFile,
+                                  Charset charset, boolean preindexed) {
             super(sourceFile, destinationFile, charset, preindexed);
         }
-
     }
 
     public static class FeatureFreqsSortTask extends WeightedTokenSortTask {
 
-        public FeatureFreqsSortTask(File sourceFile, File destinationFile, Charset charset, boolean preindexed) {
+        public FeatureFreqsSortTask(File sourceFile, File destinationFile,
+                                    Charset charset, boolean preindexed) {
             super(sourceFile, destinationFile, charset, preindexed);
         }
-
     }
 
     public static class EventFreqsSortTask extends WeightedTokenPairSortTask {
 
-        public EventFreqsSortTask(File sourceFile, File destinationFile, Charset charset, boolean preindexedTokens1, boolean preindexedTokens2) {
-            super(sourceFile, destinationFile, charset, preindexedTokens1, preindexedTokens2);
+        public EventFreqsSortTask(File sourceFile, File destinationFile,
+                                  Charset charset, boolean preindexedTokens1,
+                                  boolean preindexedTokens2) {
+            super(sourceFile, destinationFile, charset, preindexedTokens1,
+                  preindexedTokens2);
         }
-
     }
 
     public static class EventSortTask extends TokenPairSortTask {
 
-        public EventSortTask(File sourceFile, File destinationFile, Charset charset, boolean preindexedTokens1, boolean preindexedTokens2) {
-            super(sourceFile, destinationFile, charset, preindexedTokens1, preindexedTokens2);
+        public EventSortTask(File sourceFile, File destinationFile,
+                             Charset charset, boolean preindexedTokens1,
+                             boolean preindexedTokens2) {
+            super(sourceFile, destinationFile, charset, preindexedTokens1,
+                  preindexedTokens2);
         }
-
     }
 
     public static class SimsSortTask extends WeightedTokenPairSortTask {
 
-        public SimsSortTask(File sourceFile, File destinationFile, Charset charset, boolean preindexedTokens1, boolean preindexedTokens2) {
-            super(sourceFile, destinationFile, charset, preindexedTokens1, preindexedTokens2);
+        public SimsSortTask(File sourceFile, File destinationFile,
+                            Charset charset, boolean preindexedTokens1,
+                            boolean preindexedTokens2) {
+            super(sourceFile, destinationFile, charset, preindexedTokens1,
+                  preindexedTokens2);
         }
-
     }
 }

@@ -55,7 +55,7 @@ public class EntryFeatureTest {
     public void testLMMedlineSample() throws FileNotFoundException, IOException {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-input-sample");
         Charset charset = Charset.forName("UTF-8");
-        Enumerator<String> idx = new SimpleEnumerator<String>();
+        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
         TokenPairSource efSrc = new TokenPairSource(
                 new TSVSource(testSample, charset),
                 Token.stringDecoder(idx),
@@ -76,7 +76,7 @@ public class EntryFeatureTest {
     }
 
     private void copyEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        Enumerator<String> idx = new SimpleEnumerator<String>();
+        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
         TokenPairSource aSrc = new TokenPairSource(
                 new TSVSource(a, DEFAULT_CHARSET),
                 Token.stringDecoder(idx),
@@ -124,7 +124,7 @@ public class EntryFeatureTest {
 
 
         {
-            Enumerator<String> idx = new SimpleEnumerator<String>();
+            Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
             TokenPairSource aSrc = new TokenPairSource(
                     new TSVSource(a, DEFAULT_CHARSET),
                     Token.stringDecoder(idx),

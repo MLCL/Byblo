@@ -138,7 +138,7 @@ public class ChunkTask extends AbstractCommandTask {
         if (sourceFile.length() <= maxChunkSize) {
             if (LOG.isDebugEnabled())
                 LOG.debug("Input is smaller than chunk size, copying.");
-            File tmp = chunkFileFactory.createFile();
+            File tmp = chunkFileFactory.createFile("ch", "");
             CopyTask ct = new CopyTask(sourceFile, tmp);
             ct.runCommand();
             dstFileQueue.put(tmp);
@@ -167,7 +167,7 @@ public class ChunkTask extends AbstractCommandTask {
             while (line != null) {
 
                 try {
-                    tmp = chunkFileFactory.createFile();
+                    tmp = chunkFileFactory.createFile("ch", "");
                     if (LOG.isDebugEnabled())
                         LOG.debug("Producing chunk " + chunk + " to file \"" + tmp
                                 + "\".");
