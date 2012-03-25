@@ -44,6 +44,7 @@ import java.util.Comparator;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
@@ -51,7 +52,6 @@ import uk.ac.susx.mlcl.lib.io.Lexer;
 import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
-import uk.ac.susx.mlcl.lib.tasks.FallbackComparator;
 
 /**
  * An <tt>WeightedTokenSource</tt> object is used to retrieve {@link Token}
@@ -225,7 +225,7 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
         
         List<Weighted<Token>> listA = IOUtil.readAll(srcA);
         List<Weighted<Token>> listB = IOUtil.readAll(srcB);
-        Comparator<Weighted<Token>> c = new FallbackComparator<Weighted<Token>>(
+        Comparator<Weighted<Token>> c = Comparators.fallback(
             Weighted.recordOrder(Token.indexOrder()),
             Weighted.<Token>weightOrder());
         Collections.sort(listA, c);

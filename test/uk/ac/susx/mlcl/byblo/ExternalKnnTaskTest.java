@@ -36,6 +36,8 @@ import org.junit.Test;
 import uk.ac.susx.mlcl.TestConstants;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.byblo.io.TokenPair;
+import uk.ac.susx.mlcl.byblo.io.Weighted;
 
 /**
  *
@@ -54,9 +56,12 @@ public class ExternalKnnTaskTest {
                                   FRUIT_NAME + ".neighs");
 
         final ExternalKnnTask knnTask = new ExternalKnnTask(
-                in, out, DEFAULT_CHARSET, 2, false,false);
+                in, out, DEFAULT_CHARSET, 2, false, false);
         knnTask.setMaxChunkSize(1000);
         knnTask.run();
+        knnTask.setClassComparator(Weighted.recordOrder(TokenPair.firstIndexOrder()));
+        knnTask.setNearnessComparator(Weighted.<TokenPair>weightOrder());
+        knnTask.setK(100);
 
         while (knnTask.isExceptionThrown()) {
             knnTask.throwException();
@@ -81,9 +86,9 @@ public class ExternalKnnTaskTest {
     @Test
     public void testEmptyInputFile() throws Exception {
         try {
-            File in = new File(TestConstants.TEST_OUTPUT_DIR, "in");
+            File in = new File(TestConstants.TEST_OUTPUT_DIR, "extknn-test-empty.in");
             in.createNewFile();
-            File out = new File(TestConstants.TEST_OUTPUT_DIR, "out");
+            File out = new File(TestConstants.TEST_OUTPUT_DIR, "extknn-test-empty.out");
             
             ExitTrapper.enableExistTrapping();
             Main.main(new String[]{"knn", "-i", in.toString(), 

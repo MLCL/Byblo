@@ -59,10 +59,10 @@ import uk.ac.susx.mlcl.byblo.SortTask.EventSortTask;
 import uk.ac.susx.mlcl.byblo.SortTask.FeatureFreqsSortTask;
 import uk.ac.susx.mlcl.byblo.SortTask.SimsSortTask;
 import uk.ac.susx.mlcl.byblo.io.*;
+import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.io.*;
 import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
 import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
-import uk.ac.susx.mlcl.lib.tasks.ReverseComparator;
 
 /**
  *
@@ -145,7 +145,7 @@ public abstract class ExternalSortTask<T> extends AbstractParallelCommandTask {
     }
 
     public final Comparator<T> getComparator() {
-        return isReverse() ? new ReverseComparator<T>(comparator) : comparator;
+        return isReverse() ? Comparators.reverse(comparator) : comparator;
     }
 
     public final void setComparator(Comparator<T> comparator) {

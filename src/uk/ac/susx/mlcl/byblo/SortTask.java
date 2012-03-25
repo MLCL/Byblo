@@ -44,10 +44,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Checks;
+import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.io.*;
-import uk.ac.susx.mlcl.lib.tasks.ReverseComparator;
 
 /**
  * Task that takes a single input file and sorts it according to some
@@ -106,7 +106,7 @@ public abstract class SortTask<T> extends CopyTask {
     }
 
     public final Comparator<T> getComparator() {
-        return isReverse() ? new ReverseComparator<T>(comparator) : comparator;
+        return isReverse() ? Comparators.reverse(comparator) : comparator;
     }
 
     public final void setComparator(Comparator<T> comparator) {

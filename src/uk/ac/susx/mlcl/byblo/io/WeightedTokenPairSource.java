@@ -38,6 +38,7 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
@@ -45,7 +46,6 @@ import uk.ac.susx.mlcl.lib.io.Lexer;
 import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
-import uk.ac.susx.mlcl.lib.tasks.FallbackComparator;
 
 /**
  * A <tt>WeightedTokenPairSource</tt> object is used to retrieve
@@ -162,7 +162,7 @@ public class WeightedTokenPairSource
         List<Weighted<TokenPair>> listA = IOUtil.readAll(srcA);
         List<Weighted<TokenPair>> listB = IOUtil.readAll(srcB);
         Comparator<Weighted<TokenPair>> c =
-                new FallbackComparator<Weighted<TokenPair>>(
+                Comparators.fallback(
                 Weighted.recordOrder(TokenPair.indexOrder()),
                 Weighted.<TokenPair>weightOrder());
         Collections.sort(listA, c);

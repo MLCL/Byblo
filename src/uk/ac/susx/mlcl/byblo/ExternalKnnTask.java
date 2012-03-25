@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.google.common.base.Function;
 import com.google.common.base.Objects.ToStringHelper;
 import uk.ac.susx.mlcl.lib.tasks.Task;
 import java.io.File;
@@ -39,10 +40,12 @@ import java.nio.charset.Charset;
 import java.util.Comparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
-import uk.ac.susx.mlcl.lib.tasks.FallbackComparator;
-import uk.ac.susx.mlcl.lib.tasks.ReverseComparator;
+import uk.ac.susx.mlcl.lib.Comparators;
+import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.Enumerators;
 
 /**
  *
@@ -63,7 +66,7 @@ public class ExternalKnnTask extends ExternalSortTask.SimsExternalSortTask {
             Weighted.recordOrder(TokenPair.indexOrder());
 
     private Comparator<Weighted<TokenPair>> nearnessComparator =
-            new ReverseComparator(Weighted.weightOrder());
+            Comparators.reverse(Weighted.<TokenPair>weightOrder());
 
     public ExternalKnnTask(File sourceFile, File destinationFile,
                            Charset charset, int maxChunkSize, int k,
@@ -89,6 +92,54 @@ public class ExternalKnnTask extends ExternalSortTask.SimsExternalSortTask {
         updateCombinedComparator();
     }
 
+    private Enumerator<String> index1 = null;
+
+    private Enumerator<String> index2 = null;
+
+    public Enumerator<String> getIndex1() {
+        if (index1 == null)
+            index1 = Enumerators.newDefaultStringEnumerator();
+        return index1;
+    }
+
+    public void setIndex1(Enumerator<String> entryIndex) {
+        this.index1 = entryIndex;
+    }
+
+    public Enumerator<String> getIndex2() {
+        if (index2 == null)
+            index2 = Enumerators.newDefaultStringEnumerator();
+        return index2;
+    }
+
+    public void setIndex2(Enumerator<String> featureIndex) {
+        this.index2 = featureIndex;
+    }
+
+    public final Function<String, Integer> getFeatureDecoder() {
+        return isPreindexedTokens1()
+                ? Token.enumeratedDecoder()
+                : Token.stringDecoder(getIndex1());
+    }
+
+    public final Function<String, Integer> getEntryDecoder() {
+        return isPreindexedTokens1()
+                ? Token.enumeratedDecoder()
+                : Token.stringDecoder(getIndex1());
+    }
+
+    public final Function<Integer, String> getFeatureEncoder() {
+        return isPreindexedTokens2()
+                ? Token.enumeratedEncoder()
+                : Token.stringEncoder(getIndex2());
+    }
+
+    public final Function<Integer, String> getEntryEncoder() {
+        return isPreindexedTokens2()
+                ? Token.enumeratedEncoder()
+                : Token.stringEncoder(getIndex2());
+    }
+
     public Comparator<Weighted<TokenPair>> getClassComparator() {
         return classComparator;
     }
@@ -110,7 +161,7 @@ public class ExternalKnnTask extends ExternalSortTask.SimsExternalSortTask {
     }
 
     private void updateCombinedComparator() {
-        setComparator(new FallbackComparator<Weighted<TokenPair>>(
+        setComparator(Comparators.fallback(
                 classComparator, nearnessComparator));
     }
 
@@ -176,6 +227,8 @@ public class ExternalKnnTask extends ExternalSortTask.SimsExternalSortTask {
                     this.getK());
             knntask.setClassComparator(this.getClassComparator());
             knntask.setNearnessComparator(this.getNearnessComparator());
+            knntask.setIndex1(mergeTask.getIndex1());
+            knntask.setIndex2(mergeTask.getIndex2());
             submitTask(knntask);
 
         } else if (task.getClass().equals(SortTask.SimsSortTask.class)) {
@@ -189,6 +242,8 @@ public class ExternalKnnTask extends ExternalSortTask.SimsExternalSortTask {
                     sortTask.isPreindexedTokens2(),
                     getK());
             sortTask.setComparator(getComparator());
+            sortTask.setIndex1(sortTask.getIndex1());
+            sortTask.setIndex2(sortTask.getIndex2());
             submitTask(knntask);
 
         } else if (task.getClass().equals(KnnTask.class)) {

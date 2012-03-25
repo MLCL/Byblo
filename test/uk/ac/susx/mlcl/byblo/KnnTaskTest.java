@@ -36,7 +36,7 @@ import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
-import uk.ac.susx.mlcl.lib.tasks.ReverseComparator;
+import uk.ac.susx.mlcl.lib.Comparators;
 
 /**
  *
@@ -64,8 +64,7 @@ public class KnnTaskTest {
         knnTask.setClassComparator(Weighted.recordOrder(TokenPair.
                 firstIndexOrder()));
         knnTask.setNearnessComparator(
-                new ReverseComparator<Weighted<TokenPair>>(
-                Weighted.<TokenPair>weightOrder()));
+                Comparators.reverse(Weighted.<TokenPair>weightOrder()));
 
         knnTask.run();
 
@@ -96,7 +95,7 @@ public class KnnTaskTest {
         knnTask.setClassComparator(Weighted.recordOrder(TokenPair.
                 firstIndexOrder()));
         knnTask.setNearnessComparator(
-                new ReverseComparator<Weighted<TokenPair>>(
+                Comparators.reverse(
                 Weighted.<TokenPair>weightOrder()));
 
         knnTask.run();

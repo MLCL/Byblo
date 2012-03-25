@@ -41,12 +41,8 @@ import java.util.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.*;
-import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.Enumerators;
-import uk.ac.susx.mlcl.lib.SimpleEnumerator;
+import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.io.*;
-import uk.ac.susx.mlcl.lib.tasks.FallbackComparator;
-import uk.ac.susx.mlcl.lib.tasks.ReverseComparator;
 
 /**
  * Task that read in a file and produces the k-nearest-neighbors for each base
@@ -68,13 +64,13 @@ public class KnnTask extends SortTask.SimsSortTask {
             Weighted.recordOrder(TokenPair.indexOrder());
 
     private Comparator<Weighted<TokenPair>> nearnessComparator =
-            new ReverseComparator(Weighted.weightOrder());
+            Comparators.reverse(Weighted.<TokenPair>weightOrder());
 
     public KnnTask(File sourceFile, File destinationFile, Charset charset,
                    boolean preindexedTokens1, boolean preindexedTokens2, int k) {
         super(sourceFile, destinationFile, charset, preindexedTokens1,
               preindexedTokens2);
-        setComparator(new FallbackComparator<Weighted<TokenPair>>(
+        setComparator(Comparators.fallback(
                 classComparator, nearnessComparator));
         this.k = k;
     }
@@ -82,6 +78,31 @@ public class KnnTask extends SortTask.SimsSortTask {
     public KnnTask() {
     }
 
+
+    public final Function<String, Integer> getFeatureDecoder() {
+        return isPreindexedTokens1()
+                ? Token.enumeratedDecoder()
+                : Token.stringDecoder(getIndex1());
+    }
+
+    public final Function<String, Integer> getEntryDecoder() {
+        return isPreindexedTokens1()
+                ? Token.enumeratedDecoder()
+                : Token.stringDecoder(getIndex1());
+    }
+
+    public final Function<Integer, String> getFeatureEncoder() {
+        return isPreindexedTokens2()
+                ? Token.enumeratedEncoder()
+                : Token.stringEncoder(getIndex2());
+    }
+
+    public final Function<Integer, String> getEntryEncoder() {
+        return isPreindexedTokens2()
+                ? Token.enumeratedEncoder()
+                : Token.stringEncoder(getIndex2());
+    }
+    
     public Comparator<Weighted<TokenPair>> getClassComparator() {
         return classComparator;
     }
@@ -89,7 +110,7 @@ public class KnnTask extends SortTask.SimsSortTask {
     public void setClassComparator(
             Comparator<Weighted<TokenPair>> classComparator) {
         this.classComparator = classComparator;
-        setComparator(new FallbackComparator<Weighted<TokenPair>>(
+        setComparator(Comparators.fallback(
                 classComparator, nearnessComparator));
     }
 
@@ -100,7 +121,7 @@ public class KnnTask extends SortTask.SimsSortTask {
     public void setNearnessComparator(
             Comparator<Weighted<TokenPair>> nearnessComparator) {
         this.nearnessComparator = nearnessComparator;
-        setComparator(new FallbackComparator<Weighted<TokenPair>>(
+        setComparator(Comparators.fallback(
                 classComparator, nearnessComparator));
     }
 
@@ -120,36 +141,9 @@ public class KnnTask extends SortTask.SimsSortTask {
             LOG.info("Running memory K-Nearest-Neighbours from \"" + getSrcFile()
                     + "\" to \"" + getDstFile() + "\".");
 
-        final Function<String, Integer> decoder1;
-        final Function<String, Integer> decoder2;
-        final Function<Integer, String> encoder1;
-        final Function<Integer, String> encoder2;
-
-        if (!isPreindexedTokens1()) {
-            final Enumerator<String> entryIndex = Enumerators.
-                    newDefaultStringEnumerator();
-
-            decoder1 = Token.stringDecoder(entryIndex);
-            encoder1 = Token.stringEncoder(entryIndex);
-        } else {
-            decoder1 = Token.enumeratedDecoder();
-            encoder1 = Token.enumeratedEncoder();
-        }
-
-        if (!isPreindexedTokens2()) {
-            final Enumerator<String> featureIndex = Enumerators.
-                    newDefaultStringEnumerator();
-            decoder2 = Token.stringDecoder(featureIndex);
-            encoder2 = Token.stringEncoder(featureIndex);
-
-        } else {
-            decoder2 = Token.enumeratedDecoder();
-            encoder2 = Token.enumeratedEncoder();
-        }
-
         Source<Weighted<TokenPair>> src = new WeightedTokenPairSource(
                 new TSVSource(getSrcFile(), getCharset()),
-                decoder1, decoder2);
+                getEntryDecoder(), getFeatureDecoder());
 
         final List<Weighted<TokenPair>> items = IOUtil.readAll(src);
         Collections.sort(items, getComparator());
@@ -157,7 +151,7 @@ public class KnnTask extends SortTask.SimsSortTask {
 
         Sink<Weighted<TokenPair>> snk = new WeightedTokenPairSink(
                 new TSVSink(getDstFile(), getCharset()),
-                encoder1, encoder2);
+                getEntryEncoder(), getFeatureEncoder());
 
         knnLines(items, snk);
 
