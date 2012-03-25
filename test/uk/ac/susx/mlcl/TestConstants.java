@@ -73,15 +73,6 @@ public class TestConstants {
     public static final File TEST_FRUIT_ENTRY_FEATURES =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".entryFeatures");
 
-    public static final File TEST_FRUIT_INDEXED_ENTRIES =
-            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.entries");
-
-    public static final File TEST_FRUIT_INDEXED_FEATURES =
-            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.features");
-
-    public static final File TEST_FRUIT_INDEXED_ENTRY_FEATURES =
-            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.entryFeatures");
-
     public static final File TEST_FRUIT_ENTRIES_FILTERED =
             new File(TEST_FRUIT_ENTRIES.getParentFile(), TEST_FRUIT_ENTRIES.getName() + ".filtered");
 
@@ -97,6 +88,21 @@ public class TestConstants {
 
     public static final File TEST_FRUIT_NEIGHS =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".neighs");
+
+    public static final File TEST_FRUIT_INDEXED_ENTRIES =
+            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.entries");
+
+    public static final File TEST_FRUIT_INDEXED_FEATURES =
+            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.features");
+
+    public static final File TEST_FRUIT_INDEXED_ENTRY_FEATURES =
+            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.entryFeatures");
+
+    public static final File TEST_FRUIT_INDEXED_SIMS =
+            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.sims");
+
+    public static final File TEST_FRUIT_INDEXED_NEIGHS =
+            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.neighs");
 
     public static final File TEST_OUTPUT_DIR = new File(TEST_DATA_DIR, "out");
     public static final File TEST_TMP_DIR = new File(TEST_OUTPUT_DIR, "tmp");

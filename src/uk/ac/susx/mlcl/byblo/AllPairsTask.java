@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.google.common.base.Function;
 import com.google.common.base.Objects.ToStringHelper;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -139,6 +140,18 @@ public class AllPairsTask extends AbstractCommand {
                converter = DoubleConverter.class)
     private double minkP = 2;
 
+    @Parameter(names = {"-pe", "--preindexed-entries"},
+               description = "Whether tokens in the first column of the input file are indexed.")
+    private boolean preindexedEntries = false;
+
+    @Parameter(names = {"-pf", "--preindexed-features"},
+               description = "Whether entries in the second column of the input file are indexed.")
+    private boolean preindexedFeatures = false;
+
+    private Enumerator<String> entryIndex = null;
+
+    private Enumerator<String> featureIndex = null;
+
     public AllPairsTask() {
     }
 
@@ -171,6 +184,66 @@ public class AllPairsTask extends AbstractCommand {
         return classLookup;
     }
 
+    public Enumerator<String> getEntryIndex() {
+        if (entryIndex == null)
+            entryIndex = Enumerators.newDefaultStringEnumerator();
+        return entryIndex;
+    }
+
+    public void setEntryIndex(Enumerator<String> entryIndex) {
+        this.entryIndex = entryIndex;
+    }
+
+    public Enumerator<String> getFeatureIndex() {
+        if (featureIndex == null)
+            featureIndex = Enumerators.newDefaultStringEnumerator();
+        return featureIndex;
+    }
+
+    public void setFeatureIndex(Enumerator<String> featureIndex) {
+        this.featureIndex = featureIndex;
+    }
+
+    public final boolean isPreindexedEntries() {
+        return preindexedEntries;
+    }
+
+    public final void setPreindexedEntries(boolean preindexedEntries) {
+        this.preindexedEntries = preindexedEntries;
+    }
+
+    public final boolean isPreindexedFeatures() {
+        return preindexedFeatures;
+    }
+
+    public final void setPreindexedFeatures(boolean preindexedFeatures) {
+        this.preindexedFeatures = preindexedFeatures;
+    }
+
+    public final Function<String, Integer> getFeatureDecoder() {
+        return preindexedFeatures
+                ? Token.enumeratedDecoder()
+                : Token.stringDecoder(getFeatureIndex());
+    }
+
+    public final Function<String, Integer> getEntryDecoder() {
+        return preindexedEntries
+                ? Token.enumeratedDecoder()
+                : Token.stringDecoder(getEntryIndex());
+    }
+
+    public final Function<Integer, String> getFeatureEncoder() {
+        return preindexedFeatures
+                ? Token.enumeratedEncoder()
+                : Token.stringEncoder(getFeatureIndex());
+    }
+
+    public final Function<Integer, String> getEntryEncoder() {
+        return preindexedEntries
+                ? Token.enumeratedEncoder()
+                : Token.stringEncoder(getEntryIndex());
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public void runCommand() throws Exception {
@@ -179,7 +252,6 @@ public class AllPairsTask extends AbstractCommand {
             LOG.info(
                     "Running all-pairs similarity search from \"" + entryFeaturesFile + "\" to \"" + outputFile + "\"");
         }
-
 
         final Map<String, Class<? extends Proximity>> classLookup =
                 buildMeasureClassLookupTable();
@@ -207,7 +279,7 @@ public class AllPairsTask extends AbstractCommand {
             ((CrMi) prox).setGamma(crmiGamma);
         }
 
-        Enumerator<String> strIndex = Enumerators.newDefaultStringEnumerator();
+//        Enumerator<String> strIndex = Enumerators.newDefaultStringEnumerator();
 
         // Entry index is not really required for the core algorithm
         // implementation but is used to filter Entries
@@ -223,7 +295,7 @@ public class AllPairsTask extends AbstractCommand {
 
                 WeightedTokenSource features = new WeightedTokenSource(
                         new TSVSource(featuresFile, charset),
-                        Token.stringDecoder(strIndex));
+                        getFeatureDecoder());
                 AbstractMIProximity bmip = ((AbstractMIProximity) prox);
                 bmip.setFeatureFrequencies(features.readAllAsArray());
                 bmip.setFeatureFrequencySum(features.getWeightSum());
@@ -241,7 +313,7 @@ public class AllPairsTask extends AbstractCommand {
 
                 WeightedTokenSource features = new WeightedTokenSource(
                         new TSVSource(featuresFile, charset),
-                        Token.stringDecoder(strIndex));
+                        getFeatureDecoder());
                 features.readAll();
 
                 ((KendallTau) prox).setNumFeatures(features.getCardinality());
@@ -263,12 +335,12 @@ public class AllPairsTask extends AbstractCommand {
         // files, e.g compare fruit words with cake words
         final WeightedTokenPairVectorSource sourceA = new WeightedTokenPairSource(
                 new TSVSource(entryFeaturesFile, charset),
-                Token.stringDecoder(strIndex),
-                Token.stringDecoder(strIndex)).getVectorSource();
+                getEntryDecoder(),
+                getFeatureDecoder()).getVectorSource();
         final WeightedTokenPairVectorSource sourceB = new WeightedTokenPairSource(
                 new TSVSource(entryFeaturesFile, charset),
-                Token.stringDecoder(strIndex),
-                Token.stringDecoder(strIndex)).getVectorSource();
+                getEntryDecoder(),
+                getFeatureDecoder()).getVectorSource();
 
         // Create a sink object that will act as a recipient for all pairs that
         // are produced by the algorithm.
@@ -276,8 +348,8 @@ public class AllPairsTask extends AbstractCommand {
         final Sink<Weighted<TokenPair>> sink =
                 new WeightedTokenPairSink(
                 new TSVSink(outputFile, charset),
-                Token.stringEncoder(strIndex),
-                Token.stringEncoder(strIndex));
+                getEntryEncoder(),
+                getFeatureEncoder());
 
         // Instantiate the all-pairs algorithm as given on the command line.
         ThreadedApssTask<Lexer.Tell> apss = new ThreadedApssTask<Lexer.Tell>(
@@ -288,7 +360,9 @@ public class AllPairsTask extends AbstractCommand {
         apss.setNumThreads(nThreads);
         apss.setSink(sink);
 
-        prox.setFilteredFeatureId(strIndex.index(FilterTask.FILTERED_STRING));
+//        prox.setFilteredFeatureId(getEntryDecoder().apply(FilterTask.FILTERED_STRING));
+        //XXX This needs to be sorted out
+        prox.setFilteredFeatureId(Integer.MAX_VALUE);
 
         apss.setMeasure(prox);
         apss.setMaxChunkSize(chunkSize);

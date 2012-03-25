@@ -85,6 +85,9 @@ public abstract class SortTask<T> extends CopyTask {
         this(sourceFile, destinationFile, Files.DEFAULT_CHARSET);
     }
 
+    public SortTask() {
+    }
+
     public final boolean isReverse() {
         return reverse;
     }
@@ -152,6 +155,9 @@ public abstract class SortTask<T> extends CopyTask {
             super(sourceFile, destinationFile, charset,
                   Weighted.recordOrder(Token.indexOrder()));
             setPreindexedTokens(preindexed);
+        }
+
+        public WeightedTokenSortTask() {
         }
 
         private Enumerator<String> index = null;
@@ -238,6 +244,10 @@ public abstract class SortTask<T> extends CopyTask {
             setPreindexedTokens1(preindexedTokens1);
             setPreindexedTokens2(preindexedTokens2);
         }
+
+        public WeightedTokenPairSortTask() {
+        }
+        
 
         private Enumerator<String> index1 = null;
 
@@ -354,6 +364,10 @@ public abstract class SortTask<T> extends CopyTask {
             setPreindexedTokens2(preindexedTokens2);
         }
 
+        public TokenPairSortTask() {
+        }
+
+        
         private Enumerator<String> entryIndex = null;
 
         private Enumerator<String> featureIndex = null;
@@ -433,7 +447,7 @@ public abstract class SortTask<T> extends CopyTask {
 
             if (src instanceof Closeable)
                 ((Closeable) src).close();
-            
+
             Collections.sort(items, getComparator());
 
             TokenPairSink snk = new TokenPairSink(
@@ -456,6 +470,10 @@ public abstract class SortTask<T> extends CopyTask {
                                   Charset charset, boolean preindexed) {
             super(sourceFile, destinationFile, charset, preindexed);
         }
+
+        public EntryFreqsSortTask() {
+        }
+        
     }
 
     public static class FeatureFreqsSortTask extends WeightedTokenSortTask {
@@ -464,6 +482,10 @@ public abstract class SortTask<T> extends CopyTask {
                                     Charset charset, boolean preindexed) {
             super(sourceFile, destinationFile, charset, preindexed);
         }
+
+        public FeatureFreqsSortTask() {
+        }
+        
     }
 
     public static class EventFreqsSortTask extends WeightedTokenPairSortTask {
@@ -474,6 +496,11 @@ public abstract class SortTask<T> extends CopyTask {
             super(sourceFile, destinationFile, charset, preindexedTokens1,
                   preindexedTokens2);
         }
+
+        public EventFreqsSortTask() {
+        }
+        
+        
     }
 
     public static class EventSortTask extends TokenPairSortTask {
@@ -484,6 +511,10 @@ public abstract class SortTask<T> extends CopyTask {
             super(sourceFile, destinationFile, charset, preindexedTokens1,
                   preindexedTokens2);
         }
+
+        public EventSortTask() {
+        }
+        
     }
 
     public static class SimsSortTask extends WeightedTokenPairSortTask {
@@ -494,5 +525,9 @@ public abstract class SortTask<T> extends CopyTask {
             super(sourceFile, destinationFile, charset, preindexedTokens1,
                   preindexedTokens2);
         }
+
+        public SimsSortTask() {
+        }
+        
     }
 }

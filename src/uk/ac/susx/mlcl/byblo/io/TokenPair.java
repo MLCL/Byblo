@@ -288,6 +288,27 @@ public class TokenPair implements
         };
     }
 
+    public static Comparator<TokenPair> firstIndexOrder() {
+        return new Comparator<TokenPair>() {
+
+            @Override
+            public int compare(TokenPair a, TokenPair b) {
+                return a.id1() - b.id1();
+            }
+        };
+    }
+
+
+    public static Comparator<TokenPair> secondIndexOrder() {
+        return new Comparator<TokenPair>() {
+
+            @Override
+            public int compare(TokenPair a, TokenPair b) {
+                return a.id2() - b.id2();
+            }
+        };
+    }
+
     public static Comparator<TokenPair> stringOrder(
             final Function<Integer, String> encoder1,
             final Function<Integer, String> encoder2) {

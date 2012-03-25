@@ -79,6 +79,9 @@ public class KnnTask extends SortTask.SimsSortTask {
         this.k = k;
     }
 
+    public KnnTask() {
+    }
+
     public Comparator<Weighted<TokenPair>> getClassComparator() {
         return classComparator;
     }
@@ -171,7 +174,8 @@ public class KnnTask extends SortTask.SimsSortTask {
         Weighted<TokenPair> currentClass = null;
         int count = 0;
         for (Weighted<TokenPair> item : in) {
-            if (classComparator.compare(item, currentClass) != 0) {
+            if (currentClass == null
+                    || classComparator.compare(item, currentClass) != 0) {
                 currentClass = item;
                 count = 1;
             } else {

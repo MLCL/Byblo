@@ -181,8 +181,35 @@ public class ExternalCountTaskTest {
                    TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
                                          DEFAULT_CHARSET));
     }
+    @Test
+    public void testRunOnFruitAPI_Indexed() throws Exception {
+        System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT_INDEXED);
 
-    @Test(timeout = 2000)
+        final String fruitPrefix = TEST_FRUIT_INPUT_INDEXED.getName();
+        final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
+        final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
+        final File efActual = new File(TEST_OUTPUT_DIR,
+                                       fruitPrefix + ".entryFeatures");
+
+        eActual.delete();
+        fActual.delete();
+        efActual.delete();
+
+        runWithAPI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
+                   DEFAULT_CHARSET, 1000000, true, true);
+
+        assertTrue("Output entries file differs from sampledata file.",
+                   WeightedTokenSource.equal(eActual, TEST_FRUIT_INDEXED_ENTRIES,
+                                             DEFAULT_CHARSET));
+        assertTrue("Output features file differs from test data file.",
+                   WeightedTokenSource.equal(fActual, TEST_FRUIT_INDEXED_FEATURES,
+                                             DEFAULT_CHARSET));
+        assertTrue("Output entry/features file differs from test data file.",
+                   TokenPairSource.equal(efActual, TEST_FRUIT_INDEXED_ENTRY_FEATURES,
+                                         DEFAULT_CHARSET));
+    }
+
+    @Test(timeout = 4000)
     public void testRunOnFruitAPITinyChunk() throws Exception {
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
 
@@ -199,7 +226,7 @@ public class ExternalCountTaskTest {
         efActual.delete();
 
         runWithAPI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
-                   DEFAULT_CHARSET, 100000, false, false);
+                   DEFAULT_CHARSET, 10000, false, false);
 
         assertTrue("Output entries file differs from sampledata file.",
                    WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
@@ -207,9 +234,39 @@ public class ExternalCountTaskTest {
         assertTrue("Output features file differs from test data file.",
                    WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
                                              DEFAULT_CHARSET));
-//        assertTrue("Output entry/features file differs from test data file.",
-//                TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
-//                DEFAULT_CHARSET));
+        assertTrue("Output entry/features file differs from test data file.",
+                TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
+                DEFAULT_CHARSET));
+    }
+
+    @Test(timeout = 2000)
+    public void testRunOnFruitAPITinyChunk_Indexed() throws Exception {
+        System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT_INDEXED);
+
+        final String fruitPrefix = TEST_FRUIT_INPUT_INDEXED.getName();
+        final File eActual = new File(TEST_OUTPUT_DIR,
+                                      fruitPrefix + ".entries" + ".tiny");
+        final File fActual = new File(TEST_OUTPUT_DIR,
+                                      fruitPrefix + ".features" + ".tiny");
+        final File efActual = new File(TEST_OUTPUT_DIR,
+                                       fruitPrefix + ".entryFeatures" + ".tiny");
+
+        eActual.delete();
+        fActual.delete();
+        efActual.delete();
+
+        runWithAPI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
+                   DEFAULT_CHARSET, 10000, true, true);
+
+        assertTrue("Output entries file differs from sampledata file.",
+                   WeightedTokenSource.equal(eActual, TEST_FRUIT_INDEXED_ENTRIES,
+                                             DEFAULT_CHARSET));
+        assertTrue("Output features file differs from test data file.",
+                   WeightedTokenSource.equal(fActual, TEST_FRUIT_INDEXED_FEATURES,
+                                             DEFAULT_CHARSET));
+        assertTrue("Output entry/features file differs from test data file.",
+                TokenPairSource.equal(efActual, TEST_FRUIT_INDEXED_ENTRY_FEATURES,
+                DEFAULT_CHARSET));
     }
 
     @Test(timeout = 2000)
@@ -239,6 +296,36 @@ public class ExternalCountTaskTest {
                                              DEFAULT_CHARSET));
         assertTrue("Output entry/features file differs from test data file.",
                    TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
+                                         DEFAULT_CHARSET));
+    }
+
+    @Test(timeout = 2000)
+    public void testRunOnFruitCLI_Indexed() throws Exception {
+
+        System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT_INDEXED);
+
+        final String fruitPrefix = TEST_FRUIT_INPUT_INDEXED.getName();
+        final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
+        final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
+        final File efActual = new File(TEST_OUTPUT_DIR,
+                                       fruitPrefix + ".entryFeatures");
+
+        eActual.delete();
+        fActual.delete();
+        efActual.delete();
+
+        runwithCLI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
+                   DEFAULT_CHARSET, 1000000, true, true);
+
+
+        assertTrue("Output entries file differs from sampledata file.",
+                   WeightedTokenSource.equal(eActual, TEST_FRUIT_INDEXED_ENTRIES,
+                                             DEFAULT_CHARSET));
+        assertTrue("Output features file differs from test data file.",
+                   WeightedTokenSource.equal(fActual, TEST_FRUIT_INDEXED_FEATURES,
+                                             DEFAULT_CHARSET));
+        assertTrue("Output entry/features file differs from test data file.",
+                   TokenPairSource.equal(efActual, TEST_FRUIT_INDEXED_ENTRY_FEATURES,
                                          DEFAULT_CHARSET));
     }
 

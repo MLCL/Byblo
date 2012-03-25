@@ -79,6 +79,21 @@ public class AllPairsTaskTest {
     }
 
     @Test
+    public void testMainRun_Indexed() throws Exception {
+        new File("testdata","out").mkdir();
+        try {
+            ExitTrapper.enableExistTrapping();
+            Main.main(new String[]{"allpairs",
+                        "-i", "testdata/fruit/bnc-gramrels-fruit.indexed.entryFeatures",
+                        "-o", "testdata/out/bnc-gramrels-fruit.indexed.out",
+                        "-C", "500",
+                        "--preindexed-entries",
+                        "--preindexed-features"});
+        } finally {
+            ExitTrapper.disableExitTrapping();
+        }
+    }
+    @Test
     public void testExitStatus() throws Exception {
         try {
             ExitTrapper.enableExistTrapping();

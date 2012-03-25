@@ -30,18 +30,19 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
-import uk.ac.susx.mlcl.lib.test.ExitTrapper;
 import java.io.File;
 import org.junit.Test;
-import uk.ac.susx.mlcl.TestConstants;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.byblo.io.TokenPair;
+import uk.ac.susx.mlcl.byblo.io.Weighted;
+import uk.ac.susx.mlcl.lib.tasks.ReverseComparator;
 
 /**
  *
  * @author Hamish Morgan &ly;hamish.morgan@sussex.ac.uk&gt;
  */
-public class ExternalKnnTaskTest {
+public class KnnTaskTest {
 
     private static final String subject = ExternalKnnTask.class.getName();
 
@@ -53,9 +54,19 @@ public class ExternalKnnTaskTest {
         final File out = new File(TEST_OUTPUT_DIR,
                                   FRUIT_NAME + ".neighs");
 
-        final ExternalKnnTask knnTask = new ExternalKnnTask(
-                in, out, DEFAULT_CHARSET, 2, false,false);
-        knnTask.setMaxChunkSize(1000);
+        final KnnTask knnTask = new KnnTask();
+        knnTask.setSrcFile(in);
+        knnTask.setDstFile(out);
+        knnTask.setCharset(DEFAULT_CHARSET);
+        knnTask.setK(100);
+        knnTask.setPreindexedTokens1(false);
+        knnTask.setPreindexedTokens2(false);
+        knnTask.setClassComparator(Weighted.recordOrder(TokenPair.
+                firstIndexOrder()));
+        knnTask.setNearnessComparator(
+                new ReverseComparator<Weighted<TokenPair>>(
+                Weighted.<TokenPair>weightOrder()));
+
         knnTask.run();
 
         while (knnTask.isExceptionThrown()) {
@@ -66,32 +77,35 @@ public class ExternalKnnTaskTest {
         assertTrue("Empty output file found.", out.length() > 0);
     }
 
-    @Test
-    public void testExitStatus() throws Exception {
-        try {
-            ExitTrapper.enableExistTrapping();
-            Main.main(new String[]{"knn"});
-        } catch (ExitTrapper.ExitException ex) {
-            assertTrue("Expecting non-zero exit status.", ex.getStatus() != 0);
-        } finally {
-            ExitTrapper.disableExitTrapping();
-        }
-    }
+    @Test(timeout = 8000)
+    public void testRunOnFruit_Indexed() throws Exception {
+        System.out.println(
+                "Testing " + subject + " on " + TEST_FRUIT_INPUT_INDEXED);
 
-    @Test
-    public void testEmptyInputFile() throws Exception {
-        try {
-            File in = new File(TestConstants.TEST_OUTPUT_DIR, "in");
-            in.createNewFile();
-            File out = new File(TestConstants.TEST_OUTPUT_DIR, "out");
-            
-            ExitTrapper.enableExistTrapping();
-            Main.main(new String[]{"knn", "-i", in.toString(), 
-                "-o", out.toString()});
-        } catch (ExitTrapper.ExitException ex) {
-            assertTrue("Expecting non-zero exit status.", ex.getStatus() == 0);
-        } finally {
-            ExitTrapper.disableExitTrapping();
+        final File in = TEST_FRUIT_INDEXED_SIMS;
+        final File out = new File(TEST_OUTPUT_DIR,
+                                  FRUIT_NAME + ".indexed.neighs");
+
+        final KnnTask knnTask = new KnnTask();
+        knnTask.setSrcFile(in);
+        knnTask.setDstFile(out);
+        knnTask.setCharset(DEFAULT_CHARSET);
+        knnTask.setK(100);
+        knnTask.setPreindexedTokens1(true);
+        knnTask.setPreindexedTokens2(true);
+        knnTask.setClassComparator(Weighted.recordOrder(TokenPair.
+                firstIndexOrder()));
+        knnTask.setNearnessComparator(
+                new ReverseComparator<Weighted<TokenPair>>(
+                Weighted.<TokenPair>weightOrder()));
+
+        knnTask.run();
+
+        while (knnTask.isExceptionThrown()) {
+            knnTask.throwException();
         }
+
+        assertTrue("Output files not created.", out.exists());
+        assertTrue("Empty output file found.", out.length() > 0);
     }
 }
