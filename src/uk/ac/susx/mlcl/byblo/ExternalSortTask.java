@@ -66,6 +66,7 @@ import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
 
 /**
  *
+ * @param <T> 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Sort a file.")
@@ -245,7 +246,7 @@ public abstract class ExternalSortTask<T> extends AbstractParallelCommandTask {
             }
 
             // XXX: Nasty hack to stop it tight looping when both queues are empty
-            Thread.sleep(1);
+//            Thread.sleep(1);
         }
         chunkTask.throwException();
     }
@@ -262,12 +263,14 @@ public abstract class ExternalSortTask<T> extends AbstractParallelCommandTask {
 
         if (task.getClass().equals(SortTask.class)) {
 
+            @SuppressWarnings("unchecked")
             SortTask<T> sortTask = (SortTask<T>) task;
             queueMergeTask(sortTask.getDstFile());
 
         } else if (task.getClass().equals(MergeTask.class)) {
 
-            MergeTask mergeTask = (MergeTask) task;
+            @SuppressWarnings("unchecked")
+            MergeTask<T> mergeTask = (MergeTask<T>) task;
             queueMergeTask(mergeTask.getDestFile());
             submitTask(new DeleteTask(mergeTask.getSourceFileA()));
             submitTask(new DeleteTask(mergeTask.getSourceFileB()));
@@ -288,11 +291,11 @@ public abstract class ExternalSortTask<T> extends AbstractParallelCommandTask {
         new DeleteTask(finalMerge).runTask();
     }
 
-    protected Future<MergeTask> queueMergeTask(File file) throws IOException {
+    protected Future<MergeTask<T>> queueMergeTask(File file) throws IOException {
         mergeQueue.add(file);
         if (mergeQueue.size() >= 2) {
             File result = tempFileFactory.createFile();
-            MergeTask mergeTask = newMergeTask(mergeQueue.poll(), mergeQueue.
+            MergeTask<T> mergeTask = newMergeTask(mergeQueue.poll(), mergeQueue.
                     poll(), result);
             return submitTask(mergeTask);
         } else {

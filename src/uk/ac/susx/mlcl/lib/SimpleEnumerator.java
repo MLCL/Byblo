@@ -30,17 +30,14 @@
  */
 package uk.ac.susx.mlcl.lib;
 
-import com.sun.jmx.snmp.Enumerated;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import java.io.*;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
-import uk.ac.susx.mlcl.byblo.io.TokenPair;
 
 /**
  * A simple of bimap for indexing complex objects (usually strings).
@@ -58,14 +55,16 @@ public final class SimpleEnumerator<T> implements Serializable, Enumerator<T> {
 
     private final AtomicInteger nextId;
 
-    protected SimpleEnumerator(ObjectList<T> indexToObj, Object2IntMap<T> objToIndex, AtomicInteger nextId) {
+    protected SimpleEnumerator(ObjectList<T> indexToObj,
+                               Object2IntMap<T> objToIndex, AtomicInteger nextId) {
         this.indexToObj = indexToObj;
         this.objToIndex = objToIndex;
         this.nextId = nextId;
     }
 
     protected SimpleEnumerator() {
-        this(new ObjectArrayList<T>(), new Object2IntOpenHashMap<T>(), new AtomicInteger(0));
+        this(new ObjectArrayList<T>(), new Object2IntOpenHashMap<T>(),
+             new AtomicInteger(0));
         objToIndex.defaultReturnValue(-1);
     }
 
@@ -76,7 +75,7 @@ public final class SimpleEnumerator<T> implements Serializable, Enumerator<T> {
 
         final int result = objToIndex.getInt(obj);
         return (result == objToIndex.defaultReturnValue())
-               ? get0(obj) : result;
+                ? get0(obj) : result;
     }
 
     private synchronized int get0(final T obj) {
@@ -107,6 +106,7 @@ public final class SimpleEnumerator<T> implements Serializable, Enumerator<T> {
         return new Iterator<Entry<T>>() {
 
             int nextIndex = 0;
+
             @Override
             public boolean hasNext() {
                 return nextIndex < indexToObj.size();
@@ -117,10 +117,11 @@ public final class SimpleEnumerator<T> implements Serializable, Enumerator<T> {
                 final Object2IntMap.Entry<T> e = new Object2IntMap.Entry<T>() {
 
                     final int index = nextIndex;
-                    
+
                     @Override
                     public int setValue(int i) {
-                        throw new UnsupportedOperationException("Not supported yet.");
+                        throw new UnsupportedOperationException(
+                                "Not supported yet.");
                     }
 
                     @Override
@@ -140,7 +141,8 @@ public final class SimpleEnumerator<T> implements Serializable, Enumerator<T> {
 
                     @Override
                     public Integer setValue(Integer v) {
-                        throw new UnsupportedOperationException("Not supported yet.");
+                        throw new UnsupportedOperationException(
+                                "Not supported yet.");
                     }
                 };
                 nextIndex++;
@@ -154,20 +156,20 @@ public final class SimpleEnumerator<T> implements Serializable, Enumerator<T> {
         };
     }
 
-    protected final Object writeReplace() {
+    final Object writeReplace() {
         return new Serializer<T>(this);
     }
 
-    private static final class Serializer<T> implements Externalizable {
+    static final class Serializer<T> implements Externalizable {
 
         private static final long serialVersionUID = 1;
 
         private SimpleEnumerator<T> se;
 
-        public Serializer() {
+        Serializer() {
         }
 
-        public Serializer(final SimpleEnumerator<T> se) {
+        Serializer(final SimpleEnumerator<T> se) {
             if (se == null) {
                 throw new NullPointerException("se == null");
             }
@@ -186,6 +188,7 @@ public final class SimpleEnumerator<T> implements Serializable, Enumerator<T> {
                 throws IOException, ClassNotFoundException {
             AtomicInteger nextId = new AtomicInteger(0);
             nextId.set(in.readInt());
+            @SuppressWarnings("unchecked")
             ObjectList<T> indexToObj = (ObjectList<T>) in.readObject();
             Object2IntMap<T> objToIndex = new Object2IntOpenHashMap<T>();
             for (int i = 0; i < indexToObj.size(); i++) {
@@ -194,9 +197,8 @@ public final class SimpleEnumerator<T> implements Serializable, Enumerator<T> {
             this.se = new SimpleEnumerator<T>(indexToObj, objToIndex, nextId);
         }
 
-        protected final Object readResolve() {
+        final Object readResolve() {
             return se;
         }
-
     }
 }
