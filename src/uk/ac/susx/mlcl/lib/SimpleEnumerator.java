@@ -69,7 +69,7 @@ public final class SimpleEnumerator<T> implements Serializable, Enumerator<T> {
     }
 
     @Override
-    public final int index(final T obj) {
+    public synchronized final int index(final T obj) {
         if (obj == null)
             throw new NullPointerException("obj is null");
 
@@ -92,7 +92,7 @@ public final class SimpleEnumerator<T> implements Serializable, Enumerator<T> {
     }
 
     @Override
-    public final T value(final int id) {
+    public synchronized final T value(final int id) {
         return indexToObj.get(id);
     }
 

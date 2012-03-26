@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.lib.tasks;
 
 import com.google.common.base.Objects;
 import java.util.ArrayDeque;
+import java.util.Properties;
 import java.util.Queue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,6 +44,8 @@ import org.apache.commons.logging.LogFactory;
 public abstract class AbstractTask implements Task {
 
     private static final Log LOG = LogFactory.getLog(AbstractTask.class);
+
+    private final Properties properties = new Properties();
 
     private Queue<Exception> exceptions = null;
 
@@ -57,6 +60,10 @@ public abstract class AbstractTask implements Task {
     public AbstractTask() {
     }
 
+    public Properties getProperties() {
+        return properties;
+    }
+
     protected abstract void initialiseTask() throws Exception;
 
     protected abstract void runTask() throws Exception;
@@ -66,7 +73,7 @@ public abstract class AbstractTask implements Task {
     @Override
     public final void run() {
         try {
-            
+
             setState(State.INITIALISING);
             if (LOG.isDebugEnabled())
                 LOG.debug("Initialising task: " + this);
@@ -89,7 +96,7 @@ public abstract class AbstractTask implements Task {
                 if (LOG.isDebugEnabled())
                     LOG.debug("Finalising task: " + this);
                 finaliseTask();
-                
+
             } catch (Exception ex) {
                 catchException(ex);
             }
@@ -149,4 +156,5 @@ public abstract class AbstractTask implements Task {
         return Objects.toStringHelper(this).
                 add("exceptions", isExceptionThrown());
     }
+
 }

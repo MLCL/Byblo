@@ -28,22 +28,47 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.lib.tasks;
+package uk.ac.susx.mlcl.byblo;
 
-import java.util.Properties;
+import uk.ac.susx.mlcl.byblo.tasks.CopyTask;
+import com.beust.jcommander.Parameters;
+import com.beust.jcommander.ParametersDelegate;
+import com.google.common.base.Objects;
+import java.io.File;
+import uk.ac.susx.mlcl.lib.tasks.AbstractCommand;
 
 /**
+ * Copy a source file to a destination.
  *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-public interface Task extends Runnable {
+@Parameters(commandDescription = "Copy a file.")
+public class CopyCommand extends AbstractCommand {
 
-    Throwable getException();
+    @ParametersDelegate
+    protected final FilePipeDeligate filesDeligate = new FilePipeDeligate();
 
-    boolean isExceptionThrown();
+    public CopyCommand(File sourceFile, File destinationFile) {
+        filesDeligate.setSourceFile(sourceFile);
+        filesDeligate.setDestinationFile(destinationFile);
+    }
 
-    void throwException() throws Exception;
+    public CopyCommand() {
+    }
 
-    Properties getProperties();
+    @Override
+    public void runCommand() throws Exception {
+        CopyTask task = new CopyTask(filesDeligate.getSourceFile(), filesDeligate.getDestinationFile());
+        task.run();
+        while (task.isExceptionThrown())
+            task.throwException();
+    }
+
+    @Override
+    protected Objects.ToStringHelper toStringHelper() {
+        return super.toStringHelper().
+                add("in", filesDeligate.getSourceFile()).
+                add("out", filesDeligate.getDestinationFile());
+    }
 
 }

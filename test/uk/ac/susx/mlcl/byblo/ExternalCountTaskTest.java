@@ -65,8 +65,8 @@ public class ExternalCountTaskTest {
         countTask.setEntryFeaturesFile(outEF);
         countTask.setCharset(charset);
         countTask.setMaxChunkSize(chunkSize);
-        countTask.setPreindexedEntries(preindexedEntries);
-        countTask.setPreindexedFeatures(preindexedFeatures);
+        countTask.indexDeligate.setPreindexedTokens1(preindexedEntries);
+        countTask.indexDeligate.setPreindexedTokens2(preindexedFeatures);
         countTask.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
         
         countTask.run();
@@ -102,12 +102,12 @@ public class ExternalCountTaskTest {
 
         if (preindexedEntries) {
             List<String> tmp = new ArrayList<String>(Arrays.asList(args));
-            tmp.add("--preindexed-entries");
+            tmp.add("--preindexed1");
             args = tmp.toArray(new String[0]);
         }
         if (preindexedFeatures) {
             List<String> tmp = new ArrayList<String>(Arrays.asList(args));
-            tmp.add("--preindexed-features");
+            tmp.add("--preindexed2");
             args = tmp.toArray(new String[0]);
         }
 
@@ -209,7 +209,7 @@ public class ExternalCountTaskTest {
                                          DEFAULT_CHARSET));
     }
 
-    @Test(timeout = 4000)
+    @Test(timeout = 16000)
     public void testRunOnFruitAPITinyChunk() throws Exception {
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
 
@@ -226,7 +226,7 @@ public class ExternalCountTaskTest {
         efActual.delete();
 
         runWithAPI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
-                   DEFAULT_CHARSET, 10000, false, false);
+                   DEFAULT_CHARSET, 30000, false, false);
 
         assertTrue("Output entries file differs from sampledata file.",
                    WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
@@ -256,7 +256,7 @@ public class ExternalCountTaskTest {
         efActual.delete();
 
         runWithAPI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
-                   DEFAULT_CHARSET, 10000, true, true);
+                   DEFAULT_CHARSET, 30000, true, true);
 
         assertTrue("Output entries file differs from sampledata file.",
                    WeightedTokenSource.equal(eActual, TEST_FRUIT_INDEXED_ENTRIES,

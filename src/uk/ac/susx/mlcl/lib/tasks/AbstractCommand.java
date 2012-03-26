@@ -38,6 +38,7 @@ import com.google.common.base.Objects;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -51,8 +52,10 @@ public abstract class AbstractCommand implements Command {
 
     private static final Log LOG = LogFactory.getLog(AbstractCommand.class);
 
+    private final Properties properties = new Properties();
+
     @Parameter(names = {"-h", "--help"},
-               description = "Display this help message.")
+    description = "Display this help message.")
     private boolean usageRequested = false;
 
     private final Map<String, Class<? extends Command>> subCommands;
@@ -83,7 +86,7 @@ public abstract class AbstractCommand implements Command {
         jc.setProgramName(this.getClass().getSimpleName());
         jc.addConverterFactory(new ConverterFactory());
         jc.addObject(this);
-        
+
 
         // If sub-commands have been set then instantiate all the objects
         // and pass them to JCommander
@@ -167,6 +170,11 @@ public abstract class AbstractCommand implements Command {
         LOG.trace("Completed command: " + this);
     }
 
+    public Properties getProperties() {
+        return properties;
+    }
+
+    
     @Override
     public final String toString() {
         return toStringHelper().toString();
@@ -177,4 +185,5 @@ public abstract class AbstractCommand implements Command {
                 add("help", isUsageRequested()).
                 add("subCommands", subCommands);
     }
+
 }

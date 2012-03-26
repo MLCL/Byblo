@@ -139,7 +139,7 @@ public class ChunkTask extends AbstractCommandTask {
             if (LOG.isDebugEnabled())
                 LOG.debug("Input is smaller than chunk size, copying.");
             File tmp = chunkFileFactory.createFile("ch", "");
-            CopyTask ct = new CopyTask(sourceFile, tmp);
+            CopyCommand ct = new CopyCommand(sourceFile, tmp);
             ct.runCommand();
             dstFileQueue.put(tmp);
             return;

@@ -45,9 +45,9 @@ import uk.ac.susx.mlcl.byblo.io.Weighted;
  */
 public class ExternalKnnTaskTest {
 
-    private static final String subject = ExternalKnnTask.class.getName();
+    private static final String subject = ExternalSimsKnnTask.class.getName();
 
-    @Test(timeout = 8000)
+    @Test(timeout = 2000)
     public void testRunOnFruit() throws Exception {
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
 
@@ -55,7 +55,7 @@ public class ExternalKnnTaskTest {
         final File out = new File(TEST_OUTPUT_DIR,
                                   FRUIT_NAME + ".neighs");
 
-        final ExternalKnnTask knnTask = new ExternalKnnTask(
+        final ExternalSimsKnnTask knnTask = new ExternalSimsKnnTask(
                 in, out, DEFAULT_CHARSET, 2, false, false);
         knnTask.setMaxChunkSize(1000);
         knnTask.run();

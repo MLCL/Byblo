@@ -59,7 +59,7 @@ public class Enumerators {
     @SuppressWarnings("unchecked")
     public static Enumerator<String> loadStringEnumerator(File file) throws IOException, ClassNotFoundException {
         
-        ObjectList<String> indexToObj = new ObjectArrayList<String>();
+        ObjectArrayList<String> indexToObj = new ObjectArrayList<String>();
         Object2IntMap<String> objToIndex = new Object2IntOpenHashMap<String>();
         AtomicInteger nextId = new AtomicInteger(0);
         
@@ -73,7 +73,7 @@ public class Enumerators {
                 nextId.set(id+1);
             
             objToIndex.put(s, id);
-            while(id < indexToObj.size())
+            while(id >= indexToObj.size())
                 indexToObj.add(null);
             
             indexToObj.set(id, s);

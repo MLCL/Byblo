@@ -47,15 +47,15 @@ public class Main extends AbstractCommand {
     static {
         final Map<String, Class<? extends Command>> tmp =
             new HashMap<String, Class<? extends Command>>();
-        tmp.put("sort-sims", ExternalSortTask.SimsExternalSortTask.class);
-        tmp.put("sort-ents", ExternalSortTask.EntryFreqsExternalSortTask.class);
-        tmp.put("sort-feats", ExternalSortTask.FeatureFreqsExternalSortTask.class);
-        tmp.put("sort-events", ExternalSortTask.EventFreqsExternalSortTask.class);
-        tmp.put("merge-sims", MergeTask.SimsMergeTask.class);
-        tmp.put("merge-ents", MergeTask.EntryFreqsMergeTask.class);
-        tmp.put("merge-feats", MergeTask.FeatureFreqsMergeTask.class);
-        tmp.put("merge-events", MergeTask.EventFreqsMergeTask.class);
-        tmp.put("knn-sims", ExternalKnnTask.class);
+        tmp.put("sort-sims", ExternalSortTask.WeightedTokenPiarExternalSortTask.class);
+        tmp.put("sort-ents", ExternalSortTask.WeightedTokenExternalSortTask.class);
+        tmp.put("sort-feats", ExternalSortTask.WeightedTokenExternalSortTask.class);
+        tmp.put("sort-events", ExternalSortTask.WeightedTokenPiarExternalSortTask.class);
+        tmp.put("merge-sims", MergeCommand.TokenPairMergeCommand.class);
+        tmp.put("merge-ents", MergeCommand.WeightedTokenPairMergeCommand.class);
+        tmp.put("merge-feats", MergeCommand.WeightedTokenMergeCommand.class);
+        tmp.put("merge-events", MergeCommand.WeightedTokenMergeCommand.class);
+        tmp.put("knn-sims", SimsKnnCommand.class);
         tmp.put("allpairs", AllPairsTask.class);
         tmp.put("count", ExternalCountTask.class);
         tmp.put("filter", FilterTask.class);

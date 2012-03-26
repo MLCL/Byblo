@@ -61,8 +61,8 @@ public class CountTaskTest {
         countTask.setFeaturesFile(outF);
         countTask.setEntryFeaturesFile(outEF);
         countTask.setCharset(charset);
-        countTask.setPreindexedEntries(preIndexEntries);
-        countTask.setPreindexedFeatures(preIndexFeatures);
+        countTask.indexDeligate.setPreindexedTokens1(preIndexEntries);
+        countTask.indexDeligate.setPreindexedTokens2(preIndexFeatures);
         countTask.run();
         while (countTask.isExceptionThrown()) {
             countTask.throwException();
@@ -92,12 +92,12 @@ public class CountTaskTest {
 
         if (preindexedEntries) {
             List<String> tmp = new ArrayList<String>(Arrays.asList(args));
-            tmp.add("--preindexed-entries");
+            tmp.add("--preindexed1");
             args = tmp.toArray(new String[0]);
         }
         if (preindexedFeatures) {
             List<String> tmp = new ArrayList<String>(Arrays.asList(args));
-            tmp.add("--preindexed-features");
+            tmp.add("--preindexed2");
             args = tmp.toArray(new String[0]);
         }
 

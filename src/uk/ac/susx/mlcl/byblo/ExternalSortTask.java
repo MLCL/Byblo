@@ -30,9 +30,11 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import uk.ac.susx.mlcl.byblo.tasks.MergeTask;
 import uk.ac.susx.mlcl.lib.tasks.TempFileFactoryConverter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects.ToStringHelper;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
@@ -48,25 +50,14 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.MergeTask.EntryFreqsMergeTask;
-import uk.ac.susx.mlcl.byblo.MergeTask.EventFreqsMergeTask;
-import uk.ac.susx.mlcl.byblo.MergeTask.EventMergeTask;
-import uk.ac.susx.mlcl.byblo.MergeTask.FeatureFreqsMergeTask;
-import uk.ac.susx.mlcl.byblo.MergeTask.SimsMergeTask;
-import uk.ac.susx.mlcl.byblo.SortTask.EntryFreqsSortTask;
-import uk.ac.susx.mlcl.byblo.SortTask.EventFreqsSortTask;
-import uk.ac.susx.mlcl.byblo.SortTask.EventSortTask;
-import uk.ac.susx.mlcl.byblo.SortTask.FeatureFreqsSortTask;
-import uk.ac.susx.mlcl.byblo.SortTask.SimsSortTask;
 import uk.ac.susx.mlcl.byblo.io.*;
+import uk.ac.susx.mlcl.byblo.tasks.SortTask;
 import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.io.*;
-import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
-import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
 
 /**
  *
- * @param <T> 
+ * @param <T>
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Sort a file.")
@@ -77,33 +68,24 @@ public abstract class ExternalSortTask<T> extends AbstractParallelCommandTask {
     private static final int DEFAULT_MAX_CHUNK_SIZE = ChunkTask.DEFAULT_MAX_CHUNK_SIZE;
 
     @Parameter(names = {"-C", "--chunk-size"},
-               description = "Number of lines that will be read and sorted in RAM at one "
+    description = "Number of lines that will be read and sorted in RAM at one "
     + "time (per thread). Larger values increase memory usage and performace.")
     private int maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
 
-    @Parameter(names = {"-i", "--input"},
-               description = "Source file. If this argument is not given, or if it is \"-\", then stdin will be read.",
-               validateWith = InputFileValidator.class,
-               required = true)
-    private File sourceFile;
-
-    @Parameter(names = {"-o", "--output"},
-               description = "Destination file. If this argument is not given, or if it is \"-\", then stdout will be written to.",
-               validateWith = OutputFileValidator.class,
-               required = true)
-    private File destFile;
+    @ParametersDelegate
+    protected final FilePipeDeligate fileDeligate = new FilePipeDeligate();
 
     @Parameter(names = {"-T", "--temporary-directory"},
-               description = "Directory which will be used for storing temporary files.",
-               converter = TempFileFactoryConverter.class)
+    description = "Directory which will be used for storing temporary files.",
+    converter = TempFileFactoryConverter.class)
     private FileFactory tempFileFactory = new TempFileFactory();
 
     @Parameter(names = {"-c", "--charset"},
-               description = "Character encoding for reading and writing files.")
+    description = "Character encoding for reading and writing files.")
     private Charset charset = Files.DEFAULT_CHARSET;
 
     @Parameter(names = {"-r", "--reverse"},
-               description = "Reverse the result of comparisons.")
+    description = "Reverse the result of comparisons.")
     private boolean reverse = false;
 
     private Comparator<T> comparator;
@@ -119,8 +101,8 @@ public abstract class ExternalSortTask<T> extends AbstractParallelCommandTask {
     }
 
     public ExternalSortTask(File src, File dst, Charset charset) {
-        setSourceFile(src);
-        setDestinationFile(dst);
+        fileDeligate.setSourceFile(src);
+        fileDeligate.setDestinationFile(dst);
         setCharset(charset);
     }
 
@@ -167,36 +149,14 @@ public abstract class ExternalSortTask<T> extends AbstractParallelCommandTask {
         this.maxChunkSize = maxChunkSize;
     }
 
-    public final File getSrcFile() {
-        return sourceFile;
-    }
-
-    public final File getDestFile() {
-        return destFile;
-    }
-
-    public final void setSourceFile(final File sourceFile)
-            throws NullPointerException {
-        if (sourceFile == null) {
-            throw new NullPointerException("sourceFile is null");
-        }
-        this.sourceFile = sourceFile;
-    }
-
-    public final void setDestinationFile(final File destFile)
-            throws NullPointerException {
-        if (destFile == null) {
-            throw new NullPointerException("destinationFile is null");
-        }
-        this.destFile = destFile;
-    }
-
     @Override
     protected void runTask() throws Exception {
 
         if (LOG.isInfoEnabled()) {
             LOG.info(
-                    "Sorting file externally: from \"" + getSrcFile() + "\" to \"" + getDestFile() + "\".");
+                    "Sorting file externally: from \""
+                    + fileDeligate.getSourceFile() + "\" to \""
+                    + fileDeligate.getDestinationFile() + "\".");
         }
 
         if (getComparator() == null) {
@@ -220,7 +180,8 @@ public abstract class ExternalSortTask<T> extends AbstractParallelCommandTask {
 
         BlockingQueue<File> chunkQueue = new ArrayBlockingQueue<File>(2);
 
-        ChunkTask chunkTask = new ChunkTask(getSrcFile(), getCharset(),
+        ChunkTask chunkTask = new ChunkTask(fileDeligate.getSourceFile(),
+                                            getCharset(),
                                             getMaxChunkSize());
         chunkTask.setDstFileQueue(chunkQueue);
         chunkTask.setChunkFileFactory(tempFileFactory);
@@ -241,7 +202,14 @@ public abstract class ExternalSortTask<T> extends AbstractParallelCommandTask {
 
                 File chunk = chunkQueue.take();
 
-                submitTask(newSortTask(chunk, chunk));
+                Source<T> source = openSource(chunk);
+                Sink<T> sink = openSink(chunk);
+                SortTask<T> task = new SortTask<T>(source, sink);
+                task.setComparator(this.getComparator());
+
+                task.getProperties().setProperty("srcFile", chunk.toString());
+                task.getProperties().setProperty("dstFile", chunk.toString());
+                submitTask(task);
 
             }
 
@@ -251,6 +219,7 @@ public abstract class ExternalSortTask<T> extends AbstractParallelCommandTask {
         chunkTask.throwException();
     }
 
+   
     protected void reduce() throws Exception {
         while (!getFutureQueue().isEmpty()) {
             Task task = getFutureQueue().poll().get();
@@ -261,21 +230,21 @@ public abstract class ExternalSortTask<T> extends AbstractParallelCommandTask {
     protected void handleCompletedTask(Task task) throws Exception {
         task.throwException();
 
-        if (task.getClass().equals(SortTask.class)) {
+        if (task instanceof SortTask) {
 
             @SuppressWarnings("unchecked")
-            SortTask<T> sortTask = (SortTask<T>) task;
-            queueMergeTask(sortTask.getDstFile());
+            SortCommand<T> sortTask = (SortCommand<T>) task;
+            queueMergeTask(new File(sortTask.getProperties().getProperty("dstFile")));
 
-        } else if (task.getClass().equals(MergeTask.class)) {
+        } else if (task instanceof MergeTask) {
 
             @SuppressWarnings("unchecked")
-            MergeTask<T> mergeTask = (MergeTask<T>) task;
+            MergeCommand<T> mergeTask = (MergeCommand<T>) task;
             queueMergeTask(mergeTask.getDestFile());
             submitTask(new DeleteTask(mergeTask.getSourceFileA()));
             submitTask(new DeleteTask(mergeTask.getSourceFileB()));
 
-        } else if (task.getClass().equals(DeleteTask.class)) {
+        } else if (task instanceof DeleteTask) {
             // not a sausage
         } else {
             throw new AssertionError(
@@ -285,18 +254,29 @@ public abstract class ExternalSortTask<T> extends AbstractParallelCommandTask {
     }
 
     protected void finish() throws Exception {
-
         File finalMerge = mergeQueue.poll();
-        new CopyTask(finalMerge, getDestFile()).runTask();
+        new CopyCommand(finalMerge, fileDeligate.getDestinationFile()).runCommand();
         new DeleteTask(finalMerge).runTask();
     }
 
-    protected Future<MergeTask<T>> queueMergeTask(File file) throws IOException {
+    protected Future<MergeTask<T>> queueMergeTask(File file) throws IOException, Exception {
         mergeQueue.add(file);
         if (mergeQueue.size() >= 2) {
-            File result = tempFileFactory.createFile();
-            MergeTask<T> mergeTask = newMergeTask(mergeQueue.poll(), mergeQueue.
-                    poll(), result);
+            File srcA = mergeQueue.poll();
+            File srcB = mergeQueue.poll();
+            File dst = tempFileFactory.createFile();
+            Source<T> source1 = openSource(srcA);
+            Source<T> source2 = openSource(srcB);
+            Sink<T> sink = openSink(dst);
+
+            MergeTask<T> mergeTask =
+                    new MergeTask<T>(source1, source2, sink);
+            mergeTask.setComparator(this.getComparator());
+
+            mergeTask.getProperties().setProperty("srcFileA", srcA.toString());
+            mergeTask.getProperties().setProperty("srcFileB", srcB.toString());
+            mergeTask.getProperties().setProperty("dstFile", dst.toString());
+
             return submitTask(mergeTask);
         } else {
             return null;
@@ -306,244 +286,108 @@ public abstract class ExternalSortTask<T> extends AbstractParallelCommandTask {
     @Override
     protected ToStringHelper toStringHelper() {
         return super.toStringHelper().
-                add("in", sourceFile).
-                add("out", destFile).
+                add("in", fileDeligate.getSourceFile()).
+                add("out", fileDeligate.getDestinationFile()).
                 add("chunkSize", maxChunkSize).
                 add("temp", tempFileFactory).
                 add("charset", charset);
     }
 
-    abstract SortTask<T> newSortTask(File from, File to);
+    abstract Source<T> openSource(File file) throws IOException;
 
-//    SortTask<T> newSortTask(File from, File to) {
-//        SortTask<T> t = new SortTask<T>(from, to, getCharset(), getComparator());
-//        return t;
-//    }
-    abstract MergeTask<T> newMergeTask(File from1, File from2, File to);
-//
-//    MergeTask<T> newMergeTask(File from1, File from2, File to) {
-//        MergeTask<T> mergeTask = new MergeTask<T>(
-//                from1, from2, to, getCharset());
-//        mergeTask.setComparator(getComparator());
-//        return mergeTask;
-//    }
+    abstract Sink<T> openSink(File file) throws IOException;
 
-    public abstract static class OneTokenExternalSortTask<T> extends ExternalSortTask<T> {
+    public static class WeightedTokenExternalSortTask extends ExternalSortTask<Weighted<Token>> {
 
-        private static final Log LOG = LogFactory.getLog(
-                SortTask.WeightedTokenSortTask.class);
+        @ParametersDelegate
+        protected final SingleIndexDeligate indexDeligate = new SingleIndexDeligate();
 
-        @Parameter(names = {"-p", "--preindexed"},
-                   description = "Whether tokens in the input events file are indexed.")
-        private boolean preindexedTokens = false;
-
-        public OneTokenExternalSortTask(
-                File sourceFile, File destinationFile, Charset charset,
-                boolean preindexed) {
+        public WeightedTokenExternalSortTask(File sourceFile, File destinationFile,
+                                             Charset charset, boolean preindexed) {
             super(sourceFile, destinationFile, charset);
-            setPreindexedTokens(preindexed);
+            indexDeligate.setPreindexedTokens(preindexed);
         }
 
-        public OneTokenExternalSortTask() {
+        public WeightedTokenExternalSortTask() {
         }
 
-        public final boolean isPreindexedTokens() {
-            return preindexedTokens;
+        @Override
+        Sink<Weighted<Token>> openSink(File file) throws IOException {
+            return new WeightSumReducerSink<Token>(
+                    new WeightedTokenSink(
+                    new TSVSink(file, getCharset()),
+                    indexDeligate.getEncoder()));
         }
 
-        public final void setPreindexedTokens(boolean preindexedTokens) {
-            this.preindexedTokens = preindexedTokens;
+        @Override
+        Source<Weighted<Token>> openSource(File file) throws IOException {
+            return new WeightedTokenSource(
+                    new TSVSource(file, getCharset()),
+                    indexDeligate.getDecoder());
         }
+
     }
 
-    public abstract static class TwoTokenExternalSortTask<T> extends ExternalSortTask<T> {
+    public static class WeightedTokenPiarExternalSortTask extends ExternalSortTask<Weighted<TokenPair>> {
 
-        private static final Log LOG = LogFactory.getLog(
-                SortTask.WeightedTokenSortTask.class);
+        @ParametersDelegate
+        protected final TwoIndexDeligate indexDeligate = new TwoIndexDeligate();
 
-        @Parameter(names = {"-p1", "--preindexed1"},
-                   description = "Whether tokens in the first column of the input file are indexed.")
-        private boolean preindexedTokens1 = false;
-
-        @Parameter(names = {"-p2", "--preindexed2"},
-                   description = "Whether entries in the second column of the input file are indexed.")
-        private boolean preindexedTokens2 = false;
-
-        public TwoTokenExternalSortTask(
-                File sourceFile, File destinationFile, Charset charset,
-                boolean preindexedTokens1, boolean preindexedTokens2) {
+        public WeightedTokenPiarExternalSortTask(File sourceFile, File destinationFile,
+                                                 Charset charset, boolean preindexed1, boolean preindexed2) {
             super(sourceFile, destinationFile, charset);
-            setPreindexedTokens1(preindexedTokens1);
-            setPreindexedTokens2(preindexedTokens2);
+            indexDeligate.setPreindexedTokens1(preindexed1);
+            indexDeligate.setPreindexedTokens2(preindexed2);
         }
 
-        public TwoTokenExternalSortTask() {
+        public WeightedTokenPiarExternalSortTask() {
         }
 
-        public final boolean isPreindexedTokens1() {
-            return preindexedTokens1;
+        @Override
+        Sink<Weighted<TokenPair>> openSink(File file) throws IOException {
+            return new WeightSumReducerSink<TokenPair>(
+                    new WeightedTokenPairSink(
+                    new TSVSink(file, getCharset()),
+                    indexDeligate.getEncoder1(), indexDeligate.getEncoder2()));
         }
 
-        public final void setPreindexedTokens1(boolean preindexedTokens1) {
-            this.preindexedTokens1 = preindexedTokens1;
+        @Override
+        Source<Weighted<TokenPair>> openSource(File file) throws IOException {
+            return new WeightedTokenPairSource(
+                    new TSVSource(file, getCharset()),
+                    indexDeligate.getDecoder1(), indexDeligate.getDecoder2());
         }
 
-        public final boolean isPreindexedTokens2() {
-            return preindexedTokens2;
-        }
-
-        public final void setPreindexedTokens2(boolean preindexedTokens2) {
-            this.preindexedTokens2 = preindexedTokens2;
-        }
     }
 
-    public static class EntryFreqsExternalSortTask extends OneTokenExternalSortTask<Weighted<Token>> {
+    public static class TokenPiarExternalSortTask extends ExternalSortTask<TokenPair> {
 
-        public EntryFreqsExternalSortTask(File sourceFile, File destinationFile,
-                                          Charset charset, boolean preindexed) {
-            super(sourceFile, destinationFile, charset, preindexed);
+        @ParametersDelegate
+        protected final TwoIndexDeligate indexDeligate = new TwoIndexDeligate();
+
+        public TokenPiarExternalSortTask(File sourceFile, File destinationFile,
+                                         Charset charset, boolean preindexed1, boolean preindexed2) {
+            super(sourceFile, destinationFile, charset);
+            indexDeligate.setPreindexedTokens1(preindexed1);
+            indexDeligate.setPreindexedTokens2(preindexed2);
         }
 
-        public EntryFreqsExternalSortTask() {
-        }
-
-        @Override
-        EntryFreqsSortTask newSortTask(File from, File to) {
-            EntryFreqsSortTask t = new EntryFreqsSortTask(from, to, getCharset(),
-                                                          isPreindexedTokens());
-            t.setComparator(getComparator());
-            return t;
+        public TokenPiarExternalSortTask() {
         }
 
         @Override
-        EntryFreqsMergeTask newMergeTask(File from1, File from2, File to) {
-            EntryFreqsMergeTask mergeTask = new EntryFreqsMergeTask(
-                    from1, from2, to, getCharset(), isPreindexedTokens());
-            mergeTask.setComparator(getComparator());
-            return mergeTask;
-        }
-    }
-
-    public static class FeatureFreqsExternalSortTask extends OneTokenExternalSortTask<Weighted<Token>> {
-
-        public FeatureFreqsExternalSortTask(File sourceFile,
-                                            File destinationFile,
-                                            Charset charset, boolean preindexed) {
-            super(sourceFile, destinationFile, charset, preindexed);
-        }
-
-        public FeatureFreqsExternalSortTask() {
+        Sink<TokenPair> openSink(File file) throws IOException {
+            return new TokenPairSink(
+                    new TSVSink(file, getCharset()),
+                    indexDeligate.getEncoder1(), indexDeligate.getEncoder2());
         }
 
         @Override
-        FeatureFreqsSortTask newSortTask(File from, File to) {
-            FeatureFreqsSortTask t = new FeatureFreqsSortTask(from, to,
-                                                              getCharset(),
-                                                              isPreindexedTokens());
-            t.setComparator(getComparator());
-            return t;
+        Source<TokenPair> openSource(File file) throws IOException {
+            return new TokenPairSource(
+                    new TSVSource(file, getCharset()),
+                    indexDeligate.getDecoder1(), indexDeligate.getDecoder2());
         }
 
-        @Override
-        FeatureFreqsMergeTask newMergeTask(File from1, File from2, File to) {
-            FeatureFreqsMergeTask mergeTask = new FeatureFreqsMergeTask(
-                    from1, from2, to, getCharset(), isPreindexedTokens());
-            mergeTask.setComparator(getComparator());
-            return mergeTask;
-        }
-    }
-
-    public static class EventFreqsExternalSortTask extends TwoTokenExternalSortTask<Weighted<TokenPair>> {
-
-        public EventFreqsExternalSortTask(File sourceFile, File destinationFile,
-                                          Charset charset,
-                                          boolean preindexedTokens1,
-                                          boolean preindexedTokens2) {
-            super(sourceFile, destinationFile, charset, preindexedTokens1,
-                  preindexedTokens2);
-        }
-
-        public EventFreqsExternalSortTask() {
-        }
-
-        @Override
-        EventFreqsSortTask newSortTask(File from, File to) {
-            EventFreqsSortTask t = new EventFreqsSortTask(from, to, getCharset(),
-                                                          isPreindexedTokens1(),
-                                                          isPreindexedTokens2());
-            t.setComparator(getComparator());
-            return t;
-        }
-
-        @Override
-        EventFreqsMergeTask newMergeTask(File from1, File from2, File to) {
-            EventFreqsMergeTask mergeTask = new EventFreqsMergeTask(
-                    from1, from2, to, getCharset(), isPreindexedTokens1(),
-                    isPreindexedTokens2());
-            mergeTask.setComparator(getComparator());
-            return mergeTask;
-        }
-    }
-
-    public static class EventExternalSortTask extends TwoTokenExternalSortTask<TokenPair> {
-
-        public EventExternalSortTask(File sourceFile, File destinationFile,
-                                     Charset charset, boolean preindexedTokens1,
-                                     boolean preindexedTokens2) {
-            super(sourceFile, destinationFile, charset, preindexedTokens1,
-                  preindexedTokens2);
-        }
-
-        public EventExternalSortTask() {
-        }
-
-        @Override
-        EventSortTask newSortTask(File from, File to) {
-            EventSortTask t = new EventSortTask(from, to, getCharset(),
-                                                isPreindexedTokens1(),
-                                                isPreindexedTokens2());
-            t.setComparator(getComparator());
-            return t;
-        }
-
-        @Override
-        EventMergeTask newMergeTask(File from1, File from2, File to) {
-            EventMergeTask mergeTask = new EventMergeTask(
-                    from1, from2, to, getCharset(), isPreindexedTokens1(),
-                    isPreindexedTokens2());
-            mergeTask.setComparator(getComparator());
-            return mergeTask;
-        }
-    }
-
-    public static class SimsExternalSortTask extends TwoTokenExternalSortTask<Weighted<TokenPair>> {
-
-        public SimsExternalSortTask(File sourceFile, File destinationFile,
-                                    Charset charset, boolean preindexedTokens1,
-                                    boolean preindexedTokens2) {
-            super(sourceFile, destinationFile, charset, preindexedTokens1,
-                  preindexedTokens2);
-        }
-
-        public SimsExternalSortTask() {
-        }
-
-        @Override
-        SimsSortTask newSortTask(File from, File to) {
-            SimsSortTask t = new SimsSortTask(from, to, getCharset(),
-                                              isPreindexedTokens1(),
-                                              isPreindexedTokens2());
-            t.setComparator(getComparator());
-            return t;
-        }
-
-        @Override
-        SimsMergeTask newMergeTask(File from1, File from2, File to) {
-            SimsMergeTask mergeTask = new SimsMergeTask(
-                    from1, from2, to, getCharset(), isPreindexedTokens1(),
-                    isPreindexedTokens2());
-            mergeTask.setComparator(getComparator());
-            return mergeTask;
-        }
     }
 }

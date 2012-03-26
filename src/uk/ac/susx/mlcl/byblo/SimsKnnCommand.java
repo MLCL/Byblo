@@ -32,15 +32,14 @@ package uk.ac.susx.mlcl.byblo;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.*;
+import uk.ac.susx.mlcl.byblo.tasks.KnnTask;
 import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.io.*;
 
@@ -52,13 +51,13 @@ import uk.ac.susx.mlcl.lib.io.*;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Perform k-nearest-neighbours on a similarity file.")
-public class KnnTask extends SortTask.SimsSortTask {
+public class SimsKnnCommand extends SortCommand.WeightedTokenPairSortCommand {
 
-    private static final Log LOG = LogFactory.getLog(KnnTask.class);
+    private static final Log LOG = LogFactory.getLog(SimsKnnCommand.class);
 
     @Parameter(names = {"-k"},
-               description = "The maximum number of neighbours to produce per word.")
-    private int k = ExternalKnnTask.DEFAULT_K;
+    description = "The maximum number of neighbours to produce per word.")
+    private int k = ExternalSimsKnnTask.DEFAULT_K;
 
     private Comparator<Weighted<TokenPair>> classComparator =
             Weighted.recordOrder(TokenPair.indexOrder());
@@ -66,43 +65,19 @@ public class KnnTask extends SortTask.SimsSortTask {
     private Comparator<Weighted<TokenPair>> nearnessComparator =
             Comparators.reverse(Weighted.<TokenPair>weightOrder());
 
-    public KnnTask(File sourceFile, File destinationFile, Charset charset,
-                   boolean preindexedTokens1, boolean preindexedTokens2, int k) {
+    public SimsKnnCommand(File sourceFile, File destinationFile, Charset charset,
+                          boolean preindexedTokens1, boolean preindexedTokens2, int k) {
         super(sourceFile, destinationFile, charset, preindexedTokens1,
               preindexedTokens2);
         setComparator(Comparators.fallback(
                 classComparator, nearnessComparator));
-        this.k = k;
+        setK(k);
     }
 
-    public KnnTask() {
+    public SimsKnnCommand() {
+        setK(100);
     }
 
-
-    public final Function<String, Integer> getFeatureDecoder() {
-        return isPreindexedTokens1()
-                ? Token.enumeratedDecoder()
-                : Token.stringDecoder(getIndex1());
-    }
-
-    public final Function<String, Integer> getEntryDecoder() {
-        return isPreindexedTokens1()
-                ? Token.enumeratedDecoder()
-                : Token.stringDecoder(getIndex1());
-    }
-
-    public final Function<Integer, String> getFeatureEncoder() {
-        return isPreindexedTokens2()
-                ? Token.enumeratedEncoder()
-                : Token.stringEncoder(getIndex2());
-    }
-
-    public final Function<Integer, String> getEntryEncoder() {
-        return isPreindexedTokens2()
-                ? Token.enumeratedEncoder()
-                : Token.stringEncoder(getIndex2());
-    }
-    
     public Comparator<Weighted<TokenPair>> getClassComparator() {
         return classComparator;
     }
@@ -136,49 +111,33 @@ public class KnnTask extends SortTask.SimsSortTask {
     }
 
     @Override
-    protected void runTask() throws Exception {
+    public void runCommand() throws Exception {
         if (LOG.isInfoEnabled())
-            LOG.info("Running memory K-Nearest-Neighbours from \"" + getSrcFile()
-                    + "\" to \"" + getDstFile() + "\".");
+            LOG.info("Running memory K-Nearest-Neighbours from \"" + filesDeligate.getSourceFile()
+                    + "\" to \"" + filesDeligate.getDestinationFile() + "\".");
 
-        Source<Weighted<TokenPair>> src = new WeightedTokenPairSource(
-                new TSVSource(getSrcFile(), getCharset()),
-                getEntryDecoder(), getFeatureDecoder());
+        Source<Weighted<TokenPair>> src = openSource(filesDeligate.getSourceFile());
 
         final List<Weighted<TokenPair>> items = IOUtil.readAll(src);
         Collections.sort(items, getComparator());
 
+        Sink<Weighted<TokenPair>> snk = openSink(filesDeligate.getDestinationFile());
 
-        Sink<Weighted<TokenPair>> snk = new WeightedTokenPairSink(
-                new TSVSink(getDstFile(), getCharset()),
-                getEntryEncoder(), getFeatureEncoder());
+        KnnTask<Weighted<TokenPair>> task = new KnnTask<Weighted<TokenPair>>();
+        task.setSink(snk);
+        task.setSource(src);
+        task.setClassComparator(classComparator);
+        task.setNearnessComparator(nearnessComparator);
+        task.setK(k);
 
-        knnLines(items, snk);
+        task.run();
+        
+        if (task.isExceptionThrown())
+            task.throwException();
 
         if (LOG.isInfoEnabled())
             LOG.info("Completed memory K-Nearest-Neighbours.");
 
-    }
-
-    protected void knnLines(
-            Collection<Weighted<TokenPair>> in,
-            Sink<Weighted<TokenPair>> out)
-            throws IOException {
-
-        Weighted<TokenPair> currentClass = null;
-        int count = 0;
-        for (Weighted<TokenPair> item : in) {
-            if (currentClass == null
-                    || classComparator.compare(item, currentClass) != 0) {
-                currentClass = item;
-                count = 1;
-            } else {
-                count++;
-            }
-            if (count <= k) {
-                out.write(item);
-            }
-        }
     }
 
     @Override
@@ -186,4 +145,5 @@ public class KnnTask extends SortTask.SimsSortTask {
         return super.toStringHelper().
                 add("k", k);
     }
+
 }

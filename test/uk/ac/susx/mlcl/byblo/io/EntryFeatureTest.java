@@ -140,7 +140,7 @@ public class EntryFeatureTest {
                    b.length() <= a.length());
 
         {
-            Enumerator<String> idx = (Enumerator<String>) Enumerators.loadStringEnumerator(idxFile);
+            Enumerator<String> idx = Enumerators.loadStringEnumerator(idxFile);
             TokenPairSource bSrc = new TokenPairSource(new TSVSource(b, DEFAULT_CHARSET));
             TokenPairSink cSink = new TokenPairSink(
                     new TSVSink(c, DEFAULT_CHARSET),

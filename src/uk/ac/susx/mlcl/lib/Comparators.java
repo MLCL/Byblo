@@ -20,14 +20,36 @@ public class Comparators {
 
     public static <T> Comparator<T> reverse(final Comparator<T> comp) {
         return (comp.getClass().equals(ReverseComparator.class))
-                ? ((ReverseComparator<T>) comp).getInner()
-                : new ReverseComparator<T>(comp);
+               ? ((ReverseComparator<T>) comp).getInner()
+               : new ReverseComparator<T>(comp);
     }
 
     @SuppressWarnings("unchecked")
     public static <T> Comparator<T> fallback(
             final Comparator<T> a, final Comparator<T> b) {
         return new FallbackComparator<T>(a, b);
+    }
+
+    public static <T extends Comparable<T>> Comparator<T> naturalOrder() {
+        return new Comparator<T>() {
+
+            @Override
+            public int compare(final T a, final T b) {
+                return a.compareTo(b);
+            }
+
+        };
+    }
+
+    public static <T> Comparator<T> naturalOrderIfPossible() {
+        return new Comparator<T>() {
+
+            @Override
+            public int compare(final T a, final T b) {
+                return ((Comparable<T>)a).compareTo(b);
+            }
+
+        };
     }
 
     private static class FallbackComparator<T> extends AbstractList<Comparator<T>>
@@ -71,6 +93,7 @@ public class Comparators {
         public int size() {
             return innerComparators.size();
         }
+
     }
 
     private static class CaseInsensitiveStringComparator<T extends CharSequence>
@@ -107,6 +130,7 @@ public class Comparators {
         public String toString() {
             return getClass().getSimpleName();
         }
+
     }
 
     /**
@@ -150,6 +174,7 @@ public class Comparators {
             builder.append('}');
             return builder.toString();
         }
+
     }
 
     /**
@@ -224,9 +249,10 @@ public class Comparators {
                     LOG.error(
                             "Caught exception when attempting to compare "
                             + "strings \"" + string1 + "\" and \"" + string2 + "\": " + ex,
-                              ex);
+                            ex);
                 throw ex;
             }
         }
+
     }
 }

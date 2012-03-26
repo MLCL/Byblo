@@ -32,34 +32,40 @@ package uk.ac.susx.mlcl.byblo;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import com.google.common.base.Function;
 import com.google.common.base.Objects.ToStringHelper;
 import uk.ac.susx.mlcl.lib.tasks.Task;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
+import uk.ac.susx.mlcl.byblo.tasks.KnnTask;
+import uk.ac.susx.mlcl.byblo.tasks.MergeTask;
+import uk.ac.susx.mlcl.byblo.tasks.SortTask;
 import uk.ac.susx.mlcl.lib.Comparators;
-import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.Enumerators;
+import uk.ac.susx.mlcl.lib.io.*;
 
 /**
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Perform k-nearest-neighbours on a similarity file.")
-public class ExternalKnnTask extends ExternalSortTask.SimsExternalSortTask {
+public class ExternalSimsKnnTask extends ExternalSortTask.WeightedTokenPiarExternalSortTask {
 
-    private static final Log LOG = LogFactory.getLog(ExternalKnnTask.class);
+    private static final Log LOG = LogFactory.getLog(ExternalSimsKnnTask.class);
 
     public static final int DEFAULT_K = 100;
 
     @Parameter(names = {"-k"},
-               description = "The number of neighbours to produce for each base entry.")
+    description = "The number of neighbours to produce for each base entry.")
     private int k = DEFAULT_K;
 
     private Comparator<Weighted<TokenPair>> classComparator =
@@ -68,9 +74,9 @@ public class ExternalKnnTask extends ExternalSortTask.SimsExternalSortTask {
     private Comparator<Weighted<TokenPair>> nearnessComparator =
             Comparators.reverse(Weighted.<TokenPair>weightOrder());
 
-    public ExternalKnnTask(File sourceFile, File destinationFile,
-                           Charset charset, int maxChunkSize, int k,
-                           boolean preindexedTokens1, boolean preindexedTokens2) {
+    public ExternalSimsKnnTask(File sourceFile, File destinationFile,
+                               Charset charset, int maxChunkSize, int k,
+                               boolean preindexedTokens1, boolean preindexedTokens2) {
         super(sourceFile, destinationFile, charset, preindexedTokens1,
               preindexedTokens2);
         setMaxChunkSize(maxChunkSize);
@@ -78,66 +84,18 @@ public class ExternalKnnTask extends ExternalSortTask.SimsExternalSortTask {
         setK(k);
     }
 
-    public ExternalKnnTask(File sourceFile, File destinationFile,
-                           Charset charset, int k, boolean preindexedTokens1,
-                           boolean preindexedTokens2) {
+    public ExternalSimsKnnTask(File sourceFile, File destinationFile,
+                               Charset charset, int k, boolean preindexedTokens1,
+                               boolean preindexedTokens2) {
         super(sourceFile, destinationFile, charset, preindexedTokens1,
               preindexedTokens2);
         updateCombinedComparator();
         setK(k);
     }
 
-    public ExternalKnnTask() {
+    public ExternalSimsKnnTask() {
         super();
         updateCombinedComparator();
-    }
-
-    private Enumerator<String> index1 = null;
-
-    private Enumerator<String> index2 = null;
-
-    public Enumerator<String> getIndex1() {
-        if (index1 == null)
-            index1 = Enumerators.newDefaultStringEnumerator();
-        return index1;
-    }
-
-    public void setIndex1(Enumerator<String> entryIndex) {
-        this.index1 = entryIndex;
-    }
-
-    public Enumerator<String> getIndex2() {
-        if (index2 == null)
-            index2 = Enumerators.newDefaultStringEnumerator();
-        return index2;
-    }
-
-    public void setIndex2(Enumerator<String> featureIndex) {
-        this.index2 = featureIndex;
-    }
-
-    public final Function<String, Integer> getFeatureDecoder() {
-        return isPreindexedTokens1()
-                ? Token.enumeratedDecoder()
-                : Token.stringDecoder(getIndex1());
-    }
-
-    public final Function<String, Integer> getEntryDecoder() {
-        return isPreindexedTokens1()
-                ? Token.enumeratedDecoder()
-                : Token.stringDecoder(getIndex1());
-    }
-
-    public final Function<Integer, String> getFeatureEncoder() {
-        return isPreindexedTokens2()
-                ? Token.enumeratedEncoder()
-                : Token.stringEncoder(getIndex2());
-    }
-
-    public final Function<Integer, String> getEntryEncoder() {
-        return isPreindexedTokens2()
-                ? Token.enumeratedEncoder()
-                : Token.stringEncoder(getIndex2());
     }
 
     public Comparator<Weighted<TokenPair>> getClassComparator() {
@@ -194,8 +152,8 @@ public class ExternalKnnTask extends ExternalSortTask.SimsExternalSortTask {
     protected void runTask() throws Exception {
 
         if (LOG.isInfoEnabled()) {
-            LOG.info("Running external K-Nearest-Neighbours from \"" + getSrcFile()
-                    + "\" to \"" + getDestFile() + "\".");
+            LOG.info("Running external K-Nearest-Neighbours from \"" + fileDeligate.getSourceFile()
+                    + "\" to \"" + fileDeligate.getDestinationFile() + "\".");
         }
 
         map();
@@ -209,49 +167,67 @@ public class ExternalKnnTask extends ExternalSortTask.SimsExternalSortTask {
 
     }
 
+    protected Source<Weighted<TokenPair>> openSource(File file)
+            throws FileNotFoundException, IOException {
+        return new WeightedTokenPairSource(
+                new TSVSource(file, getCharset()),
+                indexDeligate.getDecoder1(), indexDeligate.getDecoder2());
+    }
+
+    protected Sink<Weighted<TokenPair>> openSink(File file)
+            throws FileNotFoundException, IOException {
+        return new WeightSumReducerSink<TokenPair>(
+                new WeightedTokenPairSink(
+                new TSVSink(file, getCharset()),
+                indexDeligate.getEncoder1(), indexDeligate.getEncoder2()));
+    }
+
+    private void submitKnnTask(File from, File to) throws IOException {
+
+        Source<Weighted<TokenPair>> src = openSource(from);
+        Sink<Weighted<TokenPair>> snk = openSink(to);
+
+        KnnTask<Weighted<TokenPair>> task = new KnnTask<Weighted<TokenPair>>();
+        task.setSink(snk);
+        task.setSource(src);
+        task.setClassComparator(classComparator);
+        task.setNearnessComparator(nearnessComparator);
+        task.setK(k);
+
+        task.getProperties().setProperty("srcFile", from.toString());
+        task.getProperties().setProperty("dstFile", to.toString());
+
+        submitTask(task);
+    }
+
     @Override
     protected void handleCompletedTask(Task task) throws Exception {
         task.throwException();
-        if (task.getClass().equals(MergeTask.SimsMergeTask.class)) {
+        if (task instanceof MergeTask) {
 
-            MergeTask.SimsMergeTask mergeTask = (MergeTask.SimsMergeTask) task;
+            MergeTask mergeTask = (MergeTask) task;
+            File srca = new File(mergeTask.getProperties().getProperty("srcFileA"));
+            File srcb = new File(mergeTask.getProperties().getProperty("srcFileB"));
+            File dst = new File(mergeTask.getProperties().getProperty("dstFile"));
+            submitTask(new DeleteTask(srca));
+            submitTask(new DeleteTask(srcb));
+            submitKnnTask(dst, dst);
 
-            submitTask(new DeleteTask(mergeTask.getSourceFileA()));
-            submitTask(new DeleteTask(mergeTask.getSourceFileB()));
-            KnnTask knntask = new KnnTask(
-                    mergeTask.getDestFile(),
-                    mergeTask.getDestFile(),
-                    mergeTask.getCharset(),
-                    mergeTask.isPreindexedTokens1(),
-                    mergeTask.isPreindexedTokens2(),
-                    this.getK());
-            knntask.setClassComparator(this.getClassComparator());
-            knntask.setNearnessComparator(this.getNearnessComparator());
-            knntask.setIndex1(mergeTask.getIndex1());
-            knntask.setIndex2(mergeTask.getIndex2());
-            submitTask(knntask);
+        } else if (task instanceof SortTask) {
 
-        } else if (task.getClass().equals(SortTask.SimsSortTask.class)) {
+            SortTask sortTask = (SortTask) task;
+            File src = new File(sortTask.getProperties().getProperty("srcFile"));
+            File dst = new File(sortTask.getProperties().getProperty("dstFile"));
+            submitKnnTask(dst, dst);
 
-            SortTask.SimsSortTask sortTask = (SortTask.SimsSortTask) task;
-            KnnTask knntask = new KnnTask(
-                    sortTask.getDstFile(),
-                    sortTask.getDstFile(),
-                    sortTask.getCharset(),
-                    sortTask.isPreindexedTokens1(),
-                    sortTask.isPreindexedTokens2(),
-                    getK());
-            sortTask.setComparator(getComparator());
-            sortTask.setIndex1(sortTask.getIndex1());
-            sortTask.setIndex2(sortTask.getIndex2());
-            submitTask(knntask);
-
-        } else if (task.getClass().equals(KnnTask.class)) {
+        } else if (task instanceof KnnTask) {
 
             KnnTask knnTask = (KnnTask) task;
-            queueMergeTask(knnTask.getDstFile());
+            File src = new File(knnTask.getProperties().getProperty("srcFile"));
+            File dst = new File(knnTask.getProperties().getProperty("dstFile"));
+            queueMergeTask(dst);
 
-        } else if (task.getClass().equals(DeleteTask.class)) {
+        } else if (task instanceof DeleteTask) {
             // not a sausage
         } else {
             throw new AssertionError(
@@ -264,4 +240,5 @@ public class ExternalKnnTask extends ExternalSortTask.SimsExternalSortTask {
     protected ToStringHelper toStringHelper() {
         return super.toStringHelper().add("k", k);
     }
+
 }

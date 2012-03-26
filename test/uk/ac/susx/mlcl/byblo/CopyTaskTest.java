@@ -49,10 +49,10 @@ public class CopyTaskTest {
     public void testGetSrcFile() {
         System.out.println("Testing getSrcFile() and setSrcFile()");
         File x = new File("x");
-        CopyTask instance = new CopyTask();
-        instance.setSrcFile(x);
+        CopyCommand instance = new CopyCommand();
+        instance.filesDeligate.setSourceFile(x);
         File expResult = x;
-        File result = instance.getSrcFile();
+        File result = instance.filesDeligate.getSourceFile();
         assertEquals(expResult, result);
     }
 
@@ -60,10 +60,10 @@ public class CopyTaskTest {
     public void testGetDstFile() {
         System.out.println("Testing getDstFile() and setDstFile()");
         File x = new File("x");
-        CopyTask instance = new CopyTask();
-        instance.setDstFile(x);
+        CopyCommand instance = new CopyCommand();
+        instance.filesDeligate.setDestinationFile(x);
         File expResult = x;
-        File result = instance.getDstFile();
+        File result = instance.filesDeligate.getDestinationFile();
         assertEquals(expResult, result);
     }
 
@@ -74,9 +74,8 @@ public class CopyTaskTest {
         String str = "blah blah yackaty schmackaty";
         Files.writeAll(in, Files.DEFAULT_CHARSET, str);
         File out = File.createTempFile(getClass().getName(), "out");
-        CopyTask instance = new CopyTask(in, out);
-        instance.run();
-        instance.throwException();
+        CopyCommand instance = new CopyCommand(in, out);
+        instance.runCommand();
         assertTrue(out.exists());
         assertEquals(in.length(), out.length());
 
@@ -93,9 +92,8 @@ public class CopyTaskTest {
         File in = File.createTempFile(getClass().getName(), "in");
         in.delete();
         File out = File.createTempFile(getClass().getName(), "out");
-        CopyTask instance = new CopyTask(in, out);
-        instance.run();
-        instance.throwException();
+        CopyCommand instance = new CopyCommand(in, out);
+        instance.runCommand();
         in.delete();
         out.delete();
     }
@@ -104,13 +102,13 @@ public class CopyTaskTest {
     public void testCLI() throws IOException {
         System.out.println("Testing command line usage.");
         File x = new File("x"), y = new File("y");
-        CopyTask instance = new CopyTask();
+        CopyCommand instance = new CopyCommand();
         String[] args = {"-i", x.toString(), "-o", y.toString()};
         JCommander jc = new JCommander();
         jc.addObject(instance);
         jc.parse(args);
-        assertEquals(x, instance.getSrcFile());
-        assertEquals(y, instance.getDstFile());
+        assertEquals(x, instance.filesDeligate.getSourceFile());
+        assertEquals(y, instance.filesDeligate.getDestinationFile());
         jc.usage();
     }
 }

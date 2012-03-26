@@ -42,9 +42,9 @@ import uk.ac.susx.mlcl.lib.Comparators;
  *
  * @author Hamish Morgan &ly;hamish.morgan@sussex.ac.uk&gt;
  */
-public class KnnTaskTest {
+public class SimsKnnCommandTest {
 
-    private static final String subject = ExternalKnnTask.class.getName();
+    private static final String subject = ExternalSimsKnnTask.class.getName();
 
     @Test(timeout = 8000)
     public void testRunOnFruit() throws Exception {
@@ -54,23 +54,19 @@ public class KnnTaskTest {
         final File out = new File(TEST_OUTPUT_DIR,
                                   FRUIT_NAME + ".neighs");
 
-        final KnnTask knnTask = new KnnTask();
-        knnTask.setSrcFile(in);
-        knnTask.setDstFile(out);
+        final SimsKnnCommand knnTask = new SimsKnnCommand();
+        knnTask.filesDeligate.setSourceFile(in);
+        knnTask.filesDeligate.setDestinationFile(out);
         knnTask.setCharset(DEFAULT_CHARSET);
         knnTask.setK(100);
-        knnTask.setPreindexedTokens1(false);
-        knnTask.setPreindexedTokens2(false);
-        knnTask.setClassComparator(Weighted.recordOrder(TokenPair.
-                firstIndexOrder()));
+        knnTask.indexDeligate.setPreindexedTokens1(false);
+        knnTask.indexDeligate.setPreindexedTokens2(false);
+        knnTask.setClassComparator(Weighted.recordOrder(TokenPair.firstIndexOrder()));
         knnTask.setNearnessComparator(
                 Comparators.reverse(Weighted.<TokenPair>weightOrder()));
 
-        knnTask.run();
+        knnTask.runCommand();
 
-        while (knnTask.isExceptionThrown()) {
-            knnTask.throwException();
-        }
 
         assertTrue("Output files not created.", out.exists());
         assertTrue("Empty output file found.", out.length() > 0);
@@ -85,26 +81,22 @@ public class KnnTaskTest {
         final File out = new File(TEST_OUTPUT_DIR,
                                   FRUIT_NAME + ".indexed.neighs");
 
-        final KnnTask knnTask = new KnnTask();
-        knnTask.setSrcFile(in);
-        knnTask.setDstFile(out);
+        final SimsKnnCommand knnTask = new SimsKnnCommand();
+        knnTask.filesDeligate.setSourceFile(in);
+        knnTask.filesDeligate.setDestinationFile(out);
         knnTask.setCharset(DEFAULT_CHARSET);
         knnTask.setK(100);
-        knnTask.setPreindexedTokens1(true);
-        knnTask.setPreindexedTokens2(true);
-        knnTask.setClassComparator(Weighted.recordOrder(TokenPair.
-                firstIndexOrder()));
+        knnTask.indexDeligate.setPreindexedTokens1(false);
+        knnTask.indexDeligate.setPreindexedTokens2(false);
+        knnTask.setClassComparator(Weighted.recordOrder(TokenPair.firstIndexOrder()));
         knnTask.setNearnessComparator(
                 Comparators.reverse(
                 Weighted.<TokenPair>weightOrder()));
 
-        knnTask.run();
-
-        while (knnTask.isExceptionThrown()) {
-            knnTask.throwException();
-        }
+        knnTask.runCommand();
 
         assertTrue("Output files not created.", out.exists());
         assertTrue("Empty output file found.", out.length() > 0);
     }
+
 }
