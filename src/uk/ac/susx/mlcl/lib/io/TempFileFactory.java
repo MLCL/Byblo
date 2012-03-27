@@ -140,6 +140,12 @@ public class TempFileFactory implements FileFactory {
 
     @Override
     public String toString() {
-        return DEFAULT_DIRECTORY.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append(getDirectory().toString());
+        sb.append(File.separator);
+        sb.append(getPrefix());
+        sb.append("<uniqueid>");
+        sb.append(getSuffix());
+        return sb.toString();
     }
 }
