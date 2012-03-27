@@ -43,6 +43,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.Checks;
 
 /**
  *
@@ -58,7 +59,7 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
             Runtime.getRuntime().availableProcessors();
 
     @Parameter(names = {"-t", "--threads"},
-               description = "Number of threads to use.")
+    description = "Number of threads to use.")
     private int nThreads = DEFAULT_NUM_THREADS;
 
     private ExecutorService executor = null;
@@ -75,8 +76,7 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
 
         if (LOG.isWarnEnabled() && nThreads > Runtime.getRuntime().
                 availableProcessors()) {
-            LOG.warn("nThreads (" + nThreads + ") > availableProcessors (" + Runtime.
-                    getRuntime().
+            LOG.warn("nThreads (" + nThreads + ") > availableProcessors (" + Runtime.getRuntime().
                     availableProcessors() + ")");
         }
         if (nThreads != this.nThreads) {
@@ -88,7 +88,7 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
         return nThreads;
     }
 
-    protected synchronized final ExecutorService getExecutor() {
+    private synchronized final ExecutorService getExecutor() {
         if (executor == null) {
             // Create a new thread pool using an unbounded queue - throttling will
             // be handled by a semaphore
@@ -112,20 +112,23 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
 
     @Override
     protected void finaliseTask() throws Exception {
-        try {
-            executor.shutdown();
-            executor.awaitTermination(1, TimeUnit.HOURS);
-            if (!executor.isTerminated()) {
-                List<Runnable> runnables = executor.shutdownNow();
-            }
-        } catch (InterruptedException ex) {
-            if (LOG.isErrorEnabled()) {
-                LOG.error("Finalization interupted", ex);
-            }
-            catchException(ex);
-        } finally {
-            executor.shutdownNow();
-        }
+//        List<Runnable> runnables = 
+        executor.shutdownNow();
+//        
+//        try {
+////            executor.shutdown();
+////            executor.awaitTermination(1, TimeUnit.HOURS);
+//            if (!executor.isTerminated()) {
+//                List<Runnable> runnables = executor.shutdownNow();
+//            }
+//        } catch (InterruptedException ex) {
+//            if (LOG.isErrorEnabled()) {
+//                LOG.error("Finalization interupted", ex);
+//            }
+//            catchException(ex);
+//        } finally {
+//            executor.shutdownNow();
+//        }
     }
 
     protected synchronized final Queue<Future<? extends Task>> getFutureQueue() {
@@ -136,9 +139,7 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
     }
 
     protected <T extends Task> Future<T> submitTask(T task) {
-        if (task == null) {
-            throw new NullPointerException("task is null");
-        }
+        Checks.checkNotNull("task", task);
         Future<T> future = getExecutor().submit(task, task);
         getFutureQueue().offer(future);
         return future;
@@ -151,4 +152,5 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
                 add("executor", executor).
                 add("futureQueue", futureQueue);
     }
+
 }

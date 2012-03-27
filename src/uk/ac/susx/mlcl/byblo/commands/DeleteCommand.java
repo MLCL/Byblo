@@ -28,17 +28,17 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo;
+package uk.ac.susx.mlcl.byblo.commands;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
-import uk.ac.susx.mlcl.lib.tasks.AbstractCommandTask;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.tasks.AbstractCommand;
 import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
 
 /**
@@ -46,33 +46,24 @@ import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Delete a file.")
-public class DeleteTask extends AbstractCommandTask {
+public class DeleteCommand extends AbstractCommand {
 
-    private static final Log LOG = LogFactory.getLog(DeleteTask.class);
+    private static final Log LOG = LogFactory.getLog(DeleteCommand.class);
 
     @Parameter(names = {"-f", "--file"},
                description = "File to deleted",
                validateWith = InputFileValidator.class, required=true)
-    private File file;
+    private File file = null;
 
-    public DeleteTask(File file) {
+    public DeleteCommand(File file) {
         setFile(file);
     }
 
-    public DeleteTask() {
-        file = null;
+    public DeleteCommand() {
     }
 
     @Override
-    protected void initialiseTask() throws Exception {
-    }
-
-    @Override
-    protected void finaliseTask() throws Exception {
-    }
-
-    @Override
-    protected void runTask() throws Exception {
+    public void runCommand() throws Exception {
         if (LOG.isInfoEnabled())
             LOG.info("Deleting file \"" + getFile() + "\".");
         if (file == null)

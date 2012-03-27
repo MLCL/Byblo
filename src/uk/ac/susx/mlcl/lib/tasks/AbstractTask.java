@@ -154,7 +154,8 @@ public abstract class AbstractTask implements Task {
 
     protected Objects.ToStringHelper toStringHelper() {
         return Objects.toStringHelper(this).
-                add("exceptions", isExceptionThrown());
+                add("state", getState()).
+                add("exceptions", isExceptionThrown()).add("properties", getProperties());
     }
 
 }

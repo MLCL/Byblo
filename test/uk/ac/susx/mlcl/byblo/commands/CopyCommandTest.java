@@ -28,8 +28,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo;
+package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.commands.CopyCommand;
 import uk.ac.susx.mlcl.lib.io.Files;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
@@ -43,7 +44,7 @@ import static org.junit.Assert.*;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class CopyTaskTest {
+public class CopyCommandTest {
 
     @Test(timeout=1000)
     public void testGetSrcFile() {

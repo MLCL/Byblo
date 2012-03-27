@@ -31,6 +31,7 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import com.google.common.base.Function;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -55,7 +56,7 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
  * @see WeightedEntryPairSink
  */
 public class WeightedTokenPairSource
-        implements SeekableSource<Weighted<TokenPair>, Lexer.Tell> {
+        implements SeekableSource<Weighted<TokenPair>, Lexer.Tell>, Closeable {
 
     private final Function<String, Integer> tokenDecoder1;
 
@@ -197,5 +198,10 @@ public class WeightedTokenPairSource
 
     public double percentRead() throws IOException {
         return inner.percentRead();
+    }
+
+    @Override
+    public void close() throws IOException {
+        inner.close();
     }
 }

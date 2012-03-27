@@ -30,9 +30,15 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import uk.ac.susx.mlcl.byblo.commands.ExternalSortCommand;
+import uk.ac.susx.mlcl.byblo.commands.AbstractMergeCommand;
+import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import uk.ac.susx.mlcl.byblo.commands.MergeTokenPairCommand;
+import uk.ac.susx.mlcl.byblo.commands.MergeWeightedTokenCommand;
+import uk.ac.susx.mlcl.byblo.commands.MergeWeightedTokenPairCommand;
 import uk.ac.susx.mlcl.lib.tasks.AbstractCommand;
 import uk.ac.susx.mlcl.lib.tasks.Command;
 
@@ -47,16 +53,16 @@ public class Main extends AbstractCommand {
     static {
         final Map<String, Class<? extends Command>> tmp =
             new HashMap<String, Class<? extends Command>>();
-        tmp.put("sort-sims", ExternalSortTask.WeightedTokenPiarExternalSortTask.class);
-        tmp.put("sort-ents", ExternalSortTask.WeightedTokenExternalSortTask.class);
-        tmp.put("sort-feats", ExternalSortTask.WeightedTokenExternalSortTask.class);
-        tmp.put("sort-events", ExternalSortTask.WeightedTokenPiarExternalSortTask.class);
-        tmp.put("merge-sims", MergeCommand.TokenPairMergeCommand.class);
-        tmp.put("merge-ents", MergeCommand.WeightedTokenPairMergeCommand.class);
-        tmp.put("merge-feats", MergeCommand.WeightedTokenMergeCommand.class);
-        tmp.put("merge-events", MergeCommand.WeightedTokenMergeCommand.class);
+        tmp.put("sort-sims", ExternalSortCommand.WeightedTokenPiarExternalSortCommand.class);
+        tmp.put("sort-ents", ExternalSortCommand.WeightedTokenExternalSortTask.class);
+        tmp.put("sort-feats", ExternalSortCommand.WeightedTokenExternalSortTask.class);
+        tmp.put("sort-events", ExternalSortCommand.WeightedTokenPiarExternalSortCommand.class);
+        tmp.put("merge-sims", MergeTokenPairCommand.class);
+        tmp.put("merge-ents", MergeWeightedTokenPairCommand.class);
+        tmp.put("merge-feats", MergeWeightedTokenCommand.class);
+        tmp.put("merge-events", MergeWeightedTokenCommand.class);
         tmp.put("knn-sims", SimsKnnCommand.class);
-        tmp.put("allpairs", AllPairsTask.class);
+        tmp.put("allpairs", AllPairsCommand.class);
         tmp.put("count", ExternalCountTask.class);
         tmp.put("filter", FilterTask.class);
         SUBCOMMANDS = Collections.unmodifiableMap(tmp);

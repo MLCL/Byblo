@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import uk.ac.susx.mlcl.byblo.commands.ExternalSimsKnnCommand;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
@@ -38,6 +39,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.commands.SortWeightedTokenPairCommand;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.tasks.KnnTask;
 import uk.ac.susx.mlcl.lib.Comparators;
@@ -51,13 +53,13 @@ import uk.ac.susx.mlcl.lib.io.*;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Perform k-nearest-neighbours on a similarity file.")
-public class SimsKnnCommand extends SortCommand.WeightedTokenPairSortCommand {
+public class SimsKnnCommand extends SortWeightedTokenPairCommand {
 
     private static final Log LOG = LogFactory.getLog(SimsKnnCommand.class);
 
     @Parameter(names = {"-k"},
     description = "The maximum number of neighbours to produce per word.")
-    private int k = ExternalSimsKnnTask.DEFAULT_K;
+    private int k = ExternalSimsKnnCommand.DEFAULT_K;
 
     private Comparator<Weighted<TokenPair>> classComparator =
             Weighted.recordOrder(TokenPair.indexOrder());
@@ -113,15 +115,15 @@ public class SimsKnnCommand extends SortCommand.WeightedTokenPairSortCommand {
     @Override
     public void runCommand() throws Exception {
         if (LOG.isInfoEnabled())
-            LOG.info("Running memory K-Nearest-Neighbours from \"" + filesDeligate.getSourceFile()
-                    + "\" to \"" + filesDeligate.getDestinationFile() + "\".");
+            LOG.info("Running memory K-Nearest-Neighbours from \"" + getFilesDeligate().getSourceFile()
+                    + "\" to \"" + getFilesDeligate().getDestinationFile() + "\".");
 
-        Source<Weighted<TokenPair>> src = openSource(filesDeligate.getSourceFile());
+        Source<Weighted<TokenPair>> src = openSource(getFilesDeligate().getSourceFile());
 
-        final List<Weighted<TokenPair>> items = IOUtil.readAll(src);
-        Collections.sort(items, getComparator());
-
-        Sink<Weighted<TokenPair>> snk = openSink(filesDeligate.getDestinationFile());
+//        final List<Weighted<TokenPair>> items = IOUtil.readAll(src);
+//        Collections.sort(items, getComparator());
+//
+        Sink<Weighted<TokenPair>> snk = openSink(getFilesDeligate().getDestinationFile());
 
         KnnTask<Weighted<TokenPair>> task = new KnnTask<Weighted<TokenPair>>();
         task.setSink(snk);
@@ -131,7 +133,7 @@ public class SimsKnnCommand extends SortCommand.WeightedTokenPairSortCommand {
         task.setK(k);
 
         task.run();
-        
+
         if (task.isExceptionThrown())
             task.throwException();
 

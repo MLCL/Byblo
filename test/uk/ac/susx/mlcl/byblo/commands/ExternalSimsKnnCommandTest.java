@@ -28,40 +28,58 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo;
+package uk.ac.susx.mlcl.byblo.commands;
 
 import uk.ac.susx.mlcl.lib.test.ExitTrapper;
 import java.io.File;
 import org.junit.Test;
 import uk.ac.susx.mlcl.TestConstants;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
+import uk.ac.susx.mlcl.byblo.Main;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
+import uk.ac.susx.mlcl.lib.Comparators;
+import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 
 /**
  *
  * @author Hamish Morgan &ly;hamish.morgan@sussex.ac.uk&gt;
  */
-public class ExternalKnnTaskTest {
+public class ExternalSimsKnnCommandTest {
 
-    private static final String subject = ExternalSimsKnnTask.class.getName();
+    private static final String subject = ExternalSimsKnnCommand.class.getName();
 
-    @Test(timeout = 2000)
+    @Test//(timeout = 2000)
     public void testRunOnFruit() throws Exception {
-        System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
+        System.out.println("Testing " + subject + " on " + TEST_FRUIT_SIMS);
 
         final File in = TEST_FRUIT_SIMS;
         final File out = new File(TEST_OUTPUT_DIR,
                                   FRUIT_NAME + ".neighs");
 
-        final ExternalSimsKnnTask knnTask = new ExternalSimsKnnTask(
-                in, out, DEFAULT_CHARSET, 2, false, false);
-        knnTask.setMaxChunkSize(1000);
-        knnTask.run();
+        assertTrue(in.exists());
+        assertTrue(in.length() > 0);
+
+        final ExternalSimsKnnCommand knnTask = new ExternalSimsKnnCommand();
+
+        knnTask.getFileDeligate().setSourceFile(in);
+        knnTask.getFileDeligate().setDestinationFile(out);
+        knnTask.getFileDeligate().setCharset(DEFAULT_CHARSET);
+        
+        knnTask.getIndexDeligate().setPreindexedTokens1(false);
+        knnTask.getIndexDeligate().setPreindexedTokens2(false);
+
+        knnTask.setMaxChunkSize(100000);
         knnTask.setClassComparator(Weighted.recordOrder(TokenPair.firstIndexOrder()));
-        knnTask.setNearnessComparator(Weighted.<TokenPair>weightOrder());
+        knnTask.setNearnessComparator(Comparators.reverse(Weighted.<TokenPair>weightOrder()));
         knnTask.setK(100);
+        
+        knnTask.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
+
+        knnTask.runCommand();
+
 
         while (knnTask.isExceptionThrown()) {
             knnTask.throwException();
@@ -84,19 +102,21 @@ public class ExternalKnnTaskTest {
     }
 
     @Test
+    @Ignore
     public void testEmptyInputFile() throws Exception {
         try {
             File in = new File(TestConstants.TEST_OUTPUT_DIR, "extknn-test-empty.in");
             in.createNewFile();
             File out = new File(TestConstants.TEST_OUTPUT_DIR, "extknn-test-empty.out");
-            
+
             ExitTrapper.enableExistTrapping();
-            Main.main(new String[]{"knn", "-i", in.toString(), 
-                "-o", out.toString()});
+            Main.main(new String[]{"knn", "-i", in.toString(),
+                        "-o", out.toString()});
         } catch (ExitTrapper.ExitException ex) {
             assertTrue("Expecting non-zero exit status.", ex.getStatus() == 0);
         } finally {
             ExitTrapper.disableExitTrapping();
         }
     }
+
 }

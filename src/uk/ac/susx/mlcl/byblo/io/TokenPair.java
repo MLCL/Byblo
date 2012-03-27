@@ -323,4 +323,31 @@ public class TokenPair implements
             }
         };
     }
+    
+    
+    public static Comparator<TokenPair> firstStringOrder(
+            final Function<Integer, String> encoder) {
+        return new Comparator<TokenPair>() {
+
+            @Override
+            public int compare(final TokenPair a, final TokenPair b) {
+                return  encoder.apply(a.id1()).compareTo(
+                        encoder.apply(b.id1()));
+            }
+        };
+    }
+    
+     
+    
+    public static Comparator<TokenPair> secondStringOrder(
+            final Function<Integer, String> encoder) {
+        return new Comparator<TokenPair>() {
+
+            @Override
+            public int compare(final TokenPair a, final TokenPair b) {
+                return  encoder.apply(a.id2()).compareTo(
+                        encoder.apply(b.id2()));
+            }
+        };
+    }
 }

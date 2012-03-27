@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import uk.ac.susx.mlcl.byblo.commands.IndexDeligatePair;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
@@ -109,7 +110,7 @@ public class CountTask extends AbstractCommandTask implements Serializable {
     private Charset charset = Files.DEFAULT_CHARSET;
 
     @ParametersDelegate
-    protected final TwoIndexDeligate indexDeligate = new TwoIndexDeligate();
+    protected final IndexDeligatePair indexDeligate = new IndexDeligatePair();
 
     /**
      * Dependency injection constructor with all fields parameterised.

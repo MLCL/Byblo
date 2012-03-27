@@ -87,8 +87,8 @@ public class AllPairsTaskTest {
                         "-i", "testdata/fruit/bnc-gramrels-fruit.indexed.entryFeatures",
                         "-o", "testdata/out/bnc-gramrels-fruit.indexed.out",
                         "-C", "500",
-                        "--preindexed-entries",
-                        "--preindexed-features"});
+                        "--preindexed1",
+                        "--preindexed2"});
         } finally {
             ExitTrapper.disableExitTrapping();
         }

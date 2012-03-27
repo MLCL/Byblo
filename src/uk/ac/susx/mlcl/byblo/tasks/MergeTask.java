@@ -86,7 +86,7 @@ public class MergeTask<T> extends AbstractTask {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final MergeTask<T> other = (MergeTask<T>) obj;
+        final MergeTask<?> other = (MergeTask<?>) obj;
         if (this.sourceA != other.sourceA && (this.sourceA == null || !this.sourceA.equals(other.sourceA)))
             return false;
         if (this.sourceB != other.sourceB && (this.sourceB == null || !this.sourceB.equals(other.sourceB)))

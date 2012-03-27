@@ -27,7 +27,15 @@ public class Comparators {
     @SuppressWarnings("unchecked")
     public static <T> Comparator<T> fallback(
             final Comparator<T> a, final Comparator<T> b) {
-        return new FallbackComparator<T>(a, b);
+        return new Comparator<T>() {
+
+            @Override
+            public int compare(final T o1, final T o2) {
+                final int c = a.compare(o1, o2);
+                return c != 0 ? c : b.compare(o1, o2);
+            }
+
+        };
     }
 
     public static <T extends Comparable<T>> Comparator<T> naturalOrder() {
@@ -41,12 +49,19 @@ public class Comparators {
         };
     }
 
+    /**
+     * XXX: this unchecked conversion is not in the least bit safe. Probably
+     * need a better way to hand this.
+     *
+     * @param <T>
+     * @return
+     */
     public static <T> Comparator<T> naturalOrderIfPossible() {
         return new Comparator<T>() {
 
             @Override
             public int compare(final T a, final T b) {
-                return ((Comparable<T>)a).compareTo(b);
+                return ((Comparable<T>) a).compareTo(b);
             }
 
         };

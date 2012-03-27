@@ -4,6 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.tasks;
 
+import com.google.common.base.Objects.ToStringHelper;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.util.Collections;
@@ -18,7 +19,7 @@ import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 
 /**
  *
- * @param <T> 
+ * @param <T>
  * @author hiam20
  */
 public class SortTask<T> extends AbstractTask {
@@ -72,20 +73,25 @@ public class SortTask<T> extends AbstractTask {
         this.source = sourceA;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null)
+    public boolean equals(SortTask<?> other) {
+        if (this.getSource() != other.getSource() && (this.getSource() == null
+                || !this.getSource().equals(other.getSource())))
             return false;
-        if (getClass() != obj.getClass())
+        if (this.getSink() != other.getSink() && (this.getSink() == null
+                || !this.getSink().equals(other.getSink())))
             return false;
-        final SortTask<T> other = (SortTask<T>) obj;
-        if (this.source != other.source && (this.source == null || !this.source.equals(other.source)))
-            return false;
-        if (this.sink != other.sink && (this.sink == null || !this.sink.equals(other.sink)))
-            return false;
-        if (this.comparator != other.comparator && (this.comparator == null || !this.comparator.equals(other.comparator)))
+        if (this.getComparator() != other.getComparator() && (this.getComparator() == null
+                || !this.getComparator().equals(other.getComparator())))
             return false;
         return true;
+
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null
+                && getClass() == obj.getClass()
+                && equals((SortTask<?>) obj);
     }
 
     @Override
@@ -107,7 +113,6 @@ public class SortTask<T> extends AbstractTask {
     @Override
     protected void runTask() throws Exception {
 
-        Source<T> src = getSource();
         final List<T> items = IOUtil.readAll(getSource());
 
         if (getSource() instanceof Closeable)
@@ -115,15 +120,13 @@ public class SortTask<T> extends AbstractTask {
 
         Collections.sort(items, getComparator());
 
-        Sink<T> snk = getSink();
-
-        int i = IOUtil.copy(items, snk);
+        int i = IOUtil.copy(items, getSink());
         assert i == items.size();
 
-        if (snk instanceof Flushable)
-            ((Flushable) snk).flush();
-        if (snk instanceof Closeable)
-            ((Closeable) snk).close();
+        if (getSink() instanceof Flushable)
+            ((Flushable) getSink()).flush();
+//        if (snk instanceof Closeable)
+//            ((Closeable) snk).close();
 
 
     }
@@ -132,4 +135,13 @@ public class SortTask<T> extends AbstractTask {
     protected void finaliseTask() throws Exception {
     }
 
+    @Override
+    protected ToStringHelper toStringHelper() {
+        return super.toStringHelper().
+                add("source", getSource()).
+                add("sink", getSink()).
+                add("comparator", getComparator());
+    }
+
+    
 }

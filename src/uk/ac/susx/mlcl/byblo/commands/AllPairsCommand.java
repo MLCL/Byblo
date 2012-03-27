@@ -28,11 +28,11 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo;
+package uk.ac.susx.mlcl.byblo.commands;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import com.google.common.base.Function;
+import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects.ToStringHelper;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -44,12 +44,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.allpairs.InvertedApssTask;
 import uk.ac.susx.mlcl.byblo.allpairs.ThreadedApssTask;
+import uk.ac.susx.mlcl.byblo.commands.IndexDeligatePair;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.measure.*;
 import uk.ac.susx.mlcl.lib.DoubleConverter;
-import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.Enumerators;
-import uk.ac.susx.mlcl.lib.SimpleEnumerator;
 import uk.ac.susx.mlcl.lib.io.*;
 import uk.ac.susx.mlcl.lib.tasks.AbstractCommand;
 import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
@@ -60,99 +58,90 @@ import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Perform all-pair similarity search on the given input frequency files.")
-public class AllPairsTask extends AbstractCommand {
+public class AllPairsCommand extends AbstractCommand {
 
-    private static final Log LOG = LogFactory.getLog(AllPairsTask.class);
+    private static final Log LOG = LogFactory.getLog(AllPairsCommand.class);
 
     @Parameter(names = {"-i", "--input"},
-               description = "Entry-feature frequency vectors files.",
-               required = true,
-               validateWith = InputFileValidator.class)
+    description = "Entry-feature frequency vectors files.",
+    required = true,
+    validateWith = InputFileValidator.class)
     private File entryFeaturesFile;
 
     @Parameter(names = {"-if", "--input-features"},
-               description = "Feature frequencies file",
-               validateWith = InputFileValidator.class)
+    description = "Feature frequencies file",
+    validateWith = InputFileValidator.class)
     private File featuresFile;
 
     @Parameter(names = {"-ie", "--input-entries"},
-               description = "Entry frequencies file",
-               validateWith = InputFileValidator.class)
+    description = "Entry frequencies file",
+    validateWith = InputFileValidator.class)
     private File entriesFile;
 
     @Parameter(names = {"-o", "--output"},
-               description = "Output similarity matrix file.",
-               required = true,
-               validateWith = OutputFileValidator.class)
+    description = "Output similarity matrix file.",
+    required = true,
+    validateWith = OutputFileValidator.class)
     private File outputFile;
 
     @Parameter(names = {"-c", "--charset"},
-               description = "Character encoding to use for reading and writing.")
+    description = "Character encoding to use for reading and writing.")
     private Charset charset = Files.DEFAULT_CHARSET;
 
     @Parameter(names = {"-C", "--chunk-size"},
-               description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
+    description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
     private int chunkSize = 5000;
 
     @Parameter(names = {"-t", "--threads"},
-               description = "Number of conccurent processing threads.")
+    description = "Number of conccurent processing threads.")
     private int nThreads = Runtime.getRuntime().availableProcessors() + 1;
 
     @Parameter(names = {"-Smn", "--similarity-min"},
-               description = "Minimum similarity threshold.",
-               converter = DoubleConverter.class)
+    description = "Minimum similarity threshold.",
+    converter = DoubleConverter.class)
     private double minSimilarity = Double.NEGATIVE_INFINITY;
 
     @Parameter(names = {"-Smx", "--similarity-max"},
-               description = "Maximyum similarity threshold.",
-               converter = DoubleConverter.class)
+    description = "Maximyum similarity threshold.",
+    converter = DoubleConverter.class)
     private double maxSimilarity = Double.POSITIVE_INFINITY;
 
     @Parameter(names = {"-ip", "--identity-pairs"},
-               description = "Produce similarity between pair of identical entries.")
+    description = "Produce similarity between pair of identical entries.")
     private boolean outputIdentityPairs = false;
 
     @Parameter(names = {"-m", "--measure"},
-               description = "Similarity measure to use.")
+    description = "Similarity measure to use.")
     private String measureName = "Jaccard";
 
     @Parameter(names = {"--measure-reversed"},
-               description = "Swap similarity measure inputs.")
+    description = "Swap similarity measure inputs.")
     private boolean measureReversed = false;
 
     @Parameter(names = {"--lee-alpha"},
-               description = "Alpha parameter to Lee's alpha-skew divergence measure.",
-               converter = DoubleConverter.class)
+    description = "Alpha parameter to Lee's alpha-skew divergence measure.",
+    converter = DoubleConverter.class)
     private double leeAlpha = Lee.DEFAULT_ALPHA;
 
     @Parameter(names = {"--crmi-beta"},
-               description = "Beta paramter to Weed's CRMI measure.",
-               converter = DoubleConverter.class)
+    description = "Beta paramter to Weed's CRMI measure.",
+    converter = DoubleConverter.class)
     private double crmiBeta = CrMi.DEFAULT_BETA;
 
     @Parameter(names = {"--crmi-gamma"},
-               description = "Gamma paramter to Weed's CRMI measure.",
-               converter = DoubleConverter.class)
+    description = "Gamma paramter to Weed's CRMI measure.",
+    converter = DoubleConverter.class)
     private double crmiGamma = CrMi.DEFAULT_GAMMA;
 
     @Parameter(names = {"--mink-p"},
-               description = "P parameter to Minkowski/Lp space measure.",
-               converter = DoubleConverter.class)
+    description = "P parameter to Minkowski/Lp space measure.",
+    converter = DoubleConverter.class)
     private double minkP = 2;
 
-    @Parameter(names = {"-pe", "--preindexed-entries"},
-               description = "Whether tokens in the first column of the input file are indexed.")
-    private boolean preindexedEntries = false;
+    @ParametersDelegate
+    protected IndexDeligatePair indexDeligate = new IndexDeligatePair();
 
-    @Parameter(names = {"-pf", "--preindexed-features"},
-               description = "Whether entries in the second column of the input file are indexed.")
-    private boolean preindexedFeatures = false;
-
-    private Enumerator<String> entryIndex = null;
-
-    private Enumerator<String> featureIndex = null;
-
-    public AllPairsTask() {
+    public AllPairsCommand() {
     }
 
     private Map<String, Class<? extends Proximity>> buildMeasureClassLookupTable() throws ClassNotFoundException {
@@ -182,66 +171,6 @@ public class AllPairsTask extends AbstractCommand {
             }
         }
         return classLookup;
-    }
-
-    public Enumerator<String> getEntryIndex() {
-        if (entryIndex == null)
-            entryIndex = Enumerators.newDefaultStringEnumerator();
-        return entryIndex;
-    }
-
-    public void setEntryIndex(Enumerator<String> entryIndex) {
-        this.entryIndex = entryIndex;
-    }
-
-    public Enumerator<String> getFeatureIndex() {
-        if (featureIndex == null)
-            featureIndex = Enumerators.newDefaultStringEnumerator();
-        return featureIndex;
-    }
-
-    public void setFeatureIndex(Enumerator<String> featureIndex) {
-        this.featureIndex = featureIndex;
-    }
-
-    public final boolean isPreindexedEntries() {
-        return preindexedEntries;
-    }
-
-    public final void setPreindexedEntries(boolean preindexedEntries) {
-        this.preindexedEntries = preindexedEntries;
-    }
-
-    public final boolean isPreindexedFeatures() {
-        return preindexedFeatures;
-    }
-
-    public final void setPreindexedFeatures(boolean preindexedFeatures) {
-        this.preindexedFeatures = preindexedFeatures;
-    }
-
-    public final Function<String, Integer> getFeatureDecoder() {
-        return preindexedFeatures
-                ? Token.enumeratedDecoder()
-                : Token.stringDecoder(getFeatureIndex());
-    }
-
-    public final Function<String, Integer> getEntryDecoder() {
-        return preindexedEntries
-                ? Token.enumeratedDecoder()
-                : Token.stringDecoder(getEntryIndex());
-    }
-
-    public final Function<Integer, String> getFeatureEncoder() {
-        return preindexedFeatures
-                ? Token.enumeratedEncoder()
-                : Token.stringEncoder(getFeatureIndex());
-    }
-
-    public final Function<Integer, String> getEntryEncoder() {
-        return preindexedEntries
-                ? Token.enumeratedEncoder()
-                : Token.stringEncoder(getEntryIndex());
     }
 
     @Override
@@ -295,7 +224,7 @@ public class AllPairsTask extends AbstractCommand {
 
                 WeightedTokenSource features = new WeightedTokenSource(
                         new TSVSource(featuresFile, charset),
-                        getFeatureDecoder());
+                        indexDeligate.getDecoder2());
                 AbstractMIProximity bmip = ((AbstractMIProximity) prox);
                 bmip.setFeatureFrequencies(features.readAllAsArray());
                 bmip.setFeatureFrequencySum(features.getWeightSum());
@@ -313,7 +242,7 @@ public class AllPairsTask extends AbstractCommand {
 
                 WeightedTokenSource features = new WeightedTokenSource(
                         new TSVSource(featuresFile, charset),
-                        getFeatureDecoder());
+                        indexDeligate.getDecoder2());
                 features.readAll();
 
                 ((KendallTau) prox).setNumFeatures(features.getCardinality());
@@ -335,12 +264,12 @@ public class AllPairsTask extends AbstractCommand {
         // files, e.g compare fruit words with cake words
         final WeightedTokenPairVectorSource sourceA = new WeightedTokenPairSource(
                 new TSVSource(entryFeaturesFile, charset),
-                getEntryDecoder(),
-                getFeatureDecoder()).getVectorSource();
+                indexDeligate.getDecoder1(),
+                indexDeligate.getDecoder2()).getVectorSource();
         final WeightedTokenPairVectorSource sourceB = new WeightedTokenPairSource(
                 new TSVSource(entryFeaturesFile, charset),
-                getEntryDecoder(),
-                getFeatureDecoder()).getVectorSource();
+                indexDeligate.getDecoder1(),
+                indexDeligate.getDecoder2()).getVectorSource();
 
         // Create a sink object that will act as a recipient for all pairs that
         // are produced by the algorithm.
@@ -348,8 +277,8 @@ public class AllPairsTask extends AbstractCommand {
         final Sink<Weighted<TokenPair>> sink =
                 new WeightedTokenPairSink(
                 new TSVSink(outputFile, charset),
-                getEntryEncoder(),
-                getFeatureEncoder());
+                indexDeligate.getEncoder1(),
+                indexDeligate.getEncoder2());
 
         // Instantiate the all-pairs algorithm as given on the command line.
         ThreadedApssTask<Lexer.Tell> apss = new ThreadedApssTask<Lexer.Tell>(
@@ -418,4 +347,5 @@ public class AllPairsTask extends AbstractCommand {
                 add("crmiGamma", crmiGamma).
                 add("minkP", minkP);
     }
+
 }

@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import uk.ac.susx.mlcl.byblo.tasks.DeleteTask;
 import com.beust.jcommander.JCommander;
 import java.util.ResourceBundle;
 import java.io.File;
@@ -91,17 +92,4 @@ public class DeleteTaskTest {
         tmp.delete();
     }
 
-    @Test(timeout=1000)
-    public void testCLI() throws IOException {
-        System.out.println("Testing command line usage.");
-        File tmp = File.createTempFile(getClass().getName(), "");
-        DeleteTask instance = new DeleteTask();
-        String[] args = {"-f", tmp.toString()};
-        JCommander jc = new JCommander();
-        jc.addObject(instance);
-        jc.parse(args);
-        assertEquals(tmp, instance.getFile());
-        tmp.delete();
-        jc.usage();
-    }
 }

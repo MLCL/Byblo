@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import uk.ac.susx.mlcl.byblo.commands.ExternalSimsKnnCommand;
 import java.io.File;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -44,9 +45,9 @@ import uk.ac.susx.mlcl.lib.Comparators;
  */
 public class SimsKnnCommandTest {
 
-    private static final String subject = ExternalSimsKnnTask.class.getName();
+    private static final String subject = ExternalSimsKnnCommand.class.getName();
 
-    @Test(timeout = 8000)
+    @Test //(timeout = 8000)
     public void testRunOnFruit() throws Exception {
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
 
@@ -55,12 +56,12 @@ public class SimsKnnCommandTest {
                                   FRUIT_NAME + ".neighs");
 
         final SimsKnnCommand knnTask = new SimsKnnCommand();
-        knnTask.filesDeligate.setSourceFile(in);
-        knnTask.filesDeligate.setDestinationFile(out);
-        knnTask.setCharset(DEFAULT_CHARSET);
+        knnTask.getFilesDeligate().setSourceFile(in);
+        knnTask.getFilesDeligate().setDestinationFile(out);
+        knnTask.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         knnTask.setK(100);
-        knnTask.indexDeligate.setPreindexedTokens1(false);
-        knnTask.indexDeligate.setPreindexedTokens2(false);
+        knnTask.getIndexDeligate().setPreindexedTokens1(false);
+        knnTask.getIndexDeligate().setPreindexedTokens2(false);
         knnTask.setClassComparator(Weighted.recordOrder(TokenPair.firstIndexOrder()));
         knnTask.setNearnessComparator(
                 Comparators.reverse(Weighted.<TokenPair>weightOrder()));
@@ -72,7 +73,7 @@ public class SimsKnnCommandTest {
         assertTrue("Empty output file found.", out.length() > 0);
     }
 
-    @Test(timeout = 8000)
+    @Test //(timeout = 8000)
     public void testRunOnFruit_Indexed() throws Exception {
         System.out.println(
                 "Testing " + subject + " on " + TEST_FRUIT_INPUT_INDEXED);
@@ -82,12 +83,12 @@ public class SimsKnnCommandTest {
                                   FRUIT_NAME + ".indexed.neighs");
 
         final SimsKnnCommand knnTask = new SimsKnnCommand();
-        knnTask.filesDeligate.setSourceFile(in);
-        knnTask.filesDeligate.setDestinationFile(out);
-        knnTask.setCharset(DEFAULT_CHARSET);
+        knnTask.getFilesDeligate().setSourceFile(in);
+        knnTask.getFilesDeligate().setDestinationFile(out);
+        knnTask.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         knnTask.setK(100);
-        knnTask.indexDeligate.setPreindexedTokens1(false);
-        knnTask.indexDeligate.setPreindexedTokens2(false);
+        knnTask.getIndexDeligate().setPreindexedTokens1(false);
+        knnTask.getIndexDeligate().setPreindexedTokens2(false);
         knnTask.setClassComparator(Weighted.recordOrder(TokenPair.firstIndexOrder()));
         knnTask.setNearnessComparator(
                 Comparators.reverse(

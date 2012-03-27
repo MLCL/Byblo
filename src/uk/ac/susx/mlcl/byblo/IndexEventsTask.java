@@ -37,26 +37,27 @@ public class IndexEventsTask extends AbstractCommandTask {
     private static final Log LOG = LogFactory.getLog(IndexEventsTask.class);
 
     @Parameter(names = {"-i", "--input"}, required = true,
-               description = "Source events file",
-               validateWith = InputFileValidator.class)
+    description = "Source events file",
+    validateWith = InputFileValidator.class)
     private File inputEventsFile;
 
     @Parameter(names = {"-o", "--output"}, required = true,
-               description = "Destination events file.",
-               validateWith = OutputFileValidator.class)
+    description = "Destination events file.",
+    validateWith = OutputFileValidator.class)
     private File outputEventsFile = null;
 
     @Parameter(names = {"-ei", "--entry-index"}, required = true,
-               description = "Entry index destination file",
-               validateWith = OutputFileValidator.class)
+    description = "Entry index destination file",
+    validateWith = OutputFileValidator.class)
     private File entryIndexFile = null;
 
     @Parameter(names = {"-fi", "--feature-index"}, required = true,
-               description = "Feature frequencies destination file.",
-               validateWith = OutputFileValidator.class)
+    description = "Feature frequencies destination file.",
+    validateWith = OutputFileValidator.class)
     private File featureIndexFile = null;
 
-    @Parameter(names = {"-c", "--charset"}, description = "Character encoding to use for input and output.")
+    @Parameter(names = {"-c", "--charset"},
+    description = "Character encoding to use for input and output.")
     private Charset charset = Files.DEFAULT_CHARSET;
 
     public IndexEventsTask(File inputEventsFile, Charset charset,
@@ -218,4 +219,5 @@ public class IndexEventsTask extends AbstractCommandTask {
                 add("idx2", getFeatureIndexFile()).
                 add("charset", getCharset());
     }
+
 }

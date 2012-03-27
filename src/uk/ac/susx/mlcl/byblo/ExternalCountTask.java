@@ -30,6 +30,9 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import uk.ac.susx.mlcl.byblo.tasks.DeleteTask;
+import uk.ac.susx.mlcl.byblo.commands.IndexDeligatePair;
+import uk.ac.susx.mlcl.byblo.commands.CopyCommand;
 import uk.ac.susx.mlcl.byblo.tasks.MergeTask;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
@@ -137,7 +140,7 @@ public class ExternalCountTask extends AbstractParallelCommandTask {
     private Charset charset = Files.DEFAULT_CHARSET;
 
     @ParametersDelegate
-    protected TwoIndexDeligate indexDeligate = new TwoIndexDeligate();
+    protected IndexDeligatePair indexDeligate = new IndexDeligatePair();
 
     private Queue<File> mergeEntryQueue;
 
