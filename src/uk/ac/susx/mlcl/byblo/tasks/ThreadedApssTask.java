@@ -77,7 +77,7 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
     private Queue<Future<? extends Task>> futureQueue =
             new ArrayDeque<Future<? extends Task>>();
 
-    private int maxChunkSize = 500;
+    private int maxChunkSize = 5000;
 
     private Semaphore throttle;
 

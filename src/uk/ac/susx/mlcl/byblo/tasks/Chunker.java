@@ -51,7 +51,7 @@ public class Chunker<T, P> implements SeekableSource<Chunk<T>, P>, Closeable {
 
     private static final Log LOG = LogFactory.getLog(Chunker.class);
 
-    public static final int DEFAULT_MAX_CHUNK_SIZE = 1000;
+    private static final int DEFAULT_MAX_CHUNK_SIZE = 1000;
 
     private int maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
 

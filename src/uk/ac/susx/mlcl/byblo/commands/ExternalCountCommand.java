@@ -109,7 +109,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     @Parameter(names = {"-C", "--chunk-size"},
     description = "Number of lines per work unit. Larger value increase performance and memory usage.")
-    private int maxChunkSize = Chunker.DEFAULT_MAX_CHUNK_SIZE;
+    private int maxChunkSize = 500000;
 
     @Parameter(names = {"-i", "--input"},
     required = true,
