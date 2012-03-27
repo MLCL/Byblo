@@ -11,7 +11,7 @@ import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
-import uk.ac.susx.mlcl.lib.command.AbstractDeligate;
+import uk.ac.susx.mlcl.lib.commands.AbstractDeligate;
 
 /**
  *

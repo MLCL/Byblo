@@ -11,9 +11,9 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.Files;
-import uk.ac.susx.mlcl.lib.command.AbstractDeligate;
-import uk.ac.susx.mlcl.lib.command.InputFileValidator;
-import uk.ac.susx.mlcl.lib.command.OutputFileValidator;
+import uk.ac.susx.mlcl.lib.commands.AbstractDeligate;
+import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
+import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
 
 /**
  *

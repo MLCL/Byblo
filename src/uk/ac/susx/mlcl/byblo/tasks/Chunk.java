@@ -30,69 +30,98 @@
  */
 package uk.ac.susx.mlcl.byblo.tasks;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
-import java.io.File;
-import java.io.FileNotFoundException;
+import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import java.io.IOException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
-import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
+import java.util.AbstractList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
- *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @param <T> The atomic type of items in this chunk
  */
-@Parameters(commandDescription = "Delete a file.")
-public class DeleteTask extends AbstractTask {
+public class Chunk<T> extends AbstractList<T>
+        implements SeekableSource<T, Integer>, Cloneable {
 
-    private static final Log LOG = LogFactory.getLog(DeleteTask.class);
+    private String name;
+    private final List<T> items;
+    private Integer nextIndex;
 
-    private File file = null;
-
-    public DeleteTask(File file) {
-        setFile(file);
+    public Chunk(String name, List<T> items) {
+        this.name = name;
+        this.items = items;
+        nextIndex = 0;
     }
 
-    public DeleteTask() {
+    /**
+     * Protected constructor for cloning only.
+     * 
+     * @param other Chunk to clone (using a shallow copy).
+     */
+    protected Chunk(Chunk<T> other) {
+        this.name = other.name;
+        this.items = other.items;
+        nextIndex = other.nextIndex;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    
+    public String getName() {
+        return name;
+    }
+    
+    
+
+    @Override
+    public Iterator<T> iterator() {
+        return items.iterator();
     }
 
     @Override
-    protected void initialiseTask() throws Exception {
+    public int size() {
+        return items.size();
     }
 
     @Override
-    protected void finaliseTask() throws Exception {
+    public T get(int index) {
+        return items.get(index);
     }
 
     @Override
-    public void runTask() throws Exception {
-        if (LOG.isInfoEnabled())
-            LOG.info("Deleting file \"" + getFile() + "\".");
-        if (file == null)
-            throw new NullPointerException("file is null");
-        if (!file.exists())
-            throw new FileNotFoundException("Unnable to delete file because it "
-                    + "doesn't exist: \"" + file + "\"");
-        if (!file.delete())
-            throw new IOException("Unnable to delete file: \"" + file + "\"");
-    }
-
-    public final File getFile() {
-        return file;
-    }
-
-    public final void setFile(final File file)
-            throws NullPointerException {
-        if (file == null)
-            throw new NullPointerException("file is null");
-        this.file = file;
+    public T read() throws IOException {
+        return items.get(nextIndex++);
     }
 
     @Override
+    public boolean hasNext() throws IOException {
+        return nextIndex < items.size();
+    }
+
+    @Override
+    public void position(Integer offset) throws IOException {
+        nextIndex = offset;
+    }
+
+    @Override
+    public Integer position() throws IOException {
+        return nextIndex;
+    }
+
+    @Override
+    public Chunk<T> clone() {
+        return new Chunk<T>(this);
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper().toString();
+    }
+
     protected Objects.ToStringHelper toStringHelper() {
-        return super.toStringHelper().add("file", file);
+        return Objects.toStringHelper(this).addValue(name);
     }
 }

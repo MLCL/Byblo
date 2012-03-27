@@ -28,71 +28,45 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo.tasks;
+package uk.ac.susx.mlcl.lib.commands;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
-import com.google.common.base.Objects;
+import com.beust.jcommander.IStringConverter;
+import com.beust.jcommander.ParameterException;
+import com.beust.jcommander.converters.FileConverter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
-import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
+import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 
 /**
- *
+ * An IStringConverter implementation for extending JCommander. Take a string 
+ * path and produces a TempFileFactory object for the production of temprory
+ * files.
+ * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(commandDescription = "Delete a file.")
-public class DeleteTask extends AbstractTask {
+public class TempFileFactoryConverter implements IStringConverter<TempFileFactory> {
 
-    private static final Log LOG = LogFactory.getLog(DeleteTask.class);
+    private static final Log LOG = LogFactory.getLog(
+            TempFileFactoryConverter.class);
 
-    private File file = null;
-
-    public DeleteTask(File file) {
-        setFile(file);
-    }
-
-    public DeleteTask() {
-    }
+    private final FileConverter inner = new FileConverter();
 
     @Override
-    protected void initialiseTask() throws Exception {
-    }
-
-    @Override
-    protected void finaliseTask() throws Exception {
-    }
-
-    @Override
-    public void runTask() throws Exception {
-        if (LOG.isInfoEnabled())
-            LOG.info("Deleting file \"" + getFile() + "\".");
-        if (file == null)
-            throw new NullPointerException("file is null");
-        if (!file.exists())
-            throw new FileNotFoundException("Unnable to delete file because it "
-                    + "doesn't exist: \"" + file + "\"");
-        if (!file.delete())
-            throw new IOException("Unnable to delete file: \"" + file + "\"");
-    }
-
-    public final File getFile() {
-        return file;
-    }
-
-    public final void setFile(final File file)
-            throws NullPointerException {
-        if (file == null)
-            throw new NullPointerException("file is null");
-        this.file = file;
-    }
-
-    @Override
-    protected Objects.ToStringHelper toStringHelper() {
-        return super.toStringHelper().add("file", file);
+    public TempFileFactory convert(String value) {
+        File tmpDir = inner.convert(value);
+        if (!tmpDir.exists()) {
+            if (LOG.isDebugEnabled())
+                LOG.debug(
+                        "Attempting to create temporary directory: \"" + tmpDir + "\"");
+            if (!tmpDir.mkdirs()) {
+                throw new ParameterException(
+                        "Unable create temporary directory \"" + tmpDir + "\"");
+            }
+        } else if (!tmpDir.isDirectory()) {
+            throw new ParameterException("The given temporary directory \""
+                    + tmpDir + "\" already exists but it is not a directory.");
+        }
+        return new TempFileFactory(tmpDir);
     }
 }

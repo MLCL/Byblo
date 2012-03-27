@@ -42,16 +42,16 @@ import java.nio.charset.Charset;
 import java.util.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.allpairs.InvertedApssTask;
-import uk.ac.susx.mlcl.byblo.allpairs.ThreadedApssTask;
+import uk.ac.susx.mlcl.byblo.tasks.InvertedApssTask;
+import uk.ac.susx.mlcl.byblo.tasks.ThreadedApssTask;
 import uk.ac.susx.mlcl.byblo.commands.IndexDeligatePair;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.measure.*;
 import uk.ac.susx.mlcl.lib.DoubleConverter;
 import uk.ac.susx.mlcl.lib.io.*;
-import uk.ac.susx.mlcl.lib.command.AbstractCommand;
-import uk.ac.susx.mlcl.lib.command.InputFileValidator;
-import uk.ac.susx.mlcl.lib.command.OutputFileValidator;
+import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
+import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
+import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
 
 /**
  *

@@ -32,7 +32,7 @@ package uk.ac.susx.mlcl.byblo.commands;
 
 import uk.ac.susx.mlcl.byblo.tasks.DeleteTask;
 import uk.ac.susx.mlcl.byblo.commands.IndexDeligatePair;
-import uk.ac.susx.mlcl.byblo.commands.CopyCommand;
+import uk.ac.susx.mlcl.lib.commands.CopyCommand;
 import uk.ac.susx.mlcl.lib.tasks.MergeTask;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
@@ -48,16 +48,15 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.ChunkTask;
-import uk.ac.susx.mlcl.byblo.WeightSumReducerSink;
+import uk.ac.susx.mlcl.byblo.io.WeightSumReducerSink;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.tasks.CountTask;
 import uk.ac.susx.mlcl.lib.tasks.SortTask;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.*;
 import uk.ac.susx.mlcl.lib.AbstractParallelCommandTask;
-import uk.ac.susx.mlcl.lib.command.InputFileValidator;
-import uk.ac.susx.mlcl.lib.command.OutputFileValidator;
+import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
+import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
 import uk.ac.susx.mlcl.lib.tasks.Task;
 
 /**

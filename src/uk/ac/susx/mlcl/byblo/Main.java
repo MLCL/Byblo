@@ -30,18 +30,22 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import uk.ac.susx.mlcl.byblo.commands.SimsKnnCommand;
+import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
 import uk.ac.susx.mlcl.byblo.commands.ExternalCountCommand;
-import uk.ac.susx.mlcl.byblo.commands.ExternalSortCommand;
+import uk.ac.susx.mlcl.byblo.commands.AbstractExternalSortCommand;
 import uk.ac.susx.mlcl.byblo.commands.AbstractMergeCommand;
 import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import uk.ac.susx.mlcl.byblo.commands.ExternalSortWeightedTokenCommand;
+import uk.ac.susx.mlcl.byblo.commands.ExternalSortWeightedTokenPiarCommand;
 import uk.ac.susx.mlcl.byblo.commands.MergeTokenPairCommand;
 import uk.ac.susx.mlcl.byblo.commands.MergeWeightedTokenCommand;
 import uk.ac.susx.mlcl.byblo.commands.MergeWeightedTokenPairCommand;
-import uk.ac.susx.mlcl.lib.command.AbstractCommand;
-import uk.ac.susx.mlcl.lib.command.Command;
+import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
+import uk.ac.susx.mlcl.lib.commands.Command;
 
 /**
  *
@@ -54,10 +58,10 @@ public class Main extends AbstractCommand {
     static {
         final Map<String, Class<? extends Command>> tmp =
             new HashMap<String, Class<? extends Command>>();
-        tmp.put("sort-sims", ExternalSortCommand.WeightedTokenPiarExternalSortCommand.class);
-        tmp.put("sort-ents", ExternalSortCommand.WeightedTokenExternalSortTask.class);
-        tmp.put("sort-feats", ExternalSortCommand.WeightedTokenExternalSortTask.class);
-        tmp.put("sort-events", ExternalSortCommand.WeightedTokenPiarExternalSortCommand.class);
+        tmp.put("sort-sims", ExternalSortWeightedTokenPiarCommand.class);
+        tmp.put("sort-ents", ExternalSortWeightedTokenCommand.class);
+        tmp.put("sort-feats", ExternalSortWeightedTokenCommand.class);
+        tmp.put("sort-events", ExternalSortWeightedTokenPiarCommand.class);
         tmp.put("merge-sims", MergeTokenPairCommand.class);
         tmp.put("merge-ents", MergeWeightedTokenPairCommand.class);
         tmp.put("merge-feats", MergeWeightedTokenCommand.class);
@@ -65,7 +69,7 @@ public class Main extends AbstractCommand {
         tmp.put("knn-sims", SimsKnnCommand.class);
         tmp.put("allpairs", AllPairsCommand.class);
         tmp.put("count", ExternalCountCommand.class);
-        tmp.put("filter", FilterTask.class);
+        tmp.put("filter", FilterCommand.class);
         SUBCOMMANDS = Collections.unmodifiableMap(tmp);
     }
 

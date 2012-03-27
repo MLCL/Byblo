@@ -40,8 +40,8 @@ import java.util.Comparator;
 import javax.naming.OperationNotSupportedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.KFirstReducerSink;
-import uk.ac.susx.mlcl.byblo.allpairs.Chunk;
+import uk.ac.susx.mlcl.byblo.io.KFirstReducerSink;
+import uk.ac.susx.mlcl.byblo.tasks.Chunk;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.tasks.MergeTask;
@@ -53,7 +53,7 @@ import uk.ac.susx.mlcl.lib.Comparators;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Perform k-nearest-neighbours on a similarity file.")
-public class ExternalSimsKnnCommand extends ExternalSortCommand.WeightedTokenPiarExternalSortCommand {
+public class ExternalSimsKnnCommand extends ExternalSortWeightedTokenPiarCommand {
 
     private static final Log LOG = LogFactory.getLog(ExternalSimsKnnCommand.class);
 
@@ -61,12 +61,12 @@ public class ExternalSimsKnnCommand extends ExternalSortCommand.WeightedTokenPia
 
     @Parameter(names = {"-k"},
     description = "The number of neighbours to produce for each base entry.")
-    private int k = DEFAULT_K;
+     int k = DEFAULT_K;
 
-    private Comparator<Weighted<TokenPair>> classComparator =
+    Comparator<Weighted<TokenPair>> classComparator =
             Weighted.recordOrder(TokenPair.indexOrder());
 
-    private Comparator<Weighted<TokenPair>> nearnessComparator =
+    Comparator<Weighted<TokenPair>> nearnessComparator =
             Comparators.reverse(Weighted.<TokenPair>weightOrder());
 
     public ExternalSimsKnnCommand(File sourceFile, File destinationFile,

@@ -45,13 +45,13 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.tasks.CountTask;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.command.AbstractCommand;
+import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.io.Files;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.TSVSink;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
-import uk.ac.susx.mlcl.lib.command.InputFileValidator;
-import uk.ac.susx.mlcl.lib.command.OutputFileValidator;
+import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
+import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
 
 /**
  * <p>Read in a raw feature instances file, to produce three frequency files:

@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.WeightSumReducerSink;
+import uk.ac.susx.mlcl.byblo.io.WeightSumReducerSink;
 import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSink;

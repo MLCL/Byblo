@@ -39,8 +39,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
-import uk.ac.susx.mlcl.lib.command.Command;
-import uk.ac.susx.mlcl.lib.command.ConverterFactory;
+import uk.ac.susx.mlcl.lib.commands.Command;
+import uk.ac.susx.mlcl.lib.commands.ConverterFactory;
 
 /**
  *

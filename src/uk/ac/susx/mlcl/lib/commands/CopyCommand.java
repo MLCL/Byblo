@@ -28,71 +28,47 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo.tasks;
+package uk.ac.susx.mlcl.lib.commands;
 
-import com.beust.jcommander.Parameter;
+import uk.ac.susx.mlcl.byblo.tasks.CopyTask;
 import com.beust.jcommander.Parameters;
+import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
-import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
+import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 
 /**
+ * Copy a source file to a destination.
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(commandDescription = "Delete a file.")
-public class DeleteTask extends AbstractTask {
+@Parameters(commandDescription = "Copy a file.")
+public class CopyCommand extends AbstractCommand {
 
-    private static final Log LOG = LogFactory.getLog(DeleteTask.class);
+    @ParametersDelegate
+    protected final FilePipeDeligate filesDeligate = new FilePipeDeligate();
 
-    private File file = null;
-
-    public DeleteTask(File file) {
-        setFile(file);
+    public CopyCommand(File sourceFile, File destinationFile) {
+        filesDeligate.setSourceFile(sourceFile);
+        filesDeligate.setDestinationFile(destinationFile);
     }
 
-    public DeleteTask() {
-    }
-
-    @Override
-    protected void initialiseTask() throws Exception {
+    public CopyCommand() {
     }
 
     @Override
-    protected void finaliseTask() throws Exception {
-    }
-
-    @Override
-    public void runTask() throws Exception {
-        if (LOG.isInfoEnabled())
-            LOG.info("Deleting file \"" + getFile() + "\".");
-        if (file == null)
-            throw new NullPointerException("file is null");
-        if (!file.exists())
-            throw new FileNotFoundException("Unnable to delete file because it "
-                    + "doesn't exist: \"" + file + "\"");
-        if (!file.delete())
-            throw new IOException("Unnable to delete file: \"" + file + "\"");
-    }
-
-    public final File getFile() {
-        return file;
-    }
-
-    public final void setFile(final File file)
-            throws NullPointerException {
-        if (file == null)
-            throw new NullPointerException("file is null");
-        this.file = file;
+    public void runCommand() throws Exception {
+        CopyTask task = new CopyTask(filesDeligate.getSourceFile(), filesDeligate.getDestinationFile());
+        task.run();
+        while (task.isExceptionThrown())
+            task.throwException();
     }
 
     @Override
     protected Objects.ToStringHelper toStringHelper() {
-        return super.toStringHelper().add("file", file);
+        return super.toStringHelper().
+                add("in", filesDeligate.getSourceFile()).
+                add("out", filesDeligate.getDestinationFile());
     }
+
 }

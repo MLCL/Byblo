@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.lib.commands.FilePipeDeligate;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
@@ -45,7 +46,7 @@ import uk.ac.susx.mlcl.lib.tasks.SortTask;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.io.*;
-import uk.ac.susx.mlcl.lib.command.AbstractCommand;
+import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 
 /**
  * Task that takes a single input file and sorts it according to some
