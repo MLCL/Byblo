@@ -50,6 +50,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.WeightSumReducerSink;
 import uk.ac.susx.mlcl.byblo.io.*;
+import uk.ac.susx.mlcl.byblo.tasks.Chunk;
+import uk.ac.susx.mlcl.byblo.tasks.Chunker;
 import uk.ac.susx.mlcl.byblo.tasks.CountTask;
 import uk.ac.susx.mlcl.lib.tasks.SortTask;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -68,8 +70,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     private static final Log LOG = LogFactory.getLog(ExternalCountCommand.class);
 
-    private static final int DEFAULT_MAX_CHUNK_SIZE = ChunkTask.DEFAULT_MAX_CHUNK_SIZE;
-
+//    private static final int DEFAULT_MAX_CHUNK_SIZE = ChunkTask.DEFAULT_MAX_CHUNK_SIZE;
     protected static final String KEY_TASK_TYPE = "KEY_TASK_TYPE";
 
     protected static final String KEY_DATA_TYPE = "KEY_DATA_TYPE";
@@ -107,8 +108,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     private static final boolean DEBUG = true;
 
     @Parameter(names = {"-C", "--chunk-size"},
-    description = "Number of lines per work unit. Lrger value increase performance and memory usage.")
-    private int maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
+    description = "Number of lines per work unit. Larger value increase performance and memory usage.")
+    private int maxChunkSize = Chunker.DEFAULT_MAX_CHUNK_SIZE;
 
     @Parameter(names = {"-i", "--input"},
     required = true,
@@ -273,42 +274,71 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
         BlockingQueue<File> chunkQueue = new ArrayBlockingQueue<File>(2);
 
-        ChunkTask chunkTask = new ChunkTask(getInputFile(), getCharset(),
-                                            getMaxChunkSize());
-        chunkTask.setDstFileQueue(chunkQueue);
-        chunkTask.setChunkFileFactory(tempFileFactory);
-        Future<ChunkTask> chunkFuture = submitTask(chunkTask);
 
-        // Immidiately poll the chunk task so we can start handling other
-        // completed tasks
-        if (!getFutureQueue().poll().equals(chunkFuture))
-            throw new AssertionError("Expecting ChunkTask on future queue.");
+        final SeekableSource<TokenPair, Lexer.Tell> src =
+                openInstancesSource(getInputFile());
 
-        while (!chunkFuture.isDone() || !chunkQueue.isEmpty()) {
+        final Chunker<TokenPair, Lexer.Tell> chunks =
+                new Chunker<TokenPair, Lexer.Tell>(src, getMaxChunkSize());
 
-            if (!getFutureQueue().isEmpty() && getFutureQueue().peek().isDone()) {
-
+        while (chunks.hasNext()) {
+            while (!getFutureQueue().isEmpty() && getFutureQueue().peek().isDone()) {
                 handleCompletedTask(getFutureQueue().poll().get());
-
-            } else if (!chunkQueue.isEmpty()) {
-
-                File chunk = chunkQueue.take();
-
-                File chunk_entriesFile = tempFileFactory.createFile("cnt.ent.",
-                                                                    "");
-                File chunk_featuresFile = tempFileFactory.createFile("cnt.feat.",
-                                                                     "");
-                File chunk_entryFeaturesFile = tempFileFactory.createFile(
-                        "cnt.evnt.", "");
-
-                submitCountTask(chunk, chunk_entriesFile, chunk_featuresFile, chunk_entryFeaturesFile);
-
             }
 
-            // XXX: Nasty hack to stop it tight looping when both queues are empty
-            Thread.sleep(1);
+            Chunk<TokenPair> chunk = chunks.read();
+//            submitCountTask(chunk, inputFile, entryFeaturesFile, inputFile);
+
+            File chunk_entriesFile = tempFileFactory.createFile("cnt.ent.",
+                                                                "");
+            File chunk_featuresFile = tempFileFactory.createFile("cnt.feat.",
+                                                                 "");
+            File chunk_eventsFile = tempFileFactory.createFile(
+                    "cnt.evnt.", "");
+
+            submitCountTask(chunk, chunk_entriesFile, chunk_featuresFile, chunk_eventsFile);
         }
-        chunkTask.throwException();
+
+//
+//
+//
+//
+//        ChunkTask chunkTask = new ChunkTask(getInputFile(), getCharset(),
+//                                            getMaxChunkSize());
+//        chunkTask.setDstFileQueue(chunkQueue);
+//        chunkTask.setChunkFileFactory(tempFileFactory);
+//        Future<ChunkTask> chunkFuture = submitTask(chunkTask);
+//
+//        // Immidiately poll the chunk task so we can start handling other
+//        // completed tasks
+//        if (!getFutureQueue().poll().equals(chunkFuture))
+//            throw new AssertionError("Expecting ChunkTask on future queue.");
+//
+//        while (!chunkFuture.isDone() || !chunkQueue.isEmpty()) {
+//
+//            if (!getFutureQueue().isEmpty() && getFutureQueue().peek().isDone()) {
+//
+//                handleCompletedTask(getFutureQueue().poll().get());
+//
+//            } else if (!chunkQueue.isEmpty()) {
+//
+//                File chunk = chunkQueue.take();
+//
+//                File chunk_entriesFile = tempFileFactory.createFile("cnt.ent.",
+//                                                                    "");
+//                File chunk_featuresFile = tempFileFactory.createFile("cnt.feat.",
+//                                                                     "");
+//                File chunk_entryFeaturesFile = tempFileFactory.createFile(
+//                        "cnt.evnt.", "");
+//
+//                submitCountTask(chunk, chunk_entriesFile, chunk_featuresFile, chunk_entryFeaturesFile);
+//
+//            }
+//
+//            // XXX: Nasty hack to stop it tight looping when both queues are empty
+//            Thread.sleep(1);
+//        }
+//        chunkTask.throwException();
     }
 
     protected void reduce() throws Exception {
@@ -429,25 +459,13 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
                : Weighted.recordOrder(TokenPair.stringOrder(indexDeligate.getEncoder1(), indexDeligate.getEncoder2()));
     }
 
-    protected void submitCountTask(File in, File outEntries, File outFeatures, File outEvents) throws IOException {
+    protected void submitCountTask(Source<TokenPair> instanceSource, File outEntries, File outFeatures, File outEvents) throws IOException {
 
 
-        final TokenPairSource instanceSource = new TokenPairSource(
-                new TSVSource(in, charset),
-                indexDeligate.getDecoder1(), indexDeligate.getDecoder2());
-
-        WeightedTokenSink entrySink = new WeightedTokenSink(
-                new TSVSink(outEntries, charset),
-                indexDeligate.getEncoder1());
-
-        WeightedTokenSink featureSink = new WeightedTokenSink(
-                new TSVSink(outFeatures, charset),
-                indexDeligate.getEncoder2());
-
-
-        WeightedTokenPairSink eventsSink = new WeightedTokenPairSink(
-                new TSVSink(outEvents, charset),
-                indexDeligate.getEncoder1(), indexDeligate.getEncoder2());
+//        Source<TokenPair> instanceSource = openInstancesSource(in);         
+        Sink<Weighted<Token>> entrySink = openEntriesSink(outEntries);
+        Sink<Weighted<Token>> featureSink = openFeaturesSink(outFeatures);
+        Sink<Weighted<TokenPair>> eventsSink = openEventsSink(outEvents);
 
         CountTask task = new CountTask(
                 instanceSource, eventsSink, entrySink, featureSink,
@@ -455,23 +473,11 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
         task.getProperties().setProperty(KEY_TASK_TYPE, VALUE_TASK_TYPE_COUNT);
 
-        task.getProperties().setProperty(KEY_SRC_FILE, in.toString());
+        task.getProperties().setProperty(KEY_SRC_FILE, getInputFile().toString());
         task.getProperties().setProperty(KEY_DST_EVENTS_FILE, outEvents.toString());
         task.getProperties().setProperty(KEY_DST_ENTRIES_FILE, outEntries.toString());
         task.getProperties().setProperty(KEY_DST_FEATURES_FILE, outFeatures.toString());
 
-//        CountCommand ct = new CountCommand();
-//        ct.setInstancesFile(in);
-//        ct.setEntriesFile(outEntries);
-//        ct.setFeaturesFile(outFeatures);
-//        ct.setEntryFeaturesFile(outEvents);
-//        ct.setCharset(getCharset());
-//        ct.indexDeligate.setPreindexedTokens1(indexDeligate.isPreindexedTokens1());
-//        ct.indexDeligate.setPreindexedTokens2(indexDeligate.isPreindexedTokens2());
-//        ct.indexDeligate.setIndex1(indexDeligate.getIndex1());
-//        ct.indexDeligate.setIndex2(indexDeligate.getIndex2());
-
-//        ct.getProperties().setProperty(KEY_TASK_TYPE, VALUE_TASK_TYPE_COUNT);
         submitTask(task);
     }
 
@@ -485,17 +491,11 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         File srcFile = file;
         File dstFile = tempFileFactory.createFile("mrg.ent.", "");
 
-        Source<Weighted<Token>> srcA = new WeightedTokenSource(
-                new TSVSource(srcFile, getCharset()),
-                indexDeligate.getDecoder1());
-
-        Sink<Weighted<Token>> snk = new WeightSumReducerSink<Token>(
-                new WeightedTokenSink(
-                new TSVSink(dstFile, getCharset()),
-                indexDeligate.getEncoder1()));
+        Source<Weighted<Token>> src = openEntriesSource(srcFile);
+        Sink<Weighted<Token>> snk = openEntriesSink(dstFile);
 
         SortTask<Weighted<Token>> task =
-                new SortTask<Weighted<Token>>(srcA, snk);
+                new SortTask<Weighted<Token>>(src, snk);
         task.setComparator(Weighted.recordOrder(Token.indexOrder()));
 
         task.getProperties().setProperty(KEY_TASK_TYPE, VALUE_TASK_TYPE_SORT);
@@ -509,17 +509,11 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         File srcFile = file;
         File dstFile = tempFileFactory.createFile("mrg.feat.", "");
 
-        Source<Weighted<Token>> srcA = new WeightedTokenSource(
-                new TSVSource(srcFile, getCharset()),
-                indexDeligate.getDecoder2());
-
-        Sink<Weighted<Token>> snk = new WeightSumReducerSink<Token>(
-                new WeightedTokenSink(
-                new TSVSink(dstFile, getCharset()),
-                indexDeligate.getEncoder2()));
+        Source<Weighted<Token>> src = openFeaturesSource(srcFile);
+        Sink<Weighted<Token>> snk = openFeaturesSink(dstFile);
 
         SortTask<Weighted<Token>> task =
-                new SortTask<Weighted<Token>>(srcA, snk);
+                new SortTask<Weighted<Token>>(src, snk);
         task.setComparator(Weighted.recordOrder(Token.indexOrder()));
 
         task.getProperties().setProperty(KEY_TASK_TYPE, VALUE_TASK_TYPE_SORT);
@@ -533,17 +527,11 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         File srcFile = file;
         File dstFile = tempFileFactory.createFile("mrg.feat.", "");
 
-        Source<Weighted<TokenPair>> srcA = new WeightedTokenPairSource(
-                new TSVSource(srcFile, getCharset()),
-                indexDeligate.getDecoder1(), indexDeligate.getDecoder2());
-
-        Sink<Weighted<TokenPair>> snk = new WeightSumReducerSink<TokenPair>(
-                new WeightedTokenPairSink(
-                new TSVSink(dstFile, getCharset()),
-                indexDeligate.getEncoder1(), indexDeligate.getEncoder2()));
+        Source<Weighted<TokenPair>> src = openEventsSource(srcFile);
+        Sink<Weighted<TokenPair>> snk = openEventsSink(dstFile);
 
         SortTask<Weighted<TokenPair>> task =
-                new SortTask<Weighted<TokenPair>>(srcA, snk);
+                new SortTask<Weighted<TokenPair>>(src, snk);
         task.setComparator(Weighted.recordOrder(TokenPair.indexOrder()));
 
         task.getProperties().setProperty(KEY_TASK_TYPE, VALUE_TASK_TYPE_SORT);
@@ -560,18 +548,9 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             File srcFileB = mergeEntryQueue.poll();
             File dstFile = tempFileFactory.createFile("mrg.ent.", "");
 
-            Source<Weighted<Token>> srcA = new WeightedTokenSource(
-                    new TSVSource(srcFileA, getCharset()),
-                    indexDeligate.getDecoder1());
-
-            Source<Weighted<Token>> srcB = new WeightedTokenSource(
-                    new TSVSource(srcFileB, getCharset()),
-                    indexDeligate.getDecoder1());
-
-            Sink<Weighted<Token>> snk = new WeightSumReducerSink<Token>(
-                    new WeightedTokenSink(
-                    new TSVSink(dstFile, getCharset()),
-                    indexDeligate.getEncoder1()));
+            Source<Weighted<Token>> srcA = openEntriesSource(srcFileA);
+            Source<Weighted<Token>> srcB = openEntriesSource(srcFileB);
+            Sink<Weighted<Token>> snk = openEntriesSink(dstFile);
 
             MergeTask<Weighted<Token>> task =
                     new MergeTask<Weighted<Token>>(srcA, srcB, snk);
@@ -595,18 +574,9 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             File srcFileB = mergeFeaturesQueue.poll();
             File dstFile = tempFileFactory.createFile("mrg.feat.", "");
 
-            Source<Weighted<Token>> srcA = new WeightedTokenSource(
-                    new TSVSource(srcFileA, getCharset()),
-                    indexDeligate.getDecoder2());
-
-            Source<Weighted<Token>> srcB = new WeightedTokenSource(
-                    new TSVSource(srcFileB, getCharset()),
-                    indexDeligate.getDecoder2());
-
-            Sink<Weighted<Token>> snk = new WeightSumReducerSink<Token>(
-                    new WeightedTokenSink(
-                    new TSVSink(dstFile, getCharset()),
-                    indexDeligate.getEncoder2()));
+            Source<Weighted<Token>> srcA = openFeaturesSource(srcFileA);
+            Source<Weighted<Token>> srcB = openFeaturesSource(srcFileB);
+            Sink<Weighted<Token>> snk = openFeaturesSink(dstFile);
 
             MergeTask<Weighted<Token>> task =
                     new MergeTask<Weighted<Token>>(srcA, srcB, snk);
@@ -629,18 +599,9 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             File srcFileB = mergeEntryFeatureQueue.poll();
             File dstFile = tempFileFactory.createFile("mrg.evnt.", "");
 
-            Source<Weighted<TokenPair>> srcA = new WeightedTokenPairSource(
-                    new TSVSource(srcFileA, getCharset()),
-                    indexDeligate.getDecoder1(), indexDeligate.getDecoder2());
-
-            Source<Weighted<TokenPair>> srcB = new WeightedTokenPairSource(
-                    new TSVSource(srcFileB, getCharset()),
-                    indexDeligate.getDecoder1(), indexDeligate.getDecoder2());
-
-            Sink<Weighted<TokenPair>> snk = new WeightSumReducerSink<TokenPair>(
-                    new WeightedTokenPairSink(
-                    new TSVSink(dstFile, getCharset()),
-                    indexDeligate.getEncoder1(), indexDeligate.getEncoder2()));
+            Source<Weighted<TokenPair>> srcA = openEventsSource(srcFileA);
+            Source<Weighted<TokenPair>> srcB = openEventsSource(srcFileB);
+            Sink<Weighted<TokenPair>> snk = openEventsSink(dstFile);
 
             MergeTask<Weighted<TokenPair>> task =
                     new MergeTask<Weighted<TokenPair>>(srcA, srcB, snk);
@@ -656,6 +617,55 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
             submitTask(task);
         }
+    }
+
+    protected SeekableSource<Weighted<Token>, Lexer.Tell> openEntriesSource(File file) throws FileNotFoundException, IOException {
+        return new WeightedTokenSource(
+                new TSVSource(file, getCharset()),
+                indexDeligate.getDecoder1());
+    }
+
+    protected Sink<Weighted<Token>> openEntriesSink(File file) throws FileNotFoundException, IOException {
+        return new WeightSumReducerSink<Token>(
+                new WeightedTokenSink(new TSVSink(file, getCharset()),
+                                      indexDeligate.getEncoder1()));
+    }
+
+    protected SeekableSource<Weighted<Token>, Lexer.Tell> openFeaturesSource(File file) throws FileNotFoundException, IOException {
+        return new WeightedTokenSource(
+                new TSVSource(file, getCharset()),
+                indexDeligate.getDecoder2());
+    }
+
+    protected Sink<Weighted<Token>> openFeaturesSink(File file) throws FileNotFoundException, IOException {
+        return new WeightSumReducerSink<Token>(
+                new WeightedTokenSink(new TSVSink(file, getCharset()),
+                                      indexDeligate.getEncoder2()));
+    }
+
+    protected SeekableSource<Weighted<TokenPair>, Lexer.Tell> openEventsSource(File file)
+            throws FileNotFoundException, IOException {
+        return new WeightedTokenPairSource(
+                new TSVSource(file, getCharset()),
+                indexDeligate.getDecoder1(), indexDeligate.getDecoder2());
+    }
+
+    protected Sink<Weighted<TokenPair>> openEventsSink(File file)
+            throws FileNotFoundException, IOException {
+        return new WeightSumReducerSink<TokenPair>(
+                new WeightedTokenPairSink(
+                new TSVSink(file, getCharset()),
+                indexDeligate.getEncoder1(), indexDeligate.getEncoder2()));
+    }
+
+    protected SeekableSource<TokenPair, Lexer.Tell> openInstancesSource(File file) throws FileNotFoundException, IOException {
+        return new TokenPairSource(new TSVSource(file, getCharset()),
+                                   indexDeligate.getDecoder1(), indexDeligate.getDecoder2());
+    }
+
+    protected Sink<TokenPair> openInstancesSink(File file) throws FileNotFoundException, IOException {
+        return new TokenPairSink(new TSVSink(file, getCharset()),
+                                 indexDeligate.getEncoder1(), indexDeligate.getEncoder2());
     }
 
     /**

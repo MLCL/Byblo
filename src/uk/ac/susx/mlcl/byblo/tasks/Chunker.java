@@ -51,25 +51,25 @@ public class Chunker<T, P> implements SeekableSource<Chunk<T>, P>, Closeable {
 
     private static final Log LOG = LogFactory.getLog(Chunker.class);
 
-    private static final long DEFAULT_MAX_CHUNK_SIZE = 1000;
+    public static final int DEFAULT_MAX_CHUNK_SIZE = 1000;
 
-    private long maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
+    private int maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
 
     private final SeekableSource<T, P> inner;
 
     private final boolean seekable;
 
-    public Chunker(SeekableSource<T, P> inner, long maxChunkSize) {
+    public Chunker(SeekableSource<T, P> inner, int maxChunkSize) {
         this.inner = inner;
         this.seekable = inner instanceof Seekable;
         this.maxChunkSize = maxChunkSize;
     }
 
-    public long getMaxChunkSize() {
+    public int getMaxChunkSize() {
         return maxChunkSize;
     }
 
-    public void setMaxChunkSize(long maxChunkSize) {
+    public void setMaxChunkSize(int maxChunkSize) {
         Checks.checkRangeExcl(maxChunkSize, 0, Integer.MAX_VALUE);
         this.maxChunkSize = maxChunkSize;
     }

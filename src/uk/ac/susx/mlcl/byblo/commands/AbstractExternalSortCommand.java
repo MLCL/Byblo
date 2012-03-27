@@ -30,32 +30,33 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.tasks.DeleteTask;
-import uk.ac.susx.mlcl.lib.commands.FilePipeDeligate;
-import uk.ac.susx.mlcl.lib.commands.CopyCommand;
-import uk.ac.susx.mlcl.lib.tasks.MergeTask;
-import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects.ToStringHelper;
-import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.io.FileFactory;
-import uk.ac.susx.mlcl.lib.io.TempFileFactory;
-import uk.ac.susx.mlcl.lib.tasks.Task;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Comparator;
+import java.util.Properties;
+import java.util.Queue;
 import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.tasks.Chunk;
 import uk.ac.susx.mlcl.byblo.tasks.Chunker;
-import uk.ac.susx.mlcl.lib.tasks.SortTask;
-import uk.ac.susx.mlcl.lib.Comparators;
-import uk.ac.susx.mlcl.lib.io.*;
+import uk.ac.susx.mlcl.byblo.tasks.DeleteTask;
 import uk.ac.susx.mlcl.lib.AbstractParallelCommandTask;
+import uk.ac.susx.mlcl.lib.Checks;
+import uk.ac.susx.mlcl.lib.Comparators;
+import uk.ac.susx.mlcl.lib.commands.CopyCommand;
+import uk.ac.susx.mlcl.lib.commands.FilePipeDeligate;
+import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
+import uk.ac.susx.mlcl.lib.io.*;
+import uk.ac.susx.mlcl.lib.tasks.MergeTask;
+import uk.ac.susx.mlcl.lib.tasks.SortTask;
+import uk.ac.susx.mlcl.lib.tasks.Task;
 
 /**
  *
@@ -75,14 +76,12 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
 
     protected static final String KEY_DST_FILE = "sort.dst.file";
 
-    private static final int DEFAULT_MAX_CHUNK_SIZE = ChunkTask.DEFAULT_MAX_CHUNK_SIZE;
-
     private static final boolean DEBUG = true;
 
     @Parameter(names = {"-C", "--chunk-size"},
     description = "Number of lines that will be read and sorted in RAM at one "
     + "time (per thread). Larger values increase memory usage and performace.")
-    private int maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
+    private int maxChunkSize = Chunker.DEFAULT_MAX_CHUNK_SIZE;
 
     @ParametersDelegate
     private final FilePipeDeligate fileDeligate = new FilePipeDeligate();
@@ -181,6 +180,10 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
         final Chunker<T, ?> chunks = (Chunker<T, ?>) new Chunker(src, getMaxChunkSize());
 
         while (chunks.hasNext()) {
+            while (!getFutureQueue().isEmpty() && getFutureQueue().peek().isDone()) {
+                handleCompletedTask(getFutureQueue().poll().get());
+            }
+
             Chunk<T> chunk = chunks.read();
             submitTask(createSortTask(chunk, getTempFileFactory().createFile()));
         }
