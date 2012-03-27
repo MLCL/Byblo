@@ -49,9 +49,9 @@ import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.measure.*;
 import uk.ac.susx.mlcl.lib.DoubleConverter;
 import uk.ac.susx.mlcl.lib.io.*;
-import uk.ac.susx.mlcl.lib.tasks.AbstractCommand;
-import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
-import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
+import uk.ac.susx.mlcl.lib.command.AbstractCommand;
+import uk.ac.susx.mlcl.lib.command.InputFileValidator;
+import uk.ac.susx.mlcl.lib.command.OutputFileValidator;
 
 /**
  *

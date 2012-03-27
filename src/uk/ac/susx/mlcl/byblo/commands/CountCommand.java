@@ -28,39 +28,30 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo;
+package uk.ac.susx.mlcl.byblo.commands;
 
 import uk.ac.susx.mlcl.byblo.commands.IndexDeligatePair;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
-import it.unimi.dsi.fastutil.ints.Int2IntMap;
-import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.*;
+import uk.ac.susx.mlcl.byblo.tasks.CountTask;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.MiscUtil;
+import uk.ac.susx.mlcl.lib.command.AbstractCommand;
 import uk.ac.susx.mlcl.lib.io.Files;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.TSVSink;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
-import uk.ac.susx.mlcl.lib.tasks.AbstractCommandTask;
-import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
-import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
+import uk.ac.susx.mlcl.lib.command.InputFileValidator;
+import uk.ac.susx.mlcl.lib.command.OutputFileValidator;
 
 /**
  * <p>Read in a raw feature instances file, to produce three frequency files:
@@ -70,11 +61,11 @@ import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
  */
 @Parameters(commandDescription = "Read in a raw feature instances file, to produce three "
 + "frequency files: entries, contexts, and features.")
-public class CountTask extends AbstractCommandTask implements Serializable {
+public class CountCommand extends AbstractCommand implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Log LOG = LogFactory.getLog(CountTask.class);
+    private static final Log LOG = LogFactory.getLog(CountCommand.class);
 
     /**
      * Number of records to read or write between progress updates.
@@ -126,20 +117,20 @@ public class CountTask extends AbstractCommandTask implements Serializable {
      * @param charset character set to use for all file I/O
      * @throws NullPointerException if any argument is null
      */
-    public CountTask(final File instancesFile, final File entryFeaturesFile,
-                     final File entriesFile, final File featuresFile,
-                     final boolean preindexedEntries,
-                     final boolean preindexedFeatures,
-                     final Charset charset) throws NullPointerException {
+    public CountCommand(final File instancesFile, final File entryFeaturesFile,
+                            final File entriesFile, final File featuresFile,
+                            final boolean preindexedEntries,
+                            final boolean preindexedFeatures,
+                            final Charset charset) throws NullPointerException {
         this(instancesFile, entryFeaturesFile, entriesFile, featuresFile);
         setCharset(charset);
         indexDeligate.setPreindexedTokens1(preindexedEntries);
         indexDeligate.setPreindexedTokens2(preindexedFeatures);
     }
 
-    public CountTask(final File instancesFile, final File entryFeaturesFile,
-                     final File entriesFile, final File featuresFile,
-                     final Charset charset) throws NullPointerException {
+    public CountCommand(final File instancesFile, final File entryFeaturesFile,
+                            final File entriesFile, final File featuresFile,
+                            final Charset charset) throws NullPointerException {
         this(instancesFile, entryFeaturesFile, entriesFile, featuresFile);
         setCharset(charset);
     }
@@ -155,7 +146,7 @@ public class CountTask extends AbstractCommandTask implements Serializable {
      * @param featuresFile output file for context/frequency pairs
      * @throws NullPointerException if any argument is null
      */
-    public CountTask(
+    public CountCommand(
             final File instancesFile, final File entryFeaturesFile,
             final File entriesFile, final File featuresFile)
             throws NullPointerException {
@@ -219,14 +210,13 @@ public class CountTask extends AbstractCommandTask implements Serializable {
      * All files will initially be set to null. Character set will be set to
      * software default from {@link IOUtil#DEFAULT_CHARSET}.
      */
-    public CountTask() {
+    public CountCommand() {
     }
 
-    @Override
-    protected void initialiseTask() throws Exception {
-        checkState();
-    }
-
+//    @Override
+//    protected void initialiseTask() throws Exception {
+//        checkState();
+//    }
     private Comparator<Weighted<Token>> getEntryOrder() {
         return indexDeligate.isPreindexedTokens1()
                ? Weighted.recordOrder(Token.indexOrder())
@@ -246,248 +236,282 @@ public class CountTask extends AbstractCommandTask implements Serializable {
     }
 
     @Override
-    protected void runTask() throws Exception {
+    public void runCommand() throws Exception {
         if (LOG.isInfoEnabled()) {
             LOG.info("Running memory count on \"" + inputFile + "\".");
         }
 
-        final Object2IntMap<TokenPair> entryFeatureFreq =
-                new Object2IntOpenHashMap<TokenPair>();
-        entryFeatureFreq.defaultReturnValue(0);
+        checkState();
 
-        final Int2IntMap featureFreq = new Int2IntOpenHashMap();
-        featureFreq.defaultReturnValue(0);
+        final TokenPairSource instanceSource = new TokenPairSource(
+                new TSVSource(inputFile, charset),
+                indexDeligate.getDecoder1(), indexDeligate.getDecoder2());
 
-        final Int2IntMap entryFreq = new Int2IntOpenHashMap();
-        entryFreq.defaultReturnValue(0);
+        WeightedTokenSink entrySink = new WeightedTokenSink(
+                new TSVSink(entriesFile, charset),
+                indexDeligate.getEncoder1());
 
-        countEvents(entryFreq, featureFreq, entryFeatureFreq,
-                    indexDeligate.getDecoder1(), indexDeligate.getDecoder2());
+        WeightedTokenSink featureSink = new WeightedTokenSink(
+                new TSVSink(featuresFile, charset),
+                indexDeligate.getEncoder2());
 
-        writeEntries(entryFreq, indexDeligate.getEncoder1());
-        writeFeatures(featureFreq, indexDeligate.getEncoder2());
-        writeEvents(entryFeatureFreq,
-                    indexDeligate.getEncoder1(),
-                    indexDeligate.getEncoder2());
+
+        WeightedTokenPairSink eventsSink = new WeightedTokenPairSink(
+                new TSVSink(entryFeaturesFile, charset),
+                indexDeligate.getEncoder1(), indexDeligate.getEncoder2());
+
+
+
+        CountTask task = new CountTask(
+                instanceSource, eventsSink, entrySink, featureSink,
+                getEventOrder(), getEntryOrder(), getFeatureOrder());
+
+        task.run();
+
+
+        while (task.isExceptionThrown())
+            task.throwException();
+
+
+        instanceSource.close();
+        entrySink.close();
+        featureSink.close();
+        eventsSink.close();
+
+//        int i = 0;
+//        final Object2IntMap<TokenPair> entryFeatureFreq =
+//                new Object2IntOpenHashMap<TokenPair>();
+//        entryFeatureFreq.defaultReturnValue(0);
+//
+//        final Int2IntMap featureFreq = new Int2IntOpenHashMap();
+//        featureFreq.defaultReturnValue(0);
+//
+//        final Int2IntMap entryFreq = new Int2IntOpenHashMap();
+//        entryFreq.defaultReturnValue(0);
+//
+//        countEvents(entryFreq, featureFreq, entryFeatureFreq,
+//                    indexDeligate.getDecoder1(), indexDeligate.getDecoder2());
+//
+//        writeEntries(entryFreq, indexDeligate.getEncoder1());
+//        writeFeatures(featureFreq, indexDeligate.getEncoder2());
+//        writeEvents(entryFeatureFreq,
+//                    indexDeligate.getEncoder1(),
+//                    indexDeligate.getEncoder2());
 
         if (LOG.isInfoEnabled()) {
             LOG.info("Completed memory count.");
         }
     }
+//
+//    @Override
+//    protected void finaliseTask() throws Exception {
+//    }
+//
+//    private void countEvents(
+//            final Int2IntMap entryFreq,
+//            final Int2IntMap featureFreq,
+//            final Object2IntMap<? super TokenPair> entryFeatureFreq,
+//            final Function<String, Integer> entryDecoder,
+//            final Function<String, Integer> featureDecoder)
+//            throws IOException {
+//
+//        final TokenPairSource instanceSource = new TokenPairSource(
+//                new TSVSource(inputFile, charset),
+//                entryDecoder, featureDecoder);
+//
+//        if (!instanceSource.hasNext() && LOG.isWarnEnabled()) {
+//            LOG.warn("Events file is empty.");
+//        }
+//
+//        long i = 0;
+//        while (instanceSource.hasNext()) {
+//            final TokenPair instance;
+//            try {
+//                instance = instanceSource.read();
+//            } catch (SingletonRecordException ex) {
+//                LOG.warn("Badly formed input data: " + ex.getMessage());
+//                continue;
+//            }
+//
+//            final int entry_id = instance.id1();
+//            final int feature_id = instance.id2();
+//
+//            entryFreq.put(entry_id, entryFreq.get(entry_id) + 1);
+//            featureFreq.put(feature_id, featureFreq.get(feature_id) + 1);
+//            entryFeatureFreq.put(instance, entryFeatureFreq.getInt(instance) + 1);
+//
+//            if ((++i % PROGRESS_INTERVAL == 0 || !instanceSource.hasNext())
+//                    && LOG.isInfoEnabled()) {
+//                LOG.info("Read " + i + " events. Found "
+//                        + entryFreq.size() + " entries, " + featureFreq.size()
+//                        + " features, and " + entryFeatureFreq.size()
+//                        + " entry-features. (" + (int) instanceSource.percentRead()
+//                        + "% complete)");
+//                LOG.debug(MiscUtil.memoryInfoString());
+//            }
+//        }
+//    }
 
-    @Override
-    protected void finaliseTask() throws Exception {
-    }
-
-    private void countEvents(
-            final Int2IntMap entryFreq,
-            final Int2IntMap featureFreq,
-            final Object2IntMap<? super TokenPair> entryFeatureFreq,
-            final Function<String, Integer> entryDecoder,
-            final Function<String, Integer> featureDecoder)
-            throws IOException {
-
-        final TokenPairSource instanceSource = new TokenPairSource(
-                new TSVSource(inputFile, charset),
-                entryDecoder, featureDecoder);
-
-        if (!instanceSource.hasNext() && LOG.isWarnEnabled()) {
-            LOG.warn("Events file is empty.");
-        }
-
-        long i = 0;
-        while (instanceSource.hasNext()) {
-            final TokenPair instance;
-            try {
-                instance = instanceSource.read();
-            } catch (SingletonRecordException ex) {
-                LOG.warn("Badly formed input data: " + ex.getMessage());
-                continue;
-            }
-
-            final int entry_id = instance.id1();
-            final int feature_id = instance.id2();
-
-            entryFreq.put(entry_id, entryFreq.get(entry_id) + 1);
-            featureFreq.put(feature_id, featureFreq.get(feature_id) + 1);
-            entryFeatureFreq.put(instance, entryFeatureFreq.getInt(instance) + 1);
-
-            if ((++i % PROGRESS_INTERVAL == 0 || !instanceSource.hasNext())
-                    && LOG.isInfoEnabled()) {
-                LOG.info("Read " + i + " events. Found "
-                        + entryFreq.size() + " entries, " + featureFreq.size()
-                        + " features, and " + entryFeatureFreq.size()
-                        + " entry-features. (" + (int) instanceSource.percentRead()
-                        + "% complete)");
-                LOG.debug(MiscUtil.memoryInfoString());
-            }
-        }
-    }
-
-    private static final Comparator<Int2IntMap.Entry> TOKEN_ID_ORDER = new Comparator<Int2IntMap.Entry>() {
-
-        @Override
-        public int compare(Int2IntMap.Entry o1, Int2IntMap.Entry o2) {
-            return o1.getIntKey() - o2.getIntKey();
-        }
-
-    };
-
-    private List<Weighted<Token>> mapToWeightedTokens(Int2IntMap map) {
-        List<Weighted<Token>> out = new ArrayList<Weighted<Token>>(map.size());
-        for (Int2IntMap.Entry e : map.int2IntEntrySet()) {
-            out.add(new Weighted<Token>(
-                    new Token(e.getIntKey()), e.getIntValue()));
-        }
-        return out;
-    }
-
-    private List<Weighted<TokenPair>> mapToWeightedTokenPairs(
-            Object2IntMap<TokenPair> map) {
-        List<Weighted<TokenPair>> out = new ArrayList<Weighted<TokenPair>>(map.size());
-        for (Object2IntMap.Entry<TokenPair> e : map.object2IntEntrySet()) {
-            out.add(new Weighted<TokenPair>(
-                    e.getKey(), e.getIntValue()));
-        }
-        return out;
-    }
-
-    private void writeEntries(
-            final Int2IntMap entryFreq,
-            final Function<Integer, String> entryEncoder)
-            throws IOException {
-
-        if (LOG.isDebugEnabled())
-            LOG.debug("Sorting entries frequency data.");
-
-
-        List<Weighted<Token>> tokens = mapToWeightedTokens(entryFreq);
-        Collections.sort(tokens, getEntryOrder());
-
-        if (LOG.isDebugEnabled())
-            LOG.debug(
-                    "Writing entries frequency data to file \"" + entriesFile + "\".");
-
-        if (entriesFile.exists() && LOG.isWarnEnabled())
-            LOG.warn("The entries file already exists and will be overwritten.");
-
-        WeightedTokenSink entrySink = null;
-        final int n = tokens.size();
-        try {
-            entrySink = new WeightedTokenSink(
-                    new TSVSink(entriesFile, charset), entryEncoder);
-            int i = 0;
-            for (final Weighted<Token> tok : tokens) {
-                entrySink.write(tok);
-                if ((++i % PROGRESS_INTERVAL == 0 || i == n) && LOG.isInfoEnabled()) {
-                    LOG.info("Wrote " + i + "/" + n + " entries. ("
-                            + (int) (i * 100d / n) + "% complete)");
-                }
-            }
-        } finally {
-            if (entrySink != null) {
-                entrySink.flush();
-                entrySink.close();
-            }
-        }
-    }
-
-    private void writeFeatures(
-            final Int2IntMap featureFreq,
-            final Function<Integer, String> featureEncoder)
-            throws IOException {
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Sorting context frequency data.");
-        }
-
-        List<Weighted<Token>> tokens = mapToWeightedTokens(featureFreq);
-        Collections.sort(tokens, getFeatureOrder());
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Writing context frequency data to " + featuresFile + ".");
-        }
-        if (featuresFile.exists() && LOG.isWarnEnabled()) {
-            LOG.warn("The contexts file already exists and will be overwritten.");
-        }
-
-        WeightedTokenSink featureSink = null;
-        final int n = tokens.size();
-        try {
-            featureSink = new WeightedTokenSink(
-                    new TSVSink(featuresFile, charset), featureEncoder);
-            int i = 0;
-            for (final Weighted<Token> tok : tokens) {
-                featureSink.write(tok);
-                if ((++i % PROGRESS_INTERVAL == 0 || i == n) && LOG.isInfoEnabled()) {
-                    LOG.info("Wrote " + i + "/" + n + " contexts. ("
-                            + (int) (i * 100d / n) + "% complete)");
-                }
-            }
-        } finally {
-            if (featureSink != null) {
-                featureSink.flush();
-                featureSink.close();
-            }
-        }
-    }
-
-    private static <T> Comparator<Object2IntMap.Entry<T>> keyOrder(
-            final Comparator<T> inner) {
-        return new Comparator<Object2IntMap.Entry<T>>() {
-
-            @Override
-            public int compare(
-                    Object2IntMap.Entry<T> o1,
-                    Object2IntMap.Entry<T> o2) {
-                return inner.compare(o1.getKey(), o2.getKey());
-            }
-
-        };
-    }
-
-    private void writeEvents(
-            final Object2IntMap<TokenPair> entryFeatureFreq,
-            final Function<Integer, String> entryEncoder,
-            final Function<Integer, String> featureEncoder)
-            throws FileNotFoundException, IOException {
-
-        LOG.debug("Sorting feature pairs frequency data.");
-
-        List<Weighted<TokenPair>> tokens = mapToWeightedTokenPairs(
-                entryFeatureFreq);
-        Collections.sort(tokens, getEventOrder());
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(
-                    "Writing feature pairs frequency data to file  " + entryFeaturesFile + ".");
-        }
-        if (entryFeaturesFile.exists() && LOG.isWarnEnabled()) {
-            LOG.warn("The features file already exists and will be overwritten.");
-        }
-
-        WeightedTokenPairSink featureSink = null;
-        final int n = tokens.size();
-        try {
-            featureSink = new WeightedTokenPairSink(
-                    new TSVSink(entryFeaturesFile, charset),
-                    entryEncoder, featureEncoder);
-            int i = 0;
-            for (final Weighted<TokenPair> tok : tokens) {
-                featureSink.write(tok);
-                if ((++i % PROGRESS_INTERVAL == 0 || i == n) && LOG.isInfoEnabled()) {
-                    LOG.info("Wrote " + i + "/" + n + " features. ("
-                            + (int) (i * 100d / n) + "% complete)");
-                }
-            }
-        } finally {
-            if (featureSink != null) {
-                featureSink.flush();
-                featureSink.close();
-            }
-        }
-    }
-
+//    private static final Comparator<Int2IntMap.Entry> TOKEN_ID_ORDER = new Comparator<Int2IntMap.Entry>() {
+//
+//        @Override
+//        public int compare(Int2IntMap.Entry o1, Int2IntMap.Entry o2) {
+//            return o1.getIntKey() - o2.getIntKey();
+//        }
+//
+//    };
+//
+//    private List<Weighted<Token>> mapToWeightedTokens(Int2IntMap map) {
+//        List<Weighted<Token>> out = new ArrayList<Weighted<Token>>(map.size());
+//        for (Int2IntMap.Entry e : map.int2IntEntrySet()) {
+//            out.add(new Weighted<Token>(
+//                    new Token(e.getIntKey()), e.getIntValue()));
+//        }
+//        return out;
+//    }
+//
+//    private List<Weighted<TokenPair>> mapToWeightedTokenPairs(
+//            Object2IntMap<TokenPair> map) {
+//        List<Weighted<TokenPair>> out = new ArrayList<Weighted<TokenPair>>(map.size());
+//        for (Object2IntMap.Entry<TokenPair> e : map.object2IntEntrySet()) {
+//            out.add(new Weighted<TokenPair>(
+//                    e.getKey(), e.getIntValue()));
+//        }
+//        return out;
+//    }
+//    private void writeEntries(
+//            final Int2IntMap entryFreq,
+//            final Function<Integer, String> entryEncoder)
+//            throws IOException {
+//
+//        if (LOG.isDebugEnabled())
+//            LOG.debug("Sorting entries frequency data.");
+//
+//
+//        List<Weighted<Token>> tokens = mapToWeightedTokens(entryFreq);
+//        Collections.sort(tokens, getEntryOrder());
+//
+//        if (LOG.isDebugEnabled())
+//            LOG.debug(
+//                    "Writing entries frequency data to file \"" + entriesFile + "\".");
+//
+//        if (entriesFile.exists() && LOG.isWarnEnabled())
+//            LOG.warn("The entries file already exists and will be overwritten.");
+//
+//        WeightedTokenSink entrySink = null;
+//        final int n = tokens.size();
+//        try {
+//            entrySink = new WeightedTokenSink(
+//                    new TSVSink(entriesFile, charset), entryEncoder);
+//            int i = 0;
+//            for (final Weighted<Token> tok : tokens) {
+//                entrySink.write(tok);
+//                if ((++i % PROGRESS_INTERVAL == 0 || i == n) && LOG.isInfoEnabled()) {
+//                    LOG.info("Wrote " + i + "/" + n + " entries. ("
+//                            + (int) (i * 100d / n) + "% complete)");
+//                }
+//            }
+//        } finally {
+//            if (entrySink != null) {
+//                entrySink.flush();
+//                entrySink.close();
+//            }
+//        }
+//    }
+//    private void writeFeatures(
+//            final Int2IntMap featureFreq,
+//            final Function<Integer, String> featureEncoder)
+//            throws IOException {
+//
+//        if (LOG.isDebugEnabled()) {
+//            LOG.debug("Sorting context frequency data.");
+//        }
+//
+//        List<Weighted<Token>> tokens = mapToWeightedTokens(featureFreq);
+//        Collections.sort(tokens, getFeatureOrder());
+//
+//        if (LOG.isDebugEnabled()) {
+//            LOG.debug("Writing context frequency data to " + featuresFile + ".");
+//        }
+//        if (featuresFile.exists() && LOG.isWarnEnabled()) {
+//            LOG.warn("The contexts file already exists and will be overwritten.");
+//        }
+//
+//        WeightedTokenSink featureSink = null;
+//        final int n = tokens.size();
+//        try {
+//            featureSink = new WeightedTokenSink(
+//                    new TSVSink(featuresFile, charset), featureEncoder);
+//            int i = 0;
+//            for (final Weighted<Token> tok : tokens) {
+//                featureSink.write(tok);
+//                if ((++i % PROGRESS_INTERVAL == 0 || i == n) && LOG.isInfoEnabled()) {
+//                    LOG.info("Wrote " + i + "/" + n + " contexts. ("
+//                            + (int) (i * 100d / n) + "% complete)");
+//                }
+//            }
+//        } finally {
+//            if (featureSink != null) {
+//                featureSink.flush();
+//                featureSink.close();
+//            }
+//        }
+//    }
+//    private static <T> Comparator<Object2IntMap.Entry<T>> keyOrder(
+//            final Comparator<T> inner) {
+//        return new Comparator<Object2IntMap.Entry<T>>() {
+//
+//            @Override
+//            public int compare(
+//                    Object2IntMap.Entry<T> o1,
+//                    Object2IntMap.Entry<T> o2) {
+//                return inner.compare(o1.getKey(), o2.getKey());
+//            }
+//
+//        };
+//    }
+//
+//    private void writeEvents(
+//            final Object2IntMap<TokenPair> entryFeatureFreq,
+//            final Function<Integer, String> entryEncoder,
+//            final Function<Integer, String> featureEncoder)
+//            throws FileNotFoundException, IOException {
+//
+//        LOG.debug("Sorting feature pairs frequency data.");
+//
+//        List<Weighted<TokenPair>> tokens = mapToWeightedTokenPairs(
+//                entryFeatureFreq);
+//        Collections.sort(tokens, getEventOrder());
+//
+//        if (LOG.isDebugEnabled()) {
+//            LOG.debug(
+//                    "Writing feature pairs frequency data to file  " + entryFeaturesFile + ".");
+//        }
+//        if (entryFeaturesFile.exists() && LOG.isWarnEnabled()) {
+//            LOG.warn("The features file already exists and will be overwritten.");
+//        }
+//
+//        WeightedTokenPairSink featureSink = null;
+//        final int n = tokens.size();
+//        try {
+//            featureSink = new WeightedTokenPairSink(
+//                    new TSVSink(entryFeaturesFile, charset),
+//                    entryEncoder, featureEncoder);
+//            int i = 0;
+//            for (final Weighted<TokenPair> tok : tokens) {
+//                featureSink.write(tok);
+//                if ((++i % PROGRESS_INTERVAL == 0 || i == n) && LOG.isInfoEnabled()) {
+//                    LOG.info("Wrote " + i + "/" + n + " features. ("
+//                            + (int) (i * 100d / n) + "% complete)");
+//                }
+//            }
+//        } finally {
+//            if (featureSink != null) {
+//                featureSink.flush();
+//                featureSink.close();
+//            }
+//        }
+//    }
     /**
      * Method that performance a number of sanity checks on the parameterisation
      * of this class. It is necessary to do this because the the class can be
@@ -586,8 +610,7 @@ public class CountTask extends AbstractCommandTask implements Serializable {
     }
 
     public static void main(String[] args) throws Exception {
-        new CountTask().runCommand(args);
+        new CountCommand().runCommand(args);
     }
-
 
 }

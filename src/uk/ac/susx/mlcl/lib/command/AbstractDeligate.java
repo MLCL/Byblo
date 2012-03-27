@@ -28,40 +28,31 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
+package uk.ac.susx.mlcl.lib.command;
 
-package uk.ac.susx.mlcl.lib.tasks;
-
-import com.beust.jcommander.IParameterValidator;
-import com.beust.jcommander.ParameterException;
-import java.io.File;
-import java.io.IOException;
+import com.google.common.base.Objects;
+import java.io.Serializable;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  *
- * @author hamish
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class InputFileValidator implements IParameterValidator {
+public abstract class AbstractDeligate implements Serializable {
+
+    private static final Log LOG = LogFactory.getLog(AbstractDeligate.class);
+
+    public AbstractDeligate() {
+    }
 
     @Override
-    public void validate(String name, String value) throws ParameterException {
-        File file;
-        try {
-            file = new File(value).getCanonicalFile();
-        } catch (IOException ex) {
-            throw new ParameterException(ex);
-        }
-        if (!file.exists()) {
-            throw new ParameterException("Input file \"" + value + "\" does not exist.");
-        }
-        if (file.isDirectory()) {
-            throw new ParameterException("Input file \"" + value + "\" exists but is a directory.");
-        }
-        if (!file.isFile()) {
-            throw new ParameterException("Input file \"" + value + "\" is not an ordinary file.");
-        }
-        if (!file.canRead()) {
-            throw new ParameterException("Input file \"" + value + "\" is not readble.");
-        }
+    public final String toString() {
+        return toStringHelper().toString();
     }
-    
+
+    protected Objects.ToStringHelper toStringHelper() {
+        return Objects.toStringHelper(this);
+    }
+
 }

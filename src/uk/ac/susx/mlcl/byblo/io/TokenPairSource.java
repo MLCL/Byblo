@@ -31,6 +31,7 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import com.google.common.base.Function;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -56,7 +57,8 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see EntryFeatureSink
  */
-public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell> {
+public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell>, Closeable
+{
 
     private static final Log LOG = LogFactory.getLog(TokenPairSource.class);
 
@@ -194,5 +196,10 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell> {
 
     public double percentRead() throws IOException {
         return inner.percentRead();
+    }
+
+    @Override
+    public void close() throws IOException {
+        inner.close();
     }
 }

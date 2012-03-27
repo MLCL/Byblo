@@ -41,11 +41,11 @@ import java.util.Comparator;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.tasks.SortTask;
+import uk.ac.susx.mlcl.lib.tasks.SortTask;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.io.*;
-import uk.ac.susx.mlcl.lib.tasks.AbstractCommand;
+import uk.ac.susx.mlcl.lib.command.AbstractCommand;
 
 /**
  * Task that takes a single input file and sorts it according to some

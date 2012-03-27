@@ -52,10 +52,10 @@ import uk.ac.susx.mlcl.byblo.io.*;
 import static uk.ac.susx.mlcl.lib.Predicates2.*;
 import uk.ac.susx.mlcl.lib.*;
 import uk.ac.susx.mlcl.lib.io.*;
-import uk.ac.susx.mlcl.lib.tasks.AbstractCommandTask;
-import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
-import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
-import uk.ac.susx.mlcl.lib.tasks.TempFileFactoryConverter;
+import uk.ac.susx.mlcl.lib.AbstractCommandTask;
+import uk.ac.susx.mlcl.lib.command.InputFileValidator;
+import uk.ac.susx.mlcl.lib.command.OutputFileValidator;
+import uk.ac.susx.mlcl.lib.command.TempFileFactoryConverter;
 
 /**
  *

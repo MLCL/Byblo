@@ -28,31 +28,45 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.lib.tasks;
+package uk.ac.susx.mlcl.lib.command;
 
-import com.google.common.base.Objects;
-import java.io.Serializable;
+import com.beust.jcommander.IStringConverter;
+import com.beust.jcommander.ParameterException;
+import com.beust.jcommander.converters.FileConverter;
+import java.io.File;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 
 /**
- *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * An IStringConverter implementation for extending JCommander. Take a string 
+ * path and produces a TempFileFactory object for the production of temprory
+ * files.
+ * 
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-public abstract class AbstractDeligate implements Serializable {
+public class TempFileFactoryConverter implements IStringConverter<TempFileFactory> {
 
-    private static final Log LOG = LogFactory.getLog(AbstractDeligate.class);
+    private static final Log LOG = LogFactory.getLog(
+            TempFileFactoryConverter.class);
 
-    public AbstractDeligate() {
-    }
+    private final FileConverter inner = new FileConverter();
 
     @Override
-    public final String toString() {
-        return toStringHelper().toString();
+    public TempFileFactory convert(String value) {
+        File tmpDir = inner.convert(value);
+        if (!tmpDir.exists()) {
+            if (LOG.isDebugEnabled())
+                LOG.debug(
+                        "Attempting to create temporary directory: \"" + tmpDir + "\"");
+            if (!tmpDir.mkdirs()) {
+                throw new ParameterException(
+                        "Unable create temporary directory \"" + tmpDir + "\"");
+            }
+        } else if (!tmpDir.isDirectory()) {
+            throw new ParameterException("The given temporary directory \""
+                    + tmpDir + "\" already exists but it is not a directory.");
+        }
+        return new TempFileFactory(tmpDir);
     }
-
-    protected Objects.ToStringHelper toStringHelper() {
-        return Objects.toStringHelper(this);
-    }
-
 }

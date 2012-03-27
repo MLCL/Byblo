@@ -24,9 +24,9 @@ import uk.ac.susx.mlcl.lib.io.Files;
 import uk.ac.susx.mlcl.lib.io.Source;
 import uk.ac.susx.mlcl.lib.io.TSVSink;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
-import uk.ac.susx.mlcl.lib.tasks.AbstractCommandTask;
-import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
-import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
+import uk.ac.susx.mlcl.lib.AbstractCommandTask;
+import uk.ac.susx.mlcl.lib.command.InputFileValidator;
+import uk.ac.susx.mlcl.lib.command.OutputFileValidator;
 
 /**
  *

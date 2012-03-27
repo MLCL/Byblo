@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo;
+package uk.ac.susx.mlcl.byblo.commands;
 
 import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
 import java.io.File;
@@ -40,22 +40,21 @@ import org.junit.Test;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.lib.collect.ArrayUtil;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class CountTaskTest {
+public class CountCommandTest {
 
-    private static final String subject = CountTask.class.getName();
+    private static final String subject = CountCommand.class.getName();
 
     private void runWithAPI(File inInst, File outE, File outF, File outEF,
                             Charset charset, boolean preIndexEntries,
                             boolean preIndexFeatures)
             throws Exception {
-        final CountTask countTask = new CountTask();
+        final CountCommand countTask = new CountCommand();
         countTask.setInstancesFile(inInst);
         countTask.setEntriesFile(outE);
         countTask.setFeaturesFile(outF);
@@ -63,10 +62,7 @@ public class CountTaskTest {
         countTask.setCharset(charset);
         countTask.indexDeligate.setPreindexedTokens1(preIndexEntries);
         countTask.indexDeligate.setPreindexedTokens2(preIndexFeatures);
-        countTask.run();
-        while (countTask.isExceptionThrown()) {
-            countTask.throwException();
-        }
+        countTask.runCommand();
 
         assertTrue("Output files not created: " + outE, outE.exists());
         assertTrue("Output files not created: " + outF, outF.exists());
@@ -103,7 +99,7 @@ public class CountTaskTest {
 
         try {
             enableExistTrapping();
-            CountTask.main(args);
+            CountCommand.main(args);
         } finally {
             disableExitTrapping();
         }
@@ -295,4 +291,5 @@ public class CountTaskTest {
         runExpectingIllegalState(instIn, eOut, fOut, dir, DEFAULT_CHARSET, false,
                                  false);
     }
+
 }

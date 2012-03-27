@@ -28,12 +28,12 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo;
+package uk.ac.susx.mlcl.byblo.commands;
 
 import uk.ac.susx.mlcl.byblo.tasks.DeleteTask;
 import uk.ac.susx.mlcl.byblo.commands.IndexDeligatePair;
 import uk.ac.susx.mlcl.byblo.commands.CopyCommand;
-import uk.ac.susx.mlcl.byblo.tasks.MergeTask;
+import uk.ac.susx.mlcl.lib.tasks.MergeTask;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
@@ -42,24 +42,22 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayDeque;
-import java.util.EnumSet;
-import java.util.Properties;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.ChunkTask;
+import uk.ac.susx.mlcl.byblo.WeightSumReducerSink;
 import uk.ac.susx.mlcl.byblo.io.*;
-import uk.ac.susx.mlcl.byblo.tasks.SortTask;
+import uk.ac.susx.mlcl.byblo.tasks.CountTask;
+import uk.ac.susx.mlcl.lib.tasks.SortTask;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.io.*;
-import uk.ac.susx.mlcl.lib.tasks.AbstractParallelCommandTask;
-import uk.ac.susx.mlcl.lib.tasks.InputFileValidator;
-import uk.ac.susx.mlcl.lib.tasks.OutputFileValidator;
+import uk.ac.susx.mlcl.lib.AbstractParallelCommandTask;
+import uk.ac.susx.mlcl.lib.command.InputFileValidator;
+import uk.ac.susx.mlcl.lib.command.OutputFileValidator;
 import uk.ac.susx.mlcl.lib.tasks.Task;
 
 /**
@@ -67,9 +65,9 @@ import uk.ac.susx.mlcl.lib.tasks.Task;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Freqency count a structured input instance file.")
-public class ExternalCountTask extends AbstractParallelCommandTask {
+public class ExternalCountCommand extends AbstractParallelCommandTask {
 
-    private static final Log LOG = LogFactory.getLog(ExternalCountTask.class);
+    private static final Log LOG = LogFactory.getLog(ExternalCountCommand.class);
 
     private static final int DEFAULT_MAX_CHUNK_SIZE = ChunkTask.DEFAULT_MAX_CHUNK_SIZE;
 
@@ -84,6 +82,12 @@ public class ExternalCountTask extends AbstractParallelCommandTask {
     protected static final String KEY_SRC_FILE_B = "KEY_SRC_FILE_B";
 
     protected static final String KEY_DST_FILE = "KEY_DST_FILE";
+
+    protected static final String KEY_DST_ENTRIES_FILE = "KEY_DST_ENTRIES_FILE";
+
+    protected static final String KEY_DST_FEATURES_FILE = "KEY_DST_FEATURES_FILE";
+
+    protected static final String KEY_DST_EVENTS_FILE = "KEY_DST_EVENTS_FILE";
 
     protected static final String VALUE_TASK_TYPE_DELETE = "VALUE_TASK_TYPE_DELETE";
 
@@ -148,7 +152,7 @@ public class ExternalCountTask extends AbstractParallelCommandTask {
 
     private Queue<File> mergeEntryFeatureQueue;
 
-    public ExternalCountTask(
+    public ExternalCountCommand(
             final File instancesFile, final File entryFeaturesFile,
             final File entriesFile, final File featuresFile, Charset charset,
             int maxChunkSize) {
@@ -157,7 +161,7 @@ public class ExternalCountTask extends AbstractParallelCommandTask {
         setMaxChunkSize(maxChunkSize);
     }
 
-    public ExternalCountTask(
+    public ExternalCountCommand(
             final File instancesFile, final File entryFeaturesFile,
             final File entriesFile, final File featuresFile) {
         setInstancesFile(instancesFile);
@@ -166,7 +170,7 @@ public class ExternalCountTask extends AbstractParallelCommandTask {
         setFeaturesFile(featuresFile);
     }
 
-    public ExternalCountTask() {
+    public ExternalCountCommand() {
         super();
     }
 
@@ -327,13 +331,14 @@ public class ExternalCountTask extends AbstractParallelCommandTask {
         if (taskType.equals(VALUE_TASK_TYPE_DELETE)) {
             // not a sausage
         } else if (taskType.equals(VALUE_TASK_TYPE_COUNT)) {
-            final CountTask countTask = (CountTask) task;
-            submitSortEntriesTask(countTask.getEntriesFile());
-            submitSortFeaturesTask(countTask.getFeaturesFile());
-            submitSortEventsTask(countTask.getEntryFeaturesFile());
 
-            if (!DEBUG && !this.getInputFile().equals(countTask.getInputFile()))
-                submitDeleteTask(countTask.getInputFile());
+            submitSortEntriesTask(new File(p.getProperty(KEY_DST_ENTRIES_FILE)));
+            submitSortFeaturesTask(new File(p.getProperty(KEY_DST_FEATURES_FILE)));
+            submitSortEventsTask(new File(p.getProperty(KEY_DST_EVENTS_FILE)));
+
+            File src = new File(p.getProperty(KEY_SRC_FILE));
+            if (!DEBUG && !this.getInputFile().equals(src))
+                submitDeleteTask(src);
 
         } else if (taskType.equals(VALUE_TASK_TYPE_SORT)) {
 
@@ -407,20 +412,68 @@ public class ExternalCountTask extends AbstractParallelCommandTask {
             new DeleteTask(finalMerge).runTask();
     }
 
-    protected void submitCountTask(File in, File outEntries, File outFeatures, File outEvents) {
-        CountTask ct = new CountTask();
-        ct.setInstancesFile(in);
-        ct.setEntriesFile(outEntries);
-        ct.setFeaturesFile(outFeatures);
-        ct.setEntryFeaturesFile(outEvents);
-        ct.setCharset(getCharset());
-        ct.indexDeligate.setPreindexedTokens1(indexDeligate.isPreindexedTokens1());
-        ct.indexDeligate.setPreindexedTokens2(indexDeligate.isPreindexedTokens2());
-        ct.indexDeligate.setIndex1(indexDeligate.getIndex1());
-        ct.indexDeligate.setIndex2(indexDeligate.getIndex2());
+    private Comparator<Weighted<Token>> getEntryOrder() {
+        return indexDeligate.isPreindexedTokens1()
+               ? Weighted.recordOrder(Token.indexOrder())
+               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getEncoder1()));
+    }
 
-        ct.getProperties().setProperty(KEY_TASK_TYPE, VALUE_TASK_TYPE_COUNT);
-        submitTask(ct);
+    private Comparator<Weighted<Token>> getFeatureOrder() {
+        return indexDeligate.isPreindexedTokens2()
+               ? Weighted.recordOrder(Token.indexOrder())
+               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getEncoder2()));
+    }
+
+    private Comparator<Weighted<TokenPair>> getEventOrder() {
+        return (indexDeligate.isPreindexedTokens1() && indexDeligate.isPreindexedTokens2())
+               ? Weighted.recordOrder(TokenPair.indexOrder())
+               : Weighted.recordOrder(TokenPair.stringOrder(indexDeligate.getEncoder1(), indexDeligate.getEncoder2()));
+    }
+
+    protected void submitCountTask(File in, File outEntries, File outFeatures, File outEvents) throws IOException {
+
+
+        final TokenPairSource instanceSource = new TokenPairSource(
+                new TSVSource(in, charset),
+                indexDeligate.getDecoder1(), indexDeligate.getDecoder2());
+
+        WeightedTokenSink entrySink = new WeightedTokenSink(
+                new TSVSink(outEntries, charset),
+                indexDeligate.getEncoder1());
+
+        WeightedTokenSink featureSink = new WeightedTokenSink(
+                new TSVSink(outFeatures, charset),
+                indexDeligate.getEncoder2());
+
+
+        WeightedTokenPairSink eventsSink = new WeightedTokenPairSink(
+                new TSVSink(outEvents, charset),
+                indexDeligate.getEncoder1(), indexDeligate.getEncoder2());
+
+        CountTask task = new CountTask(
+                instanceSource, eventsSink, entrySink, featureSink,
+                getEventOrder(), getEntryOrder(), getFeatureOrder());
+
+        task.getProperties().setProperty(KEY_TASK_TYPE, VALUE_TASK_TYPE_COUNT);
+
+        task.getProperties().setProperty(KEY_SRC_FILE, in.toString());
+        task.getProperties().setProperty(KEY_DST_EVENTS_FILE, outEvents.toString());
+        task.getProperties().setProperty(KEY_DST_ENTRIES_FILE, outEntries.toString());
+        task.getProperties().setProperty(KEY_DST_FEATURES_FILE, outFeatures.toString());
+
+//        CountCommand ct = new CountCommand();
+//        ct.setInstancesFile(in);
+//        ct.setEntriesFile(outEntries);
+//        ct.setFeaturesFile(outFeatures);
+//        ct.setEntryFeaturesFile(outEvents);
+//        ct.setCharset(getCharset());
+//        ct.indexDeligate.setPreindexedTokens1(indexDeligate.isPreindexedTokens1());
+//        ct.indexDeligate.setPreindexedTokens2(indexDeligate.isPreindexedTokens2());
+//        ct.indexDeligate.setIndex1(indexDeligate.getIndex1());
+//        ct.indexDeligate.setIndex2(indexDeligate.getIndex2());
+
+//        ct.getProperties().setProperty(KEY_TASK_TYPE, VALUE_TASK_TYPE_COUNT);
+        submitTask(task);
     }
 
     protected void submitDeleteTask(File file) {

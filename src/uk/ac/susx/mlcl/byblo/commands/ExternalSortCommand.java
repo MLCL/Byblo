@@ -35,8 +35,8 @@ import uk.ac.susx.mlcl.byblo.commands.IndexDeligateSingle;
 import uk.ac.susx.mlcl.byblo.commands.IndexDeligatePair;
 import uk.ac.susx.mlcl.byblo.commands.FilePipeDeligate;
 import uk.ac.susx.mlcl.byblo.commands.CopyCommand;
-import uk.ac.susx.mlcl.byblo.tasks.MergeTask;
-import uk.ac.susx.mlcl.lib.tasks.TempFileFactoryConverter;
+import uk.ac.susx.mlcl.lib.tasks.MergeTask;
+import uk.ac.susx.mlcl.lib.command.TempFileFactoryConverter;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
@@ -57,10 +57,10 @@ import uk.ac.susx.mlcl.byblo.WeightSumReducerSink;
 import uk.ac.susx.mlcl.byblo.allpairs.Chunk;
 import uk.ac.susx.mlcl.byblo.allpairs.Chunker;
 import uk.ac.susx.mlcl.byblo.io.*;
-import uk.ac.susx.mlcl.byblo.tasks.SortTask;
+import uk.ac.susx.mlcl.lib.tasks.SortTask;
 import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.io.*;
-import uk.ac.susx.mlcl.lib.tasks.AbstractParallelCommandTask;
+import uk.ac.susx.mlcl.lib.AbstractParallelCommandTask;
 
 /**
  *

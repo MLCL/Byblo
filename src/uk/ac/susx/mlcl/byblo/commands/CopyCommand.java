@@ -35,7 +35,7 @@ import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
 import java.io.File;
-import uk.ac.susx.mlcl.lib.tasks.AbstractCommand;
+import uk.ac.susx.mlcl.lib.command.AbstractCommand;
 
 /**
  * Copy a source file to a destination.

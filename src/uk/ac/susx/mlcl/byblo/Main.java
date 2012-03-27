@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import uk.ac.susx.mlcl.byblo.commands.ExternalCountCommand;
 import uk.ac.susx.mlcl.byblo.commands.ExternalSortCommand;
 import uk.ac.susx.mlcl.byblo.commands.AbstractMergeCommand;
 import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
@@ -39,8 +40,8 @@ import java.util.Map;
 import uk.ac.susx.mlcl.byblo.commands.MergeTokenPairCommand;
 import uk.ac.susx.mlcl.byblo.commands.MergeWeightedTokenCommand;
 import uk.ac.susx.mlcl.byblo.commands.MergeWeightedTokenPairCommand;
-import uk.ac.susx.mlcl.lib.tasks.AbstractCommand;
-import uk.ac.susx.mlcl.lib.tasks.Command;
+import uk.ac.susx.mlcl.lib.command.AbstractCommand;
+import uk.ac.susx.mlcl.lib.command.Command;
 
 /**
  *
@@ -63,7 +64,7 @@ public class Main extends AbstractCommand {
         tmp.put("merge-events", MergeWeightedTokenCommand.class);
         tmp.put("knn-sims", SimsKnnCommand.class);
         tmp.put("allpairs", AllPairsCommand.class);
-        tmp.put("count", ExternalCountTask.class);
+        tmp.put("count", ExternalCountCommand.class);
         tmp.put("filter", FilterTask.class);
         SUBCOMMANDS = Collections.unmodifiableMap(tmp);
     }

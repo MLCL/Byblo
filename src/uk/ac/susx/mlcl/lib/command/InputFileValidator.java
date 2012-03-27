@@ -28,45 +28,40 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.lib.tasks;
 
-import com.beust.jcommander.IStringConverter;
+package uk.ac.susx.mlcl.lib.command;
+
+import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.ParameterException;
-import com.beust.jcommander.converters.FileConverter;
 import java.io.File;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.io.TempFileFactory;
+import java.io.IOException;
 
 /**
- * An IStringConverter implementation for extending JCommander. Take a string 
- * path and produces a TempFileFactory object for the production of temprory
- * files.
- * 
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
+ *
+ * @author hamish
  */
-public class TempFileFactoryConverter implements IStringConverter<TempFileFactory> {
-
-    private static final Log LOG = LogFactory.getLog(
-            TempFileFactoryConverter.class);
-
-    private final FileConverter inner = new FileConverter();
+public class InputFileValidator implements IParameterValidator {
 
     @Override
-    public TempFileFactory convert(String value) {
-        File tmpDir = inner.convert(value);
-        if (!tmpDir.exists()) {
-            if (LOG.isDebugEnabled())
-                LOG.debug(
-                        "Attempting to create temporary directory: \"" + tmpDir + "\"");
-            if (!tmpDir.mkdirs()) {
-                throw new ParameterException(
-                        "Unable create temporary directory \"" + tmpDir + "\"");
-            }
-        } else if (!tmpDir.isDirectory()) {
-            throw new ParameterException("The given temporary directory \""
-                    + tmpDir + "\" already exists but it is not a directory.");
+    public void validate(String name, String value) throws ParameterException {
+        File file;
+        try {
+            file = new File(value).getCanonicalFile();
+        } catch (IOException ex) {
+            throw new ParameterException(ex);
         }
-        return new TempFileFactory(tmpDir);
+        if (!file.exists()) {
+            throw new ParameterException("Input file \"" + value + "\" does not exist.");
+        }
+        if (file.isDirectory()) {
+            throw new ParameterException("Input file \"" + value + "\" exists but is a directory.");
+        }
+        if (!file.isFile()) {
+            throw new ParameterException("Input file \"" + value + "\" is not an ordinary file.");
+        }
+        if (!file.canRead()) {
+            throw new ParameterException("Input file \"" + value + "\" is not readble.");
+        }
     }
+    
 }

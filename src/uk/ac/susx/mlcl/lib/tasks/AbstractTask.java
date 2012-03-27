@@ -55,7 +55,7 @@ public abstract class AbstractTask implements Task {
 
     }
 
-    public State state = State.STOPPED;
+    private State state = State.STOPPED;
 
     public AbstractTask() {
     }

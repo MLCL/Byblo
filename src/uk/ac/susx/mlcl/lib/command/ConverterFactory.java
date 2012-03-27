@@ -2,8 +2,9 @@
  * Copyright (c) 2010, Hamish Morgan.
  * All Rights Reserved.
  */
-package uk.ac.susx.mlcl.lib.tasks;
+package uk.ac.susx.mlcl.lib.command;
 
+import uk.ac.susx.mlcl.lib.command.CharsetStringConverter;
 import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.IStringConverterFactory;
 import java.nio.charset.Charset;

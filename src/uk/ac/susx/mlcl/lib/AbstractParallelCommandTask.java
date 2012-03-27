@@ -28,8 +28,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.lib.tasks;
+package uk.ac.susx.mlcl.lib;
 
+import uk.ac.susx.mlcl.lib.AbstractCommandTask;
 import com.beust.jcommander.Parameter;
 import com.google.common.base.Objects;
 import java.util.ArrayDeque;
@@ -44,6 +45,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Checks;
+import uk.ac.susx.mlcl.lib.tasks.Task;
 
 /**
  *

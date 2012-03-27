@@ -4,6 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.tasks;
 
+import uk.ac.susx.mlcl.lib.tasks.MergeTask;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

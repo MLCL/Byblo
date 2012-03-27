@@ -44,8 +44,8 @@ import uk.ac.susx.mlcl.byblo.KFirstReducerSink;
 import uk.ac.susx.mlcl.byblo.allpairs.Chunk;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
-import uk.ac.susx.mlcl.byblo.tasks.MergeTask;
-import uk.ac.susx.mlcl.byblo.tasks.SortTask;
+import uk.ac.susx.mlcl.lib.tasks.MergeTask;
+import uk.ac.susx.mlcl.lib.tasks.SortTask;
 import uk.ac.susx.mlcl.lib.Comparators;
 
 /**

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.byblo.tasks;
+package uk.ac.susx.mlcl.lib.tasks;
 
 import com.google.common.base.Objects.ToStringHelper;
 import java.io.Closeable;
@@ -15,7 +15,6 @@ import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.io.Source;
-import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 
 /**
  *
@@ -125,10 +124,6 @@ public class SortTask<T> extends AbstractTask {
 
         if (getSink() instanceof Flushable)
             ((Flushable) getSink()).flush();
-//        if (snk instanceof Closeable)
-//            ((Closeable) snk).close();
-
-
     }
 
     @Override
@@ -143,5 +138,4 @@ public class SortTask<T> extends AbstractTask {
                 add("comparator", getComparator());
     }
 
-    
 }

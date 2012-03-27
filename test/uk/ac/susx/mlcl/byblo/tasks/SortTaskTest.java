@@ -4,6 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.tasks;
 
+import uk.ac.susx.mlcl.lib.tasks.SortTask;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;

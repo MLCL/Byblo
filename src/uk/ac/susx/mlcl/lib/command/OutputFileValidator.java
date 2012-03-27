@@ -28,55 +28,45 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.lib.tasks;
+package uk.ac.susx.mlcl.lib.command;
 
-import com.beust.jcommander.Parameter;
-import com.google.common.base.Objects;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import com.beust.jcommander.IParameterValidator;
+import com.beust.jcommander.ParameterException;
+import java.io.File;
+import java.io.IOException;
 
 /**
- *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * 
+ * @author hamish
  */
-public abstract class AbstractParallelCommand extends AbstractCommand {
+public class OutputFileValidator implements IParameterValidator {
 
-    private static final Log LOG = LogFactory.getLog(
-            AbstractParallelCommand.class);
-
-    protected static final int DEFAULT_NUM_THREADS =
-            Runtime.getRuntime().availableProcessors();
-
-    @Parameter(names = {"-t", "--threads"},
-               description = "Number of threads to use for parallel processing.")
-    private int nThreads = DEFAULT_NUM_THREADS;
-
-    public AbstractParallelCommand() {
-    }
-
-    public void setNumThreads(int nThreads) {
-        if (nThreads < 1) {
-            throw new IllegalArgumentException("nThreads < 1");
-        }
-
-        if (LOG.isWarnEnabled() && nThreads > Runtime.getRuntime().
-                availableProcessors()) {
-            LOG.warn("nThreads (" + nThreads + ") > availableProcessors (" + Runtime.
-                    getRuntime().
-                    availableProcessors() + ")");
-        }
-        if (nThreads != this.nThreads) {
-            this.nThreads = nThreads;
-        }
-    }
-
-    public final int getNumThreads() {
-        return nThreads;
+    public OutputFileValidator() {
     }
 
     @Override
-    protected Objects.ToStringHelper toStringHelper() {
-        return super.toStringHelper().
-                add("threads", getNumThreads());
+    public void validate(String name, String value) throws ParameterException {
+        File file;
+        try {
+            file = new File(value).getCanonicalFile();
+        } catch (IOException ex) {
+            throw new ParameterException(ex);
+        }
+        if (file.exists()) {
+            if (file.isDirectory()) {
+                throw new ParameterException("Output file \"" + value + "\" exists but is a directory.");
+            }
+            if (!file.isFile()) {
+                throw new ParameterException("Output file \"" + value + "\" exists but is not an ordinary file.");
+            }
+            if (!file.canWrite()) {
+                throw new ParameterException("Output file \"" + value + "\" is not writeable.");
+            }
+        } else {
+            if (file.getParentFile() == null || !file.getParentFile().canWrite()) {
+                throw new ParameterException("Output file \"" + value + "\" does not exist and the parent directory is not writable.");
+            }
+        }
     }
+    
 }

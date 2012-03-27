@@ -28,8 +28,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo;
+package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.commands.ExternalCountCommand;
 import uk.ac.susx.mlcl.lib.test.ExitTrapper;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
 import java.io.File;
@@ -41,6 +42,7 @@ import org.junit.Test;
 import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
 import static org.junit.Assert.*;
 import org.junit.Ignore;
+import uk.ac.susx.mlcl.byblo.Main;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
@@ -49,16 +51,16 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class ExternalCountTaskTest {
+public class ExternalCountCommandTest {
 
-    private static final String subject = ExternalCountTask.class.getName();
+    private static final String subject = ExternalCountCommand.class.getName();
 
     private void runWithAPI(
             File inInst, File outE, File outF,
             File outEF, Charset charset, int chunkSize,
             boolean preindexedEntries, boolean preindexedFeatures)
             throws Exception {
-        final ExternalCountTask countTask = new ExternalCountTask();
+        final ExternalCountCommand countTask = new ExternalCountCommand();
         countTask.setInstancesFile(inInst);
         countTask.setEntriesFile(outE);
         countTask.setFeaturesFile(outF);
