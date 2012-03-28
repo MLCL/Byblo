@@ -101,11 +101,11 @@ public abstract class AbstractSortCommand<T> extends AbstractCommand {
     }
 
    
-    public final Comparator<T> getComparator() {
+    public Comparator<T> getComparator() {
         return isReverse() ? Comparators.reverse(comparator) : comparator;
     }
 
-    public final void setComparator(Comparator<T> comparator) {
+    public void setComparator(Comparator<T> comparator) {
         Checks.checkNotNull("comparator", comparator);
         this.comparator = comparator;
     }
@@ -140,6 +140,7 @@ public abstract class AbstractSortCommand<T> extends AbstractCommand {
         if (LOG.isInfoEnabled())
             LOG.info("Completed memory sort.");
     }
+    
 
     @Override
     protected Objects.ToStringHelper toStringHelper() {

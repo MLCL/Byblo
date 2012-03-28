@@ -37,6 +37,7 @@ import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.Comparator;
@@ -217,19 +218,19 @@ public class CountCommand extends AbstractCommand implements Serializable {
 //    protected void initialiseTask() throws Exception {
 //        checkState();
 //    }
-    private Comparator<Weighted<Token>> getEntryOrder() {
+    private Comparator<Weighted<Token>> getEntryOrder() throws IOException {
         return indexDeligate.isPreindexedTokens1()
                ? Weighted.recordOrder(Token.indexOrder())
                : Weighted.recordOrder(Token.stringOrder(indexDeligate.getEncoder1()));
     }
 
-    private Comparator<Weighted<Token>> getFeatureOrder() {
+    private Comparator<Weighted<Token>> getFeatureOrder() throws IOException {
         return indexDeligate.isPreindexedTokens2()
                ? Weighted.recordOrder(Token.indexOrder())
                : Weighted.recordOrder(Token.stringOrder(indexDeligate.getEncoder2()));
     }
 
-    private Comparator<Weighted<TokenPair>> getEventOrder() {
+    private Comparator<Weighted<TokenPair>> getEventOrder() throws IOException {
         return (indexDeligate.isPreindexedTokens1() && indexDeligate.isPreindexedTokens2())
                ? Weighted.recordOrder(TokenPair.indexOrder())
                : Weighted.recordOrder(TokenPair.stringOrder(indexDeligate.getEncoder1(), indexDeligate.getEncoder2()));

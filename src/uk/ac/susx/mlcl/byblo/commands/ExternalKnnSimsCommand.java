@@ -53,40 +53,42 @@ import uk.ac.susx.mlcl.lib.Comparators;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Perform k-nearest-neighbours on a similarity file.")
-public class ExternalSimsKnnCommand extends ExternalSortWeightedTokenPiarCommand {
+public class ExternalKnnSimsCommand extends ExternalSortWeightedTokenPiarCommand {
 
-    private static final Log LOG = LogFactory.getLog(ExternalSimsKnnCommand.class);
+    private static final Log LOG = LogFactory.getLog(ExternalKnnSimsCommand.class);
 
     public static final int DEFAULT_K = 100;
 
     @Parameter(names = {"-k"},
     description = "The number of neighbours to produce for each base entry.")
-     int k = DEFAULT_K;
+    int k = DEFAULT_K;
 
     Comparator<Weighted<TokenPair>> classComparator =
-            Weighted.recordOrder(TokenPair.indexOrder());
+            Weighted.recordOrder(TokenPair.firstIndexOrder());
 
     Comparator<Weighted<TokenPair>> nearnessComparator =
             Comparators.reverse(Weighted.<TokenPair>weightOrder());
 
-    public ExternalSimsKnnCommand(File sourceFile, File destinationFile,
-                                  Charset charset, int maxChunkSize, int k,
-                                  boolean preindexedTokens1, boolean preindexedTokens2) {
+    public ExternalKnnSimsCommand(
+            File sourceFile, File destinationFile, Charset charset,
+            boolean preindexedTokens1, boolean preindexedTokens2,
+            int k, int maxChunkSize) {
         super(sourceFile, destinationFile, charset, preindexedTokens1,
               preindexedTokens2);
         setMaxChunkSize(maxChunkSize);
         setK(k);
     }
 
-    public ExternalSimsKnnCommand(File sourceFile, File destinationFile,
-                                  Charset charset, int k, boolean preindexedTokens1,
-                                  boolean preindexedTokens2) {
+    public ExternalKnnSimsCommand(
+            File sourceFile, File destinationFile, Charset charset,
+            boolean preindexedTokens1, boolean preindexedTokens2,
+            int k) {
         super(sourceFile, destinationFile, charset, preindexedTokens1,
               preindexedTokens2);
         setK(k);
     }
 
-    public ExternalSimsKnnCommand() {
+    public ExternalKnnSimsCommand() {
         super();
     }
 

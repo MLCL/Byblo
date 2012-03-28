@@ -12,6 +12,10 @@ import it.unimi.dsi.fastutil.objects.ObjectList;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.commands.AbstractSortCommand;
+import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
 import uk.ac.susx.mlcl.lib.io.Files;
 import uk.ac.susx.mlcl.lib.io.TSVSink;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
@@ -22,28 +26,22 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
  */
 public class Enumerators {
 
+    private static final Log LOG = LogFactory.getLog(Enumerators.class);
+    
     private Enumerators() {
     }
 
-    private static final class InstanceHolder {
-        private static final Enumerator<String> onTheFlyStringEnumerator 
-                = new SimpleEnumerator<String>();
-
-        private InstanceHolder() {
-        }
-    }
     
     
     public static Enumerator<String> newDefaultStringEnumerator() {
-//        return InstanceHolder.onTheFlyStringEnumerator;
-        return new SimpleEnumerator<String>();
+        SimpleEnumerator<String> instance = new SimpleEnumerator<String>();
+        instance.index(FilterCommand.FILTERED_STRING);
+        return instance;
     } 
-//    public static Enumerator<String> newSimpleStringEnumerator() {
-//        return new SimpleEnumerator<String>();
-//    }
 
     public static void saveStringEnumerator(Enumerator<String> strEnum, File file) throws IOException {
 //        Files.writeSerialized(strEnum, file, true);
+        LOG.info("Saving string index: " + file);
         
         TSVSink out = new TSVSink(file, Files.DEFAULT_CHARSET);
         
@@ -57,7 +55,9 @@ public class Enumerators {
     }
 
     @SuppressWarnings("unchecked")
-    public static Enumerator<String> loadStringEnumerator(File file) throws IOException, ClassNotFoundException {
+    public static Enumerator<String> loadStringEnumerator(File file) throws IOException {
+        
+        LOG.info("Loading string index: " + file);
         
         ObjectArrayList<String> indexToObj = new ObjectArrayList<String>();
         Object2IntMap<String> objToIndex = new Object2IntOpenHashMap<String>();

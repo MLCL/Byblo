@@ -30,18 +30,17 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.commands.ExternalSimsKnnCommand;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.commands.SortWeightedTokenPairCommand;
 import uk.ac.susx.mlcl.byblo.io.*;
-import uk.ac.susx.mlcl.byblo.tasks.KnnTask;
 import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.io.*;
 
@@ -53,31 +52,49 @@ import uk.ac.susx.mlcl.lib.io.*;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Perform k-nearest-neighbours on a similarity file.")
-public class SimsKnnCommand extends SortWeightedTokenPairCommand {
+public class KnnSimsCommand extends SortWeightedTokenPairCommand {
 
-    private static final Log LOG = LogFactory.getLog(SimsKnnCommand.class);
+    private static final Log LOG = LogFactory.getLog(KnnSimsCommand.class);
 
     @Parameter(names = {"-k"},
     description = "The maximum number of neighbours to produce per word.")
-    private int k = ExternalSimsKnnCommand.DEFAULT_K;
+    private int k = ExternalKnnSimsCommand.DEFAULT_K;
 
     private Comparator<Weighted<TokenPair>> classComparator =
-            Weighted.recordOrder(TokenPair.indexOrder());
+            Weighted.recordOrder(TokenPair.firstIndexOrder());
 
     private Comparator<Weighted<TokenPair>> nearnessComparator =
             Comparators.reverse(Weighted.<TokenPair>weightOrder());
 
-    public SimsKnnCommand(File sourceFile, File destinationFile, Charset charset,
+    public KnnSimsCommand(File sourceFile, File destinationFile, Charset charset,
                           boolean preindexedTokens1, boolean preindexedTokens2, int k) {
         super(sourceFile, destinationFile, charset, preindexedTokens1,
               preindexedTokens2);
-        setComparator(Comparators.fallback(
+        super.setComparator(Comparators.fallback(
                 classComparator, nearnessComparator));
         setK(k);
     }
 
-    public SimsKnnCommand() {
+    public KnnSimsCommand() {
         setK(100);
+    }
+
+    public Comparator<Weighted<TokenPair>> getCombinedComparator() {
+        return Comparators.fallback(getClassComparator(), getNearnessComparator());
+    }
+
+    @Override
+    public Comparator<Weighted<TokenPair>> getComparator() {
+        return isReverse()
+               ? Comparators.reverse(getCombinedComparator())
+               : getCombinedComparator();
+    }
+
+    @Override
+    @Deprecated
+    public void setComparator(Comparator<Weighted<TokenPair>> comparator) {
+        throw new UnsupportedOperationException(
+                "Class and nearness comparators should be set instead.");
     }
 
     public Comparator<Weighted<TokenPair>> getClassComparator() {
@@ -87,8 +104,6 @@ public class SimsKnnCommand extends SortWeightedTokenPairCommand {
     public void setClassComparator(
             Comparator<Weighted<TokenPair>> classComparator) {
         this.classComparator = classComparator;
-        setComparator(Comparators.fallback(
-                classComparator, nearnessComparator));
     }
 
     public Comparator<Weighted<TokenPair>> getNearnessComparator() {
@@ -98,8 +113,6 @@ public class SimsKnnCommand extends SortWeightedTokenPairCommand {
     public void setNearnessComparator(
             Comparator<Weighted<TokenPair>> nearnessComparator) {
         this.nearnessComparator = nearnessComparator;
-        setComparator(Comparators.fallback(
-                classComparator, nearnessComparator));
     }
 
     public final int getK() {
@@ -113,34 +126,52 @@ public class SimsKnnCommand extends SortWeightedTokenPairCommand {
     }
 
     @Override
-    public void runCommand() throws Exception {
-        if (LOG.isInfoEnabled())
-            LOG.info("Running memory K-Nearest-Neighbours from \"" + getFilesDeligate().getSourceFile()
-                    + "\" to \"" + getFilesDeligate().getDestinationFile() + "\".");
-
-        Source<Weighted<TokenPair>> src = openSource(getFilesDeligate().getSourceFile());
-
-//        final List<Weighted<TokenPair>> items = IOUtil.readAll(src);
-//        Collections.sort(items, getComparator());
-//
-        Sink<Weighted<TokenPair>> snk = openSink(getFilesDeligate().getDestinationFile());
-
-        KnnTask<Weighted<TokenPair>> task = new KnnTask<Weighted<TokenPair>>();
-        task.setSink(snk);
-        task.setSource(src);
-        task.setClassComparator(classComparator);
-        task.setNearnessComparator(nearnessComparator);
-        task.setK(k);
-
-        task.run();
-
-        if (task.isExceptionThrown())
-            task.throwException();
-
-        if (LOG.isInfoEnabled())
-            LOG.info("Completed memory K-Nearest-Neighbours.");
-
+    protected Sink<Weighted<TokenPair>> openSink(File file) throws FileNotFoundException, IOException {
+        return new KFirstReducerSink<Weighted<TokenPair>>(
+                super.openSink(file), classComparator, k);
     }
+    
+    
+//
+//    @Override
+//    public void runCommand() throws Exception {
+//        if (LOG.isInfoEnabled())
+//            LOG.info("Running memory K-Nearest-Neighbours from \"" + getFilesDeligate().getSourceFile()
+//                    + "\" to \"" + getFilesDeligate().getDestinationFile() + "\".");
+//
+//        Source<Weighted<TokenPair>> src = openSource(getFilesDeligate().getSourceFile());
+//
+////        final List<Weighted<TokenPair>> items = IOUtil.readAll(src);
+////        Collections.sort(items, getComparator());
+////
+//        Sink<Weighted<TokenPair>> snk = openSink(getFilesDeligate().getDestinationFile());
+//        snk = new KFirstReducerSink<Weighted<TokenPair>>(snk, classComparator, k);
+//
+//        SortTask<Weighted<TokenPair>> task = new SortTask<Weighted<TokenPair>>();
+//        task.setComparator(getComparator());
+//        task.setSource(src);
+//        task.setSink(snk);
+//        task.run();
+//
+//        while (task.isExceptionThrown())
+//            task.throwException();
+////        
+////        KnnTask<Weighted<TokenPair>> task = new KnnTask<Weighted<TokenPair>>();
+////        task.setSink(snk);
+////        task.setSource(src);
+////        task.setClassComparator(classComparator);
+////        task.setNearnessComparator(nearnessComparator);
+////        task.setK(k);
+////
+////        task.run();
+////
+////        if (task.isExceptionThrown())
+////            task.throwException();
+//
+//        if (LOG.isInfoEnabled())
+//            LOG.info("Completed memory K-Nearest-Neighbours.");
+//
+//    }
 
     @Override
     protected Objects.ToStringHelper toStringHelper() {

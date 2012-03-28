@@ -89,6 +89,10 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
         setNumThreads(DEFAULT_NUM_THREADS);
     }
 
+    public ThreadedApssTask() {
+    }
+    
+
     public int getMaxChunkSize() {
         return maxChunkSize;
     }

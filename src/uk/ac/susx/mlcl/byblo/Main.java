@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
-import uk.ac.susx.mlcl.byblo.commands.SimsKnnCommand;
+import uk.ac.susx.mlcl.byblo.commands.KnnSimsCommand;
 import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
 import uk.ac.susx.mlcl.byblo.commands.ExternalCountCommand;
 import uk.ac.susx.mlcl.byblo.commands.AbstractExternalSortCommand;
@@ -66,7 +66,7 @@ public class Main extends AbstractCommand {
         tmp.put("merge-ents", MergeWeightedTokenPairCommand.class);
         tmp.put("merge-feats", MergeWeightedTokenCommand.class);
         tmp.put("merge-events", MergeWeightedTokenCommand.class);
-        tmp.put("knn-sims", SimsKnnCommand.class);
+        tmp.put("knn-sims", KnnSimsCommand.class);
         tmp.put("allpairs", AllPairsCommand.class);
         tmp.put("count", ExternalCountCommand.class);
         tmp.put("filter", FilterCommand.class);

@@ -44,9 +44,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.tasks.InvertedApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.ThreadedApssTask;
-import uk.ac.susx.mlcl.byblo.commands.IndexDeligatePair;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.measure.*;
+import uk.ac.susx.mlcl.byblo.tasks.NaiveApssTask;
+import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.DoubleConverter;
 import uk.ac.susx.mlcl.lib.io.*;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
@@ -138,8 +139,33 @@ public class AllPairsCommand extends AbstractCommand {
     converter = DoubleConverter.class)
     private double minkP = 2;
 
+    public enum Algorithm {
+
+        Naive,
+        Inverted
+
+    }
+
+    @Parameter(names = {"--algorithm"},
+    hidden = true,
+    description = "APPS algorithm to use.")
+    private Algorithm algorithm = Algorithm.Inverted;
+
+    @Parameter(names = {"--serial"},
+    hidden = true,
+    description = "Run in serial mode (i.e disable threading entirely)")
+    private Boolean serial = Boolean.FALSE;
+
     @ParametersDelegate
-    protected IndexDeligatePair indexDeligate = new IndexDeligatePair();
+    private IndexDeligatePair indexDeligate = new IndexDeligatePair();
+
+    public AllPairsCommand(File entriesFile, File featuresFile, File entryFeaturesFile, File outputFile, Charset charset) {
+        setEntryFeaturesFile(entryFeaturesFile);
+        setEntriesFile(entriesFile);
+        setFeaturesFile(featuresFile);
+        setOutputFile(outputFile);
+        setCharset(charset);
+    }
 
     public AllPairsCommand() {
     }
@@ -179,19 +205,19 @@ public class AllPairsCommand extends AbstractCommand {
 
         if (LOG.isInfoEnabled()) {
             LOG.info(
-                    "Running all-pairs similarity search from \"" + entryFeaturesFile + "\" to \"" + outputFile + "\"");
+                    "Running all-pairs similarity search from \"" + getEntryFeaturesFile() + "\" to \"" + getOutputFile() + "\"");
         }
 
         final Map<String, Class<? extends Proximity>> classLookup =
                 buildMeasureClassLookupTable();
 
         Class<? extends Proximity> measureClass = null;
-        if (classLookup.containsKey(measureName.toLowerCase().trim())) {
-            measureClass = classLookup.get(measureName.toLowerCase().trim());
+        if (classLookup.containsKey(getMeasureName().toLowerCase().trim())) {
+            measureClass = classLookup.get(getMeasureName().toLowerCase().trim());
         } else {
             @SuppressWarnings("unchecked")
             Class<? extends Proximity> clazz =
-                    (Class<? extends Proximity>) Class.forName(measureName);
+                    (Class<? extends Proximity>) Class.forName(getMeasureName());
             measureClass = clazz;
         }
 
@@ -200,12 +226,12 @@ public class AllPairsCommand extends AbstractCommand {
 
         // Parameterise those measures that require them
         if (prox instanceof Lp) {
-            ((Lp) prox).setP(minkP);
+            ((Lp) prox).setP(getMinkP());
         } else if (prox instanceof Lee) {
-            ((Lee) prox).setAlpha(leeAlpha);
+            ((Lee) prox).setAlpha(getLeeAlpha());
         } else if (prox instanceof CrMi) {
-            ((CrMi) prox).setBeta(crmiBeta);
-            ((CrMi) prox).setGamma(crmiGamma);
+            ((CrMi) prox).setBeta(getCrmiBeta());
+            ((CrMi) prox).setGamma(getCrmiGamma());
         }
 
 //        Enumerator<String> strIndex = Enumerators.newDefaultStringEnumerator();
@@ -219,12 +245,12 @@ public class AllPairsCommand extends AbstractCommand {
         if (prox instanceof AbstractMIProximity) {
             try {
                 if (LOG.isInfoEnabled()) {
-                    LOG.info("Loading features file " + featuresFile);
+                    LOG.info("Loading features file " + getFeaturesFile());
                 }
 
                 WeightedTokenSource features = new WeightedTokenSource(
-                        new TSVSource(featuresFile, charset),
-                        indexDeligate.getDecoder2());
+                        new TSVSource(getFeaturesFile(), getCharset()),
+                        getIndexDeligate().getDecoder2());
                 AbstractMIProximity bmip = ((AbstractMIProximity) prox);
                 bmip.setFeatureFrequencies(features.readAllAsArray());
                 bmip.setFeatureFrequencySum(features.getWeightSum());
@@ -237,12 +263,12 @@ public class AllPairsCommand extends AbstractCommand {
             try {
                 if (LOG.isInfoEnabled()) {
                     LOG.info("Loading entries file for "
-                            + "KendalTau.numFeatures: " + featuresFile);
+                            + "KendalTau.numFeatures: " + getFeaturesFile());
                 }
 
                 WeightedTokenSource features = new WeightedTokenSource(
-                        new TSVSource(featuresFile, charset),
-                        indexDeligate.getDecoder2());
+                        new TSVSource(getFeaturesFile(), getCharset()),
+                        getIndexDeligate().getDecoder2());
                 features.readAll();
 
                 ((KendallTau) prox).setNumFeatures(features.getCardinality());
@@ -253,7 +279,7 @@ public class AllPairsCommand extends AbstractCommand {
         }
 
         // Swap the proximity measure inputs if required
-        if (measureReversed) {
+        if (isMeasureReversed()) {
             prox = new ReversedProximity(prox);
         }
 
@@ -263,30 +289,48 @@ public class AllPairsCommand extends AbstractCommand {
         // in the file. Also this allows for the possibility of having differnt
         // files, e.g compare fruit words with cake words
         final WeightedTokenPairVectorSource sourceA = new WeightedTokenPairSource(
-                new TSVSource(entryFeaturesFile, charset),
-                indexDeligate.getDecoder1(),
-                indexDeligate.getDecoder2()).getVectorSource();
+                new TSVSource(getEntryFeaturesFile(), getCharset()),
+                getIndexDeligate().getDecoder1(),
+                getIndexDeligate().getDecoder2()).getVectorSource();
+        
         final WeightedTokenPairVectorSource sourceB = new WeightedTokenPairSource(
-                new TSVSource(entryFeaturesFile, charset),
-                indexDeligate.getDecoder1(),
-                indexDeligate.getDecoder2()).getVectorSource();
+                new TSVSource(getEntryFeaturesFile(), getCharset()),
+                getIndexDeligate().getDecoder1(),
+                getIndexDeligate().getDecoder2()).getVectorSource();
 
         // Create a sink object that will act as a recipient for all pairs that
         // are produced by the algorithm.
 
         final Sink<Weighted<TokenPair>> sink =
                 new WeightedTokenPairSink(
-                new TSVSink(outputFile, charset),
-                indexDeligate.getEncoder1(),
-                indexDeligate.getEncoder2());
+                new TSVSink(getOutputFile(), getCharset()),
+                getIndexDeligate().getEncoder1(),
+                getIndexDeligate().getEncoder1());
 
-        // Instantiate the all-pairs algorithm as given on the command line.
-        ThreadedApssTask<Lexer.Tell> apss = new ThreadedApssTask<Lexer.Tell>(
-                sourceA, sourceB, sink);
-        apss.setInnerAlgorithm(InvertedApssTask.class);
 
+        NaiveApssTask<Lexer.Tell> apss = null;
+
+
+        if (getSerial()) {
+            apss = getAlgorithm() == Algorithm.Inverted
+                   ? new InvertedApssTask<Lexer.Tell>()
+                   : new NaiveApssTask<Lexer.Tell>();
+        } else {
+
+            // Instantiate the all-pairs algorithm as given on the command line.
+            ThreadedApssTask<Lexer.Tell> tapss = new ThreadedApssTask<Lexer.Tell>();
+            tapss.setInnerAlgorithm(
+                    getAlgorithm() == Algorithm.Inverted
+                    ? InvertedApssTask.class
+                    : NaiveApssTask.class);
+
+            tapss.setNumThreads(getnThreads());
+            tapss.setMaxChunkSize(getChunkSize());
+            apss = tapss;
+        }
         // Parameterise the all-pairs algorithm
-        apss.setNumThreads(nThreads);
+        apss.setSourceA(sourceA);
+        apss.setSourceB(sourceB);
         apss.setSink(sink);
 
 //        prox.setFilteredFeatureId(getEntryDecoder().apply(FilterTask.FILTERED_STRING));
@@ -294,21 +338,20 @@ public class AllPairsCommand extends AbstractCommand {
         prox.setFilteredFeatureId(Integer.MAX_VALUE);
 
         apss.setMeasure(prox);
-        apss.setMaxChunkSize(chunkSize);
 
         List<Predicate<Weighted<TokenPair>>> pairFilters =
                 new ArrayList<Predicate<Weighted<TokenPair>>>();
 
-        if (minSimilarity != Double.NEGATIVE_INFINITY) {
+        if (getMinSimilarity() != Double.NEGATIVE_INFINITY) {
             pairFilters.add(Weighted.<TokenPair>greaterThanOrEqualTo(
-                    minSimilarity));
+                    getMinSimilarity()));
         }
 
-        if (maxSimilarity != Double.POSITIVE_INFINITY) {
-            pairFilters.add(Weighted.<TokenPair>lessThanOrEqualTo(maxSimilarity));
+        if (getMaxSimilarity() != Double.POSITIVE_INFINITY) {
+            pairFilters.add(Weighted.<TokenPair>lessThanOrEqualTo(getMaxSimilarity()));
         }
 
-        if (!outputIdentityPairs) {
+        if (!isOutputIdentityPairs()) {
             pairFilters.add(Predicates.not(Predicates.compose(
                     TokenPair.identity(), Weighted.<TokenPair>recordFunction())));
         }
@@ -321,6 +364,9 @@ public class AllPairsCommand extends AbstractCommand {
         }
 
         apss.run();
+        
+        if(apss.isExceptionThrown())
+            apss.throwException();
 
         if (LOG.isInfoEnabled()) {
             LOG.info("Completed all-pairs similarity search.");
@@ -330,22 +376,188 @@ public class AllPairsCommand extends AbstractCommand {
     @Override
     protected ToStringHelper toStringHelper() {
         return super.toStringHelper().
-                add("eventsIn", entryFeaturesFile).
-                add("entriesIn", entriesFile).
-                add("featuresIn", featuresFile).
-                add("simsOut", outputFile).
-                add("charset", charset).
-                add("chunkSize", chunkSize).
-                add("threads", nThreads).
-                add("minSimilarity", minSimilarity).
-                add("maxSimilarity", maxSimilarity).
-                add("outputIdentityPairs", outputIdentityPairs).
-                add("measure", measureName).
-                add("measureReversed", measureReversed).
-                add("leeAlpha", leeAlpha).
-                add("crmiBeta", crmiBeta).
-                add("crmiGamma", crmiGamma).
-                add("minkP", minkP);
+                add("eventsIn", getEntryFeaturesFile()).
+                add("entriesIn", getEntriesFile()).
+                add("featuresIn", getFeaturesFile()).
+                add("simsOut", getOutputFile()).
+                add("charset", getCharset()).
+                add("chunkSize", getChunkSize()).
+                add("threads", getnThreads()).
+                add("minSimilarity", getMinSimilarity()).
+                add("maxSimilarity", getMaxSimilarity()).
+                add("outputIdentityPairs", isOutputIdentityPairs()).
+                add("measure", getMeasureName()).
+                add("measureReversed", isMeasureReversed()).
+                add("leeAlpha", getLeeAlpha()).
+                add("crmiBeta", getCrmiBeta()).
+                add("crmiGamma", getCrmiGamma()).
+                add("minkP", getMinkP());
+    }
+
+    public Algorithm getAlgorithm() {
+        return algorithm;
+    }
+
+    public void setAlgorithm(Algorithm algorithm) {
+        Checks.checkNotNull("algorithm", algorithm);
+        this.algorithm = algorithm;
+    }
+
+    public Boolean getSerial() {
+        return serial;
+    }
+
+    public void setSerial(Boolean serial) {
+        Checks.checkNotNull("serial", serial);
+        this.serial = serial;
+    }
+
+    public final File getEntryFeaturesFile() {
+        return entryFeaturesFile;
+    }
+
+    public final void setEntryFeaturesFile(File entryFeaturesFile) {
+        Checks.checkNotNull("entryFeaturesFile", entryFeaturesFile);
+        this.entryFeaturesFile = entryFeaturesFile;
+    }
+
+    public final File getFeaturesFile() {
+        return featuresFile;
+    }
+
+    public final void setFeaturesFile(File featuresFile) {
+        Checks.checkNotNull("featuresFile", featuresFile);
+        this.featuresFile = featuresFile;
+    }
+
+    public File getEntriesFile() {
+        return entriesFile;
+    }
+
+    public final void setEntriesFile(File entriesFile) {
+        Checks.checkNotNull("entriesFile", entriesFile);
+        this.entriesFile = entriesFile;
+    }
+
+    public final File getOutputFile() {
+        return outputFile;
+    }
+
+    public final void setOutputFile(File outputFile) {
+        Checks.checkNotNull("outputFile", outputFile);
+        this.outputFile = outputFile;
+    }
+
+    public final Charset getCharset() {
+        return charset;
+    }
+
+    public final void setCharset(Charset charset) {
+        Checks.checkNotNull("charset", charset);
+        this.charset = charset;
+    }
+
+    public final int getChunkSize() {
+        return chunkSize;
+    }
+
+    public final void setChunkSize(int chunkSize) {
+        Checks.checkRangeIncl("chunkSize", chunkSize, 1, Integer.MAX_VALUE);
+        this.chunkSize = chunkSize;
+    }
+
+    public final int getnThreads() {
+        return nThreads;
+    }
+
+    public final void setnThreads(int nThreads) {
+        Checks.checkRangeIncl("nThreads", nThreads, 1, Integer.MAX_VALUE);
+        this.nThreads = nThreads;
+    }
+
+    public final double getMinSimilarity() {
+        return minSimilarity;
+    }
+
+    public final void setMinSimilarity(double minSimilarity) {
+        Checks.checkRangeIncl("minSimilarity", minSimilarity, 0, Double.POSITIVE_INFINITY);
+        this.minSimilarity = minSimilarity;
+    }
+
+    public final double getMaxSimilarity() {
+        return maxSimilarity;
+    }
+
+    public final void setMaxSimilarity(double maxSimilarity) {
+        Checks.checkRangeIncl("maxSimilarity", maxSimilarity, 0, Double.POSITIVE_INFINITY);
+        this.maxSimilarity = maxSimilarity;
+    }
+
+    public final boolean isOutputIdentityPairs() {
+        return outputIdentityPairs;
+    }
+
+    public final void setOutputIdentityPairs(boolean outputIdentityPairs) {
+        this.outputIdentityPairs = outputIdentityPairs;
+    }
+
+    public final String getMeasureName() {
+        return measureName;
+    }
+
+    public final void setMeasureName(String measureName) {
+        Checks.checkNotNull("measureName", measureName);
+        this.measureName = measureName;
+    }
+
+    public final boolean isMeasureReversed() {
+        return measureReversed;
+    }
+
+    public final void setMeasureReversed(boolean measureReversed) {
+        this.measureReversed = measureReversed;
+    }
+
+    public final double getLeeAlpha() {
+        return leeAlpha;
+    }
+
+    public final void setLeeAlpha(double leeAlpha) {
+        Checks.checkRangeIncl("leeAlpha", leeAlpha, 0, 1);
+        this.leeAlpha = leeAlpha;
+    }
+
+    public final double getCrmiBeta() {
+        return crmiBeta;
+    }
+
+    public final void setCrmiBeta(double crmiBeta) {
+        this.crmiBeta = crmiBeta;
+    }
+
+    public final double getCrmiGamma() {
+        return crmiGamma;
+    }
+
+    public final void setCrmiGamma(double crmiGamma) {
+        this.crmiGamma = crmiGamma;
+    }
+
+    public final double getMinkP() {
+        return minkP;
+    }
+
+    public final void setMinkP(double minkP) {
+        this.minkP = minkP;
+    }
+
+    public final IndexDeligatePair getIndexDeligate() {
+        return indexDeligate;
+    }
+
+    public final void setIndexDeligate(IndexDeligatePair indexDeligate) {
+        Checks.checkNotNull("indexDeligate", indexDeligate);
+        this.indexDeligate = indexDeligate;
     }
 
 }

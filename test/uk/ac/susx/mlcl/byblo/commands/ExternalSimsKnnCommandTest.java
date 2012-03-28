@@ -49,7 +49,7 @@ import uk.ac.susx.mlcl.lib.io.TempFileFactory;
  */
 public class ExternalSimsKnnCommandTest {
 
-    private static final String subject = ExternalSimsKnnCommand.class.getName();
+    private static final String subject = ExternalKnnSimsCommand.class.getName();
 
     @Test//(timeout = 2000)
     public void testRunOnFruit() throws Exception {
@@ -62,7 +62,7 @@ public class ExternalSimsKnnCommandTest {
         assertTrue(in.exists());
         assertTrue(in.length() > 0);
 
-        final ExternalSimsKnnCommand knnTask = new ExternalSimsKnnCommand();
+        final ExternalKnnSimsCommand knnTask = new ExternalKnnSimsCommand();
 
         knnTask.getFileDeligate().setSourceFile(in);
         knnTask.getFileDeligate().setDestinationFile(out);

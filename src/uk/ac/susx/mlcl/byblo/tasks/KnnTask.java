@@ -9,7 +9,7 @@ import java.io.Flushable;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import uk.ac.susx.mlcl.byblo.commands.ExternalSimsKnnCommand;
+import uk.ac.susx.mlcl.byblo.commands.ExternalKnnSimsCommand;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
@@ -28,7 +28,7 @@ public class KnnTask<T> extends AbstractTask {
 
     private Sink<T> sink;
 
-    private int k = ExternalSimsKnnCommand.DEFAULT_K;
+    private int k = ExternalKnnSimsCommand.DEFAULT_K;
 
     private Comparator<T> classComparator;
 

@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Random;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -105,6 +106,7 @@ public class TestConstants {
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.neighs");
 
     public static final File TEST_OUTPUT_DIR = new File(TEST_DATA_DIR, "out");
+
     public static final File TEST_TMP_DIR = new File(TEST_OUTPUT_DIR, "tmp");
 
     public static final Charset DEFAULT_CHARSET = Files.DEFAULT_CHARSET;
@@ -131,6 +133,15 @@ public class TestConstants {
         out.flush();
         out.close();
         return file;
+    }
+
+    public static void assertValidInputFiles(File... files) {
+        for (File file : files) {
+            assertTrue("Input file is null", file != null);
+            assertTrue("Input file does not exist:" + file, file.exists());
+            assertTrue("Input file is not a regular file: " + file, file.isFile());
+            assertTrue("Input file is empty: " + file, file.length() > 0);
+        }
     }
 
 }

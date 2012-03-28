@@ -30,8 +30,8 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.commands.SimsKnnCommand;
-import uk.ac.susx.mlcl.byblo.commands.ExternalSimsKnnCommand;
+import uk.ac.susx.mlcl.byblo.commands.KnnSimsCommand;
+import uk.ac.susx.mlcl.byblo.commands.ExternalKnnSimsCommand;
 import java.io.File;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -46,7 +46,7 @@ import uk.ac.susx.mlcl.lib.Comparators;
  */
 public class SimsKnnCommandTest {
 
-    private static final String subject = ExternalSimsKnnCommand.class.getName();
+    private static final String subject = ExternalKnnSimsCommand.class.getName();
 
     @Test //(timeout = 8000)
     public void testRunOnFruit() throws Exception {
@@ -56,7 +56,7 @@ public class SimsKnnCommandTest {
         final File out = new File(TEST_OUTPUT_DIR,
                                   FRUIT_NAME + ".neighs");
 
-        final SimsKnnCommand knnTask = new SimsKnnCommand();
+        final KnnSimsCommand knnTask = new KnnSimsCommand();
         knnTask.getFilesDeligate().setSourceFile(in);
         knnTask.getFilesDeligate().setDestinationFile(out);
         knnTask.getFilesDeligate().setCharset(DEFAULT_CHARSET);
@@ -83,7 +83,7 @@ public class SimsKnnCommandTest {
         final File out = new File(TEST_OUTPUT_DIR,
                                   FRUIT_NAME + ".indexed.neighs");
 
-        final SimsKnnCommand knnTask = new SimsKnnCommand();
+        final KnnSimsCommand knnTask = new KnnSimsCommand();
         knnTask.getFilesDeligate().setSourceFile(in);
         knnTask.getFilesDeligate().setDestinationFile(out);
         knnTask.getFilesDeligate().setCharset(DEFAULT_CHARSET);

@@ -155,10 +155,28 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     public ExternalCountCommand(
             final File instancesFile, final File entryFeaturesFile,
             final File entriesFile, final File featuresFile, Charset charset,
+            boolean preindexedEntries, boolean preindexedFeatures,
             int maxChunkSize) {
         this(instancesFile, entryFeaturesFile, entriesFile, featuresFile);
         setCharset(charset);
         setMaxChunkSize(maxChunkSize);
+        indexDeligate.setPreindexedTokens1(preindexedEntries);
+        indexDeligate.setPreindexedTokens2(preindexedFeatures);
+        
+    }
+
+    public ExternalCountCommand(
+            final File instancesFile, final File entryFeaturesFile,
+            final File entriesFile, final File featuresFile,
+            final Charset charset,
+            boolean preindexedEntries, boolean preindexedFeatures){
+        setInstancesFile(instancesFile);
+        setEntryFeaturesFile(entryFeaturesFile);
+        setEntriesFile(entriesFile);
+        setFeaturesFile(featuresFile);
+        setCharset(charset);
+        indexDeligate.setPreindexedTokens1(preindexedEntries);
+        indexDeligate.setPreindexedTokens2(preindexedFeatures);
     }
 
     public ExternalCountCommand(
@@ -441,19 +459,19 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             new DeleteTask(finalMerge).runTask();
     }
 
-    private Comparator<Weighted<Token>> getEntryOrder() {
+    private Comparator<Weighted<Token>> getEntryOrder() throws IOException {
         return indexDeligate.isPreindexedTokens1()
                ? Weighted.recordOrder(Token.indexOrder())
                : Weighted.recordOrder(Token.stringOrder(indexDeligate.getEncoder1()));
     }
 
-    private Comparator<Weighted<Token>> getFeatureOrder() {
+    private Comparator<Weighted<Token>> getFeatureOrder() throws IOException {
         return indexDeligate.isPreindexedTokens2()
                ? Weighted.recordOrder(Token.indexOrder())
                : Weighted.recordOrder(Token.stringOrder(indexDeligate.getEncoder2()));
     }
 
-    private Comparator<Weighted<TokenPair>> getEventOrder() {
+    private Comparator<Weighted<TokenPair>> getEventOrder() throws IOException {
         return (indexDeligate.isPreindexedTokens1() && indexDeligate.isPreindexedTokens2())
                ? Weighted.recordOrder(TokenPair.indexOrder())
                : Weighted.recordOrder(TokenPair.stringOrder(indexDeligate.getEncoder1(), indexDeligate.getEncoder2()));
