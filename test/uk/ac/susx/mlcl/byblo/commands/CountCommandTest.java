@@ -33,6 +33,7 @@ package uk.ac.susx.mlcl.byblo.commands;
 import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
 import java.io.File;
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -214,7 +215,7 @@ public class CountCommandTest {
         runWithAPI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
                    DEFAULT_CHARSET, true, true);
 
-        assertTrue("Output entries file differs from sampledata file.",
+        assertTrue(MessageFormat.format("Output entries file \"{0}\" differs from expected file \"{1}\".",eActual,TEST_FRUIT_INDEXED_ENTRIES),
                    WeightedTokenSource.equal(eActual,
                                              TEST_FRUIT_INDEXED_ENTRIES,
                                              DEFAULT_CHARSET));

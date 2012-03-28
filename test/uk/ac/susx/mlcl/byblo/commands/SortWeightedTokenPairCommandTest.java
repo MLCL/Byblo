@@ -140,8 +140,7 @@ public class SortWeightedTokenPairCommandTest {
                 new SortWeightedTokenPairCommand(
                 randomisedFile, sortedFile, DEFAULT_CHARSET,
                 idx.isPreindexedTokens1(), idx.isPreindexedTokens2());
-        cmd.getIndexDeligate().setIndex1(idx.getIndex1());
-        cmd.getIndexDeligate().setIndex2(idx.getIndex2());
+        cmd.setIndexDeligate(idx);
         cmd.setComparator(comparator);
 
 

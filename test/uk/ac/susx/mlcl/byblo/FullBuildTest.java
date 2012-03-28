@@ -282,7 +282,7 @@ public class FullBuildTest {
 
         assertValidInputFiles(neighbours);
         assertSizeGT(similarities, neighbours);
-        assertSizeGT(TEST_FRUIT_NEIGHS, neighbours);
+        assertSizeGT(TEST_FRUIT_SIMS_100NN, neighbours);
 
         // Finally, convert neighbours back to strings
 

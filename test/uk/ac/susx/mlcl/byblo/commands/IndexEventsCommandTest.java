@@ -7,9 +7,11 @@ package uk.ac.susx.mlcl.byblo.commands;
 import com.google.common.io.Files;
 import java.io.File;
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import org.junit.*;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
 
 /**
  *
@@ -87,8 +89,8 @@ public class IndexEventsCommandTest {
         assertTrue(idx2.length() > 0);
 
 
-        assertTrue("Output entries file differs from sampledata file.",
-                   Files.equal(out, TEST_FRUIT_INPUT_INDEXED));
+        assertTrue(MessageFormat.format("Output entries file \"{0}\" differs from expected data file \"{1}\".",out, TEST_FRUIT_INPUT_INDEXED),
+                   TokenPairSource.equal(out, TEST_FRUIT_INPUT_INDEXED, DEFAULT_CHARSET));
         assertTrue("Output features file differs from test data file.",
                    Files.equal(idx1, TEST_FRUIT_ENTRY_INDEX));
         assertTrue("Output entry/features file differs from test data file.",

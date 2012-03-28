@@ -85,10 +85,10 @@ public class TestConstants {
                      TEST_FRUIT_ENTRY_FEATURES.getName() + ".filtered");
 
     public static final File TEST_FRUIT_SIMS =
-            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".pairs-lin");
+            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".sims");
 
-    public static final File TEST_FRUIT_NEIGHS =
-            new File(TEST_FRUIT_DIR, TEST_FRUIT_SIMS.getName() + ".neighs-100nn");
+    public static final File TEST_FRUIT_SIMS_100NN =
+            new File(TEST_FRUIT_DIR, TEST_FRUIT_SIMS.getName() + ".100nn");
 
     public static final File TEST_FRUIT_INDEXED_ENTRIES =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.entries");
@@ -102,8 +102,8 @@ public class TestConstants {
     public static final File TEST_FRUIT_INDEXED_SIMS =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.sims");
 
-    public static final File TEST_FRUIT_INDEXED_NEIGHS =
-            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.neighs");
+    public static final File TEST_FRUIT_INDEXED_SIMS_100NN =
+            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.sims.100nn");
 
     public static final File TEST_OUTPUT_DIR = new File(TEST_DATA_DIR, "out");
 

@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.byblo.io.*;
+import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.*;
 
 /**
@@ -18,7 +19,7 @@ import uk.ac.susx.mlcl.lib.io.*;
 public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
-    private final IndexDeligatePair indexDeligate = new IndexDeligatePair();
+    private IndexDeligatePair indexDeligate = new IndexDeligatePair();
 
     public ExternalSortWeightedTokenPiarCommand(File sourceFile, File destinationFile, Charset charset, boolean preindexed1, boolean preindexed2) {
         super(sourceFile, destinationFile, charset);
@@ -42,5 +43,12 @@ public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCo
     public IndexDeligatePair getIndexDeligate() {
         return indexDeligate;
     }
+
+    public void setIndexDeligate(IndexDeligatePair indexDeligate) {
+        Checks.checkNotNull("indexDeligate",indexDeligate);
+        this.indexDeligate = indexDeligate;
+    }
+    
+    
     
 }

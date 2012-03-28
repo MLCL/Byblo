@@ -144,9 +144,7 @@ public class ExternalSortWeightedTokenPairCommandTest {
         cmd.setMaxChunkSize(1000);
         cmd.setNumThreads(6);
         cmd.setTempFileFactory(new TempFileFactory(TEST_OUTPUT_DIR));
-
-        cmd.getIndexDeligate().setIndex1(idx.getIndex1());
-        cmd.getIndexDeligate().setIndex2(idx.getIndex2());
+        cmd.setIndexDeligate(idx);
         cmd.setComparator(comparator);
 
 

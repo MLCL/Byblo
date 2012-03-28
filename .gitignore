@@ -1,3 +1,6 @@
+# Unit tests write to this directory
+testdata/out/
+
 # Eclipse
 .settings
 .metadata

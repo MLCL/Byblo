@@ -39,6 +39,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 
 /**
@@ -61,8 +62,8 @@ public final class TSVSource implements SeekableSource<Iterable<String>, Lexer.T
     private long column;
 
     public TSVSource(File file, Charset charset) throws FileNotFoundException, IOException {
-        if (file == null)
-            throw new NullPointerException("file == null");
+        Checks.checkNotNull("file", "file");
+        Checks.checkNotNull("charset", "charset");
         if (!file.exists())
             throw new FileNotFoundException("Path " + file + " does not exist.");
         if (!file.isFile())

@@ -16,6 +16,7 @@ import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
+import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.io.Source;
 import uk.ac.susx.mlcl.lib.io.TSVSink;
@@ -30,7 +31,7 @@ public class SortWeightedTokenPairCommand extends AbstractSortCommand<Weighted<T
     private static final Log LOG = LogFactory.getLog(SortWeightedTokenCommand.class);
 
     @ParametersDelegate
-    private final IndexDeligatePair indexDeligate = new IndexDeligatePair();
+    private IndexDeligatePair indexDeligate = new IndexDeligatePair();
 
     public SortWeightedTokenPairCommand(
             File sourceFile, File destinationFile, Charset charset,
@@ -45,6 +46,11 @@ public class SortWeightedTokenPairCommand extends AbstractSortCommand<Weighted<T
 
     public IndexDeligatePair getIndexDeligate() {
         return indexDeligate;
+    }
+
+    public void setIndexDeligate(IndexDeligatePair indexDeligate) {
+        Checks.checkNotNull("indexDeligate", indexDeligate);
+        this.indexDeligate = indexDeligate;
     }
 
     @Override
