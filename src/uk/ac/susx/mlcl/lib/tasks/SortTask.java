@@ -7,6 +7,7 @@ package uk.ac.susx.mlcl.lib.tasks;
 import com.google.common.base.Objects.ToStringHelper;
 import java.io.Closeable;
 import java.io.Flushable;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -21,27 +22,24 @@ import uk.ac.susx.mlcl.lib.io.Source;
  * @param <T>
  * @author hiam20
  */
-public class SortTask<T> extends AbstractTask {
+public class SortTask<T> extends PipeTask<T> {
 
-    private Source<T> source;
-
-    private Sink<T> sink;
+    private static final long serialVersionUID = 1L;
 
     private Comparator<T> comparator;
 
     public SortTask(Source<T> source, Sink<T> sink, Comparator<T> comparator) {
-        setSource(source);
-        setSink(sink);
+        super(source, sink);
         setComparator(comparator);
     }
 
-    public SortTask(Source<T> sourceA, Sink<T> sink) {
-        setSource(sourceA);
-        setSink(sink);
+    public SortTask(Source<T> source, Sink<T> sink) {
+        super(source, sink);
         setComparator(Comparators.<T>naturalOrderIfPossible());
     }
 
     public SortTask() {
+        super();
         setComparator(Comparators.<T>naturalOrderIfPossible());
     }
 
@@ -54,31 +52,8 @@ public class SortTask<T> extends AbstractTask {
         this.comparator = comparator;
     }
 
-    public final Sink<T> getSink() {
-        return sink;
-    }
-
-    public final void setSink(Sink<T> sink) {
-        Checks.checkNotNull(sink);
-        this.sink = sink;
-    }
-
-    public final Source<T> getSource() {
-        return source;
-    }
-
-    public final void setSource(Source<T> sourceA) {
-        Checks.checkNotNull(sourceA);
-        this.source = sourceA;
-    }
-
     public boolean equals(SortTask<?> other) {
-        if (this.getSource() != other.getSource() && (this.getSource() == null
-                || !this.getSource().equals(other.getSource())))
-            return false;
-        if (this.getSink() != other.getSink() && (this.getSink() == null
-                || !this.getSink().equals(other.getSink())))
-            return false;
+        super.equals(this);
         if (this.getComparator() != other.getComparator() && (this.getComparator() == null
                 || !this.getComparator().equals(other.getComparator())))
             return false;
@@ -95,22 +70,19 @@ public class SortTask<T> extends AbstractTask {
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 71 * hash + (this.source != null ? this.source.hashCode() : 0);
-        hash = 71 * hash + (this.sink != null ? this.sink.hashCode() : 0);
+        int hash = super.hashCode();
         hash = 71 * hash + (this.comparator != null ? this.comparator.hashCode() : 0);
         return hash;
     }
 
     @Override
     protected void initialiseTask() throws Exception {
-        Checks.checkNotNull(getSource());
-        Checks.checkNotNull(getSink());
+        super.initialiseTask();
         Checks.checkNotNull(getComparator());
     }
 
     @Override
-    protected void runTask() throws Exception {
+    protected void runTask() throws IOException {
 
         final List<T> items = IOUtil.readAll(getSource());
 
@@ -127,14 +99,8 @@ public class SortTask<T> extends AbstractTask {
     }
 
     @Override
-    protected void finaliseTask() throws Exception {
-    }
-
-    @Override
     protected ToStringHelper toStringHelper() {
         return super.toStringHelper().
-                add("source", getSource()).
-                add("sink", getSink()).
                 add("comparator", getComparator());
     }
 

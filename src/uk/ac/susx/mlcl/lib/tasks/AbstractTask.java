@@ -60,10 +60,6 @@ public abstract class AbstractTask implements Task {
     public AbstractTask() {
     }
 
-    public Properties getProperties() {
-        return properties;
-    }
-
     protected abstract void initialiseTask() throws Exception;
 
     protected abstract void runTask() throws Exception;
@@ -108,6 +104,19 @@ public abstract class AbstractTask implements Task {
         }
     }
 
+    @Override
+    public Properties getProperties() {
+        return properties;
+    }
+    
+    public String getProperty(String key) {
+        return getProperty(key);
+    }
+    
+    public void setProperty(String key, String value) {
+        getProperties().setProperty(key, value);
+    }
+  
     public State getState() {
         return state;
     }

@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.lib.commands;
 
-import uk.ac.susx.mlcl.byblo.tasks.CopyTask;
+import uk.ac.susx.mlcl.byblo.tasks.CopyFileTask;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
@@ -58,7 +58,7 @@ public class CopyCommand extends AbstractCommand {
 
     @Override
     public void runCommand() throws Exception {
-        CopyTask task = new CopyTask(filesDeligate.getSourceFile(), filesDeligate.getDestinationFile());
+        CopyFileTask task = new CopyFileTask(filesDeligate.getSourceFile(), filesDeligate.getDestinationFile());
         task.run();
         while (task.isExceptionThrown())
             task.throwException();

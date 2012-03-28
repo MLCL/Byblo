@@ -85,10 +85,10 @@ public class TestConstants {
                      TEST_FRUIT_ENTRY_FEATURES.getName() + ".filtered");
 
     public static final File TEST_FRUIT_SIMS =
-            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".sims");
+            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".pairs-lin");
 
     public static final File TEST_FRUIT_NEIGHS =
-            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".neighs");
+            new File(TEST_FRUIT_DIR, TEST_FRUIT_SIMS.getName() + ".neighs-100nn");
 
     public static final File TEST_FRUIT_INDEXED_ENTRIES =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.entries");
@@ -138,7 +138,7 @@ public class TestConstants {
     public static void assertValidInputFiles(File... files) {
         for (File file : files) {
             assertTrue("Input file is null", file != null);
-            assertTrue("Input file does not exist:" + file, file.exists());
+            assertTrue("Input file does not exist: " + file, file.exists());
             assertTrue("Input file is not a regular file: " + file, file.isFile());
             assertTrue("Input file is empty: " + file, file.length() > 0);
         }

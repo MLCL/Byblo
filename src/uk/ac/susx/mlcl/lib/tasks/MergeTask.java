@@ -10,10 +10,10 @@ import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.io.Source;
-import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 
 /**
  *
+ * @param <T> 
  * @author hiam20
  */
 public class MergeTask<T> extends AbstractTask {
@@ -80,22 +80,28 @@ public class MergeTask<T> extends AbstractTask {
         this.sourceB = sourceB;
     }
 
+    public boolean equals(MergeTask<?> other) {
+        if (this.getSourceA() != other.getSourceA()
+                && (this.getSourceA() == null || !this.getSourceA().equals(other.getSourceA())))
+            return false;
+        if (this.getSourceB() != other.getSourceB()
+                && (this.getSourceB() == null || !this.getSourceB().equals(other.getSourceB())))
+            return false;
+        if (this.getSink() != other.getSink() && (this.getSink() == null || !this.getSink().equals(other.getSink())))
+            return false;
+        if (this.getComparator() != other.getComparator()
+                && (this.getComparator() == null || !this.getComparator().equals(other.getComparator())))
+            return false;
+        return true;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final MergeTask<?> other = (MergeTask<?>) obj;
-        if (this.sourceA != other.sourceA && (this.sourceA == null || !this.sourceA.equals(other.sourceA)))
-            return false;
-        if (this.sourceB != other.sourceB && (this.sourceB == null || !this.sourceB.equals(other.sourceB)))
-            return false;
-        if (this.sink != other.sink && (this.sink == null || !this.sink.equals(other.sink)))
-            return false;
-        if (this.comparator != other.comparator && (this.comparator == null || !this.comparator.equals(other.comparator)))
-            return false;
-        return true;
+        return equals((MergeTask<?>) obj);
     }
 
     @Override
@@ -114,6 +120,12 @@ public class MergeTask<T> extends AbstractTask {
         Checks.checkNotNull(getSourceB());
         Checks.checkNotNull(getSink());
         Checks.checkNotNull(getComparator());
+        if (getSourceA().equals(getSourceB()))
+            throw new IllegalStateException("Sources A and B are the same.");
+        if (getSourceA().equals(getSink()))
+            throw new IllegalStateException("Source A is the same as the sink.");
+        if (getSourceB().equals(getSink()))
+            throw new IllegalStateException("Source B is the same as the sink.");
     }
 
     @Override
@@ -143,8 +155,12 @@ public class MergeTask<T> extends AbstractTask {
             sink.write(b);
             b = sourceB.hasNext() ? sourceB.read() : null;
         }
-    }
 
+
+        if (getSink() instanceof Flushable)
+            ((Flushable) getSink()).flush();
+    }
+    
     @Override
     protected void finaliseTask() throws Exception {
         if (sink instanceof Flushable)

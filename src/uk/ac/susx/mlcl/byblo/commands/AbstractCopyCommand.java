@@ -30,87 +30,62 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.Comparator;
+import java.text.MessageFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.tasks.SortTask;
-import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.Comparators;
-import uk.ac.susx.mlcl.lib.io.*;
+import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
+import uk.ac.susx.mlcl.lib.commands.FilePipeDeligate;
+import uk.ac.susx.mlcl.lib.io.Files;
+import uk.ac.susx.mlcl.lib.io.Sink;
+import uk.ac.susx.mlcl.lib.io.Source;
+import uk.ac.susx.mlcl.lib.tasks.PipeTask;
 
 /**
- * Task that takes a single input file and sorts it according to some
- * comparator, then writes the results to an output file.
  *
  * @param <T>
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Sort a file.")
-public abstract class AbstractSortCommand<T> extends AbstractCopyCommand<T> {
+public abstract class AbstractCopyCommand<T> extends AbstractCommand {
 
-    private static final Log LOG = LogFactory.getLog(AbstractSortCommand.class);
+    private static final Log LOG = LogFactory.getLog(AbstractCopyCommand.class);
 
-    @Parameter(names = {"-r", "--reverse"},
-    description = "Reverse the result of comparisons.")
-    private boolean reverse = false;
+    @ParametersDelegate
+    private FilePipeDeligate filesDeligate = new FilePipeDeligate();
 
-    private Comparator<T> comparator = null;
-
-    public AbstractSortCommand(File sourceFile, File destinationFile, Charset charset,
-                               Comparator<T> comparator) {
-        super(sourceFile, destinationFile, charset);
-        this.comparator = comparator;
+    public AbstractCopyCommand(File sourceFile, File destinationFile, Charset charset) {
+        filesDeligate = new FilePipeDeligate(sourceFile, destinationFile, charset);
     }
 
-    public AbstractSortCommand(File sourceFile, File destinationFile, Charset charset) {
-        super(sourceFile, destinationFile, charset);
+    public AbstractCopyCommand(File sourceFile, File destinationFile) {
+        this(sourceFile, destinationFile, Files.DEFAULT_CHARSET);
     }
 
-    public AbstractSortCommand(File sourceFile, File destinationFile) {
-        super(sourceFile, destinationFile);
+    public AbstractCopyCommand() {
     }
 
-    public AbstractSortCommand() {
-        super();
-    }
-
-    public final boolean isReverse() {
-        return reverse;
-    }
-
-    public final void setReverse(boolean reverse) {
-        this.reverse = reverse;
-    }
-
-    public Comparator<T> getComparator() {
-        return isReverse() ? Comparators.reverse(comparator) : comparator;
-    }
-
-    public void setComparator(Comparator<T> comparator) {
-        Checks.checkNotNull("comparator", comparator);
-        this.comparator = comparator;
-    }
-
-    public boolean isComparatorSet() {
-        return getComparator() != null;
+    public FilePipeDeligate getFilesDeligate() {
+        return filesDeligate;
     }
 
     @Override
     public void runCommand() throws Exception {
         if (LOG.isInfoEnabled())
-            LOG.info("Running memory sort from \"" + getFilesDeligate().getSourceFile()
-                    + "\" to \"" + getFilesDeligate().getDestinationFile() + "\".");
+            LOG.info(MessageFormat.format(
+                    "Running command {0} from \"{1}\" to \"{2}\".",
+                    getFilesDeligate().getSourceFile(),
+                    getFilesDeligate().getDestinationFile(),
+                    getName()));
 
         Source<T> src = openSource(getFilesDeligate().getSourceFile());
         Sink<T> snk = openSink(getFilesDeligate().getDestinationFile());
 
-        SortTask<T> task = new SortTask<T>();
-        task.setComparator(getComparator());
+        PipeTask<T> task = new PipeTask<T>();
         task.setSource(src);
         task.setSink(snk);
         task.run();
@@ -124,25 +99,23 @@ public abstract class AbstractSortCommand<T> extends AbstractCopyCommand<T> {
             ((Closeable) snk).close();
 
         if (LOG.isInfoEnabled())
-            LOG.info("Completed memory sort.");
+            LOG.info(MessageFormat.format("Completed command {0}.", getName()));
     }
 
-    @Override
     public String getName() {
-        return "sort";
+        return "copy";
     }
 
     @Override
     protected Objects.ToStringHelper toStringHelper() {
         return super.toStringHelper().
-                add("comparator", comparator);
+                add("name", getName()).
+                add("files", getFilesDeligate());
     }
 
-    @Override
     protected abstract Source<T> openSource(File file)
             throws FileNotFoundException, IOException;
 
-    @Override
     protected abstract Sink<T> openSink(File file)
             throws FileNotFoundException, IOException;
 

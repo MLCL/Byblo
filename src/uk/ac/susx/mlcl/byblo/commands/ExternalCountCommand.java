@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.tasks.DeleteTask;
+import uk.ac.susx.mlcl.byblo.tasks.DeleteFileTask;
 import uk.ac.susx.mlcl.byblo.commands.IndexDeligatePair;
 import uk.ac.susx.mlcl.lib.commands.CopyCommand;
 import uk.ac.susx.mlcl.lib.tasks.MergeTask;
@@ -440,7 +440,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
                     "The entry merge queue is empty but final copy has not been completed.");
         new CopyCommand(finalMerge, getEntriesFile()).runCommand();
         if (!DEBUG)
-            new DeleteTask(finalMerge).runTask();
+            new DeleteFileTask(finalMerge).runTask();
 
         finalMerge = mergeEntryFeatureQueue.poll();
         if (finalMerge == null)
@@ -448,7 +448,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
                     "The entry/feature merge queue is empty but final copy has not been completed.");
         new CopyCommand(finalMerge, getEntryFeaturesFile()).runCommand();
         if (!DEBUG)
-            new DeleteTask(finalMerge).runTask();
+            new DeleteFileTask(finalMerge).runTask();
 
         finalMerge = mergeFeaturesQueue.poll();
         if (finalMerge == null)
@@ -456,7 +456,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
                     "The feature merge queue is empty but final copy has not been completed.");
         new CopyCommand(finalMerge, getFeaturesFile()).runCommand();
         if (!DEBUG)
-            new DeleteTask(finalMerge).runTask();
+            new DeleteFileTask(finalMerge).runTask();
     }
 
     private Comparator<Weighted<Token>> getEntryOrder() throws IOException {
@@ -500,7 +500,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     }
 
     protected void submitDeleteTask(File file) {
-        final DeleteTask deleteTask = new DeleteTask(file);
+        final DeleteFileTask deleteTask = new DeleteFileTask(file);
         deleteTask.getProperties().setProperty(KEY_TASK_TYPE, VALUE_TASK_TYPE_DELETE);
         submitTask(deleteTask);
     }

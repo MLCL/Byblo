@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.tasks;
 
-import uk.ac.susx.mlcl.byblo.tasks.DeleteTask;
+import uk.ac.susx.mlcl.byblo.tasks.DeleteFileTask;
 import com.beust.jcommander.JCommander;
 import java.util.ResourceBundle;
 import java.io.File;
@@ -50,7 +50,7 @@ public class DeleteTaskTest {
         System.out.println("Testing run() -- expecting success");
         File tmp = File.createTempFile(getClass().getName(), "");
         assertTrue(tmp.exists());
-        DeleteTask instance = new DeleteTask(tmp);
+        DeleteFileTask instance = new DeleteFileTask(tmp);
         instance.run();
         while(instance.isExceptionThrown())
             instance.throwException();
@@ -63,7 +63,7 @@ public class DeleteTaskTest {
         File tmp = File.createTempFile(getClass().getName(), "");
         tmp.delete();
         assertFalse(tmp.exists());
-        DeleteTask instance = new DeleteTask(tmp);
+        DeleteFileTask instance = new DeleteFileTask(tmp);
         instance.run();
         instance.throwException();
     }
@@ -74,7 +74,7 @@ public class DeleteTaskTest {
         File tmp = File.createTempFile(getClass().getName(), "");
         tmp.delete();
         assertFalse(tmp.exists());
-        DeleteTask instance = new DeleteTask(tmp);
+        DeleteFileTask instance = new DeleteFileTask(tmp);
         instance.run();
         instance.throwException();
     }
@@ -83,10 +83,10 @@ public class DeleteTaskTest {
     public void testGetSetFile() throws IOException {
         System.out.println("Testing getFile() and setFile()");
         File tmp = File.createTempFile(getClass().getName(), "");
-        DeleteTask instance = new DeleteTask(tmp);
+        DeleteFileTask instance = new DeleteFileTask(tmp);
         File expResult = tmp;
         assertEquals(expResult, instance.getFile());
-        instance = new DeleteTask();
+        instance = new DeleteFileTask();
         instance.setFile(tmp);
         assertEquals(tmp, instance.getFile());
         tmp.delete();

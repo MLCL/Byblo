@@ -16,10 +16,12 @@ import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 /**
  *
  * @author hiam20
+ * @deprecated Should be replaced
  */
-public class CopyTask extends AbstractTask {
+@Deprecated
+public class CopyFileTask extends AbstractTask {
 
-    private static final Log LOG = LogFactory.getLog(CopyTask.class);
+    private static final Log LOG = LogFactory.getLog(CopyFileTask.class);
 
     private static final int BUFFER_SIZE = 100000;
 
@@ -27,12 +29,12 @@ public class CopyTask extends AbstractTask {
 
     private File destFile;
 
-    public CopyTask(File sourceFile, File destinationFile) {
+    public CopyFileTask(File sourceFile, File destinationFile) {
         setSrcFile(sourceFile);
         setDstFile(destinationFile);
     }
 
-    public CopyTask() {
+    public CopyFileTask() {
     }
 
     @Override

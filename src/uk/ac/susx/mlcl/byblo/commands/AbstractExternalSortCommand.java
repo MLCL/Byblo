@@ -46,7 +46,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.tasks.Chunk;
 import uk.ac.susx.mlcl.byblo.tasks.Chunker;
-import uk.ac.susx.mlcl.byblo.tasks.DeleteTask;
+import uk.ac.susx.mlcl.byblo.tasks.DeleteFileTask;
 import uk.ac.susx.mlcl.lib.AbstractParallelCommandTask;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Comparators;
@@ -221,7 +221,7 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
                 submitTask(createDeleteTask(new File(p.getProperty(KEY_SRC_FILE_B))));
             }
 
-        } else if (task instanceof DeleteTask) {
+        } else if (task instanceof DeleteFileTask) {
             // not a sausage
         } else {
             throw new AssertionError(
@@ -247,8 +247,8 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
         }
     }
 
-    protected DeleteTask createDeleteTask(File file) {
-        return new DeleteTask(file);
+    protected DeleteFileTask createDeleteTask(File file) {
+        return new DeleteFileTask(file);
     }
 
     protected SortTask<T> createSortTask(Chunk<T> chunk, File dst) throws IOException {

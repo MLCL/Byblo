@@ -46,17 +46,17 @@ import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Delete a file.")
-public class DeleteTask extends AbstractTask {
+public class DeleteFileTask extends AbstractTask {
 
-    private static final Log LOG = LogFactory.getLog(DeleteTask.class);
+    private static final Log LOG = LogFactory.getLog(DeleteFileTask.class);
 
     private File file = null;
 
-    public DeleteTask(File file) {
+    public DeleteFileTask(File file) {
         setFile(file);
     }
 
-    public DeleteTask() {
+    public DeleteFileTask() {
     }
 
     @Override

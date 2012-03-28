@@ -14,6 +14,7 @@ import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
 import uk.ac.susx.mlcl.byblo.commands.KnnSimsCommand;
 import static org.junit.Assert.*;
 import uk.ac.susx.mlcl.byblo.commands.*;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
 
 /**
  *
@@ -212,10 +213,14 @@ public class FullBuildTest {
                 instances, charet, instancesIndexed,
                 entryIndex, featureIndex);
         index.runCommand();
+
+        assertSizeGT(instances, instancesIndexed);
         assertValidInputFiles(instancesIndexed, entryIndex, featureIndex);
 
         preindexedEntries = true;
         preindexedFeatures = true;
+
+
 
         // Count the entries, features and events
 
@@ -226,9 +231,15 @@ public class FullBuildTest {
                 preindexedEntries, preindexedFeatures, charet);
         count.runCommand();
 
+        assertValidInputFiles(entries, features, events);
+        assertSizeGT(TEST_FRUIT_ENTRY_FEATURES, events);
+        assertSizeGT(TEST_FRUIT_ENTRIES, entries);
+        assertSizeGT(TEST_FRUIT_FEATURES, features);
+
         // Filter 
 
-        assertValidInputFiles(entries, features, events);
+
+
         deleteIfExist(eventsFiltered, featuresFiltered, entriesFiltered);
 
         FilterCommand filter = new FilterCommand(
@@ -238,18 +249,13 @@ public class FullBuildTest {
         filter.getIndexDeligate().setIndexFile2(featureIndex);
         filter.getIndexDeligate().setPreindexedTokens1(preindexedEntries);
         filter.getIndexDeligate().setPreindexedTokens2(preindexedFeatures);
-        
         filter.addEntryFeatureMinimumFrequency(2);
-        
-        
-        filter.runCommand();
 
-        assertTrue("Filtered events file is no smaller that events file.",
-                   events.length() > eventsFiltered.length());
-        assertTrue("Filtered entries file is no smaller that entries file.",
-                   entries.length() > entriesFiltered.length());
-        assertTrue("Filtered features file is no smaller that features file.",
-                   features.length() > featuresFiltered.length());
+
+        filter.runCommand();
+        assertSizeGT(events, eventsFiltered);
+        assertSizeGT(entries, entriesFiltered);
+        assertSizeGT(features, featuresFiltered);
 
         // All pairs
 
@@ -261,8 +267,12 @@ public class FullBuildTest {
         allpairs.setSerial(true);
         allpairs.runCommand();
 
-        // KNN
         assertValidInputFiles(similarities);
+        assertSizeGT(TEST_FRUIT_SIMS, similarities);
+
+        // KNN
+
+
         deleteIfExist(neighbours);
 
         KnnSimsCommand knn = new KnnSimsCommand(
@@ -271,12 +281,18 @@ public class FullBuildTest {
         knn.runCommand();
 
         assertValidInputFiles(neighbours);
-        assertTrue("Neighbours file is no smaller that similarities file.",
-                   neighbours.length() < similarities.length());
-        
-        // Finally, convert neighbours back to strings
-        
+        assertSizeGT(similarities, neighbours);
+        assertSizeGT(TEST_FRUIT_NEIGHS, neighbours);
 
+        // Finally, convert neighbours back to strings
+
+        deleteIfExist(neighboursStrings);
+
+        UnindexSimsCommand unindex = new UnindexSimsCommand(
+                neighbours, neighboursStrings, charet, entryIndex);
+        unindex.runCommand();
+
+        assertValidInputFiles(neighboursStrings);
     }
 
     private static void deleteIfExist(File... files) {
@@ -284,6 +300,13 @@ public class FullBuildTest {
             if (file.exists())
                 file.delete();
         }
+    }
+
+    private static void assertSizeGT(File bigger, File smaller) {
+        assertValidInputFiles(bigger);
+        assertValidInputFiles(smaller);
+        assertTrue(smaller + " is not smaller than " + bigger,
+                   bigger.length() > smaller.length());
     }
 
 }
