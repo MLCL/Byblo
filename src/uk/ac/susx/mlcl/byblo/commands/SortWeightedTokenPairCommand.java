@@ -36,20 +36,19 @@ public class SortWeightedTokenPairCommand extends AbstractSortCommand<Weighted<T
 
     public SortWeightedTokenPairCommand(
             File sourceFile, File destinationFile, Charset charset,
-            boolean preindexedTokens1, boolean preindexedTokens2) {
+            IndexDeligatePair indexDeligate) {
         super(sourceFile, destinationFile, charset, Weighted.recordOrder(TokenPair.indexOrder()));
-        indexDeligate.setPreindexedTokens1(preindexedTokens1);
-        indexDeligate.setPreindexedTokens2(preindexedTokens2);
+        setIndexDeligate(indexDeligate);
     }
 
     public SortWeightedTokenPairCommand() {
     }
 
-    public IndexDeligatePair getIndexDeligate() {
+    public final IndexDeligatePair getIndexDeligate() {
         return indexDeligate;
     }
 
-    public void setIndexDeligate(IndexDeligatePair indexDeligate) {
+    public final void setIndexDeligate(IndexDeligatePair indexDeligate) {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }
@@ -73,5 +72,7 @@ public class SortWeightedTokenPairCommand extends AbstractSortCommand<Weighted<T
         s.setCompactFormatEnabled(!getFilesDeligate().isCompactFormatDisabled());
         return new WeightSumReducerSink<TokenPair>(s);
     }
+    
+    
 
 }

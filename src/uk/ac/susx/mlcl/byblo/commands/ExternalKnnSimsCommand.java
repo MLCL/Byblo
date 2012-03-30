@@ -40,6 +40,7 @@ import java.util.Comparator;
 import javax.naming.OperationNotSupportedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligate;
 import uk.ac.susx.mlcl.byblo.io.KFirstReducerSink;
 import uk.ac.susx.mlcl.byblo.tasks.Chunk;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
@@ -59,32 +60,32 @@ public class ExternalKnnSimsCommand extends ExternalSortWeightedTokenPiarCommand
 
     public static final int DEFAULT_K = 100;
 
+    private static final long serialVersionUID = 1L;
+
     @Parameter(names = {"-k"},
     description = "The number of neighbours to produce for each base entry.")
-    int k = DEFAULT_K;
+    private int k = DEFAULT_K;
 
-    Comparator<Weighted<TokenPair>> classComparator =
+    private Comparator<Weighted<TokenPair>> classComparator =
             Weighted.recordOrder(TokenPair.firstIndexOrder());
 
-    Comparator<Weighted<TokenPair>> nearnessComparator =
+    private Comparator<Weighted<TokenPair>> nearnessComparator =
             Comparators.reverse(Weighted.<TokenPair>weightOrder());
 
     public ExternalKnnSimsCommand(
             File sourceFile, File destinationFile, Charset charset,
-            boolean preindexedTokens1, boolean preindexedTokens2,
-            int k, int maxChunkSize) {
-        super(sourceFile, destinationFile, charset, preindexedTokens1,
-              preindexedTokens2);
+            IndexDeligate indexDeligate,
+            int k, int maxChunkSize) throws IOException {
+        super(sourceFile, destinationFile, charset, indexDeligate.pair());
         setMaxChunkSize(maxChunkSize);
         setK(k);
     }
 
     public ExternalKnnSimsCommand(
             File sourceFile, File destinationFile, Charset charset,
-            boolean preindexedTokens1, boolean preindexedTokens2,
-            int k) {
-        super(sourceFile, destinationFile, charset, preindexedTokens1,
-              preindexedTokens2);
+            IndexDeligate indexDeligate,
+            int k) throws IOException {
+        super(sourceFile, destinationFile, charset, indexDeligate.pair());
         setK(k);
     }
 

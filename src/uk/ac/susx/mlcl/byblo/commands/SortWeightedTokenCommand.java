@@ -17,6 +17,7 @@ import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSink;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
+import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.io.Source;
 import uk.ac.susx.mlcl.lib.io.TSVSink;
@@ -31,11 +32,11 @@ public class SortWeightedTokenCommand extends AbstractSortCommand<Weighted<Token
     private static final Log LOG = LogFactory.getLog(SortWeightedTokenCommand.class);
 
     @ParametersDelegate
-    protected IndexDeligate indexDeligate = new IndexDeligate();
+    private IndexDeligate indexDeligate = new IndexDeligate();
 
-    public SortWeightedTokenCommand(File sourceFile, File destinationFile, Charset charset, boolean preindexed) {
+    public SortWeightedTokenCommand(File sourceFile, File destinationFile, Charset charset, IndexDeligate indexDeligate) {
         super(sourceFile, destinationFile, charset, Weighted.recordOrder(Token.indexOrder()));
-        indexDeligate.setPreindexedTokens(preindexed);
+        setIndexDeligate(indexDeligate);
     }
 
     public SortWeightedTokenCommand() {
@@ -56,5 +57,16 @@ public class SortWeightedTokenCommand extends AbstractSortCommand<Weighted<Token
         return new WeightSumReducerSink<Token>(s);
 
     }
+
+    public final IndexDeligate getIndexDeligate() {
+        return indexDeligate;
+    }
+
+    public final void setIndexDeligate(IndexDeligate indexDeligate) {
+        Checks.checkNotNull("indexDeligate", indexDeligate);
+        this.indexDeligate = indexDeligate;
+    }
+    
+    
 
 }

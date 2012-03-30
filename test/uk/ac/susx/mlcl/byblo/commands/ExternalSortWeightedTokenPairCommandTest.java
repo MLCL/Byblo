@@ -142,7 +142,7 @@ public class ExternalSortWeightedTokenPairCommandTest {
         ExternalSortWeightedTokenPiarCommand cmd =
                 new ExternalSortWeightedTokenPiarCommand(
                 randomisedFile, sortedFile, DEFAULT_CHARSET,
-                idx.isPreindexedTokens1(), idx.isPreindexedTokens2());
+                idx);
         cmd.setMaxChunkSize(1000);
         cmd.setNumThreads(6);
         cmd.setTempFileFactory(new TempFileFactory(TEST_OUTPUT_DIR));

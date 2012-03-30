@@ -16,6 +16,7 @@ import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
+import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.io.Source;
 import uk.ac.susx.mlcl.lib.io.TSVSink;
@@ -28,15 +29,25 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
 public class MergeWeightedTokenPairCommand extends AbstractMergeCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
-    protected final IndexDeligatePair indexDeligate = new IndexDeligatePair();
+    private IndexDeligatePair indexDeligate = new IndexDeligatePair();
 
-    public MergeWeightedTokenPairCommand(File sourceFileA, File sourceFileB, File destinationFile, Charset charset, boolean preindexedTokens1, boolean preindexedTokens2) {
+    public MergeWeightedTokenPairCommand(
+            File sourceFileA, File sourceFileB, File destinationFile,
+            Charset charset, IndexDeligatePair indexDeligate) {
         super(sourceFileA, sourceFileB, destinationFile, charset, Weighted.recordOrder(TokenPair.indexOrder()));
-        indexDeligate.setPreindexedTokens1(preindexedTokens1);
-        indexDeligate.setPreindexedTokens2(preindexedTokens2);
+        setIndexDeligate(indexDeligate);
     }
 
     public MergeWeightedTokenPairCommand() {
+    }
+
+    public final IndexDeligatePair getIndexDeligate() {
+        return indexDeligate;
+    }
+
+    public final void setIndexDeligate(IndexDeligatePair indexDeligate) {
+        Checks.checkNotNull("indexDeligate", indexDeligate);
+        this.indexDeligate = indexDeligate;
     }
 
     @Override

@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.byblo.io.*;
+import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.*;
 
 /**
@@ -18,12 +19,16 @@ import uk.ac.susx.mlcl.lib.io.*;
  */
 public class ExternalSortWeightedTokenCommand extends AbstractExternalSortCommand<Weighted<Token>> {
 
-    @ParametersDelegate
-    private final IndexDeligate indexDeligate = new IndexDeligate();
+    private static final long serialVersionUID = 1L;
 
-    public ExternalSortWeightedTokenCommand(File sourceFile, File destinationFile, Charset charset, boolean preindexed) {
+    @ParametersDelegate
+    private IndexDeligate indexDeligate = new IndexDeligate();
+
+    public ExternalSortWeightedTokenCommand(
+            File sourceFile, File destinationFile, Charset charset,
+            IndexDeligate indexDeligate) {
         super(sourceFile, destinationFile, charset);
-        indexDeligate.setPreindexedTokens(preindexed);
+        setIndexDeligate(indexDeligate);
     }
 
     public ExternalSortWeightedTokenCommand() {
@@ -45,8 +50,13 @@ public class ExternalSortWeightedTokenCommand extends AbstractExternalSortComman
                 getIndexDeligate());
     }
 
-    public IndexDeligate getIndexDeligate() {
+    public final IndexDeligate getIndexDeligate() {
         return indexDeligate;
+    }
+
+    public final void setIndexDeligate(IndexDeligate indexDeligate) {
+        Checks.checkNotNull("indexDeligate", indexDeligate);
+        this.indexDeligate = indexDeligate;
     }
 
 }

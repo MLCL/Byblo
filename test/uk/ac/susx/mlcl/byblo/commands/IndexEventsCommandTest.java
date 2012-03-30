@@ -44,11 +44,11 @@ public class IndexEventsCommandTest {
                             Charset charset)
             throws Exception {
         final IndexEventsCommand task = new IndexEventsCommand();
-        task.setInputEventsFile(in);
-        task.setOutputEventsFile(out);
-        task.setEntryIndexFile(index1);
-        task.setFeatureIndexFile(index2);
-        task.setCharset(charset);
+        task.getFileDeligate().setSourceFile(in);
+        task.getFileDeligate().setDestinationFile(out);
+        task.getIndexDeligate().setIndexFile1(index1);
+        task.getIndexDeligate().setIndexFile2(index2);
+        task.getFileDeligate().setCharset(charset);
 
         task.runCommand();
 

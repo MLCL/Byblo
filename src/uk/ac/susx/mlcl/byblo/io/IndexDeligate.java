@@ -23,21 +23,30 @@ public class IndexDeligate extends AbstractDeligate implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    static final boolean DEFAULT_INDEXING = false;
+
+    static final boolean DEFAULT_SKIP_INDEXING = false;
+
     @Parameter(names = {"-p", "--preindexed"},
     description = "Whether tokens in the input events file are indexed.")
-    private boolean preindexedTokens = false;
+    private boolean preindexedTokens = DEFAULT_INDEXING;
 
     @Parameter(names = {"-x", "--index-file"},
     description = "Index for the string tokens.",
     validateWith = InputFileValidator.class)
     private File indexFile = null;
 
+    @Parameter(names = {"-s", "--skipindexed"},
+    description = "")
+    private boolean skipIndexed = DEFAULT_SKIP_INDEXING;
+
     private Enumerator<String> enumerator = null;
 
-    public IndexDeligate(boolean preindexedTokens, File indexFile, Enumerator<String> index) {
+    public IndexDeligate(boolean preindexedTokens, File indexFile, Enumerator<String> index, boolean skipIndexed) {
         this.preindexedTokens = preindexedTokens;
         this.indexFile = indexFile;
         this.enumerator = index;
+        this.skipIndexed = skipIndexed;
     }
 
     public IndexDeligate(boolean preindexedTokens, Enumerator<String> index) {
@@ -52,6 +61,21 @@ public class IndexDeligate extends AbstractDeligate implements Serializable {
     public IndexDeligate() {
     }
 
+    public IndexDeligatePair pair() throws IOException {
+        return new IndexDeligatePair(
+                isPreindexedTokens(), isPreindexedTokens(),
+                getEnumerator(), getEnumerator(),
+                isSkipIndexed(), isSkipIndexed());
+    }
+
+    public boolean isSkipIndexed() {
+        return skipIndexed;
+    }
+
+    public void setSkipIndexed(boolean skipIndexed) {
+        this.skipIndexed = skipIndexed;
+    }
+
     public File getIndexFile() {
         return indexFile;
     }
@@ -62,7 +86,7 @@ public class IndexDeligate extends AbstractDeligate implements Serializable {
     }
 
     public final Enumerator<String> getEnumerator() throws IOException {
-         if (enumerator == null) {
+        if (enumerator == null) {
             if (isPreindexedTokens()) {
                 if (indexFile != null && indexFile.exists())
                     enumerator = Enumerators.loadStringEnumerator(indexFile);

@@ -41,6 +41,7 @@ import org.junit.Test;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
@@ -61,8 +62,7 @@ public class CountCommandTest {
         countTask.setFeaturesFile(outF);
         countTask.setEntryFeaturesFile(outEF);
         countTask.setCharset(charset);
-        countTask.indexDeligate.setPreindexedTokens1(preIndexEntries);
-        countTask.indexDeligate.setPreindexedTokens2(preIndexFeatures);
+        countTask.setIndexDeligate(new IndexDeligatePair(preIndexEntries, preIndexFeatures));
         countTask.runCommand();
 
         assertTrue("Output files not created: " + outE, outE.exists());

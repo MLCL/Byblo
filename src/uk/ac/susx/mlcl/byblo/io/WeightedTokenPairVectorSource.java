@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import com.google.common.base.Function;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import java.io.IOException;
@@ -39,9 +38,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource.Tell;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.io.Lexer;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
 
 /**
@@ -51,29 +50,21 @@ import uk.ac.susx.mlcl.lib.io.SeekableSource;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class WeightedTokenPairVectorSource
-        implements SeekableSource<Indexed<SparseDoubleVector>, Lexer.Tell> {
+        implements SeekableSource<Indexed<SparseDoubleVector>, Tell> {
 
     private final WeightedTokenPairSource inner;
 
     private Weighted<TokenPair> next;
 
-    private Lexer.Tell tell;
+    private Tell tell;
 
     private long count = 0;
 
     public WeightedTokenPairVectorSource(WeightedTokenPairSource inner) {
         this.inner = inner;
-        tell = Lexer.Tell.START;
+        tell = Tell.START;
         next = null;
     }
-//
-//    public Function<String, Integer> getTokenDecoder2() {
-//        return inner.getTokenDecoder2();
-//    }
-//
-//    public Function<String, Integer> getTokenDecoder1() {
-//        return inner.getTokenDecoder1();
-//    }
 
     @Override
     public boolean hasNext() throws IOException {
@@ -108,14 +99,14 @@ public class WeightedTokenPairVectorSource
     }
 
     @Override
-    public void position(Lexer.Tell offset) throws IOException {
+    public void position(Tell offset) throws IOException {
         inner.position(offset);
         tell = offset;
         readNext();
     }
 
     @Override
-    public Lexer.Tell position() throws IOException {
+    public Tell position() throws IOException {
         return tell;
     }
 

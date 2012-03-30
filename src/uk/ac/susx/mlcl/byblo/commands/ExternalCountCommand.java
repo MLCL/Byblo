@@ -45,7 +45,6 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.WeightSumReducerSink;
@@ -155,13 +154,12 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     public ExternalCountCommand(
             final File instancesFile, final File entryFeaturesFile,
             final File entriesFile, final File featuresFile, Charset charset,
-            boolean preindexedEntries, boolean preindexedFeatures,
+            IndexDeligatePair indexDeligate,
             int maxChunkSize) {
         this(instancesFile, entryFeaturesFile, entriesFile, featuresFile);
         fileDeligate.setCharset(charset);
         setMaxChunkSize(maxChunkSize);
-        indexDeligate.setPreindexedTokens1(preindexedEntries);
-        indexDeligate.setPreindexedTokens2(preindexedFeatures);
+        setIndexDeligate(indexDeligate);
 
     }
 
@@ -169,14 +167,13 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             final File instancesFile, final File entryFeaturesFile,
             final File entriesFile, final File featuresFile,
             final Charset charset,
-            boolean preindexedEntries, boolean preindexedFeatures) {
+           IndexDeligatePair indexDeligate) {
         setInstancesFile(instancesFile);
         setEntryFeaturesFile(entryFeaturesFile);
         setEntriesFile(entriesFile);
         setFeaturesFile(featuresFile);
         fileDeligate.setCharset(charset);
-        indexDeligate.setPreindexedTokens1(preindexedEntries);
-        indexDeligate.setPreindexedTokens2(preindexedFeatures);
+        setIndexDeligate(indexDeligate);
     }
 
     public ExternalCountCommand(
@@ -200,11 +197,12 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         this.fileDeligate = fileDeligate;
     }
 
-    public IndexDeligatePair getIndexDeligate() {
+    public  final IndexDeligatePair getIndexDeligate() {
         return indexDeligate;
     }
 
-    public void setIndexDeligate(IndexDeligatePair indexDeligate) {
+    public final  void setIndexDeligate(IndexDeligatePair indexDeligate) {
+        Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }
 
@@ -671,7 +669,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         return new WeightSumReducerSink<Token>(s);
     }
 
-    protected SeekableSource<Weighted<TokenPair>, Lexer.Tell> openEventsSource(File file)
+    protected WeightedTokenPairSource openEventsSource(File file)
             throws FileNotFoundException, IOException {
         WeightedTokenPairSource s = new WeightedTokenPairSource(
                 new TSVSource(file, getFileDeligate().getCharset()), indexDeligate);

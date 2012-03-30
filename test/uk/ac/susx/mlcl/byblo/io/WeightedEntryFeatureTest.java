@@ -46,12 +46,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import org.junit.Test;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource.Tell;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
-import uk.ac.susx.mlcl.lib.SimpleEnumerator;
 import uk.ac.susx.mlcl.lib.io.TSVSink;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
 
@@ -268,7 +267,7 @@ public class WeightedEntryFeatureTest {
             WeightedTokenPairSource aSrc = new WeightedTokenPairSource(
                     new TSVSource(a, DEFAULT_CHARSET),
                     new IndexDeligatePair(false, false, idx, idx));
-            
+
             WeightedTokenPairSink bSink = new WeightedTokenPairSink(
                     new TSVSink(b, DEFAULT_CHARSET),
                     new IndexDeligatePair(true, true));
@@ -287,6 +286,54 @@ public class WeightedEntryFeatureTest {
             WeightedTokenPairSink cSink = new WeightedTokenPairSink(
                     new TSVSink(c, DEFAULT_CHARSET),
                     new IndexDeligatePair(false, false, idx, idx));
+            cSink.setCompactFormatEnabled(false);
+            IOUtil.copy(bSrc, cSink);
+            cSink.close();
+        }
+
+        assertTrue("Verbose copy is smaller that compact source.",
+                   c.length() >= b.length());
+        assertTrue("Double converted file is not equal to origion: " + a + " " + c,
+                   Files.equal(a, c));
+    }
+
+    @Test
+    public void testEntryFeaturePairCompactEnumeratorConversion_SkipIndex() throws FileNotFoundException, IOException {
+        File a = TEST_FRUIT_ENTRY_FEATURES;
+        File b = new File(TEST_OUTPUT_DIR,
+                          TEST_FRUIT_ENTRY_FEATURES.getName() + ".enum.skip.compact");
+        File c = new File(TEST_OUTPUT_DIR,
+                          TEST_FRUIT_ENTRY_FEATURES.getName() + ".enum.skip.compact.str");
+
+        Enumerator<String> enumerator = Enumerators.newDefaultStringEnumerator();
+
+        {
+            WeightedTokenPairSource aSrc = new WeightedTokenPairSource(
+                    new TSVSource(a, DEFAULT_CHARSET),
+                    new IndexDeligatePair(false, false, enumerator, enumerator));
+
+            IndexDeligatePair tmpIdx = new IndexDeligatePair(true, true);
+            tmpIdx.setSkipindexed1(true);
+            tmpIdx.setSkipindexed2(true);
+            WeightedTokenPairSink bSink = new WeightedTokenPairSink(
+                    new TSVSink(b, DEFAULT_CHARSET), tmpIdx);
+            bSink.setCompactFormatEnabled(true);
+            IOUtil.copy(aSrc, bSink);
+            bSink.close();
+        }
+
+        assertTrue("Compact copy is smaller that verbose source.",
+                   b.length() <= a.length());
+
+        {
+            IndexDeligatePair tmpIdx = new IndexDeligatePair(true, true);
+            tmpIdx.setSkipindexed1(true);
+            tmpIdx.setSkipindexed2(true);
+            WeightedTokenPairSource bSrc = new WeightedTokenPairSource(
+                    new TSVSource(b, DEFAULT_CHARSET), tmpIdx);
+            WeightedTokenPairSink cSink = new WeightedTokenPairSink(
+                    new TSVSink(c, DEFAULT_CHARSET),
+                    new IndexDeligatePair(false, false, enumerator, enumerator));
             cSink.setCompactFormatEnabled(false);
             IOUtil.copy(bSrc, cSink);
             cSink.close();

@@ -16,6 +16,7 @@ import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSink;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
+import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.io.Source;
 import uk.ac.susx.mlcl.lib.io.TSVSink;
@@ -28,17 +29,29 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
 public class MergeWeightedTokenCommand extends AbstractMergeCommand<Weighted<Token>> {
 
     @ParametersDelegate
-    protected final IndexDeligate indexDeligate = new IndexDeligate();
+    private IndexDeligate indexDeligate = new IndexDeligate();
 
-    public MergeWeightedTokenCommand(File sourceFileA, File sourceFileB, File destinationFile, Charset charset, boolean preindexed) {
+    public MergeWeightedTokenCommand(
+            File sourceFileA, File sourceFileB, File destinationFile, 
+            Charset charset, IndexDeligate indexDeligate) {
         super(sourceFileA, sourceFileB, destinationFile, charset,
               Weighted.recordOrder(Token.indexOrder()));
-        indexDeligate.setPreindexedTokens(preindexed);
+        setIndexDeligate(indexDeligate);
     }
 
     public MergeWeightedTokenCommand() {
     }
 
+    public final IndexDeligate getIndexDeligate() {
+        return indexDeligate;
+    }
+
+    public final void setIndexDeligate(IndexDeligate indexDeligate) {
+        Checks.checkNotNull("indexDeligate", indexDeligate);
+        this.indexDeligate = indexDeligate;
+    }
+
+    
     @Override
     protected Source<Weighted<Token>> openSource(File file) throws FileNotFoundException, IOException {
         return new WeightedTokenSource(

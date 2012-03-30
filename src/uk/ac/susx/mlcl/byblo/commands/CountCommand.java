@@ -102,7 +102,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
     private Charset charset = Files.DEFAULT_CHARSET;
 
     @ParametersDelegate
-    protected final IndexDeligatePair indexDeligate = new IndexDeligatePair();
+    private IndexDeligatePair indexDeligate = new IndexDeligatePair();
 
     /**
      * Dependency injection constructor with all fields parameterised.
@@ -119,19 +119,17 @@ public class CountCommand extends AbstractCommand implements Serializable {
      * @throws NullPointerException if any argument is null
      */
     public CountCommand(final File instancesFile, final File entryFeaturesFile,
-                            final File entriesFile, final File featuresFile,
-                            final boolean preindexedEntries,
-                            final boolean preindexedFeatures,
-                            final Charset charset) throws NullPointerException {
+                        final File entriesFile, final File featuresFile,
+                        IndexDeligatePair indexDeligate, 
+                        final Charset charset) throws NullPointerException {
         this(instancesFile, entryFeaturesFile, entriesFile, featuresFile);
         setCharset(charset);
-        indexDeligate.setPreindexedTokens1(preindexedEntries);
-        indexDeligate.setPreindexedTokens2(preindexedFeatures);
+        setIndexDeligate(indexDeligate);
     }
 
     public CountCommand(final File instancesFile, final File entryFeaturesFile,
-                            final File entriesFile, final File featuresFile,
-                            final Charset charset) throws NullPointerException {
+                        final File entriesFile, final File featuresFile,
+                        final Charset charset) throws NullPointerException {
         this(instancesFile, entryFeaturesFile, entriesFile, featuresFile);
         setCharset(charset);
     }
@@ -155,6 +153,15 @@ public class CountCommand extends AbstractCommand implements Serializable {
         setEntryFeaturesFile(entryFeaturesFile);
         setEntriesFile(entriesFile);
         setFeaturesFile(featuresFile);
+    }
+
+    public IndexDeligatePair getIndexDeligate() {
+        return indexDeligate;
+    }
+
+    public final void setIndexDeligate(IndexDeligatePair indexDeligate) {
+        Checks.checkNotNull("indexDeligate", indexDeligate);
+        this.indexDeligate = indexDeligate;
     }
 
     public final File getFeaturesFile() {
@@ -259,10 +266,9 @@ public class CountCommand extends AbstractCommand implements Serializable {
 
         WeightedTokenPairSink eventsSink = new WeightedTokenPairSink(
                 new TSVSink(entryFeaturesFile, charset),
-                indexDeligate
-//                indexDeligate.getEncoder1(), indexDeligate.getEncoder2()
+                indexDeligate //                indexDeligate.getEncoder1(), indexDeligate.getEncoder2()
                 );
-        
+
 
         CountTask task = new CountTask(
                 instanceSource, eventsSink, entrySink, featureSink,

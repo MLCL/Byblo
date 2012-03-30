@@ -14,6 +14,7 @@ import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.TokenPairSink;
 import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
+import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.io.Source;
 import uk.ac.susx.mlcl.lib.io.TSVSink;
@@ -26,15 +27,25 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
 public class MergeTokenPairCommand extends AbstractMergeCommand<TokenPair> {
 
     @ParametersDelegate
-    protected final IndexDeligatePair indexDeligate = new IndexDeligatePair();
+    private IndexDeligatePair indexDeligate = new IndexDeligatePair();
 
-    public MergeTokenPairCommand(File sourceFileA, File sourceFileB, File destinationFile, Charset charset, boolean preindexedTokens1, boolean preindexedTokens2) {
+    public MergeTokenPairCommand(
+            File sourceFileA, File sourceFileB, File destinationFile,
+            Charset charset, IndexDeligatePair indexDeligate) {
         super(sourceFileA, sourceFileB, destinationFile, charset, TokenPair.indexOrder());
-        indexDeligate.setPreindexedTokens1(preindexedTokens1);
-        indexDeligate.setPreindexedTokens2(preindexedTokens2);
+        setIndexDeligate(indexDeligate);
     }
 
     public MergeTokenPairCommand() {
+    }
+
+    public final IndexDeligatePair getIndexDeligate() {
+        return indexDeligate;
+    }
+
+    public final void setIndexDeligate(IndexDeligatePair indexDeligate) {
+        Checks.checkNotNull("indexDeligate", indexDeligate);
+        this.indexDeligate = indexDeligate;
     }
 
     @Override

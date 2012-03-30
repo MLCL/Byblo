@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import com.google.common.base.Function;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -39,14 +38,9 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource.Tell;
 import uk.ac.susx.mlcl.lib.Comparators;
-import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.Enumerators;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
-import uk.ac.susx.mlcl.lib.io.Lexer;
-import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
-import uk.ac.susx.mlcl.lib.io.SeekableSource;
-import uk.ac.susx.mlcl.lib.io.TSVSource;
+import uk.ac.susx.mlcl.lib.io.*;
 
 /**
  * A <tt>WeightedTokenPairSource</tt> object is used to retrieve
@@ -56,48 +50,27 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
  * @see WeightedEntryPairSink
  */
 public class WeightedTokenPairSource
-        implements SeekableSource<Weighted<TokenPair>, Lexer.Tell>, Closeable {
+        implements SeekableSource<Weighted<TokenPair>, Tell>, Closeable {
 
     private IndexDeligatePair indexDeligate;
-//    
-//    private final Function<String, Integer> tokenDecoder1;
-//
-//    private final Function<String, Integer> tokenDecoder2;
 
-    private Weighted<TokenPair> previousRecord = null;
+    private int prev_id1 = 0;
+
+    private int prev_id2 = 0;
+
+    private boolean token1_continuation = false;
 
     private long count = 0;
 
     private final TSVSource inner;
 
     public WeightedTokenPairSource(
-            TSVSource inner, IndexDeligatePair indexDeligate
-//            Function<String, Integer> tokenDecoder1,
-//            Function<String, Integer> tokenDecoder2
-            )
+            TSVSource inner, IndexDeligatePair indexDeligate)
             throws FileNotFoundException, IOException {
 
         this.inner = inner;
         this.indexDeligate = indexDeligate;
-//        this.tokenDecoder1 = tokenDecoder1;
-//        this.tokenDecoder2 = tokenDecoder2;
     }
-
-//    public WeightedTokenPairSource(TSVSource inner)
-//            throws FileNotFoundException, IOException {
-//        this.inner = inner;
-//        indexDeligate = new IndexDeligatePair();
-////        this.tokenDecoder1 = Token.enumeratedDecoder();
-////        this.tokenDecoder2 = Token.enumeratedDecoder();
-//    }
-//
-//    public Function<String, Integer> getTokenDecoder2() {
-//        return tokenDecoder2;
-//    }
-//
-//    public Function<String, Integer> getTokenDecoder1() {
-//        return tokenDecoder1;
-//    }
 
     public long getCount() {
         return count;
@@ -106,7 +79,17 @@ public class WeightedTokenPairSource
     @Override
     public Weighted<TokenPair> read() throws IOException {
 
-        final int tokenId1 = readToken1();
+        final int tokenId1;
+        if (token1_continuation) {
+            tokenId1 = prev_id1;
+        } else {
+            tokenId1 = readToken1();
+            assert tokenId1 >= 0 : "Negative token 1 id read";
+            prev_id1 = tokenId1;
+            prev_id2 = 0;
+            token1_continuation = true;
+        }
+
 
         if (!hasNext() || inner.isEndOfRecordNext()) {
             inner.endOfRecord();
@@ -115,89 +98,51 @@ public class WeightedTokenPairSource
         }
 
         final int tokenId2 = readToken2();
-        final double weight = readWight();
+        assert tokenId2 >= 0 : "Negative token 2 id read";
+        prev_id2 = tokenId2;
+        final double weight = readWeight();
 
         final Weighted<TokenPair> record = new Weighted<TokenPair>(
                 new TokenPair(tokenId1, tokenId2), weight);
         ++count;
 
-        if (inner.hasNext() && !inner.isEndOfRecordNext()) {
-            previousRecord = record;
-        }
 
-        if (inner.hasNext() && inner.isEndOfRecordNext()) {
+        if (inner.isEndOfRecordNext()) {
             inner.endOfRecord();
-            previousRecord = null;
+            token1_continuation = false;
+            prev_id2 = 0;
         }
 
         return record;
     }
 
     protected int readToken1() throws IOException {
-        if (previousRecord == null) {
-            if(indexDeligate.isPreindexedTokens1())
-                return inner.readInt();
+        if (indexDeligate.isPreindexedTokens1()) {
+            if (indexDeligate.isSkipindexed1())
+                return prev_id1 + inner.readInt();
             else
-                return indexDeligate.getEnumerator1().index(inner.readString());
-//                indexDeligate.getDecoder1().apply(inner.readString());
-//            else
-//            return tokenDecoder1.apply(inner.readString());
-        } else {
-            return previousRecord.record().id1();
-        }
+                return inner.readInt();
+        } else
+            return indexDeligate.getEnumerator1().index(inner.readString());
     }
 
     protected int readToken2() throws IOException {
-        if(indexDeligate.isPreindexedTokens2())
+        if (indexDeligate.isPreindexedTokens2()) {
+            if (indexDeligate.isSkipindexed2()) {
+                return prev_id2 + inner.readInt();
+            } else {
                 return inner.readInt();
-            else
-                return indexDeligate.getEnumerator2().index(inner.readString());
-        
-//        return tokenDecoder2.apply(inner.readString());
+            }
+        } else
+            return indexDeligate.getEnumerator2().index(inner.readString());
     }
 
-    protected double readWight() throws IOException {
+    protected double readWeight() throws IOException {
         return inner.readDouble();
     }
 
     public WeightedTokenPairVectorSource getVectorSource() {
         return new WeightedTokenPairVectorSource(this);
-    }
-
-    public static boolean equal(File a, File b, Charset charset) throws IOException {
-        final Enumerator<String> stringIndex = Enumerators.newDefaultStringEnumerator();
-        IndexDeligatePair idx = new IndexDeligatePair(false, false);
-        final WeightedTokenPairSource srcA = new WeightedTokenPairSource(
-                new TSVSource(a, charset),idx
-//                Token.stringDecoder(stringIndex),
-//                Token.stringDecoder(stringIndex)
-                        );
-        final WeightedTokenPairSource srcB = new WeightedTokenPairSource(
-                new TSVSource(b, charset), idx
-//                Token.stringDecoder(stringIndex),
-                //                Token.stringDecoder(stringIndex)
-                        );
-
-
-        List<Weighted<TokenPair>> listA = IOUtil.readAll(srcA);
-        List<Weighted<TokenPair>> listB = IOUtil.readAll(srcB);
-        Comparator<Weighted<TokenPair>> c =
-                Comparators.fallback(
-                Weighted.recordOrder(TokenPair.indexOrder()),
-                Weighted.<TokenPair>weightOrder());
-        Collections.sort(listA, c);
-        Collections.sort(listB, c);
-        return listA.equals(listB);
-//
-//        boolean equal = true;
-//        while (equal && srcA.hasNext() && srcB.hasNext()) {
-//            final Weighted<TokenPair> recA = srcA.read();
-//            final Weighted<TokenPair> recB = srcB.read();
-//            equal = recA.record().id1() == recB.record().id1()
-//                    && recA.record().id2() == recB.record().id2()
-//                    && recA.weight() == recB.weight();
-//        }
-//        return equal && srcA.hasNext() == srcB.hasNext();
     }
 
     @Override
@@ -207,12 +152,16 @@ public class WeightedTokenPairSource
 
     @Override
     public void position(Tell p) throws IOException {
-        inner.position(p);
+        this.token1_continuation = p.isToken1_continuation();
+        this.prev_id1 = p.getPrev_id1();
+        this.prev_id2 = p.getPrev_id2();
+        inner.position(p.getInner());
     }
 
     @Override
     public Tell position() throws IOException {
-        return inner.position();
+        return new Tell(inner.position(),
+                        token1_continuation, prev_id1, prev_id2);
     }
 
     public double percentRead() throws IOException {
@@ -224,4 +173,83 @@ public class WeightedTokenPairSource
         inner.close();
     }
 
+    public static boolean equal(File a, File b, Charset charset) throws IOException {
+        IndexDeligatePair idx = new IndexDeligatePair(false, false);
+        final WeightedTokenPairSource srcA = new WeightedTokenPairSource(
+                new TSVSource(a, charset), idx);
+        final WeightedTokenPairSource srcB = new WeightedTokenPairSource(
+                new TSVSource(b, charset), idx);
+
+        List<Weighted<TokenPair>> listA = IOUtil.readAll(srcA);
+        List<Weighted<TokenPair>> listB = IOUtil.readAll(srcB);
+        Comparator<Weighted<TokenPair>> c =
+                Comparators.fallback(
+                Weighted.recordOrder(TokenPair.indexOrder()),
+                Weighted.<TokenPair>weightOrder());
+        Collections.sort(listA, c);
+        Collections.sort(listB, c);
+        return listA.equals(listB);
+    }
+
+    public static final class Tell {
+
+        public static final Tell START = new Tell(Lexer.Tell.START, false, 0, 0);
+
+        private final Lexer.Tell inner;
+
+        private final boolean token1_continuation;
+
+        private final int prev_id1;
+
+        private final int prev_id2;
+
+        public Tell(Lexer.Tell inner, boolean token1_continuation, int prev_id1, int prev_id2) {
+            this.inner = inner;
+            this.token1_continuation = token1_continuation;
+            this.prev_id1 = prev_id1;
+            this.prev_id2 = prev_id2;
+        }
+
+        public Lexer.Tell getInner() {
+            return inner;
+        }
+
+        public int getPrev_id1() {
+            return prev_id1;
+        }
+
+        public int getPrev_id2() {
+            return prev_id2;
+        }
+
+        public boolean isToken1_continuation() {
+            return token1_continuation;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            final Tell other = (Tell) obj;
+            if (this.inner != other.inner && (this.inner == null || !this.inner.equals(other.inner)))
+                return false;
+            if (this.prev_id1 != other.prev_id1)
+                return false;
+            if (this.prev_id2 != other.prev_id2)
+                return false;
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 7;
+            hash = 83 * hash + (this.inner != null ? this.inner.hashCode() : 0);
+            hash = 83 * hash + this.prev_id1;
+            hash = 83 * hash + this.prev_id2;
+            return hash;
+        }
+
+    }
 }

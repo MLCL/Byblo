@@ -80,9 +80,13 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
 
     private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
 
-    private boolean compactFormatEnabled = true;
+    private boolean compactFormatEnabled = false;
 
-    private Weighted<TokenPair> previousRecord = null;
+    private boolean token1_continuation = false;
+
+    private int prev_id1 = 0;
+
+    private int prev_id2 = 0;
 
     private long count = 0;
 
@@ -115,39 +119,58 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
         ++count;
     }
 
-    private void writeVerbose(Weighted<TokenPair> record) throws IOException {
+    private void writeVerbose(final Weighted<TokenPair> record) throws IOException {
         writeToken1(record.record().id1());
         writeToken2(record.record().id2());
         writeWeight(record.weight());
         inner.endOfRecord();
+        prev_id1 = record.record().id1();
+        prev_id2 = record.record().id2();
     }
 
     private void writeCompact(final Weighted<TokenPair> record) throws IOException {
-        if (previousRecord == null) {
-            writeToken1(record.record().id1());
-        } else if (previousRecord.record().id1() != record.record().
-                id1()) {
+        if (token1_continuation && prev_id1 != record.record().id1()) {
             inner.endOfRecord();
+            token1_continuation = false;
+            prev_id2 = 0;
+        }
+
+        if (!token1_continuation) {
             writeToken1(record.record().id1());
+            prev_id1 = record.record().id1();
+            token1_continuation = true;
         }
 
         writeToken2(record.record().id2());
+        prev_id2 = record.record().id2();
+        
         writeWeight(record.weight());
-        previousRecord = record;
     }
 
     private void writeToken1(int tokenId) throws IOException {
+        assert tokenId >= 0 : "Writing negative token 1 id";
+        
         if (indexDeligate.isPreindexedTokens1())
-            inner.writeInt(tokenId);
+            if (indexDeligate.isSkipindexed1())
+                inner.writeInt(tokenId - prev_id1);
+            else
+                inner.writeInt(tokenId);
         else
             inner.writeString(indexDeligate.getEnumerator1().value(tokenId));
     }
 
     private void writeToken2(int tokenId) throws IOException {
-        if (indexDeligate.isPreindexedTokens2())
-            inner.writeInt(tokenId);
-        else
+        assert tokenId >= 0 : "Writing negative token 2 id";
+        
+        if (indexDeligate.isPreindexedTokens2()) {
+            if (indexDeligate.isSkipindexed2()) {
+                inner.writeInt(tokenId - prev_id2);
+            } else {
+                inner.writeInt(tokenId);
+            }
+        } else {
             inner.writeString(indexDeligate.getEnumerator2().value(tokenId));
+        }
     }
 
     private void writeWeight(double weight) throws IOException {
@@ -160,7 +183,7 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
 
     @Override
     public void close() throws IOException {
-        if (isCompactFormatEnabled() && previousRecord != null) {
+        if (isCompactFormatEnabled() && token1_continuation) {
             inner.endOfRecord();
         }
         inner.close();

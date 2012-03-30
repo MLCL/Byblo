@@ -5,7 +5,6 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import com.beust.jcommander.Parameter;
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import java.io.File;
 import java.io.IOException;
@@ -26,11 +25,11 @@ public class IndexDeligatePair extends AbstractDeligate implements Serializable 
 
     @Parameter(names = {"-p1", "--preindexed1"},
     description = "Whether tokens in the first column of the input file are indexed.")
-    private boolean preindexedTokens1 = false;
+    private boolean preindexedTokens1 = IndexDeligate.DEFAULT_INDEXING;
 
     @Parameter(names = {"-p2", "--preindexed2"},
     description = "Whether entries in the second column of the input file are indexed.")
-    private boolean preindexedTokens2 = false;
+    private boolean preindexedTokens2 = IndexDeligate.DEFAULT_INDEXING;
 
     @Parameter(names = {"-x1", "--index-file-1"},
     description = "Index for the first token type.",
@@ -41,6 +40,14 @@ public class IndexDeligatePair extends AbstractDeligate implements Serializable 
     description = "Index for the second token type.",
     validateWith = InputFileValidator.class)
     private File indexFile2 = null;
+
+    @Parameter(names = {"-s1", "--skipindexed1"},
+    description = "")
+    private boolean skipindexed1 = IndexDeligate.DEFAULT_SKIP_INDEXING;
+
+    @Parameter(names = {"-s2", "--skipindexed2"},
+    description = "")
+    private boolean skipindexed2 = IndexDeligate.DEFAULT_SKIP_INDEXING;
 
     private Enumerator<String> enumerator1 = null;
 
@@ -59,15 +66,42 @@ public class IndexDeligatePair extends AbstractDeligate implements Serializable 
         setEnumerator2(index2);
     }
 
+    public IndexDeligatePair(boolean preindexedTokens1, boolean preindexedTokens2,
+                             Enumerator<String> index1, Enumerator<String> index2,
+                             boolean skipindexed1, boolean skipindexed2) {
+        setPreindexedTokens1(preindexedTokens1);
+        setPreindexedTokens2(preindexedTokens2);
+        setEnumerator1(index1);
+        setEnumerator2(index2);
+        setSkipindexed1(skipindexed1);
+        setSkipindexed2(skipindexed2);
+    }
+
     public IndexDeligatePair() {
     }
 
+    public final boolean isSkipindexed1() {
+        return skipindexed1;
+    }
+
+    public final void setSkipindexed1(boolean skipindexed1) {
+        this.skipindexed1 = skipindexed1;
+    }
+
+    public final boolean isSkipindexed2() {
+        return skipindexed2;
+    }
+
+    public final void setSkipindexed2(boolean skipindexed2) {
+        this.skipindexed2 = skipindexed2;
+    }
+
     public IndexDeligate single1() throws IOException {
-        return new IndexDeligate(preindexedTokens1, indexFile1, getEnumerator1());
+        return new IndexDeligate(isPreindexedTokens1(), getIndexFile1(), getEnumerator1(), isSkipindexed1());
     }
 
     public IndexDeligate single2() throws IOException {
-        return new IndexDeligate(preindexedTokens2, indexFile2, getEnumerator2());
+        return new IndexDeligate(isPreindexedTokens2(), getIndexFile2(), getEnumerator2(), isSkipindexed2());
     }
 
     public final Enumerator<String> getEnumerator1() throws IOException {

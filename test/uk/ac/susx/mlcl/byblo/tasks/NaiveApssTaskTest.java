@@ -30,9 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.tasks;
 
-import uk.ac.susx.mlcl.byblo.tasks.NaiveApssTask;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
-import uk.ac.susx.mlcl.lib.io.Lexer;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairVectorSource;
 import com.google.common.base.Predicate;
 import uk.ac.susx.mlcl.byblo.measure.Proximity;
@@ -46,10 +44,9 @@ import uk.ac.susx.mlcl.byblo.io.Weighted;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
-import uk.ac.susx.mlcl.byblo.io.Token;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource.Tell;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
-import uk.ac.susx.mlcl.lib.SimpleEnumerator;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
 
 /**
@@ -70,7 +67,7 @@ public class NaiveApssTaskTest {
     @SuppressWarnings("unchecked")
     public void testRunTask() throws Exception {
 
-        NaiveApssTask<Lexer.Tell> instance = new NaiveApssTask<Lexer.Tell>();
+        NaiveApssTask<Tell> instance = new NaiveApssTask<Tell>();
 
         Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
         WeightedTokenPairSource mdbsa = new WeightedTokenPairSource(

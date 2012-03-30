@@ -6,6 +6,7 @@ package uk.ac.susx.mlcl.byblo.commands;
 
 import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -30,18 +31,14 @@ public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>>
 
     private static final Log LOG = LogFactory.getLog(UnindexSimsCommand.class);
 
-    @Parameter(names = {"-x", "--index-file"},
-    required = true,
-    description = "Index for the first token type.",
-    validateWith = InputFileValidator.class)
-    private File indexFile = null;
+    @ParametersDelegate
+    private IndexDeligate indexDeligate = new IndexDeligate();
 
-    private Enumerator<String> index = null;
-
+//    private Enumerator<String> index = null;
     public UnindexSimsCommand(
             File sourceFile, File destinationFile, Charset charset, File indexFile) {
         super(sourceFile, destinationFile, charset);
-        setIndexFile(indexFile);
+        indexDeligate.setIndexFile(indexFile);
     }
 //
 //    public UnindexSimsCommand(File sourceFile, File destinationFile) {
@@ -54,37 +51,50 @@ public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>>
 
     @Override
     public void runCommand() throws Exception {
-        Checks.checkNotNull("indexFile", indexFile);
-        index = Enumerators.loadStringEnumerator(indexFile);
-        Checks.checkNotNull("index", index);
+        Checks.checkNotNull("indexFile", indexDeligate.getIndexFile());
+
+//        index = Enumerators.loadStringEnumerator(indexFile);
+//        Checks.checkNotNull("index", index);
         super.runCommand();
     }
 
     @Override
     protected Source<Weighted<TokenPair>> openSource(File file)
             throws FileNotFoundException, IOException {
+        IndexDeligatePair dstIdx = new IndexDeligatePair(true, true);
+        dstIdx.setSkipindexed1(indexDeligate.isSkipIndexed());
+        dstIdx.setSkipindexed2(indexDeligate.isSkipIndexed());
         return new WeightedTokenPairSource(
                 new TSVSource(file, getFilesDeligate().getCharset()),
-                new IndexDeligatePair(true, true) //                Token.enumeratedDecoder(), Token.enumeratedDecoder()
-                );
+                dstIdx);
     }
 
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file)
             throws FileNotFoundException, IOException {
+        IndexDeligatePair srcIdx = new IndexDeligatePair(
+                false, false, 
+                indexDeligate.getEnumerator(), 
+                indexDeligate.getEnumerator(), false, false);
         return new WeightedTokenPairSink(
                 new TSVSink(file, getFilesDeligate().getCharset()),
-                new IndexDeligatePair(false, false, index, index) //                Token.stringEncoder(index), Token.stringEncoder(index)
-                );
+                srcIdx);
     }
 
-    public final File getIndexFile() {
-        return indexFile;
+//    public final File getIndexFile() {
+//        return indexFile;
+//    }
+//
+//    public final void setIndexFile(File indexFile) {
+//        Checks.checkNotNull("indexFile", indexFile);
+//        this.indexFile = indexFile;
+//    }
+    public IndexDeligate getIndexDeligate() {
+        return indexDeligate;
     }
 
-    public final void setIndexFile(File indexFile) {
-        Checks.checkNotNull("indexFile", indexFile);
-        this.indexFile = indexFile;
+    public void setIndexDeligate(IndexDeligate indexDeligate) {
+        this.indexDeligate = indexDeligate;
     }
 
 }

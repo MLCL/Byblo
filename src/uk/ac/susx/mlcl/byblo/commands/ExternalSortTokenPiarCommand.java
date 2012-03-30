@@ -12,6 +12,7 @@ import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.TokenPairSink;
 import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
+import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.*;
 
 /**
@@ -20,13 +21,16 @@ import uk.ac.susx.mlcl.lib.io.*;
  */
 public class ExternalSortTokenPiarCommand extends AbstractExternalSortCommand<TokenPair> {
 
-    @ParametersDelegate
-    private final IndexDeligatePair indexDeligate = new IndexDeligatePair();
+    private static final long serialVersionUID = 1L;
 
-    public ExternalSortTokenPiarCommand(File sourceFile, File destinationFile, Charset charset, boolean preindexed1, boolean preindexed2) {
+    @ParametersDelegate
+    private IndexDeligatePair indexDeligate = new IndexDeligatePair();
+
+    public ExternalSortTokenPiarCommand(
+            File sourceFile, File destinationFile, Charset charset,
+            IndexDeligatePair indexDeligate) {
         super(sourceFile, destinationFile, charset);
-        indexDeligate.setPreindexedTokens1(preindexed1);
-        indexDeligate.setPreindexedTokens2(preindexed2);
+        setIndexDeligate(indexDeligate);
     }
 
     public ExternalSortTokenPiarCommand() {
@@ -48,8 +52,13 @@ public class ExternalSortTokenPiarCommand extends AbstractExternalSortCommand<To
                 getIndexDeligate());
     }
 
-    public IndexDeligatePair getIndexDeligate() {
+    public final IndexDeligatePair getIndexDeligate() {
         return indexDeligate;
+    }
+
+    public final void setIndexDeligate(IndexDeligatePair indexDeligate) {
+        Checks.checkNotNull("indexDeligate", indexDeligate);
+        this.indexDeligate = indexDeligate;
     }
 
 }

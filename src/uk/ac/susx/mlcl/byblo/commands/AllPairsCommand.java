@@ -46,6 +46,7 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.tasks.InvertedApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.ThreadedApssTask;
 import uk.ac.susx.mlcl.byblo.io.*;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource.Tell;
 import uk.ac.susx.mlcl.byblo.measure.*;
 import uk.ac.susx.mlcl.byblo.tasks.NaiveApssTask;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -306,27 +307,32 @@ public class AllPairsCommand extends AbstractCommand {
         // Create a sink object that will act as a recipient for all pairs that
         // are produced by the algorithm.
 
+        IndexDeligatePair sinkIdx = new IndexDeligatePair(
+                getIndexDeligate().isPreindexedTokens1(), 
+                getIndexDeligate().isPreindexedTokens1(), 
+                getIndexDeligate().getEnumerator1(), 
+                getIndexDeligate().getEnumerator1());
+        sinkIdx.setSkipindexed1(getIndexDeligate().isSkipindexed1());
+        sinkIdx.setSkipindexed2(getIndexDeligate().isSkipindexed2());
+                
+        
         final Sink<Weighted<TokenPair>> sink =
                 new WeightedTokenPairSink(
                 new TSVSink(getOutputFile(), getCharset()),
-                new IndexDeligatePair(
-                getIndexDeligate().isPreindexedTokens1(), 
-                getIndexDeligate().isPreindexedTokens1(), 
-                getIndexDeligate().getEnumerator1(), getIndexDeligate().getEnumerator1())
-                );
+                sinkIdx);
 
 
-        NaiveApssTask<Lexer.Tell> apss = null;
+        NaiveApssTask<Tell> apss = null;
 
 
         if (getSerial()) {
             apss = getAlgorithm() == Algorithm.Inverted
-                   ? new InvertedApssTask<Lexer.Tell>()
-                   : new NaiveApssTask<Lexer.Tell>();
+                   ? new InvertedApssTask<Tell>()
+                   : new NaiveApssTask<Tell>();
         } else {
 
             // Instantiate the all-pairs algorithm as given on the command line.
-            ThreadedApssTask<Lexer.Tell> tapss = new ThreadedApssTask<Lexer.Tell>();
+            ThreadedApssTask<Tell> tapss = new ThreadedApssTask<Tell>();
             tapss.setInnerAlgorithm(
                     getAlgorithm() == Algorithm.Inverted
                     ? InvertedApssTask.class

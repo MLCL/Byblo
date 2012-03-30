@@ -22,10 +22,11 @@ public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCo
     @ParametersDelegate
     private IndexDeligatePair indexDeligate = new IndexDeligatePair();
 
-    public ExternalSortWeightedTokenPiarCommand(File sourceFile, File destinationFile, Charset charset, boolean preindexed1, boolean preindexed2) {
+    public ExternalSortWeightedTokenPiarCommand(
+            File sourceFile, File destinationFile, Charset charset, 
+            IndexDeligatePair indexDeligate) {
         super(sourceFile, destinationFile, charset);
-        indexDeligate.setPreindexedTokens1(preindexed1);
-        indexDeligate.setPreindexedTokens2(preindexed2);
+        setIndexDeligate(indexDeligate);
     }
 
     public ExternalSortWeightedTokenPiarCommand() {
@@ -40,17 +41,17 @@ public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCo
     }
 
     @Override
-    protected SeekableSource<Weighted<TokenPair>, Lexer.Tell> openSource(File file) throws IOException {
+    protected WeightedTokenPairSource openSource(File file) throws IOException {
         return new WeightedTokenPairSource(
                 new TSVSource(file, getFileDeligate().getCharset()),
                 getIndexDeligate());
     }
 
-    public IndexDeligatePair getIndexDeligate() {
+    public final IndexDeligatePair getIndexDeligate() {
         return indexDeligate;
     }
 
-    public void setIndexDeligate(IndexDeligatePair indexDeligate) {
+    public final void setIndexDeligate(IndexDeligatePair indexDeligate) {
         Checks.checkNotNull("indexDeligate",indexDeligate);
         this.indexDeligate = indexDeligate;
     }
