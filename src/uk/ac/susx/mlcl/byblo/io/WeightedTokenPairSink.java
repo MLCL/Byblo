@@ -87,34 +87,11 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
     private long count = 0;
 
     private TSVSink inner;
-//
-//    private final Function<Integer, String> tokenEncoder1;
-//
-//    private final Function<Integer, String> tokenEncoder2;
 
-    public WeightedTokenPairSink(TSVSink inner, 
-                                 IndexDeligatePair indexDeligate
-//                                 Function<Integer, String> tokenEncoder1, Function<Integer, String> tokenEncoder2
-            ) {
+    public WeightedTokenPairSink(TSVSink inner, IndexDeligatePair indexDeligate) {
         this.inner = inner;
         this.indexDeligate = indexDeligate;
-//        this.tokenEncoder1 = tokenEncoder1;
-//        this.tokenEncoder2 = tokenEncoder2;
     }
-
-//    public WeightedTokenPairSink(TSVSink inner) {
-//        this.inner = inner;
-//        this.tokenEncoder1 = Token.enumeratedEncoder();
-//        this.tokenEncoder2 = Token.enumeratedEncoder();
-//    }
-
-//    public Function<Integer, String> getTokenEncoder1() {
-//        return tokenEncoder1;
-//    }
-//
-//    public Function<Integer, String> getTokenEncoder2() {
-//        return tokenEncoder2;
-//    }
 
     public boolean isCompactFormatEnabled() {
         return compactFormatEnabled;
@@ -160,19 +137,17 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
     }
 
     private void writeToken1(int tokenId) throws IOException {
-        if(indexDeligate.isPreindexedTokens1())
+        if (indexDeligate.isPreindexedTokens1())
             inner.writeInt(tokenId);
         else
-        inner.writeString(indexDeligate.getEncoder1().apply(tokenId));
-//        inner.writeString(tokenEncoder1.apply(tokenId));
+            inner.writeString(indexDeligate.getEnumerator1().value(tokenId));
     }
 
     private void writeToken2(int tokenId) throws IOException {
-         if(indexDeligate.isPreindexedTokens2())
+        if (indexDeligate.isPreindexedTokens2())
             inner.writeInt(tokenId);
         else
-        inner.writeString(indexDeligate.getEncoder2().apply(tokenId));
-//        inner.writeString(tokenEncoder2.apply(tokenId));
+            inner.writeString(indexDeligate.getEnumerator2().value(tokenId));
     }
 
     private void writeWeight(double weight) throws IOException {

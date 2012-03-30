@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import java.io.*;
 import java.util.Comparator;
@@ -155,104 +154,57 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
         }
 
     }
-
-    public static Function<Integer, String> enumeratedEncoder() {
-        return new Function<Integer, String>() {
-
-            @Override
-            public String apply(Integer token) {
-                return Integer.toString(token);
-            }
-
-        };
-    }
-
-    public static Function<String, Integer> enumeratedDecoder() {
-        return new Function<String, Integer>() {
-
-            @Override
-            public Integer apply(String str) {
-                return Integer.parseInt(str);
-            }
-
-        };
-    }
-
-    // XXX: Broken
-    @Deprecated
-    public static Function<Integer, String> deltaEncoder() {
-        return new Function<Integer, String>() {
-
-            private int previous = 0;
-
-            @Override
-            public String apply(Integer token) {
-                final int delta = token - previous;
-                previous = token;
-                return (deltaNumDigits(delta) < idxNumDigits(token))
-                       ? (delta < 0 ? '-' : '+') + Integer.toString(delta)
-                       : Integer.toString(token);
-
-            }
-
-            private int deltaNumDigits(int delta) {
-                return (int) (Math.floor(Math.log10(Math.abs(delta)))) + 2;
-            }
-
-            private int idxNumDigits(int idx) {
-                assert idx >= 0 : "num must be a positive index";
-                return (int) (Math.floor(Math.log10(idx))) + 1;
-            }
-
-        };
-    }
-
-    // XXX: Broken
-    @Deprecated
-    public static Function<String, Integer> deltaDecoder() {
-        return new Function<String, Integer>() {
-
-            private int previous = 0;
-
-            @Override
-            public Integer apply(String str) {
-                switch (str.charAt(0)) {
-                    case '-':
-                        previous -= Integer.parseInt(str.substring(1));
-                    case '+':
-                        previous += Integer.parseInt(str.substring(1));
-                        return previous;
-                    default:
-                        return Integer.parseInt(str);
-                }
-            }
-
-        };
-    }
-
-    public static Function<Integer, String> stringEncoder(
-            final Enumerator<String> strEnum) {
-        return new Function<Integer, String>() {
-
-            @Override
-            public String apply(Integer token) {
-                return strEnum.value(token);
-            }
-
-        };
-    }
-
-    public static Function<String, Integer> stringDecoder(
-            final Enumerator<String> strEnum) {
-        return new Function<String, Integer>() {
-
-            @Override
-            public Integer apply(String str) {
-                return strEnum.index(str);
-            }
-
-        };
-    }
+//    // XXX: Broken
+//    @Deprecated
+//    public static Function<Integer, String> deltaEncoder() {
+//        return new Function<Integer, String>() {
+//
+//            private int previous = 0;
+//
+//            @Override
+//            public String apply(Integer token) {
+//                final int delta = token - previous;
+//                previous = token;
+//                return (deltaNumDigits(delta) < idxNumDigits(token))
+//                       ? (delta < 0 ? '-' : '+') + Integer.toString(delta)
+//                       : Integer.toString(token);
+//
+//            }
+//
+//            private int deltaNumDigits(int delta) {
+//                return (int) (Math.floor(Math.log10(Math.abs(delta)))) + 2;
+//            }
+//
+//            private int idxNumDigits(int idx) {
+//                assert idx >= 0 : "num must be a positive index";
+//                return (int) (Math.floor(Math.log10(idx))) + 1;
+//            }
+//
+//        };
+//    }
+//
+//    // XXX: Broken
+//    @Deprecated
+//    public static Function<String, Integer> deltaDecoder() {
+//        return new Function<String, Integer>() {
+//
+//            private int previous = 0;
+//
+//            @Override
+//            public Integer apply(String str) {
+//                switch (str.charAt(0)) {
+//                    case '-':
+//                        previous -= Integer.parseInt(str.substring(1));
+//                    case '+':
+//                        previous += Integer.parseInt(str.substring(1));
+//                        return previous;
+//                    default:
+//                        return Integer.parseInt(str);
+//                }
+//            }
+//
+//        };
+//    }
 
     public static Comparator<Token> indexOrder() {
         return new Comparator<Token>() {
@@ -265,14 +217,13 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
         };
     }
 
-    public static Comparator<Token> stringOrder(
-            final Function<Integer, String> encoder) {
+    public static Comparator<Token> stringOrder(final Enumerator<String> enumerator) {
         return new Comparator<Token>() {
 
             @Override
             public int compare(final Token a, final Token b) {
-                return encoder.apply(a.id()).compareTo(
-                        encoder.apply(b.id()));
+                return enumerator.value(a.id()).compareTo(
+                        enumerator.value(b.id()));
             }
 
         };

@@ -138,7 +138,7 @@ public class WeightedTokenPairSource
             if(indexDeligate.isPreindexedTokens1())
                 return inner.readInt();
             else
-                return indexDeligate.getIndex1().index(inner.readString());
+                return indexDeligate.getEnumerator1().index(inner.readString());
 //                indexDeligate.getDecoder1().apply(inner.readString());
 //            else
 //            return tokenDecoder1.apply(inner.readString());
@@ -151,7 +151,7 @@ public class WeightedTokenPairSource
         if(indexDeligate.isPreindexedTokens2())
                 return inner.readInt();
             else
-                return indexDeligate.getIndex2().index(inner.readString());
+                return indexDeligate.getEnumerator2().index(inner.readString());
         
 //        return tokenDecoder2.apply(inner.readString());
     }

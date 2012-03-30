@@ -133,14 +133,14 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
         if(indexDeligate.isPreindexedTokens1())
             inner.writeInt(stringId);
         else
-            inner.writeString(indexDeligate.getIndex1().value(stringId));
+            inner.writeString(indexDeligate.getEnumerator1().value(stringId));
     }
 
     private void writeString2(int stringId) throws IOException {
         if(indexDeligate.isPreindexedTokens2())
             inner.writeInt(stringId);
         else
-            inner.writeString(indexDeligate.getIndex2().value(stringId));
+            inner.writeString(indexDeligate.getEnumerator2().value(stringId));
     }
 
     @Override

@@ -312,7 +312,7 @@ public class AllPairsCommand extends AbstractCommand {
                 new IndexDeligatePair(
                 getIndexDeligate().isPreindexedTokens1(), 
                 getIndexDeligate().isPreindexedTokens1(), 
-                getIndexDeligate().getIndex1(), getIndexDeligate().getIndex1())
+                getIndexDeligate().getEnumerator1(), getIndexDeligate().getEnumerator1())
                 );
 
 

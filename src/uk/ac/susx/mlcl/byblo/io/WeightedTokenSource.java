@@ -141,7 +141,7 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
         if (indexDeligate.isPreindexedTokens()) {
             return inner.readInt();
         } else
-            return indexDeligate.getDecoder().apply(inner.readString());
+            return indexDeligate.getEnumerator().index(inner.readString());
 //        return tokenDecoder.apply(inner.readString());
     }
 
@@ -197,7 +197,7 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
 
                 if (LOG.isWarnEnabled())
                     LOG.warn("Found duplicate Entry \""
-                            + (indexDeligate.getIndex().value(entry.record().id()))
+                            + (indexDeligate.getEnumerator().value(entry.record().id()))
                             + "\" (id=" + id
                             + ") in entries file. Merging records. Old frequency = "
                             + oldFreq + ", new frequency = " + newFreq + ".");

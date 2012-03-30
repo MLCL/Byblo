@@ -87,22 +87,12 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
 
     private TSVSink inner;
 
-    public WeightedTokenSink(TSVSink inner,
-                             IndexDeligate indexDeligate
-//                             Function<Integer, String> tokenEncoder
-            )
+    public WeightedTokenSink(TSVSink inner, IndexDeligate indexDeligate)
             throws FileNotFoundException, IOException {
         this.inner = inner;
         this.indexDeligate = indexDeligate;
-//        this.tokenEncoder = tokenEncoder;
     }
 
-//    public WeightedTokenSink(TSVSink inner)
-//            throws FileNotFoundException, IOException {
-//        this.inner = inner;
-//        this.tokenEncoder = Token.enumeratedEncoder();
-//    }
-//
     public boolean isCompactFormatEnabled() {
         return compactFormatEnabled;
     }
@@ -110,10 +100,6 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
     public void setCompactFormatEnabled(boolean compactFormatEnabled) {
         this.compactFormatEnabled = compactFormatEnabled;
     }
-//
-//    public Function<Integer, String> getTokenEncoder() {
-//        return tokenEncoder;
-//    }
 
     @Override
     public void write(final Weighted<Token> record) throws IOException {
@@ -147,10 +133,10 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
     }
 
     private void writeString(int id) throws IOException {
-        if(indexDeligate.isPreindexedTokens())
+        if (indexDeligate.isPreindexedTokens())
             inner.writeInt(id);
         else
-            inner.writeString(indexDeligate.getEncoder().apply(id));
+            inner.writeString(indexDeligate.getEnumerator().value(id));
     }
 
     private void writeWeight(double weight) throws IOException {

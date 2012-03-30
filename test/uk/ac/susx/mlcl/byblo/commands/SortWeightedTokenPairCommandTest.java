@@ -65,7 +65,7 @@ public class SortWeightedTokenPairCommandTest {
                 preindexedTokens1, preindexedTokens2);
 
         Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(
-                Weighted.recordOrder(TokenPair.firstStringOrder(idx.getEncoder1())),
+                Weighted.recordOrder(TokenPair.firstStringOrder(idx.getEnumerator1())),
                 Comparators.reverse(Weighted.<TokenPair>weightOrder()));
 
         testSortWeightedTokenPairCommand(inputFile, randomisedFile, sortedFile, idx, comparator);
@@ -90,7 +90,7 @@ public class SortWeightedTokenPairCommandTest {
 
 
         Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(
-                Weighted.recordOrder(TokenPair.firstStringOrder(idx.getEncoder1())),
+                Weighted.recordOrder(TokenPair.firstIndexOrder()),
                 Comparators.reverse(Weighted.<TokenPair>weightOrder()));
 
         testSortWeightedTokenPairCommand(inputFile, randomisedFile, sortedFile, idx, comparator);

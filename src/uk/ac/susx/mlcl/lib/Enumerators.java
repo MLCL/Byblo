@@ -33,22 +33,26 @@ public class Enumerators {
     public static <T> Enumerator<T> nullEnumerator() {
         return new Enumerator<T>() {
 
+            private final String ERROR = "Null Enumerator should not be accessed.";
+
             @Override
             public int index(T obj) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                throw new UnsupportedOperationException(ERROR);
             }
 
             @Override
             public T value(int id) {
-                throw new UnsupportedOperationException("Not supported yet.");
+                throw new UnsupportedOperationException(ERROR);
             }
 
             @Override
             public Iterator<Entry<T>> iterator() {
-                throw new UnsupportedOperationException("Not supported yet.");
+                throw new UnsupportedOperationException(ERROR);
             }
+
         };
     }
+
     public static Enumerator<String> newDefaultStringEnumerator() {
         SimpleEnumerator<String> instance = new SimpleEnumerator<String>();
         instance.index(FilterCommand.FILTERED_STRING);

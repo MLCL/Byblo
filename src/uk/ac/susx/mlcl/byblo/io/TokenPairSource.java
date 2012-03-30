@@ -135,7 +135,7 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell>, C
         if (indexDeligate.isPreindexedTokens1())
             return inner.readInt();
         else
-            return indexDeligate.getIndex1().index(inner.readString());
+            return indexDeligate.getEnumerator1().index(inner.readString());
 //                   
 //        return tokenDecoder1.apply(inner.readString());
     }
@@ -144,7 +144,7 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell>, C
         if (indexDeligate.isPreindexedTokens2())
             return inner.readInt();
         else
-            return indexDeligate.getIndex2().index(inner.readString());
+            return indexDeligate.getEnumerator2().index(inner.readString());
 //        return tokenDecoder2.apply(inner.readString());
     }
 

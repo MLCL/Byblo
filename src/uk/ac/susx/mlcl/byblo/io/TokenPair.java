@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import java.io.*;
@@ -187,6 +186,7 @@ public class TokenPair implements
         protected final Object readResolve() {
             return pair;
         }
+
     }
 
     public static Predicate<TokenPair> identity() {
@@ -201,6 +201,7 @@ public class TokenPair implements
             public String toString() {
                 return "identity";
             }
+
         };
     }
 //
@@ -285,6 +286,7 @@ public class TokenPair implements
                 int c = a.id1() - b.id1();
                 return c != 0 ? c : a.id2() - b.id2();
             }
+
         };
     }
 
@@ -295,9 +297,9 @@ public class TokenPair implements
             public int compare(TokenPair a, TokenPair b) {
                 return a.id1() - b.id1();
             }
+
         };
     }
-
 
     public static Comparator<TokenPair> secondIndexOrder() {
         return new Comparator<TokenPair>() {
@@ -306,48 +308,50 @@ public class TokenPair implements
             public int compare(TokenPair a, TokenPair b) {
                 return a.id2() - b.id2();
             }
+
         };
     }
 
     public static Comparator<TokenPair> stringOrder(
-            final Function<Integer, String> encoder1,
-            final Function<Integer, String> encoder2) {
+            final Enumerator<String> enum1,
+            final Enumerator<String> enum2) {
         return new Comparator<TokenPair>() {
 
             @Override
             public int compare(final TokenPair a, final TokenPair b) {
-                int c = encoder1.apply(a.id1()).compareTo(
-                        encoder1.apply(b.id1()));
-                return c != 0 ? c : encoder2.apply(a.id2()).compareTo(
-                        encoder2.apply(b.id2()));
+                int c = enum1.value(a.id1()).compareTo(
+                        enum1.value(b.id1()));
+                return c != 0 ? c : enum2.value(a.id2()).compareTo(
+                        enum2.value(b.id2()));
             }
+
         };
     }
-    
-    
+
     public static Comparator<TokenPair> firstStringOrder(
-            final Function<Integer, String> encoder) {
+            final Enumerator<String> enumerator) {
         return new Comparator<TokenPair>() {
 
             @Override
             public int compare(final TokenPair a, final TokenPair b) {
-                return  encoder.apply(a.id1()).compareTo(
-                        encoder.apply(b.id1()));
+                return enumerator.value(a.id1()).compareTo(
+                        enumerator.value(b.id1()));
             }
+
         };
     }
-    
-     
-    
+
     public static Comparator<TokenPair> secondStringOrder(
-            final Function<Integer, String> encoder) {
+            final Enumerator<String> enumerator) {
         return new Comparator<TokenPair>() {
 
             @Override
             public int compare(final TokenPair a, final TokenPair b) {
-                return  encoder.apply(a.id2()).compareTo(
-                        encoder.apply(b.id2()));
+                return enumerator.value(a.id2()).compareTo(
+                        enumerator.value(b.id2()));
             }
+
         };
     }
+
 }

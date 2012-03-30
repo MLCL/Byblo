@@ -10,6 +10,7 @@ import com.google.common.base.Objects;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.commands.AbstractDeligate;
@@ -41,9 +42,9 @@ public class IndexDeligatePair extends AbstractDeligate implements Serializable 
     validateWith = InputFileValidator.class)
     private File indexFile2 = null;
 
-    private Enumerator<String> index1 = null;
+    private Enumerator<String> enumerator1 = null;
 
-    private Enumerator<String> index2 = null;
+    private Enumerator<String> enumerator2 = null;
 
     public IndexDeligatePair(boolean preindexedTokens1, boolean preindexedTokens2) {
         setPreindexedTokens1(preindexedTokens1);
@@ -54,65 +55,67 @@ public class IndexDeligatePair extends AbstractDeligate implements Serializable 
                              Enumerator<String> index1, Enumerator<String> index2) {
         setPreindexedTokens1(preindexedTokens1);
         setPreindexedTokens2(preindexedTokens2);
-        setIndex1(index1);
-        setIndex2(index2);
+        setEnumerator1(index1);
+        setEnumerator2(index2);
     }
 
     public IndexDeligatePair() {
     }
 
     public IndexDeligate single1() throws IOException {
-        return new IndexDeligate(preindexedTokens1, indexFile1, getIndex1());
+        return new IndexDeligate(preindexedTokens1, indexFile1, getEnumerator1());
     }
 
     public IndexDeligate single2() throws IOException {
-        return new IndexDeligate(preindexedTokens2, indexFile2, getIndex2());
+        return new IndexDeligate(preindexedTokens2, indexFile2, getEnumerator2());
     }
 
-    public final Enumerator<String> getIndex1() throws IOException {
-        if (index1 == null) {
+    public final Enumerator<String> getEnumerator1() throws IOException {
+        if (enumerator1 == null) {
             // if tokens are preindexed then a file MUST be available
             // otherwise the file will be loaded if it exists
             if (isPreindexedTokens1()) {
                 if (indexFile1 != null && indexFile1.exists())
-                    index1 = Enumerators.loadStringEnumerator(indexFile1);
+                    enumerator1 = Enumerators.loadStringEnumerator(indexFile1);
                 else
-                    index1 = Enumerators.nullEnumerator();
+                    enumerator1 = Enumerators.nullEnumerator();
             } else {
                 if (indexFile1 != null && indexFile1.exists()) {
-                    index1 = Enumerators.loadStringEnumerator(indexFile1);
+                    enumerator1 = Enumerators.loadStringEnumerator(indexFile1);
                 } else {
-                    index1 = Enumerators.newDefaultStringEnumerator();
+                    enumerator1 = Enumerators.newDefaultStringEnumerator();
                 }
             }
         }
-        return index1;
+        return enumerator1;
     }
 
-    public final void setIndex1(Enumerator<String> entryIndex) {
-        this.index1 = entryIndex;
+    public final void setEnumerator1(Enumerator<String> enumerator1) {
+        Checks.checkNotNull("enumerator1", enumerator1);
+        this.enumerator1 = enumerator1;
     }
 
-    public final Enumerator<String> getIndex2() throws IOException {
-        if (index2 == null) {
+    public final Enumerator<String> getEnumerator2() throws IOException {
+        if (enumerator2 == null) {
             if (isPreindexedTokens2()) {
                 if (indexFile2 != null && indexFile2.exists())
-                    index2 = Enumerators.loadStringEnumerator(indexFile2);
+                    enumerator2 = Enumerators.loadStringEnumerator(indexFile2);
                 else
-                    index2 = Enumerators.nullEnumerator();
+                    enumerator2 = Enumerators.nullEnumerator();
             } else {
                 if (indexFile2 != null && indexFile2.exists()) {
-                    index2 = Enumerators.loadStringEnumerator(indexFile2);
+                    enumerator2 = Enumerators.loadStringEnumerator(indexFile2);
                 } else {
-                    index2 = Enumerators.newDefaultStringEnumerator();
+                    enumerator2 = Enumerators.newDefaultStringEnumerator();
                 }
             }
         }
-        return index2;
+        return enumerator2;
     }
 
-    public final void setIndex2(Enumerator<String> featureIndex) {
-        this.index2 = featureIndex;
+    public final void setEnumerator2(Enumerator<String> enumerator2) {
+        Checks.checkNotNull("enumerator2", enumerator2);
+        this.enumerator2 = enumerator2;
     }
 
     public final boolean isPreindexedTokens1() {
@@ -129,38 +132,6 @@ public class IndexDeligatePair extends AbstractDeligate implements Serializable 
 
     public final void setPreindexedTokens2(boolean preindexedTokens2) {
         this.preindexedTokens2 = preindexedTokens2;
-    }
-
-    public final Function<String, Integer> getDecoder1()
-            throws IOException {
-        return isPreindexedTokens1()
-               ? Token.enumeratedDecoder()
-               //                ? Token.deltaDecoder()
-               : Token.stringDecoder(getIndex1());
-    }
-
-    public final Function<Integer, String> getEncoder1()
-            throws IOException {
-        return isPreindexedTokens1()
-               ? Token.enumeratedEncoder()
-               //                ? Token.deltaEncoder()
-               : Token.stringEncoder(getIndex1());
-    }
-
-    public final Function<String, Integer> getDecoder2()
-            throws IOException {
-        return isPreindexedTokens2()
-               ? Token.enumeratedDecoder()
-               //                ? Token.deltaDecoder()
-               : Token.stringDecoder(getIndex2());
-    }
-
-    public final Function<Integer, String> getEncoder2()
-            throws IOException {
-        return isPreindexedTokens2()
-               ? Token.enumeratedEncoder()
-               //                ? Token.deltaEncoder()
-               : Token.stringEncoder(getIndex2());
     }
 
     public File getIndexFile1() {

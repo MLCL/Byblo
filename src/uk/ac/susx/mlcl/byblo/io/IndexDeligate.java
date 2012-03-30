@@ -5,12 +5,10 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import com.beust.jcommander.Parameter;
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
@@ -34,19 +32,19 @@ public class IndexDeligate extends AbstractDeligate implements Serializable {
     validateWith = InputFileValidator.class)
     private File indexFile = null;
 
-    private Enumerator<String> index = null;
+    private Enumerator<String> enumerator = null;
 
-    public IndexDeligate(boolean preindexedTokens, File indexFile ,Enumerator<String> index) {
+    public IndexDeligate(boolean preindexedTokens, File indexFile, Enumerator<String> index) {
         this.preindexedTokens = preindexedTokens;
         this.indexFile = indexFile;
-        this.index = index;
+        this.enumerator = index;
     }
 
     public IndexDeligate(boolean preindexedTokens, Enumerator<String> index) {
         this.preindexedTokens = preindexedTokens;
-        this.index = index;
+        this.enumerator = index;
     }
-    
+
     public IndexDeligate(boolean preindexed) {
         setPreindexedTokens(preindexed);
     }
@@ -63,21 +61,27 @@ public class IndexDeligate extends AbstractDeligate implements Serializable {
         this.indexFile = indexFile;
     }
 
-    public final Enumerator<String> getIndex() throws IOException {
-        if (index == null) {
-            // if tokens are preindexed then a file MUST be available
-            // otherwise the file will be loaded if it exists
-            if (isPreindexedTokens() || (indexFile != null && indexFile.exists())) {
-                index = Enumerators.loadStringEnumerator(indexFile);
+    public final Enumerator<String> getEnumerator() throws IOException {
+         if (enumerator == null) {
+            if (isPreindexedTokens()) {
+                if (indexFile != null && indexFile.exists())
+                    enumerator = Enumerators.loadStringEnumerator(indexFile);
+                else
+                    enumerator = Enumerators.nullEnumerator();
             } else {
-                index = Enumerators.newDefaultStringEnumerator();
+                if (indexFile != null && indexFile.exists()) {
+                    enumerator = Enumerators.loadStringEnumerator(indexFile);
+                } else {
+                    enumerator = Enumerators.newDefaultStringEnumerator();
+                }
             }
         }
-        return index;
+        return enumerator;
     }
 
-    public final void setIndex(Enumerator<String> entryIndex) {
-        this.index = entryIndex;
+    public final void setEnumerator(Enumerator<String> enumerator) {
+        Checks.checkNotNull("enumerator", enumerator);
+        this.enumerator = enumerator;
     }
 
     public final boolean isPreindexedTokens() {
@@ -86,18 +90,6 @@ public class IndexDeligate extends AbstractDeligate implements Serializable {
 
     public final void setPreindexedTokens(boolean preindexedTokens) {
         this.preindexedTokens = preindexedTokens;
-    }
-
-    public final Function<String, Integer> getDecoder() throws IOException {
-        return isPreindexedTokens()
-               ? Token.enumeratedDecoder()
-               : Token.stringDecoder(getIndex());
-    }
-
-    public final Function<Integer, String> getEncoder() throws IOException {
-        return isPreindexedTokens()
-               ? Token.enumeratedEncoder()
-               : Token.stringEncoder(getIndex());
     }
 
     @Override
