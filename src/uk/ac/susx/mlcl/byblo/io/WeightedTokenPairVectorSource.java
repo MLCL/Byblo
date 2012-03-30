@@ -66,14 +66,14 @@ public class WeightedTokenPairVectorSource
         tell = Lexer.Tell.START;
         next = null;
     }
-
-    public Function<String, Integer> getTokenDecoder2() {
-        return inner.getTokenDecoder2();
-    }
-
-    public Function<String, Integer> getTokenDecoder1() {
-        return inner.getTokenDecoder1();
-    }
+//
+//    public Function<String, Integer> getTokenDecoder2() {
+//        return inner.getTokenDecoder2();
+//    }
+//
+//    public Function<String, Integer> getTokenDecoder1() {
+//        return inner.getTokenDecoder1();
+//    }
 
     @Override
     public boolean hasNext() throws IOException {

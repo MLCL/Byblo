@@ -11,15 +11,12 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.Files;
-import uk.ac.susx.mlcl.lib.commands.AbstractDeligate;
-import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
-import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
 
 /**
  *
  * @author hiam20
  */
-public class FilePipeDeligate extends AbstractDeligate implements Serializable {
+public class FilePipeDeligate extends FileDeligate implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -29,26 +26,15 @@ public class FilePipeDeligate extends AbstractDeligate implements Serializable {
     @Parameter(names = {"-o", "--output"}, description = "Destination file that will be writen to.", validateWith = OutputFileValidator.class, required = true)
     private File destFile;
 
-    @Parameter(names = {"-c", "--charset"},
-    description = "The character set encoding to use for both reading input and writing output files.")
-    private Charset charset = Files.DEFAULT_CHARSET;
+  
 
     public FilePipeDeligate(File sourceFile, File destinationFile, Charset charset) {
+        super(charset);
         setSourceFile(sourceFile);
         setDestinationFile(destinationFile);
-        setCharset(charset);
     }
 
     public FilePipeDeligate() {
-    }
-
-    public final Charset getCharset() {
-        return charset;
-    }
-
-    public final void setCharset(Charset charset) {
-        Checks.checkNotNull(charset);
-        this.charset = charset;
     }
 
     public final File getSourceFile() {
@@ -75,8 +61,7 @@ public class FilePipeDeligate extends AbstractDeligate implements Serializable {
     protected Objects.ToStringHelper toStringHelper() {
         return super.toStringHelper().
                 add("in", getSourceFile()).
-                add("out", getDestinationFile()).
-                add("charset", getCharset());
+                add("out", getDestinationFile());
     }
 
 }

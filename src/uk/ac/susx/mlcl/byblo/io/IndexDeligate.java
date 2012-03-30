@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.byblo.commands;
+package uk.ac.susx.mlcl.byblo.io;
 
 import com.beust.jcommander.Parameter;
 import com.google.common.base.Function;
@@ -21,7 +21,7 @@ import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
  *
  * @author hiam20
  */
-public class IndexDeligateSingle extends AbstractDeligate implements Serializable {
+public class IndexDeligate extends AbstractDeligate implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -36,11 +36,22 @@ public class IndexDeligateSingle extends AbstractDeligate implements Serializabl
 
     private Enumerator<String> index = null;
 
-    public IndexDeligateSingle(boolean preindexed) {
+    public IndexDeligate(boolean preindexedTokens, File indexFile ,Enumerator<String> index) {
+        this.preindexedTokens = preindexedTokens;
+        this.indexFile = indexFile;
+        this.index = index;
+    }
+
+    public IndexDeligate(boolean preindexedTokens, Enumerator<String> index) {
+        this.preindexedTokens = preindexedTokens;
+        this.index = index;
+    }
+    
+    public IndexDeligate(boolean preindexed) {
         setPreindexedTokens(preindexed);
     }
 
-    public IndexDeligateSingle() {
+    public IndexDeligate() {
     }
 
     public File getIndexFile() {

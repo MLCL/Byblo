@@ -57,14 +57,15 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see EntryFeatureSink
  */
-public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell>, Closeable
-{
+public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell>, Closeable {
 
     private static final Log LOG = LogFactory.getLog(TokenPairSource.class);
 
-    private final Function<String, Integer> tokenDecoder1;
-
-    private final Function<String, Integer> tokenDecoder2;
+    private IndexDeligatePair indexDeligate;
+//
+//    private final Function<String, Integer> tokenDecoder1;
+//
+//    private final Function<String, Integer> tokenDecoder2;
 
     private TokenPair previousRecord = null;
 
@@ -74,27 +75,24 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell>, C
 
     public TokenPairSource(
             TSVSource inner,
-            Function<String, Integer> tokenDecoder1,
-            Function<String, Integer> tokenDecoder2)
+            IndexDeligatePair indexDeligate)
             throws FileNotFoundException, IOException {
         this.inner = inner;
-        this.tokenDecoder1 = tokenDecoder1;
-        this.tokenDecoder2 = tokenDecoder2;
+        this.indexDeligate = indexDeligate;
     }
 
-    public TokenPairSource(TSVSource inner)
-            throws FileNotFoundException, IOException {
-        this(inner, Token.enumeratedDecoder(), Token.enumeratedDecoder());
-    }
-
-    public Function<String, Integer> getTokenDecoder1() {
-        return tokenDecoder1;
-    }
-
-    public Function<String, Integer> getTokenDecoder2() {
-        return tokenDecoder2;
-    }
-
+//    public TokenPairSource(TSVSource inner)
+//            throws FileNotFoundException, IOException {
+//        this(inner, Token.enumeratedDecoder(), Token.enumeratedDecoder());
+//    }
+//
+//    public Function<String, Integer> getTokenDecoder1() {
+//        return tokenDecoder1;
+//    }
+//
+//    public Function<String, Integer> getTokenDecoder2() {
+//        return tokenDecoder2;
+//    }
     public long getCount() {
         return count;
     }
@@ -134,27 +132,32 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell>, C
     }
 
     private int readToken1() throws CharacterCodingException, IOException {
-        return tokenDecoder1.apply(inner.readString());
+        if (indexDeligate.isPreindexedTokens1())
+            return inner.readInt();
+        else
+            return indexDeligate.getIndex1().index(inner.readString());
+//                   
+//        return tokenDecoder1.apply(inner.readString());
     }
 
     private int readToken2() throws CharacterCodingException, IOException {
-        return tokenDecoder2.apply(inner.readString());
+        if (indexDeligate.isPreindexedTokens2())
+            return inner.readInt();
+        else
+            return indexDeligate.getIndex2().index(inner.readString());
+//        return tokenDecoder2.apply(inner.readString());
     }
 
     public static boolean equal(File fileA, File fileB, Charset charset)
             throws IOException {
-        final Enumerator<String> stringIndex = Enumerators.
-                newDefaultStringEnumerator();
+        final Enumerator<String> stringIndex = Enumerators.newDefaultStringEnumerator();
+        IndexDeligatePair idx = new IndexDeligatePair(false, false, stringIndex, stringIndex);
         final TokenPairSource srcA = new TokenPairSource(
-                new TSVSource(fileA, charset),
-                Token.stringDecoder(stringIndex),
-                Token.stringDecoder(stringIndex));
+                new TSVSource(fileA, charset), idx);
         final TokenPairSource srcB = new TokenPairSource(
-                new TSVSource(fileB, charset),
-                Token.stringDecoder(stringIndex),
-                Token.stringDecoder(stringIndex));
+                new TSVSource(fileB, charset), idx);
 
-        
+
         List<TokenPair> listA = IOUtil.readAll(srcA);
         List<TokenPair> listB = IOUtil.readAll(srcB);
         Comparator<TokenPair> c = TokenPair.indexOrder();
@@ -202,4 +205,5 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell>, C
     public void close() throws IOException {
         inner.close();
     }
+
 }

@@ -60,20 +60,20 @@ public class EntryTest {
                        boolean enumOut)
             throws FileNotFoundException, IOException {
 
-        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
+        Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
+        IndexDeligate idx = new IndexDeligate(false, strEnum);
         WeightedTokenSource aSrc;
         WeightedTokenSink bSink;
         if (enumIn)
-            aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET),
-                                           Token.stringDecoder(idx));
+            aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET), idx);
         else
-            aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET));
+            aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET), idx);
 
         if (enumOut)
             bSink = new WeightedTokenSink(
-                    new TSVSink(b, DEFAULT_CHARSET), Token.stringEncoder(idx));
+                    new TSVSink(b, DEFAULT_CHARSET), idx);
         else
-            bSink = new WeightedTokenSink(new TSVSink(b, DEFAULT_CHARSET));
+            bSink = new WeightedTokenSink(new TSVSink(b, DEFAULT_CHARSET), idx);
         bSink.setCompactFormatEnabled(compact);
 
         IOUtil.copy(aSrc, bSink);
@@ -110,14 +110,16 @@ public class EntryTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_ENTRIES.getName() + ".str");
 
-        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
+//        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
+        Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
 
         {
             WeightedTokenSource aSrc = new WeightedTokenSource(
                     new TSVSource(a, DEFAULT_CHARSET),
-                    Token.stringDecoder(idx));
+                    new IndexDeligate(false, strEnum));
             WeightedTokenSink bSink = new WeightedTokenSink(
-                    new TSVSink(b, DEFAULT_CHARSET));
+                    new TSVSink(b, DEFAULT_CHARSET),
+                    new IndexDeligate(true));
             IOUtil.copy(aSrc, bSink);
             bSink.close();
         }
@@ -127,10 +129,11 @@ public class EntryTest {
 
         {
             WeightedTokenSource bSrc = new WeightedTokenSource(
-                    new TSVSource(b, DEFAULT_CHARSET));
+                    new TSVSource(b, DEFAULT_CHARSET),
+                    new IndexDeligate(true));
             WeightedTokenSink cSink = new WeightedTokenSink(
                     new TSVSink(c, DEFAULT_CHARSET),
-                    Token.stringEncoder(idx));
+                     new IndexDeligate(false, strEnum));
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }
@@ -145,10 +148,13 @@ public class EntryTest {
         final Map<Tell, Weighted<Token>> hist =
                 new HashMap<Tell, Weighted<Token>>();
 
+        Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
+
+        
         Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
         WeightedTokenSource src = new WeightedTokenSource(
                 new TSVSource(file, DEFAULT_CHARSET),
-                Token.stringDecoder(idx));
+                new IndexDeligate(false, idx));
         {
             while (src.hasNext()) {
                 final Tell pos = src.position();
@@ -193,4 +199,5 @@ public class EntryTest {
             throws FileNotFoundException, IOException {
         testRandomAccess(TEST_FRUIT_ENTRIES);
     }
+
 }

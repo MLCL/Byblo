@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.byblo.commands;
+package uk.ac.susx.mlcl.byblo.io;
 
 import com.beust.jcommander.Parameter;
 import com.google.common.base.Function;
@@ -10,7 +10,6 @@ import com.google.common.base.Objects;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.commands.AbstractDeligate;
@@ -51,17 +50,40 @@ public class IndexDeligatePair extends AbstractDeligate implements Serializable 
         setPreindexedTokens2(preindexedTokens2);
     }
 
+    public IndexDeligatePair(boolean preindexedTokens1, boolean preindexedTokens2,
+                             Enumerator<String> index1, Enumerator<String> index2) {
+        setPreindexedTokens1(preindexedTokens1);
+        setPreindexedTokens2(preindexedTokens2);
+        setIndex1(index1);
+        setIndex2(index2);
+    }
+
     public IndexDeligatePair() {
+    }
+
+    public IndexDeligate single1() throws IOException {
+        return new IndexDeligate(preindexedTokens1, indexFile1, getIndex1());
+    }
+
+    public IndexDeligate single2() throws IOException {
+        return new IndexDeligate(preindexedTokens2, indexFile2, getIndex2());
     }
 
     public final Enumerator<String> getIndex1() throws IOException {
         if (index1 == null) {
             // if tokens are preindexed then a file MUST be available
             // otherwise the file will be loaded if it exists
-            if (isPreindexedTokens1() || (indexFile1 != null && indexFile1.exists())) {
-                index1 = Enumerators.loadStringEnumerator(indexFile1);
+            if (isPreindexedTokens1()) {
+                if (indexFile1 != null && indexFile1.exists())
+                    index1 = Enumerators.loadStringEnumerator(indexFile1);
+                else
+                    index1 = Enumerators.nullEnumerator();
             } else {
-                index1 = Enumerators.newDefaultStringEnumerator();
+                if (indexFile1 != null && indexFile1.exists()) {
+                    index1 = Enumerators.loadStringEnumerator(indexFile1);
+                } else {
+                    index1 = Enumerators.newDefaultStringEnumerator();
+                }
             }
         }
         return index1;
@@ -73,12 +95,17 @@ public class IndexDeligatePair extends AbstractDeligate implements Serializable 
 
     public final Enumerator<String> getIndex2() throws IOException {
         if (index2 == null) {
-            // if tokens are preindexed then a file MUST be available
-            // otherwise the file will be loaded if it exists
-            if (isPreindexedTokens2() || (indexFile2 != null && indexFile2.exists())) {
-                index2 = Enumerators.loadStringEnumerator(indexFile2);
+            if (isPreindexedTokens2()) {
+                if (indexFile2 != null && indexFile2.exists())
+                    index2 = Enumerators.loadStringEnumerator(indexFile2);
+                else
+                    index2 = Enumerators.nullEnumerator();
             } else {
-                index2 = Enumerators.newDefaultStringEnumerator();
+                if (indexFile2 != null && indexFile2.exists()) {
+                    index2 = Enumerators.loadStringEnumerator(indexFile2);
+                } else {
+                    index2 = Enumerators.newDefaultStringEnumerator();
+                }
             }
         }
         return index2;
@@ -104,20 +131,36 @@ public class IndexDeligatePair extends AbstractDeligate implements Serializable 
         this.preindexedTokens2 = preindexedTokens2;
     }
 
-    public final Function<String, Integer> getDecoder1() throws IOException {
-        return isPreindexedTokens1() ? Token.enumeratedDecoder() : Token.stringDecoder(getIndex1());
+    public final Function<String, Integer> getDecoder1()
+            throws IOException {
+        return isPreindexedTokens1()
+               ? Token.enumeratedDecoder()
+               //                ? Token.deltaDecoder()
+               : Token.stringDecoder(getIndex1());
     }
 
-    public final Function<Integer, String> getEncoder1() throws IOException {
-        return isPreindexedTokens1() ? Token.enumeratedEncoder() : Token.stringEncoder(getIndex1());
+    public final Function<Integer, String> getEncoder1()
+            throws IOException {
+        return isPreindexedTokens1()
+               ? Token.enumeratedEncoder()
+               //                ? Token.deltaEncoder()
+               : Token.stringEncoder(getIndex1());
     }
 
-    public final Function<String, Integer> getDecoder2() throws IOException {
-        return isPreindexedTokens2() ? Token.enumeratedDecoder() : Token.stringDecoder(getIndex2());
+    public final Function<String, Integer> getDecoder2()
+            throws IOException {
+        return isPreindexedTokens2()
+               ? Token.enumeratedDecoder()
+               //                ? Token.deltaDecoder()
+               : Token.stringDecoder(getIndex2());
     }
 
-    public final Function<Integer, String> getEncoder2() throws IOException {
-        return isPreindexedTokens2() ? Token.enumeratedEncoder() : Token.stringEncoder(getIndex2());
+    public final Function<Integer, String> getEncoder2()
+            throws IOException {
+        return isPreindexedTokens2()
+               ? Token.enumeratedEncoder()
+               //                ? Token.deltaEncoder()
+               : Token.stringEncoder(getIndex2());
     }
 
     public File getIndexFile1() {
@@ -136,8 +179,6 @@ public class IndexDeligatePair extends AbstractDeligate implements Serializable 
         this.indexFile2 = indexFile2;
     }
 
-    
-    
     @Override
     protected Objects.ToStringHelper toStringHelper() {
         return super.toStringHelper().

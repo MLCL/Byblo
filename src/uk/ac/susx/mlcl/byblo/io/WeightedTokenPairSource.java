@@ -58,9 +58,11 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
 public class WeightedTokenPairSource
         implements SeekableSource<Weighted<TokenPair>, Lexer.Tell>, Closeable {
 
-    private final Function<String, Integer> tokenDecoder1;
-
-    private final Function<String, Integer> tokenDecoder2;
+    private IndexDeligatePair indexDeligate;
+//    
+//    private final Function<String, Integer> tokenDecoder1;
+//
+//    private final Function<String, Integer> tokenDecoder2;
 
     private Weighted<TokenPair> previousRecord = null;
 
@@ -69,29 +71,33 @@ public class WeightedTokenPairSource
     private final TSVSource inner;
 
     public WeightedTokenPairSource(
-            TSVSource inner,
-            Function<String, Integer> tokenDecoder1,
-            Function<String, Integer> tokenDecoder2)
+            TSVSource inner, IndexDeligatePair indexDeligate
+//            Function<String, Integer> tokenDecoder1,
+//            Function<String, Integer> tokenDecoder2
+            )
             throws FileNotFoundException, IOException {
+
         this.inner = inner;
-        this.tokenDecoder1 = tokenDecoder1;
-        this.tokenDecoder2 = tokenDecoder2;
+        this.indexDeligate = indexDeligate;
+//        this.tokenDecoder1 = tokenDecoder1;
+//        this.tokenDecoder2 = tokenDecoder2;
     }
 
-    public WeightedTokenPairSource(TSVSource inner)
-            throws FileNotFoundException, IOException {
-        this.inner = inner;
-        this.tokenDecoder1 = Token.enumeratedDecoder();
-        this.tokenDecoder2 = Token.enumeratedDecoder();
-    }
-
-    public Function<String, Integer> getTokenDecoder2() {
-        return tokenDecoder2;
-    }
-
-    public Function<String, Integer> getTokenDecoder1() {
-        return tokenDecoder1;
-    }
+//    public WeightedTokenPairSource(TSVSource inner)
+//            throws FileNotFoundException, IOException {
+//        this.inner = inner;
+//        indexDeligate = new IndexDeligatePair();
+////        this.tokenDecoder1 = Token.enumeratedDecoder();
+////        this.tokenDecoder2 = Token.enumeratedDecoder();
+//    }
+//
+//    public Function<String, Integer> getTokenDecoder2() {
+//        return tokenDecoder2;
+//    }
+//
+//    public Function<String, Integer> getTokenDecoder1() {
+//        return tokenDecoder1;
+//    }
 
     public long getCount() {
         return count;
@@ -99,17 +105,13 @@ public class WeightedTokenPairSource
 
     @Override
     public Weighted<TokenPair> read() throws IOException {
-        final int tokenId1;
-        if (previousRecord == null) {
-            tokenId1 = readToken1();
-        } else {
-            tokenId1 = previousRecord.record().id1();
-        }
+
+        final int tokenId1 = readToken1();
 
         if (!hasNext() || inner.isEndOfRecordNext()) {
             inner.endOfRecord();
-            throw new SingletonRecordException(inner,
-                                               "Found weighte entry pair record with second entries.");
+            throw new SingletonRecordException(
+                    inner, "Found weighte entry pair record with second entries.");
         }
 
         final int tokenId2 = readToken2();
@@ -132,11 +134,26 @@ public class WeightedTokenPairSource
     }
 
     protected int readToken1() throws IOException {
-        return tokenDecoder1.apply(inner.readString());
+        if (previousRecord == null) {
+            if(indexDeligate.isPreindexedTokens1())
+                return inner.readInt();
+            else
+                return indexDeligate.getIndex1().index(inner.readString());
+//                indexDeligate.getDecoder1().apply(inner.readString());
+//            else
+//            return tokenDecoder1.apply(inner.readString());
+        } else {
+            return previousRecord.record().id1();
+        }
     }
 
     protected int readToken2() throws IOException {
-        return tokenDecoder2.apply(inner.readString());
+        if(indexDeligate.isPreindexedTokens2())
+                return inner.readInt();
+            else
+                return indexDeligate.getIndex2().index(inner.readString());
+        
+//        return tokenDecoder2.apply(inner.readString());
     }
 
     protected double readWight() throws IOException {
@@ -148,16 +165,18 @@ public class WeightedTokenPairSource
     }
 
     public static boolean equal(File a, File b, Charset charset) throws IOException {
-        final Enumerator<String> stringIndex = Enumerators.
-                newDefaultStringEnumerator();
+        final Enumerator<String> stringIndex = Enumerators.newDefaultStringEnumerator();
+        IndexDeligatePair idx = new IndexDeligatePair(false, false);
         final WeightedTokenPairSource srcA = new WeightedTokenPairSource(
-                new TSVSource(a, charset),
-                Token.stringDecoder(stringIndex),
-                Token.stringDecoder(stringIndex));
+                new TSVSource(a, charset),idx
+//                Token.stringDecoder(stringIndex),
+//                Token.stringDecoder(stringIndex)
+                        );
         final WeightedTokenPairSource srcB = new WeightedTokenPairSource(
-                new TSVSource(b, charset),
-                Token.stringDecoder(stringIndex),
-                Token.stringDecoder(stringIndex));
+                new TSVSource(b, charset), idx
+//                Token.stringDecoder(stringIndex),
+                //                Token.stringDecoder(stringIndex)
+                        );
 
 
         List<Weighted<TokenPair>> listA = IOUtil.readAll(srcA);
@@ -204,4 +223,5 @@ public class WeightedTokenPairSource
     public void close() throws IOException {
         inner.close();
     }
+
 }

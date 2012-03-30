@@ -43,6 +43,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.Main;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
 import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
@@ -103,19 +104,17 @@ public class ThreadedApssTaskTest {
     public void testNaive() throws Exception {
         System.out.println("Testing " + subject + " Naive");
 
-        Enumerator<String> stringIndex = Enumerators.newDefaultStringEnumerator();
+        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
 
         WeightedTokenPairVectorSource vsa =
                 new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
                 new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET),
-                Token.stringDecoder(stringIndex),
-                Token.stringDecoder(stringIndex)));
+                new IndexDeligatePair(false, false, idx, idx)));
 
         WeightedTokenPairVectorSource vsb =
                 new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
                 new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), 
-                    Token.stringDecoder(stringIndex),
-                    Token.stringDecoder(stringIndex)));
+                    new IndexDeligatePair(false, false, idx, idx)));
 
         List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
         Sink<Weighted<TokenPair>> sink = IOUtil.asSink(result);
@@ -141,19 +140,17 @@ public class ThreadedApssTaskTest {
     @Test(timeout = 1000)
     public void testInverted() throws Exception {
         System.out.println("Testing " + subject + " Inverted");
-        Enumerator<String> stringIndex = Enumerators.newDefaultStringEnumerator();
+        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
 
         WeightedTokenPairVectorSource vsa =
                 new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
                 new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), 
-                Token.stringDecoder(stringIndex),
-                Token.stringDecoder(stringIndex)));
+                new IndexDeligatePair(false, false, idx, idx)));
 
         WeightedTokenPairVectorSource vsb =
                 new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
                 new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), 
-                    Token.stringDecoder(stringIndex),
-                    Token.stringDecoder(stringIndex)));
+                    new IndexDeligatePair(false, false, idx, idx)));
 
         List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
         Sink<Weighted<TokenPair>> sink = IOUtil.asSink(result);
@@ -183,19 +180,17 @@ public class ThreadedApssTaskTest {
         List<Weighted<TokenPair>> invertedResults = new ArrayList<Weighted<TokenPair>>();
 
         {
-            Enumerator<String> stringIndex = Enumerators.newDefaultStringEnumerator();
+            Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
 
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
                     new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), 
-                Token.stringDecoder(stringIndex),
-                Token.stringDecoder(stringIndex)));
+                new IndexDeligatePair(false, false, idx, idx)));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
                     new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET),
-                    Token.stringDecoder(stringIndex),
-                    Token.stringDecoder(stringIndex)));
+                    new IndexDeligatePair(false, false, idx, idx)));
 
 
             List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
@@ -215,18 +210,16 @@ public class ThreadedApssTaskTest {
         }
 
         {
-            Enumerator<String> stringIndex = Enumerators.newDefaultStringEnumerator();
+            Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
                     new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), 
-                Token.stringDecoder(stringIndex),
-                Token.stringDecoder(stringIndex)));
+                new IndexDeligatePair(false, false, idx, idx)));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
                     new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), 
-                    Token.stringDecoder(stringIndex),
-                    Token.stringDecoder(stringIndex)));
+                    new IndexDeligatePair(false, false, idx, idx)));
 
 
             List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
@@ -260,19 +253,17 @@ public class ThreadedApssTaskTest {
         List<Weighted<TokenPair>> nonThreadedResults = new ArrayList<Weighted<TokenPair>>();
 
         {
-            Enumerator<String> stringIndex = Enumerators.newDefaultStringEnumerator();
+            Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
 
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
                     new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), 
-                Token.stringDecoder(stringIndex),
-                Token.stringDecoder(stringIndex)));
+                new IndexDeligatePair(false, false, idx, idx)));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
                     new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET),
-                    Token.stringDecoder(stringIndex),
-                    Token.stringDecoder(stringIndex)));
+                    new IndexDeligatePair(false, false, idx, idx)));
 
 
             Sink<Weighted<TokenPair>> sink = IOUtil.asSink(threadedResults);
@@ -293,19 +284,17 @@ public class ThreadedApssTaskTest {
         {
             NaiveApssTask<Lexer.Tell> instance = new NaiveApssTask<Lexer.Tell>();
 
-            Enumerator<String> stringIndex = Enumerators.newDefaultStringEnumerator();
+            Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
 
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
                     new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), 
-                Token.stringDecoder(stringIndex),
-                Token.stringDecoder(stringIndex)));
+               new IndexDeligatePair(false, false, idx, idx)));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
                     new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), 
-                    Token.stringDecoder(stringIndex),
-                    Token.stringDecoder(stringIndex)));
+                    new IndexDeligatePair(false, false, idx, idx)));
 
             instance.setSourceA(vsa);
             instance.setSourceB(vsb);
@@ -334,19 +323,17 @@ public class ThreadedApssTaskTest {
         List<Weighted<TokenPair>> nonThreadedResults = new ArrayList<Weighted<TokenPair>>();
 
         {
-            Enumerator<String> stringIndex = Enumerators.newDefaultStringEnumerator();
+            Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
 
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
                     new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), 
-                Token.stringDecoder(stringIndex),
-                Token.stringDecoder(stringIndex)));
+                new IndexDeligatePair(false, false, idx, idx)));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
                     new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), 
-                    Token.stringDecoder(stringIndex),
-                    Token.stringDecoder(stringIndex)));
+                    new IndexDeligatePair(false, false, idx, idx)));
 
             Sink<Weighted<TokenPair>> sink = IOUtil.asSink(threadedResults);
             ThreadedApssTask<Lexer.Tell> instance = new ThreadedApssTask<Lexer.Tell>(
@@ -366,19 +353,17 @@ public class ThreadedApssTaskTest {
         {
             InvertedApssTask<Lexer.Tell> instance = new InvertedApssTask<Lexer.Tell>();
 
-            Enumerator<String> stringIndex = Enumerators.newDefaultStringEnumerator();
+            Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
 
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
                     new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), 
-                Token.stringDecoder(stringIndex),
-                Token.stringDecoder(stringIndex)));
+               new IndexDeligatePair(false, false, idx, idx)));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(new WeightedTokenPairSource(
                     new TSVSource(TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET), 
-                    Token.stringDecoder(stringIndex),
-                    Token.stringDecoder(stringIndex)));
+             new IndexDeligatePair(false, false, idx, idx)));
 
             instance.setSourceA(vsa);
             instance.setSourceB(vsb);

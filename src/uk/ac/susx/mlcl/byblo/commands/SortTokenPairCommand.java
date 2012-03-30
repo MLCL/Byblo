@@ -4,6 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -42,13 +43,15 @@ public class SortTokenPairCommand extends AbstractSortCommand<TokenPair> {
     @Override
     protected Source<TokenPair> openSource(File file) throws FileNotFoundException, IOException {
         return new TokenPairSource(new TSVSource(file, getFilesDeligate().getCharset()),
-                                   indexDeligate.getDecoder1(), indexDeligate.getDecoder2());
+                                   indexDeligate);
     }
 
     @Override
     protected Sink<TokenPair> openSink(File file) throws FileNotFoundException, IOException {
-        return new TokenPairSink(new TSVSink(file, getFilesDeligate().getCharset()),
-                                 indexDeligate.getEncoder1(), indexDeligate.getEncoder2());
+        TokenPairSink s = new TokenPairSink(new TSVSink(file, getFilesDeligate().getCharset()),
+                                 indexDeligate);
+        s.setCompactFormatEnabled(!getFilesDeligate().isCompactFormatDisabled());
+        return s;
     }
 
 }

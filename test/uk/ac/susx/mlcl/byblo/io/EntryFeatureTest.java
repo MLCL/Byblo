@@ -55,11 +55,9 @@ public class EntryFeatureTest {
     public void testLMMedlineSample() throws FileNotFoundException, IOException {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-input-sample");
         Charset charset = Charset.forName("UTF-8");
-        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
+        IndexDeligatePair idx = new IndexDeligatePair(false, false);
         TokenPairSource efSrc = new TokenPairSource(
-                new TSVSource(testSample, charset),
-                Token.stringDecoder(idx),
-                Token.stringDecoder(idx));
+                new TSVSource(testSample, charset), idx);
         assertTrue("EntryFeatureSource is empty", efSrc.hasNext());
 
         while (efSrc.hasNext()) {
@@ -76,15 +74,11 @@ public class EntryFeatureTest {
     }
 
     private void copyEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
+        IndexDeligatePair idx = new IndexDeligatePair(false, false);
         TokenPairSource aSrc = new TokenPairSource(
-                new TSVSource(a, DEFAULT_CHARSET),
-                Token.stringDecoder(idx),
-                Token.stringDecoder(idx));
+                new TSVSource(a, DEFAULT_CHARSET), idx);
         TokenPairSink bSink = new TokenPairSink(
-                new TSVSink(b, DEFAULT_CHARSET),
-                Token.stringEncoder(idx),
-                Token.stringEncoder(idx));
+                new TSVSink(b, DEFAULT_CHARSET), idx);
         bSink.setCompactFormatEnabled(compact);
 
         IOUtil.copy(aSrc, bSink);
@@ -124,14 +118,15 @@ public class EntryFeatureTest {
 
 
         {
-            Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
+            Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
+            IndexDeligatePair idx = new IndexDeligatePair(false, false, strEnum, strEnum);
             TokenPairSource aSrc = new TokenPairSource(
-                    new TSVSource(a, DEFAULT_CHARSET),
-                    Token.stringDecoder(idx),
-                    Token.stringDecoder(idx));
-            TokenPairSink bSink = new TokenPairSink(new TSVSink(b, DEFAULT_CHARSET));
+                    new TSVSource(a, DEFAULT_CHARSET), idx);
+            TokenPairSink bSink = new TokenPairSink(
+                    new TSVSink(b, DEFAULT_CHARSET),
+                    new IndexDeligatePair(true, true));
             IOUtil.copy(aSrc, bSink);
-            Enumerators.saveStringEnumerator(idx, idxFile);
+            Enumerators.saveStringEnumerator(strEnum, idxFile);
 
             bSink.close();
         }
@@ -140,12 +135,14 @@ public class EntryFeatureTest {
                    b.length() <= a.length());
 
         {
-            Enumerator<String> idx = Enumerators.loadStringEnumerator(idxFile);
-            TokenPairSource bSrc = new TokenPairSource(new TSVSource(b, DEFAULT_CHARSET));
+            Enumerator<String> strEnum = Enumerators.loadStringEnumerator(idxFile);
+            IndexDeligatePair idx = new IndexDeligatePair(false, false, strEnum, strEnum);
+            TokenPairSource bSrc = new TokenPairSource(
+                    new TSVSource(b, DEFAULT_CHARSET),
+                    new IndexDeligatePair(true, true));
             TokenPairSink cSink = new TokenPairSink(
-                    new TSVSink(c, DEFAULT_CHARSET),
-                    Token.stringEncoder(idx),
-                    Token.stringEncoder(idx));
+                    new TSVSink(c, DEFAULT_CHARSET), idx);
+            cSink.setCompactFormatEnabled(false);
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }

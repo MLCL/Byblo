@@ -76,38 +76,45 @@ import uk.ac.susx.mlcl.lib.io.TSVSink;
  */
 public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeable, Flushable {
 
+    private IndexDeligatePair indexDeligate;
+
     private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
 
-    private boolean compactFormatEnabled = false;
+    private boolean compactFormatEnabled = true;
 
     private Weighted<TokenPair> previousRecord = null;
 
     private long count = 0;
 
     private TSVSink inner;
+//
+//    private final Function<Integer, String> tokenEncoder1;
+//
+//    private final Function<Integer, String> tokenEncoder2;
 
-    private final Function<Integer, String> tokenEncoder1;
-
-    private final Function<Integer, String> tokenEncoder2;
-    
-    public WeightedTokenPairSink(TSVSink inner,Function<Integer, String> tokenEncoder1, Function<Integer, String> tokenEncoder2) {
+    public WeightedTokenPairSink(TSVSink inner, 
+                                 IndexDeligatePair indexDeligate
+//                                 Function<Integer, String> tokenEncoder1, Function<Integer, String> tokenEncoder2
+            ) {
         this.inner = inner;
-        this.tokenEncoder1 = tokenEncoder1;
-        this.tokenEncoder2 = tokenEncoder2;
-    }
-    public WeightedTokenPairSink(TSVSink inner) {
-        this.inner = inner;
-        this.tokenEncoder1 = Token.enumeratedEncoder();
-        this.tokenEncoder2 = Token.enumeratedEncoder();
+        this.indexDeligate = indexDeligate;
+//        this.tokenEncoder1 = tokenEncoder1;
+//        this.tokenEncoder2 = tokenEncoder2;
     }
 
-    public Function<Integer, String> getTokenEncoder1() {
-        return tokenEncoder1;
-    }
+//    public WeightedTokenPairSink(TSVSink inner) {
+//        this.inner = inner;
+//        this.tokenEncoder1 = Token.enumeratedEncoder();
+//        this.tokenEncoder2 = Token.enumeratedEncoder();
+//    }
 
-    public Function<Integer, String> getTokenEncoder2() {
-        return tokenEncoder2;
-    }
+//    public Function<Integer, String> getTokenEncoder1() {
+//        return tokenEncoder1;
+//    }
+//
+//    public Function<Integer, String> getTokenEncoder2() {
+//        return tokenEncoder2;
+//    }
 
     public boolean isCompactFormatEnabled() {
         return compactFormatEnabled;
@@ -153,11 +160,19 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
     }
 
     private void writeToken1(int tokenId) throws IOException {
-        inner.writeString(tokenEncoder1.apply(tokenId));
+        if(indexDeligate.isPreindexedTokens1())
+            inner.writeInt(tokenId);
+        else
+        inner.writeString(indexDeligate.getEncoder1().apply(tokenId));
+//        inner.writeString(tokenEncoder1.apply(tokenId));
     }
 
     private void writeToken2(int tokenId) throws IOException {
-        inner.writeString(tokenEncoder2.apply(tokenId));
+         if(indexDeligate.isPreindexedTokens2())
+            inner.writeInt(tokenId);
+        else
+        inner.writeString(indexDeligate.getEncoder2().apply(tokenId));
+//        inner.writeString(tokenEncoder2.apply(tokenId));
     }
 
     private void writeWeight(double weight) throws IOException {

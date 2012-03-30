@@ -4,6 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
 import com.beust.jcommander.Parameter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,6 +31,7 @@ public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>>
     private static final Log LOG = LogFactory.getLog(UnindexSimsCommand.class);
 
     @Parameter(names = {"-x", "--index-file"},
+    required = true,
     description = "Index for the first token type.",
     validateWith = InputFileValidator.class)
     private File indexFile = null;
@@ -41,10 +43,10 @@ public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>>
         super(sourceFile, destinationFile, charset);
         setIndexFile(indexFile);
     }
-
-    public UnindexSimsCommand(File sourceFile, File destinationFile) {
-        super(sourceFile, destinationFile);
-    }
+//
+//    public UnindexSimsCommand(File sourceFile, File destinationFile) {
+//        super(sourceFile, destinationFile);
+//    }
 
     public UnindexSimsCommand() {
         super();
@@ -52,8 +54,9 @@ public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>>
 
     @Override
     public void runCommand() throws Exception {
+        Checks.checkNotNull("indexFile", indexFile);
         index = Enumerators.loadStringEnumerator(indexFile);
-
+        Checks.checkNotNull("index", index);
         super.runCommand();
     }
 
@@ -62,7 +65,8 @@ public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>>
             throws FileNotFoundException, IOException {
         return new WeightedTokenPairSource(
                 new TSVSource(file, getFilesDeligate().getCharset()),
-                Token.enumeratedDecoder(), Token.enumeratedDecoder());
+                new IndexDeligatePair(true, true) //                Token.enumeratedDecoder(), Token.enumeratedDecoder()
+                );
     }
 
     @Override
@@ -70,7 +74,8 @@ public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>>
             throws FileNotFoundException, IOException {
         return new WeightedTokenPairSink(
                 new TSVSink(file, getFilesDeligate().getCharset()),
-                Token.stringEncoder(index), Token.stringEncoder(index));
+                new IndexDeligatePair(false, false, index, index) //                Token.stringEncoder(index), Token.stringEncoder(index)
+                );
     }
 
     public final File getIndexFile() {

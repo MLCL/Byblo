@@ -40,7 +40,6 @@ import java.nio.charset.Charset;
 import java.util.Comparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.*;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 
@@ -72,7 +71,10 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
 
     public AbstractMergeCommand(File sourceFileA, File sourceFileB, File destination,
                                 Charset charset, Comparator<T> comparator) {
-        fileDeligate.set(sourceFileA, sourceFileB, destination, charset);
+        fileDeligate.setSourceFileA(sourceFileA);
+        fileDeligate.setSourceFileB(sourceFileB);
+        fileDeligate.setDestinationFile(destination);
+        fileDeligate.setCharset(charset);
         setComparator(comparator);
     }
 

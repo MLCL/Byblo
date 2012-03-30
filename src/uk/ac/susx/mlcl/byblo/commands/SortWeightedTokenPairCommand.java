@@ -4,6 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -56,18 +57,21 @@ public class SortWeightedTokenPairCommand extends AbstractSortCommand<Weighted<T
     @Override
     protected Source<Weighted<TokenPair>> openSource(File file)
             throws FileNotFoundException, IOException {
-        return new WeightedTokenPairSource(
+        WeightedTokenPairSource s = new WeightedTokenPairSource(
                 new TSVSource(file, getFilesDeligate().getCharset()),
-                getIndexDeligate().getDecoder1(), getIndexDeligate().getDecoder2());
+                getIndexDeligate()
+                );
+        return s;
     }
 
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file)
             throws FileNotFoundException, IOException {
-        return new WeightSumReducerSink<TokenPair>(
-                new WeightedTokenPairSink(
+        WeightedTokenPairSink s = new WeightedTokenPairSink(
                 new TSVSink(file, getFilesDeligate().getCharset()),
-                getIndexDeligate().getEncoder1(), getIndexDeligate().getEncoder2()));
+                getIndexDeligate());
+        s.setCompactFormatEnabled(!getFilesDeligate().isCompactFormatDisabled());
+        return new WeightSumReducerSink<TokenPair>(s);
     }
 
 }

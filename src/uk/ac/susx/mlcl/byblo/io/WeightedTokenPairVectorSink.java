@@ -63,14 +63,14 @@ public class WeightedTokenPairVectorSink
         }
         ++count;
     }
-
-    public Function<Integer, String> getTokenEncoder1() {
-        return inner.getTokenEncoder1();
-    }
-
-    public Function<Integer, String> getTokenEncoder2() {
-        return inner.getTokenEncoder2();
-    }
+//
+//    public Function<Integer, String> getTokenEncoder1() {
+//        return inner.getTokenEncoder1();
+//    }
+//
+//    public Function<Integer, String> getTokenEncoder2() {
+//        return inner.getTokenEncoder2();
+//    }
 
     public long getCount() {
         return count;

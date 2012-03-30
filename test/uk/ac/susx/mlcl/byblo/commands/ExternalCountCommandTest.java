@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.commands.ExternalCountCommand;
 import uk.ac.susx.mlcl.lib.test.ExitTrapper;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
 import java.io.File;
@@ -41,7 +40,6 @@ import java.util.List;
 import org.junit.Test;
 import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
 import static org.junit.Assert.*;
-import org.junit.Ignore;
 import uk.ac.susx.mlcl.byblo.Main;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
@@ -65,12 +63,12 @@ public class ExternalCountCommandTest {
         countTask.setEntriesFile(outE);
         countTask.setFeaturesFile(outF);
         countTask.setEntryFeaturesFile(outEF);
-        countTask.setCharset(charset);
+        countTask.getFileDeligate().setCharset(charset);
         countTask.setMaxChunkSize(chunkSize);
-        countTask.indexDeligate.setPreindexedTokens1(preindexedEntries);
-        countTask.indexDeligate.setPreindexedTokens2(preindexedFeatures);
+        countTask.getIndexDeligate().setPreindexedTokens1(preindexedEntries);
+        countTask.getIndexDeligate().setPreindexedTokens2(preindexedFeatures);
         countTask.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
-        
+
         countTask.run();
         while (countTask.isExceptionThrown()) {
             countTask.throwException();
@@ -183,6 +181,7 @@ public class ExternalCountCommandTest {
                    TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
                                          DEFAULT_CHARSET));
     }
+
     @Test
     public void testRunOnFruitAPI_Indexed() throws Exception {
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT_INDEXED);
@@ -237,8 +236,8 @@ public class ExternalCountCommandTest {
                    WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
                                              DEFAULT_CHARSET));
         assertTrue("Output entry/features file differs from test data file.",
-                TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
-                DEFAULT_CHARSET));
+                   TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
+                                         DEFAULT_CHARSET));
     }
 
     @Test(timeout = 2000)
@@ -267,8 +266,8 @@ public class ExternalCountCommandTest {
                    WeightedTokenSource.equal(fActual, TEST_FRUIT_INDEXED_FEATURES,
                                              DEFAULT_CHARSET));
         assertTrue("Output entry/features file differs from test data file.",
-                TokenPairSource.equal(efActual, TEST_FRUIT_INDEXED_ENTRY_FEATURES,
-                DEFAULT_CHARSET));
+                   TokenPairSource.equal(efActual, TEST_FRUIT_INDEXED_ENTRY_FEATURES,
+                                         DEFAULT_CHARSET));
     }
 
     @Test(timeout = 2000)
@@ -374,4 +373,5 @@ public class ExternalCountCommandTest {
             ExitTrapper.disableExitTrapping();
         }
     }
+
 }

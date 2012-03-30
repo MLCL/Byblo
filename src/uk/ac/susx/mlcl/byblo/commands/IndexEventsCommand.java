@@ -13,9 +13,13 @@ import java.io.Flushable;
 import java.nio.charset.Charset;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
 import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
+import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.TokenPairSink;
+import uk.ac.susx.mlcl.byblo.io.TokenPairSink;
+import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
 import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Enumerator;
@@ -61,8 +65,8 @@ public class IndexEventsCommand extends AbstractCommand {
     private Charset charset = Files.DEFAULT_CHARSET;
 
     public IndexEventsCommand(File inputEventsFile, Charset charset,
-                           File outputEventsFile,
-                           File entryIndexFile, File featureIndexFile) {
+                              File outputEventsFile,
+                              File entryIndexFile, File featureIndexFile) {
         setCharset(charset);
         setEntryIndexFile(entryIndexFile);
         setFeatureIndexFile(featureIndexFile);
@@ -73,50 +77,37 @@ public class IndexEventsCommand extends AbstractCommand {
     public IndexEventsCommand() {
     }
 
-
-
     @Override
     public void runCommand() throws Exception {
-
-        final Enumerator<String> token1Index =
+        checkState();
+        
+        final Enumerator<String> index1 =
                 Enumerators.newDefaultStringEnumerator();
 
-        final Enumerator<String> token2Index =
+        final Enumerator<String> index2 =
                 Enumerators.newDefaultStringEnumerator();
 
-        final Function<String, Integer> srcToken1Decoder =
-                Token.stringDecoder(token1Index);
-
-        final Function<String, Integer> srcToken2Decoder =
-                Token.stringDecoder(token2Index);
-
-        final Function<Integer, String> dstToken1Encoder =
-                Token.enumeratedEncoder();
-
-        final Function<Integer, String> dstToken2Encoder =
-                Token.enumeratedEncoder();
 
         Source<TokenPair> src = null;
 
         try {
             src = new TokenPairSource(
                     new TSVSource(inputEventsFile, charset),
-                    srcToken1Decoder, srcToken2Decoder);
+                    new IndexDeligatePair(false, false, index1, index2));
 
             TokenPairSink snk = null;
 
             try {
                 snk = new TokenPairSink(
                         new TSVSink(outputEventsFile, charset),
-                        dstToken1Encoder, dstToken2Encoder);
+                        new IndexDeligatePair(true, true));
                 snk.setCompactFormatEnabled(true);
 
                 while (src.hasNext())
                     snk.write(src.read());
 
-
-                Enumerators.saveStringEnumerator(token1Index, entryIndexFile);
-                Enumerators.saveStringEnumerator(token2Index, featureIndexFile);
+                Enumerators.saveStringEnumerator(index1, entryIndexFile);
+                Enumerators.saveStringEnumerator(index2, featureIndexFile);
 
 
             } finally {

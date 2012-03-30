@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
@@ -91,7 +92,7 @@ public class AllPairsCommand extends AbstractCommand {
 
     @Parameter(names = {"-C", "--chunk-size"},
     description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
-    private int chunkSize = 5000;
+    private int chunkSize = 2500;
 
     @Parameter(names = {"-t", "--threads"},
     description = "Number of conccurent processing threads.")
@@ -250,7 +251,7 @@ public class AllPairsCommand extends AbstractCommand {
 
                 WeightedTokenSource features = new WeightedTokenSource(
                         new TSVSource(getFeaturesFile(), getCharset()),
-                        getIndexDeligate().getDecoder2());
+                        getIndexDeligate().single2());
                 AbstractMIProximity bmip = ((AbstractMIProximity) prox);
                 bmip.setFeatureFrequencies(features.readAllAsArray());
                 bmip.setFeatureFrequencySum(features.getWeightSum());
@@ -268,7 +269,7 @@ public class AllPairsCommand extends AbstractCommand {
 
                 WeightedTokenSource features = new WeightedTokenSource(
                         new TSVSource(getFeaturesFile(), getCharset()),
-                        getIndexDeligate().getDecoder2());
+                        getIndexDeligate().single2());
                 features.readAll();
 
                 ((KendallTau) prox).setNumFeatures(features.getCardinality());
@@ -290,13 +291,17 @@ public class AllPairsCommand extends AbstractCommand {
         // files, e.g compare fruit words with cake words
         final WeightedTokenPairVectorSource sourceA = new WeightedTokenPairSource(
                 new TSVSource(getEntryFeaturesFile(), getCharset()),
-                getIndexDeligate().getDecoder1(),
-                getIndexDeligate().getDecoder2()).getVectorSource();
+                getIndexDeligate()
+//                getIndexDeligate().getDecoder1(),
+//                getIndexDeligate().getDecoder2()
+                        ).getVectorSource();
         
         final WeightedTokenPairVectorSource sourceB = new WeightedTokenPairSource(
                 new TSVSource(getEntryFeaturesFile(), getCharset()),
-                getIndexDeligate().getDecoder1(),
-                getIndexDeligate().getDecoder2()).getVectorSource();
+                getIndexDeligate()
+//                getIndexDeligate().getDecoder1(),
+//                getIndexDeligate().getDecoder2()
+                ).getVectorSource();
 
         // Create a sink object that will act as a recipient for all pairs that
         // are produced by the algorithm.
@@ -304,8 +309,11 @@ public class AllPairsCommand extends AbstractCommand {
         final Sink<Weighted<TokenPair>> sink =
                 new WeightedTokenPairSink(
                 new TSVSink(getOutputFile(), getCharset()),
-                getIndexDeligate().getEncoder1(),
-                getIndexDeligate().getEncoder1());
+                new IndexDeligatePair(
+                getIndexDeligate().isPreindexedTokens1(), 
+                getIndexDeligate().isPreindexedTokens1(), 
+                getIndexDeligate().getIndex1(), getIndexDeligate().getIndex1())
+                );
 
 
         NaiveApssTask<Lexer.Tell> apss = null;

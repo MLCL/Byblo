@@ -6,9 +6,11 @@ package uk.ac.susx.mlcl.lib;
 
 import com.google.common.base.Function;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.io.*;
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,6 +30,25 @@ public class Enumerators {
     private Enumerators() {
     }
 
+    public static <T> Enumerator<T> nullEnumerator() {
+        return new Enumerator<T>() {
+
+            @Override
+            public int index(T obj) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public T value(int id) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public Iterator<Entry<T>> iterator() {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        };
+    }
     public static Enumerator<String> newDefaultStringEnumerator() {
         SimpleEnumerator<String> instance = new SimpleEnumerator<String>();
         instance.index(FilterCommand.FILTERED_STRING);

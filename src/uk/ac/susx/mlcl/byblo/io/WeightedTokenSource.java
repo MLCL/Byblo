@@ -64,7 +64,8 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
 
     private static final Log LOG = LogFactory.getLog(WeightedTokenSource.class);
 
-    private final Function<String, Integer> tokenDecoder;
+    private IndexDeligate indexDeligate;
+//    private final Function<String, Integer> tokenDecoder;
 
     private double weightSum = 0;
 
@@ -82,21 +83,24 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
 
     private final TSVSource inner;
 
-    public WeightedTokenSource(TSVSource inner, Function<String, Integer> tokenDecoder)
+    public WeightedTokenSource(TSVSource inner,
+                               IndexDeligate indexDeligate //                               Function<String, Integer> tokenDecoder
+            )
             throws FileNotFoundException, IOException {
         this.inner = inner;
-        this.tokenDecoder = tokenDecoder;
+        this.indexDeligate = indexDeligate;
+//        this.tokenDecoder = tokenDecoder;
     }
-
-    public WeightedTokenSource(TSVSource inner)
-            throws FileNotFoundException, IOException {
-        this.inner = inner;
-        this.tokenDecoder = Token.enumeratedDecoder();
-    }
-
-    public Function<String, Integer> getTokenDecoder() {
-        return tokenDecoder;
-    }
+//
+//    public WeightedTokenSource(TSVSource inner)
+//            throws FileNotFoundException, IOException {
+//        this.inner = inner;
+//        this.tokenDecoder = Token.enumeratedDecoder();
+//    }
+//
+//    public Function<String, Integer> getTokenDecoder() {
+//        return tokenDecoder;
+//    }
 
     public double getWeightSum() {
         return weightSum;
@@ -134,7 +138,11 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
     }
 
     private int readString() throws IOException {
-        return tokenDecoder.apply(inner.readString());
+        if (indexDeligate.isPreindexedTokens()) {
+            return inner.readInt();
+        } else
+            return indexDeligate.getDecoder().apply(inner.readString());
+//        return tokenDecoder.apply(inner.readString());
     }
 
     @Override
@@ -189,7 +197,7 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
 
                 if (LOG.isWarnEnabled())
                     LOG.warn("Found duplicate Entry \""
-                            + (tokenDecoder.apply("" + entry.record().id()))
+                            + (indexDeligate.getIndex().value(entry.record().id()))
                             + "\" (id=" + id
                             + ") in entries file. Merging records. Old frequency = "
                             + oldFreq + ", new frequency = " + newFreq + ".");
@@ -216,18 +224,19 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
 
     public static boolean equal(File a, File b, Charset charset) throws IOException {
         final Enumerator<String> stringIndex = Enumerators.newDefaultStringEnumerator();
+        IndexDeligate idx = new IndexDeligate();
         final WeightedTokenSource srcA = new WeightedTokenSource(
-                new TSVSource(a, charset),
-                Token.stringDecoder(stringIndex));
+                new TSVSource(a, charset), idx //                Token.stringDecoder(stringIndex)
+                );
         final WeightedTokenSource srcB = new WeightedTokenSource(
-                new TSVSource(b, charset),
-                Token.stringDecoder(stringIndex));
-        
+                new TSVSource(b, charset), idx //                Token.stringDecoder(stringIndex)
+                );
+
         List<Weighted<Token>> listA = IOUtil.readAll(srcA);
         List<Weighted<Token>> listB = IOUtil.readAll(srcB);
         Comparator<Weighted<Token>> c = Comparators.fallback(
-            Weighted.recordOrder(Token.indexOrder()),
-            Weighted.<Token>weightOrder());
+                Weighted.recordOrder(Token.indexOrder()),
+                Weighted.<Token>weightOrder());
         Collections.sort(listA, c);
         Collections.sort(listB, c);
         return listA.equals(listB);

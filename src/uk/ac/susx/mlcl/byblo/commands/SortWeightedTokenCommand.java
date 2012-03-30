@@ -4,6 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.io.IndexDeligate;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,7 +31,7 @@ public class SortWeightedTokenCommand extends AbstractSortCommand<Weighted<Token
     private static final Log LOG = LogFactory.getLog(SortWeightedTokenCommand.class);
 
     @ParametersDelegate
-    protected IndexDeligateSingle indexDeligate = new IndexDeligateSingle();
+    protected IndexDeligate indexDeligate = new IndexDeligate();
 
     public SortWeightedTokenCommand(File sourceFile, File destinationFile, Charset charset, boolean preindexed) {
         super(sourceFile, destinationFile, charset, Weighted.recordOrder(Token.indexOrder()));
@@ -44,14 +45,16 @@ public class SortWeightedTokenCommand extends AbstractSortCommand<Weighted<Token
     protected Source<Weighted<Token>> openSource(File file) throws FileNotFoundException, IOException {
         return new WeightedTokenSource(
                 new TSVSource(file, getFilesDeligate().getCharset()),
-                indexDeligate.getDecoder());
+                indexDeligate);
     }
 
     @Override
     protected Sink<Weighted<Token>> openSink(File file) throws FileNotFoundException, IOException {
-        return new WeightSumReducerSink<Token>(
-                new WeightedTokenSink(new TSVSink(file, getFilesDeligate().getCharset()),
-                                      indexDeligate.getEncoder()));
+        WeightedTokenSink s = new WeightedTokenSink(
+                new TSVSink(file, getFilesDeligate().getCharset()), indexDeligate);
+        s.setCompactFormatEnabled(!getFilesDeligate().isCompactFormatDisabled());
+        return new WeightSumReducerSink<Token>(s);
+
     }
 
 }

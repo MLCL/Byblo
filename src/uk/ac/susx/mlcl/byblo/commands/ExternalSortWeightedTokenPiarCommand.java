@@ -4,6 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.IOException;
@@ -32,12 +33,17 @@ public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCo
 
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file) throws IOException {
-        return new WeightSumReducerSink<TokenPair>(new WeightedTokenPairSink(new TSVSink(file, getFileDeligate().getCharset()), getIndexDeligate().getEncoder1(), getIndexDeligate().getEncoder2()));
+        WeightedTokenPairSink s = new WeightedTokenPairSink(new TSVSink(file, getFileDeligate().getCharset()),
+                getIndexDeligate());
+        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
+        return new WeightSumReducerSink<TokenPair>(s);
     }
 
     @Override
     protected SeekableSource<Weighted<TokenPair>, Lexer.Tell> openSource(File file) throws IOException {
-        return new WeightedTokenPairSource(new TSVSource(file, getFileDeligate().getCharset()), getIndexDeligate().getDecoder1(), getIndexDeligate().getDecoder2());
+        return new WeightedTokenPairSource(
+                new TSVSource(file, getFileDeligate().getCharset()),
+                getIndexDeligate());
     }
 
     public IndexDeligatePair getIndexDeligate() {

@@ -54,9 +54,9 @@ public class WeightedEntryPairTest {
         Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
 
         WeightedTokenPairSource aSrc = new WeightedTokenPairSource(
-                new TSVSource(a, DEFAULT_CHARSET), Token.stringDecoder(idx),Token.stringDecoder(idx));
+                new TSVSource(a, DEFAULT_CHARSET), new IndexDeligatePair(false, false, idx, idx));
         WeightedTokenPairSink bSink = new WeightedTokenPairSink(
-                new TSVSink(b, DEFAULT_CHARSET),Token.stringEncoder(idx), Token.stringEncoder(idx));
+                new TSVSink(b, DEFAULT_CHARSET),new IndexDeligatePair(false, false, idx, idx));
         bSink.setCompactFormatEnabled(compact);
 
         IOUtil.copy(aSrc, bSink);
@@ -98,10 +98,10 @@ public class WeightedEntryPairTest {
         {
             WeightedTokenPairSource aSrc = new WeightedTokenPairSource(
                     new TSVSource(a, DEFAULT_CHARSET), 
-                    Token.stringDecoder(idx), 
-                    Token.stringDecoder(idx));
+                    new IndexDeligatePair(false, false, idx, idx));
             WeightedTokenPairSink bSink = new WeightedTokenPairSink(
-                    new TSVSink(b, DEFAULT_CHARSET));
+                    new TSVSink(b, DEFAULT_CHARSET),
+                    new IndexDeligatePair(true, true));
             IOUtil.copy(aSrc, bSink);
             bSink.close();
         }
@@ -110,10 +110,12 @@ public class WeightedEntryPairTest {
                    b.length() <= a.length());
 
         {
-            WeightedTokenPairSource bSrc = new WeightedTokenPairSource(new TSVSource(b, DEFAULT_CHARSET));
+            WeightedTokenPairSource bSrc = new WeightedTokenPairSource(
+                    new TSVSource(b, DEFAULT_CHARSET),
+                    new IndexDeligatePair(true, true));
             WeightedTokenPairSink cSink = new WeightedTokenPairSink(
                     new TSVSink(c, DEFAULT_CHARSET), 
-                    Token.stringEncoder(idx), Token.stringEncoder(idx));
+                    new IndexDeligatePair(false, false, idx, idx));
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }

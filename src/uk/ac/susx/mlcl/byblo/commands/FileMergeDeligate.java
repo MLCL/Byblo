@@ -9,9 +9,7 @@ import com.google.common.base.Objects;
 import java.io.File;
 import java.io.Serializable;
 import java.nio.charset.Charset;
-import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.io.Files;
-import uk.ac.susx.mlcl.lib.commands.AbstractDeligate;
+import uk.ac.susx.mlcl.lib.commands.FileDeligate;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
 
@@ -19,7 +17,7 @@ import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
  *
  * @author hiam20
  */
-public class FileMergeDeligate extends AbstractDeligate implements Serializable {
+public class FileMergeDeligate extends FileDeligate implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -41,31 +39,14 @@ public class FileMergeDeligate extends AbstractDeligate implements Serializable 
     validateWith = OutputFileValidator.class)
     private File destinationFile;
 
-    @Parameter(names = {"-c", "--charset"},
-    description = "The character set encoding to use for both input and output files.")
-    private Charset charset = Files.DEFAULT_CHARSET;
-
     public FileMergeDeligate(File sourceFileA, File sourceFileB, File destination, Charset charset) {
-        set(sourceFileA, sourceFileB, destination, charset);
-    }
-
-    public FileMergeDeligate() {
-    }
-
-    public final Charset getCharset() {
-        return charset;
-    }
-
-    public final void setCharset(Charset charset) {
-        Checks.checkNotNull(charset);
-        this.charset = charset;
-    }
-
-    public final void set(File sourceFileA, File sourceFileB, File destination, Charset charset) {
+        super(charset);
         setSourceFileA(sourceFileA);
         setSourceFileB(sourceFileB);
         setDestinationFile(destination);
-        setCharset(charset);
+    }
+
+    public FileMergeDeligate() {
     }
 
     public File getSourceFileA() {
@@ -115,8 +96,7 @@ public class FileMergeDeligate extends AbstractDeligate implements Serializable 
         return super.toStringHelper().
                 add("in1", getSourceFileA()).
                 add("in2", getSourceFileB()).
-                add("out", getDestinationFile()).
-                add("charset", getCharset());
+                add("out", getDestinationFile());
     }
 
 }

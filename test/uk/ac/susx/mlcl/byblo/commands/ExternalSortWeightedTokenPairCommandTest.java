@@ -4,6 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
 import uk.ac.susx.mlcl.byblo.commands.AbstractExternalSortCommand;
 import uk.ac.susx.mlcl.byblo.commands.*;
 import java.io.File;
@@ -126,6 +127,7 @@ public class ExternalSortWeightedTokenPairCommandTest {
         // write to a temporary file
 
         WeightedTokenPairSink randomisedSink = openSink(randomisedFile, idx);
+        randomisedSink.setCompactFormatEnabled(false);
         IOUtil.copy(list, randomisedSink);
         randomisedSink.flush();
         randomisedSink.close();
@@ -146,6 +148,7 @@ public class ExternalSortWeightedTokenPairCommandTest {
         cmd.setTempFileFactory(new TempFileFactory(TEST_OUTPUT_DIR));
         cmd.setIndexDeligate(idx);
         cmd.setComparator(comparator);
+        cmd.getFileDeligate().setCompactFormatDisabled(true);
 
 
         cmd.runCommand();
@@ -197,14 +200,14 @@ public class ExternalSortWeightedTokenPairCommandTest {
             throws IOException {
         return new WeightedTokenPairSource(
                 new TSVSource(file, DEFAULT_CHARSET),
-                idx.getDecoder1(), idx.getDecoder2());
+                idx);
     }
 
     private static WeightedTokenPairSink openSink(File file, IndexDeligatePair idx)
             throws IOException {
         return new WeightedTokenPairSink(
                 new TSVSink(file, DEFAULT_CHARSET),
-                idx.getEncoder1(), idx.getEncoder2());
+                idx);
     }
 
 }

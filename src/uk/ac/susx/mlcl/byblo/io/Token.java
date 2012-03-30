@@ -153,6 +153,7 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
         protected final Object readResolve() {
             return token;
         }
+
     }
 
     public static Function<Integer, String> enumeratedEncoder() {
@@ -162,6 +163,7 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
             public String apply(Integer token) {
                 return Integer.toString(token);
             }
+
         };
     }
 
@@ -172,6 +174,59 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
             public Integer apply(String str) {
                 return Integer.parseInt(str);
             }
+
+        };
+    }
+
+    // XXX: Broken
+    @Deprecated
+    public static Function<Integer, String> deltaEncoder() {
+        return new Function<Integer, String>() {
+
+            private int previous = 0;
+
+            @Override
+            public String apply(Integer token) {
+                final int delta = token - previous;
+                previous = token;
+                return (deltaNumDigits(delta) < idxNumDigits(token))
+                       ? (delta < 0 ? '-' : '+') + Integer.toString(delta)
+                       : Integer.toString(token);
+
+            }
+
+            private int deltaNumDigits(int delta) {
+                return (int) (Math.floor(Math.log10(Math.abs(delta)))) + 2;
+            }
+
+            private int idxNumDigits(int idx) {
+                assert idx >= 0 : "num must be a positive index";
+                return (int) (Math.floor(Math.log10(idx))) + 1;
+            }
+
+        };
+    }
+
+    // XXX: Broken
+    @Deprecated
+    public static Function<String, Integer> deltaDecoder() {
+        return new Function<String, Integer>() {
+
+            private int previous = 0;
+
+            @Override
+            public Integer apply(String str) {
+                switch (str.charAt(0)) {
+                    case '-':
+                        previous -= Integer.parseInt(str.substring(1));
+                    case '+':
+                        previous += Integer.parseInt(str.substring(1));
+                        return previous;
+                    default:
+                        return Integer.parseInt(str);
+                }
+            }
+
         };
     }
 
@@ -183,6 +238,7 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
             public String apply(Integer token) {
                 return strEnum.value(token);
             }
+
         };
     }
 
@@ -194,6 +250,7 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
             public Integer apply(String str) {
                 return strEnum.index(str);
             }
+
         };
     }
 
@@ -204,6 +261,7 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
             public int compare(final Token a, final Token b) {
                 return a.id() - b.id();
             }
+
         };
     }
 
@@ -216,6 +274,8 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
                 return encoder.apply(a.id()).compareTo(
                         encoder.apply(b.id()));
             }
+
         };
     }
+
 }

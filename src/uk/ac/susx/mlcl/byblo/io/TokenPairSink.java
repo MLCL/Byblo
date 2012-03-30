@@ -74,11 +74,9 @@ import uk.ac.susx.mlcl.lib.io.TSVSink;
  */
 public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
 
-    private final Function<Integer, String> tokenEncoder1;
+    private IndexDeligatePair indexDeligate;
 
-    private final Function<Integer, String> tokenEncoder2;
-
-    private boolean compactFormatEnabled = false;
+    private boolean compactFormatEnabled = true;
 
     private TokenPair previousRecord = null;
 
@@ -86,28 +84,10 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
 
     private final TSVSink inner;
 
-    public TokenPairSink(TSVSink inner,
-                         Function<Integer, String> tokenEncoder1,
-                         Function<Integer, String> tokenEncoder2)
+    public TokenPairSink(TSVSink inner,IndexDeligatePair indexDeligate)
             throws FileNotFoundException, IOException {
         this.inner = inner;
-        this.tokenEncoder1 = tokenEncoder1;
-        this.tokenEncoder2 = tokenEncoder2;
-    }
-
-    public TokenPairSink(TSVSink inner)
-            throws FileNotFoundException, IOException {
-        this.inner = inner;
-        this.tokenEncoder1 = Token.enumeratedEncoder();
-        this.tokenEncoder2 = Token.enumeratedEncoder();
-    }
-
-    public Function<Integer, String> getTokenEncoder1() {
-        return tokenEncoder1;
-    }
-
-    public Function<Integer, String> getTokenEncoder2() {
-        return tokenEncoder2;
+        this.indexDeligate = indexDeligate;
     }
 
     public boolean isCompactFormatEnabled() {
@@ -150,11 +130,17 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
     }
 
     private void writeString1(int stringId) throws IOException {
-        inner.writeString(tokenEncoder1.apply(stringId));
+        if(indexDeligate.isPreindexedTokens1())
+            inner.writeInt(stringId);
+        else
+            inner.writeString(indexDeligate.getIndex1().value(stringId));
     }
 
     private void writeString2(int stringId) throws IOException {
-        inner.writeString(tokenEncoder2.apply(stringId));
+        if(indexDeligate.isPreindexedTokens2())
+            inner.writeInt(stringId);
+        else
+            inner.writeString(indexDeligate.getIndex2().value(stringId));
     }
 
     @Override

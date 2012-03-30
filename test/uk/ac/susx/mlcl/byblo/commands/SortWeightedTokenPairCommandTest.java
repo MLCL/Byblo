@@ -4,6 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -142,8 +143,7 @@ public class SortWeightedTokenPairCommandTest {
                 idx.isPreindexedTokens1(), idx.isPreindexedTokens2());
         cmd.setIndexDeligate(idx);
         cmd.setComparator(comparator);
-
-
+        cmd.getFilesDeligate().setCompactFormatDisabled(true);
         cmd.runCommand();
 
 
@@ -156,7 +156,6 @@ public class SortWeightedTokenPairCommandTest {
         WeightedTokenPairSource sortedSource = openSource(sortedFile, idx);
         List<Weighted<TokenPair>> sorted = IOUtil.readAll(sortedSource);
         inputSource.close();
-
 
 
         List<Weighted<TokenPair>> listCopy = new ArrayList<Weighted<TokenPair>>(list);
@@ -191,14 +190,16 @@ public class SortWeightedTokenPairCommandTest {
             throws IOException {
         return new WeightedTokenPairSource(
                 new TSVSource(file, DEFAULT_CHARSET),
-                idx.getDecoder1(), idx.getDecoder2());
+                idx);
     }
 
     private static WeightedTokenPairSink openSink(File file, IndexDeligatePair idx)
             throws IOException {
-        return new WeightedTokenPairSink(
+        WeightedTokenPairSink sink = new WeightedTokenPairSink(
                 new TSVSink(file, DEFAULT_CHARSET),
-                idx.getEncoder1(), idx.getEncoder2());
+                idx);
+        sink.setCompactFormatEnabled(false);
+        return sink;
     }
 
 }

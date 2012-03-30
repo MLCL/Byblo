@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.commands.IndexDeligatePair;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
@@ -246,22 +246,23 @@ public class CountCommand extends AbstractCommand implements Serializable {
 
         final TokenPairSource instanceSource = new TokenPairSource(
                 new TSVSource(inputFile, charset),
-                indexDeligate.getDecoder1(), indexDeligate.getDecoder2());
+                indexDeligate);
 
         WeightedTokenSink entrySink = new WeightedTokenSink(
                 new TSVSink(entriesFile, charset),
-                indexDeligate.getEncoder1());
+                indexDeligate.single1());
 
         WeightedTokenSink featureSink = new WeightedTokenSink(
                 new TSVSink(featuresFile, charset),
-                indexDeligate.getEncoder2());
+                indexDeligate.single2());
 
 
         WeightedTokenPairSink eventsSink = new WeightedTokenPairSink(
                 new TSVSink(entryFeaturesFile, charset),
-                indexDeligate.getEncoder1(), indexDeligate.getEncoder2());
-
-
+                indexDeligate
+//                indexDeligate.getEncoder1(), indexDeligate.getEncoder2()
+                );
+        
 
         CountTask task = new CountTask(
                 instanceSource, eventsSink, entrySink, featureSink,

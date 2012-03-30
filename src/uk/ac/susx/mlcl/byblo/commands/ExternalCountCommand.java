@@ -31,7 +31,7 @@
 package uk.ac.susx.mlcl.byblo.commands;
 
 import uk.ac.susx.mlcl.byblo.tasks.DeleteFileTask;
-import uk.ac.susx.mlcl.byblo.commands.IndexDeligatePair;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
 import uk.ac.susx.mlcl.lib.commands.CopyCommand;
 import uk.ac.susx.mlcl.lib.tasks.MergeTask;
 import com.beust.jcommander.Parameter;
@@ -57,6 +57,7 @@ import uk.ac.susx.mlcl.lib.tasks.SortTask;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.*;
 import uk.ac.susx.mlcl.lib.AbstractParallelCommandTask;
+import uk.ac.susx.mlcl.lib.commands.FileDeligate;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
 import uk.ac.susx.mlcl.lib.tasks.Task;
@@ -107,6 +108,12 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     private static final boolean DEBUG = true;
 
+    @ParametersDelegate
+    private IndexDeligatePair indexDeligate = new IndexDeligatePair();
+
+    @ParametersDelegate
+    private FileDeligate fileDeligate = new FileDeligate();
+
     @Parameter(names = {"-C", "--chunk-size"},
     description = "Number of lines per work unit. Larger value increase performance and memory usage.")
     private int maxChunkSize = 500000;
@@ -139,13 +146,6 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     description = "Directory used for holding temporary files.")
     private TempFileFactory tempFileFactory = new TempFileFactory();
 
-    @Parameter(names = {"-c", "--charset"},
-    description = "Character encoding to use for reading and writing files.")
-    private Charset charset = Files.DEFAULT_CHARSET;
-
-    @ParametersDelegate
-    protected IndexDeligatePair indexDeligate = new IndexDeligatePair();
-
     private Queue<File> mergeEntryQueue;
 
     private Queue<File> mergeFeaturesQueue;
@@ -158,23 +158,23 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             boolean preindexedEntries, boolean preindexedFeatures,
             int maxChunkSize) {
         this(instancesFile, entryFeaturesFile, entriesFile, featuresFile);
-        setCharset(charset);
+        fileDeligate.setCharset(charset);
         setMaxChunkSize(maxChunkSize);
         indexDeligate.setPreindexedTokens1(preindexedEntries);
         indexDeligate.setPreindexedTokens2(preindexedFeatures);
-        
+
     }
 
     public ExternalCountCommand(
             final File instancesFile, final File entryFeaturesFile,
             final File entriesFile, final File featuresFile,
             final Charset charset,
-            boolean preindexedEntries, boolean preindexedFeatures){
+            boolean preindexedEntries, boolean preindexedFeatures) {
         setInstancesFile(instancesFile);
         setEntryFeaturesFile(entryFeaturesFile);
         setEntriesFile(entriesFile);
         setFeaturesFile(featuresFile);
-        setCharset(charset);
+        fileDeligate.setCharset(charset);
         indexDeligate.setPreindexedTokens1(preindexedEntries);
         indexDeligate.setPreindexedTokens2(preindexedFeatures);
     }
@@ -192,6 +192,22 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         super();
     }
 
+    public FileDeligate getFileDeligate() {
+        return fileDeligate;
+    }
+
+    public void setFileDeligate(FileDeligate fileDeligate) {
+        this.fileDeligate = fileDeligate;
+    }
+
+    public IndexDeligatePair getIndexDeligate() {
+        return indexDeligate;
+    }
+
+    public void setIndexDeligate(IndexDeligatePair indexDeligate) {
+        this.indexDeligate = indexDeligate;
+    }
+
     public TempFileFactory getTempFileFactory() {
         return tempFileFactory;
     }
@@ -199,15 +215,6 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     public void setTempFileFactory(TempFileFactory tempFileFactory) {
         Checks.checkNotNull("tempFileFactory", tempFileFactory);
         this.tempFileFactory = tempFileFactory;
-    }
-
-    public final Charset getCharset() {
-        return charset;
-    }
-
-    public final void setCharset(Charset charset) {
-        Checks.checkNotNull(charset);
-        this.charset = charset;
     }
 
     public final int getMaxChunkSize() {
@@ -639,51 +646,59 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     protected SeekableSource<Weighted<Token>, Lexer.Tell> openEntriesSource(File file) throws FileNotFoundException, IOException {
         return new WeightedTokenSource(
-                new TSVSource(file, getCharset()),
-                indexDeligate.getDecoder1());
+                new TSVSource(file, getFileDeligate().getCharset()),
+                indexDeligate.single1());
     }
 
     protected Sink<Weighted<Token>> openEntriesSink(File file) throws FileNotFoundException, IOException {
-        return new WeightSumReducerSink<Token>(
-                new WeightedTokenSink(new TSVSink(file, getCharset()),
-                                      indexDeligate.getEncoder1()));
+        WeightedTokenSink s = new WeightedTokenSink(new TSVSink(file, getFileDeligate().getCharset()),
+                                                    indexDeligate.single1());
+        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
+        return new WeightSumReducerSink<Token>(s);
     }
 
     protected SeekableSource<Weighted<Token>, Lexer.Tell> openFeaturesSource(File file) throws FileNotFoundException, IOException {
         return new WeightedTokenSource(
-                new TSVSource(file, getCharset()),
-                indexDeligate.getDecoder2());
+                new TSVSource(file, getFileDeligate().getCharset()),
+                indexDeligate.single2());
     }
 
     protected Sink<Weighted<Token>> openFeaturesSink(File file) throws FileNotFoundException, IOException {
-        return new WeightSumReducerSink<Token>(
-                new WeightedTokenSink(new TSVSink(file, getCharset()),
-                                      indexDeligate.getEncoder2()));
+
+        WeightedTokenSink s = new WeightedTokenSink(new TSVSink(file, getFileDeligate().getCharset()),
+                                                    indexDeligate.single2());
+        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
+        return new WeightSumReducerSink<Token>(s);
     }
 
     protected SeekableSource<Weighted<TokenPair>, Lexer.Tell> openEventsSource(File file)
             throws FileNotFoundException, IOException {
-        return new WeightedTokenPairSource(
-                new TSVSource(file, getCharset()),
-                indexDeligate.getDecoder1(), indexDeligate.getDecoder2());
+        WeightedTokenPairSource s = new WeightedTokenPairSource(
+                new TSVSource(file, getFileDeligate().getCharset()), indexDeligate);
+        return s;
     }
 
     protected Sink<Weighted<TokenPair>> openEventsSink(File file)
             throws FileNotFoundException, IOException {
-        return new WeightSumReducerSink<TokenPair>(
-                new WeightedTokenPairSink(
-                new TSVSink(file, getCharset()),
-                indexDeligate.getEncoder1(), indexDeligate.getEncoder2()));
+        WeightedTokenPairSink s = new WeightedTokenPairSink(
+                new TSVSink(file, getFileDeligate().getCharset()),
+                indexDeligate);
+        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
+        return new WeightSumReducerSink<TokenPair>(s);
     }
 
     protected SeekableSource<TokenPair, Lexer.Tell> openInstancesSource(File file) throws FileNotFoundException, IOException {
-        return new TokenPairSource(new TSVSource(file, getCharset()),
-                                   indexDeligate.getDecoder1(), indexDeligate.getDecoder2());
+        return new TokenPairSource(
+                new TSVSource(file, getFileDeligate().getCharset()),
+                indexDeligate);
     }
 
     protected Sink<TokenPair> openInstancesSink(File file) throws FileNotFoundException, IOException {
-        return new TokenPairSink(new TSVSink(file, getCharset()),
-                                 indexDeligate.getEncoder1(), indexDeligate.getEncoder2());
+        TokenPairSink s = new TokenPairSink(
+                new TSVSink(file, getFileDeligate().getCharset()),
+                indexDeligate);
+        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
+        return s;
     }
 
     /**
@@ -705,8 +720,6 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             throw new NullPointerException("featuresFile is null");
         if (entriesFile == null)
             throw new NullPointerException("entriesFile is null");
-        if (charset == null)
-            throw new NullPointerException("charset is null");
 
         // Check that no two files are the same
         if (inputFile.equals(entryFeaturesFile))
@@ -773,7 +786,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
                 add("featuresOut", featuresFile).
                 add("eventsOut", entryFeaturesFile).
                 add("tempDir", tempFileFactory).
-                add("charset", charset);
+                add("fd", getFileDeligate()).
+                add("id", getIndexDeligate());
     }
 
 }

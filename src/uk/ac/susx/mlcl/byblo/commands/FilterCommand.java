@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
@@ -224,9 +225,11 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
     @Override
     public void runCommand() throws Exception {
-        if (LOG.isInfoEnabled()) {
+        if (LOG.isInfoEnabled()) 
             LOG.info("Running filtering.");
-        }
+        if (LOG.isDebugEnabled()) 
+            LOG.debug(this);
+        
 
         if (filterFeatureMinFreq > 0) {
             addFeaturesMinimumFrequency(filterFeatureMinFreq);
@@ -347,14 +350,14 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         final IntSet rejected = new IntOpenHashSet();
 
         WeightedTokenSource entriesSource = new WeightedTokenSource(
-                new TSVSource(activeEntriesFile, charset), indexDeligate.getDecoder1());
+                new TSVSource(activeEntriesFile, charset), indexDeligate.single1());
 
         File outputFile = tempFiles.createFile();
         outputFile.deleteOnExit();
 
         WeightedTokenSink entriesSink = new WeightedTokenSink(
                 new TSVSink(outputFile, charset),
-                indexDeligate.getEncoder1());
+                indexDeligate.single1());
 
         if (LOG.isInfoEnabled()) {
             LOG.info(
@@ -420,16 +423,20 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
         WeightedTokenPairSource efSrc = new WeightedTokenPairSource(
                 new TSVSource(activeEntryFeaturesFile, charset),
-                indexDeligate.getDecoder1(),
-                indexDeligate.getDecoder2());
+                indexDeligate
+//                indexDeligate.getDecoder1(),
+//                indexDeligate.getDecoder2()
+                        );
 
         File outputFile = tempFiles.createFile();
         outputFile.deleteOnExit();
 
         WeightedTokenPairSink efSink = new WeightedTokenPairSink(
                 new TSVSink(outputFile, charset),
-                indexDeligate.getEncoder1(),
-                indexDeligate.getEncoder2());
+                indexDeligate
+//                indexDeligate.getEncoder1(),
+//                indexDeligate.getEncoder2()
+                );
 
         if (LOG.isInfoEnabled()) {
             LOG.info("Filtering entry/features pairs from "
@@ -437,6 +444,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         }
 
         // Store the id of the special filtered feature and entry
+        // TODO This can probably be removed now but need to check
         final int filteredEntry = indexDeligate.getIndex1().index(FILTERED_STRING);
         final int filteredFeature = indexDeligate.getIndex2().index(FILTERED_STRING);
 
@@ -547,14 +555,14 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
         WeightedTokenSource featureSource = new WeightedTokenSource(
                 new TSVSource(activeFeaturesFile, charset),
-                indexDeligate.getDecoder2());
+                indexDeligate.single2());
 
         File outputFile = tempFiles.createFile();
         outputFile.deleteOnExit();
 
         WeightedTokenSink featureSink = new WeightedTokenSink(
                 new TSVSink(outputFile, charset),
-                indexDeligate.getEncoder2());
+                indexDeligate.single2());
 
         if (LOG.isInfoEnabled()) {
             LOG.info(

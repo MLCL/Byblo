@@ -81,7 +81,7 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
     @Parameter(names = {"-C", "--chunk-size"},
     description = "Number of lines that will be read and sorted in RAM at one "
     + "time (per thread). Larger values increase memory usage and performace.")
-    private int maxChunkSize = 500000;
+    private int maxChunkSize = 1000000;
 
     @ParametersDelegate
     private final FilePipeDeligate fileDeligate = new FilePipeDeligate();

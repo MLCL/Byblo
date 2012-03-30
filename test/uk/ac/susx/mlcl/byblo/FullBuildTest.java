@@ -4,6 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import uk.ac.susx.mlcl.byblo.commands.IndexEventsCommand;
 import java.io.File;
 import java.nio.charset.Charset;
 import org.junit.Test;
@@ -14,7 +15,6 @@ import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
 import uk.ac.susx.mlcl.byblo.commands.KnnSimsCommand;
 import static org.junit.Assert.*;
 import uk.ac.susx.mlcl.byblo.commands.*;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
 
 /**
  *
@@ -180,8 +180,8 @@ public class FullBuildTest {
 
         final File instances = TEST_FRUIT_INPUT;
         final Charset charet = DEFAULT_CHARSET;
-        boolean preindexedEntries = false;
-        boolean preindexedFeatures = false;
+        boolean preindexedEntries = true;
+        boolean preindexedFeatures = true;
 
         File instancesIndexed = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".indexed");
         File entryIndex = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".entry-index");
@@ -216,11 +216,6 @@ public class FullBuildTest {
 
         assertSizeGT(instances, instancesIndexed);
         assertValidInputFiles(instancesIndexed, entryIndex, featureIndex);
-
-        preindexedEntries = true;
-        preindexedFeatures = true;
-
-
 
         // Count the entries, features and events
 

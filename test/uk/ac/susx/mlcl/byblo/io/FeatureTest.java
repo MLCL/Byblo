@@ -51,13 +51,13 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
 public class FeatureTest {
 
     private void copyF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
+        Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
         WeightedTokenSource aSrc = new WeightedTokenSource(
                 new TSVSource(a, DEFAULT_CHARSET),
-                Token.stringDecoder(idx));
+                new IndexDeligate(false, strEnum));
         WeightedTokenSink bSink = new WeightedTokenSink(
                 new TSVSink(b, DEFAULT_CHARSET),
-                Token.stringEncoder(idx));
+                new IndexDeligate(false, strEnum));
         bSink.setCompactFormatEnabled(compact);
 
         IOUtil.copy(aSrc, bSink);
@@ -94,11 +94,15 @@ public class FeatureTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_FEATURES.getName() + ".str");
 
-        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
+        Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
 
         {
-            WeightedTokenSource aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET), Token.stringDecoder(idx));
-            WeightedTokenSink bSink = new WeightedTokenSink(new TSVSink(b, DEFAULT_CHARSET));
+            WeightedTokenSource aSrc = new WeightedTokenSource(
+                    new TSVSource(a, DEFAULT_CHARSET), 
+                    new IndexDeligate(false, strEnum));
+            WeightedTokenSink bSink = new WeightedTokenSink(
+                    new TSVSink(b, DEFAULT_CHARSET),
+                    new IndexDeligate(true));
             IOUtil.copy(aSrc, bSink);
             bSink.close();
         }
@@ -107,8 +111,12 @@ public class FeatureTest {
                    b.length() <= a.length());
 
         {
-            WeightedTokenSource bSrc = new WeightedTokenSource(new TSVSource(b, DEFAULT_CHARSET));
-            WeightedTokenSink cSink = new WeightedTokenSink(new TSVSink(c, DEFAULT_CHARSET), Token.stringEncoder(idx));
+            WeightedTokenSource bSrc = new WeightedTokenSource(
+                    new TSVSource(b, DEFAULT_CHARSET),
+                    new IndexDeligate(true));
+            WeightedTokenSink cSink = new WeightedTokenSink(
+                    new TSVSink(c, DEFAULT_CHARSET), 
+                    new IndexDeligate(false, strEnum));
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }

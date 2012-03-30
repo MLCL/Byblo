@@ -4,6 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.IOException;
@@ -33,16 +34,22 @@ public class ExternalSortTokenPiarCommand extends AbstractExternalSortCommand<To
 
     @Override
     protected Sink<TokenPair> openSink(File file) throws IOException {
-        return new TokenPairSink(new TSVSink(file, getFileDeligate().getCharset()), getIndexDeligate().getEncoder1(), getIndexDeligate().getEncoder2());
+        TokenPairSink s = new TokenPairSink(
+                new TSVSink(file, getFileDeligate().getCharset()),
+                getIndexDeligate());
+        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
+        return s;
     }
 
     @Override
     protected SeekableSource<TokenPair, Lexer.Tell> openSource(File file) throws IOException {
-        return new TokenPairSource(new TSVSource(file, getFileDeligate().getCharset()), getIndexDeligate().getDecoder1(), getIndexDeligate().getDecoder2());
+        return new TokenPairSource(
+                new TSVSource(file, getFileDeligate().getCharset()),
+                getIndexDeligate());
     }
 
     public IndexDeligatePair getIndexDeligate() {
         return indexDeligate;
     }
-    
+
 }

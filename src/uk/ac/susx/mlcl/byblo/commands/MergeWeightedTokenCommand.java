@@ -4,6 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.io.IndexDeligate;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
 import java.io.File;
@@ -27,7 +28,7 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
 public class MergeWeightedTokenCommand extends AbstractMergeCommand<Weighted<Token>> {
 
     @ParametersDelegate
-    protected final IndexDeligateSingle indexDeligate = new IndexDeligateSingle();
+    protected final IndexDeligate indexDeligate = new IndexDeligate();
 
     public MergeWeightedTokenCommand(File sourceFileA, File sourceFileB, File destinationFile, Charset charset, boolean preindexed) {
         super(sourceFileA, sourceFileB, destinationFile, charset,
@@ -42,14 +43,16 @@ public class MergeWeightedTokenCommand extends AbstractMergeCommand<Weighted<Tok
     protected Source<Weighted<Token>> openSource(File file) throws FileNotFoundException, IOException {
         return new WeightedTokenSource(
                 new TSVSource(file, getFileDeligate().getCharset()),
-                indexDeligate.getDecoder());
+                indexDeligate);
     }
 
     @Override
     protected Sink<Weighted<Token>> openSink(File file) throws FileNotFoundException, IOException {
-        return new WeightSumReducerSink<Token>(new WeightedTokenSink(
+        WeightedTokenSink s = new WeightedTokenSink(
                 new TSVSink(file, getFileDeligate().getCharset()),
-                indexDeligate.getEncoder()));
+                indexDeligate);
+        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
+        return new WeightSumReducerSink<Token>(s);
     }
 
     public static void main(String[] args) throws Exception {

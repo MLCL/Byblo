@@ -4,6 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects.ToStringHelper;
 import java.io.File;
@@ -42,15 +43,17 @@ public class MergeWeightedTokenPairCommand extends AbstractMergeCommand<Weighted
     protected Source<Weighted<TokenPair>> openSource(File file) throws FileNotFoundException, IOException {
         return new WeightedTokenPairSource(
                 new TSVSource(file, getFileDeligate().getCharset()),
-                indexDeligate.getDecoder1(), indexDeligate.getDecoder2());
+                indexDeligate);
     }
 
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file) throws FileNotFoundException, IOException {
-        return new WeightSumReducerSink<TokenPair>(
-                new WeightedTokenPairSink(
+
+        WeightedTokenPairSink s = new WeightedTokenPairSink(
                 new TSVSink(file, getFileDeligate().getCharset()),
-                indexDeligate.getEncoder1(), indexDeligate.getEncoder2()));
+                indexDeligate);
+        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
+        return new WeightSumReducerSink<TokenPair>(s);
     }
 
     public static void main(String[] args) throws Exception {
@@ -61,7 +64,5 @@ public class MergeWeightedTokenPairCommand extends AbstractMergeCommand<Weighted
     protected ToStringHelper toStringHelper() {
         return super.toStringHelper().add("indexing", indexDeligate);
     }
-    
-    
 
 }

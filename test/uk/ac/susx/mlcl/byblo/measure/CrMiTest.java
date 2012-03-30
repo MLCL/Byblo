@@ -38,6 +38,7 @@ import org.junit.Test;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
 import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
@@ -261,9 +262,9 @@ public class CrMiTest {
 
         Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
         WeightedTokenPairSource expected = new WeightedTokenPairSource(
-                new TSVSource(expectedOutput, DEFAULT_CHARSET), Token.stringDecoder(idx), Token.stringDecoder(idx));
+                new TSVSource(expectedOutput, DEFAULT_CHARSET), new IndexDeligatePair(false, false, idx, idx));
         WeightedTokenPairSource actual = new WeightedTokenPairSource(
-                new TSVSource(crmiOutput, DEFAULT_CHARSET), Token.stringDecoder(idx), Token.stringDecoder(idx));
+                new TSVSource(crmiOutput, DEFAULT_CHARSET), new IndexDeligatePair(false, false, idx, idx));
 
         while (expected.hasNext() && actual.hasNext()) {
             Weighted<TokenPair> e = expected.read();
