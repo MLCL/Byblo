@@ -112,7 +112,7 @@ public final class TSVSource implements SeekableSource<Iterable<String>, Lexer.T
         return lexer.hasNext();
     }
 
-    protected void skipWhitespace() throws CharacterCodingException, IOException {
+    private void skipWhitespace() throws CharacterCodingException, IOException {
         while (lexer.type() == Lexer.Type.Whitespace && lexer.hasNext()) {
             lexer.advance();
         }

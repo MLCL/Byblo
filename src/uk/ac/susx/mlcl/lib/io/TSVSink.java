@@ -68,11 +68,10 @@ public final class TSVSink implements Sink<Iterable<String>>, Closeable, Flushab
 
     }
 
-    
     public void endOfRecord() throws IOException {
         writeRecordDelimiter();
     }
-    
+
     private void writeRecordDelimiter() throws IOException {
         out.append(RECORD_DELIM);
         ++row;
@@ -84,7 +83,7 @@ public final class TSVSink implements Sink<Iterable<String>>, Closeable, Flushab
     }
 
     public void writeString(String str) throws IOException {
-        if(column > 0)
+        if (column > 0)
             writeValueDelimiter();
         out.write(str);
         ++column;
@@ -110,14 +109,6 @@ public final class TSVSink implements Sink<Iterable<String>>, Closeable, Flushab
         out.flush();
     }
 
-    // XXX Check if this is strictly necessary
-    @Override
-    protected void finalize() throws Throwable {
-        flush();
-        close();
-        super.finalize();
-    }
-
     @Override
     public void write(Iterable<String> record) throws IOException {
         boolean first = true;
@@ -129,5 +120,4 @@ public final class TSVSink implements Sink<Iterable<String>>, Closeable, Flushab
         }
         writeRecordDelimiter();
     }
-
 }
