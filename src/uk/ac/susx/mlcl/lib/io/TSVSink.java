@@ -40,7 +40,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class TSVSink implements Sink<Iterable<String>>, Closeable, Flushable {
+public final class TSVSink implements Closeable, Flushable, DataSink {
 
     private static final Log LOG = LogFactory.getLog(TSVSink.class);
 
@@ -48,7 +48,7 @@ public final class TSVSink implements Sink<Iterable<String>>, Closeable, Flushab
 
     private static final char VALUE_DELIM = '\t';
 
-    private final Writer out;
+    private final Appendable out;
 
     private long row;
 
@@ -68,6 +68,7 @@ public final class TSVSink implements Sink<Iterable<String>>, Closeable, Flushab
 
     }
 
+    @Override
     public void endOfRecord() throws IOException {
         writeRecordDelimiter();
     }
@@ -82,42 +83,60 @@ public final class TSVSink implements Sink<Iterable<String>>, Closeable, Flushab
         out.append(VALUE_DELIM);
     }
 
+    @Override
     public void writeString(String str) throws IOException {
+        assert str.indexOf(VALUE_DELIM) == -1;
+        assert str.indexOf(RECORD_DELIM) == -1;
         if (column > 0)
             writeValueDelimiter();
-        out.write(str);
+        out.append(str);
         ++column;
     }
 
+    @Override
     public void writeInt(int val) throws IOException {
         writeString(Integer.toString(val));
-        ++column;
     }
 
+    @Override
     public void writeDouble(double val) throws IOException {
         writeString(Double.toString(val));
-        ++column;
+    }
+
+    @Override
+    public void writeChar(char val) throws IOException {
+        writeInt(val);
+    }
+
+    @Override
+    public void writeByte(byte val) throws IOException {
+        writeInt(val);
+    }
+
+    @Override
+    public void writeShort(short val) throws IOException {
+        writeInt(val);
+    }
+
+    @Override
+    public void writeLong(long val) throws IOException {
+        writeString(Long.toString(val));
+    }
+
+    @Override
+    public void writeFloat(float val) throws IOException {
+        writeString(Float.toString(val));
     }
 
     @Override
     public void close() throws IOException {
-        out.close();
+        if (out instanceof Closeable)
+            ((Closeable) out).close();
     }
 
     @Override
     public void flush() throws IOException {
-        out.flush();
-    }
-
-    @Override
-    public void write(Iterable<String> record) throws IOException {
-        boolean first = true;
-        for (String v : record) {
-            if (!first)
-                writeValueDelimiter();
-            writeString(v);
-            first = false;
-        }
-        writeRecordDelimiter();
+        if (out instanceof Flushable)
+            ((Flushable) out).flush();
     }
 }

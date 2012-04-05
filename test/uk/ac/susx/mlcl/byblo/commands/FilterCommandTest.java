@@ -109,7 +109,7 @@ public class FilterCommandTest {
                    OUTPUT_ENTRY_FEATURES.exists());
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testMainMethodRun_fruit_entryFreqFilter() throws Exception {
         System.out.println(
                 "Testing " + SUBJECT + ": on fruit, from main method, filter by Entry freqency.");

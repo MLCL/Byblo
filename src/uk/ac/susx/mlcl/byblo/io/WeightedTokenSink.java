@@ -30,13 +30,10 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import com.google.common.base.Function;
 import java.io.*;
 import java.text.DecimalFormat;
-import sun.security.krb5.internal.crypto.EType;
-import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.io.DataSink;
 import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.io.TSVSink;
 
 /**
  * An <tt>WeightedTokenSink</tt> object is used to store {@link Token} objects
@@ -76,7 +73,6 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
 
     private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
 
-//    private final Function<Integer, String> tokenEncoder;
     private IndexDeligate indexDeligate;
 
     private boolean compactFormatEnabled = true;
@@ -85,9 +81,9 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
 
     private long count = 0;
 
-    private TSVSink inner;
+    private DataSink inner;
 
-    public WeightedTokenSink(TSVSink inner, IndexDeligate indexDeligate)
+    public WeightedTokenSink(DataSink inner, IndexDeligate indexDeligate)
             throws FileNotFoundException, IOException {
         this.inner = inner;
         this.indexDeligate = indexDeligate;
@@ -149,7 +145,8 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
 
     @Override
     public void flush() throws IOException {
-        inner.flush();
+        if (inner instanceof Flushable)
+            ((Flushable) inner).flush();
     }
 
     @Override
@@ -157,7 +154,7 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
         if (isCompactFormatEnabled() && previousRecord != null) {
             inner.endOfRecord();
         }
-        inner.close();
+        if (inner instanceof Closeable)
+            ((Closeable) inner).close();
     }
-
 }

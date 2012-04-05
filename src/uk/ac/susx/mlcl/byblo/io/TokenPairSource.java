@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import com.google.common.base.Function;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -40,59 +39,37 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
-import uk.ac.susx.mlcl.lib.io.Lexer;
-import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
-import uk.ac.susx.mlcl.lib.io.SeekableSource;
-import uk.ac.susx.mlcl.lib.io.TSVSource;
+import uk.ac.susx.mlcl.lib.io.*;
 
 /**
  * An <tt>TokenPairSource</tt> object is used to retrieve
  * {@link EntryFeature} objects from a flat file.
  *
+ * @param <P> 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see EntryFeatureSink
  */
-public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell>, Closeable {
-
-    private static final Log LOG = LogFactory.getLog(TokenPairSource.class);
+public class TokenPairSource<P>
+        implements SeekableSource<TokenPair, P>, Closeable {
 
     private IndexDeligatePair indexDeligate;
-//
-//    private final Function<String, Integer> tokenDecoder1;
-//
-//    private final Function<String, Integer> tokenDecoder2;
 
     private TokenPair previousRecord = null;
 
     private long count = 0;
 
-    private final TSVSource inner;
+    private final SeekableDataSource<P> inner;
 
     public TokenPairSource(
-            TSVSource inner,
+            SeekableDataSource<P> inner,
             IndexDeligatePair indexDeligate)
             throws FileNotFoundException, IOException {
         this.inner = inner;
         this.indexDeligate = indexDeligate;
     }
 
-//    public TokenPairSource(TSVSource inner)
-//            throws FileNotFoundException, IOException {
-//        this(inner, Token.enumeratedDecoder(), Token.enumeratedDecoder());
-//    }
-//
-//    public Function<String, Integer> getTokenDecoder1() {
-//        return tokenDecoder1;
-//    }
-//
-//    public Function<String, Integer> getTokenDecoder2() {
-//        return tokenDecoder2;
-//    }
     public long getCount() {
         return count;
     }
@@ -111,8 +88,7 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell>, C
             // the task at hand, but quite a common scenario in general feature
             // extraction. Throw an exception which is caught for end user input
             inner.endOfRecord();
-            throw new SingletonRecordException(inner,
-                                               "Found entry/feature record with no features.");
+            throw new IOException("Found entry/feature record with no features.");
         }
 
         final int id2 = readToken2();
@@ -136,8 +112,6 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell>, C
             return inner.readInt();
         else
             return indexDeligate.getEnumerator1().index(inner.readString());
-//                   
-//        return tokenDecoder1.apply(inner.readString());
     }
 
     private int readToken2() throws CharacterCodingException, IOException {
@@ -145,16 +119,17 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell>, C
             return inner.readInt();
         else
             return indexDeligate.getEnumerator2().index(inner.readString());
-//        return tokenDecoder2.apply(inner.readString());
     }
 
     public static boolean equal(File fileA, File fileB, Charset charset)
             throws IOException {
-        final Enumerator<String> stringIndex = Enumerators.newDefaultStringEnumerator();
-        IndexDeligatePair idx = new IndexDeligatePair(false, false, stringIndex, stringIndex);
-        final TokenPairSource srcA = new TokenPairSource(
+        final Enumerator<String> stringIndex = Enumerators.
+                newDefaultStringEnumerator();
+        IndexDeligatePair idx = new IndexDeligatePair(false, false, stringIndex,
+                                                      stringIndex);
+        final TokenPairSource<?> srcA = new TokenPairSource<Lexer.Tell>(
                 new TSVSource(fileA, charset), idx);
-        final TokenPairSource srcB = new TokenPairSource(
+        final TokenPairSource<?> srcB = new TokenPairSource<Lexer.Tell>(
                 new TSVSource(fileB, charset), idx);
 
 
@@ -164,46 +139,26 @@ public class TokenPairSource implements SeekableSource<TokenPair, Lexer.Tell>, C
         Collections.sort(listA, c);
         Collections.sort(listB, c);
         return listA.equals(listB);
-//        
-//        boolean equal = true;
-//        while (equal && srcA.hasNext() && srcB.hasNext()) {
-//            final TokenPair recA = srcA.read();
-//            final TokenPair recB = srcB.read();
-//
-//            equal = equal
-//                    && recA.id1() == recB.id1()
-//                    && recA.id2() == recB.id2();
-//
-//            if (!equal) {
-//                LOG.info(recA + " | " + recB);
-//            }
-//        }
-//        equal = equal && srcA.hasNext() == srcB.hasNext();
-//        return equal;
     }
 
     @Override
     public boolean hasNext() throws IOException {
-        return inner.hasNext();
+        return inner.canRead();
     }
 
     @Override
-    public void position(Tell p) throws IOException {
+    public void position(P p) throws IOException {
         inner.position(p);
     }
 
     @Override
-    public Tell position() throws IOException {
+    public P position() throws IOException {
         return inner.position();
-    }
-
-    public double percentRead() throws IOException {
-        return inner.percentRead();
     }
 
     @Override
     public void close() throws IOException {
-        inner.close();
+        if (inner instanceof Closeable)
+            ((Closeable) inner).close();
     }
-
 }

@@ -84,7 +84,7 @@ public class Enumerators {
         AtomicInteger nextId = new AtomicInteger(0);
 
         TSVSource in = new TSVSource(file, Files.DEFAULT_CHARSET);
-        while (in.hasNext()) {
+        while (in.canRead()) {
             int id = in.readInt();
             String s = in.readString();
             in.endOfRecord();

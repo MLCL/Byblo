@@ -46,11 +46,12 @@ import uk.ac.susx.mlcl.lib.io.*;
  * A <tt>WeightedTokenPairSource</tt> object is used to retrieve
  * {@link TokenPair} objects from a flat file.
  *
+ * @param <P> 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see WeightedEntryPairSink
  */
-public class WeightedTokenPairSource
-        implements SeekableSource<Weighted<TokenPair>, Tell>, Closeable {
+public class WeightedTokenPairSource<P>
+        implements SeekableSource<Weighted<TokenPair>, Tell<P>>, Closeable {
 
     private IndexDeligatePair indexDeligate;
 
@@ -62,10 +63,10 @@ public class WeightedTokenPairSource
 
     private long count = 0;
 
-    private final TSVSource inner;
+    private final SeekableDataSource<P> inner;
 
     public WeightedTokenPairSource(
-            TSVSource inner, IndexDeligatePair indexDeligate)
+            SeekableDataSource<P> inner, IndexDeligatePair indexDeligate)
             throws FileNotFoundException, IOException {
 
         this.inner = inner;
@@ -93,8 +94,8 @@ public class WeightedTokenPairSource
 
         if (!hasNext() || inner.isEndOfRecordNext()) {
             inner.endOfRecord();
-            throw new SingletonRecordException(
-                    inner, "Found weighte entry pair record with second entries.");
+            throw new IOException(
+                    "Found weighte entry pair record with second entries.");
         }
 
         final int tokenId2 = readToken2();
@@ -141,17 +142,17 @@ public class WeightedTokenPairSource
         return inner.readDouble();
     }
 
-    public WeightedTokenPairVectorSource getVectorSource() {
-        return new WeightedTokenPairVectorSource(this);
+    public WeightedTokenPairVectorSource<P> getVectorSource() throws IOException {
+        return new WeightedTokenPairVectorSource<P>(this);
     }
 
     @Override
     public boolean hasNext() throws IOException {
-        return inner.hasNext();
+        return inner.canRead();
     }
 
     @Override
-    public void position(Tell p) throws IOException {
+    public void position(Tell<P> p) throws IOException {
         this.token1_continuation = p.isToken1_continuation();
         this.prev_id1 = p.getPrev_id1();
         this.prev_id2 = p.getPrev_id2();
@@ -159,25 +160,22 @@ public class WeightedTokenPairSource
     }
 
     @Override
-    public Tell position() throws IOException {
-        return new Tell(inner.position(),
+    public Tell<P> position() throws IOException {
+        return new Tell<P>(inner.position(),
                         token1_continuation, prev_id1, prev_id2);
-    }
-
-    public double percentRead() throws IOException {
-        return inner.percentRead();
     }
 
     @Override
     public void close() throws IOException {
-        inner.close();
+        if (inner instanceof Closeable)
+            ((Closeable) inner).close();
     }
 
     public static boolean equal(File a, File b, Charset charset) throws IOException {
         IndexDeligatePair idx = new IndexDeligatePair(false, false);
-        final WeightedTokenPairSource srcA = new WeightedTokenPairSource(
+        final WeightedTokenPairSource<?> srcA = new WeightedTokenPairSource<Lexer.Tell>(
                 new TSVSource(a, charset), idx);
-        final WeightedTokenPairSource srcB = new WeightedTokenPairSource(
+        final WeightedTokenPairSource<?> srcB = new WeightedTokenPairSource<Lexer.Tell>(
                 new TSVSource(b, charset), idx);
 
         List<Weighted<TokenPair>> listA = IOUtil.readAll(srcA);
@@ -191,11 +189,9 @@ public class WeightedTokenPairSource
         return listA.equals(listB);
     }
 
-    public static final class Tell {
+    public static final class Tell<P> {
 
-        public static final Tell START = new Tell(Lexer.Tell.START, false, 0, 0);
-
-        private final Lexer.Tell inner;
+        private final P inner;
 
         private final boolean token1_continuation;
 
@@ -203,14 +199,15 @@ public class WeightedTokenPairSource
 
         private final int prev_id2;
 
-        public Tell(Lexer.Tell inner, boolean token1_continuation, int prev_id1, int prev_id2) {
+        public Tell(P inner, boolean token1_continuation, int prev_id1,
+                    int prev_id2) {
             this.inner = inner;
             this.token1_continuation = token1_continuation;
             this.prev_id1 = prev_id1;
             this.prev_id2 = prev_id2;
         }
 
-        public Lexer.Tell getInner() {
+        public P getInner() {
             return inner;
         }
 
@@ -233,7 +230,8 @@ public class WeightedTokenPairSource
             if (getClass() != obj.getClass())
                 return false;
             final Tell other = (Tell) obj;
-            if (this.inner != other.inner && (this.inner == null || !this.inner.equals(other.inner)))
+            if (this.inner != other.inner && (this.inner == null || !this.inner.
+                                              equals(other.inner)))
                 return false;
             if (this.prev_id1 != other.prev_id1)
                 return false;
@@ -250,6 +248,5 @@ public class WeightedTokenPairSource
             hash = 83 * hash + this.prev_id2;
             return hash;
         }
-
     }
 }

@@ -61,15 +61,8 @@ public class EntryFeatureTest {
         assertTrue("EntryFeatureSource is empty", efSrc.hasNext());
 
         while (efSrc.hasNext()) {
-            try {
-                TokenPair ef = efSrc.read();
-                assertNotNull("Found null EntryFeatureRecord", ef);
-            } catch (SingletonRecordException ex) {
-                // This is allowed to happen here, because the file explicitly
-                // contains this erroneous expression for test purposes
-                if (ex.getOffset() != 1671)
-                    throw ex;
-            }
+            TokenPair ef = efSrc.read();
+            assertNotNull("Found null EntryFeatureRecord", ef);
         }
     }
 
@@ -119,7 +112,8 @@ public class EntryFeatureTest {
 
         {
             Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
-            IndexDeligatePair idx = new IndexDeligatePair(false, false, strEnum, strEnum);
+            IndexDeligatePair idx = new IndexDeligatePair(false, false, strEnum,
+                                                          strEnum);
             TokenPairSource aSrc = new TokenPairSource(
                     new TSVSource(a, DEFAULT_CHARSET), idx);
             TokenPairSink bSink = new TokenPairSink(
@@ -135,8 +129,10 @@ public class EntryFeatureTest {
                    b.length() <= a.length());
 
         {
-            Enumerator<String> strEnum = Enumerators.loadStringEnumerator(idxFile);
-            IndexDeligatePair idx = new IndexDeligatePair(false, false, strEnum, strEnum);
+            Enumerator<String> strEnum = Enumerators.loadStringEnumerator(
+                    idxFile);
+            IndexDeligatePair idx = new IndexDeligatePair(false, false, strEnum,
+                                                          strEnum);
             TokenPairSource bSrc = new TokenPairSource(
                     new TSVSource(b, DEFAULT_CHARSET),
                     new IndexDeligatePair(true, true));
@@ -152,5 +148,4 @@ public class EntryFeatureTest {
         assertTrue("Double converted file is not equal to origion.",
                    Files.equal(a, c));
     }
-
 }

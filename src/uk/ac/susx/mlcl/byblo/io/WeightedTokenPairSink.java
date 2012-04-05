@@ -30,14 +30,12 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import com.google.common.base.Function;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
 import java.text.DecimalFormat;
-import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.io.DataSink;
 import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.io.TSVSink;
 
 /**
  * An <tt>WeightedTokenPairSink</tt> object is used to store
@@ -90,9 +88,9 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
 
     private long count = 0;
 
-    private TSVSink inner;
+    private DataSink inner;
 
-    public WeightedTokenPairSink(TSVSink inner, IndexDeligatePair indexDeligate) {
+    public WeightedTokenPairSink(DataSink inner, IndexDeligatePair indexDeligate) {
         this.inner = inner;
         this.indexDeligate = indexDeligate;
     }
@@ -143,13 +141,13 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
 
         writeToken2(record.record().id2());
         prev_id2 = record.record().id2();
-        
+
         writeWeight(record.weight());
     }
 
     private void writeToken1(int tokenId) throws IOException {
         assert tokenId >= 0 : "Writing negative token 1 id";
-        
+
         if (indexDeligate.isPreindexedTokens1())
             if (indexDeligate.isSkipindexed1())
                 inner.writeInt(tokenId - prev_id1);
@@ -161,7 +159,7 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
 
     private void writeToken2(int tokenId) throws IOException {
         assert tokenId >= 0 : "Writing negative token 2 id";
-        
+
         if (indexDeligate.isPreindexedTokens2()) {
             if (indexDeligate.isSkipindexed2()) {
                 inner.writeInt(tokenId - prev_id2);
@@ -186,12 +184,13 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
         if (isCompactFormatEnabled() && token1_continuation) {
             inner.endOfRecord();
         }
-        inner.close();
+        if (inner instanceof Closeable)
+            ((Closeable) inner).close();
     }
 
     @Override
     public void flush() throws IOException {
-        inner.flush();
+        if (inner instanceof Flushable)
+            ((Flushable) inner).flush();
     }
-
 }

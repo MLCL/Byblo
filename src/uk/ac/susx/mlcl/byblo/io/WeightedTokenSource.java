@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import com.google.common.base.Function;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -47,11 +46,7 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
-import uk.ac.susx.mlcl.lib.io.Lexer;
-import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
-import uk.ac.susx.mlcl.lib.io.SeekableSource;
-import uk.ac.susx.mlcl.lib.io.TSVSource;
+import uk.ac.susx.mlcl.lib.io.*;
 
 /**
  * An <tt>WeightedTokenSource</tt> object is used to retrieve {@link Token}
@@ -60,12 +55,12 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see EntrySink
  */
-public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexer.Tell>, Closeable {
+public class WeightedTokenSource<P>
+        implements SeekableSource<Weighted<Token>, P>, Closeable {
 
     private static final Log LOG = LogFactory.getLog(WeightedTokenSource.class);
 
     private IndexDeligate indexDeligate;
-//    private final Function<String, Integer> tokenDecoder;
 
     private double weightSum = 0;
 
@@ -81,26 +76,14 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
 
     private Weighted<Token> previousRecord = null;
 
-    private final TSVSource inner;
+    private final SeekableDataSource<P> inner;
 
-    public WeightedTokenSource(TSVSource inner,
-                               IndexDeligate indexDeligate //                               Function<String, Integer> tokenDecoder
-            )
+    public WeightedTokenSource(SeekableDataSource<P> inner,
+                               IndexDeligate indexDeligate)
             throws FileNotFoundException, IOException {
         this.inner = inner;
         this.indexDeligate = indexDeligate;
-//        this.tokenDecoder = tokenDecoder;
     }
-//
-//    public WeightedTokenSource(TSVSource inner)
-//            throws FileNotFoundException, IOException {
-//        this.inner = inner;
-//        this.tokenDecoder = Token.enumeratedDecoder();
-//    }
-//
-//    public Function<String, Integer> getTokenDecoder() {
-//        return tokenDecoder;
-//    }
 
     public double getWeightSum() {
         return weightSum;
@@ -127,13 +110,13 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
     }
 
     @Override
-    public void position(Tell offset) throws IOException {
+    public void position(P offset) throws IOException {
         inner.position(offset);
         previousRecord = null;
     }
 
     @Override
-    public Tell position() {
+    public P position() throws IOException {
         return inner.position();
     }
 
@@ -142,7 +125,6 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
             return inner.readInt();
         } else
             return indexDeligate.getEnumerator().index(inner.readString());
-//        return tokenDecoder.apply(inner.readString());
     }
 
     @Override
@@ -156,8 +138,7 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
 
         if (!hasNext() || inner.isEndOfRecordNext()) {
             inner.endOfRecord();
-            throw new SingletonRecordException(inner,
-                                               "Found entry record with no weights.");
+            throw new IOException("Found entry record with no weights.");
         }
 
         final double weight = inner.readDouble();
@@ -166,9 +147,10 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
         weightSum += weight;
         weightMax = Math.max(weightMax, weight);
         ++count;
-        final Weighted<Token> record = new Weighted<Token>(new Token(tokenId), weight);
+        final Weighted<Token> record = new Weighted<Token>(new Token(tokenId),
+                                                           weight);
 
-        if (inner.hasNext() && !inner.isEndOfRecordNext()) {
+        if (inner.canRead() && !inner.isEndOfRecordNext()) {
             previousRecord = record;
         }
 
@@ -197,7 +179,8 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
 
                 if (LOG.isWarnEnabled())
                     LOG.warn("Found duplicate Entry \""
-                            + (indexDeligate.getEnumerator().value(entry.record().id()))
+                            + (indexDeligate.getEnumerator().value(entry.record().
+                               id()))
                             + "\" (id=" + id
                             + ") in entries file. Merging records. Old frequency = "
                             + oldFreq + ", new frequency = " + newFreq + ".");
@@ -223,14 +206,13 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
     }
 
     public static boolean equal(File a, File b, Charset charset) throws IOException {
-        final Enumerator<String> stringIndex = Enumerators.newDefaultStringEnumerator();
+        final Enumerator<String> stringIndex = Enumerators.
+                newDefaultStringEnumerator();
         IndexDeligate idx = new IndexDeligate();
-        final WeightedTokenSource srcA = new WeightedTokenSource(
-                new TSVSource(a, charset), idx //                Token.stringDecoder(stringIndex)
-                );
-        final WeightedTokenSource srcB = new WeightedTokenSource(
-                new TSVSource(b, charset), idx //                Token.stringDecoder(stringIndex)
-                );
+        final WeightedTokenSource<?> srcA = new WeightedTokenSource<Lexer.Tell>(
+                new TSVSource(a, charset), idx);
+        final WeightedTokenSource<?> srcB = new WeightedTokenSource<Lexer.Tell>(
+                new TSVSource(b, charset), idx);
 
         List<Weighted<Token>> listA = IOUtil.readAll(srcA);
         List<Weighted<Token>> listB = IOUtil.readAll(srcB);
@@ -240,29 +222,16 @@ public class WeightedTokenSource implements SeekableSource<Weighted<Token>, Lexe
         Collections.sort(listA, c);
         Collections.sort(listB, c);
         return listA.equals(listB);
-//        
-//        boolean equal = true;
-//        while (equal && srcA.hasNext() && srcB.hasNext()) {
-//            final Weighted<Token> recA = srcA.read();
-//            final Weighted<Token> recB = srcB.read();
-//            equal = recA.record().id() == recB.record().id()
-//                    && recA.weight() == recB.weight();
-//        }
-//        return equal && srcA.hasNext() == srcB.hasNext();
     }
 
     @Override
     public boolean hasNext() throws IOException {
-        return inner.hasNext();
-    }
-
-    public double percentRead() throws IOException {
-        return inner.percentRead();
+        return inner.canRead();
     }
 
     @Override
     public void close() throws IOException {
-        inner.close();
+        if (inner instanceof Closeable)
+            ((Closeable) inner).close();
     }
-
 }

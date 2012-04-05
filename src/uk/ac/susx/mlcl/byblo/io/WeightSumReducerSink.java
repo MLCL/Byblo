@@ -7,7 +7,6 @@ package uk.ac.susx.mlcl.byblo.io;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
-import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.io.Sink;
 
 /**
@@ -57,5 +56,4 @@ public class WeightSumReducerSink<T> implements Sink<Weighted<T>>, Flushable, Cl
         if (inner instanceof Closeable)
             ((Closeable) inner).close();
     }
-    
 }

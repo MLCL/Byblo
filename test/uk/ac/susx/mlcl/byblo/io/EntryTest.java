@@ -46,7 +46,7 @@ import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
-import uk.ac.susx.mlcl.lib.SimpleEnumerator;
+import uk.ac.susx.mlcl.lib.io.Lexer;
 import uk.ac.susx.mlcl.lib.io.TSVSink;
 import uk.ac.susx.mlcl.lib.io.TSVSource;
 
@@ -65,9 +65,11 @@ public class EntryTest {
         WeightedTokenSource aSrc;
         WeightedTokenSink bSink;
         if (enumIn)
-            aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET), idx);
+            aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET),
+                                           idx);
         else
-            aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET), idx);
+            aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET),
+                                           idx);
 
         if (enumOut)
             bSink = new WeightedTokenSink(
@@ -133,7 +135,7 @@ public class EntryTest {
                     new IndexDeligate(true));
             WeightedTokenSink cSink = new WeightedTokenSink(
                     new TSVSink(c, DEFAULT_CHARSET),
-                     new IndexDeligate(false, strEnum));
+                    new IndexDeligate(false, strEnum));
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }
@@ -150,13 +152,14 @@ public class EntryTest {
 
         Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
 
-        
+
         Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
-        WeightedTokenSource src = new WeightedTokenSource(
+        WeightedTokenSource<Lexer.Tell> src = new WeightedTokenSource<Lexer.Tell>(
                 new TSVSource(file, DEFAULT_CHARSET),
                 new IndexDeligate(false, idx));
         {
             while (src.hasNext()) {
+
                 final Tell pos = src.position();
                 final Weighted<Token> record = src.read();
 
@@ -199,5 +202,4 @@ public class EntryTest {
             throws FileNotFoundException, IOException {
         testRandomAccess(TEST_FRUIT_ENTRIES);
     }
-
 }

@@ -47,22 +47,23 @@ import uk.ac.susx.mlcl.lib.io.SeekableSource;
  * Wraps a {@link WeightedEntryFeatureSource} to produce complete feature
  * vectors instead of just individual entry/feature records.
  *
+ * @param <P> 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightedTokenPairVectorSource
-        implements SeekableSource<Indexed<SparseDoubleVector>, Tell> {
+public class WeightedTokenPairVectorSource<P>
+        implements SeekableSource<Indexed<SparseDoubleVector>, Tell<P>> {
 
-    private final WeightedTokenPairSource inner;
+    private final WeightedTokenPairSource<P> inner;
 
     private Weighted<TokenPair> next;
 
-    private Tell tell;
+    private Tell<P> tell;
 
     private long count = 0;
 
-    public WeightedTokenPairVectorSource(WeightedTokenPairSource inner) {
+    public WeightedTokenPairVectorSource(WeightedTokenPairSource<P> inner) throws IOException {
         this.inner = inner;
-        tell = Tell.START;
+        tell = inner.position();
         next = null;
     }
 
@@ -99,14 +100,14 @@ public class WeightedTokenPairVectorSource
     }
 
     @Override
-    public void position(Tell offset) throws IOException {
+    public void position(Tell<P> offset) throws IOException {
         inner.position(offset);
         tell = offset;
         readNext();
     }
 
     @Override
-    public Tell position() throws IOException {
+    public Tell<P> position() throws IOException {
         return tell;
     }
 
@@ -119,7 +120,8 @@ public class WeightedTokenPairVectorSource
         }
     }
 
-    public static SparseDoubleVector toDoubleVector(Int2DoubleMap map, int cardinality) {
+    public static SparseDoubleVector toDoubleVector(Int2DoubleMap map,
+                                                    int cardinality) {
         if (map == null) {
             throw new NullPointerException();
         }
@@ -127,14 +129,15 @@ public class WeightedTokenPairVectorSource
             throw new IllegalArgumentException();
         }
 
-        List<Int2DoubleMap.Entry> entries = new ArrayList<Int2DoubleMap.Entry>(map.int2DoubleEntrySet());
+        List<Int2DoubleMap.Entry> entries = new ArrayList<Int2DoubleMap.Entry>(map.
+                int2DoubleEntrySet());
         Collections.sort(entries, new Comparator<Int2DoubleMap.Entry>() {
 
             @Override
-            public final int compare(final Int2DoubleMap.Entry t, final Int2DoubleMap.Entry t1) {
+            public final int compare(final Int2DoubleMap.Entry t,
+                                     final Int2DoubleMap.Entry t1) {
                 return t.getIntKey() - t1.getIntKey();
             }
-
         });
 
         int[] keys = new int[entries.size()];
@@ -145,9 +148,9 @@ public class WeightedTokenPairVectorSource
             values[i] = entries.get(i).getDoubleValue();
         }
 
-        SparseDoubleVector vec = new SparseDoubleVector(keys, values, cardinality, keys.length);
+        SparseDoubleVector vec = new SparseDoubleVector(keys, values,
+                                                        cardinality, keys.length);
         vec.compact();
         return vec;
     }
-
 }

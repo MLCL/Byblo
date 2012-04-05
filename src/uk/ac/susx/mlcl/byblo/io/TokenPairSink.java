@@ -30,13 +30,12 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import com.google.common.base.Function;
 import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.Flushable;
 import java.io.IOException;
+import uk.ac.susx.mlcl.lib.io.DataSink;
 import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.io.TSVSink;
 
 /**
  * An <tt>TokenPairSink</tt> object is used to store
@@ -82,9 +81,9 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
 
     private long count = 0;
 
-    private final TSVSink inner;
+    private final DataSink inner;
 
-    public TokenPairSink(TSVSink inner,IndexDeligatePair indexDeligate)
+    public TokenPairSink(DataSink inner, IndexDeligatePair indexDeligate)
             throws FileNotFoundException, IOException {
         this.inner = inner;
         this.indexDeligate = indexDeligate;
@@ -130,14 +129,14 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
     }
 
     private void writeString1(int stringId) throws IOException {
-        if(indexDeligate.isPreindexedTokens1())
+        if (indexDeligate.isPreindexedTokens1())
             inner.writeInt(stringId);
         else
             inner.writeString(indexDeligate.getEnumerator1().value(stringId));
     }
 
     private void writeString2(int stringId) throws IOException {
-        if(indexDeligate.isPreindexedTokens2())
+        if (indexDeligate.isPreindexedTokens2())
             inner.writeInt(stringId);
         else
             inner.writeString(indexDeligate.getEnumerator2().value(stringId));
@@ -148,12 +147,13 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
         if (isCompactFormatEnabled() && previousRecord != null) {
             inner.endOfRecord();
         }
-        inner.close();
+        if (inner instanceof Closeable)
+            ((Closeable) inner).close();
     }
 
     @Override
     public void flush() throws IOException {
-        inner.flush();
+        if (inner instanceof Flushable)
+            ((Flushable) inner).flush();
     }
-
 }

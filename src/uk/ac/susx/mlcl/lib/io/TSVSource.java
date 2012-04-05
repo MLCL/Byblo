@@ -35,10 +35,8 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.MessageFormat;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 
@@ -47,7 +45,7 @@ import uk.ac.susx.mlcl.lib.MiscUtil;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class TSVSource implements SeekableSource<Iterable<String>, Lexer.Tell>, Closeable {
+public final class TSVSource implements Closeable, SeekableDataSource<Lexer.Tell> {
 
     private static final char RECORD_DELIM = '\n';
 
@@ -108,43 +106,46 @@ public final class TSVSource implements SeekableSource<Iterable<String>, Lexer.T
     }
 
     @Override
-    public boolean hasNext() throws CharacterCodingException, IOException {
+    public boolean canRead() throws IOException {
         return lexer.hasNext();
     }
 
-    private void skipWhitespace() throws CharacterCodingException, IOException {
+    private void skipWhitespace() throws IOException {
         while (lexer.type() == Lexer.Type.Whitespace && lexer.hasNext()) {
             lexer.advance();
         }
     }
 
-    public boolean isEndOfRecordNext() throws CharacterCodingException, IOException {
+    @Override
+    public boolean isEndOfRecordNext() throws IOException {
         return isDelimiterNext() && lexer.charAt(0) == RECORD_DELIM;
     }
 
-    private boolean isValueDelimiterNext() throws CharacterCodingException, IOException {
+    private boolean isValueDelimiterNext() throws IOException {
         return isDelimiterNext() && lexer.charAt(0) == VALUE_DELIM;
     }
 
-    private boolean isDelimiterNext() throws CharacterCodingException, IOException {
+    private boolean isDelimiterNext() throws IOException {
         return lexer.type() == Lexer.Type.Delimiter;
     }
 
-    public void endOfRecord() throws CharacterCodingException, IOException {
+    @Override
+    public void endOfRecord() throws IOException {
         do {
             parseDelimiter(RECORD_DELIM);
             ++row;
-        } while (isEndOfRecordNext() && hasNext());
+        } while (isEndOfRecordNext() && canRead());
         column = 0;
     }
 
-    private void parseValueDelimiter() throws CharacterCodingException, IOException {
+    private void parseValueDelimiter() throws IOException {
         do {
             parseDelimiter(VALUE_DELIM);
-        } while (isValueDelimiterNext() && hasNext());
+        } while (isValueDelimiterNext() && canRead());
     }
 
-    public String readString() throws CharacterCodingException, IOException {
+    @Override
+    public String readString() throws IOException {
         if (column > 0)
             parseValueDelimiter();
 
@@ -158,27 +159,31 @@ public final class TSVSource implements SeekableSource<Iterable<String>, Lexer.T
         return str;
     }
 
-    public double readDouble() throws CharacterCodingException, IOException {
-        String str = readString();
+    @Override
+    public double readDouble() throws IOException {
+        final String str = readString();
         try {
             return Double.valueOf(str);
         } catch (NumberFormatException nfe) {
-            throw new TSVDataFormatException(
-                    this,
-                    "Caused by NumberFormatException parsing string \"" + str + "\"",
-                    nfe);
+            throw new TSVDataFormatException(this, MessageFormat.format(
+                    "Caused by NumberFormatException parsing string \"{0}\"",
+                    str), nfe);
         }
     }
 
-    public int readInt() throws CharacterCodingException, IOException {
+    @Override
+    public int readInt() throws IOException {
+        final String str = readString();
         try {
-            return Integer.parseInt(readString());
+            return Integer.parseInt(str);
         } catch (NumberFormatException nfe) {
-            throw new TSVDataFormatException(this, nfe);
+            throw new TSVDataFormatException(this, MessageFormat.format(
+                    "Caused by NumberFormatException parsing string \"{0}\"",
+                    str), nfe);
         }
     }
 
-    private void parseDelimiter(char delim) throws CharacterCodingException, IOException {
+    private void parseDelimiter(char delim) throws IOException {
         skipWhitespace();
         expectType(Lexer.Type.Delimiter, lexer.type());
         expectDelim(delim, lexer.charAt(0));
@@ -201,20 +206,53 @@ public final class TSVSource implements SeekableSource<Iterable<String>, Lexer.T
     }
 
     @Override
-    public Iterable<String> read() throws IOException {
-        List<String> record = new ArrayList<String>();
-        boolean first = true;
-        while (!isEndOfRecordNext()) {
-            if (!first)
-                parseValueDelimiter();
-            record.add(readString());
-        }
-        endOfRecord();
-        return record;
+    public void close() throws IOException {
+        lexer.close();
     }
 
     @Override
-    public void close() throws IOException {
-        lexer.close();
+    public byte readByte() throws IOException {
+        return (byte) readInt();
+    }
+
+    @Override
+    public char readChar() throws IOException {
+        return (char) readInt();
+    }
+
+    @Override
+    public short readShort() throws IOException {
+        final String str = readString();
+        try {
+            return Short.parseShort(str);
+        } catch (NumberFormatException nfe) {
+            throw new TSVDataFormatException(this, MessageFormat.format(
+                    "Caused by NumberFormatException parsing string \"{0}\"",
+                    str), nfe);
+        }
+    }
+
+    @Override
+    public long readLong() throws IOException {
+        final String str = readString();
+        try {
+            return Long.parseLong(str);
+        } catch (NumberFormatException nfe) {
+            throw new TSVDataFormatException(this, MessageFormat.format(
+                    "Caused by NumberFormatException parsing string \"{0}\"",
+                    str), nfe);
+        }
+    }
+
+    @Override
+    public float readFloat() throws IOException {
+        final String str = readString();
+        try {
+            return Float.parseFloat(str);
+        } catch (NumberFormatException nfe) {
+            throw new TSVDataFormatException(this, MessageFormat.format(
+                    "Caused by NumberFormatException parsing string \"{0}\"",
+                    str), nfe);
+        }
     }
 }

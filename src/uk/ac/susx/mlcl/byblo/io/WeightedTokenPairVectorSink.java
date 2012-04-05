@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import com.google.common.base.Function;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
@@ -63,14 +62,6 @@ public class WeightedTokenPairVectorSink
         }
         ++count;
     }
-//
-//    public Function<Integer, String> getTokenEncoder1() {
-//        return inner.getTokenEncoder1();
-//    }
-//
-//    public Function<Integer, String> getTokenEncoder2() {
-//        return inner.getTokenEncoder2();
-//    }
 
     public long getCount() {
         return count;
