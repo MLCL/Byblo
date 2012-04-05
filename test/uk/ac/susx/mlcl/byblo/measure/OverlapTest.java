@@ -44,7 +44,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
  */
 public class OverlapTest {
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testMainMethodRun() throws Exception {
         System.out.println("Testing Overlap from main method.");
 
@@ -74,7 +74,7 @@ public class OverlapTest {
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void test_Overlap_Symmetry() throws Exception {
         System.out.println("Testing symmetry.");
 

@@ -43,7 +43,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
  */
 public class ConfusionTest {
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testConfusionCLI() throws Exception {
         System.out.println("Testing Confusion from main method.");
 

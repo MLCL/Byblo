@@ -43,7 +43,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
  */
 public class RecallTest {
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testMainMethodRun_RecallMI() throws Exception {
         System.out.println("Testing RecallMI from main method.");
 

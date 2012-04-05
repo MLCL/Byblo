@@ -48,7 +48,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
  */
 public class JaccardTest {
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testJaccardCLI() throws Exception {
         System.out.println("Testing Jaccard from main method.");
 
@@ -75,7 +75,7 @@ public class JaccardTest {
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testJaccardMiCLI() throws Exception {
         System.out.println("Testing JaccardMI from main method.");
 
@@ -107,7 +107,7 @@ public class JaccardTest {
     /**
      * http://people.revoledu.com/kardi/tutorial/Similarity/Jaccard.html
      */
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testJaccardExample1() {
         System.out.println("Testing Jaccard example1");
         double[] objectA = new double[]{1, 1, 1, 1};
@@ -134,7 +134,7 @@ public class JaccardTest {
     /**
      * http://people.revoledu.com/kardi/tutorial/Similarity/Jaccard.html
      */
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testJaccardExample2() {
         System.out.println("Testing Jaccard example2");
         Set<Integer> A = new HashSet<Integer>();
@@ -174,7 +174,7 @@ public class JaccardTest {
     /**
      * Test of shared method, of class Jaccard.
      */
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testShared() {
         System.out.println("Testing shared()");
         SparseDoubleVector Q = SparseDoubleVector.from(
@@ -190,7 +190,7 @@ public class JaccardTest {
     /**
      * Test of left method, of class Jaccard.
      */
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testLeft() {
         System.out.println("Testing left()");
         SparseDoubleVector Q = SparseDoubleVector.from(
@@ -204,7 +204,7 @@ public class JaccardTest {
     /**
      * Test of right method, of class Jaccard.
      */
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testRight() {
         System.out.println("Testing right()");
         SparseDoubleVector R = SparseDoubleVector.from(
@@ -218,7 +218,7 @@ public class JaccardTest {
     /**
      * Test of combine method, of class Jaccard.
      */
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testCombine() {
         System.out.println("Testing combine()");
         double shared = 7.0;
@@ -233,7 +233,7 @@ public class JaccardTest {
     /**
      * Test of isSymmetric method, of class Jaccard.
      */
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testIsSymmetric() {
         System.out.println("Testing isSymmetric()");
         boolean expResult = true;
@@ -242,7 +242,7 @@ public class JaccardTest {
         assertEquals(expResult, result);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testJaccard_Symmetry() throws Exception {
         System.out.println("Testing Jaccard symmetry.");
 
@@ -281,7 +281,7 @@ public class JaccardTest {
                                                  DEFAULT_CHARSET));
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testJaccardMi_Symmetry() throws Exception {
         System.out.println("Testing symmetry.");
 

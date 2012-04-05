@@ -78,7 +78,7 @@ public class LpTest {
 
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testMainMethodRun_L1() throws Exception {
         System.out.println("Testing L1 from main method.");
 
