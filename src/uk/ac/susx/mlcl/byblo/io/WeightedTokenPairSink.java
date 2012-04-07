@@ -31,11 +31,16 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.Flushable;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.text.DecimalFormat;
+import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.io.DataIO;
 import uk.ac.susx.mlcl.lib.io.DataSink;
 import uk.ac.susx.mlcl.lib.io.Sink;
+import uk.ac.susx.mlcl.lib.io.TSVSink;
 
 /**
  * An <tt>WeightedTokenPairSink</tt> object is used to store
@@ -74,116 +79,123 @@ import uk.ac.susx.mlcl.lib.io.Sink;
  */
 public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeable, Flushable {
 
-    private IndexDeligatePair indexDeligate;
+//    private IndexDeligatePair indexDeligate;
 
-    private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
+//    private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
 
-    private boolean compactFormatEnabled = false;
+//    private boolean compactFormatEnabled = false;
 
-    private boolean token1_continuation = false;
-
-    private int prev_id1 = 0;
-
-    private int prev_id2 = 0;
-
-    private long count = 0;
-
+//    private boolean token1_continuation = false;
+//
+//    private int prev_id1 = 0;
+//
+//    private int prev_id2 = 0;
+//
+//    private long count = 0;
+//
     private DataSink inner;
 
-    public WeightedTokenPairSink(DataSink inner, IndexDeligatePair indexDeligate) {
+    public WeightedTokenPairSink(DataSink inner//, IndexDeligatePair indexDeligate
+            ) {
         this.inner = inner;
-        this.indexDeligate = indexDeligate;
+//        this.indexDeligate = indexDeligate;
     }
-
-    public boolean isCompactFormatEnabled() {
-        return compactFormatEnabled;
-    }
-
-    public void setCompactFormatEnabled(boolean compactFormatEnabled) {
-        this.compactFormatEnabled = compactFormatEnabled;
-    }
-
-    public long getCount() {
-        return count;
-    }
+//
+//    public boolean isCompactFormatEnabled() {
+//        return compactFormatEnabled;
+//    }
+//
+//    public void setCompactFormatEnabled(boolean compactFormatEnabled) {
+//        this.compactFormatEnabled = compactFormatEnabled;
+//    }
+//
+//    public long getCount() {
+//        return count;
+//    }
 
     @Override
     public void write(Weighted<TokenPair> record) throws IOException {
-        if (isCompactFormatEnabled()) {
-            writeCompact(record);
-        } else {
-            writeVerbose(record);
-        }
-        ++count;
-    }
-
-    private void writeVerbose(final Weighted<TokenPair> record) throws IOException {
-        writeToken1(record.record().id1());
-        writeToken2(record.record().id2());
-        writeWeight(record.weight());
+        inner.writeInt(record.record().id1());
+        inner.writeInt(record.record().id2());
+        inner.writeDouble(record.weight());
         inner.endOfRecord();
-        prev_id1 = record.record().id1();
-        prev_id2 = record.record().id2();
+
+        //        if (isCompactFormatEnabled()) {
+//            writeCompact(record);
+//        } else {
+//            writeVerbose(record);
+//        }
+//        ++count;
     }
+//
+//    private void writeVerbose(final Weighted<TokenPair> record) throws IOException {
+//        writeToken1(record.record().id1());
+//        writeToken2(record.record().id2());
+//        writeWeight(record.weight());
+//        inner.endOfRecord();
+//        prev_id1 = record.record().id1();
+//        prev_id2 = record.record().id2();
+//    }
 
-    private void writeCompact(final Weighted<TokenPair> record) throws IOException {
-        if (token1_continuation && prev_id1 != record.record().id1()) {
-            inner.endOfRecord();
-            token1_continuation = false;
-            prev_id2 = 0;
-        }
+//    private void writeCompact(final Weighted<TokenPair> record) throws IOException {
+//        if (token1_continuation && prev_id1 != record.record().id1()) {
+//            inner.endOfRecord();
+//            token1_continuation = false;
+//            prev_id2 = 0;
+//        }
+//
+//        if (!token1_continuation) {
+//            writeToken1(record.record().id1());
+//            prev_id1 = record.record().id1();
+//            token1_continuation = true;
+//        }
+//
+//        writeToken2(record.record().id2());
+//        prev_id2 = record.record().id2();
+//
+//        writeWeight(record.weight());
+//    }
 
-        if (!token1_continuation) {
-            writeToken1(record.record().id1());
-            prev_id1 = record.record().id1();
-            token1_continuation = true;
-        }
-
-        writeToken2(record.record().id2());
-        prev_id2 = record.record().id2();
-
-        writeWeight(record.weight());
-    }
-
-    private void writeToken1(int tokenId) throws IOException {
-        assert tokenId >= 0 : "Writing negative token 1 id";
-
-        if (indexDeligate.isPreindexedTokens1())
-            if (indexDeligate.isSkipindexed1())
-                inner.writeInt(tokenId - prev_id1);
-            else
-                inner.writeInt(tokenId);
-        else
-            inner.writeString(indexDeligate.getEnumerator1().value(tokenId));
-    }
-
-    private void writeToken2(int tokenId) throws IOException {
-        assert tokenId >= 0 : "Writing negative token 2 id";
-
-        if (indexDeligate.isPreindexedTokens2()) {
-            if (indexDeligate.isSkipindexed2()) {
-                inner.writeInt(tokenId - prev_id2);
-            } else {
-                inner.writeInt(tokenId);
-            }
-        } else {
-            inner.writeString(indexDeligate.getEnumerator2().value(tokenId));
-        }
-    }
-
-    private void writeWeight(double weight) throws IOException {
-        if (Double.compare((int) weight, weight) == 0) {
-            inner.writeInt((int) weight);
-        } else {
-            inner.writeString(f.format(weight));
-        }
-    }
+//    private void writeToken1(int tokenId) throws IOException {
+//        assert tokenId >= 0 : "Writing negative token 1 id";
+//
+//        if (indexDeligate.isPreindexedTokens1())
+//            if (indexDeligate.isSkipindexed1())
+//                inner.writeInt(tokenId - prev_id1);
+//            else
+//                inner.writeInt(tokenId);
+//        else
+//            inner.writeString(indexDeligate.getEnumerator1().value(tokenId));
+//    }
+//
+//    private void writeToken2(int tokenId) throws IOException {
+//        assert tokenId >= 0 : "Writing negative token 2 id";
+//
+//        if (indexDeligate.isPreindexedTokens2()) {
+//            if (indexDeligate.isSkipindexed2()) {
+//                inner.writeInt(tokenId - prev_id2);
+//            } else {
+//                inner.writeInt(tokenId);
+//            }
+//        } else {
+//            inner.writeString(indexDeligate.getEnumerator2().value(tokenId));
+//        }
+//    }
+//
+//    private void writeWeight(double weight) throws IOException {
+//        inner.writeDouble(weight);
+////        if (Double.compare((int) weight, weight) == 0) {
+////            inner.writeInt((int) weight);
+////        } else {
+////            inner.writeString(f.format(weight));
+////        }
+//    }
 
     @Override
     public void close() throws IOException {
-        if (isCompactFormatEnabled() && token1_continuation) {
-            inner.endOfRecord();
-        }
+//        if (isCompactFormatEnabled() && token1_continuation) {
+//            inner.endOfRecord();
+//        }
         if (inner instanceof Closeable)
             ((Closeable) inner).close();
     }
@@ -192,5 +204,24 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
     public void flush() throws IOException {
         if (inner instanceof Flushable)
             ((Flushable) inner).flush();
+    }
+    
+    
+    
+    public static WeightedTokenPairSink open(
+            File file, Charset charset, IndexDeligatePair idx, boolean compact)
+            throws IOException {
+        DataSink tsv = new TSVSink(file, charset);
+        if(compact)
+            tsv = DataIO.compact(tsv);
+        if (!idx.isPreindexedTokens1() || !idx.isPreindexedTokens2()) {
+            Enumerator<String>[] enumerators = (Enumerator<String>[])new Enumerator[2];
+            if (!idx.isPreindexedTokens1())
+                enumerators[0] = idx.getEnumerator1();
+            if (!idx.isPreindexedTokens2())
+                enumerators[1] = idx.getEnumerator2();
+            tsv = DataIO.enumerated(tsv, enumerators);
+        }
+        return new WeightedTokenPairSink(tsv);
     }
 }

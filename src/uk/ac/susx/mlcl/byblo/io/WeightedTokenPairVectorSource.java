@@ -38,30 +38,30 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource.Tell;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
+import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
  * Wraps a {@link WeightedEntryFeatureSource} to produce complete feature
  * vectors instead of just individual entry/feature records.
  *
- * @param <P> 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightedTokenPairVectorSource<P>
-        implements SeekableSource<Indexed<SparseDoubleVector>, Tell<P>> {
+public class WeightedTokenPairVectorSource
+        implements SeekableSource<Indexed<SparseDoubleVector>, Tell> {
 
-    private final WeightedTokenPairSource<P> inner;
+    private final SeekableSource<Weighted<TokenPair>, Tell> inner;
 
     private Weighted<TokenPair> next;
 
-    private Tell<P> tell;
+    private Tell tell;
 
     private long count = 0;
 
-    public WeightedTokenPairVectorSource(WeightedTokenPairSource<P> inner) throws IOException {
+    public WeightedTokenPairVectorSource(
+            SeekableSource<Weighted<TokenPair>, Tell> inner) throws IOException {
         this.inner = inner;
         tell = inner.position();
         next = null;
@@ -100,14 +100,14 @@ public class WeightedTokenPairVectorSource<P>
     }
 
     @Override
-    public void position(Tell<P> offset) throws IOException {
+    public void position(Tell offset) throws IOException {
         inner.position(offset);
         tell = offset;
         readNext();
     }
 
     @Override
-    public Tell<P> position() throws IOException {
+    public Tell position() throws IOException {
         return tell;
     }
 

@@ -50,17 +50,18 @@ public class MergeTokenPairCommand extends AbstractMergeCommand<TokenPair> {
 
     @Override
     protected Source<TokenPair> openSource(File file) throws FileNotFoundException, IOException {
-        return new TokenPairSource(
-                new TSVSource(file, getFileDeligate().getCharset()),
+        return TokenPairSource.open(
+                file, getFileDeligate().getCharset(),
                 indexDeligate);
     }
 
     @Override
     protected Sink<TokenPair> openSink(File file) throws FileNotFoundException, IOException {
-        TokenPairSink s = new TokenPairSink(
-                new TSVSink(file, getFileDeligate().getCharset()),
-                indexDeligate);
-        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
+        TokenPairSink s = TokenPairSink.open(
+                file, getFileDeligate().getCharset(),
+                indexDeligate,
+                !getFileDeligate().isCompactFormatDisabled());
+//        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
         return s;
     }
 

@@ -34,7 +34,6 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Comparator;
@@ -47,90 +46,99 @@ import uk.ac.susx.mlcl.lib.io.*;
  * An <tt>TokenPairSource</tt> object is used to retrieve
  * {@link EntryFeature} objects from a flat file.
  *
- * @param <P> 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see EntryFeatureSink
  */
-public class TokenPairSource<P>
-        implements SeekableSource<TokenPair, P>, Closeable {
+public class TokenPairSource
+        implements SeekableSource<TokenPair, Tell>, Closeable {
 
-    private IndexDeligatePair indexDeligate;
-
-    private TokenPair previousRecord = null;
-
-    private long count = 0;
-
-    private final SeekableDataSource<P> inner;
+//    private IndexDeligatePair indexDeligate;
+//    private TokenPair previousRecord = null;
+//
+//    private long count = 0;
+    private final SeekableDataSource<Tell> inner;
 
     public TokenPairSource(
-            SeekableDataSource<P> inner,
-            IndexDeligatePair indexDeligate)
+            SeekableDataSource<Tell> inner //            ,
+            //            IndexDeligatePair indexDeligate
+            )
             throws FileNotFoundException, IOException {
         this.inner = inner;
-        this.indexDeligate = indexDeligate;
+//        this.indexDeligate = indexDeligate;
     }
-
-    public long getCount() {
-        return count;
-    }
+//
+//    public long getCount() {
+//        return count;
+//    }
 
     @Override
     public TokenPair read() throws IOException {
-        final int id1;
-        if (previousRecord == null) {
-            id1 = readToken1();
-        } else {
-            id1 = previousRecord.id1();
-        }
+        final int id1 = inner.readInt();
+        final int id2 = inner.readInt();
+        inner.endOfRecord();
+        return new TokenPair(id1, id2);
 
-        if (!hasNext() || inner.isEndOfRecordNext()) {
-            // Encountered an entry without any features. This is incoherent wrt
-            // the task at hand, but quite a common scenario in general feature
-            // extraction. Throw an exception which is caught for end user input
-            inner.endOfRecord();
-            throw new IOException("Found entry/feature record with no features.");
-        }
 
-        final int id2 = readToken2();
-        final TokenPair record = new TokenPair(id1, id2);
 
-        if (hasNext() && !inner.isEndOfRecordNext()) {
-            previousRecord = record;
-        }
 
-        if (hasNext() && inner.isEndOfRecordNext()) {
-            inner.endOfRecord();
-            previousRecord = null;
-        }
-
-        ++count;
-        return record;
+//        final int id1;
+////        if (previousRecord == null) {
+//        id1 = readToken1();
+////        } else {
+////            id1 = previousRecord.id1();
+////        }
+////
+////        if (!hasNext() || inner.isEndOfRecordNext()) {
+////            // Encountered an entry without any features. This is incoherent wrt
+////            // the task at hand, but quite a common scenario in general feature
+////            // extraction. Throw an exception which is caught for end user input
+////            inner.endOfRecord();
+////            throw new IOException("Found entry/feature record with no features.");
+////        }
+//
+//        final int id2 = readToken2();
+//        final TokenPair record = new TokenPair(id1, id2);
+//
+////        if (hasNext() && !inner.isEndOfRecordNext()) {
+////            previousRecord = record;
+////        }
+////
+////        if (hasNext() && inner.isEndOfRecordNext()) {
+//        inner.endOfRecord();
+////            previousRecord = null;
+////        }
+//
+////        ++count;
+//        return record;
     }
 
-    private int readToken1() throws CharacterCodingException, IOException {
-        if (indexDeligate.isPreindexedTokens1())
-            return inner.readInt();
-        else
-            return indexDeligate.getEnumerator1().index(inner.readString());
-    }
-
-    private int readToken2() throws CharacterCodingException, IOException {
-        if (indexDeligate.isPreindexedTokens2())
-            return inner.readInt();
-        else
-            return indexDeligate.getEnumerator2().index(inner.readString());
-    }
-
+//    private int readToken1() throws CharacterCodingException, IOException {
+//        return inner.readInt();
+////        if (indexDeligate.isPreindexedTokens1())
+////            return inner.readInt();
+////        else
+////            return indexDeligate.getEnumerator1().index(inner.readString());
+//    }
+//
+//    private int readToken2() throws CharacterCodingException, IOException {
+//        return inner.readInt();
+////        if (indexDeligate.isPreindexedTokens2())
+////            return inner.readInt();
+////        else
+////            return indexDeligate.getEnumerator2().index(inner.readString());
+//    }
     public static boolean equal(File fileA, File fileB, Charset charset)
             throws IOException {
         final Enumerator<String> stringIndex = Enumerators.
                 newDefaultStringEnumerator();
         IndexDeligatePair idx = new IndexDeligatePair(false, false, stringIndex,
                                                       stringIndex);
-        final TokenPairSource<?> srcA = new TokenPairSource<Lexer.Tell>(
-                new TSVSource(fileA, charset), idx);
-        final TokenPairSource<?> srcB = new TokenPairSource<Lexer.Tell>(
-                new TSVSource(fileB, charset), idx);
+//        final TokenPairSource srcA = new TokenPairSource(
+//                new TSVSource(fileA, charset), idx);
+//        final TokenPairSource srcB = new TokenPairSource(
+//                new TSVSource(fileB, charset), idx);
+        final TokenPairSource srcA = open(fileA, charset, idx);
+        final TokenPairSource srcB = open(fileB, charset, idx);
 
 
         List<TokenPair> listA = IOUtil.readAll(srcA);
@@ -147,12 +155,12 @@ public class TokenPairSource<P>
     }
 
     @Override
-    public void position(P p) throws IOException {
+    public void position(Tell p) throws IOException {
         inner.position(p);
     }
 
     @Override
-    public P position() throws IOException {
+    public Tell position() throws IOException {
         return inner.position();
     }
 
@@ -160,5 +168,21 @@ public class TokenPairSource<P>
     public void close() throws IOException {
         if (inner instanceof Closeable)
             ((Closeable) inner).close();
+    }
+
+    public static TokenPairSource open(
+            File file, Charset charset, IndexDeligatePair idx)
+            throws IOException {
+        SeekableDataSource<Tell> tsv = new TSVSource(file, charset);
+        tsv = DataIO.compact(tsv, 2);
+        if (!idx.isPreindexedTokens1() || !idx.isPreindexedTokens2()) {
+            Enumerator<String>[] enumerators = (Enumerator<String>[]) new Enumerator[2];
+            if (!idx.isPreindexedTokens1())
+                enumerators[0] = idx.getEnumerator1();
+            if (!idx.isPreindexedTokens2())
+                enumerators[1] = idx.getEnumerator2();
+            tsv = DataIO.enumerated(tsv, enumerators);
+        }
+        return new TokenPairSource(tsv);
     }
 }

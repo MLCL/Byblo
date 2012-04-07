@@ -38,17 +38,18 @@ public class ExternalSortTokenPiarCommand extends AbstractExternalSortCommand<To
 
     @Override
     protected Sink<TokenPair> openSink(File file) throws IOException {
-        TokenPairSink s = new TokenPairSink(
-                new TSVSink(file, getFileDeligate().getCharset()),
-                getIndexDeligate());
-        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
+        TokenPairSink s =  TokenPairSink.open(
+                file, getFileDeligate().getCharset(),
+                getIndexDeligate(),
+                !getFileDeligate().isCompactFormatDisabled());
+//        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
         return s;
     }
 
     @Override
-    protected SeekableSource<TokenPair, Lexer.Tell> openSource(File file) throws IOException {
-        return new TokenPairSource(
-                new TSVSource(file, getFileDeligate().getCharset()),
+    protected SeekableSource<TokenPair, Tell> openSource(File file) throws IOException {
+        return  TokenPairSource.open(
+                file, getFileDeligate().getCharset(),
                 getIndexDeligate());
     }
 

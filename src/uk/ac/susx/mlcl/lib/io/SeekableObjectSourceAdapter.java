@@ -5,18 +5,21 @@
 package uk.ac.susx.mlcl.lib.io;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  *
  * @param <S>
- * @param <P>
+ * @param <T>
  * @author hamish
  */
-public class SeekableDataSourceAdapter<S extends SeekableDataSource<P>, P>
-        extends DataSourceAdapter<S>
-        implements SeekableDataSource<P> {
+public abstract class SeekableObjectSourceAdapter<S extends SeekableSource<T, P>, T, P>
+        extends ObjectSourceAdapter<S, T>
+        implements SeekableSource<T, P>, Serializable {
 
-    public SeekableDataSourceAdapter(S inner) {
+    private static final long serialVersionUID = 1L;
+
+    public SeekableObjectSourceAdapter(S inner) {
         super(inner);
     }
 

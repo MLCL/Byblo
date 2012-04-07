@@ -29,13 +29,16 @@ import uk.ac.susx.mlcl.lib.io.TSVSource;
  */
 public class SortWeightedTokenCommand extends AbstractSortCommand<Weighted<Token>> {
 
-    private static final Log LOG = LogFactory.getLog(SortWeightedTokenCommand.class);
+    private static final Log LOG = LogFactory.getLog(
+            SortWeightedTokenCommand.class);
 
     @ParametersDelegate
     private IndexDeligate indexDeligate = new IndexDeligate();
 
-    public SortWeightedTokenCommand(File sourceFile, File destinationFile, Charset charset, IndexDeligate indexDeligate) {
-        super(sourceFile, destinationFile, charset, Weighted.recordOrder(Token.indexOrder()));
+    public SortWeightedTokenCommand(File sourceFile, File destinationFile,
+                                    Charset charset, IndexDeligate indexDeligate) {
+        super(sourceFile, destinationFile, charset, Weighted.recordOrder(Token.
+                indexOrder()));
         setIndexDeligate(indexDeligate);
     }
 
@@ -44,15 +47,16 @@ public class SortWeightedTokenCommand extends AbstractSortCommand<Weighted<Token
 
     @Override
     protected Source<Weighted<Token>> openSource(File file) throws FileNotFoundException, IOException {
-        return new WeightedTokenSource(
-                new TSVSource(file, getFilesDeligate().getCharset()),
-                indexDeligate);
+        return WeightedTokenSource.open(file, getFilesDeligate().getCharset(),
+                                        indexDeligate);
     }
 
     @Override
     protected Sink<Weighted<Token>> openSink(File file) throws FileNotFoundException, IOException {
-        WeightedTokenSink s = new WeightedTokenSink(
-                new TSVSink(file, getFilesDeligate().getCharset()), indexDeligate);
+        WeightedTokenSink s = WeightedTokenSink.open(
+                file, getFilesDeligate().getCharset(), indexDeligate);
+//                new WeightedTokenSink(
+//                new TSVSink(file, getFilesDeligate().getCharset()), indexDeligate);
         s.setCompactFormatEnabled(!getFilesDeligate().isCompactFormatDisabled());
         return new WeightSumReducerSink<Token>(s);
 
@@ -66,7 +70,4 @@ public class SortWeightedTokenCommand extends AbstractSortCommand<Weighted<Token
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }
-    
-    
-
 }

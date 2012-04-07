@@ -114,17 +114,18 @@ public class IndexEventsCommand extends AbstractCommand {
         dstIdx.setSkipindexed1(getIndexDeligate().isSkipindexed1());
         dstIdx.setSkipindexed2(getIndexDeligate().isSkipindexed2());
         try {
-            src = new TokenPairSource(
-                    new TSVSource(fileDeligate.getSourceFile(), fileDeligate.getCharset()),
+            src =  TokenPairSource.open(
+                    fileDeligate.getSourceFile(), fileDeligate.getCharset(),
                     srcIdx);
 
             TokenPairSink snk = null;
 
             try {
-                snk = new TokenPairSink(
-                        new TSVSink(fileDeligate.getDestinationFile(), fileDeligate.getCharset()),
-                        dstIdx);
-                snk.setCompactFormatEnabled(true);
+                snk =  TokenPairSink.open(
+                        fileDeligate.getDestinationFile(), fileDeligate.getCharset(),
+                        dstIdx,
+                        true);
+//                snk.setCompactFormatEnabled(true);
 
                 while (src.hasNext())
                     snk.write(src.read());

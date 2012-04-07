@@ -43,7 +43,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
  */
 public class LeeTest {
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testLee_alpha_0_00() throws Exception {
         System.out.println("Testing Lee (alpha=0.00) from main method.");
 

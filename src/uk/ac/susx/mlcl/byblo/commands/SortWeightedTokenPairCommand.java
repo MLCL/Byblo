@@ -56,8 +56,8 @@ public class SortWeightedTokenPairCommand extends AbstractSortCommand<Weighted<T
     @Override
     protected Source<Weighted<TokenPair>> openSource(File file)
             throws FileNotFoundException, IOException {
-        WeightedTokenPairSource s = new WeightedTokenPairSource(
-                new TSVSource(file, getFilesDeligate().getCharset()),
+        WeightedTokenPairSource s =  WeightedTokenPairSource.open(
+                file, getFilesDeligate().getCharset(),
                 getIndexDeligate()
                 );
         return s;
@@ -66,10 +66,11 @@ public class SortWeightedTokenPairCommand extends AbstractSortCommand<Weighted<T
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file)
             throws FileNotFoundException, IOException {
-        WeightedTokenPairSink s = new WeightedTokenPairSink(
-                new TSVSink(file, getFilesDeligate().getCharset()),
-                getIndexDeligate());
-        s.setCompactFormatEnabled(!getFilesDeligate().isCompactFormatDisabled());
+        WeightedTokenPairSink s = WeightedTokenPairSink.open(
+                file, getFilesDeligate().getCharset(),
+                getIndexDeligate(),
+                !getFilesDeligate().isCompactFormatDisabled());
+//        s.setCompactFormatEnabled();
         return new WeightSumReducerSink<TokenPair>(s);
     }
     

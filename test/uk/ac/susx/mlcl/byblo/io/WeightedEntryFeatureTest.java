@@ -48,11 +48,9 @@ import org.junit.Test;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource.Tell;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
-import uk.ac.susx.mlcl.lib.io.TSVSink;
-import uk.ac.susx.mlcl.lib.io.TSVSource;
+import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
  *
@@ -62,13 +60,12 @@ public class WeightedEntryFeatureTest {
 
     private void copyWEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
         Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
-        WeightedTokenPairSource aSrc = new WeightedTokenPairSource(
-                new TSVSource(a, DEFAULT_CHARSET),
+        WeightedTokenPairSource aSrc = WeightedTokenPairSource.open(
+                a, DEFAULT_CHARSET,
                 new IndexDeligatePair(false, false, idx, idx));
-        WeightedTokenPairSink bSink = new WeightedTokenPairSink(
-                new TSVSink(b, DEFAULT_CHARSET),
-                new IndexDeligatePair(false, false, idx, idx));
-        bSink.setCompactFormatEnabled(compact);
+        WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
+                b, DEFAULT_CHARSET,
+                new IndexDeligatePair(false, false, idx, idx), compact);
 
         IOUtil.copy(aSrc, bSink);
         bSink.close();
@@ -77,17 +74,16 @@ public class WeightedEntryFeatureTest {
     private void copyWEFV(File a, File b, boolean compact) throws FileNotFoundException, IOException {
         Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
         WeightedTokenPairVectorSource aSrc = new WeightedTokenPairVectorSource(
-                new WeightedTokenPairSource(
-                new TSVSource(a, DEFAULT_CHARSET),
+                WeightedTokenPairSource.open(
+                a, DEFAULT_CHARSET,
                 new IndexDeligatePair(false, false, idx, idx)));
 
         List<Indexed<SparseDoubleVector>> list = IOUtil.readAll(aSrc);
         Collections.sort(list);
 
-        WeightedTokenPairSink tmp = new WeightedTokenPairSink(
-                new TSVSink(b, DEFAULT_CHARSET),
-                new IndexDeligatePair(false, false, idx, idx));
-        tmp.setCompactFormatEnabled(compact);
+        WeightedTokenPairSink tmp = WeightedTokenPairSink.open(
+                b, DEFAULT_CHARSET,
+                new IndexDeligatePair(false, false, idx, idx), compact);
 
         WeightedTokenPairVectorSink bSink = new WeightedTokenPairVectorSink(
                 tmp);
@@ -151,8 +147,8 @@ public class WeightedEntryFeatureTest {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-ef-sample");
         Charset charset = Charset.forName("UTF-8");
         Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
-        WeightedTokenPairSource efSrc = new WeightedTokenPairSource(
-                new TSVSource(testSample, charset),
+        WeightedTokenPairSource efSrc = WeightedTokenPairSource.open(
+                testSample, charset,
                 new IndexDeligatePair(false, false, idx, idx));
         assertTrue("EntryFeatureSource is empty", efSrc.hasNext());
 
@@ -168,8 +164,8 @@ public class WeightedEntryFeatureTest {
 
         Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
         WeightedTokenPairSource src =
-                new WeightedTokenPairSource(
-                new TSVSource(file, DEFAULT_CHARSET),
+                WeightedTokenPairSource.open(
+                file, DEFAULT_CHARSET,
                 new IndexDeligatePair(false, false, idx, idx));
         {
             while (src.hasNext()) {
@@ -189,16 +185,20 @@ public class WeightedEntryFeatureTest {
                 final Weighted<TokenPair> expected = hist.get(pos);
 
                 System.out.println("expected tell: " + pos);
-                System.out.println("expected: " + expected.record().toString(idx, idx));
+                System.out.println(
+                        "expected: " + expected.record().toString(idx, idx));
 
                 src.position(pos);
 
+                System.out.println("actual tell: " + src.position());
                 assertEquals(pos, src.position());
                 assertTrue(src.hasNext());
 
                 Weighted<TokenPair> actual = src.read();
                 System.out.println("actual tell: " + src.position());
-                System.out.println("actual: " + actual.record().toString(idx, idx));
+                System.out.println("actual: " + actual.record().toString(idx,
+                                                                         idx));
+                System.out.flush();
 
                 assertEquals(expected, actual);
             }
@@ -221,13 +221,13 @@ public class WeightedEntryFeatureTest {
         Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
 
         {
-            WeightedTokenPairSource aSrc = new WeightedTokenPairSource(
-                    new TSVSource(a, DEFAULT_CHARSET),
+            WeightedTokenPairSource aSrc = WeightedTokenPairSource.open(
+                    a, DEFAULT_CHARSET,
                     new IndexDeligatePair(false, false, idx, idx));
-            WeightedTokenPairSink bSink = new WeightedTokenPairSink(
-                    new TSVSink(b, DEFAULT_CHARSET),
-                    new IndexDeligatePair(true, true));
-            bSink.setCompactFormatEnabled(false);
+            WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
+                    b, DEFAULT_CHARSET,
+                    new IndexDeligatePair(true, true), false);
+//            bSink.setCompactFormatEnabled(false);
             IOUtil.copy(aSrc, bSink);
             bSink.close();
         }
@@ -236,20 +236,21 @@ public class WeightedEntryFeatureTest {
                    b.length() <= a.length());
 
         {
-            WeightedTokenPairSource bSrc = new WeightedTokenPairSource(
-                    new TSVSource(b, DEFAULT_CHARSET),
+            WeightedTokenPairSource bSrc = WeightedTokenPairSource.open(
+                    b, DEFAULT_CHARSET,
                     new IndexDeligatePair(true, true));
-            WeightedTokenPairSink cSink = new WeightedTokenPairSink(
-                    new TSVSink(c, DEFAULT_CHARSET),
-                    new IndexDeligatePair(false, false, idx, idx));
-            cSink.setCompactFormatEnabled(false);
+            WeightedTokenPairSink cSink = WeightedTokenPairSink.open(
+                    c, DEFAULT_CHARSET,
+                    new IndexDeligatePair(false, false, idx, idx), false);
+//            cSink.setCompactFormatEnabled(false);
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }
 
         assertTrue("Verbose copy is smaller that compact source.",
                    c.length() >= b.length());
-        assertTrue("Double converted file is not equal to origion: " + a + " => " + c,
+        assertTrue(
+                "Double converted file is not equal to origion: " + a + " => " + c,
                    Files.equal(a, c));
     }
 
@@ -264,14 +265,14 @@ public class WeightedEntryFeatureTest {
         Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
 
         {
-            WeightedTokenPairSource aSrc = new WeightedTokenPairSource(
-                    new TSVSource(a, DEFAULT_CHARSET),
+            WeightedTokenPairSource aSrc = WeightedTokenPairSource.open(
+                    a, DEFAULT_CHARSET,
                     new IndexDeligatePair(false, false, idx, idx));
 
-            WeightedTokenPairSink bSink = new WeightedTokenPairSink(
-                    new TSVSink(b, DEFAULT_CHARSET),
-                    new IndexDeligatePair(true, true));
-            bSink.setCompactFormatEnabled(true);
+            WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
+                    b, DEFAULT_CHARSET,
+                    new IndexDeligatePair(true, true), true);
+//            bSink.setCompactFormatEnabled(true);
             IOUtil.copy(aSrc, bSink);
             bSink.close();
         }
@@ -280,20 +281,21 @@ public class WeightedEntryFeatureTest {
                    b.length() <= a.length());
 
         {
-            WeightedTokenPairSource bSrc = new WeightedTokenPairSource(
-                    new TSVSource(b, DEFAULT_CHARSET),
+            WeightedTokenPairSource bSrc = WeightedTokenPairSource.open(
+                    b, DEFAULT_CHARSET,
                     new IndexDeligatePair(true, true));
-            WeightedTokenPairSink cSink = new WeightedTokenPairSink(
-                    new TSVSink(c, DEFAULT_CHARSET),
-                    new IndexDeligatePair(false, false, idx, idx));
-            cSink.setCompactFormatEnabled(false);
+            WeightedTokenPairSink cSink = WeightedTokenPairSink.open(
+                    c, DEFAULT_CHARSET,
+                    new IndexDeligatePair(false, false, idx, idx), false);
+//            cSink.setCompactFormatEnabled(false);
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }
 
         assertTrue("Verbose copy is smaller that compact source.",
                    c.length() >= b.length());
-        assertTrue("Double converted file is not equal to origion: " + a + " " + c,
+        assertTrue(
+                "Double converted file is not equal to origion: " + a + " " + c,
                    Files.equal(a, c));
     }
 
@@ -308,16 +310,16 @@ public class WeightedEntryFeatureTest {
         Enumerator<String> enumerator = Enumerators.newDefaultStringEnumerator();
 
         {
-            WeightedTokenPairSource aSrc = new WeightedTokenPairSource(
-                    new TSVSource(a, DEFAULT_CHARSET),
+            WeightedTokenPairSource aSrc = WeightedTokenPairSource.open(
+                    a, DEFAULT_CHARSET,
                     new IndexDeligatePair(false, false, enumerator, enumerator));
 
             IndexDeligatePair tmpIdx = new IndexDeligatePair(true, true);
             tmpIdx.setSkipindexed1(true);
             tmpIdx.setSkipindexed2(true);
-            WeightedTokenPairSink bSink = new WeightedTokenPairSink(
-                    new TSVSink(b, DEFAULT_CHARSET), tmpIdx);
-            bSink.setCompactFormatEnabled(true);
+            WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
+                    b, DEFAULT_CHARSET, tmpIdx, true);
+//            bSink.setCompactFormatEnabled(true);
             IOUtil.copy(aSrc, bSink);
             bSink.close();
         }
@@ -329,20 +331,21 @@ public class WeightedEntryFeatureTest {
             IndexDeligatePair tmpIdx = new IndexDeligatePair(true, true);
             tmpIdx.setSkipindexed1(true);
             tmpIdx.setSkipindexed2(true);
-            WeightedTokenPairSource bSrc = new WeightedTokenPairSource(
-                    new TSVSource(b, DEFAULT_CHARSET), tmpIdx);
-            WeightedTokenPairSink cSink = new WeightedTokenPairSink(
-                    new TSVSink(c, DEFAULT_CHARSET),
-                    new IndexDeligatePair(false, false, enumerator, enumerator));
-            cSink.setCompactFormatEnabled(false);
+            WeightedTokenPairSource bSrc = WeightedTokenPairSource.open(
+                    b, DEFAULT_CHARSET, tmpIdx);
+            WeightedTokenPairSink cSink = WeightedTokenPairSink.open(
+                    c, DEFAULT_CHARSET,
+                    new IndexDeligatePair(false, false, enumerator, enumerator),
+                    false);
+//            cSink.setCompactFormatEnabled(false);
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }
 
         assertTrue("Verbose copy is smaller that compact source.",
                    c.length() >= b.length());
-        assertTrue("Double converted file is not equal to origion: " + a + " " + c,
+        assertTrue(
+                "Double converted file is not equal to origion: " + a + " " + c,
                    Files.equal(a, c));
     }
-
 }

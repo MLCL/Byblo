@@ -30,20 +30,18 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import uk.ac.susx.mlcl.lib.io.IOUtil;
 import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
-import uk.ac.susx.mlcl.lib.SimpleEnumerator;
-import uk.ac.susx.mlcl.lib.io.TSVSink;
-import uk.ac.susx.mlcl.lib.io.TSVSource;
+import uk.ac.susx.mlcl.lib.io.IOUtil;
 
 /**
  *
@@ -56,8 +54,8 @@ public class EntryFeatureTest {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-input-sample");
         Charset charset = Charset.forName("UTF-8");
         IndexDeligatePair idx = new IndexDeligatePair(false, false);
-        TokenPairSource efSrc = new TokenPairSource(
-                new TSVSource(testSample, charset), idx);
+        TokenPairSource efSrc = TokenPairSource.open(
+                testSample, charset, idx);
         assertTrue("EntryFeatureSource is empty", efSrc.hasNext());
 
         while (efSrc.hasNext()) {
@@ -68,18 +66,16 @@ public class EntryFeatureTest {
 
     private void copyEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
         IndexDeligatePair idx = new IndexDeligatePair(false, false);
-        TokenPairSource aSrc = new TokenPairSource(
-                new TSVSource(a, DEFAULT_CHARSET), idx);
-        TokenPairSink bSink = new TokenPairSink(
-                new TSVSink(b, DEFAULT_CHARSET), idx);
-        bSink.setCompactFormatEnabled(compact);
-
-        IOUtil.copy(aSrc, bSink);
-        bSink.close();
+        TokenPairSource src = TokenPairSource.open(
+                a, DEFAULT_CHARSET, idx);
+        TokenPairSink sink = TokenPairSink.open(
+                b, DEFAULT_CHARSET, idx, compact);
+        IOUtil.copy(src, sink);
+        sink.close();
     }
 
     @Test
-    public void testEntryFeaturesConversion() throws FileNotFoundException, IOException {
+    public void testEntryFeatures_CompactConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_INPUT;
         File b = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_INPUT.getName() + ".compact");
@@ -100,7 +96,7 @@ public class EntryFeatureTest {
     }
 
     @Test
-    public void testEntryPairEnumeratorConversion() throws FileNotFoundException, IOException, ClassNotFoundException {
+    public void testEntryPair_EnumeratorConversion() throws FileNotFoundException, IOException, ClassNotFoundException {
         File a = TEST_FRUIT_INPUT;
         File b = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_INPUT.getName() + ".enum");
@@ -114,11 +110,11 @@ public class EntryFeatureTest {
             Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
             IndexDeligatePair idx = new IndexDeligatePair(false, false, strEnum,
                                                           strEnum);
-            TokenPairSource aSrc = new TokenPairSource(
-                    new TSVSource(a, DEFAULT_CHARSET), idx);
-            TokenPairSink bSink = new TokenPairSink(
-                    new TSVSink(b, DEFAULT_CHARSET),
-                    new IndexDeligatePair(true, true));
+            TokenPairSource aSrc = TokenPairSource.open(
+                    a, DEFAULT_CHARSET, idx);
+            TokenPairSink bSink = TokenPairSink.open(
+                    b, DEFAULT_CHARSET,
+                    new IndexDeligatePair(true, true), true);
             IOUtil.copy(aSrc, bSink);
             Enumerators.saveStringEnumerator(strEnum, idxFile);
 
@@ -133,12 +129,12 @@ public class EntryFeatureTest {
                     idxFile);
             IndexDeligatePair idx = new IndexDeligatePair(false, false, strEnum,
                                                           strEnum);
-            TokenPairSource bSrc = new TokenPairSource(
-                    new TSVSource(b, DEFAULT_CHARSET),
+            TokenPairSource bSrc = TokenPairSource.open(
+                    b, DEFAULT_CHARSET,
                     new IndexDeligatePair(true, true));
-            TokenPairSink cSink = new TokenPairSink(
-                    new TSVSink(c, DEFAULT_CHARSET), idx);
-            cSink.setCompactFormatEnabled(false);
+            TokenPairSink cSink = TokenPairSink.open(
+                    c, DEFAULT_CHARSET, idx,
+                    false);
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }

@@ -64,8 +64,8 @@ public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>>
         IndexDeligatePair dstIdx = new IndexDeligatePair(true, true);
         dstIdx.setSkipindexed1(indexDeligate.isSkipIndexed());
         dstIdx.setSkipindexed2(indexDeligate.isSkipIndexed());
-        return new WeightedTokenPairSource(
-                new TSVSource(file, getFilesDeligate().getCharset()),
+        return WeightedTokenPairSource.open(
+                file, getFilesDeligate().getCharset(),
                 dstIdx);
     }
 
@@ -76,9 +76,9 @@ public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>>
                 false, false, 
                 indexDeligate.getEnumerator(), 
                 indexDeligate.getEnumerator(), false, false);
-        return new WeightedTokenPairSink(
-                new TSVSink(file, getFilesDeligate().getCharset()),
-                srcIdx);
+        return WeightedTokenPairSink.open(
+                file, getFilesDeligate().getCharset(),
+                srcIdx, true);
     }
 
 //    public final File getIndexFile() {

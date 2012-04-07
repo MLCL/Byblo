@@ -44,7 +44,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
  */
 public class JensenTest {
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testJensenCLI() throws Exception {
         System.out.println("Testing Jensen from main method.");
 

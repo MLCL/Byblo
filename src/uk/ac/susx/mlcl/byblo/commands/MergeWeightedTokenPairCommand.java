@@ -52,18 +52,19 @@ public class MergeWeightedTokenPairCommand extends AbstractMergeCommand<Weighted
 
     @Override
     protected Source<Weighted<TokenPair>> openSource(File file) throws FileNotFoundException, IOException {
-        return new WeightedTokenPairSource(
-                new TSVSource(file, getFileDeligate().getCharset()),
+        return  WeightedTokenPairSource.open(
+                file, getFileDeligate().getCharset(),
                 indexDeligate);
     }
 
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file) throws FileNotFoundException, IOException {
 
-        WeightedTokenPairSink s = new WeightedTokenPairSink(
-                new TSVSink(file, getFileDeligate().getCharset()),
-                indexDeligate);
-        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
+        WeightedTokenPairSink s =  WeightedTokenPairSink.open(
+                file, getFileDeligate().getCharset(),
+                indexDeligate,
+                !getFileDeligate().isCompactFormatDisabled());
+//        s.setCompactFormatEnabled();
         return new WeightSumReducerSink<TokenPair>(s);
     }
 

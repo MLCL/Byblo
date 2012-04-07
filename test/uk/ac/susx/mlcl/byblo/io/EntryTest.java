@@ -36,7 +36,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
 import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -46,9 +45,7 @@ import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
-import uk.ac.susx.mlcl.lib.io.Lexer;
-import uk.ac.susx.mlcl.lib.io.TSVSink;
-import uk.ac.susx.mlcl.lib.io.TSVSource;
+import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
  *
@@ -65,17 +62,14 @@ public class EntryTest {
         WeightedTokenSource aSrc;
         WeightedTokenSink bSink;
         if (enumIn)
-            aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET),
-                                           idx);
+            aSrc = WeightedTokenSource.open(a, DEFAULT_CHARSET, idx);
         else
-            aSrc = new WeightedTokenSource(new TSVSource(a, DEFAULT_CHARSET),
-                                           idx);
+            aSrc = WeightedTokenSource.open(a, DEFAULT_CHARSET, idx);
 
         if (enumOut)
-            bSink = new WeightedTokenSink(
-                    new TSVSink(b, DEFAULT_CHARSET), idx);
+            bSink = WeightedTokenSink.open(b, DEFAULT_CHARSET, idx);
         else
-            bSink = new WeightedTokenSink(new TSVSink(b, DEFAULT_CHARSET), idx);
+            bSink = WeightedTokenSink.open(b, DEFAULT_CHARSET, idx);
         bSink.setCompactFormatEnabled(compact);
 
         IOUtil.copy(aSrc, bSink);
@@ -116,11 +110,11 @@ public class EntryTest {
         Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
 
         {
-            WeightedTokenSource aSrc = new WeightedTokenSource(
-                    new TSVSource(a, DEFAULT_CHARSET),
+            WeightedTokenSource aSrc = WeightedTokenSource.open(
+                    a, DEFAULT_CHARSET,
                     new IndexDeligate(false, strEnum));
-            WeightedTokenSink bSink = new WeightedTokenSink(
-                    new TSVSink(b, DEFAULT_CHARSET),
+            WeightedTokenSink bSink = WeightedTokenSink.open(
+                    b, DEFAULT_CHARSET,
                     new IndexDeligate(true));
             IOUtil.copy(aSrc, bSink);
             bSink.close();
@@ -130,11 +124,11 @@ public class EntryTest {
                    b.length() <= a.length());
 
         {
-            WeightedTokenSource bSrc = new WeightedTokenSource(
-                    new TSVSource(b, DEFAULT_CHARSET),
+            WeightedTokenSource bSrc = WeightedTokenSource.open(
+                    b, DEFAULT_CHARSET,
                     new IndexDeligate(true));
-            WeightedTokenSink cSink = new WeightedTokenSink(
-                    new TSVSink(c, DEFAULT_CHARSET),
+            WeightedTokenSink cSink = WeightedTokenSink.open(
+                    c, DEFAULT_CHARSET,
                     new IndexDeligate(false, strEnum));
             IOUtil.copy(bSrc, cSink);
             cSink.close();
@@ -154,8 +148,8 @@ public class EntryTest {
 
 
         Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
-        WeightedTokenSource<Lexer.Tell> src = new WeightedTokenSource<Lexer.Tell>(
-                new TSVSource(file, DEFAULT_CHARSET),
+        WeightedTokenSource src = WeightedTokenSource.open(
+                file, DEFAULT_CHARSET,
                 new IndexDeligate(false, idx));
         {
             while (src.hasNext()) {

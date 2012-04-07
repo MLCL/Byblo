@@ -52,11 +52,11 @@ public class FeatureTest {
 
     private void copyF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
         Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
-        WeightedTokenSource aSrc = new WeightedTokenSource(
-                new TSVSource(a, DEFAULT_CHARSET),
+        WeightedTokenSource aSrc = WeightedTokenSource.open(
+                a, DEFAULT_CHARSET,
                 new IndexDeligate(false, strEnum));
-        WeightedTokenSink bSink = new WeightedTokenSink(
-                new TSVSink(b, DEFAULT_CHARSET),
+        WeightedTokenSink bSink = WeightedTokenSink.open(
+                b, DEFAULT_CHARSET,
                 new IndexDeligate(false, strEnum));
         bSink.setCompactFormatEnabled(compact);
 
@@ -97,11 +97,11 @@ public class FeatureTest {
         Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
 
         {
-            WeightedTokenSource aSrc = new WeightedTokenSource(
-                    new TSVSource(a, DEFAULT_CHARSET), 
+            WeightedTokenSource aSrc = WeightedTokenSource.open(
+                    a, DEFAULT_CHARSET,
                     new IndexDeligate(false, strEnum));
-            WeightedTokenSink bSink = new WeightedTokenSink(
-                    new TSVSink(b, DEFAULT_CHARSET),
+            WeightedTokenSink bSink = WeightedTokenSink.open(
+                    b, DEFAULT_CHARSET,
                     new IndexDeligate(true));
             IOUtil.copy(aSrc, bSink);
             bSink.close();
@@ -111,11 +111,11 @@ public class FeatureTest {
                    b.length() <= a.length());
 
         {
-            WeightedTokenSource bSrc = new WeightedTokenSource(
-                    new TSVSource(b, DEFAULT_CHARSET),
+            WeightedTokenSource bSrc = WeightedTokenSource.open(
+                    b, DEFAULT_CHARSET,
                     new IndexDeligate(true));
-            WeightedTokenSink cSink = new WeightedTokenSink(
-                    new TSVSink(c, DEFAULT_CHARSET), 
+            WeightedTokenSink cSink = WeightedTokenSink.open(
+                    c, DEFAULT_CHARSET,
                     new IndexDeligate(false, strEnum));
             IOUtil.copy(bSrc, cSink);
             cSink.close();
@@ -126,5 +126,4 @@ public class FeatureTest {
         assertTrue("Double converted file is not equal to origion.",
                    Files.equal(a, c));
     }
-
 }

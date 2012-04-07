@@ -19,8 +19,6 @@ import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.io.Source;
-import uk.ac.susx.mlcl.lib.io.TSVSink;
-import uk.ac.susx.mlcl.lib.io.TSVSource;
 
 /**
  *
@@ -54,16 +52,21 @@ public class MergeWeightedTokenCommand extends AbstractMergeCommand<Weighted<Tok
     
     @Override
     protected Source<Weighted<Token>> openSource(File file) throws FileNotFoundException, IOException {
-        return new WeightedTokenSource(
-                new TSVSource(file, getFileDeligate().getCharset()),
-                indexDeligate);
+        return  WeightedTokenSource.open(file, getFileDeligate().getCharset(),
+                                        indexDeligate);
+//
+//                new WeightedTokenSource(
+//                new TSVSource(file, getFileDeligate().getCharset()),
+//                indexDeligate);
     }
 
     @Override
     protected Sink<Weighted<Token>> openSink(File file) throws FileNotFoundException, IOException {
-        WeightedTokenSink s = new WeightedTokenSink(
-                new TSVSink(file, getFileDeligate().getCharset()),
-                indexDeligate);
+        WeightedTokenSink s = WeightedTokenSink.open(
+                file, getFileDeligate().getCharset(), indexDeligate);
+//        new WeightedTokenSink(
+//                new TSVSink(file, getFileDeligate().getCharset()),
+//                indexDeligate);
         s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
         return new WeightSumReducerSink<Token>(s);
     }

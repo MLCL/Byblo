@@ -82,7 +82,7 @@ public class CrMiTest {
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testCRMI_beta_0_gamma_0() throws Exception {
         testCrmiCli(0, 0);
     }
@@ -261,10 +261,10 @@ public class CrMiTest {
 
 
         Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
-        WeightedTokenPairSource expected = new WeightedTokenPairSource(
-                new TSVSource(expectedOutput, DEFAULT_CHARSET), new IndexDeligatePair(false, false, idx, idx));
-        WeightedTokenPairSource actual = new WeightedTokenPairSource(
-                new TSVSource(crmiOutput, DEFAULT_CHARSET), new IndexDeligatePair(false, false, idx, idx));
+        WeightedTokenPairSource expected =  WeightedTokenPairSource.open(
+                expectedOutput, DEFAULT_CHARSET, new IndexDeligatePair(false, false, idx, idx));
+        WeightedTokenPairSource actual =  WeightedTokenPairSource.open(
+                crmiOutput, DEFAULT_CHARSET, new IndexDeligatePair(false, false, idx, idx));
 
         while (expected.hasNext() && actual.hasNext()) {
             Weighted<TokenPair> e = expected.read();

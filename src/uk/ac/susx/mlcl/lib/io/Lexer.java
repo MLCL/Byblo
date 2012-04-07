@@ -42,7 +42,6 @@ import java.util.NoSuchElementException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.charset.Charset;
-import java.text.MessageFormat;
 import java.util.RandomAccess;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -106,7 +105,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class Lexer implements RandomAccess, Closeable {
+public class Lexer implements Seekable<Tell>, Closeable {
 
     /**
      * Report events to this logger. Only major events are reported, and to
@@ -173,7 +172,11 @@ public class Lexer implements RandomAccess, Closeable {
      * Record the offset that can be used for seeking back to the currently
      * advanced position.
      */
-    private Tell tell = new Tell(0, 0);
+//    private Tell tell = new Tell(0, 0);
+    private long channelOffset = 0;
+    // the offset in the buffer of the first character in the lexeme
+
+    private int bufferOffset = 0;
 
     /**
      * Store decoded characters
@@ -279,8 +282,10 @@ public class Lexer implements RandomAccess, Closeable {
         if (!hasNext())
             throw new NoSuchElementException("iteration has no more elements.");
 
-        tell.channelOffset = channelRestartOffset;
-        tell.bufferOffset = cbuf.position() - charBufferRestartOffset;
+//        tell.channelOffset = channelRestartOffset;
+//        tell.bufferOffset = cbuf.position() - charBufferRestartOffset;
+        channelOffset = channelRestartOffset;
+        bufferOffset = cbuf.position() - charBufferRestartOffset;
 
         start = cbuf.position();
         char c = read();
@@ -505,62 +510,14 @@ public class Lexer implements RandomAccess, Closeable {
      *
      * @return byte offset of the current lexeme.
      */
-    public Tell tell() {
-        return tell.clone();
-    }
-
-    public static final class Tell {
-        // the offset in the channel of the current buffered region
-
-        public static final Tell START = new Tell(0, 0);
-
-        private long channelOffset;
-        // the offset in the buffer of the first character in the lexeme
-
-        private int bufferOffset;
-
-        private Tell(long channelOffset, int bufferOffset) {
-            this.channelOffset = channelOffset;
-            this.bufferOffset = bufferOffset;
-        }
-
-        private Tell() {
-            this(0, 0);
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
-            final Tell other = (Tell) obj;
-            if (this.channelOffset != other.channelOffset)
-                return false;
-            if (this.bufferOffset != other.bufferOffset)
-                return false;
-            return true;
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 7;
-            hash = 83 * hash + (int) (this.channelOffset ^ (this.channelOffset >>> 32));
-            hash = 83 * hash + this.bufferOffset;
-            return hash;
-        }
-
-        @Override
-        public String toString() {
-            return MessageFormat.format(
-                    "{0,number,integer}/{1,number,integer}",
-                    new Object[]{channelOffset, bufferOffset});
-        }
-
-        @Override
-        protected Tell clone() {
-            return new Tell(this.channelOffset, this.bufferOffset);
-        }
+    @Override
+    public Tell position() {
+        return new Tell(Long.class, channelOffset).
+                push(Integer.class, bufferOffset);
+//        tell.push(Long.class, channelOffset);
+//        tell.push(Integer.class, bufferOffset);
+//        return tell;
+//        return tell.clone();
     }
 
     /**
@@ -582,9 +539,15 @@ public class Lexer implements RandomAccess, Closeable {
      * @throws CharacterCodingException
      * @throws IOException
      */
-    public void seek(final Tell offset) throws CharacterCodingException, IOException {
+    @Override
+    public void position(final Tell offset) throws IOException {
 
-        channel.position(offset.channelOffset);
+//        this.bufferOffset = offset.pop(Integer.class);
+//        this.channelOffset = offset.pop(Long.class);
+        this.bufferOffset = offset.value(Integer.class);
+        this.channelOffset = offset.next().value(Long.class);
+
+        channel.position(channelOffset);
         channelRestartOffset = channel.position();
         charBufferRestartOffset = 0;
 
@@ -592,14 +555,88 @@ public class Lexer implements RandomAccess, Closeable {
         channel.read(cbuf);
         cbuf.flip();
 
-        cbuf.position(offset.bufferOffset);
+        cbuf.position(bufferOffset);
 
-        start = offset.bufferOffset;
-        end = offset.bufferOffset;
+        start = bufferOffset;
+        end = bufferOffset;
 
         if (hasNext())
             advance();
+
+//        
+
+
+//        channel.position(offset.channelOffset);
+//        channelRestartOffset = channel.position();
+//        charBufferRestartOffset = 0;
+//
+//        cbuf.clear();
+//        channel.read(cbuf);
+//        cbuf.flip();
+//
+//        cbuf.position(offset.bufferOffset);
+//
+//        start = offset.bufferOffset;
+//        end = offset.bufferOffset;
+//
+//        if (hasNext())
+//            advance();
     }
+    
+    
+//    public static final class Tell {
+//        // the offset in the channel of the current buffered region
+//
+//        public static final Tell START = new Tell(0, 0);
+//
+//        private long channelOffset;
+//        // the offset in the buffer of the first character in the lexeme
+//
+//        private int bufferOffset;
+//
+//        private Tell(long channelOffset, int bufferOffset) {
+//            this.channelOffset = channelOffset;
+//            this.bufferOffset = bufferOffset;
+//        }
+//
+//        private Tell() {
+//            this(0, 0);
+//        }
+//
+//        @Override
+//        public boolean equals(Object obj) {
+//            if (obj == null)
+//                return false;
+//            if (getClass() != obj.getClass())
+//                return false;
+//            final Tell other = (Tell) obj;
+//            if (this.channelOffset != other.channelOffset)
+//                return false;
+//            if (this.bufferOffset != other.bufferOffset)
+//                return false;
+//            return true;
+//        }
+//
+//        @Override
+//        public int hashCode() {
+//            int hash = 7;
+//            hash = 83 * hash + (int) (this.channelOffset ^ (this.channelOffset >>> 32));
+//            hash = 83 * hash + this.bufferOffset;
+//            return hash;
+//        }
+//
+//        @Override
+//        public String toString() {
+//            return MessageFormat.format(
+//                    "{0,number,integer}/{1,number,integer}",
+//                    new Object[]{channelOffset, bufferOffset});
+//        }
+//
+//        @Override
+//        protected Tell clone() {
+//            return new Tell(this.channelOffset, this.bufferOffset);
+//        }
+//    }
 
     /**
      * Gets the next character from the buffer, refilling it if necessary.

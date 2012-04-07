@@ -123,7 +123,7 @@ public class SortWeightedTokenPairCommandTest {
 
         // write to a temporary file
 
-        WeightedTokenPairSink randomisedSink = openSink(randomisedFile, idx);
+        WeightedTokenPairSink randomisedSink = openSink(randomisedFile, idx, false);
         IOUtil.copy(list, randomisedSink);
         randomisedSink.flush();
         randomisedSink.close();
@@ -188,17 +188,18 @@ public class SortWeightedTokenPairCommandTest {
 
     private static WeightedTokenPairSource openSource(File file, IndexDeligatePair idx)
             throws IOException {
-        return new WeightedTokenPairSource(
-                new TSVSource(file, DEFAULT_CHARSET),
+        return  WeightedTokenPairSource.open(
+                file, DEFAULT_CHARSET,
                 idx);
     }
 
-    private static WeightedTokenPairSink openSink(File file, IndexDeligatePair idx)
+    private static WeightedTokenPairSink openSink(
+            File file, IndexDeligatePair idx, boolean compact)
             throws IOException {
-        WeightedTokenPairSink sink = new WeightedTokenPairSink(
-                new TSVSink(file, DEFAULT_CHARSET),
-                idx);
-        sink.setCompactFormatEnabled(false);
+        WeightedTokenPairSink sink = WeightedTokenPairSink.open(
+                file, DEFAULT_CHARSET,
+                idx, compact);
+//        sink.setCompactFormatEnabled(false);
         return sink;
     }
 

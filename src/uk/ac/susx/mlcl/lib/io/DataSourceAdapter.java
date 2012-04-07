@@ -5,7 +5,6 @@
 package uk.ac.susx.mlcl.lib.io;
 
 import java.io.Closeable;
-import java.io.Flushable;
 import java.io.IOException;
 
 /**
@@ -14,7 +13,7 @@ import java.io.IOException;
  * @author hamish
  */
 public abstract class DataSourceAdapter<T extends DataSource>
-        implements DataSource, Closeable, Flushable {
+        implements DataSource, Closeable {
 
     private final T inner;
 
@@ -87,11 +86,6 @@ public abstract class DataSourceAdapter<T extends DataSource>
             ((Closeable) inner).close();
     }
 
-    @Override
-    public void flush() throws IOException {
-        if (inner instanceof Flushable)
-            ((Flushable) inner).flush();
-    }
 
     @Override
     public boolean equals(Object obj) {

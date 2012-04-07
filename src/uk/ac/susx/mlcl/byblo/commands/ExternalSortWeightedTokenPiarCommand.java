@@ -34,16 +34,18 @@ public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCo
 
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file) throws IOException {
-        WeightedTokenPairSink s = new WeightedTokenPairSink(new TSVSink(file, getFileDeligate().getCharset()),
-                getIndexDeligate());
-        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
+        WeightedTokenPairSink s =  WeightedTokenPairSink.open(
+                file, getFileDeligate().getCharset(),
+                getIndexDeligate(),
+                !getFileDeligate().isCompactFormatDisabled());
+//        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
         return new WeightSumReducerSink<TokenPair>(s);
     }
 
     @Override
     protected WeightedTokenPairSource openSource(File file) throws IOException {
-        return new WeightedTokenPairSource(
-                new TSVSource(file, getFileDeligate().getCharset()),
+        return WeightedTokenPairSource.open(
+                file, getFileDeligate().getCharset(),
                 getIndexDeligate());
     }
 

@@ -5,8 +5,6 @@
 package uk.ac.susx.mlcl.byblo.commands;
 
 import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
-import uk.ac.susx.mlcl.byblo.commands.AbstractExternalSortCommand;
-import uk.ac.susx.mlcl.byblo.commands.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,8 +19,6 @@ import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
-import uk.ac.susx.mlcl.lib.io.TSVSink;
-import uk.ac.susx.mlcl.lib.io.TSVSource;
 import static org.junit.Assert.*;
 import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
@@ -61,17 +57,20 @@ public class ExternalSortWeightedTokenPairCommandTest {
         final boolean preindexedTokens1 = false;
         final boolean preindexedTokens2 = false;
 
-        File randomisedFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".sims.randomised");
+        File randomisedFile = new File(TEST_OUTPUT_DIR,
+                                       FRUIT_NAME + ".sims.randomised");
         File sortedFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".sims.sorted");
 
         final IndexDeligatePair idx = new IndexDeligatePair(
                 preindexedTokens1, preindexedTokens2);
 
         Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(
-                Weighted.recordOrder(TokenPair.firstStringOrder(idx.getEnumerator1())),
+                Weighted.recordOrder(TokenPair.firstStringOrder(idx.
+                getEnumerator1())),
                 Comparators.reverse(Weighted.<TokenPair>weightOrder()));
 
-        testSortWeightedTokenPairCommand(inputFile, randomisedFile, sortedFile, idx, comparator);
+        testSortWeightedTokenPairCommand(inputFile, randomisedFile, sortedFile,
+                                         idx, comparator);
 
     }
 
@@ -84,8 +83,10 @@ public class ExternalSortWeightedTokenPairCommandTest {
         final boolean preindexedTokens1 = true;
         final boolean preindexedTokens2 = true;
 
-        File randomisedFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".indexed.sims.randomised");
-        File sortedFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".indexed.sims.sorted");
+        File randomisedFile = new File(TEST_OUTPUT_DIR,
+                                       FRUIT_NAME + ".indexed.sims.randomised");
+        File sortedFile = new File(TEST_OUTPUT_DIR,
+                                   FRUIT_NAME + ".indexed.sims.sorted");
 
 
         final IndexDeligatePair idx = new IndexDeligatePair(
@@ -96,7 +97,8 @@ public class ExternalSortWeightedTokenPairCommandTest {
                 Weighted.recordOrder(TokenPair.firstIndexOrder()),
                 Comparators.reverse(Weighted.<TokenPair>weightOrder()));
 
-        testSortWeightedTokenPairCommand(inputFile, randomisedFile, sortedFile, idx, comparator);
+        testSortWeightedTokenPairCommand(inputFile, randomisedFile, sortedFile,
+                                         idx, comparator);
 
 
     }
@@ -110,7 +112,8 @@ public class ExternalSortWeightedTokenPairCommandTest {
 
         assertTrue("Input file does not exist", inputFile.exists());
         assertTrue("Input file is not a regular file", inputFile.isFile());
-        assertTrue("Input file length differs from input", inputFile.length() > 0);
+        assertTrue("Input file length differs from input",
+                   inputFile.length() > 0);
 
 
         // load a weighted token pair file
@@ -126,15 +129,18 @@ public class ExternalSortWeightedTokenPairCommandTest {
 
         // write to a temporary file
 
-        WeightedTokenPairSink randomisedSink = openSink(randomisedFile, idx);
-        randomisedSink.setCompactFormatEnabled(false);
+        WeightedTokenPairSink randomisedSink = openSink(randomisedFile, idx,
+                                                        false);
+//        randomisedSink.setCompactFormatEnabled(false);
         IOUtil.copy(list, randomisedSink);
         randomisedSink.flush();
         randomisedSink.close();
 
         assertTrue("Randomised file does not exist", randomisedFile.exists());
-        assertTrue("Randomised file is not a regular file", randomisedFile.isFile());
-        assertTrue("Randomised file length differs from input", randomisedFile.length() == inputFile.length());
+        assertTrue("Randomised file is not a regular file", randomisedFile.
+                isFile());
+        assertTrue("Randomised file length differs from input", randomisedFile.
+                length() == inputFile.length());
 
 
         // run the command
@@ -156,7 +162,8 @@ public class ExternalSortWeightedTokenPairCommandTest {
 
         assertTrue("Sorted file does not exist", sortedFile.exists());
         assertTrue("Sorted file is not a regular file", sortedFile.isFile());
-        assertTrue("Sorted file length differs from input", sortedFile.length() == inputFile.length());
+        assertTrue("Sorted file length differs from input",
+                   sortedFile.length() == inputFile.length());
 
         // load the sorted output file and check it's sensible
 
@@ -164,19 +171,20 @@ public class ExternalSortWeightedTokenPairCommandTest {
         List<Weighted<TokenPair>> sorted = IOUtil.readAll(sortedSource);
         inputSource.close();
 
-        List<Weighted<TokenPair>> listCopy = new ArrayList<Weighted<TokenPair>>(list);
+        List<Weighted<TokenPair>> listCopy = new ArrayList<Weighted<TokenPair>>(
+                list);
         Collections.sort(listCopy, comparator);
-        
+
         for (int i = 1; i < sorted.size(); i++) {
             Weighted<TokenPair> a = sorted.get(i - 1);
             Weighted<TokenPair> b = sorted.get(i);
             assertTrue("Sorted data does not match comparator: "
                     + a + " > " + b, comparator.compare(a, b) <= 0);
         }
-        
+
         for (int i = 0; i < sorted.size(); i++) {
             assertTrue(String.format("Row %d does not match: ", i),
-                         comparator.compare(sorted.get(i), listCopy.get(i)) == 0);
+                       comparator.compare(sorted.get(i), listCopy.get(i)) == 0);
         }
 
 
@@ -196,18 +204,19 @@ public class ExternalSortWeightedTokenPairCommandTest {
             swap(list, i, rand.nextInt(list.size()));
     }
 
-    private static WeightedTokenPairSource openSource(File file, IndexDeligatePair idx)
+    private static WeightedTokenPairSource openSource(
+            File file, IndexDeligatePair idx)
             throws IOException {
-        return new WeightedTokenPairSource(
-                new TSVSource(file, DEFAULT_CHARSET),
+        return WeightedTokenPairSource.open(
+                file, DEFAULT_CHARSET,
                 idx);
     }
 
-    private static WeightedTokenPairSink openSink(File file, IndexDeligatePair idx)
+    private static WeightedTokenPairSink openSink(
+            File file, IndexDeligatePair idx, boolean compact)
             throws IOException {
-        return new WeightedTokenPairSink(
-                new TSVSink(file, DEFAULT_CHARSET),
-                idx);
+        return WeightedTokenPairSink.open(
+                file, DEFAULT_CHARSET,
+                idx, compact);
     }
-
 }

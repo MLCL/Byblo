@@ -46,7 +46,6 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.tasks.InvertedApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.ThreadedApssTask;
 import uk.ac.susx.mlcl.byblo.io.*;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource.Tell;
 import uk.ac.susx.mlcl.byblo.measure.*;
 import uk.ac.susx.mlcl.byblo.tasks.NaiveApssTask;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -66,79 +65,79 @@ public class AllPairsCommand extends AbstractCommand {
     private static final Log LOG = LogFactory.getLog(AllPairsCommand.class);
 
     @Parameter(names = {"-i", "--input"},
-    description = "Entry-feature frequency vectors files.",
-    required = true,
-    validateWith = InputFileValidator.class)
+               description = "Entry-feature frequency vectors files.",
+               required = true,
+               validateWith = InputFileValidator.class)
     private File entryFeaturesFile;
 
     @Parameter(names = {"-if", "--input-features"},
-    description = "Feature frequencies file",
-    validateWith = InputFileValidator.class)
+               description = "Feature frequencies file",
+               validateWith = InputFileValidator.class)
     private File featuresFile;
 
     @Parameter(names = {"-ie", "--input-entries"},
-    description = "Entry frequencies file",
-    validateWith = InputFileValidator.class)
+               description = "Entry frequencies file",
+               validateWith = InputFileValidator.class)
     private File entriesFile;
 
     @Parameter(names = {"-o", "--output"},
-    description = "Output similarity matrix file.",
-    required = true,
-    validateWith = OutputFileValidator.class)
+               description = "Output similarity matrix file.",
+               required = true,
+               validateWith = OutputFileValidator.class)
     private File outputFile;
 
     @Parameter(names = {"-c", "--charset"},
-    description = "Character encoding to use for reading and writing.")
+               description = "Character encoding to use for reading and writing.")
     private Charset charset = Files.DEFAULT_CHARSET;
 
     @Parameter(names = {"-C", "--chunk-size"},
-    description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
+               description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
     private int chunkSize = 2500;
 
     @Parameter(names = {"-t", "--threads"},
-    description = "Number of conccurent processing threads.")
+               description = "Number of conccurent processing threads.")
     private int nThreads = Runtime.getRuntime().availableProcessors() + 1;
 
     @Parameter(names = {"-Smn", "--similarity-min"},
-    description = "Minimum similarity threshold.",
-    converter = DoubleConverter.class)
+               description = "Minimum similarity threshold.",
+               converter = DoubleConverter.class)
     private double minSimilarity = Double.NEGATIVE_INFINITY;
 
     @Parameter(names = {"-Smx", "--similarity-max"},
-    description = "Maximyum similarity threshold.",
-    converter = DoubleConverter.class)
+               description = "Maximyum similarity threshold.",
+               converter = DoubleConverter.class)
     private double maxSimilarity = Double.POSITIVE_INFINITY;
 
     @Parameter(names = {"-ip", "--identity-pairs"},
-    description = "Produce similarity between pair of identical entries.")
+               description = "Produce similarity between pair of identical entries.")
     private boolean outputIdentityPairs = false;
 
     @Parameter(names = {"-m", "--measure"},
-    description = "Similarity measure to use.")
+               description = "Similarity measure to use.")
     private String measureName = "Jaccard";
 
     @Parameter(names = {"--measure-reversed"},
-    description = "Swap similarity measure inputs.")
+               description = "Swap similarity measure inputs.")
     private boolean measureReversed = false;
 
     @Parameter(names = {"--lee-alpha"},
-    description = "Alpha parameter to Lee's alpha-skew divergence measure.",
-    converter = DoubleConverter.class)
+               description = "Alpha parameter to Lee's alpha-skew divergence measure.",
+               converter = DoubleConverter.class)
     private double leeAlpha = Lee.DEFAULT_ALPHA;
 
     @Parameter(names = {"--crmi-beta"},
-    description = "Beta paramter to Weed's CRMI measure.",
-    converter = DoubleConverter.class)
+               description = "Beta paramter to Weed's CRMI measure.",
+               converter = DoubleConverter.class)
     private double crmiBeta = CrMi.DEFAULT_BETA;
 
     @Parameter(names = {"--crmi-gamma"},
-    description = "Gamma paramter to Weed's CRMI measure.",
-    converter = DoubleConverter.class)
+               description = "Gamma paramter to Weed's CRMI measure.",
+               converter = DoubleConverter.class)
     private double crmiGamma = CrMi.DEFAULT_GAMMA;
 
     @Parameter(names = {"--mink-p"},
-    description = "P parameter to Minkowski/Lp space measure.",
-    converter = DoubleConverter.class)
+               description = "P parameter to Minkowski/Lp space measure.",
+               converter = DoubleConverter.class)
     private double minkP = 2;
 
     public enum Algorithm {
@@ -149,19 +148,21 @@ public class AllPairsCommand extends AbstractCommand {
     }
 
     @Parameter(names = {"--algorithm"},
-    hidden = true,
-    description = "APPS algorithm to use.")
+               hidden = true,
+               description = "APPS algorithm to use.")
     private Algorithm algorithm = Algorithm.Inverted;
 
     @Parameter(names = {"--serial"},
-    hidden = true,
-    description = "Run in serial mode (i.e disable threading entirely)")
+               hidden = true,
+               description = "Run in serial mode (i.e disable threading entirely)")
     private Boolean serial = Boolean.FALSE;
 
     @ParametersDelegate
     private IndexDeligatePair indexDeligate = new IndexDeligatePair();
 
-    public AllPairsCommand(File entriesFile, File featuresFile, File entryFeaturesFile, File outputFile, Charset charset) {
+    public AllPairsCommand(File entriesFile, File featuresFile,
+                           File entryFeaturesFile, File outputFile,
+                           Charset charset) {
         setEntryFeaturesFile(entryFeaturesFile);
         setEntriesFile(entriesFile);
         setFeaturesFile(featuresFile);
@@ -213,7 +214,7 @@ public class AllPairsCommand extends AbstractCommand {
         final Map<String, Class<? extends Proximity>> classLookup =
                 buildMeasureClassLookupTable();
 
-        Class<? extends Proximity> measureClass = null;
+        Class<? extends Proximity> measureClass;
         if (classLookup.containsKey(getMeasureName().toLowerCase().trim())) {
             measureClass = classLookup.get(getMeasureName().toLowerCase().trim());
         } else {
@@ -250,9 +251,12 @@ public class AllPairsCommand extends AbstractCommand {
                     LOG.info("Loading features file " + getFeaturesFile());
                 }
 
-                WeightedTokenSource features = new WeightedTokenSource(
-                        new TSVSource(getFeaturesFile(), getCharset()),
-                        getIndexDeligate().single2());
+                WeightedTokenSource features = WeightedTokenSource.open(
+                        getFeaturesFile(), getCharset(), getIndexDeligate().
+                        single2());
+//                        new WeightedTokenSource(
+//                        new TSVSource(getFeaturesFile(), getCharset()),
+//                        getIndexDeligate().single2());
                 AbstractMIProximity bmip = ((AbstractMIProximity) prox);
                 bmip.setFeatureFrequencies(features.readAllAsArray());
                 bmip.setFeatureFrequencySum(features.getWeightSum());
@@ -268,9 +272,13 @@ public class AllPairsCommand extends AbstractCommand {
                             + "KendalTau.numFeatures: " + getFeaturesFile());
                 }
 
-                WeightedTokenSource features = new WeightedTokenSource(
-                        new TSVSource(getFeaturesFile(), getCharset()),
-                        getIndexDeligate().single2());
+                WeightedTokenSource features = WeightedTokenSource.open(
+                        getFeaturesFile(), getCharset(), getIndexDeligate().
+                        single2());
+//                
+//                        new WeightedTokenSource(
+//                        new TSVSource(getFeaturesFile(), getCharset()),
+//                        getIndexDeligate().single2());
                 features.readAll();
 
                 ((KendallTau) prox).setNumFeatures(features.getCardinality());
@@ -290,45 +298,43 @@ public class AllPairsCommand extends AbstractCommand {
         // combinations of vectors, so will be looking at two differnt points
         // in the file. Also this allows for the possibility of having differnt
         // files, e.g compare fruit words with cake words
-        final WeightedTokenPairVectorSource sourceA = new WeightedTokenPairSource(
-                new TSVSource(getEntryFeaturesFile(), getCharset()),
-                getIndexDeligate()
-//                getIndexDeligate().getDecoder1(),
-//                getIndexDeligate().getDecoder2()
-                        ).getVectorSource();
-        
-        final WeightedTokenPairVectorSource sourceB = new WeightedTokenPairSource(
-                new TSVSource(getEntryFeaturesFile(), getCharset()),
-                getIndexDeligate()
-//                getIndexDeligate().getDecoder1(),
-//                getIndexDeligate().getDecoder2()
+        final WeightedTokenPairVectorSource sourceA =  WeightedTokenPairSource.open(
+                getEntryFeaturesFile(), getCharset(),
+                getIndexDeligate() //                getIndexDeligate().getDecoder1(),
+                //                getIndexDeligate().getDecoder2()
+                ).getVectorSource();
+
+        final WeightedTokenPairVectorSource sourceB = WeightedTokenPairSource.open(
+                getEntryFeaturesFile(), getCharset(),
+                getIndexDeligate() //                getIndexDeligate().getDecoder1(),
+                //                getIndexDeligate().getDecoder2()
                 ).getVectorSource();
 
         // Create a sink object that will act as a recipient for all pairs that
         // are produced by the algorithm.
 
         IndexDeligatePair sinkIdx = new IndexDeligatePair(
-                getIndexDeligate().isPreindexedTokens1(), 
-                getIndexDeligate().isPreindexedTokens1(), 
-                getIndexDeligate().getEnumerator1(), 
+                getIndexDeligate().isPreindexedTokens1(),
+                getIndexDeligate().isPreindexedTokens1(),
+                getIndexDeligate().getEnumerator1(),
                 getIndexDeligate().getEnumerator1());
         sinkIdx.setSkipindexed1(getIndexDeligate().isSkipindexed1());
         sinkIdx.setSkipindexed2(getIndexDeligate().isSkipindexed2());
-                
-        
+
+
         final Sink<Weighted<TokenPair>> sink =
-                new WeightedTokenPairSink(
-                new TSVSink(getOutputFile(), getCharset()),
-                sinkIdx);
+                WeightedTokenPairSink.open(
+                getOutputFile(), getCharset(),
+                sinkIdx, true);
 
 
-        NaiveApssTask<Tell> apss = null;
+        NaiveApssTask<Tell> apss;
 
 
         if (getSerial()) {
             apss = getAlgorithm() == Algorithm.Inverted
-                   ? new InvertedApssTask<Tell>()
-                   : new NaiveApssTask<Tell>();
+                    ? new InvertedApssTask<Tell>()
+                    : new NaiveApssTask<Tell>();
         } else {
 
             // Instantiate the all-pairs algorithm as given on the command line.
@@ -362,7 +368,8 @@ public class AllPairsCommand extends AbstractCommand {
         }
 
         if (getMaxSimilarity() != Double.POSITIVE_INFINITY) {
-            pairFilters.add(Weighted.<TokenPair>lessThanOrEqualTo(getMaxSimilarity()));
+            pairFilters.add(Weighted.<TokenPair>lessThanOrEqualTo(
+                    getMaxSimilarity()));
         }
 
         if (!isOutputIdentityPairs()) {
@@ -378,8 +385,8 @@ public class AllPairsCommand extends AbstractCommand {
         }
 
         apss.run();
-        
-        if(apss.isExceptionThrown())
+
+        if (apss.isExceptionThrown())
             apss.throwException();
 
         if (LOG.isInfoEnabled()) {
@@ -494,7 +501,8 @@ public class AllPairsCommand extends AbstractCommand {
     }
 
     public final void setMinSimilarity(double minSimilarity) {
-        Checks.checkRangeIncl("minSimilarity", minSimilarity, 0, Double.POSITIVE_INFINITY);
+        Checks.checkRangeIncl("minSimilarity", minSimilarity, 0,
+                              Double.POSITIVE_INFINITY);
         this.minSimilarity = minSimilarity;
     }
 
@@ -503,7 +511,8 @@ public class AllPairsCommand extends AbstractCommand {
     }
 
     public final void setMaxSimilarity(double maxSimilarity) {
-        Checks.checkRangeIncl("maxSimilarity", maxSimilarity, 0, Double.POSITIVE_INFINITY);
+        Checks.checkRangeIncl("maxSimilarity", maxSimilarity, 0,
+                              Double.POSITIVE_INFINITY);
         this.maxSimilarity = maxSimilarity;
     }
 
@@ -573,5 +582,4 @@ public class AllPairsCommand extends AbstractCommand {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }
-
 }

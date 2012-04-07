@@ -74,31 +74,31 @@ public class CountCommand extends AbstractCommand implements Serializable {
     private static final int PROGRESS_INTERVAL = 1000000;
 
     @Parameter(names = {"-i", "--input"},
-    required = true,
-    description = "Source instances file",
-    validateWith = InputFileValidator.class)
+               required = true,
+               description = "Source instances file",
+               validateWith = InputFileValidator.class)
     private File inputFile;
 
     @Parameter(names = {"-oef", "--output-entry-features"},
-    required = true,
-    description = "Entry-feature-pair frequencies destination file",
-    validateWith = OutputFileValidator.class)
+               required = true,
+               description = "Entry-feature-pair frequencies destination file",
+               validateWith = OutputFileValidator.class)
     private File entryFeaturesFile = null;
 
     @Parameter(names = {"-oe", "--output-entries"},
-    required = true,
-    description = "Entry frequencies destination file",
-    validateWith = OutputFileValidator.class)
+               required = true,
+               description = "Entry frequencies destination file",
+               validateWith = OutputFileValidator.class)
     private File entriesFile = null;
 
     @Parameter(names = {"-of", "--output-features"},
-    required = true,
-    description = "Feature frequencies destination file.",
-    validateWith = OutputFileValidator.class)
+               required = true,
+               description = "Feature frequencies destination file.",
+               validateWith = OutputFileValidator.class)
     private File featuresFile = null;
 
     @Parameter(names = {"-c", "--charset"},
-    description = "Character encoding to use for input and output.")
+               description = "Character encoding to use for input and output.")
     private Charset charset = Files.DEFAULT_CHARSET;
 
     @ParametersDelegate
@@ -120,7 +120,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
      */
     public CountCommand(final File instancesFile, final File entryFeaturesFile,
                         final File entriesFile, final File featuresFile,
-                        IndexDeligatePair indexDeligate, 
+                        IndexDeligatePair indexDeligate,
                         final Charset charset) throws NullPointerException {
         this(instancesFile, entryFeaturesFile, entriesFile, featuresFile);
         setCharset(charset);
@@ -227,20 +227,24 @@ public class CountCommand extends AbstractCommand implements Serializable {
 //    }
     private Comparator<Weighted<Token>> getEntryOrder() throws IOException {
         return indexDeligate.isPreindexedTokens1()
-               ? Weighted.recordOrder(Token.indexOrder())
-               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getEnumerator1()));
+                ? Weighted.recordOrder(Token.indexOrder())
+                : Weighted.recordOrder(Token.stringOrder(indexDeligate.
+                getEnumerator1()));
     }
 
     private Comparator<Weighted<Token>> getFeatureOrder() throws IOException {
         return indexDeligate.isPreindexedTokens2()
-               ? Weighted.recordOrder(Token.indexOrder())
-               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getEnumerator2()));
+                ? Weighted.recordOrder(Token.indexOrder())
+                : Weighted.recordOrder(Token.stringOrder(indexDeligate.
+                getEnumerator2()));
     }
 
     private Comparator<Weighted<TokenPair>> getEventOrder() throws IOException {
-        return (indexDeligate.isPreindexedTokens1() && indexDeligate.isPreindexedTokens2())
-               ? Weighted.recordOrder(TokenPair.indexOrder())
-               : Weighted.recordOrder(TokenPair.stringOrder(indexDeligate.getEnumerator1(), indexDeligate.getEnumerator2()));
+        return (indexDeligate.isPreindexedTokens1() && indexDeligate.
+                isPreindexedTokens2())
+                ? Weighted.recordOrder(TokenPair.indexOrder())
+                : Weighted.recordOrder(TokenPair.stringOrder(indexDeligate.
+                getEnumerator1(), indexDeligate.getEnumerator2()));
     }
 
     @Override
@@ -251,23 +255,30 @@ public class CountCommand extends AbstractCommand implements Serializable {
 
         checkState();
 
-        final TokenPairSource instanceSource = new TokenPairSource(
-                new TSVSource(inputFile, charset),
-                indexDeligate);
+        final TokenPairSource instanceSource =  TokenPairSource.open(
+                inputFile, charset, indexDeligate);
 
-        WeightedTokenSink entrySink = new WeightedTokenSink(
-                new TSVSink(entriesFile, charset),
-                indexDeligate.single1());
+        WeightedTokenSink entrySink =
+                WeightedTokenSink.open(
+                entriesFile, charset, indexDeligate.single1());
+//        
+//                new WeightedTokenSink(
+//                new TSVSink(entriesFile, charset),
+//                indexDeligate.single1());
 
-        WeightedTokenSink featureSink = new WeightedTokenSink(
-                new TSVSink(featuresFile, charset),
-                indexDeligate.single2());
+        WeightedTokenSink featureSink =
+                WeightedTokenSink.open(
+                featuresFile, charset, indexDeligate.single2());
+//        
+//                new WeightedTokenSink(
+//                new TSVSink(featuresFile, charset),
+//                indexDeligate.single2());
 
 
-        WeightedTokenPairSink eventsSink = new WeightedTokenPairSink(
-                new TSVSink(entryFeaturesFile, charset),
-                indexDeligate //                indexDeligate.getEncoder1(), indexDeligate.getEncoder2()
-                );
+        WeightedTokenPairSink eventsSink = WeightedTokenPairSink.open(
+                entryFeaturesFile, charset,
+                indexDeligate, //                indexDeligate.getEncoder1(), indexDeligate.getEncoder2()
+                true);
 
 
         CountTask task = new CountTask(
@@ -575,7 +586,8 @@ public class CountCommand extends AbstractCommand implements Serializable {
 
         // For each output file, check that either it exists and it writeable,
         // or that it does not exist but is creatable
-        if (entriesFile.exists() && (!entriesFile.isFile() || !entriesFile.canWrite())) {
+        if (entriesFile.exists() && (!entriesFile.isFile() || !entriesFile.
+                                     canWrite())) {
             throw new IllegalStateException(
                     "entries file exists but is not writable: " + entriesFile);
         }
@@ -585,7 +597,8 @@ public class CountCommand extends AbstractCommand implements Serializable {
             throw new IllegalStateException(
                     "entries file does not exists and can not be reated: " + entriesFile);
         }
-        if (featuresFile.exists() && (!featuresFile.isFile() || !featuresFile.canWrite())) {
+        if (featuresFile.exists() && (!featuresFile.isFile() || !featuresFile.
+                                      canWrite())) {
             throw new IllegalStateException(
                     "features file exists but is not writable: " + featuresFile);
         }
@@ -595,7 +608,8 @@ public class CountCommand extends AbstractCommand implements Serializable {
             throw new IllegalStateException(
                     "features file does not exists and can not be reated: " + featuresFile);
         }
-        if (entryFeaturesFile.exists() && (!entryFeaturesFile.isFile() || !entryFeaturesFile.canWrite())) {
+        if (entryFeaturesFile.exists() && (!entryFeaturesFile.isFile() || !entryFeaturesFile.
+                                           canWrite())) {
             throw new IllegalStateException(
                     "entry-features file exists but is not writable: " + entryFeaturesFile);
         }
@@ -620,5 +634,4 @@ public class CountCommand extends AbstractCommand implements Serializable {
     public static void main(String[] args) throws Exception {
         new CountCommand().runCommand(args);
     }
-
 }

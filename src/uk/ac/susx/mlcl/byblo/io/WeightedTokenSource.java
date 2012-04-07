@@ -55,13 +55,12 @@ import uk.ac.susx.mlcl.lib.io.*;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see EntrySink
  */
-public class WeightedTokenSource<P>
-        implements SeekableSource<Weighted<Token>, P>, Closeable {
+public class WeightedTokenSource
+        implements SeekableSource<Weighted<Token>, Tell>, Closeable {
 
     private static final Log LOG = LogFactory.getLog(WeightedTokenSource.class);
 
-    private IndexDeligate indexDeligate;
-
+//    private IndexDeligate indexDeligate;
     private double weightSum = 0;
 
     private double weightMax = 0;
@@ -76,13 +75,13 @@ public class WeightedTokenSource<P>
 
     private Weighted<Token> previousRecord = null;
 
-    private final SeekableDataSource<P> inner;
+    private final SeekableDataSource<Tell> inner;
 
-    public WeightedTokenSource(SeekableDataSource<P> inner,
-                               IndexDeligate indexDeligate)
+    public WeightedTokenSource(SeekableDataSource<Tell> inner //                             ,  IndexDeligate indexDeligate
+            )
             throws FileNotFoundException, IOException {
         this.inner = inner;
-        this.indexDeligate = indexDeligate;
+//        this.indexDeligate = indexDeligate;
     }
 
     public double getWeightSum() {
@@ -110,28 +109,29 @@ public class WeightedTokenSource<P>
     }
 
     @Override
-    public void position(P offset) throws IOException {
+    public void position(Tell offset) throws IOException {
         inner.position(offset);
         previousRecord = null;
     }
 
     @Override
-    public P position() throws IOException {
+    public Tell position() throws IOException {
         return inner.position();
     }
 
-    private int readString() throws IOException {
-        if (indexDeligate.isPreindexedTokens()) {
-            return inner.readInt();
-        } else
-            return indexDeligate.getEnumerator().index(inner.readString());
+    private int readTokenId() throws IOException {
+        return inner.readInt();
+//        if (indexDeligate.isPreindexedTokens()) {
+//            return inner.readInt();
+//        } else
+//            return indexDeligate.getEnumerator().index(inner.readString());
     }
 
     @Override
     public Weighted<Token> read() throws IOException {
         final int tokenId;
         if (previousRecord == null) {
-            tokenId = readString();
+            tokenId = readTokenId();
         } else {
             tokenId = previousRecord.record().id();
         }
@@ -179,8 +179,8 @@ public class WeightedTokenSource<P>
 
                 if (LOG.isWarnEnabled())
                     LOG.warn("Found duplicate Entry \""
-                            + (indexDeligate.getEnumerator().value(entry.record().
-                               id()))
+                            //                            + (indexDeligate.getEnumerator().value(entry.record().id()))
+                            + (entry.record().id())
                             + "\" (id=" + id
                             + ") in entries file. Merging records. Old frequency = "
                             + oldFreq + ", new frequency = " + newFreq + ".");
@@ -205,14 +205,21 @@ public class WeightedTokenSource<P>
         return entryFreqs;
     }
 
+    public static WeightedTokenSource open(
+            File f, Charset charset, IndexDeligate idx) throws IOException {
+        SeekableDataSource<Tell> tsv = new TSVSource(f, charset);
+        tsv = DataIO.compact(tsv, 2);
+        if (!idx.isPreindexedTokens())
+            tsv = DataIO.enumerated(tsv, idx.getEnumerator());
+        return new WeightedTokenSource(tsv);
+    }
+
     public static boolean equal(File a, File b, Charset charset) throws IOException {
         final Enumerator<String> stringIndex = Enumerators.
                 newDefaultStringEnumerator();
         IndexDeligate idx = new IndexDeligate();
-        final WeightedTokenSource<?> srcA = new WeightedTokenSource<Lexer.Tell>(
-                new TSVSource(a, charset), idx);
-        final WeightedTokenSource<?> srcB = new WeightedTokenSource<Lexer.Tell>(
-                new TSVSource(b, charset), idx);
+        final WeightedTokenSource srcA = open(a, charset, idx);
+        final WeightedTokenSource srcB = open(b, charset, idx);
 
         List<Weighted<Token>> listA = IOUtil.readAll(srcA);
         List<Weighted<Token>> listB = IOUtil.readAll(srcB);
@@ -234,4 +241,5 @@ public class WeightedTokenSource<P>
         if (inner instanceof Closeable)
             ((Closeable) inner).close();
     }
+  
 }

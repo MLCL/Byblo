@@ -45,7 +45,7 @@ import uk.ac.susx.mlcl.lib.MiscUtil;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class TSVSource implements Closeable, SeekableDataSource<Lexer.Tell> {
+public final class TSVSource implements Closeable, SeekableDataSource<Tell> {
 
     private static final char RECORD_DELIM = '\n';
 
@@ -86,10 +86,11 @@ public final class TSVSource implements Closeable, SeekableDataSource<Lexer.Tell
     }
 
     @Override
-    public void position(Lexer.Tell offset) throws IOException {
-        lexer.seek(offset);
-        row = 0;
-        column = 0;
+    public void position(Tell offset) throws IOException {
+        row = offset.value(Long.class);
+        offset = offset.next();
+        column = offset.value(Long.class);
+        lexer.position(offset.next());
     }
 
     public double percentRead() throws IOException {
@@ -101,8 +102,10 @@ public final class TSVSource implements Closeable, SeekableDataSource<Lexer.Tell
     }
 
     @Override
-    public Lexer.Tell position() {
-        return lexer.tell();
+    public Tell position() {
+        return lexer.position().
+                push(Long.class, column).
+                push(Long.class, row);
     }
 
     @Override

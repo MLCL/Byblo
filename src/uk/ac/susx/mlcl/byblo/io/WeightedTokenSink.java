@@ -31,9 +31,9 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.text.DecimalFormat;
-import uk.ac.susx.mlcl.lib.io.DataSink;
-import uk.ac.susx.mlcl.lib.io.Sink;
+import uk.ac.susx.mlcl.lib.io.*;
 
 /**
  * An <tt>WeightedTokenSink</tt> object is used to store {@link Token} objects
@@ -71,10 +71,9 @@ import uk.ac.susx.mlcl.lib.io.Sink;
  */
 public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flushable {
 
-    private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
+//    private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
 
-    private IndexDeligate indexDeligate;
-
+//    private IndexDeligate indexDeligate;
     private boolean compactFormatEnabled = true;
 
     private Weighted<Token> previousRecord = null;
@@ -83,10 +82,11 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
 
     private DataSink inner;
 
-    public WeightedTokenSink(DataSink inner, IndexDeligate indexDeligate)
+    public WeightedTokenSink(DataSink inner //            , IndexDeligate indexDeligate
+            )
             throws FileNotFoundException, IOException {
         this.inner = inner;
-        this.indexDeligate = indexDeligate;
+//        this.indexDeligate = indexDeligate;
     }
 
     public boolean isCompactFormatEnabled() {
@@ -112,35 +112,37 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
     }
 
     private void writeVerbose(final Weighted<Token> record) throws IOException {
-        writeString(record.record().id());
+        writeTokenId(record.record().id());
         writeWeight(record.weight());
         inner.endOfRecord();
     }
 
     private void writeCompact(final Weighted<Token> record) throws IOException {
         if (previousRecord == null) {
-            writeString(record.record().id());
+            writeTokenId(record.record().id());
         } else if (previousRecord.record().id() != record.record().id()) {
             inner.endOfRecord();
-            writeString(record.record().id());
+            writeTokenId(record.record().id());
         }
         writeWeight(record.weight());
         previousRecord = record;
     }
 
-    private void writeString(int id) throws IOException {
-        if (indexDeligate.isPreindexedTokens())
-            inner.writeInt(id);
-        else
-            inner.writeString(indexDeligate.getEnumerator().value(id));
+    private void writeTokenId(int id) throws IOException {
+        inner.writeInt(id);
+//        if (indexDeligate.isPreindexedTokens())
+//            inner.writeInt(id);
+//        else
+//            inner.writeString(indexDeligate.getEnumerator().value(id));
     }
 
     private void writeWeight(double weight) throws IOException {
-        if (Double.compare((int) weight, weight) == 0) {
-            inner.writeInt((int) weight);
-        } else {
-            inner.writeString(f.format(weight));
-        }
+        inner.writeDouble(weight);
+//        if (Double.compare((int) weight, weight) == 0) {
+//            inner.writeInt((int) weight);
+//        } else {
+//            inner.writeString(f.format(weight));
+//        }
     }
 
     @Override
@@ -156,5 +158,13 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
         }
         if (inner instanceof Closeable)
             ((Closeable) inner).close();
+    }
+
+    public static WeightedTokenSink open(
+            File f, Charset charset, IndexDeligate idx) throws IOException {
+        DataSink tsv = new TSVSink(f, charset);
+        if (!idx.isPreindexedTokens())
+            tsv = DataIO.enumerated(tsv, idx.getEnumerator());
+        return new WeightedTokenSink(tsv);
     }
 }

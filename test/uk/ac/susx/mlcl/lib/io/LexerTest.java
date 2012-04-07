@@ -166,11 +166,11 @@ public class LexerTest {
 
         // Iterator of the whole string, storing the tell offsets for every
         // lexeme in a list
-        Lexer.Tell[] tells = new Lexer.Tell[CFB_numbers.length];
+        Tell[] tells = new Tell[CFB_numbers.length];
         int i = 0;
         while (lexer.hasNext()) {
             lexer.advance();
-            tells[i] = lexer.tell();
+            tells[i] = lexer.position();
             i++;
         }
 
@@ -182,7 +182,7 @@ public class LexerTest {
 //                          "column");
         for (int j = 0; j < 500; j++) {
             i = rand.nextInt(CFB_numbers.length);
-            lexer.seek(tells[i]);
+            lexer.position(tells[i]);
 //            System.out.printf("%-6d %-6d %-12s %-6d %-6d %-15s (%d,%d)%n",
 //                              i, 0/*lexer.number()*/, lexer.type(),
 //                              lexer.start(), lexer.end(),
@@ -229,11 +229,11 @@ public class LexerTest {
 
         Lexer lexer = new Lexer(file, charset);
 
-        List<Lexer.Tell> tells = new ArrayList<Lexer.Tell>();
+        List<Tell> tells = new ArrayList<Tell>();
         List<String> values = new ArrayList<String>();
         while (lexer.hasNext()) {
             lexer.advance();
-            tells.add(lexer.tell());
+            tells.add(lexer.position());
             values.add(lexer.value().toString());
         }
 
@@ -242,17 +242,17 @@ public class LexerTest {
         for (int j = 0; j < 500; j++) {
             final int i = rand.nextInt(tells.size());
 
-            lexer.seek(tells.get(i));
+            lexer.position(tells.get(i));
 
             assertEquals(values.get(i), lexer.value().toString());
-            assertEquals(tells.get(i), lexer.tell());
+            assertEquals(tells.get(i), lexer.position());
         }
 
         // Check the edge cases
         for (int i : new int[]{tells.size() - 1, 0, tells.size() - 2, 1}) {
-            lexer.seek(tells.get(i));
+            lexer.position(tells.get(i));
             assertEquals(values.get(i), lexer.value().toString());
-            assertEquals(tells.get(i), lexer.tell());
+            assertEquals(tells.get(i), lexer.position());
         }
 
     }

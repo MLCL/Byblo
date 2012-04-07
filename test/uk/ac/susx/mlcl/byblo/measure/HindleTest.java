@@ -44,7 +44,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
  */
 public class HindleTest {
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testHindleCLI() throws Exception {
         System.out.println("Testing Hindel from main method.");
 

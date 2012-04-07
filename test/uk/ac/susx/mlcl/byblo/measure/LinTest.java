@@ -45,7 +45,7 @@ public class LinTest {
 
     private static final Class<?> subject = Lin.class;
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testMainMethodRun() throws Exception {
         System.out.println("Testing " + subject + " from main method.");
 

@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.lib.io;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.text.DecimalFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -98,9 +99,19 @@ public final class TSVSink implements Closeable, Flushable, DataSink {
         writeString(Integer.toString(val));
     }
 
+    private final DecimalFormat DOUBLE_FORMAT =
+            new DecimalFormat("###0.0#####;-###0.0#####");
+
     @Override
     public void writeDouble(double val) throws IOException {
-        writeString(Double.toString(val));
+        if (Double.compare(Math.floor(val), val) == 0) {
+            writeInt((int) val);
+        } else {
+            writeString(DOUBLE_FORMAT.format(val));
+        }
+
+
+//        writeString(Double.toString(val));
     }
 
     @Override

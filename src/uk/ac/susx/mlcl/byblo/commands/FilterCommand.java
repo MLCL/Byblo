@@ -349,16 +349,24 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
         final IntSet rejected = new IntOpenHashSet();
 
-        WeightedTokenSource entriesSource = new WeightedTokenSource(
-                new TSVSource(activeEntriesFile, charset), getIndexDeligate().
+        WeightedTokenSource entriesSource = WeightedTokenSource.open(
+                activeEntriesFile, charset,
+                getIndexDeligate().
                 single1());
+
+//                new WeightedTokenSource(
+//                new TSVSource(activeEntriesFile, charset), getIndexDeligate().
+//                single1());
 
         File outputFile = tempFiles.createFile();
         outputFile.deleteOnExit();
 
-        WeightedTokenSink entriesSink = new WeightedTokenSink(
-                new TSVSink(outputFile, charset),
-                getIndexDeligate().single1());
+        WeightedTokenSink entriesSink = WeightedTokenSink.open(
+                outputFile, charset, getIndexDeligate().single1());
+//        
+//                new WeightedTokenSink(
+//                new TSVSink(outputFile, charset),
+//                getIndexDeligate().single1());
 
         if (LOG.isInfoEnabled()) {
             LOG.info(
@@ -424,16 +432,17 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         IntSet rejectedFeatures = new IntOpenHashSet();
         IntSet acceptedFeatures = new IntOpenHashSet();
 
-        WeightedTokenPairSource efSrc = new WeightedTokenPairSource(
-                new TSVSource(activeEntryFeaturesFile, charset),
+        WeightedTokenPairSource efSrc = WeightedTokenPairSource.open(
+                activeEntryFeaturesFile, charset,
                 getIndexDeligate());
 
         File outputFile = tempFiles.createFile();
         outputFile.deleteOnExit();
 
-        WeightedTokenPairSink efSink = new WeightedTokenPairSink(
-                new TSVSink(outputFile, charset),
-                getIndexDeligate());
+        WeightedTokenPairSink efSink = WeightedTokenPairSink.open(
+                outputFile, charset,
+                getIndexDeligate(),
+                true);
 
         if (LOG.isInfoEnabled()) {
             LOG.info("Filtering entry/features pairs from "
@@ -497,13 +506,13 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             }
 
 
-            if ((efSrc.getCount() % PROGRESS_INTERVAL == 0
-                 || !efSrc.hasNext()) && LOG.isInfoEnabled()) {
-                LOG.info(
-                        "Accepted " + efSink.getCount() + " of " + efSrc.
-                        getCount() + " feature entries.");
-                LOG.debug(MiscUtil.memoryInfoString());
-            }
+//            if ((efSrc.getCount() % PROGRESS_INTERVAL == 0
+//                 || !efSrc.hasNext()) && LOG.isInfoEnabled()) {
+//                LOG.info(
+//                        "Accepted " + efSink.getCount() + " of " + efSrc.
+//                        getCount() + " feature entries.");
+//                LOG.debug(MiscUtil.memoryInfoString());
+//            }
         }
 
 
@@ -553,16 +562,20 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             throws FileNotFoundException, IOException {
         IntSet rejectedFeatures = new IntOpenHashSet();
 
-        WeightedTokenSource featureSource = new WeightedTokenSource(
-                new TSVSource(activeFeaturesFile, charset),
-                getIndexDeligate().single2());
+        WeightedTokenSource featureSource = WeightedTokenSource.open(
+                activeFeaturesFile, charset, getIndexDeligate().single2());
+//new WeightedTokenSource(
+//                new TSVSource(activeFeaturesFile, charset),
+//                getIndexDeligate().single2());
 
         File outputFile = tempFiles.createFile();
         outputFile.deleteOnExit();
 
-        WeightedTokenSink featureSink = new WeightedTokenSink(
-                new TSVSink(outputFile, charset),
-                getIndexDeligate().single2());
+        WeightedTokenSink featureSink = WeightedTokenSink.open(
+                outputFile, charset, getIndexDeligate().single2());
+//        new WeightedTokenSink(
+//                new TSVSink(outputFile, charset),
+//                getIndexDeligate().single2());
 
         if (LOG.isInfoEnabled()) {
             LOG.info(

@@ -43,15 +43,16 @@ public class SortTokenPairCommand extends AbstractSortCommand<TokenPair> {
 
     @Override
     protected Source<TokenPair> openSource(File file) throws FileNotFoundException, IOException {
-        return new TokenPairSource(new TSVSource(file, getFilesDeligate().getCharset()),
+        return TokenPairSource.open(file, getFilesDeligate().getCharset(),
                                    indexDeligate);
     }
 
     @Override
     protected Sink<TokenPair> openSink(File file) throws FileNotFoundException, IOException {
-        TokenPairSink s = new TokenPairSink(new TSVSink(file, getFilesDeligate().getCharset()),
-                                 indexDeligate);
-        s.setCompactFormatEnabled(!getFilesDeligate().isCompactFormatDisabled());
+        TokenPairSink s =  TokenPairSink.open(file, getFilesDeligate().getCharset(),
+                                 indexDeligate,
+                                 !getFilesDeligate().isCompactFormatDisabled());
+//        s.setCompactFormatEnabled(!getFilesDeligate().isCompactFormatDisabled());
         return s;
     }
 
