@@ -30,17 +30,14 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import com.google.common.base.Predicate;
 import java.io.Closeable;
 import java.io.File;
 import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.text.DecimalFormat;
 import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.io.DataIO;
-import uk.ac.susx.mlcl.lib.io.DataSink;
-import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.io.TSVSink;
+import uk.ac.susx.mlcl.lib.io.*;
 
 /**
  * An <tt>WeightedTokenPairSink</tt> object is used to store
@@ -80,11 +77,8 @@ import uk.ac.susx.mlcl.lib.io.TSVSink;
 public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeable, Flushable {
 
 //    private IndexDeligatePair indexDeligate;
-
 //    private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
-
 //    private boolean compactFormatEnabled = false;
-
 //    private boolean token1_continuation = false;
 //
 //    private int prev_id1 = 0;
@@ -155,7 +149,6 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
 //
 //        writeWeight(record.weight());
 //    }
-
 //    private void writeToken1(int tokenId) throws IOException {
 //        assert tokenId >= 0 : "Writing negative token 1 id";
 //
@@ -190,7 +183,6 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
 ////            inner.writeString(f.format(weight));
 ////        }
 //    }
-
     @Override
     public void close() throws IOException {
 //        if (isCompactFormatEnabled() && token1_continuation) {
@@ -205,22 +197,40 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
         if (inner instanceof Flushable)
             ((Flushable) inner).flush();
     }
-    
-    
-    
+
     public static WeightedTokenPairSink open(
             File file, Charset charset, IndexDeligatePair idx, boolean compact)
             throws IOException {
-        DataSink tsv = new TSVSink(file, charset);
-        if(compact)
-            tsv = DataIO.compact(tsv);
+        DataSink tsv = new TSV.Sink(file, charset);
+
+        if (idx.isSkipindexed1()) {
+            tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
+
+                @Override
+                public boolean apply(Integer column) {
+                    return column == 0;
+                }
+            });
+        }
+        if (idx.isSkipindexed2()) {
+            tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
+
+                @Override
+                public boolean apply(Integer column) {
+                    return (column - 1) % 2 == 0;
+                }
+            });
+        }
+
+        if (compact)
+            tsv = Compact.compact(tsv, 3);
         if (!idx.isPreindexedTokens1() || !idx.isPreindexedTokens2()) {
-            Enumerator<String>[] enumerators = (Enumerator<String>[])new Enumerator[2];
+            Enumerator<String>[] enumerators = (Enumerator<String>[]) new Enumerator[2];
             if (!idx.isPreindexedTokens1())
                 enumerators[0] = idx.getEnumerator1();
             if (!idx.isPreindexedTokens2())
                 enumerators[1] = idx.getEnumerator2();
-            tsv = DataIO.enumerated(tsv, enumerators);
+            tsv = Enumerated.enumerated(tsv, enumerators);
         }
         return new WeightedTokenPairSink(tsv);
     }

@@ -407,7 +407,7 @@ public class FullBuildTest {
         knn.runCommand();
 
         assertValidInputFiles(neighbours);
-        assertSizeGT(similarities, neighbours);
+//        assertSizeGT(similarities, neighbours);
         assertSizeGT(TEST_FRUIT_SIMS_100NN, neighbours);
 
         // Finally, convert neighbours back to strings

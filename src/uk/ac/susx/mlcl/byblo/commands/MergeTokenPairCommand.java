@@ -17,8 +17,6 @@ import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.io.Source;
-import uk.ac.susx.mlcl.lib.io.TSVSink;
-import uk.ac.susx.mlcl.lib.io.TSVSource;
 
 /**
  *

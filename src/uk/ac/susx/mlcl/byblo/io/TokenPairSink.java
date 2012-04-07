@@ -30,13 +30,11 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import com.google.common.base.Predicate;
 import java.io.*;
 import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.io.DataIO;
-import uk.ac.susx.mlcl.lib.io.DataSink;
-import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.io.TSVSink;
+import uk.ac.susx.mlcl.lib.io.*;
 
 /**
  * An <tt>TokenPairSink</tt> object is used to store
@@ -76,11 +74,8 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
 
 //    private IndexDeligatePair indexDeligate;
 //    private boolean compactFormatEnabled = true;
-
 //    private TokenPair previousRecord = null;
-
 //    private long count = 0;
-
     private final DataSink inner;
 
     public TokenPairSink(DataSink inner //, IndexDeligatePair indexDeligate
@@ -147,7 +142,6 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
 ////        else
 ////            inner.writeString(indexDeligate.getEnumerator2().value(stringId));
 //    }
-
     @Override
     public void close() throws IOException {
 //        if (isCompactFormatEnabled() && previousRecord != null) {
@@ -166,16 +160,35 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
     public static TokenPairSink open(
             File file, Charset charset, IndexDeligatePair idx, boolean compact)
             throws IOException {
-        DataSink tsv = new TSVSink(file, charset);
-        if(compact)
-            tsv = DataIO.compact(tsv);
+        DataSink tsv = new TSV.Sink(file, charset);
+        if (idx.isSkipindexed1()) {
+            tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
+
+                @Override
+                public boolean apply(Integer column) {
+                    return column == 0;
+                }
+            });
+        }
+        if (idx.isSkipindexed2()) {
+            tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
+
+                @Override
+                public boolean apply(Integer column) {
+                    return column > 0;
+                }
+            });
+        }
+
+        if (compact)
+            tsv = Compact.compact(tsv, 2);
         if (!idx.isPreindexedTokens1() || !idx.isPreindexedTokens2()) {
-            Enumerator<String>[] enumerators = (Enumerator<String>[])new Enumerator[2];
+            Enumerator<String>[] enumerators = (Enumerator<String>[]) new Enumerator[2];
             if (!idx.isPreindexedTokens1())
                 enumerators[0] = idx.getEnumerator1();
             if (!idx.isPreindexedTokens2())
                 enumerators[1] = idx.getEnumerator2();
-            tsv = DataIO.enumerated(tsv, enumerators);
+            tsv = Enumerated.enumerated(tsv, enumerators);
         }
         return new TokenPairSink(tsv);
     }

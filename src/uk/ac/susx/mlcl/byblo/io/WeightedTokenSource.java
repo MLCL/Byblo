@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import com.google.common.base.Predicate;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -75,9 +76,9 @@ public class WeightedTokenSource
 
     private Weighted<Token> previousRecord = null;
 
-    private final SeekableDataSource<Tell> inner;
+    private final SeekableDataSource inner;
 
-    public WeightedTokenSource(SeekableDataSource<Tell> inner //                             ,  IndexDeligate indexDeligate
+    public WeightedTokenSource(SeekableDataSource inner //                             ,  IndexDeligate indexDeligate
             )
             throws FileNotFoundException, IOException {
         this.inner = inner;
@@ -207,10 +208,23 @@ public class WeightedTokenSource
 
     public static WeightedTokenSource open(
             File f, Charset charset, IndexDeligate idx) throws IOException {
-        SeekableDataSource<Tell> tsv = new TSVSource(f, charset);
-        tsv = DataIO.compact(tsv, 2);
+        SeekableDataSource tsv = new TSV.Source(f, charset);
+        
+        if (idx.isSkipIndexed()) {
+            tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
+
+                @Override
+                public boolean apply(Integer column) {
+                    return column == 0;
+                }
+            });
+        }
+        
+        
+        
+        tsv = Compact.compact(tsv, 2);
         if (!idx.isPreindexedTokens())
-            tsv = DataIO.enumerated(tsv, idx.getEnumerator());
+            tsv = Enumerated.enumerated(tsv, idx.getEnumerator());
         return new WeightedTokenSource(tsv);
     }
 
@@ -241,5 +255,4 @@ public class WeightedTokenSource
         if (inner instanceof Closeable)
             ((Closeable) inner).close();
     }
-  
 }

@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import com.google.common.base.Predicate;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -63,10 +64,10 @@ public class WeightedTokenPairSource
 //
 //    private long count = 0;
 //
-    private final SeekableDataSource<Tell> inner;
+    private final SeekableDataSource inner;
 
     public WeightedTokenPairSource(
-            SeekableDataSource<Tell> inner//, IndexDeligatePair indexDeligate
+            SeekableDataSource inner//, IndexDeligatePair indexDeligate
             )
             throws FileNotFoundException, IOException {
 
@@ -273,15 +274,37 @@ public class WeightedTokenPairSource
     public static WeightedTokenPairSource open(
             File file, Charset charset, IndexDeligatePair idx)
             throws IOException {
-        SeekableDataSource<Tell> tsv = new TSVSource(file, charset);
-        tsv = DataIO.compact(tsv, 3);
+        SeekableDataSource tsv = new TSV.Source(file, charset);
+
+
+        if (idx.isSkipindexed1()) {
+            tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
+
+                @Override
+                public boolean apply(Integer column) {
+                    return column == 0;
+                }
+            });
+        }
+        if (idx.isSkipindexed2()) {
+            tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
+
+                @Override
+                public boolean apply(Integer column) {
+                    return (column - 1) % 2 == 0;
+                }
+            });
+        }
+
+
+        tsv = Compact.compact(tsv, 3);
         if (!idx.isPreindexedTokens1() || !idx.isPreindexedTokens2()) {
             Enumerator<String>[] enumerators = (Enumerator<String>[]) new Enumerator[2];
             if (!idx.isPreindexedTokens1())
                 enumerators[0] = idx.getEnumerator1();
             if (!idx.isPreindexedTokens2())
                 enumerators[1] = idx.getEnumerator2();
-            tsv = DataIO.enumerated(tsv, enumerators);
+            tsv = Enumerated.enumerated(tsv, enumerators);
         }
         return new WeightedTokenPairSource(tsv);
     }

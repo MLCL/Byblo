@@ -46,7 +46,6 @@ import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
-import uk.ac.susx.mlcl.lib.io.TSVSource;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**

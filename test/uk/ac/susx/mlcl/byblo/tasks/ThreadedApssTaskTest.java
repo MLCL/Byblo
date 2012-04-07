@@ -51,7 +51,6 @@ import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.io.TSVSource;
 import uk.ac.susx.mlcl.lib.io.Tell;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.disableExitTrapping;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.enableExistTrapping;
@@ -69,7 +68,7 @@ public class ThreadedApssTaskTest {
     private static final Predicate<Weighted<TokenPair>> PAIR_FILTER =
             Weighted.greaterThanOrEqualTo(0.1);
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testCLI() throws Exception {
         String output = new File(TEST_OUTPUT_DIR,
                                  TEST_FRUIT_INPUT.getName() + ".sims").toString();

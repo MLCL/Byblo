@@ -19,8 +19,6 @@ import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
-import uk.ac.susx.mlcl.lib.io.TSVSink;
-import uk.ac.susx.mlcl.lib.io.TSVSource;
 import static org.junit.Assert.*;
 import uk.ac.susx.mlcl.lib.Comparators;
 

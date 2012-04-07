@@ -39,11 +39,8 @@ import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
-import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
-import uk.ac.susx.mlcl.lib.SimpleEnumerator;
-import uk.ac.susx.mlcl.lib.io.TSVSource;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**

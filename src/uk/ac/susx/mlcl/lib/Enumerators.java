@@ -16,8 +16,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
 import uk.ac.susx.mlcl.lib.io.Files;
-import uk.ac.susx.mlcl.lib.io.TSVSink;
-import uk.ac.susx.mlcl.lib.io.TSVSource;
+import uk.ac.susx.mlcl.lib.io.TSV;
 
 /**
  *
@@ -49,7 +48,6 @@ public class Enumerators {
             public Iterator<Entry<T>> iterator() {
                 throw new UnsupportedOperationException(ERROR);
             }
-
         };
     }
 
@@ -59,11 +57,12 @@ public class Enumerators {
         return instance;
     }
 
-    public static void saveStringEnumerator(Enumerator<String> strEnum, File file) throws IOException {
+    public static void saveStringEnumerator(Enumerator<String> strEnum,
+                                            File file) throws IOException {
 //        Files.writeSerialized(strEnum, file, true);
         LOG.info("Saving string index: " + file);
 
-        TSVSink out = new TSVSink(file, Files.DEFAULT_CHARSET);
+        TSV.Sink out = new TSV.Sink(file, Files.DEFAULT_CHARSET);
 
         for (Object2IntMap.Entry<String> e : strEnum) {
             out.writeInt(e.getIntValue());
@@ -83,7 +82,7 @@ public class Enumerators {
         Object2IntMap<String> objToIndex = new Object2IntOpenHashMap<String>();
         AtomicInteger nextId = new AtomicInteger(0);
 
-        TSVSource in = new TSVSource(file, Files.DEFAULT_CHARSET);
+        TSV.Source in = new TSV.Source(file, Files.DEFAULT_CHARSET);
         while (in.canRead()) {
             int id = in.readInt();
             String s = in.readString();
@@ -111,7 +110,6 @@ public class Enumerators {
             public Integer apply(T val) {
                 return en.index(val);
             }
-
         };
     }
 
@@ -122,8 +120,6 @@ public class Enumerators {
             public T apply(Integer idx) {
                 return en.value(idx);
             }
-
         };
     }
-
 }

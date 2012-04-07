@@ -22,8 +22,6 @@ import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.commands.FilePipeDeligate;
 import uk.ac.susx.mlcl.lib.io.Source;
-import uk.ac.susx.mlcl.lib.io.TSVSink;
-import uk.ac.susx.mlcl.lib.io.TSVSource;
 
 /**
  *

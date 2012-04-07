@@ -30,9 +30,9 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import com.google.common.base.Predicate;
 import java.io.*;
 import java.nio.charset.Charset;
-import java.text.DecimalFormat;
 import uk.ac.susx.mlcl.lib.io.*;
 
 /**
@@ -72,7 +72,6 @@ import uk.ac.susx.mlcl.lib.io.*;
 public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flushable {
 
 //    private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
-
 //    private IndexDeligate indexDeligate;
     private boolean compactFormatEnabled = true;
 
@@ -162,9 +161,20 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
 
     public static WeightedTokenSink open(
             File f, Charset charset, IndexDeligate idx) throws IOException {
-        DataSink tsv = new TSVSink(f, charset);
+        DataSink tsv = new TSV.Sink(f, charset);
+
+        if (idx.isSkipIndexed()) {
+            tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
+
+                @Override
+                public boolean apply(Integer column) {
+                    return column == 0;
+                }
+            });
+        }
+        
         if (!idx.isPreindexedTokens())
-            tsv = DataIO.enumerated(tsv, idx.getEnumerator());
+            tsv = Enumerated.enumerated(tsv, idx.getEnumerator());
         return new WeightedTokenSink(tsv);
     }
 }
