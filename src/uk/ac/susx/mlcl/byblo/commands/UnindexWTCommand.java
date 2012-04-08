@@ -4,7 +4,6 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,19 +18,19 @@ import uk.ac.susx.mlcl.lib.io.Source;
  *
  * @author hiam20
  */
-public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
+public class UnindexWTCommand extends AbstractCopyCommand<Weighted<Token>> {
 
     @ParametersDelegate
     private IndexDeligate indexDeligate = new IndexDeligate();
 
-    public UnindexSimsCommand(
+    public UnindexWTCommand(
             File sourceFile, File destinationFile, Charset charset,
             File indexFile) {
         super(sourceFile, destinationFile, charset);
         indexDeligate.setIndexFile(indexFile);
     }
 
-    public UnindexSimsCommand() {
+    public UnindexWTCommand() {
         super();
     }
 
@@ -42,26 +41,23 @@ public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>>
     }
 
     @Override
-    protected Source<Weighted<TokenPair>> openSource(File file)
+    protected Source<Weighted<Token>> openSource(File file)
             throws FileNotFoundException, IOException {
-        IndexDeligatePair dstIdx = new IndexDeligatePair(true, true);
-        dstIdx.setSkipIndexed1(indexDeligate.isSkipIndexed());
-        dstIdx.setSkipIndexed2(indexDeligate.isSkipIndexed());
-        return WeightedTokenPairSource.open(
+        IndexDeligate dstIdx = new IndexDeligate(true);
+        dstIdx.setSkipIndexed(indexDeligate.isSkipIndexed());
+        return WeightedTokenSource.open(
                 file, getFilesDeligate().getCharset(),
                 dstIdx);
     }
 
     @Override
-    protected Sink<Weighted<TokenPair>> openSink(File file)
+    protected Sink<Weighted<Token>> openSink(File file)
             throws FileNotFoundException, IOException {
-        IndexDeligatePair srcIdx = new IndexDeligatePair(
-                false, false,
-                indexDeligate.getEnumerator(),
-                indexDeligate.getEnumerator(), false, false);
-        return WeightedTokenPairSink.open(
-                file, getFilesDeligate().getCharset(),
-                srcIdx, true);
+        IndexDeligate srcIdx = new IndexDeligate(
+                false,
+                indexDeligate.getEnumerator());
+        return WeightedTokenSink.open(
+                file, getFilesDeligate().getCharset(), srcIdx);
     }
 
     public IndexDeligate getIndexDeligate() {

@@ -34,17 +34,25 @@ public class FullBuildTest {
         boolean preindexedEntries = false;
         boolean preindexedFeatures = false;
 
-        File events = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".events");
-        File entries = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".entries");
-        File features = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".features");
+        File events = new File(TEST_OUTPUT_DIR,
+                               affix + instances.getName() + ".events");
+        File entries = new File(TEST_OUTPUT_DIR,
+                                affix + instances.getName() + ".entries");
+        File features = new File(TEST_OUTPUT_DIR,
+                                 affix + instances.getName() + ".features");
 
-        File eventsFiltered = new File(TEST_OUTPUT_DIR, events.getName() + ".filtered");
-        File entriesFiltered = new File(TEST_OUTPUT_DIR, entries.getName() + ".filtered");
-        File featuresFiltered = new File(TEST_OUTPUT_DIR, features.getName() + ".filtered");
+        File eventsFiltered = new File(TEST_OUTPUT_DIR,
+                                       events.getName() + ".filtered");
+        File entriesFiltered = new File(TEST_OUTPUT_DIR,
+                                        entries.getName() + ".filtered");
+        File featuresFiltered = new File(TEST_OUTPUT_DIR,
+                                         features.getName() + ".filtered");
 
-        File similarities = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".sims");
+        File similarities = new File(TEST_OUTPUT_DIR,
+                                     affix + instances.getName() + ".sims");
 
-        File neighbours = new File(TEST_OUTPUT_DIR, similarities.getName() + ".neighs");
+        File neighbours = new File(TEST_OUTPUT_DIR,
+                                   similarities.getName() + ".neighs");
 
         // Count the entries, features and events
 
@@ -53,7 +61,8 @@ public class FullBuildTest {
 
         CountCommand count = new CountCommand(
                 instances, events, entries, features,
-                new IndexDeligatePair(preindexedEntries, preindexedFeatures), charet);
+                new IndexDeligatePair(preindexedEntries, preindexedFeatures),
+                charet);
         count.runCommand();
 
         // Filter 
@@ -80,7 +89,8 @@ public class FullBuildTest {
         deleteIfExist(similarities);
 
         AllPairsCommand allpairs = new AllPairsCommand(
-                entriesFiltered, featuresFiltered, eventsFiltered, similarities, charet);
+                entriesFiltered, featuresFiltered, eventsFiltered, similarities,
+                charet);
         allpairs.setSerial(true);
         allpairs.runCommand();
 
@@ -109,17 +119,25 @@ public class FullBuildTest {
         boolean preindexedEntries = false;
         boolean preindexedFeatures = false;
 
-        File events = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".events");
-        File entries = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".entries");
-        File features = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".features");
+        File events = new File(TEST_OUTPUT_DIR,
+                               affix + instances.getName() + ".events");
+        File entries = new File(TEST_OUTPUT_DIR,
+                                affix + instances.getName() + ".entries");
+        File features = new File(TEST_OUTPUT_DIR,
+                                 affix + instances.getName() + ".features");
 
-        File eventsFiltered = new File(TEST_OUTPUT_DIR, events.getName() + ".filtered");
-        File entriesFiltered = new File(TEST_OUTPUT_DIR, entries.getName() + ".filtered");
-        File featuresFiltered = new File(TEST_OUTPUT_DIR, features.getName() + ".filtered");
+        File eventsFiltered = new File(TEST_OUTPUT_DIR,
+                                       events.getName() + ".filtered");
+        File entriesFiltered = new File(TEST_OUTPUT_DIR,
+                                        entries.getName() + ".filtered");
+        File featuresFiltered = new File(TEST_OUTPUT_DIR,
+                                         features.getName() + ".filtered");
 
-        File similarities = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".sims");
+        File similarities = new File(TEST_OUTPUT_DIR,
+                                     affix + instances.getName() + ".sims");
 
-        File neighbours = new File(TEST_OUTPUT_DIR, similarities.getName() + ".neighs");
+        File neighbours = new File(TEST_OUTPUT_DIR,
+                                   similarities.getName() + ".neighs");
 
         // Count the entries, features and events
 
@@ -156,7 +174,8 @@ public class FullBuildTest {
         deleteIfExist(similarities);
 
         AllPairsCommand allpairs = new AllPairsCommand(
-                entriesFiltered, featuresFiltered, eventsFiltered, similarities, charet);
+                entriesFiltered, featuresFiltered, eventsFiltered, similarities,
+                charet);
         allpairs.setSerial(false);
         allpairs.runCommand();
 
@@ -185,23 +204,35 @@ public class FullBuildTest {
         boolean preindexedEntries = true;
         boolean preindexedFeatures = true;
 
-        File instancesIndexed = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".indexed");
-        File entryIndex = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".entry-index");
-        File featureIndex = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".feature-index");
+        File instancesIndexed = new File(TEST_OUTPUT_DIR, affix + instances.
+                getName() + ".indexed");
+        File entryIndex = new File(TEST_OUTPUT_DIR,
+                                   affix + instances.getName() + ".entry-index");
+        File featureIndex = new File(TEST_OUTPUT_DIR,
+                                     affix + instances.getName() + ".feature-index");
 
-        File events = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".events");
-        File entries = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".entries");
-        File features = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".features");
+        File events = new File(TEST_OUTPUT_DIR,
+                               affix + instances.getName() + ".events");
+        File entries = new File(TEST_OUTPUT_DIR,
+                                affix + instances.getName() + ".entries");
+        File features = new File(TEST_OUTPUT_DIR,
+                                 affix + instances.getName() + ".features");
 
-        File eventsFiltered = new File(TEST_OUTPUT_DIR, events.getName() + ".filtered");
-        File entriesFiltered = new File(TEST_OUTPUT_DIR, entries.getName() + ".filtered");
-        File featuresFiltered = new File(TEST_OUTPUT_DIR, features.getName() + ".filtered");
+        File eventsFiltered = new File(TEST_OUTPUT_DIR,
+                                       events.getName() + ".filtered");
+        File entriesFiltered = new File(TEST_OUTPUT_DIR,
+                                        entries.getName() + ".filtered");
+        File featuresFiltered = new File(TEST_OUTPUT_DIR,
+                                         features.getName() + ".filtered");
 
-        File similarities = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".sims");
+        File similarities = new File(TEST_OUTPUT_DIR,
+                                     affix + instances.getName() + ".sims");
 
-        File neighbours = new File(TEST_OUTPUT_DIR, similarities.getName() + ".neighs");
+        File neighbours = new File(TEST_OUTPUT_DIR,
+                                   similarities.getName() + ".neighs");
 
-        File neighboursStrings = new File(TEST_OUTPUT_DIR, neighbours.getName() + ".strings");
+        File neighboursStrings = new File(TEST_OUTPUT_DIR,
+                                          neighbours.getName() + ".strings");
 
 
 
@@ -225,7 +256,8 @@ public class FullBuildTest {
 
         CountCommand count = new CountCommand(
                 instancesIndexed, events, entries, features,
-                new IndexDeligatePair(preindexedEntries, preindexedFeatures), charet);
+                new IndexDeligatePair(preindexedEntries, preindexedFeatures),
+                charet);
         count.runCommand();
 
         assertValidInputFiles(entries, features, events);
@@ -260,7 +292,8 @@ public class FullBuildTest {
         deleteIfExist(similarities);
 
         AllPairsCommand allpairs = new AllPairsCommand(
-                entriesFiltered, featuresFiltered, eventsFiltered, similarities, charet);
+                entriesFiltered, featuresFiltered, eventsFiltered, similarities,
+                charet);
         allpairs.setSerial(true);
         allpairs.runCommand();
 
@@ -304,23 +337,35 @@ public class FullBuildTest {
         boolean skipIndexEntries = true;
         boolean skipIndexFeatures = true;
 
-        File instancesIndexed = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".indexed");
-        File entryIndex = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".entry-index");
-        File featureIndex = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".feature-index");
+        File instancesIndexed = new File(TEST_OUTPUT_DIR, affix + instances.
+                getName() + ".indexed");
+        File entryIndex = new File(TEST_OUTPUT_DIR,
+                                   affix + instances.getName() + ".entry-index");
+        File featureIndex = new File(TEST_OUTPUT_DIR,
+                                     affix + instances.getName() + ".feature-index");
 
-        File events = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".events");
-        File entries = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".entries");
-        File features = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".features");
+        File events = new File(TEST_OUTPUT_DIR,
+                               affix + instances.getName() + ".events");
+        File entries = new File(TEST_OUTPUT_DIR,
+                                affix + instances.getName() + ".entries");
+        File features = new File(TEST_OUTPUT_DIR,
+                                 affix + instances.getName() + ".features");
 
-        File eventsFiltered = new File(TEST_OUTPUT_DIR, events.getName() + ".filtered");
-        File entriesFiltered = new File(TEST_OUTPUT_DIR, entries.getName() + ".filtered");
-        File featuresFiltered = new File(TEST_OUTPUT_DIR, features.getName() + ".filtered");
+        File eventsFiltered = new File(TEST_OUTPUT_DIR,
+                                       events.getName() + ".filtered");
+        File entriesFiltered = new File(TEST_OUTPUT_DIR,
+                                        entries.getName() + ".filtered");
+        File featuresFiltered = new File(TEST_OUTPUT_DIR,
+                                         features.getName() + ".filtered");
 
-        File similarities = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".sims");
+        File similarities = new File(TEST_OUTPUT_DIR,
+                                     affix + instances.getName() + ".sims");
 
-        File neighbours = new File(TEST_OUTPUT_DIR, similarities.getName() + ".neighs");
+        File neighbours = new File(TEST_OUTPUT_DIR,
+                                   similarities.getName() + ".neighs");
 
-        File neighboursStrings = new File(TEST_OUTPUT_DIR, neighbours.getName() + ".strings");
+        File neighboursStrings = new File(TEST_OUTPUT_DIR,
+                                          neighbours.getName() + ".strings");
 
 
 
@@ -333,28 +378,39 @@ public class FullBuildTest {
         IndexEventsCommand index = new IndexEventsCommand(
                 instances, charet, instancesIndexed,
                 entryIndex, featureIndex);
-        index.getIndexDeligate().setSkipindexed1(skipIndexEntries);
-        index.getIndexDeligate().setSkipindexed2(skipIndexFeatures);
+        index.getIndexDeligate().setSkipIndexed1(skipIndexEntries);
+        index.getIndexDeligate().setSkipIndexed2(skipIndexFeatures);
         index.runCommand();
 
         assertSizeGT(instances, instancesIndexed);
         assertValidInputFiles(instancesIndexed, entryIndex, featureIndex);
 
+        unindexTP(instancesIndexed, suffix(instancesIndexed, ".strings"), entryIndex, featureIndex,
+                   skipIndexEntries, skipIndexFeatures);
+        
         // Count the entries, features and events
 
         deleteIfExist(events, entries, features);
 
         CountCommand count = new CountCommand(
                 instancesIndexed, events, entries, features,
-                new IndexDeligatePair(preindexedEntries, preindexedFeatures), charet);
-        count.getIndexDeligate().setSkipindexed1(skipIndexEntries);
-        count.getIndexDeligate().setSkipindexed2(skipIndexFeatures);
+                new IndexDeligatePair(preindexedEntries, preindexedFeatures),
+                charet);
+        count.getIndexDeligate().setSkipIndexed1(skipIndexEntries);
+        count.getIndexDeligate().setSkipIndexed2(skipIndexFeatures);
         count.runCommand();
 
         assertValidInputFiles(entries, features, events);
         assertSizeGT(TEST_FRUIT_ENTRY_FEATURES, events);
         assertSizeGT(TEST_FRUIT_ENTRIES, entries);
         assertSizeGT(TEST_FRUIT_FEATURES, features);
+
+        unindexWT(entries, suffix(entries, ".strings"), entryIndex,
+                  skipIndexEntries);
+        unindexWT(features, suffix(features, ".strings"), featureIndex,
+                  skipIndexFeatures);
+        unindexWTP(events, suffix(events, ".strings"), entryIndex, featureIndex,
+                   skipIndexEntries, skipIndexFeatures);
 
         // Filter 
 
@@ -369,8 +425,8 @@ public class FullBuildTest {
         filter.getIndexDeligate().setIndexFile2(featureIndex);
         filter.getIndexDeligate().setPreindexedTokens1(preindexedEntries);
         filter.getIndexDeligate().setPreindexedTokens2(preindexedFeatures);
-        filter.getIndexDeligate().setSkipindexed1(skipIndexEntries);
-        filter.getIndexDeligate().setSkipindexed2(skipIndexFeatures);
+        filter.getIndexDeligate().setSkipIndexed1(skipIndexEntries);
+        filter.getIndexDeligate().setSkipIndexed2(skipIndexFeatures);
         filter.addEntryFeatureMinimumFrequency(2);
 
 
@@ -379,20 +435,30 @@ public class FullBuildTest {
         assertSizeGT(entries, entriesFiltered);
         assertSizeGT(features, featuresFiltered);
 
+        unindexWT(entriesFiltered, suffix(entriesFiltered, ".strings"),
+                  entryIndex, skipIndexEntries);
+        unindexWT(featuresFiltered, suffix(featuresFiltered, ".strings"),
+                  featureIndex, skipIndexFeatures);
+        unindexWTP(eventsFiltered, suffix(eventsFiltered, ".strings"),
+                   entryIndex, featureIndex, skipIndexEntries, skipIndexFeatures);
+
         // All pairs
 
         assertValidInputFiles(eventsFiltered, entriesFiltered, featuresFiltered);
         deleteIfExist(similarities);
 
         AllPairsCommand allpairs = new AllPairsCommand(
-                entriesFiltered, featuresFiltered, eventsFiltered, similarities, charet);
+                entriesFiltered, featuresFiltered, eventsFiltered, similarities,
+                charet);
         allpairs.setSerial(true);
-        allpairs.getIndexDeligate().setSkipindexed1(skipIndexEntries);
-        allpairs.getIndexDeligate().setSkipindexed2(skipIndexFeatures);
+        allpairs.getIndexDeligate().setSkipIndexed1(skipIndexEntries);
+        allpairs.getIndexDeligate().setSkipIndexed2(skipIndexFeatures);
         allpairs.runCommand();
 
         assertValidInputFiles(similarities);
         assertSizeGT(TEST_FRUIT_SIMS, similarities);
+
+        unindexSims(similarities, suffix(similarities, ".strings"), entryIndex, skipIndexEntries);
 
         // KNN
 
@@ -402,8 +468,8 @@ public class FullBuildTest {
         KnnSimsCommand knn = new KnnSimsCommand(
                 similarities, neighbours, charet,
                 new IndexDeligate(preindexedEntries), 5);
-        knn.getIndexDeligate().setSkipindexed1(skipIndexEntries);
-        knn.getIndexDeligate().setSkipindexed2(skipIndexFeatures);
+        knn.getIndexDeligate().setSkipIndexed1(skipIndexEntries);
+        knn.getIndexDeligate().setSkipIndexed2(skipIndexFeatures);
         knn.runCommand();
 
         assertValidInputFiles(neighbours);
@@ -414,12 +480,69 @@ public class FullBuildTest {
 
         deleteIfExist(neighboursStrings);
 
-        UnindexSimsCommand unindex = new UnindexSimsCommand(
-                neighbours, neighboursStrings, charet, entryIndex);
-        unindex.getIndexDeligate().setSkipIndexed(skipIndexEntries);
-        unindex.runCommand();
+        unindexSims(neighbours, suffix(neighbours, ".strings"), entryIndex, skipIndexEntries);
 
         assertValidInputFiles(neighboursStrings);
+    }
+
+    private static File suffix(File file, String suffix) {
+        return new File(file.getParentFile(), file.getName() + suffix);
+    }
+
+     private static void unindexSims(File from, File to, File index, boolean skip)
+            throws Exception {
+        UnindexSimsCommand unindex = new UnindexSimsCommand();
+        unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
+        unindex.getFilesDeligate().setSourceFile(from);
+        unindex.getFilesDeligate().setDestinationFile(to);
+        unindex.getFilesDeligate().setCompactFormatDisabled(false);
+        unindex.getIndexDeligate().setIndexFile(index);
+        unindex.getIndexDeligate().setSkipIndexed(skip);
+        unindex.runCommand();
+    }
+     
+    private static void unindexWT(File from, File to, File index, boolean skip)
+            throws Exception {
+        UnindexWTCommand unindex = new UnindexWTCommand();
+        unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
+        unindex.getFilesDeligate().setSourceFile(from);
+        unindex.getFilesDeligate().setDestinationFile(to);
+        unindex.getFilesDeligate().setCompactFormatDisabled(false);
+        unindex.getIndexDeligate().setIndexFile(index);
+        unindex.getIndexDeligate().setSkipIndexed(skip);
+        unindex.runCommand();
+    }
+
+    private static void unindexWTP(File from, File to,
+                                   File index1, File index2,
+                                   boolean skip1, boolean skip2)
+            throws Exception {
+        UnindexWTPCommand unindex = new UnindexWTPCommand();
+        unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
+        unindex.getFilesDeligate().setSourceFile(from);
+        unindex.getFilesDeligate().setDestinationFile(to);
+        unindex.getFilesDeligate().setCompactFormatDisabled(false);
+        unindex.getIndexDeligate().setIndexFile1(index1);
+        unindex.getIndexDeligate().setIndexFile2(index2);
+        unindex.getIndexDeligate().setSkipIndexed1(skip1);
+        unindex.getIndexDeligate().setSkipIndexed2(skip2);
+        unindex.runCommand();
+    }
+
+    private static void unindexTP(File from, File to,
+                                  File index1, File index2,
+                                  boolean skip1, boolean skip2)
+            throws Exception {
+        UnindexTPCommand unindex = new UnindexTPCommand();
+        unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
+        unindex.getFilesDeligate().setSourceFile(from);
+        unindex.getFilesDeligate().setDestinationFile(to);
+        unindex.getFilesDeligate().setCompactFormatDisabled(false);
+        unindex.getIndexDeligate().setIndexFile1(index1);
+        unindex.getIndexDeligate().setIndexFile2(index2);
+        unindex.getIndexDeligate().setSkipIndexed1(skip1);
+        unindex.getIndexDeligate().setSkipIndexed2(skip2);
+        unindex.runCommand();
     }
 
     private static void deleteIfExist(File... files) {
@@ -435,5 +558,4 @@ public class FullBuildTest {
         assertTrue(smaller + " is not smaller than " + bigger,
                    bigger.length() > smaller.length());
     }
-
 }

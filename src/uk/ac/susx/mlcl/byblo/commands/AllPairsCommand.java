@@ -38,6 +38,7 @@ import com.google.common.base.Objects.ToStringHelper;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import java.io.File;
+import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -318,8 +319,8 @@ public class AllPairsCommand extends AbstractCommand {
                 getIndexDeligate().isPreindexedTokens1(),
                 getIndexDeligate().getEnumerator1(),
                 getIndexDeligate().getEnumerator1());
-        sinkIdx.setSkipindexed1(getIndexDeligate().isSkipindexed1());
-        sinkIdx.setSkipindexed2(getIndexDeligate().isSkipindexed2());
+        sinkIdx.setSkipIndexed1(getIndexDeligate().isSkipIndexed1());
+        sinkIdx.setSkipIndexed2(getIndexDeligate().isSkipIndexed2());
 
 
         final Sink<Weighted<TokenPair>> sink =
@@ -352,6 +353,9 @@ public class AllPairsCommand extends AbstractCommand {
         apss.setSourceA(sourceA);
         apss.setSourceB(sourceB);
         apss.setSink(sink);
+        
+        
+        ((Flushable)sink).flush();
 
 //        prox.setFilteredFeatureId(getEntryDecoder().apply(FilterTask.FILTERED_STRING));
         //XXX This needs to be sorted out

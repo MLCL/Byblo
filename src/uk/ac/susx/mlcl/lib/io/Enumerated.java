@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
+import com.google.common.base.Predicate;
 import java.io.Closeable;
 import java.io.IOException;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -42,6 +43,40 @@ import uk.ac.susx.mlcl.lib.Enumerator;
 public class Enumerated {
 
     private Enumerated() {
+    }
+
+    public static DataSource enumerated(
+            DataSource inner, Enumerator<String> enumerator,
+            Predicate<Integer> enumColumn) {
+        Checks.checkNotNull("inner", inner);
+        Checks.checkNotNull("enumerators", enumerator);
+        Checks.checkNotNull("enumColumn", enumColumn);
+        assert !(inner instanceof ComplexDSink);
+        assert !(inner instanceof SimpleDSink);
+        return new ComplexDSource2<DataSource>(inner, enumerator, enumColumn);
+    }
+
+    public static SeekableDataSource enumerated(
+            SeekableDataSource inner, Enumerator<String> enumerator,
+            Predicate<Integer> enumColumn) {
+        Checks.checkNotNull("inner", inner);
+        Checks.checkNotNull("enumerator", enumerator);
+        Checks.checkNotNull("enumColumn", enumColumn);
+        assert !(inner instanceof ComplexDSink);
+        assert !(inner instanceof SimpleDSink);
+        return new ComplexSDSource2<SeekableDataSource>(inner, enumerator,
+                                                        enumColumn);
+    }
+
+    public static DataSink enumerated(
+            DataSink inner, Enumerator<String> enumerator,
+            Predicate<Integer> enumColumn) {
+        Checks.checkNotNull("inner", inner);
+        Checks.checkNotNull("enumerator", enumerator);
+        Checks.checkNotNull("enumColumn", enumColumn);
+        assert !(inner instanceof ComplexDSink);
+        assert !(inner instanceof SimpleDSink);
+        return new ComplexDSink2<DataSink>(inner, enumerator, enumColumn);
     }
 
     public static DataSource enumerated(
@@ -300,6 +335,183 @@ public class Enumerated {
                 getInner().writeInt(val);
             else
                 getInner().writeString(enumerators[column].value(val));
+            ++column;
+        }
+
+        @Override
+        public void writeLong(long val) throws IOException {
+            ++column;
+            getInner().writeLong(val);
+        }
+
+        @Override
+        public void writeShort(short val) throws IOException {
+            ++column;
+            getInner().writeShort(val);
+        }
+
+        @Override
+        public void writeString(String str) throws IOException {
+            ++column;
+            getInner().writeString(str);
+        }
+    }
+
+    static class ComplexDSource2<T extends DataSource>
+            extends DataSourceAdapter<T>
+            implements DataSource, Closeable {
+
+        final Enumerator<String> enumerator;
+
+        final Predicate<Integer> enumColumn;
+
+        protected int column;
+
+        private ComplexDSource2(
+                T inner,
+                Enumerator<String> enumerator,
+                Predicate<Integer> enumColumn) {
+            super(inner);
+            this.enumerator = enumerator;
+            this.enumColumn = enumColumn;
+            column = 0;
+        }
+
+        @Override
+        public void endOfRecord() throws IOException {
+            getInner().endOfRecord();
+            column = 0;
+        }
+
+        @Override
+        public byte readByte() throws IOException {
+            ++column;
+            return getInner().readByte();
+        }
+
+        @Override
+        public char readChar() throws IOException {
+            ++column;
+            return getInner().readChar();
+        }
+
+        @Override
+        public short readShort() throws IOException {
+            ++column;
+            return getInner().readShort();
+        }
+
+        @Override
+        public int readInt() throws IOException {
+            final int val =
+                    enumColumn.apply(column)
+                    ? enumerator.index(getInner().readString())
+                    : getInner().readInt();
+            ++column;
+            return val;
+        }
+
+        @Override
+        public long readLong() throws IOException {
+            ++column;
+            return getInner().readLong();
+        }
+
+        @Override
+        public float readFloat() throws IOException {
+            ++column;
+            return getInner().readFloat();
+        }
+
+        @Override
+        public double readDouble() throws IOException {
+            ++column;
+            return getInner().readDouble();
+        }
+
+        @Override
+        public String readString() throws IOException {
+            ++column;
+            return getInner().readString();
+        }
+    }
+
+    static class ComplexSDSource2<S extends SeekableDataSource>
+            extends ComplexDSource2<S>
+            implements SeekableDataSource {
+
+        private ComplexSDSource2(
+                S inner, Enumerator<String> enumerator,
+                Predicate<Integer> enumColumn) {
+            super(inner, enumerator, enumColumn);
+        }
+
+        @Override
+        public void position(Tell offset) throws IOException {
+            column = offset.value(Integer.class);
+            getInner().position(offset.next());
+        }
+
+        @Override
+        public Tell position() throws IOException {
+            return getInner().position().push(Integer.class, column);
+        }
+    }
+
+    static class ComplexDSink2<S extends DataSink>
+            extends DataSinkAdapter<S> {
+
+        final Enumerator<String> enumerator;
+
+        final Predicate<Integer> enumColumn;
+
+        protected int column;
+
+        private ComplexDSink2(
+                S inner,
+                Enumerator<String> enumerators,
+                Predicate<Integer> enumColumn) {
+            super(inner);
+            this.enumerator = enumerators;
+            this.enumColumn = enumColumn;
+        }
+
+        @Override
+        public void endOfRecord() throws IOException {
+            super.endOfRecord();
+            column = 0;
+        }
+
+        @Override
+        public void writeByte(byte val) throws IOException {
+            ++column;
+            getInner().writeByte(val);
+        }
+
+        @Override
+        public void writeChar(char val) throws IOException {
+            ++column;
+            getInner().writeChar(val);
+        }
+
+        @Override
+        public void writeDouble(double val) throws IOException {
+            ++column;
+            getInner().writeDouble(val);
+        }
+
+        @Override
+        public void writeFloat(float val) throws IOException {
+            ++column;
+            getInner().writeFloat(val);
+        }
+
+        @Override
+        public void writeInt(int val) throws IOException {
+            if (!enumColumn.apply(column))
+                getInner().writeInt(val);
+            else
+                getInner().writeString(enumerator.value(val));
             ++column;
         }
 

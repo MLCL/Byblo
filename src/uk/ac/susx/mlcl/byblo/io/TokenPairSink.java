@@ -161,7 +161,7 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
             File file, Charset charset, IndexDeligatePair idx, boolean compact)
             throws IOException {
         DataSink tsv = new TSV.Sink(file, charset);
-        if (idx.isSkipindexed1()) {
+        if (idx.isSkipIndexed1()) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override
@@ -170,7 +170,7 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
                 }
             });
         }
-        if (idx.isSkipindexed2()) {
+        if (idx.isSkipIndexed2()) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override

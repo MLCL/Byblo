@@ -109,8 +109,8 @@ public class IndexEventsCommand extends AbstractCommand {
                                                          index1, index2);
 
         IndexDeligatePair dstIdx = new IndexDeligatePair(true, true);
-        dstIdx.setSkipindexed1(getIndexDeligate().isSkipindexed1());
-        dstIdx.setSkipindexed2(getIndexDeligate().isSkipindexed2());
+        dstIdx.setSkipIndexed1(getIndexDeligate().isSkipIndexed1());
+        dstIdx.setSkipIndexed2(getIndexDeligate().isSkipIndexed2());
         try {
             src =  TokenPairSource.open(
                     fileDeligate.getSourceFile(), fileDeligate.getCharset(),

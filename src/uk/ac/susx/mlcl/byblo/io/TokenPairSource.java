@@ -176,7 +176,7 @@ public class TokenPairSource
             throws IOException {
         SeekableDataSource tsv = new TSV.Source(file, charset);
 
-        if (idx.isSkipindexed1()) {
+        if (idx.isSkipIndexed1()) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override
@@ -185,7 +185,7 @@ public class TokenPairSource
                 }
             });
         }
-        if (idx.isSkipindexed2()) {
+        if (idx.isSkipIndexed2()) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override

@@ -73,35 +73,35 @@ public class IndexDeligatePair extends AbstractDeligate implements Serializable 
         setPreindexedTokens2(preindexedTokens2);
         setEnumerator1(index1);
         setEnumerator2(index2);
-        setSkipindexed1(skipindexed1);
-        setSkipindexed2(skipindexed2);
+        setSkipIndexed1(skipindexed1);
+        setSkipIndexed2(skipindexed2);
     }
 
     public IndexDeligatePair() {
     }
 
-    public final boolean isSkipindexed1() {
+    public final boolean isSkipIndexed1() {
         return skipindexed1;
     }
 
-    public final void setSkipindexed1(boolean skipindexed1) {
+    public final void setSkipIndexed1(boolean skipindexed1) {
         this.skipindexed1 = skipindexed1;
     }
 
-    public final boolean isSkipindexed2() {
+    public final boolean isSkipIndexed2() {
         return skipindexed2;
     }
 
-    public final void setSkipindexed2(boolean skipindexed2) {
+    public final void setSkipIndexed2(boolean skipindexed2) {
         this.skipindexed2 = skipindexed2;
     }
 
     public IndexDeligate single1() throws IOException {
-        return new IndexDeligate(isPreindexedTokens1(), getIndexFile1(), getEnumerator1(), isSkipindexed1());
+        return new IndexDeligate(isPreindexedTokens1(), getIndexFile1(), getEnumerator1(), isSkipIndexed1());
     }
 
     public IndexDeligate single2() throws IOException {
-        return new IndexDeligate(isPreindexedTokens2(), getIndexFile2(), getEnumerator2(), isSkipindexed2());
+        return new IndexDeligate(isPreindexedTokens2(), getIndexFile2(), getEnumerator2(), isSkipIndexed2());
     }
 
     public final Enumerator<String> getEnumerator1() throws IOException {

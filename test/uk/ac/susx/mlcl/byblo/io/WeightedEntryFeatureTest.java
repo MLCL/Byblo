@@ -315,8 +315,8 @@ public class WeightedEntryFeatureTest {
                     new IndexDeligatePair(false, false, enumerator, enumerator));
 
             IndexDeligatePair tmpIdx = new IndexDeligatePair(true, true);
-            tmpIdx.setSkipindexed1(true);
-            tmpIdx.setSkipindexed2(true);
+            tmpIdx.setSkipIndexed1(true);
+            tmpIdx.setSkipIndexed2(true);
             WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
                     b, DEFAULT_CHARSET, tmpIdx, true);
 //            bSink.setCompactFormatEnabled(true);
@@ -329,8 +329,8 @@ public class WeightedEntryFeatureTest {
 
         {
             IndexDeligatePair tmpIdx = new IndexDeligatePair(true, true);
-            tmpIdx.setSkipindexed1(true);
-            tmpIdx.setSkipindexed2(true);
+            tmpIdx.setSkipIndexed1(true);
+            tmpIdx.setSkipIndexed2(true);
             WeightedTokenPairSource bSrc = WeightedTokenPairSource.open(
                     b, DEFAULT_CHARSET, tmpIdx);
             WeightedTokenPairSink cSink = WeightedTokenPairSink.open(

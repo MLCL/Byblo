@@ -74,7 +74,8 @@ import uk.ac.susx.mlcl.lib.io.*;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeable, Flushable {
+public class WeightedTokenPairSink 
+    implements Sink<Weighted<TokenPair>>, Closeable, Flushable {
 
 //    private IndexDeligatePair indexDeligate;
 //    private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
@@ -203,7 +204,7 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
             throws IOException {
         DataSink tsv = new TSV.Sink(file, charset);
 
-        if (idx.isSkipindexed1()) {
+        if (idx.isSkipIndexed1()) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override
@@ -212,7 +213,7 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
                 }
             });
         }
-        if (idx.isSkipindexed2()) {
+        if (idx.isSkipIndexed2()) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override
@@ -224,14 +225,37 @@ public class WeightedTokenPairSink implements Sink<Weighted<TokenPair>>, Closeab
 
         if (compact)
             tsv = Compact.compact(tsv, 3);
-        if (!idx.isPreindexedTokens1() || !idx.isPreindexedTokens2()) {
-            Enumerator<String>[] enumerators = (Enumerator<String>[]) new Enumerator[2];
-            if (!idx.isPreindexedTokens1())
-                enumerators[0] = idx.getEnumerator1();
-            if (!idx.isPreindexedTokens2())
-                enumerators[1] = idx.getEnumerator2();
-            tsv = Enumerated.enumerated(tsv, enumerators);
+        
+        
+         if (!idx.isPreindexedTokens1()) {
+            tsv = Enumerated.enumerated(tsv, idx.getEnumerator1(), new Predicate<Integer>() {
+
+                @Override
+                public boolean apply(Integer column) {
+                    return column == 0;
+                }
+            });
         }
+        
+        if (!idx.isPreindexedTokens2()) {
+            tsv = Enumerated.enumerated(tsv, idx.getEnumerator2(), new Predicate<Integer>() {
+
+                @Override
+                public boolean apply(Integer column) {
+                    return column == 1;
+                }
+            });
+        }
+        
+//        
+//        if (!idx.isPreindexedTokens1() || !idx.isPreindexedTokens2()) {
+//            Enumerator<String>[] enumerators = (Enumerator<String>[]) new Enumerator[2];
+//            if (!idx.isPreindexedTokens1())
+//                enumerators[0] = idx.getEnumerator1();
+//            if (!idx.isPreindexedTokens2())
+//                enumerators[1] = idx.getEnumerator2();
+//            tsv = Enumerated.enumerated(tsv, enumerators);
+//        }
         return new WeightedTokenPairSink(tsv);
     }
 }

@@ -19,25 +19,27 @@ import uk.ac.susx.mlcl.lib.io.Source;
  *
  * @author hiam20
  */
-public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
+public class UnindexWTPCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
-    private IndexDeligate indexDeligate = new IndexDeligate();
+    private IndexDeligatePair indexDeligate = new IndexDeligatePair();
 
-    public UnindexSimsCommand(
+    public UnindexWTPCommand(
             File sourceFile, File destinationFile, Charset charset,
-            File indexFile) {
+            File indexFile1, File indexFile2) {
         super(sourceFile, destinationFile, charset);
-        indexDeligate.setIndexFile(indexFile);
+        indexDeligate.setIndexFile1(indexFile1);
+        indexDeligate.setIndexFile2(indexFile2);
     }
 
-    public UnindexSimsCommand() {
+    public UnindexWTPCommand() {
         super();
     }
 
     @Override
     public void runCommand() throws Exception {
-        Checks.checkNotNull("indexFile", indexDeligate.getIndexFile());
+        Checks.checkNotNull("indexFile1", indexDeligate.getIndexFile1());
+        Checks.checkNotNull("indexFile2", indexDeligate.getIndexFile2());
         super.runCommand();
     }
 
@@ -45,8 +47,8 @@ public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>>
     protected Source<Weighted<TokenPair>> openSource(File file)
             throws FileNotFoundException, IOException {
         IndexDeligatePair dstIdx = new IndexDeligatePair(true, true);
-        dstIdx.setSkipIndexed1(indexDeligate.isSkipIndexed());
-        dstIdx.setSkipIndexed2(indexDeligate.isSkipIndexed());
+        dstIdx.setSkipIndexed1(indexDeligate.isSkipIndexed1());
+        dstIdx.setSkipIndexed2(indexDeligate.isSkipIndexed2());
         return WeightedTokenPairSource.open(
                 file, getFilesDeligate().getCharset(),
                 dstIdx);
@@ -57,18 +59,18 @@ public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>>
             throws FileNotFoundException, IOException {
         IndexDeligatePair srcIdx = new IndexDeligatePair(
                 false, false,
-                indexDeligate.getEnumerator(),
-                indexDeligate.getEnumerator(), false, false);
+                indexDeligate.getEnumerator1(),
+                indexDeligate.getEnumerator2(), false, false);
         return WeightedTokenPairSink.open(
                 file, getFilesDeligate().getCharset(),
                 srcIdx, true);
     }
 
-    public IndexDeligate getIndexDeligate() {
+    public IndexDeligatePair getIndexDeligate() {
         return indexDeligate;
     }
 
-    public void setIndexDeligate(IndexDeligate indexDeligate) {
+    public void setIndexDeligate(IndexDeligatePair indexDeligate) {
         this.indexDeligate = indexDeligate;
     }
 }
