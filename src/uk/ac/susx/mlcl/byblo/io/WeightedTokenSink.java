@@ -163,7 +163,7 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
             File f, Charset charset, IndexDeligate idx) throws IOException {
         DataSink tsv = new TSV.Sink(f, charset);
 
-        if (idx.isSkipIndexed()) {
+        if (idx.isSkipIndexed1()) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override

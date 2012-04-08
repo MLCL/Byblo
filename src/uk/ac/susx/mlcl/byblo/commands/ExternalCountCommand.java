@@ -467,22 +467,22 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     }
 
     private Comparator<Weighted<Token>> getEntryOrder() throws IOException {
-        return indexDeligate.isPreindexedTokens1()
+        return indexDeligate.isEnumerated1()
                 ? Weighted.recordOrder(Token.indexOrder())
                 : Weighted.recordOrder(Token.stringOrder(indexDeligate.
                 getEnumerator1()));
     }
 
     private Comparator<Weighted<Token>> getFeatureOrder() throws IOException {
-        return indexDeligate.isPreindexedTokens2()
+        return indexDeligate.isEnumerated2()
                 ? Weighted.recordOrder(Token.indexOrder())
                 : Weighted.recordOrder(Token.stringOrder(indexDeligate.
                 getEnumerator2()));
     }
 
     private Comparator<Weighted<TokenPair>> getEventOrder() throws IOException {
-        return (indexDeligate.isPreindexedTokens1() && indexDeligate.
-                isPreindexedTokens2())
+        return (indexDeligate.isEnumerated1() && indexDeligate.
+                isEnumerated2())
                 ? Weighted.recordOrder(TokenPair.indexOrder())
                 : Weighted.recordOrder(TokenPair.stringOrder(indexDeligate.
                 getEnumerator1(), indexDeligate.getEnumerator2()));

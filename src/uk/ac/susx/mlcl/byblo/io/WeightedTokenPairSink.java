@@ -36,7 +36,6 @@ import java.io.File;
 import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.io.*;
 
 /**
@@ -74,8 +73,8 @@ import uk.ac.susx.mlcl.lib.io.*;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightedTokenPairSink 
-    implements Sink<Weighted<TokenPair>>, Closeable, Flushable {
+public class WeightedTokenPairSink
+        implements Sink<Weighted<TokenPair>>, Closeable, Flushable {
 
 //    private IndexDeligatePair indexDeligate;
 //    private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
@@ -204,6 +203,7 @@ public class WeightedTokenPairSink
             throws IOException {
         DataSink tsv = new TSV.Sink(file, charset);
 
+        
         if (idx.isSkipIndexed1()) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
@@ -218,17 +218,16 @@ public class WeightedTokenPairSink
 
                 @Override
                 public boolean apply(Integer column) {
-                    return (column - 1) % 2 == 0;
+                    return (column + 1) % 2 == 0;
                 }
             });
         }
-
-        if (compact)
-            tsv = Compact.compact(tsv, 3);
         
         
-         if (!idx.isPreindexedTokens1()) {
-            tsv = Enumerated.enumerated(tsv, idx.getEnumerator1(), new Predicate<Integer>() {
+        
+        if (!idx.isEnumerated1()) {
+            tsv = Enumerated.enumerated(tsv, idx.getEnumerator1(),
+                                        new Predicate<Integer>() {
 
                 @Override
                 public boolean apply(Integer column) {
@@ -236,17 +235,25 @@ public class WeightedTokenPairSink
                 }
             });
         }
-        
-        if (!idx.isPreindexedTokens2()) {
-            tsv = Enumerated.enumerated(tsv, idx.getEnumerator2(), new Predicate<Integer>() {
+
+        if (!idx.isEnumerated2()) {
+            tsv = Enumerated.enumerated(tsv, idx.getEnumerator2(),
+                                        new Predicate<Integer>() {
 
                 @Override
                 public boolean apply(Integer column) {
-                    return column == 1;
+                    return (column + 1) % 2 == 0;
                 }
             });
         }
         
+        
+        if (compact)
+            tsv = Compact.compact(tsv, 3);
+
+
+
+
 //        
 //        if (!idx.isPreindexedTokens1() || !idx.isPreindexedTokens2()) {
 //            Enumerator<String>[] enumerators = (Enumerator<String>[]) new Enumerator[2];

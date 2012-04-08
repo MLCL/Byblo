@@ -508,29 +508,29 @@ public class Enumerated {
 
         @Override
         public void writeInt(int val) throws IOException {
-            if (!enumColumn.apply(column))
-                getInner().writeInt(val);
-            else
+            if (enumColumn.apply(column))
                 getInner().writeString(enumerator.value(val));
+            else
+                getInner().writeInt(val);
             ++column;
         }
 
         @Override
         public void writeLong(long val) throws IOException {
-            ++column;
             getInner().writeLong(val);
+            ++column;
         }
 
         @Override
         public void writeShort(short val) throws IOException {
-            ++column;
             getInner().writeShort(val);
+            ++column;
         }
 
         @Override
         public void writeString(String str) throws IOException {
-            ++column;
             getInner().writeString(str);
+            ++column;
         }
     }
 }

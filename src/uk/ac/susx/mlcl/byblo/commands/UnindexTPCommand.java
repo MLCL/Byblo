@@ -63,7 +63,7 @@ public class UnindexTPCommand extends AbstractCopyCommand<TokenPair> {
                 indexDeligate.getEnumerator2(), false, false);
         return TokenPairSink.open(
                 file, getFilesDeligate().getCharset(),
-                srcIdx, true);
+                srcIdx, !getFilesDeligate().isCompactFormatDisabled());
     }
 
     public IndexDeligatePair getIndexDeligate() {

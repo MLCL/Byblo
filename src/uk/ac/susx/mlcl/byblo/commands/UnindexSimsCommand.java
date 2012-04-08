@@ -45,8 +45,8 @@ public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>>
     protected Source<Weighted<TokenPair>> openSource(File file)
             throws FileNotFoundException, IOException {
         IndexDeligatePair dstIdx = new IndexDeligatePair(true, true);
-        dstIdx.setSkipIndexed1(indexDeligate.isSkipIndexed());
-        dstIdx.setSkipIndexed2(indexDeligate.isSkipIndexed());
+        dstIdx.setSkipIndexed1(indexDeligate.isSkipIndexed1());
+        dstIdx.setSkipIndexed2(indexDeligate.isSkipIndexed2());
         return WeightedTokenPairSource.open(
                 file, getFilesDeligate().getCharset(),
                 dstIdx);
@@ -58,10 +58,11 @@ public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>>
         IndexDeligatePair srcIdx = new IndexDeligatePair(
                 false, false,
                 indexDeligate.getEnumerator(),
-                indexDeligate.getEnumerator(), false, false);
+                indexDeligate.getEnumerator(),
+                false, false);
         return WeightedTokenPairSink.open(
                 file, getFilesDeligate().getCharset(),
-                srcIdx, true);
+                srcIdx, !getFilesDeligate().isCompactFormatDisabled());
     }
 
     public IndexDeligate getIndexDeligate() {

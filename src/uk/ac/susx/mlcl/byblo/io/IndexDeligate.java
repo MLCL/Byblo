@@ -28,25 +28,32 @@ public class IndexDeligate extends AbstractDeligate implements Serializable {
     static final boolean DEFAULT_SKIP_INDEXING = false;
 
     @Parameter(names = {"-p", "--preindexed"},
-    description = "Whether tokens in the input events file are indexed.")
+               description = "Whether tokens in the input events file are indexed.")
     private boolean preindexedTokens = DEFAULT_INDEXING;
 
     @Parameter(names = {"-x", "--index-file"},
-    description = "Index for the string tokens.",
-    validateWith = InputFileValidator.class)
+               description = "Index for the string tokens.",
+               validateWith = InputFileValidator.class)
     private File indexFile = null;
 
-    @Parameter(names = {"-s", "--skipindexed"},
-    description = "")
-    private boolean skipIndexed = DEFAULT_SKIP_INDEXING;
+    @Parameter(names = {"-s1", "--skipindexed1"},
+               description = "")
+    private boolean skipIndexed1 = DEFAULT_SKIP_INDEXING;
+
+    @Parameter(names = {"-s2", "--skipindexed2"},
+               description = "")
+    private boolean skipIndexed2 = DEFAULT_SKIP_INDEXING;
 
     private Enumerator<String> enumerator = null;
 
-    public IndexDeligate(boolean preindexedTokens, File indexFile, Enumerator<String> index, boolean skipIndexed) {
+    public IndexDeligate(boolean preindexedTokens, File indexFile,
+                         Enumerator<String> index,
+                         boolean skipIndexed1, boolean skipIndexed2) {
         this.preindexedTokens = preindexedTokens;
         this.indexFile = indexFile;
         this.enumerator = index;
-        this.skipIndexed = skipIndexed;
+        this.skipIndexed1 = skipIndexed1;
+        this.skipIndexed2 = skipIndexed2;
     }
 
     public IndexDeligate(boolean preindexedTokens, Enumerator<String> index) {
@@ -65,15 +72,23 @@ public class IndexDeligate extends AbstractDeligate implements Serializable {
         return new IndexDeligatePair(
                 isPreindexedTokens(), isPreindexedTokens(),
                 getEnumerator(), getEnumerator(),
-                isSkipIndexed(), isSkipIndexed());
+                isSkipIndexed1(), isSkipIndexed2());
     }
 
-    public boolean isSkipIndexed() {
-        return skipIndexed;
+    public boolean isSkipIndexed1() {
+        return skipIndexed1;
     }
 
-    public void setSkipIndexed(boolean skipIndexed) {
-        this.skipIndexed = skipIndexed;
+    public void setSkipIndexed1(boolean skipIndexed1) {
+        this.skipIndexed1 = skipIndexed1;
+    }
+
+    public boolean isSkipIndexed2() {
+        return skipIndexed2;
+    }
+
+    public void setSkipIndexed2(boolean skipIndexed2) {
+        this.skipIndexed2 = skipIndexed2;
     }
 
     public File getIndexFile() {
@@ -122,5 +137,4 @@ public class IndexDeligate extends AbstractDeligate implements Serializable {
                 add("preindexed", isPreindexedTokens()).
                 add("index", getIndexFile());
     }
-
 }

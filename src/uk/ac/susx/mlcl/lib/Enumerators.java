@@ -4,7 +4,6 @@
  */
 package uk.ac.susx.mlcl.lib;
 
-import com.google.common.base.Function;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -32,7 +31,7 @@ public class Enumerators {
     public static <T> Enumerator<T> nullEnumerator() {
         return new Enumerator<T>() {
 
-            private final String ERROR = "Null Enumerator should not be accessed.";
+            private final String ERROR = "Null Enumerator should never be accessed.";
 
             @Override
             public int index(T obj) {
@@ -102,24 +101,24 @@ public class Enumerators {
 
 //        return (Enumerator<String>) Files.readSerialized(file, true);
     }
-
-    public static <T> Function<T, Integer> encoder(final Enumerator<T> en) {
-        return new Function<T, Integer>() {
-
-            @Override
-            public Integer apply(T val) {
-                return en.index(val);
-            }
-        };
-    }
-
-    public static <T> Function<Integer, T> decoder(final Enumerator<T> en) {
-        return new Function<Integer, T>() {
-
-            @Override
-            public T apply(Integer idx) {
-                return en.value(idx);
-            }
-        };
-    }
+//
+//    public static <T> Function<T, Integer> encoder(final Enumerator<T> en) {
+//        return new Function<T, Integer>() {
+//
+//            @Override
+//            public Integer apply(T val) {
+//                return en.index(val);
+//            }
+//        };
+//    }
+//
+//    public static <T> Function<Integer, T> decoder(final Enumerator<T> en) {
+//        return new Function<Integer, T>() {
+//
+//            @Override
+//            public T apply(Integer idx) {
+//                return en.value(idx);
+//            }
+//        };
+//    }
 }

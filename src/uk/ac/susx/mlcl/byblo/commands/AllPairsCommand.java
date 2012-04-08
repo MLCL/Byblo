@@ -315,8 +315,8 @@ public class AllPairsCommand extends AbstractCommand {
         // are produced by the algorithm.
 
         IndexDeligatePair sinkIdx = new IndexDeligatePair(
-                getIndexDeligate().isPreindexedTokens1(),
-                getIndexDeligate().isPreindexedTokens1(),
+                getIndexDeligate().isEnumerated1(),
+                getIndexDeligate().isEnumerated1(),
                 getIndexDeligate().getEnumerator1(),
                 getIndexDeligate().getEnumerator1());
         sinkIdx.setSkipIndexed1(getIndexDeligate().isSkipIndexed1());

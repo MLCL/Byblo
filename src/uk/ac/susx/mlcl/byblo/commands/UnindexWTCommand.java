@@ -44,7 +44,8 @@ public class UnindexWTCommand extends AbstractCopyCommand<Weighted<Token>> {
     protected Source<Weighted<Token>> openSource(File file)
             throws FileNotFoundException, IOException {
         IndexDeligate dstIdx = new IndexDeligate(true);
-        dstIdx.setSkipIndexed(indexDeligate.isSkipIndexed());
+        dstIdx.setSkipIndexed1(indexDeligate.isSkipIndexed1());
+        dstIdx.setSkipIndexed2(indexDeligate.isSkipIndexed2());
         return WeightedTokenSource.open(
                 file, getFilesDeligate().getCharset(),
                 dstIdx);

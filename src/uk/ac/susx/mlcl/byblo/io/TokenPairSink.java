@@ -182,11 +182,12 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
 
         if (compact)
             tsv = Compact.compact(tsv, 2);
-        if (!idx.isPreindexedTokens1() || !idx.isPreindexedTokens2()) {
+        
+        if (!idx.isEnumerated1() || !idx.isEnumerated2()) {
             Enumerator<String>[] enumerators = (Enumerator<String>[]) new Enumerator[2];
-            if (!idx.isPreindexedTokens1())
+            if (!idx.isEnumerated1())
                 enumerators[0] = idx.getEnumerator1();
-            if (!idx.isPreindexedTokens2())
+            if (!idx.isEnumerated2())
                 enumerators[1] = idx.getEnumerator2();
             tsv = Enumerated.enumerated(tsv, enumerators);
         }

@@ -210,7 +210,7 @@ public class WeightedTokenSource
             File f, Charset charset, IndexDeligate idx) throws IOException {
         SeekableDataSource tsv = new TSV.Source(f, charset);
         
-        if (idx.isSkipIndexed()) {
+        if (idx.isSkipIndexed1()) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override

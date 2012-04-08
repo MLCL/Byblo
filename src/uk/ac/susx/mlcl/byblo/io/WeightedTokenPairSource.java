@@ -291,15 +291,13 @@ public class WeightedTokenPairSource
 
                 @Override
                 public boolean apply(Integer column) {
-                    return (column - 1) % 2 == 0;
+                    return (column + 1) % 2 == 0;
                 }
             });
         }
-
-        tsv = Compact.compact(tsv, 3);
-        
-        if (!idx.isPreindexedTokens1()) {
-            tsv = Enumerated.enumerated(tsv, idx.getEnumerator1(), new Predicate<Integer>() {
+        if (!idx.isEnumerated1()) {
+            tsv = Enumerated.enumerated(tsv, idx.getEnumerator1(),
+                                        new Predicate<Integer>() {
 
                 @Override
                 public boolean apply(Integer column) {
@@ -307,17 +305,21 @@ public class WeightedTokenPairSource
                 }
             });
         }
-        
-        if (!idx.isPreindexedTokens2()) {
-            tsv = Enumerated.enumerated(tsv, idx.getEnumerator2(), new Predicate<Integer>() {
+
+        if (!idx.isEnumerated2()) {
+            tsv = Enumerated.enumerated(tsv, idx.getEnumerator2(),
+                                        new Predicate<Integer>() {
 
                 @Override
                 public boolean apply(Integer column) {
-                    return column == 1;
+                    return (column + 1) % 2 == 0;
                 }
             });
         }
-        
+
+        tsv = Compact.compact(tsv, 3);
+
+
 //        
 //        if (!idx.isPreindexedTokens1() || !idx.isPreindexedTokens2()) {
 //            Enumerator<String>[] enumerators = (Enumerator<String>[]) new Enumerator[2];
@@ -327,7 +329,7 @@ public class WeightedTokenPairSource
 //                enumerators[1] = idx.getEnumerator2();
 //            tsv = Enumerated.enumerated(tsv, enumerators);
 //        }
-        
+
         return new WeightedTokenPairSource(tsv);
     }
 }

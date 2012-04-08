@@ -37,6 +37,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import static java.text.MessageFormat.*;
 import java.util.Random;
 import static org.junit.Assert.*;
 
@@ -75,10 +76,12 @@ public class TestConstants {
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".entryFeatures");
 
     public static final File TEST_FRUIT_ENTRIES_FILTERED =
-            new File(TEST_FRUIT_ENTRIES.getParentFile(), TEST_FRUIT_ENTRIES.getName() + ".filtered");
+            new File(TEST_FRUIT_ENTRIES.getParentFile(), TEST_FRUIT_ENTRIES.
+            getName() + ".filtered");
 
     public static final File TEST_FRUIT_FEATURES_FILTERED =
-            new File(TEST_FRUIT_FEATURES.getParentFile(), TEST_FRUIT_FEATURES.getName() + ".filtered");
+            new File(TEST_FRUIT_FEATURES.getParentFile(), TEST_FRUIT_FEATURES.
+            getName() + ".filtered");
 
     public static final File TEST_FRUIT_ENTRY_FEATURES_FILTERED =
             new File(TEST_FRUIT_ENTRY_FEATURES.getParentFile(),
@@ -137,11 +140,46 @@ public class TestConstants {
 
     public static void assertValidInputFiles(File... files) {
         for (File file : files) {
-            assertTrue("Input file is null", file != null);
-            assertTrue("Input file does not exist: " + file, file.exists());
-            assertTrue("Input file is not a regular file: " + file, file.isFile());
-            assertTrue("Input file is empty: " + file, file.length() > 0);
+            assertTrue(format("Input file is null: \"{0}\"", file), file != null);
+            assertTrue(format("Input file does not exist: \"{0}\" ", file),
+                       file.exists());
+            assertTrue(
+                    format("Input file is not a regular file: \"{0}\" ", file),
+                    file.isFile());
+            assertTrue(format("Input file is empty: ", file) + file,
+                       file.length() > 0);
         }
     }
 
+    public static void assertValidOutpuFiles(File... files) throws IOException {
+        for (File file : files) {
+            if (file.exists()) {
+                assertTrue(format("Input file is not a regular: \"{0}\"", file),
+                           file.isFile());
+                assertTrue(format("Input file is not writeable: \"{0}\"", file),
+                           file.canWrite());
+            } else {
+                assertTrue(format("Input file is not a regular: \"{0}\"", file),
+                           file.createNewFile());
+            }
+        }
+    }
+
+    public static void assertSizeGT(File bigger, File smaller) {
+        assertValidInputFiles(bigger, smaller);
+        assertTrue(
+                format("\"{0}\" is not smaller than \"{1}\"", smaller, bigger),
+                   bigger.length() > smaller.length());
+    }
+
+    public static void deleteIfExist(File... files) {
+        for (File file : files) {
+            if (file.exists())
+                file.delete();
+        }
+    }
+
+    public static File suffix(File file, String suffix) {
+        return new File(file.getParentFile(), file.getName() + suffix);
+    }
 }

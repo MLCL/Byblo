@@ -24,50 +24,55 @@ public class IndexDeligatePair extends AbstractDeligate implements Serializable 
     private static final long serialVersionUID = 1L;
 
     @Parameter(names = {"-p1", "--preindexed1"},
-    description = "Whether tokens in the first column of the input file are indexed.")
+               description = "Whether tokens in the first column of the input file are indexed.")
     private boolean preindexedTokens1 = IndexDeligate.DEFAULT_INDEXING;
 
     @Parameter(names = {"-p2", "--preindexed2"},
-    description = "Whether entries in the second column of the input file are indexed.")
+               description = "Whether entries in the second column of the input file are indexed.")
     private boolean preindexedTokens2 = IndexDeligate.DEFAULT_INDEXING;
 
     @Parameter(names = {"-x1", "--index-file-1"},
-    description = "Index for the first token type.",
-    validateWith = InputFileValidator.class)
+               description = "Index for the first token type.",
+               validateWith = InputFileValidator.class)
     private File indexFile1 = null;
 
     @Parameter(names = {"-x2", "--index-file-2"},
-    description = "Index for the second token type.",
-    validateWith = InputFileValidator.class)
+               description = "Index for the second token type.",
+               validateWith = InputFileValidator.class)
     private File indexFile2 = null;
 
     @Parameter(names = {"-s1", "--skipindexed1"},
-    description = "")
+               description = "")
     private boolean skipindexed1 = IndexDeligate.DEFAULT_SKIP_INDEXING;
 
     @Parameter(names = {"-s2", "--skipindexed2"},
-    description = "")
+               description = "")
     private boolean skipindexed2 = IndexDeligate.DEFAULT_SKIP_INDEXING;
 
     private Enumerator<String> enumerator1 = null;
 
     private Enumerator<String> enumerator2 = null;
 
-    public IndexDeligatePair(boolean preindexedTokens1, boolean preindexedTokens2) {
+    public IndexDeligatePair(boolean preindexedTokens1,
+                             boolean preindexedTokens2) {
         setPreindexedTokens1(preindexedTokens1);
         setPreindexedTokens2(preindexedTokens2);
     }
 
-    public IndexDeligatePair(boolean preindexedTokens1, boolean preindexedTokens2,
-                             Enumerator<String> index1, Enumerator<String> index2) {
+    public IndexDeligatePair(boolean preindexedTokens1,
+                             boolean preindexedTokens2,
+                             Enumerator<String> index1,
+                             Enumerator<String> index2) {
         setPreindexedTokens1(preindexedTokens1);
         setPreindexedTokens2(preindexedTokens2);
         setEnumerator1(index1);
         setEnumerator2(index2);
     }
 
-    public IndexDeligatePair(boolean preindexedTokens1, boolean preindexedTokens2,
-                             Enumerator<String> index1, Enumerator<String> index2,
+    public IndexDeligatePair(boolean preindexedTokens1,
+                             boolean preindexedTokens2,
+                             Enumerator<String> index1,
+                             Enumerator<String> index2,
                              boolean skipindexed1, boolean skipindexed2) {
         setPreindexedTokens1(preindexedTokens1);
         setPreindexedTokens2(preindexedTokens2);
@@ -97,27 +102,32 @@ public class IndexDeligatePair extends AbstractDeligate implements Serializable 
     }
 
     public IndexDeligate single1() throws IOException {
-        return new IndexDeligate(isPreindexedTokens1(), getIndexFile1(), getEnumerator1(), isSkipIndexed1());
+        return new IndexDeligate(isEnumerated1(), getIndexFile1(),
+                                 getEnumerator1(), isSkipIndexed1(),
+                                 isSkipIndexed2());
     }
 
     public IndexDeligate single2() throws IOException {
-        return new IndexDeligate(isPreindexedTokens2(), getIndexFile2(), getEnumerator2(), isSkipIndexed2());
+        return new IndexDeligate(isEnumerated2(), getIndexFile2(),
+                                 getEnumerator2(), isSkipIndexed1(),
+                                 isSkipIndexed2());
     }
 
     public final Enumerator<String> getEnumerator1() throws IOException {
         if (enumerator1 == null) {
             // if tokens are preindexed then a file MUST be available
             // otherwise the file will be loaded if it exists
-            if (isPreindexedTokens1()) {
-                if (indexFile1 != null && indexFile1.exists())
-                    enumerator1 = Enumerators.loadStringEnumerator(indexFile1);
-                else
+            if (isEnumerated1()) {
+                if (indexFile1 == null || !indexFile1.exists()) {
                     enumerator1 = Enumerators.nullEnumerator();
-            } else {
-                if (indexFile1 != null && indexFile1.exists()) {
-                    enumerator1 = Enumerators.loadStringEnumerator(indexFile1);
                 } else {
+                    enumerator1 = Enumerators.loadStringEnumerator(indexFile1);
+                }
+            } else {
+                if (indexFile1 == null || !indexFile1.exists()) {
                     enumerator1 = Enumerators.newDefaultStringEnumerator();
+                } else {
+                    enumerator1 = Enumerators.loadStringEnumerator(indexFile1);
                 }
             }
         }
@@ -131,7 +141,7 @@ public class IndexDeligatePair extends AbstractDeligate implements Serializable 
 
     public final Enumerator<String> getEnumerator2() throws IOException {
         if (enumerator2 == null) {
-            if (isPreindexedTokens2()) {
+            if (isEnumerated2()) {
                 if (indexFile2 != null && indexFile2.exists())
                     enumerator2 = Enumerators.loadStringEnumerator(indexFile2);
                 else
@@ -152,7 +162,7 @@ public class IndexDeligatePair extends AbstractDeligate implements Serializable 
         this.enumerator2 = enumerator2;
     }
 
-    public final boolean isPreindexedTokens1() {
+    public final boolean isEnumerated1() {
         return preindexedTokens1;
     }
 
@@ -160,7 +170,7 @@ public class IndexDeligatePair extends AbstractDeligate implements Serializable 
         this.preindexedTokens1 = preindexedTokens1;
     }
 
-    public final boolean isPreindexedTokens2() {
+    public final boolean isEnumerated2() {
         return preindexedTokens2;
     }
 
@@ -187,10 +197,9 @@ public class IndexDeligatePair extends AbstractDeligate implements Serializable 
     @Override
     protected Objects.ToStringHelper toStringHelper() {
         return super.toStringHelper().
-                add("preindexed1", isPreindexedTokens1()).
-                add("preindexed2", isPreindexedTokens2()).
+                add("preindexed1", isEnumerated1()).
+                add("preindexed2", isEnumerated2()).
                 add("index1", getIndexFile1()).
                 add("index2", getIndexFile2());
     }
-
 }

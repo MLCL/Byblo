@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
-import uk.ac.susx.mlcl.byblo.commands.IndexEventsCommand;
 import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
 import uk.ac.susx.mlcl.byblo.commands.ExternalCountCommand;
 import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
@@ -51,7 +50,7 @@ public class Main extends AbstractCommand {
 
     static {
         final Map<String, Class<? extends Command>> tmp =
-            new HashMap<String, Class<? extends Command>>();
+                new HashMap<String, Class<? extends Command>>();
         tmp.put("sort-sims", ExternalSortWeightedTokenPiarCommand.class);
         tmp.put("sort-ents", ExternalSortWeightedTokenCommand.class);
         tmp.put("sort-feats", ExternalSortWeightedTokenCommand.class);
@@ -64,7 +63,7 @@ public class Main extends AbstractCommand {
         tmp.put("allpairs", AllPairsCommand.class);
         tmp.put("count", ExternalCountCommand.class);
         tmp.put("filter", FilterCommand.class);
-        tmp.put("index", IndexEventsCommand.class);
+        tmp.put("index", IndexTPCommand.class);
         tmp.put("unindex-sims", UnindexSimsCommand.class);
         SUBCOMMANDS = Collections.unmodifiableMap(tmp);
     }

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Checks;
+import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.io.Source;
 
@@ -19,12 +20,12 @@ import uk.ac.susx.mlcl.lib.io.Source;
  *
  * @author hiam20
  */
-public class UnindexWTPCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
+public class IndexTPCommand extends AbstractCopyCommand<TokenPair> {
 
     @ParametersDelegate
     private IndexDeligatePair indexDeligate = new IndexDeligatePair();
 
-    public UnindexWTPCommand(
+    public IndexTPCommand(
             File sourceFile, File destinationFile, Charset charset,
             File indexFile1, File indexFile2) {
         super(sourceFile, destinationFile, charset);
@@ -32,7 +33,7 @@ public class UnindexWTPCommand extends AbstractCopyCommand<Weighted<TokenPair>> 
         indexDeligate.setIndexFile2(indexFile2);
     }
 
-    public UnindexWTPCommand() {
+    public IndexTPCommand() {
         super();
     }
 
@@ -40,30 +41,36 @@ public class UnindexWTPCommand extends AbstractCopyCommand<Weighted<TokenPair>> 
     public void runCommand() throws Exception {
         Checks.checkNotNull("indexFile1", indexDeligate.getIndexFile1());
         Checks.checkNotNull("indexFile2", indexDeligate.getIndexFile2());
+        
         super.runCommand();
+
+        Enumerators.saveStringEnumerator(indexDeligate.getEnumerator1(),
+                                         indexDeligate.getIndexFile1());
+        Enumerators.saveStringEnumerator(indexDeligate.getEnumerator2(),
+                                         indexDeligate.getIndexFile2());
     }
 
     @Override
-    protected Source<Weighted<TokenPair>> openSource(File file)
+    protected Source<TokenPair> openSource(File file)
+            throws FileNotFoundException, IOException {
+        IndexDeligatePair srcIdx = new IndexDeligatePair(
+                false, false);
+        indexDeligate.setEnumerator1(srcIdx.getEnumerator1());
+        indexDeligate.setEnumerator2(srcIdx.getEnumerator2());
+        return TokenPairSource.open(
+                file, getFilesDeligate().getCharset(),
+                srcIdx);
+    }
+
+    @Override
+    protected Sink<TokenPair> openSink(File file)
             throws FileNotFoundException, IOException {
         IndexDeligatePair dstIdx = new IndexDeligatePair(true, true);
         dstIdx.setSkipIndexed1(indexDeligate.isSkipIndexed1());
         dstIdx.setSkipIndexed2(indexDeligate.isSkipIndexed2());
-        return WeightedTokenPairSource.open(
+        return TokenPairSink.open(
                 file, getFilesDeligate().getCharset(),
-                dstIdx);
-    }
-
-    @Override
-    protected Sink<Weighted<TokenPair>> openSink(File file)
-            throws FileNotFoundException, IOException {
-        IndexDeligatePair srcIdx = new IndexDeligatePair(
-                false, false,
-                indexDeligate.getEnumerator1(),
-                indexDeligate.getEnumerator2(), false, false);
-        return WeightedTokenPairSink.open(
-                file, getFilesDeligate().getCharset(),
-                srcIdx, !getFilesDeligate().isCompactFormatDisabled());
+                dstIdx, !getFilesDeligate().isCompactFormatDisabled());
     }
 
     public IndexDeligatePair getIndexDeligate() {
