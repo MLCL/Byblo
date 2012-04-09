@@ -30,12 +30,8 @@
  */
 package uk.ac.susx.mlcl;
 
+import java.io.*;
 import uk.ac.susx.mlcl.lib.io.Files;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 import static java.text.MessageFormat.*;
 import java.util.Random;
@@ -138,7 +134,7 @@ public class TestConstants {
         return file;
     }
 
-    public static void assertValidInputFiles(File... files) {
+    public static void assertValidInputFiles(File... files) throws IOException {
         for (File file : files) {
             assertTrue(format("Input file is null: \"{0}\"", file), file != null);
             assertTrue(format("Input file does not exist: \"{0}\" ", file),
@@ -148,6 +144,13 @@ public class TestConstants {
                     file.isFile());
             assertTrue(format("Input file is empty: ", file) + file,
                        file.length() > 0);
+            
+            // The last character should be a newline.
+            RandomAccessFile raf = new RandomAccessFile(file, "rw");
+            raf.seek(file.length() - 1);
+            int ch = raf.read();
+            assertEquals(format("Expecting newline chracter at end of inout file: \"{0}\"", file), ch, '\n');
+            raf.close();
         }
     }
 
@@ -165,7 +168,7 @@ public class TestConstants {
         }
     }
 
-    public static void assertSizeGT(File bigger, File smaller) {
+    public static void assertSizeGT(File bigger, File smaller) throws IOException {
         assertValidInputFiles(bigger, smaller);
         assertTrue(
                 format("\"{0}\" is not smaller than \"{1}\"", smaller, bigger),

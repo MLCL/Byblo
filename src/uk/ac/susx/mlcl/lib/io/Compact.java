@@ -186,6 +186,7 @@ public class Compact {
             if (currentHead != null) {
                 inner.endOfRecord();
                 currentHead = null;
+                flush();
             }
             super.close();
         }

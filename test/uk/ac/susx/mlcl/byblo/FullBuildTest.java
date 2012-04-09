@@ -5,7 +5,6 @@
 package uk.ac.susx.mlcl.byblo;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
@@ -463,7 +462,6 @@ public class FullBuildTest {
 
     }
 
-
     private static void knn(File from, File to,
                             boolean enumerated,
                             boolean skip1, boolean skip2)
@@ -581,7 +579,4 @@ public class FullBuildTest {
         assertValidInputFiles(to);
         assertSizeGT(to, from);
     }
-
-   
-
 }

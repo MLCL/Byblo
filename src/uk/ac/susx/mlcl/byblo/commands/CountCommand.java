@@ -291,8 +291,11 @@ public class CountCommand extends AbstractCommand implements Serializable {
 
 
         instanceSource.close();
+        entrySink.flush();
         entrySink.close();
+        featureSink.flush();
         featureSink.close();
+        eventsSink.flush();
         eventsSink.close();
 
 //        int i = 0;

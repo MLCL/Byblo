@@ -31,6 +31,8 @@
 package uk.ac.susx.mlcl.byblo.tasks;
 
 import com.google.common.base.Objects.ToStringHelper;
+import java.io.Closeable;
+import java.io.Flushable;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
@@ -91,7 +93,6 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
 
     public ThreadedApssTask() {
     }
-    
 
     public int getMaxChunkSize() {
         return maxChunkSize;
@@ -199,7 +200,16 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
             chunkerB.position(restartPos);
         }
         getExecutor().shutdown();
-        getExecutor().awaitTermination(1, TimeUnit.DAYS);
+        
+        while (!getFutureQueue().isEmpty()) {
+            Future<? extends Task> completed = getFutureQueue().poll();
+            Task t = completed.get();
+            while (t.isExceptionThrown()) {
+                t.throwException();
+            }
+        }
+        
+        getExecutor().awaitTermination(Integer.MIN_VALUE, TimeUnit.DAYS);
 
     }
 

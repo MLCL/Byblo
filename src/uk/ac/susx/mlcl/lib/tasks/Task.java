@@ -30,14 +30,13 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
-import java.io.Serializable;
 import java.util.Properties;
 
 /**
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public interface Task extends Runnable, Serializable {
+public interface Task extends Runnable {
 
     @Override
     void run();

@@ -406,6 +406,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
                                                   filteredWeight));
         }
 
+        entriesSource.close();
         entriesSink.flush();
         entriesSink.close();
         entryFilterRequired = false;
@@ -534,6 +535,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
                     filteredEntryWeight));
         }
 
+        efSrc.close();
         efSink.flush();
         efSink.close();
         entryFeatureFilterRequired = false;
@@ -615,6 +617,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             featureSink.write(new Weighted<Token>(new Token(filteredId),
                                                   filteredWeight));
         }
+        featureSource.close();
         featureSink.flush();
         featureSink.close();
         featureFilterRequired = false;

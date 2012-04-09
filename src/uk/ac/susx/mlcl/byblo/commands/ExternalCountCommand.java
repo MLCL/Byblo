@@ -38,9 +38,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -385,6 +383,22 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             // not a sausage
         } else if (taskType.equals(VALUE_TASK_TYPE_COUNT)) {
 
+            CountTask countTask = (CountTask)task;
+            if(countTask.getEntrySink() instanceof Flushable)
+                ((Flushable)countTask.getEntrySink()).flush();
+            if(countTask.getEntrySink() instanceof Closeable)
+                ((Closeable)countTask.getEntrySink()).close();
+            if(countTask.getFeatureSink() instanceof Flushable)
+                ((Flushable)countTask.getFeatureSink()).flush();
+            if(countTask.getFeatureSink() instanceof Closeable)
+                ((Closeable)countTask.getFeatureSink()).close();
+            if(countTask.getEventSink() instanceof Flushable)
+                ((Flushable)countTask.getEventSink()).flush();
+            if(countTask.getEventSink() instanceof Closeable)
+                ((Closeable)countTask.getEventSink()).close();
+            if(countTask.getSource() instanceof Closeable)
+                ((Closeable)countTask.getSource()).close();
+            
             submitSortEntriesTask(new File(p.getProperty(KEY_DST_ENTRIES_FILE)));
             submitSortFeaturesTask(
                     new File(p.getProperty(KEY_DST_FEATURES_FILE)));
@@ -399,6 +413,14 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             final File src = new File(p.getProperty(KEY_SRC_FILE));
             final File dst = new File(p.getProperty(KEY_DST_FILE));
 
+            SortTask<?> sortTask = (SortTask)task;
+            if(sortTask.getSink() instanceof Flushable)
+                ((Flushable)sortTask.getSink()).flush();
+            if(sortTask.getSink() instanceof Closeable)
+                ((Closeable)sortTask.getSink()).close();
+            if(sortTask.getSource() instanceof Closeable)
+                ((Closeable)sortTask.getSource()).close();
+            
             if (dataType.equals(VALUE_DATA_TYPE_ENTRIES))
                 submitMergeEntriesTask(dst);
             else if (dataType.equals(VALUE_DATA_TYPE_FEATURES))
@@ -416,6 +438,17 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             final File srca = new File(p.getProperty(KEY_SRC_FILE_A));
             final File srcb = new File(p.getProperty(KEY_SRC_FILE_B));
             final File dst = new File(p.getProperty(KEY_DST_FILE));
+
+            MergeTask<?> mergeTask = (MergeTask)task;
+            if(mergeTask.getSink() instanceof Flushable)
+                ((Flushable)mergeTask.getSink()).flush();
+            if(mergeTask.getSink() instanceof Closeable)
+                ((Closeable)mergeTask.getSink()).close();
+            if(mergeTask.getSourceA() instanceof Closeable)
+                ((Closeable)mergeTask.getSourceA()).close();
+            if(mergeTask.getSourceB() instanceof Closeable)
+                ((Closeable)mergeTask.getSourceB()).close();
+            
 
             if (dataType.equals(VALUE_DATA_TYPE_ENTRIES))
                 submitMergeEntriesTask(dst);

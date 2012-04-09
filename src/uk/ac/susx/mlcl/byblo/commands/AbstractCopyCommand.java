@@ -93,6 +93,8 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand {
         while (task.isExceptionThrown())
             task.throwException();
 
+        if (src instanceof Closeable)
+            ((Closeable) src).close();
         if (snk instanceof Flushable)
             ((Flushable) snk).flush();
         if (snk instanceof Closeable)

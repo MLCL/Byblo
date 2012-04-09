@@ -122,6 +122,8 @@ public abstract class AbstractSortCommand<T> extends AbstractCopyCommand<T> {
             ((Flushable) snk).flush();
         if (snk instanceof Closeable)
             ((Closeable) snk).close();
+        if (src instanceof Closeable)
+            ((Closeable) src).close();
 
         if (LOG.isInfoEnabled())
             LOG.info("Completed memory sort.");

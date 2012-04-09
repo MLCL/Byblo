@@ -23,7 +23,7 @@ public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCo
     private IndexDeligatePair indexDeligate = new IndexDeligatePair();
 
     public ExternalSortWeightedTokenPiarCommand(
-            File sourceFile, File destinationFile, Charset charset, 
+            File sourceFile, File destinationFile, Charset charset,
             IndexDeligatePair indexDeligate) {
         super(sourceFile, destinationFile, charset);
         setIndexDeligate(indexDeligate);
@@ -34,7 +34,7 @@ public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCo
 
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file) throws IOException {
-        WeightedTokenPairSink s =  WeightedTokenPairSink.open(
+        WeightedTokenPairSink s = WeightedTokenPairSink.open(
                 file, getFileDeligate().getCharset(),
                 getIndexDeligate(),
                 !getFileDeligate().isCompactFormatDisabled());
@@ -54,10 +54,7 @@ public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCo
     }
 
     public final void setIndexDeligate(IndexDeligatePair indexDeligate) {
-        Checks.checkNotNull("indexDeligate",indexDeligate);
+        Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }
-    
-    
-    
 }

@@ -37,6 +37,7 @@ import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects.ToStringHelper;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import java.io.Closeable;
 import java.io.File;
 import java.io.Flushable;
 import java.io.IOException;
@@ -355,7 +356,6 @@ public class AllPairsCommand extends AbstractCommand {
         apss.setSink(sink);
         
         
-        ((Flushable)sink).flush();
 
 //        prox.setFilteredFeatureId(getEntryDecoder().apply(FilterTask.FILTERED_STRING));
         //XXX This needs to be sorted out
@@ -389,6 +389,17 @@ public class AllPairsCommand extends AbstractCommand {
         }
 
         apss.run();
+        
+        if(sink instanceof Flushable)
+            ((Flushable)sink).flush();
+        if(sink instanceof Closeable)
+            ((Closeable)sink).close();
+        
+        if(sourceA instanceof Closeable)
+            ((Closeable)sourceA).close();
+
+        if(sourceB instanceof Closeable)
+            ((Closeable)sourceB).close();
 
         if (apss.isExceptionThrown())
             apss.throwException();

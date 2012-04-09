@@ -105,8 +105,6 @@ public class InvertedApssTask<S> extends NaiveApssTask<S> {
         }
         synchronized (getSink()) {
             IOUtil.copy(pairs, getSink());
-            if (getSink() instanceof Flushable)
-                ((Flushable) getSink()).flush();
         }
         getSourceB().position(startB);
 
