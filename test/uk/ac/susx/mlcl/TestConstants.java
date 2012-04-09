@@ -154,7 +154,7 @@ public class TestConstants {
         }
     }
 
-    public static void assertValidOutpuFiles(File... files) throws IOException {
+    public static void assertValidOutputFiles(File... files) throws IOException {
         for (File file : files) {
             if (file.exists()) {
                 assertTrue(format("Input file is not a regular: \"{0}\"", file),

@@ -38,7 +38,6 @@ import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.io.Flushable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +52,7 @@ import uk.ac.susx.mlcl.lib.io.IOUtil;
  * building a reverse index of one of the input sources. This allows candidate
  * pairs to be found relatively quickly given sufficient sparsity
  *
+ * @param <S> 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class InvertedApssTask<S> extends NaiveApssTask<S> {

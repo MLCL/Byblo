@@ -53,6 +53,7 @@ public class Enumerators {
     public static Enumerator<String> newDefaultStringEnumerator() {
         SimpleEnumerator<String> instance = new SimpleEnumerator<String>();
         instance.index(FilterCommand.FILTERED_STRING);
+        assert instance.index(FilterCommand.FILTERED_STRING) == 0;
         return instance;
     }
 
@@ -97,7 +98,11 @@ public class Enumerators {
             indexToObj.set(id, s);
         }
 
-        return new SimpleEnumerator<String>(indexToObj, objToIndex, nextId);
+        Enumerator<String> instance = new SimpleEnumerator<String>(indexToObj,
+                                                                   objToIndex,
+                                                                   nextId);
+        assert instance.index(FilterCommand.FILTERED_STRING) == 0;
+        return instance;
 
 //        return (Enumerator<String>) Files.readSerialized(file, true);
     }

@@ -52,8 +52,10 @@ import uk.ac.susx.mlcl.byblo.measure.*;
 import uk.ac.susx.mlcl.byblo.tasks.NaiveApssTask;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.DoubleConverter;
+import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.io.*;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
+import uk.ac.susx.mlcl.lib.commands.FileDeligate;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
 
@@ -65,6 +67,9 @@ import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
 public class AllPairsCommand extends AbstractCommand {
 
     private static final Log LOG = LogFactory.getLog(AllPairsCommand.class);
+
+    @ParametersDelegate
+    private FileDeligate fileDeligate = new FileDeligate();
 
     @Parameter(names = {"-i", "--input"},
                description = "Entry-feature frequency vectors files.",
@@ -87,10 +92,6 @@ public class AllPairsCommand extends AbstractCommand {
                required = true,
                validateWith = OutputFileValidator.class)
     private File outputFile;
-
-    @Parameter(names = {"-c", "--charset"},
-               description = "Character encoding to use for reading and writing.")
-    private Charset charset = Files.DEFAULT_CHARSET;
 
     @Parameter(names = {"-C", "--chunk-size"},
                description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
@@ -300,17 +301,13 @@ public class AllPairsCommand extends AbstractCommand {
         // combinations of vectors, so will be looking at two differnt points
         // in the file. Also this allows for the possibility of having differnt
         // files, e.g compare fruit words with cake words
-        final WeightedTokenPairVectorSource sourceA =  WeightedTokenPairSource.open(
-                getEntryFeaturesFile(), getCharset(),
-                getIndexDeligate() //                getIndexDeligate().getDecoder1(),
-                //                getIndexDeligate().getDecoder2()
-                ).getVectorSource();
+        final WeightedTokenPairVectorSource sourceA = WeightedTokenPairSource.
+                open(getEntryFeaturesFile(), getCharset(), getIndexDeligate()).
+                getVectorSource();
 
-        final WeightedTokenPairVectorSource sourceB = WeightedTokenPairSource.open(
-                getEntryFeaturesFile(), getCharset(),
-                getIndexDeligate() //                getIndexDeligate().getDecoder1(),
-                //                getIndexDeligate().getDecoder2()
-                ).getVectorSource();
+        final WeightedTokenPairVectorSource sourceB = WeightedTokenPairSource.
+                open(getEntryFeaturesFile(), getCharset(), getIndexDeligate()).
+                getVectorSource();
 
         // Create a sink object that will act as a recipient for all pairs that
         // are produced by the algorithm.
@@ -327,7 +324,7 @@ public class AllPairsCommand extends AbstractCommand {
         final Sink<Weighted<TokenPair>> sink =
                 WeightedTokenPairSink.open(
                 getOutputFile(), getCharset(),
-                sinkIdx, true);
+                sinkIdx, fileDeligate.isCompactFormatDisabled());
 
 
         NaiveApssTask<Tell> apss;
@@ -354,12 +351,13 @@ public class AllPairsCommand extends AbstractCommand {
         apss.setSourceA(sourceA);
         apss.setSourceB(sourceB);
         apss.setSink(sink);
-        
-        
+
+
 
 //        prox.setFilteredFeatureId(getEntryDecoder().apply(FilterTask.FILTERED_STRING));
         //XXX This needs to be sorted out
-        prox.setFilteredFeatureId(Integer.MAX_VALUE);
+        prox.setFilteredFeatureId(FilterCommand.FILTERED_ID);
+        
 
         apss.setMeasure(prox);
 
@@ -389,17 +387,17 @@ public class AllPairsCommand extends AbstractCommand {
         }
 
         apss.run();
-        
-        if(sink instanceof Flushable)
-            ((Flushable)sink).flush();
-        if(sink instanceof Closeable)
-            ((Closeable)sink).close();
-        
-        if(sourceA instanceof Closeable)
-            ((Closeable)sourceA).close();
 
-        if(sourceB instanceof Closeable)
-            ((Closeable)sourceB).close();
+        if (sink instanceof Flushable)
+            ((Flushable) sink).flush();
+        if (sink instanceof Closeable)
+            ((Closeable) sink).close();
+
+        if (sourceA instanceof Closeable)
+            ((Closeable) sourceA).close();
+
+        if (sourceB instanceof Closeable)
+            ((Closeable) sourceB).close();
 
         if (apss.isExceptionThrown())
             apss.throwException();
@@ -485,12 +483,12 @@ public class AllPairsCommand extends AbstractCommand {
     }
 
     public final Charset getCharset() {
-        return charset;
+        return fileDeligate.getCharset();
     }
 
     public final void setCharset(Charset charset) {
         Checks.checkNotNull("charset", charset);
-        this.charset = charset;
+        this.fileDeligate.setCharset(charset);
     }
 
     public final int getChunkSize() {

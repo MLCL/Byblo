@@ -5,9 +5,16 @@
 package uk.ac.susx.mlcl.byblo.commands;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import org.junit.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
+import uk.ac.susx.mlcl.byblo.io.*;
+import uk.ac.susx.mlcl.lib.collect.Indexed;
+import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+import uk.ac.susx.mlcl.lib.io.Tell;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -87,7 +94,7 @@ public class IndexSimsCommandTest {
         deleteIfExist(out, idx);
 
         indexSims(TEST_FRUIT_SIMS_100NN, out, idx, skip1, skip2,
-                compact);
+                  compact);
 
         unindexSims(out, out2, idx, skip1, skip2, compact);
 
@@ -95,11 +102,129 @@ public class IndexSimsCommandTest {
 
     }
 
+    @Test
+    public void testCompareSkipVsNoSkip() throws Exception {
+        System.out.println("Testing " + IndexWTPCommandTest.class.getName()
+                + " on " + TEST_FRUIT_SIMS);
+
+
+        final String name = TEST_FRUIT_SIMS.getName();
+        String prefixa = "wtp-noskip-";
+        String prefixb = "wtp-skip-";
+
+        final File outa = new File(TEST_OUTPUT_DIR, prefixa + name + ".indexed");
+        final File outb = new File(TEST_OUTPUT_DIR, prefixb + name + ".indexed");
+
+        final File idxa = new File(TEST_OUTPUT_DIR,
+                                   prefixa + name + ".entry-index");
+        final File idxb = new File(TEST_OUTPUT_DIR,
+                                   prefixb + name + ".entry-index");
+
+        boolean skip1a = false;
+        boolean skip2a = false;
+        boolean skip1b = true;
+        boolean skip2b = true;
+
+        deleteIfExist(outa, idxa, outb, idxb);
+
+        indexSims(TEST_FRUIT_SIMS, outa, idxa, skip1a, skip2a, true);
+        indexSims(TEST_FRUIT_SIMS, outb, idxb, skip1b, skip2b, true);
+
+        // Read back the data checking it's identical
+        {
+            WeightedTokenPairSource wtpsa = WeightedTokenPairSource.open(
+                    outa, DEFAULT_CHARSET,
+                    new IndexDeligatePair(true, true, skip1a, skip2a));
+            WeightedTokenPairSource wtpsb = WeightedTokenPairSource.open(
+                    outb, DEFAULT_CHARSET,
+                    new IndexDeligatePair(true, true, skip1b, skip2b));
+            List<Tell> pa = new ArrayList<Tell>();
+            List<Tell> pb = new ArrayList<Tell>();
+            List<Weighted<TokenPair>> va = new ArrayList<Weighted<TokenPair>>();
+            List<Weighted<TokenPair>> vb = new ArrayList<Weighted<TokenPair>>();
+
+            // sequential
+            while (wtpsa.hasNext() && wtpsb.hasNext()) {
+                pa.add(wtpsa.position());
+                pb.add(wtpsb.position());
+                Weighted<TokenPair> a = wtpsa.read();
+                Weighted<TokenPair> b = wtpsb.read();
+                va.add(a);
+                vb.add(b);
+                assertEquals(a, b);
+            }
+            assertTrue(!wtpsa.hasNext());
+            assertTrue(!wtpsb.hasNext());
+
+            // random
+            Random rand = new Random(0);
+            for (int i = 0; i < 1000; i++) {
+                int j = rand.nextInt(pa.size());
+                wtpsa.position(pa.get(j));
+                wtpsb.position(pb.get(j));
+                Weighted<TokenPair> a = wtpsa.read();
+                Weighted<TokenPair> b = wtpsb.read();
+
+                assertEquals(va.get(j), a);
+                assertEquals(vb.get(j), b);
+                assertEquals(a, b);
+            }
+        }
+
+        // Read back the data again, this time as vectors
+        {
+            WeightedTokenPairVectorSource wtpsa = WeightedTokenPairSource.open(
+                    outa, DEFAULT_CHARSET,
+                    new IndexDeligatePair(true, true, skip1a, skip2a)).
+                    getVectorSource();
+            WeightedTokenPairVectorSource wtpsb = WeightedTokenPairSource.open(
+                    outb, DEFAULT_CHARSET,
+                    new IndexDeligatePair(true, true, skip1b, skip2b)).
+                    getVectorSource();
+
+            List<Tell> pa = new ArrayList<Tell>();
+            List<Tell> pb = new ArrayList<Tell>();
+            List<Indexed<SparseDoubleVector>> va = new ArrayList<Indexed<SparseDoubleVector>>();
+            List<Indexed<SparseDoubleVector>> vb = new ArrayList<Indexed<SparseDoubleVector>>();
+
+            // sequential
+            while (wtpsa.hasNext() && wtpsb.hasNext()) {
+                pa.add(wtpsa.position());
+                pb.add(wtpsb.position());
+
+                Indexed<SparseDoubleVector> a = wtpsa.read();
+                Indexed<SparseDoubleVector> b = wtpsb.read();
+                va.add(a);
+                vb.add(b);
+                assertEquals(a, b);
+            }
+            assertTrue(!wtpsa.hasNext());
+            assertTrue(!wtpsb.hasNext());
+
+            // random
+            Random rand = new Random(0);
+            for (int i = 0; i < 1000; i++) {
+                int j = rand.nextInt(pa.size());
+                wtpsa.position(pa.get(j));
+                wtpsb.position(pb.get(j));
+                Indexed<SparseDoubleVector> a = wtpsa.read();
+                Indexed<SparseDoubleVector> b = wtpsb.read();
+
+                assertEquals(va.get(j), a);
+                assertEquals(va.get(j).value(), a.value());
+                assertEquals(vb.get(j), b);
+                assertEquals(vb.get(j).value(), b.value());
+                assertEquals(a, b);
+                assertEquals(a.value(), b.value());
+            }
+        }
+    }
+
     private static void indexSims(File from, File to, File index,
-                                boolean skip1, boolean skip2, boolean compact)
+                                  boolean skip1, boolean skip2, boolean compact)
             throws Exception {
         assertValidInputFiles(from);
-        assertValidOutpuFiles(to, index);
+        assertValidOutputFiles(to, index);
 
         IndexSimsCommand unindex = new IndexSimsCommand();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
@@ -116,10 +241,11 @@ public class IndexSimsCommandTest {
     }
 
     private static void unindexSims(File from, File to, File index,
-                                  boolean skip1, boolean skip2, boolean compact)
+                                    boolean skip1, boolean skip2,
+                                    boolean compact)
             throws Exception {
         assertValidInputFiles(from, index);
-        assertValidOutpuFiles(to);
+        assertValidOutputFiles(to);
 
         UnindexSimsCommand unindex = new UnindexSimsCommand();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);

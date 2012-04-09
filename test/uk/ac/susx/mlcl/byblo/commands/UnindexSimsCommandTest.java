@@ -101,7 +101,7 @@ public class UnindexSimsCommandTest {
                                 boolean skip1, boolean skip2, boolean compact)
             throws Exception {
         assertValidInputFiles(from);
-        assertValidOutpuFiles(to, index);
+        assertValidOutputFiles(to, index);
 
         IndexSimsCommand unindex = new IndexSimsCommand();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
@@ -121,7 +121,7 @@ public class UnindexSimsCommandTest {
                                   boolean skip1, boolean skip2, boolean compact)
             throws Exception {
         assertValidInputFiles(from, index);
-        assertValidOutpuFiles(to);
+        assertValidOutputFiles(to);
 
         UnindexSimsCommand unindex = new UnindexSimsCommand();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);

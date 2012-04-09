@@ -81,6 +81,14 @@ public class IndexDeligatePair extends AbstractDeligate implements Serializable 
         setSkipIndexed1(skipindexed1);
         setSkipIndexed2(skipindexed2);
     }
+    public IndexDeligatePair(boolean preindexedTokens1,
+                             boolean preindexedTokens2,
+                             boolean skipindexed1, boolean skipindexed2) {
+        setPreindexedTokens1(preindexedTokens1);
+        setPreindexedTokens2(preindexedTokens2);
+        setSkipIndexed1(skipindexed1);
+        setSkipIndexed2(skipindexed2);
+    }
 
     public IndexDeligatePair() {
     }

@@ -10,7 +10,7 @@ import static java.text.MessageFormat.*;
 import org.junit.*;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
+import uk.ac.susx.mlcl.byblo.io.*;
 
 /**
  *
@@ -122,12 +122,12 @@ public class IndexTPCommandTest {
         TokenPairSource.equal(out, out2, DEFAULT_CHARSET);
 
     }
-
+    
     private static void indexTP(File from, File to, File index1, File index2,
                                 boolean skip1, boolean skip2, boolean compact)
             throws Exception {
         assertValidInputFiles(from);
-        assertValidOutpuFiles(to, index1, index2);
+        assertValidOutputFiles(to, index1, index2);
 
         IndexTPCommand unindex = new IndexTPCommand();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
@@ -148,7 +148,7 @@ public class IndexTPCommandTest {
                                   boolean skip1, boolean skip2, boolean compact)
             throws Exception {
         assertValidInputFiles(from, index1, index2);
-        assertValidOutpuFiles(to);
+        assertValidOutputFiles(to);
 
         UnindexTPCommand unindex = new UnindexTPCommand();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);

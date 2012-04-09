@@ -31,29 +31,21 @@
 package uk.ac.susx.mlcl.byblo.tasks;
 
 import com.google.common.base.Objects.ToStringHelper;
-import java.io.Closeable;
-import java.io.Flushable;
-import uk.ac.susx.mlcl.lib.MiscUtil;
-import uk.ac.susx.mlcl.lib.collect.Indexed;
-import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.byblo.io.TokenPair;
-import uk.ac.susx.mlcl.lib.io.SeekableSource;
-import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.tasks.Task;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayDeque;
 import java.util.Queue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
+import uk.ac.susx.mlcl.lib.MiscUtil;
+import uk.ac.susx.mlcl.lib.collect.Indexed;
+import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+import uk.ac.susx.mlcl.lib.io.SeekableSource;
+import uk.ac.susx.mlcl.lib.io.Sink;
+import uk.ac.susx.mlcl.lib.tasks.Task;
 
 /**
  * An all pairs similarity search implementation that parallelises another
@@ -200,7 +192,7 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
             chunkerB.position(restartPos);
         }
         getExecutor().shutdown();
-        
+
         while (!getFutureQueue().isEmpty()) {
             Future<? extends Task> completed = getFutureQueue().poll();
             Task t = completed.get();
@@ -208,7 +200,7 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 t.throwException();
             }
         }
-        
+
         getExecutor().awaitTermination(Integer.MIN_VALUE, TimeUnit.DAYS);
 
     }

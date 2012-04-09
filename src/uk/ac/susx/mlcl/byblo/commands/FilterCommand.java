@@ -81,6 +81,8 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
     public static final String FILTERED_STRING = "___FILTERED___";
 
+    public static final int FILTERED_ID = 0;
+
     @ParametersDelegate
     private IndexDeligatePair indexDeligate = new IndexDeligatePair();
 

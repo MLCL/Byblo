@@ -44,7 +44,6 @@ import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
-import java.io.Closeable;
 import java.io.Flushable;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,10 +51,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
+import uk.ac.susx.mlcl.lib.io.Tell;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 
 /**
- * The most basic implementation of all-pairs similarity search. Will only 
+ * The most basic implementation of all-pairs similarity search. Will only
  * perform better than the inverted index approach {@link InvertedApssTask} with
  * very dense vectors.
  *
@@ -63,40 +63,50 @@ import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
  * @param <P> The generic-type for offset positions.
  */
 public class NaiveApssTask<P> extends AbstractTask {
-    
+
     private static final Log LOG = LogFactory.getLog(NaiveApssTask.class);
+
     /**
      * Set to Jaccard because it requires no parameterization; hence can be
      * instantiated quickly and easily.
      */
     public static final Proximity DEFAULT_MEASURE = new Jaccard();
+
     private SeekableSource<Indexed<SparseDoubleVector>, P> sourceA;
+
     private SeekableSource<Indexed<SparseDoubleVector>, P> sourceB;
+
     private Proximity measure = DEFAULT_MEASURE;
+
     private Sink<Weighted<TokenPair>> sink;
+
     /**
      * Filters that determine which feature vectors are considered.
      */
     private Predicate<Indexed<SparseDoubleVector>> processRecord = alwaysTrue();
+
     /**
      * Filters that determine which resultant pairs are output
      */
     private Predicate<Weighted<TokenPair>> pruducePair = alwaysTrue();
     // Stat collection
+
     private ApssStats stats = new ApssStats();
     // Component of the similarity calculation that depends only on the sourceA
     // feature vectorx - can be precalculated to save time during the
     // quadratic part of the algorithm
+
     private Int2DoubleMap precalcA = null;
     // Component of the similarity calculation that depends only on the sourceB
     // feature vectors - can be precalculated to save time during the
     // quadratic part of the algorithm
+
     private Int2DoubleMap precalcB = null;
 
     /**
      * Constructor of minimal parameterisation, taking arguments that must be
      * given to the algorithm for it to be in a runnable state.
-     * 
+     *
      * @param Q
      * @param R
      * @param sink
@@ -115,35 +125,35 @@ public class NaiveApssTask<P> extends AbstractTask {
      */
     public NaiveApssTask() {
     }
-    
+
     public Predicate<Weighted<TokenPair>> getProducatePair() {
         return pruducePair;
     }
-    
+
     public void setProducatePair(Predicate<Weighted<TokenPair>> pruducePair) {
         Checks.checkNotNull("pruducePair");
         this.pruducePair = pruducePair;
     }
-    
+
     public Predicate<Indexed<SparseDoubleVector>> getProcessRecord() {
         return processRecord;
     }
-    
+
     public void setProcessRecord(
             Predicate<Indexed<SparseDoubleVector>> processRecord) {
         Checks.checkNotNull("processRecord");
         this.processRecord = processRecord;
     }
-    
+
     public final ApssStats getStats() {
         return stats;
     }
-    
+
     public final void setStats(ApssStats stats) {
         Checks.checkNotNull("stats");
         this.stats = stats;
     }
-    
+
     public final void setSourceA(
             SeekableSource<Indexed<SparseDoubleVector>, P> A) {
         if (A == null) {
@@ -154,7 +164,7 @@ public class NaiveApssTask<P> extends AbstractTask {
         }
         this.sourceA = A;
     }
-    
+
     public final void setSourceB(
             SeekableSource<Indexed<SparseDoubleVector>, P> B) {
         if (B == null) {
@@ -165,43 +175,43 @@ public class NaiveApssTask<P> extends AbstractTask {
         }
         this.sourceB = B;
     }
-    
+
     protected final SeekableSource<Indexed<SparseDoubleVector>, P> getSourceA() {
         return sourceA;
     }
-    
+
     protected final SeekableSource<Indexed<SparseDoubleVector>, P> getSourceB() {
         return sourceB;
     }
-    
+
     public final Proximity getMeasure() {
         return measure;
     }
-    
+
     public final void setMeasure(Proximity measure) {
         if (measure == null) {
             throw new NullPointerException("measure == null");
         }
         this.measure = measure;
     }
-    
+
     public final Sink<Weighted<TokenPair>> getSink() {
         return sink;
     }
-    
+
     public final void setSink(Sink<Weighted<TokenPair>> sink) {
         if (sink == null) {
             throw new NullPointerException("handler == null");
         }
         this.sink = sink;
     }
-    
+
     @Override
     protected void initialiseTask() throws Exception {
         checkState();
         buildPrecalcs();
     }
-    
+
     @Override
     protected void runTask() throws Exception {
         List<Weighted<TokenPair>> pairs = new ArrayList<Weighted<TokenPair>>();
@@ -210,7 +220,7 @@ public class NaiveApssTask<P> extends AbstractTask {
         // for every vector (a) in source A
         while (getSourceA().hasNext()) {
             Indexed<SparseDoubleVector> a = getSourceA().read();
-            
+
             if (!processRecord.apply(a)) {
                 continue;
             }
@@ -221,12 +231,12 @@ public class NaiveApssTask<P> extends AbstractTask {
             }
             while (getSourceB().hasNext()) {
                 stats.incrementCandidatesCount();
-                
+
                 Indexed<SparseDoubleVector> b = sourceB.read();
                 if (!processRecord.apply(b)) {
                     continue;
                 }
-                
+
                 double sim = sim(a, b);
                 Weighted<TokenPair> pair = new Weighted<TokenPair>(
                         new TokenPair(a.key(), b.key()), sim);
@@ -243,15 +253,15 @@ public class NaiveApssTask<P> extends AbstractTask {
             }
         }
     }
-    
+
     @Override
     protected void finaliseTask() throws Exception {
-        if (sourceA instanceof Closeable) {
-            ((Closeable) sourceA).close();
-        }
-        if (sourceB instanceof Closeable) {
-            ((Closeable) sourceB).close();
-        }
+//        if (sourceA instanceof Closeable) {
+//            ((Closeable) sourceA).close();
+//        }
+//        if (sourceB instanceof Closeable) {
+//            ((Closeable) sourceB).close();
+//        }
         precalcA = null;
         precalcB = null;
     }
@@ -289,7 +299,7 @@ public class NaiveApssTask<P> extends AbstractTask {
             throw new NullPointerException("pairFilter == null");
         }
     }
-    
+
     protected void buildPrecalcs() throws IOException {
         // Calculate the left and right hand components if they have not been
         // provided.
@@ -299,17 +309,17 @@ public class NaiveApssTask<P> extends AbstractTask {
         if (precalcB == null) {
             precalcB = buildPrecalcB();
         }
-        
+
     }
-    
+
     protected Int2DoubleMap getPrecalcA() {
         return precalcA;
     }
-    
+
     protected Int2DoubleMap getPrecalcB() {
         return precalcB;
     }
-    
+
     protected Int2DoubleMap buildPrecalcA() throws IOException {
         final P startA = sourceA.position();
         Int2DoubleOpenHashMap result = new Int2DoubleOpenHashMap();
@@ -320,7 +330,7 @@ public class NaiveApssTask<P> extends AbstractTask {
         sourceA.position(startA);
         return result;
     }
-    
+
     protected Int2DoubleMap buildPrecalcB() throws IOException {
         final P startB = sourceB.position();
         Int2DoubleOpenHashMap result = new Int2DoubleOpenHashMap();
@@ -331,7 +341,7 @@ public class NaiveApssTask<P> extends AbstractTask {
         sourceB.position(startB);
         return result;
     }
-    
+
     protected final double sim(
             final Indexed<SparseDoubleVector> a,
             final Indexed<SparseDoubleVector> b) {
@@ -341,7 +351,7 @@ public class NaiveApssTask<P> extends AbstractTask {
                 precalcA.get(a.key()),
                 precalcB.get(b.key()));
     }
-    
+
     @Override
     protected ToStringHelper toStringHelper() {
         return super.toStringHelper().

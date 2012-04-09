@@ -45,7 +45,9 @@ public class Chunk<T> extends AbstractList<T>
         implements SeekableSource<T, Integer>, Cloneable {
 
     private String name;
+
     private final List<T> items;
+
     private Integer nextIndex;
 
     public Chunk(String name, List<T> items) {
@@ -56,7 +58,7 @@ public class Chunk<T> extends AbstractList<T>
 
     /**
      * Protected constructor for cloning only.
-     * 
+     *
      * @param other Chunk to clone (using a shallow copy).
      */
     protected Chunk(Chunk<T> other) {
@@ -69,12 +71,9 @@ public class Chunk<T> extends AbstractList<T>
         this.name = name;
     }
 
-    
     public String getName() {
         return name;
     }
-    
-    
 
     @Override
     public Iterator<T> iterator() {
