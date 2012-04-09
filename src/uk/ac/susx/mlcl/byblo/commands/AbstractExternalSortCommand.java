@@ -201,7 +201,11 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
         File finalMerge = mergeQueue.poll();
         new CopyCommand(finalMerge, getFileDeligate().getDestinationFile()).
                 runCommand();
-        createDeleteTask(finalMerge).runTask();
+        
+        DeleteFileTask finalDelete = createDeleteTask(finalMerge);
+        finalDelete.runTask();
+        if(finalDelete.isExceptionThrown())
+            finalDelete.throwException();
 
 
         if (LOG.isInfoEnabled()) {
@@ -214,6 +218,9 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
         Checks.checkNotNull("task", task);
         task.throwException();
         final Properties p = task.getProperties();
+        
+        if(task.isExceptionThrown())
+            task.throwException();
 
         if (task instanceof SortTask) {
 

@@ -103,7 +103,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     protected static final String VALUE_DATA_TYPE_EVENTS = "VALUE_DATA_TYPE_EVENTS";
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     @ParametersDelegate
     private IndexDeligatePair indexDeligate = new IndexDeligatePair();
@@ -378,7 +378,9 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         final String taskType = p.getProperty(KEY_TASK_TYPE);
         final String dataType = p.getProperty(KEY_DATA_TYPE);
 
-
+        if(task.isExceptionThrown())
+            task.throwException();
+        
         if (taskType.equals(VALUE_TASK_TYPE_DELETE)) {
             // not a sausage
         } else if (taskType.equals(VALUE_TASK_TYPE_COUNT)) {
@@ -479,24 +481,38 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             throw new AssertionError(
                     "The entry merge queue is empty but final copy has not been completed.");
         new CopyCommand(finalMerge, getEntriesFile()).runCommand();
-        if (!DEBUG)
-            new DeleteFileTask(finalMerge).runTask();
+        if (!DEBUG) {
+            DeleteFileTask delete = new DeleteFileTask(finalMerge);
+            delete.runTask();
+            if(delete.isExceptionThrown())
+                delete.throwException();
+        }
 
         finalMerge = mergeEntryFeatureQueue.poll();
         if (finalMerge == null)
             throw new AssertionError(
                     "The entry/feature merge queue is empty but final copy has not been completed.");
         new CopyCommand(finalMerge, getEntryFeaturesFile()).runCommand();
-        if (!DEBUG)
-            new DeleteFileTask(finalMerge).runTask();
+        if (!DEBUG) {
+            DeleteFileTask delete = new DeleteFileTask(finalMerge);
+            delete.runTask();
+            if(delete.isExceptionThrown())
+                delete.throwException();
+            
+        }
 
         finalMerge = mergeFeaturesQueue.poll();
         if (finalMerge == null)
             throw new AssertionError(
                     "The feature merge queue is empty but final copy has not been completed.");
         new CopyCommand(finalMerge, getFeaturesFile()).runCommand();
-        if (!DEBUG)
-            new DeleteFileTask(finalMerge).runTask();
+        if (!DEBUG) {
+            DeleteFileTask delete = new DeleteFileTask(finalMerge);
+            delete.runTask();
+            if(delete.isExceptionThrown())
+                delete.throwException();
+            
+        }
     }
 
     private Comparator<Weighted<Token>> getEntryOrder() throws IOException {

@@ -179,7 +179,7 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 queueTask(task);
 
                 // retrieve the results
-                while (getFutureQueue().peek().isDone()) {
+                while (!getFutureQueue().isEmpty() && getFutureQueue().peek().isDone()) {
                     Future<? extends Task> completed = getFutureQueue().poll();
                     Task t = completed.get();
                     while (t.isExceptionThrown()) {
