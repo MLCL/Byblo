@@ -146,7 +146,7 @@ public class TestConstants {
                        file.length() > 0);
             
             // The last character should be a newline.
-            RandomAccessFile raf = new RandomAccessFile(file, "rw");
+            RandomAccessFile raf = new RandomAccessFile(file, "r");
             raf.seek(file.length() - 1);
             int ch = raf.read();
             assertEquals(format("Expecting newline chracter at end of inout file: \"{0}\"", file), ch, '\n');

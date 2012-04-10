@@ -139,7 +139,7 @@ public class CosineTest {
                                                  DEFAULT_CHARSET));
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void test_CosineMi_Symmetry() throws Exception {
         System.out.println("Testing CosineMi symmetry.");
 
