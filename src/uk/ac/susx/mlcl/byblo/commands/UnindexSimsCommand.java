@@ -4,7 +4,6 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,13 +21,13 @@ import uk.ac.susx.mlcl.lib.io.Source;
 public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
-    private IndexDeligate indexDeligate = new IndexDeligate();
+    private IndexDeligate indexDeligate = new IndexDeligateImpl(false);
 
     public UnindexSimsCommand(
             File sourceFile, File destinationFile, Charset charset,
-            File indexFile) {
+            IndexDeligate indexDeligate) {
         super(sourceFile, destinationFile, charset);
-        indexDeligate.setIndexFile(indexFile);
+        this.indexDeligate = indexDeligate;
     }
 
     public UnindexSimsCommand() {
@@ -44,25 +43,17 @@ public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>>
     @Override
     protected Source<Weighted<TokenPair>> openSource(File file)
             throws FileNotFoundException, IOException {
-        IndexDeligatePair dstIdx = new IndexDeligatePair(true, true);
-        dstIdx.setSkipIndexed1(indexDeligate.isSkipIndexed1());
-        dstIdx.setSkipIndexed2(indexDeligate.isSkipIndexed2());
         return WeightedTokenPairSource.open(
                 file, getFilesDeligate().getCharset(),
-                dstIdx);
+                sourceIndexDeligate());
     }
 
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file)
             throws FileNotFoundException, IOException {
-        IndexDeligatePair srcIdx = new IndexDeligatePair(
-                false, false,
-                indexDeligate.getEnumerator(),
-                indexDeligate.getEnumerator(),
-                false, false);
         return WeightedTokenPairSink.open(
                 file, getFilesDeligate().getCharset(),
-                srcIdx, !getFilesDeligate().isCompactFormatDisabled());
+                sinkIndexDeligate(), !getFilesDeligate().isCompactFormatDisabled());
     }
 
     public IndexDeligate getIndexDeligate() {
@@ -72,4 +63,15 @@ public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>>
     public void setIndexDeligate(IndexDeligate indexDeligate) {
         this.indexDeligate = indexDeligate;
     }
+
+    protected IndexDeligatePair sourceIndexDeligate() {
+        return new IndexDeligates.SingleToPairAdapter(
+                IndexDeligates.decorateEnumerated(indexDeligate, true));
+    }
+
+    protected IndexDeligatePair sinkIndexDeligate() {
+        return new IndexDeligates.SingleToPairAdapter(
+                IndexDeligates.decorateEnumerated(indexDeligate, false));
+    }
+
 }

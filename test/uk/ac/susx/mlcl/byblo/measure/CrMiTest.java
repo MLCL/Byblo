@@ -38,7 +38,7 @@ import org.junit.Test;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
@@ -259,9 +259,9 @@ public class CrMiTest {
 
         Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
         WeightedTokenPairSource expected =  WeightedTokenPairSource.open(
-                expectedOutput, DEFAULT_CHARSET, new IndexDeligatePair(false, false, idx, idx));
+                expectedOutput, DEFAULT_CHARSET, new IndexDeligatePairImpl(false, false, idx, idx));
         WeightedTokenPairSource actual =  WeightedTokenPairSource.open(
-                crmiOutput, DEFAULT_CHARSET, new IndexDeligatePair(false, false, idx, idx));
+                crmiOutput, DEFAULT_CHARSET, new IndexDeligatePairImpl(false, false, idx, idx));
 
         while (expected.hasNext() && actual.hasNext()) {
             Weighted<TokenPair> e = expected.read();

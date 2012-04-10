@@ -51,10 +51,10 @@ public class FeatureTest {
         Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
         WeightedTokenSource aSrc = WeightedTokenSource.open(
                 a, DEFAULT_CHARSET,
-                new IndexDeligate(false, strEnum));
+                new IndexDeligateImpl(false, strEnum));
         WeightedTokenSink bSink = WeightedTokenSink.open(
                 b, DEFAULT_CHARSET,
-                new IndexDeligate(false, strEnum));
+                new IndexDeligateImpl(false, strEnum));
         bSink.setCompactFormatEnabled(compact);
 
         IOUtil.copy(aSrc, bSink);
@@ -96,10 +96,10 @@ public class FeatureTest {
         {
             WeightedTokenSource aSrc = WeightedTokenSource.open(
                     a, DEFAULT_CHARSET,
-                    new IndexDeligate(false, strEnum));
+                    new IndexDeligateImpl(false, strEnum));
             WeightedTokenSink bSink = WeightedTokenSink.open(
                     b, DEFAULT_CHARSET,
-                    new IndexDeligate(true));
+                    new IndexDeligateImpl(true));
             IOUtil.copy(aSrc, bSink);
             bSink.close();
         }
@@ -110,10 +110,10 @@ public class FeatureTest {
         {
             WeightedTokenSource bSrc = WeightedTokenSource.open(
                     b, DEFAULT_CHARSET,
-                    new IndexDeligate(true));
+                    new IndexDeligateImpl(true));
             WeightedTokenSink cSink = WeightedTokenSink.open(
                     c, DEFAULT_CHARSET,
-                    new IndexDeligate(false, strEnum));
+                    new IndexDeligateImpl(false, strEnum));
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }

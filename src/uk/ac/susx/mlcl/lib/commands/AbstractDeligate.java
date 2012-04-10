@@ -41,8 +41,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class AbstractDeligate implements Serializable {
 
-    private static final Log LOG = LogFactory.getLog(AbstractDeligate.class);
-
     public AbstractDeligate() {
     }
 

@@ -38,6 +38,7 @@ import static org.junit.Assert.*;
 import org.junit.Ignore;
 import uk.ac.susx.mlcl.byblo.Main;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.Comparators;
@@ -68,8 +69,7 @@ public class ExternalSimsKnnCommandTest {
         knnTask.getFileDeligate().setDestinationFile(out);
         knnTask.getFileDeligate().setCharset(DEFAULT_CHARSET);
         
-        knnTask.getIndexDeligate().setPreindexedTokens1(false);
-        knnTask.getIndexDeligate().setPreindexedTokens2(false);
+        knnTask.setIndexDeligate(new IndexDeligatePairImpl(false, false));
 
         knnTask.setMaxChunkSize(100000);
         knnTask.setClassComparator(Weighted.recordOrder(TokenPair.firstIndexOrder()));

@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
@@ -72,35 +72,35 @@ public class CountCommand extends AbstractCommand implements Serializable {
     private static final int PROGRESS_INTERVAL = 1000000;
 
     @Parameter(names = {"-i", "--input"},
-               required = true,
-               description = "Source instances file",
-               validateWith = InputFileValidator.class)
+    required = true,
+    description = "Source instances file",
+    validateWith = InputFileValidator.class)
     private File inputFile;
 
     @Parameter(names = {"-oef", "--output-entry-features"},
-               required = true,
-               description = "Entry-feature-pair frequencies destination file",
-               validateWith = OutputFileValidator.class)
+    required = true,
+    description = "Entry-feature-pair frequencies destination file",
+    validateWith = OutputFileValidator.class)
     private File entryFeaturesFile = null;
 
     @Parameter(names = {"-oe", "--output-entries"},
-               required = true,
-               description = "Entry frequencies destination file",
-               validateWith = OutputFileValidator.class)
+    required = true,
+    description = "Entry frequencies destination file",
+    validateWith = OutputFileValidator.class)
     private File entriesFile = null;
 
     @Parameter(names = {"-of", "--output-features"},
-               required = true,
-               description = "Feature frequencies destination file.",
-               validateWith = OutputFileValidator.class)
+    required = true,
+    description = "Feature frequencies destination file.",
+    validateWith = OutputFileValidator.class)
     private File featuresFile = null;
 
     @Parameter(names = {"-c", "--charset"},
-               description = "Character encoding to use for input and output.")
+    description = "Character encoding to use for input and output.")
     private Charset charset = Files.DEFAULT_CHARSET;
 
     @ParametersDelegate
-    private IndexDeligatePair indexDeligate = new IndexDeligatePair();
+    private IndexDeligatePair indexDeligate = new IndexDeligatePairImpl();
 
     /**
      * Dependency injection constructor with all fields parameterised.
@@ -225,24 +225,20 @@ public class CountCommand extends AbstractCommand implements Serializable {
 //    }
     private Comparator<Weighted<Token>> getEntryOrder() throws IOException {
         return indexDeligate.isEnumerated1()
-                ? Weighted.recordOrder(Token.indexOrder())
-                : Weighted.recordOrder(Token.stringOrder(indexDeligate.
-                getEnumerator1()));
+               ? Weighted.recordOrder(Token.indexOrder())
+               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getEnumerator1()));
     }
 
     private Comparator<Weighted<Token>> getFeatureOrder() throws IOException {
         return indexDeligate.isEnumerated2()
-                ? Weighted.recordOrder(Token.indexOrder())
-                : Weighted.recordOrder(Token.stringOrder(indexDeligate.
-                getEnumerator2()));
+               ? Weighted.recordOrder(Token.indexOrder())
+               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getEnumerator2()));
     }
 
     private Comparator<Weighted<TokenPair>> getEventOrder() throws IOException {
-        return (indexDeligate.isEnumerated1() && indexDeligate.
-                isEnumerated2())
-                ? Weighted.recordOrder(TokenPair.indexOrder())
-                : Weighted.recordOrder(TokenPair.stringOrder(indexDeligate.
-                getEnumerator1(), indexDeligate.getEnumerator2()));
+        return (indexDeligate.isEnumerated1() && indexDeligate.isEnumerated2())
+               ? Weighted.recordOrder(TokenPair.indexOrder())
+               : Weighted.recordOrder(TokenPair.stringOrder(indexDeligate.getEnumerator1(), indexDeligate.getEnumerator2()));
     }
 
     @Override
@@ -253,12 +249,12 @@ public class CountCommand extends AbstractCommand implements Serializable {
 
         checkState();
 
-        final TokenPairSource instanceSource =  TokenPairSource.open(
+        final TokenPairSource instanceSource = TokenPairSource.open(
                 inputFile, charset, indexDeligate);
 
         WeightedTokenSink entrySink =
                 WeightedTokenSink.open(
-                entriesFile, charset, indexDeligate.single1());
+                entriesFile, charset, IndexDeligates.toSingle1(indexDeligate));
 //        
 //                new WeightedTokenSink(
 //                new TSVSink(entriesFile, charset),
@@ -266,7 +262,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
 
         WeightedTokenSink featureSink =
                 WeightedTokenSink.open(
-                featuresFile, charset, indexDeligate.single2());
+                featuresFile, charset, IndexDeligates.toSingle2(indexDeligate));
 //        
 //                new WeightedTokenSink(
 //                new TSVSink(featuresFile, charset),
@@ -587,8 +583,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
 
         // For each output file, check that either it exists and it writeable,
         // or that it does not exist but is creatable
-        if (entriesFile.exists() && (!entriesFile.isFile() || !entriesFile.
-                                     canWrite())) {
+        if (entriesFile.exists() && (!entriesFile.isFile() || !entriesFile.canWrite())) {
             throw new IllegalStateException(
                     "entries file exists but is not writable: " + entriesFile);
         }
@@ -598,8 +593,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
             throw new IllegalStateException(
                     "entries file does not exists and can not be reated: " + entriesFile);
         }
-        if (featuresFile.exists() && (!featuresFile.isFile() || !featuresFile.
-                                      canWrite())) {
+        if (featuresFile.exists() && (!featuresFile.isFile() || !featuresFile.canWrite())) {
             throw new IllegalStateException(
                     "features file exists but is not writable: " + featuresFile);
         }
@@ -609,8 +603,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
             throw new IllegalStateException(
                     "features file does not exists and can not be reated: " + featuresFile);
         }
-        if (entryFeaturesFile.exists() && (!entryFeaturesFile.isFile() || !entryFeaturesFile.
-                                           canWrite())) {
+        if (entryFeaturesFile.exists() && (!entryFeaturesFile.isFile() || !entryFeaturesFile.canWrite())) {
             throw new IllegalStateException(
                     "entry-features file exists but is not writable: " + entryFeaturesFile);
         }
@@ -635,4 +628,5 @@ public class CountCommand extends AbstractCommand implements Serializable {
     public static void main(String[] args) throws Exception {
         new CountCommand().runCommand(args);
     }
+
 }

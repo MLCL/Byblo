@@ -134,10 +134,10 @@ public class IndexSimsCommandTest {
         {
             WeightedTokenPairSource wtpsa = WeightedTokenPairSource.open(
                     outa, DEFAULT_CHARSET,
-                    new IndexDeligatePair(true, true, skip1a, skip2a));
+                    new IndexDeligatePairImpl(true, true, skip1a, skip2a));
             WeightedTokenPairSource wtpsb = WeightedTokenPairSource.open(
                     outb, DEFAULT_CHARSET,
-                    new IndexDeligatePair(true, true, skip1b, skip2b));
+                    new IndexDeligatePairImpl(true, true, skip1b, skip2b));
             List<Tell> pa = new ArrayList<Tell>();
             List<Tell> pb = new ArrayList<Tell>();
             List<Weighted<TokenPair>> va = new ArrayList<Weighted<TokenPair>>();
@@ -175,11 +175,11 @@ public class IndexSimsCommandTest {
         {
             WeightedTokenPairVectorSource wtpsa = WeightedTokenPairSource.open(
                     outa, DEFAULT_CHARSET,
-                    new IndexDeligatePair(true, true, skip1a, skip2a)).
+                    new IndexDeligatePairImpl(true, true, skip1a, skip2a)).
                     getVectorSource();
             WeightedTokenPairVectorSource wtpsb = WeightedTokenPairSource.open(
                     outb, DEFAULT_CHARSET,
-                    new IndexDeligatePair(true, true, skip1b, skip2b)).
+                    new IndexDeligatePairImpl(true, true, skip1b, skip2b)).
                     getVectorSource();
 
             List<Tell> pa = new ArrayList<Tell>();
@@ -231,9 +231,8 @@ public class IndexSimsCommandTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
-        unindex.getIndexDeligate().setIndexFile(index);
-        unindex.getIndexDeligate().setSkipIndexed1(skip1);
-        unindex.getIndexDeligate().setSkipIndexed2(skip2);
+
+        unindex.setIndexDeligate(new IndexDeligateImpl(true, index, null, skip1, skip2));
         unindex.runCommand();
 
         assertValidInputFiles(to, index);
@@ -252,12 +251,11 @@ public class IndexSimsCommandTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
-        unindex.getIndexDeligate().setIndexFile(index);
-        unindex.getIndexDeligate().setSkipIndexed1(skip1);
-        unindex.getIndexDeligate().setSkipIndexed2(skip2);
+        unindex.setIndexDeligate(new IndexDeligateImpl(true, index, null, skip1, skip2));
         unindex.runCommand();
 
         assertValidInputFiles(to);
         assertSizeGT(to, from);
     }
+
 }

@@ -136,6 +136,7 @@ public class TestConstants {
 
     public static void assertValidInputFiles(File... files) throws IOException {
         for (File file : files) {
+            assertNotNull("File is null.", file);
             assertTrue(format("Input file is null: \"{0}\"", file), file != null);
             assertTrue(format("Input file does not exist: \"{0}\" ", file),
                        file.exists());
@@ -156,6 +157,7 @@ public class TestConstants {
 
     public static void assertValidOutputFiles(File... files) throws IOException {
         for (File file : files) {
+            assertNotNull("File is null.", file);
             if (file.exists()) {
                 assertTrue(format("Input file is not a regular: \"{0}\"", file),
                            file.isFile());

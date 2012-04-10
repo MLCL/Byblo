@@ -1,140 +1,58 @@
 /*
- * To change this template, choose Tools | Templates
+ * Copyright (c) 2010-2012, University of Sussex
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met:
+ *  
+ *  * Redistributions of source code must retain the above copyright notice, 
+ *    this list of conditions and the following disclaimer.
+ * 
+ *  * Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ *  * Neither the name of the University of Sussex nor the names of its 
+ *    contributors may be used to endorse or promote products derived from this 
+ *    software without specific prior written permission.
+ *  
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ * POSSIBILITY OF SUCH DAMAGE.To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import com.beust.jcommander.Parameter;
-import com.google.common.base.Objects;
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
-import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.Enumerators;
-import uk.ac.susx.mlcl.lib.commands.AbstractDeligate;
-import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 
 /**
  *
  * @author hiam20
  */
-public class IndexDeligate extends AbstractDeligate implements Serializable {
+public interface IndexDeligate {
 
-    private static final long serialVersionUID = 1L;
+    boolean DEFAULT_ENUMERATED = false;
 
-    static final boolean DEFAULT_INDEXING = false;
+    boolean DEFAULT_SKIP_INDEXING = false;
 
-    static final boolean DEFAULT_SKIP_INDEXING = false;
+    Enumerator<String> getEnumerator() throws IOException;
 
-    @Parameter(names = {"-p", "--preindexed"},
-               description = "Whether tokens in the input events file are indexed.")
-    private boolean preindexedTokens = DEFAULT_INDEXING;
+    File getIndexFile();
 
-    @Parameter(names = {"-x", "--index-file"},
-               description = "Index for the string tokens.",
-               validateWith = InputFileValidator.class)
-    private File indexFile = null;
+    boolean isEnumerated();
 
-    @Parameter(names = {"-s1", "--skipindexed1"},
-               description = "")
-    private boolean skipIndexed1 = DEFAULT_SKIP_INDEXING;
+    boolean isSkipIndexed1();
 
-    @Parameter(names = {"-s2", "--skipindexed2"},
-               description = "")
-    private boolean skipIndexed2 = DEFAULT_SKIP_INDEXING;
+    boolean isSkipIndexed2();
 
-    private Enumerator<String> enumerator = null;
-
-    public IndexDeligate(boolean preindexedTokens, File indexFile,
-                         Enumerator<String> index,
-                         boolean skipIndexed1, boolean skipIndexed2) {
-        this.preindexedTokens = preindexedTokens;
-        this.indexFile = indexFile;
-        this.enumerator = index;
-        this.skipIndexed1 = skipIndexed1;
-        this.skipIndexed2 = skipIndexed2;
-    }
-
-    public IndexDeligate(boolean preindexedTokens, Enumerator<String> index) {
-        this.preindexedTokens = preindexedTokens;
-        this.enumerator = index;
-    }
-
-    public IndexDeligate(boolean preindexed) {
-        setPreindexedTokens(preindexed);
-    }
-
-    public IndexDeligate() {
-    }
-
-    public IndexDeligatePair pair() throws IOException {
-        return new IndexDeligatePair(
-                isPreindexedTokens(), isPreindexedTokens(),
-                getEnumerator(), getEnumerator(),
-                isSkipIndexed1(), isSkipIndexed2());
-    }
-
-    public boolean isSkipIndexed1() {
-        return skipIndexed1;
-    }
-
-    public void setSkipIndexed1(boolean skipIndexed1) {
-        this.skipIndexed1 = skipIndexed1;
-    }
-
-    public boolean isSkipIndexed2() {
-        return skipIndexed2;
-    }
-
-    public void setSkipIndexed2(boolean skipIndexed2) {
-        this.skipIndexed2 = skipIndexed2;
-    }
-
-    public File getIndexFile() {
-        return indexFile;
-    }
-
-    public void setIndexFile(File indexFile) {
-        Checks.checkNotNull(indexFile);
-        this.indexFile = indexFile;
-    }
-
-    public final Enumerator<String> getEnumerator() throws IOException {
-        if (enumerator == null) {
-            if (isPreindexedTokens()) {
-                if (indexFile != null && indexFile.exists())
-                    enumerator = Enumerators.loadStringEnumerator(indexFile);
-                else
-                    enumerator = Enumerators.nullEnumerator();
-            } else {
-                if (indexFile != null && indexFile.exists()) {
-                    enumerator = Enumerators.loadStringEnumerator(indexFile);
-                } else {
-                    enumerator = Enumerators.newDefaultStringEnumerator();
-                }
-            }
-        }
-        return enumerator;
-    }
-
-    public final void setEnumerator(Enumerator<String> enumerator) {
-        Checks.checkNotNull("enumerator", enumerator);
-        this.enumerator = enumerator;
-    }
-
-    public final boolean isPreindexedTokens() {
-        return preindexedTokens;
-    }
-
-    public final void setPreindexedTokens(boolean preindexedTokens) {
-        this.preindexedTokens = preindexedTokens;
-    }
-
-    @Override
-    protected Objects.ToStringHelper toStringHelper() {
-        return super.toStringHelper().
-                add("preindexed", isPreindexedTokens()).
-                add("index", getIndexFile());
-    }
 }

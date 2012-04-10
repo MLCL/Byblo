@@ -21,13 +21,13 @@ import uk.ac.susx.mlcl.lib.io.Source;
 public class UnindexWTCommand extends AbstractCopyCommand<Weighted<Token>> {
 
     @ParametersDelegate
-    private IndexDeligate indexDeligate = new IndexDeligate();
+    private IndexDeligate indexDeligate = new IndexDeligateImpl(false);
 
     public UnindexWTCommand(
             File sourceFile, File destinationFile, Charset charset,
-            File indexFile) {
+            IndexDeligate indexDeligate) {
         super(sourceFile, destinationFile, charset);
-        indexDeligate.setIndexFile(indexFile);
+        this.indexDeligate = indexDeligate;
     }
 
     public UnindexWTCommand() {
@@ -43,22 +43,17 @@ public class UnindexWTCommand extends AbstractCopyCommand<Weighted<Token>> {
     @Override
     protected Source<Weighted<Token>> openSource(File file)
             throws FileNotFoundException, IOException {
-        IndexDeligate dstIdx = new IndexDeligate(true);
-        dstIdx.setSkipIndexed1(indexDeligate.isSkipIndexed1());
-        dstIdx.setSkipIndexed2(indexDeligate.isSkipIndexed2());
         return WeightedTokenSource.open(
                 file, getFilesDeligate().getCharset(),
-                dstIdx);
+                sourceIndexDeligate());
     }
 
     @Override
     protected Sink<Weighted<Token>> openSink(File file)
             throws FileNotFoundException, IOException {
-        IndexDeligate srcIdx = new IndexDeligate(
-                false,
-                indexDeligate.getEnumerator());
         return WeightedTokenSink.open(
-                file, getFilesDeligate().getCharset(), srcIdx);
+                file, getFilesDeligate().getCharset(),
+                sinkIndexDeligate());
     }
 
     public IndexDeligate getIndexDeligate() {
@@ -68,4 +63,13 @@ public class UnindexWTCommand extends AbstractCopyCommand<Weighted<Token>> {
     public void setIndexDeligate(IndexDeligate indexDeligate) {
         this.indexDeligate = indexDeligate;
     }
+
+    protected IndexDeligate sourceIndexDeligate() {
+        return IndexDeligates.decorateEnumerated(indexDeligate, true);
+    }
+
+    protected IndexDeligate sinkIndexDeligate() {
+        return IndexDeligates.decorateEnumerated(indexDeligate, false);
+    }
+
 }

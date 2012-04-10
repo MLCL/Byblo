@@ -4,7 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,10 +28,10 @@ public class SortTokenPairCommand extends AbstractSortCommand<TokenPair> {
     private static final Log LOG = LogFactory.getLog(SortWeightedTokenCommand.class);
 
     @ParametersDelegate
-    private IndexDeligatePair indexDeligate = new IndexDeligatePair();
+    private IndexDeligatePairImpl indexDeligate = new IndexDeligatePairImpl();
 
     public SortTokenPairCommand(File sourceFile, File destinationFile, Charset charset,
-                                                                       IndexDeligatePair indexDeligate) {
+                                IndexDeligatePairImpl indexDeligate) {
         super(sourceFile, destinationFile, charset, TokenPair.indexOrder());
         setIndexDeligate(indexDeligate);
     }
@@ -42,26 +42,23 @@ public class SortTokenPairCommand extends AbstractSortCommand<TokenPair> {
     @Override
     protected Source<TokenPair> openSource(File file) throws FileNotFoundException, IOException {
         return TokenPairSource.open(file, getFilesDeligate().getCharset(),
-                                   indexDeligate);
+                                    indexDeligate);
     }
 
     @Override
     protected Sink<TokenPair> openSink(File file) throws FileNotFoundException, IOException {
-        TokenPairSink s =  TokenPairSink.open(file, getFilesDeligate().getCharset(),
-                                 indexDeligate,
-                                 !getFilesDeligate().isCompactFormatDisabled());
-//        s.setCompactFormatEnabled(!getFilesDeligate().isCompactFormatDisabled());
-        return s;
+        return TokenPairSink.open(
+                file, getFilesDeligate().getCharset(), indexDeligate,
+                !getFilesDeligate().isCompactFormatDisabled());
     }
 
-    public final IndexDeligatePair getIndexDeligate() {
+    public final IndexDeligatePairImpl getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(IndexDeligatePair indexDeligate) {
+    public final void setIndexDeligate(IndexDeligatePairImpl indexDeligate) {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }
 
-    
 }

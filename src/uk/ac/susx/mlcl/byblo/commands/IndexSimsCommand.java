@@ -4,7 +4,6 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,13 +23,13 @@ import uk.ac.susx.mlcl.lib.io.Source;
 public class IndexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
-    private IndexDeligate indexDeligate = new IndexDeligate();
+    private IndexDeligate indexDeligate = new IndexDeligateImpl(false);
 
     public IndexSimsCommand(
             File sourceFile, File destinationFile, Charset charset,
-            File indexFile) {
+            IndexDeligate indexDeligate) {
         super(sourceFile, destinationFile, charset);
-        indexDeligate.setIndexFile(indexFile);
+        this.indexDeligate = indexDeligate;
     }
 
     public IndexSimsCommand() {
@@ -41,35 +40,27 @@ public class IndexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
     public void runCommand() throws Exception {
         Checks.checkNotNull("indexFile", indexDeligate.getIndexFile());
 
-        Enumerator<String> senum = Enumerators.newDefaultStringEnumerator();
-        indexDeligate.setEnumerator(senum);
-
         super.runCommand();
 
-        Enumerators.saveStringEnumerator(senum,
+        Enumerators.saveStringEnumerator(indexDeligate.getEnumerator(),
                                          indexDeligate.getIndexFile());
     }
 
     @Override
     protected Source<Weighted<TokenPair>> openSource(File file)
             throws FileNotFoundException, IOException {
-        IndexDeligatePair srcIdx = new IndexDeligatePair(false, false,
-                                                         indexDeligate.
-                getEnumerator(), indexDeligate.getEnumerator());
         return WeightedTokenPairSource.open(
                 file, getFilesDeligate().getCharset(),
-                srcIdx);
+                sourceIndexDeligate());
     }
 
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file)
             throws FileNotFoundException, IOException {
-        IndexDeligatePair dstIdx = new IndexDeligatePair(true, true);
-        dstIdx.setSkipIndexed1(indexDeligate.isSkipIndexed1());
-        dstIdx.setSkipIndexed2(indexDeligate.isSkipIndexed2());
         return WeightedTokenPairSink.open(
                 file, getFilesDeligate().getCharset(),
-                dstIdx, !getFilesDeligate().isCompactFormatDisabled());
+                sinkIndexDeligate(),
+                !getFilesDeligate().isCompactFormatDisabled());
     }
 
     public IndexDeligate getIndexDeligate() {
@@ -79,4 +70,15 @@ public class IndexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
     public void setIndexDeligate(IndexDeligate indexDeligate) {
         this.indexDeligate = indexDeligate;
     }
+
+    protected IndexDeligatePair sourceIndexDeligate() {
+        return new IndexDeligates.SingleToPairAdapter(
+                IndexDeligates.decorateEnumerated(indexDeligate, false));
+    }
+
+    protected IndexDeligatePair sinkIndexDeligate() {
+        return new IndexDeligates.SingleToPairAdapter(
+                IndexDeligates.decorateEnumerated(indexDeligate, true));
+    }
+
 }

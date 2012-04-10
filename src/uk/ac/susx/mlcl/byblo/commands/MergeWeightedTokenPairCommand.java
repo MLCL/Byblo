@@ -4,7 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects.ToStringHelper;
 import java.io.File;
@@ -27,11 +27,11 @@ import uk.ac.susx.mlcl.lib.io.Source;
 public class MergeWeightedTokenPairCommand extends AbstractMergeCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
-    private IndexDeligatePair indexDeligate = new IndexDeligatePair();
+    private IndexDeligatePairImpl indexDeligate = new IndexDeligatePairImpl();
 
     public MergeWeightedTokenPairCommand(
             File sourceFileA, File sourceFileB, File destinationFile,
-            Charset charset, IndexDeligatePair indexDeligate) {
+            Charset charset, IndexDeligatePairImpl indexDeligate) {
         super(sourceFileA, sourceFileB, destinationFile, charset, Weighted.recordOrder(TokenPair.indexOrder()));
         setIndexDeligate(indexDeligate);
     }
@@ -39,30 +39,28 @@ public class MergeWeightedTokenPairCommand extends AbstractMergeCommand<Weighted
     public MergeWeightedTokenPairCommand() {
     }
 
-    public final IndexDeligatePair getIndexDeligate() {
+    public final IndexDeligatePairImpl getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(IndexDeligatePair indexDeligate) {
+    public final void setIndexDeligate(IndexDeligatePairImpl indexDeligate) {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }
 
     @Override
     protected Source<Weighted<TokenPair>> openSource(File file) throws FileNotFoundException, IOException {
-        return  WeightedTokenPairSource.open(
+        return WeightedTokenPairSource.open(
                 file, getFileDeligate().getCharset(),
                 indexDeligate);
     }
 
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file) throws FileNotFoundException, IOException {
-
-        WeightedTokenPairSink s =  WeightedTokenPairSink.open(
+        WeightedTokenPairSink s = WeightedTokenPairSink.open(
                 file, getFileDeligate().getCharset(),
                 indexDeligate,
                 !getFileDeligate().isCompactFormatDisabled());
-//        s.setCompactFormatEnabled();
         return new WeightSumReducerSink<TokenPair>(s);
     }
 

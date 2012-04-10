@@ -4,7 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,6 +20,7 @@ import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import static org.junit.Assert.*;
+import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 
@@ -61,7 +62,7 @@ public class ExternalSortWeightedTokenPairCommandTest {
                                        FRUIT_NAME + ".sims.randomised");
         File sortedFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".sims.sorted");
 
-        final IndexDeligatePair idx = new IndexDeligatePair(
+        final IndexDeligatePair idx = new IndexDeligatePairImpl(
                 preindexedTokens1, preindexedTokens2);
 
         Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(
@@ -89,7 +90,7 @@ public class ExternalSortWeightedTokenPairCommandTest {
                                    FRUIT_NAME + ".indexed.sims.sorted");
 
 
-        final IndexDeligatePair idx = new IndexDeligatePair(
+        final IndexDeligatePair idx = new IndexDeligatePairImpl(
                 preindexedTokens1, preindexedTokens2);
 
 

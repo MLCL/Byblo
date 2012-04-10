@@ -4,18 +4,14 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligate;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligateImpl;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import uk.ac.susx.mlcl.byblo.io.WeightSumReducerSink;
-import uk.ac.susx.mlcl.byblo.io.Token;
-import uk.ac.susx.mlcl.byblo.io.Weighted;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenSink;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
+import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.io.Source;
@@ -27,7 +23,7 @@ import uk.ac.susx.mlcl.lib.io.Source;
 public class MergeWeightedTokenCommand extends AbstractMergeCommand<Weighted<Token>> {
 
     @ParametersDelegate
-    private IndexDeligate indexDeligate = new IndexDeligate();
+    private IndexDeligate indexDeligate = new IndexDeligateImpl();
 
     public MergeWeightedTokenCommand(
             File sourceFileA, File sourceFileB, File destinationFile, 

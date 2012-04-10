@@ -4,7 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
 import java.io.File;
@@ -25,11 +25,11 @@ import uk.ac.susx.mlcl.lib.io.Source;
 public class MergeTokenPairCommand extends AbstractMergeCommand<TokenPair> {
 
     @ParametersDelegate
-    private IndexDeligatePair indexDeligate = new IndexDeligatePair();
+    private IndexDeligatePairImpl indexDeligate = new IndexDeligatePairImpl();
 
     public MergeTokenPairCommand(
             File sourceFileA, File sourceFileB, File destinationFile,
-            Charset charset, IndexDeligatePair indexDeligate) {
+            Charset charset, IndexDeligatePairImpl indexDeligate) {
         super(sourceFileA, sourceFileB, destinationFile, charset, TokenPair.indexOrder());
         setIndexDeligate(indexDeligate);
     }
@@ -37,11 +37,11 @@ public class MergeTokenPairCommand extends AbstractMergeCommand<TokenPair> {
     public MergeTokenPairCommand() {
     }
 
-    public final IndexDeligatePair getIndexDeligate() {
+    public final IndexDeligatePairImpl getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(IndexDeligatePair indexDeligate) {
+    public final void setIndexDeligate(IndexDeligatePairImpl indexDeligate) {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }

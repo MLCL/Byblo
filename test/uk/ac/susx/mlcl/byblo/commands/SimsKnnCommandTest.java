@@ -36,6 +36,7 @@ import java.io.File;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.Comparators;
@@ -61,8 +62,7 @@ public class SimsKnnCommandTest {
         knnTask.getFilesDeligate().setDestinationFile(out);
         knnTask.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         knnTask.setK(100);
-        knnTask.getIndexDeligate().setPreindexedTokens1(false);
-        knnTask.getIndexDeligate().setPreindexedTokens2(false);
+        knnTask.setIndexDeligate(new IndexDeligatePairImpl(false, false));
         knnTask.setClassComparator(Weighted.recordOrder(TokenPair.firstIndexOrder()));
         knnTask.setNearnessComparator(
                 Comparators.reverse(Weighted.<TokenPair>weightOrder()));
@@ -88,8 +88,7 @@ public class SimsKnnCommandTest {
         knnTask.getFilesDeligate().setDestinationFile(out);
         knnTask.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         knnTask.setK(100);
-        knnTask.getIndexDeligate().setPreindexedTokens1(false);
-        knnTask.getIndexDeligate().setPreindexedTokens2(false);
+        knnTask.setIndexDeligate(new IndexDeligatePairImpl(false, false));
         knnTask.setClassComparator(Weighted.recordOrder(TokenPair.firstIndexOrder()));
         knnTask.setNearnessComparator(
                 Comparators.reverse(

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 import org.junit.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
 import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import static org.junit.Assert.*;
@@ -143,10 +143,10 @@ public class IndexWTPCommandTest {
         {
             WeightedTokenPairSource wtpsa = WeightedTokenPairSource.open(
                     outa, DEFAULT_CHARSET,
-                    new IndexDeligatePair(true, true, skip1a, skip2a));
+                    new IndexDeligatePairImpl(true, true, skip1a, skip2a));
             WeightedTokenPairSource wtpsb = WeightedTokenPairSource.open(
                     outb, DEFAULT_CHARSET,
-                    new IndexDeligatePair(true, true, skip1b, skip2b));
+                    new IndexDeligatePairImpl(true, true, skip1b, skip2b));
             List<Tell> pa = new ArrayList<Tell>();
             List<Tell> pb = new ArrayList<Tell>();
             List<Weighted<TokenPair>> va = new ArrayList<Weighted<TokenPair>>();
@@ -184,11 +184,11 @@ public class IndexWTPCommandTest {
         {
             WeightedTokenPairVectorSource wtpsa = WeightedTokenPairSource.open(
                     outa, DEFAULT_CHARSET,
-                    new IndexDeligatePair(true, true, skip1a, skip2a)).
+                    new IndexDeligatePairImpl(true, true, skip1a, skip2a)).
                     getVectorSource();
             WeightedTokenPairVectorSource wtpsb = WeightedTokenPairSource.open(
                     outb, DEFAULT_CHARSET,
-                    new IndexDeligatePair(true, true, skip1b, skip2b)).
+                    new IndexDeligatePairImpl(true, true, skip1b, skip2b)).
                     getVectorSource();
 
             List<Tell> pa = new ArrayList<Tell>();
@@ -240,10 +240,7 @@ public class IndexWTPCommandTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
-        unindex.getIndexDeligate().setIndexFile1(index1);
-        unindex.getIndexDeligate().setIndexFile2(index2);
-        unindex.getIndexDeligate().setSkipIndexed1(skip1);
-        unindex.getIndexDeligate().setSkipIndexed2(skip2);
+        unindex.setIndexDeligate(new IndexDeligatePairImpl(true, true, index1, index2, skip1, skip2));
         unindex.runCommand();
 
         assertValidInputFiles(to, index1, index2);
@@ -261,10 +258,7 @@ public class IndexWTPCommandTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
-        unindex.getIndexDeligate().setIndexFile1(index1);
-        unindex.getIndexDeligate().setIndexFile2(index2);
-        unindex.getIndexDeligate().setSkipIndexed1(skip1);
-        unindex.getIndexDeligate().setSkipIndexed2(skip2);
+        unindex.setIndexDeligate(new IndexDeligatePairImpl(true, true, index1, index2, skip1, skip2));
         unindex.runCommand();
 
         assertValidInputFiles(to);

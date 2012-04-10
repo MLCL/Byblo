@@ -51,9 +51,9 @@ public class WeightedEntryPairTest {
         Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
 
         WeightedTokenPairSource aSrc = WeightedTokenPairSource.open(
-                a, DEFAULT_CHARSET, new IndexDeligatePair(false, false, idx, idx));
+                a, DEFAULT_CHARSET, new IndexDeligatePairImpl(false, false, idx, idx));
         WeightedTokenPairSink bSink =  WeightedTokenPairSink.open(
-                b, DEFAULT_CHARSET,new IndexDeligatePair(false, false, idx, idx), compact);
+                b, DEFAULT_CHARSET,new IndexDeligatePairImpl(false, false, idx, idx), compact);
 //        bSink.setCompactFormatEnabled(compact);
 
         IOUtil.copy(aSrc, bSink);
@@ -95,10 +95,10 @@ public class WeightedEntryPairTest {
         {
             WeightedTokenPairSource aSrc = WeightedTokenPairSource.open(
                     a, DEFAULT_CHARSET, 
-                    new IndexDeligatePair(false, false, idx, idx));
+                    new IndexDeligatePairImpl(false, false, idx, idx));
             WeightedTokenPairSink bSink =  WeightedTokenPairSink.open(
                     b, DEFAULT_CHARSET,
-                    new IndexDeligatePair(true, true), true);
+                    new IndexDeligatePairImpl(true, true), true);
             IOUtil.copy(aSrc, bSink);
             bSink.close();
         }
@@ -109,10 +109,10 @@ public class WeightedEntryPairTest {
         {
             WeightedTokenPairSource bSrc =  WeightedTokenPairSource.open(
                     b, DEFAULT_CHARSET,
-                    new IndexDeligatePair(true, true));
+                    new IndexDeligatePairImpl(true, true));
             WeightedTokenPairSink cSink = WeightedTokenPairSink.open(
                     c, DEFAULT_CHARSET, 
-                    new IndexDeligatePair(false, false, idx, idx), true);
+                    new IndexDeligatePairImpl(false, false, idx, idx), true);
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }

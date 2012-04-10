@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
@@ -84,96 +84,96 @@ public class FilterCommand extends AbstractCommand implements Serializable {
     public static final int FILTERED_ID = 0;
 
     @ParametersDelegate
-    private IndexDeligatePair indexDeligate = new IndexDeligatePair();
+    private IndexDeligatePairImpl indexDeligate = new IndexDeligatePairImpl();
 
     /*
      * === INPUT FILES ===
      */
     @Parameter(names = {"-ief", "--input-entry-features"},
-               required = true,
-               description = "Input entry/feature pair frequencies file.",
-               validateWith = InputFileValidator.class)
+    required = true,
+    description = "Input entry/feature pair frequencies file.",
+    validateWith = InputFileValidator.class)
     private File inputEntryFeaturesFile;
 
     @Parameter(names = {"-ie", "--input-entries"},
-               required = true,
-               description = "Input entry frequencies file.",
-               validateWith = InputFileValidator.class)
+    required = true,
+    description = "Input entry frequencies file.",
+    validateWith = InputFileValidator.class)
     private File inputEntriesFile;
 
     @Parameter(names = {"-if", "--input-features"},
-               required = true,
-               description = "Input features frequencies file.",
-               validateWith = InputFileValidator.class)
+    required = true,
+    description = "Input features frequencies file.",
+    validateWith = InputFileValidator.class)
     private File inputFeaturesFile;
     /*
      * === OUTPUT FILES ===
      */
 
     @Parameter(names = {"-oef", "--output-entry-features"},
-               required = true,
-               description = "Output entry/feature pair frequencies file.",
-               validateWith = OutputFileValidator.class)
+    required = true,
+    description = "Output entry/feature pair frequencies file.",
+    validateWith = OutputFileValidator.class)
     private File outputEntryFeaturesFile;
 
     @Parameter(names = {"-oe", "--output-entries"},
-               required = true,
-               description = "Output entry frequencies file",
-               validateWith = OutputFileValidator.class)
+    required = true,
+    description = "Output entry frequencies file",
+    validateWith = OutputFileValidator.class)
     private File outputEntriesFile;
 
     @Parameter(names = {"-of", "--output-features"},
-               required = true,
-               description = "Output features frequencies file.",
-               validateWith = OutputFileValidator.class)
+    required = true,
+    description = "Output features frequencies file.",
+    validateWith = OutputFileValidator.class)
     private File outputFeaturesFile;
 
     /*
      * === CHARACTER ENCODING ===
      */
     @Parameter(names = {"-c", "--charset"},
-               description = "Character encoding to use for both input and output.")
+    description = "Character encoding to use for both input and output.")
     private Charset charset = Files.DEFAULT_CHARSET;
 
     /*
      * === FILTER PARAMATERISATION ===
      */
     @Parameter(names = {"-fef", "--filter-entry-freq"},
-               description = "Minimum entry pair frequency threshold.",
-               converter = DoubleConverter.class)
+    description = "Minimum entry pair frequency threshold.",
+    converter = DoubleConverter.class)
     private double filterEntryMinFreq;
 
     @Parameter(names = {"-few", "--filter-entry-whitelist"},
-               description = "Whitelist file containing entries of interest. (All others will be ignored)",
-               validateWith = InputFileValidator.class)
+    description = "Whitelist file containing entries of interest. (All others will be ignored)",
+    validateWith = InputFileValidator.class)
     private File filterEntryWhitelist;
 
     @Parameter(names = {"-fep", "--filter-entry-pattern"},
-               description = "Regular expresion that accepted entries must match.")
+    description = "Regular expresion that accepted entries must match.")
     private String filterEntryPattern;
 
     @Parameter(names = {"-feff", "--filter-entry-feature-freq"},
-               description = "Minimum entry/feature pair frequency threshold.",
-               converter = DoubleConverter.class)
+    description = "Minimum entry/feature pair frequency threshold.",
+    converter = DoubleConverter.class)
     private double filterEntryFeatureMinFreq;
 
     @Parameter(names = {"-fff", "--filter-feature-freq"},
-               description = "Minimum feature pair frequency threshold.",
-               converter = DoubleConverter.class)
+    description = "Minimum feature pair frequency threshold.",
+    converter = DoubleConverter.class)
     private double filterFeatureMinFreq;
 
     @Parameter(names = {"-ffw", "--filter-feature-whitelist"},
-               description = "Whitelist file containing features of interest. (All others will be ignored)",
-               validateWith = InputFileValidator.class)
+    description = "Whitelist file containing features of interest. (All others will be ignored)",
+    validateWith = InputFileValidator.class)
     private File filterFeatureWhitelist;
 
     @Parameter(names = {"-ffp", "--filter-feature-pattern"},
-               description = "Regular expresion that accepted features must match.")
+    description = "Regular expresion that accepted features must match.")
     private String filterFeaturePattern;
 
     @Parameter(names = {"-T", "--temp-dir"},
-               description = "Temorary directory which will be used during filtering.",
-               converter = TempFileFactoryConverter.class)
+    description = "Temorary directory which will be used during filtering.",
+    converter = TempFileFactoryConverter.class)
     private FileFactory tempFiles = new TempFileFactory();
 
     /*
@@ -217,11 +217,11 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         setOutputEntriesFile(outputEntriesFile);
     }
 
-    public final IndexDeligatePair getIndexDeligate() {
+    public final IndexDeligatePairImpl getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(IndexDeligatePair indexDeligate) {
+    public final void setIndexDeligate(IndexDeligatePairImpl indexDeligate) {
         this.indexDeligate = indexDeligate;
     }
 
@@ -353,8 +353,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
         WeightedTokenSource entriesSource = WeightedTokenSource.open(
                 activeEntriesFile, charset,
-                getIndexDeligate().
-                single1());
+                IndexDeligates.toSingle1(getIndexDeligate()));
 
 //                new WeightedTokenSource(
 //                new TSVSource(activeEntriesFile, charset), getIndexDeligate().
@@ -364,7 +363,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         outputFile.deleteOnExit();
 
         WeightedTokenSink entriesSink = WeightedTokenSink.open(
-                outputFile, charset, getIndexDeligate().single1());
+                outputFile, charset, IndexDeligates.toSingle1(getIndexDeligate()));
 //        
 //                new WeightedTokenSink(
 //                new TSVSink(outputFile, charset),
@@ -392,8 +391,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
                 filteredWeight += record.weight();
             }
 
-            if ((entriesSource.getCount() % PROGRESS_INTERVAL == 0 || !entriesSource.
-                 hasNext())
+            if ((entriesSource.getCount() % PROGRESS_INTERVAL == 0 || !entriesSource.hasNext())
                     && LOG.isInfoEnabled()) {
                 LOG.info(
                         "Accepted " + entriesSink.getCount()
@@ -567,7 +565,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         IntSet rejectedFeatures = new IntOpenHashSet();
 
         WeightedTokenSource featureSource = WeightedTokenSource.open(
-                activeFeaturesFile, charset, getIndexDeligate().single2());
+                activeFeaturesFile, charset, IndexDeligates.toSingle2(getIndexDeligate()));
 //new WeightedTokenSource(
 //                new TSVSource(activeFeaturesFile, charset),
 //                getIndexDeligate().single2());
@@ -576,7 +574,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         outputFile.deleteOnExit();
 
         WeightedTokenSink featureSink = WeightedTokenSink.open(
-                outputFile, charset, getIndexDeligate().single2());
+                outputFile, charset, IndexDeligates.toSingle2(getIndexDeligate()));
 //        new WeightedTokenSink(
 //                new TSVSink(outputFile, charset),
 //                getIndexDeligate().single2());
@@ -605,11 +603,10 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             }
 
             if ((featureSource.getCount() % PROGRESS_INTERVAL == 0
-                 || !featureSource.hasNext())
+                    || !featureSource.hasNext())
                     && LOG.isInfoEnabled()) {
                 LOG.info(
-                        "Accepted " + featureSink.getCount() + " of " + featureSource.
-                        getCount()
+                        "Accepted " + featureSink.getCount() + " of " + featureSource.getCount()
                         + " features.");
                 LOG.debug(MiscUtil.memoryInfoString());
             }
@@ -879,10 +876,8 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         // Check that no two files are the same
         for (Map.Entry<String, File> a : allFiles.entrySet()) {
             for (Map.Entry<String, File> b : allFiles.entrySet()) {
-                if (!a.getKey().equals(b.getKey()) && a.getValue().equals(b.
-                        getValue())) {
-                    throw new IllegalStateException(a.getKey() + " equal to " + b.
-                            getKey());
+                if (!a.getKey().equals(b.getKey()) && a.getValue().equals(b.getValue())) {
+                    throw new IllegalStateException(a.getKey() + " equal to " + b.getKey());
                 }
             }
         }
@@ -936,6 +931,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             public String toString() {
                 return "Weight";
             }
+
         };
     }
 
@@ -951,6 +947,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             public String toString() {
                 return "ID";
             }
+
         };
     }
 
@@ -960,8 +957,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             @Override
             public String apply(Weighted<Token> input) {
                 try {
-                    return getIndexDeligate().getEnumerator1().value(input.
-                            record().id());
+                    return getIndexDeligate().getEnumerator1().value(input.record().id());
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -971,6 +967,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             public String toString() {
                 return "EntriesString";
             }
+
         };
     }
 
@@ -980,8 +977,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             @Override
             public String apply(Weighted<Token> input) {
                 try {
-                    return getIndexDeligate().getEnumerator2().value(input.
-                            record().id());
+                    return getIndexDeligate().getEnumerator2().value(input.record().id());
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -991,6 +987,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             public String toString() {
                 return "FeatureString";
             }
+
         };
     }
 
@@ -1006,6 +1003,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             public String toString() {
                 return "FeatureEntryID";
             }
+
         };
     }
 
@@ -1021,6 +1019,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             public String toString() {
                 return "EntryFeatureID";
             }
+
         };
     }
 
@@ -1030,8 +1029,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             @Override
             public String apply(Weighted<TokenPair> input) {
                 try {
-                    return getIndexDeligate().getEnumerator2().value(input.
-                            record().id2());
+                    return getIndexDeligate().getEnumerator2().value(input.record().id2());
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -1041,6 +1039,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             public String toString() {
                 return "EntryFeatureFeatureString";
             }
+
         };
     }
 
@@ -1050,8 +1049,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             @Override
             public String apply(Weighted<TokenPair> input) {
                 try {
-                    return getIndexDeligate().getEnumerator1().value(input.
-                            record().id1());
+                    return getIndexDeligate().getEnumerator1().value(input.record().id1());
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -1061,6 +1059,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             public String toString() {
                 return "EntryFeatureEntryString";
             }
+
         };
     }
 
@@ -1086,4 +1085,5 @@ public class FilterCommand extends AbstractCommand implements Serializable {
                 add("acceptFeature", acceptFeature).
                 add("acceptEvent", acceptEntryFeature);
     }
+
 }

@@ -40,11 +40,8 @@ import java.util.Comparator;
 import javax.naming.OperationNotSupportedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.io.IndexDeligate;
-import uk.ac.susx.mlcl.byblo.io.KFirstReducerSink;
+import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.tasks.Chunk;
-import uk.ac.susx.mlcl.byblo.io.TokenPair;
-import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.tasks.MergeTask;
 import uk.ac.susx.mlcl.lib.tasks.SortTask;
 import uk.ac.susx.mlcl.lib.Comparators;
@@ -76,7 +73,7 @@ public class ExternalKnnSimsCommand extends ExternalSortWeightedTokenPiarCommand
             File sourceFile, File destinationFile, Charset charset,
             IndexDeligate indexDeligate,
             int k, int maxChunkSize) throws IOException {
-        super(sourceFile, destinationFile, charset, indexDeligate.pair());
+        super(sourceFile, destinationFile, charset, IndexDeligates.toPair(indexDeligate));
         setMaxChunkSize(maxChunkSize);
         setK(k);
     }
@@ -85,7 +82,7 @@ public class ExternalKnnSimsCommand extends ExternalSortWeightedTokenPiarCommand
             File sourceFile, File destinationFile, Charset charset,
             IndexDeligate indexDeligate,
             int k) throws IOException {
-        super(sourceFile, destinationFile, charset, indexDeligate.pair());
+        super(sourceFile, destinationFile, charset, IndexDeligates.toPair(indexDeligate));
         setK(k);
     }
 

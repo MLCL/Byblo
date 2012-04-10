@@ -10,8 +10,8 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.commands.*;
-import uk.ac.susx.mlcl.byblo.io.IndexDeligate;
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligateImpl;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
 
 /**
  *
@@ -56,7 +56,7 @@ public class FullBuildTest {
 
         CountCommand count = new CountCommand(
                 instances, events, entries, features,
-                new IndexDeligatePair(preindexedEntries, preindexedFeatures),
+                new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures),
                 charet);
         count.runCommand();
 
@@ -85,7 +85,7 @@ public class FullBuildTest {
 
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
-                charet);
+                charet, new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures, false, false));
         allpairs.setnThreads(1);
         allpairs.runCommand();
 
@@ -95,7 +95,7 @@ public class FullBuildTest {
 
         KnnSimsCommand knn = new KnnSimsCommand(
                 similarities, neighbours, charet,
-                new IndexDeligate(preindexedEntries), 5);
+                new IndexDeligateImpl(preindexedEntries), 5);
         knn.runCommand();
 
         assertValidInputFiles(neighbours);
@@ -142,7 +142,7 @@ public class FullBuildTest {
 
         ExternalCountCommand count = new ExternalCountCommand(
                 instances, events, entries, features, charet,
-                new IndexDeligatePair(preindexedEntries, preindexedFeatures));
+                new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures));
         count.runCommand();
 
         // Filter 
@@ -170,7 +170,7 @@ public class FullBuildTest {
 
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
-                charet);
+                charet, new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures, false, false));
         allpairs.runCommand();
 
         // KNN
@@ -179,7 +179,7 @@ public class FullBuildTest {
 
         ExternalKnnSimsCommand knn = new ExternalKnnSimsCommand(
                 similarities, neighbours, charet,
-                new IndexDeligate(preindexedEntries), 5);
+                new IndexDeligateImpl(preindexedEntries), 5);
         knn.runCommand();
 
         assertValidInputFiles(neighbours);
@@ -198,8 +198,7 @@ public class FullBuildTest {
         boolean preindexedEntries = true;
         boolean preindexedFeatures = true;
 
-        File instancesIndexed = new File(TEST_OUTPUT_DIR, affix + instances.
-                getName() + ".indexed");
+        File instancesIndexed = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".indexed");
         File entryIndex = new File(TEST_OUTPUT_DIR,
                                    affix + instances.getName() + ".entry-index");
         File featureIndex = new File(TEST_OUTPUT_DIR,
@@ -244,7 +243,7 @@ public class FullBuildTest {
 
         CountCommand count = new CountCommand(
                 instancesIndexed, events, entries, features,
-                new IndexDeligatePair(preindexedEntries, preindexedFeatures),
+                new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures),
                 charet);
         count.runCommand();
 
@@ -281,7 +280,7 @@ public class FullBuildTest {
 
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
-                charet);
+                charet, new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures, false, false));
         allpairs.setnThreads(1);
         allpairs.runCommand();
 
@@ -295,7 +294,7 @@ public class FullBuildTest {
 
         KnnSimsCommand knn = new KnnSimsCommand(
                 similarities, neighbours, charet,
-                new IndexDeligate(preindexedEntries), 5);
+                new IndexDeligateImpl(preindexedEntries), 5);
         knn.runCommand();
 
         assertValidInputFiles(neighbours);
@@ -322,8 +321,7 @@ public class FullBuildTest {
         boolean preindexedEntries = true;
         boolean preindexedFeatures = true;
 
-        File instancesIndexed = new File(TEST_OUTPUT_DIR, affix + instances.
-                getName() + ".indexed");
+        File instancesIndexed = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".indexed");
         File entryIndex = new File(TEST_OUTPUT_DIR,
                                    affix + instances.getName() + ".entry-index");
         File featureIndex = new File(TEST_OUTPUT_DIR,
@@ -371,8 +369,8 @@ public class FullBuildTest {
         count.setEntriesFile(entries);
         count.setFeaturesFile(features);
         count.setEntryFeaturesFile(events);
-        count.setIndexDeligate(new IndexDeligatePair(preindexedEntries,
-                                                     preindexedFeatures));
+        count.setIndexDeligate(new IndexDeligatePairImpl(preindexedEntries,
+                                                         preindexedFeatures));
         count.getFileDeligate().setCharset(charet);
         count.runCommand();
 
@@ -399,7 +397,7 @@ public class FullBuildTest {
 
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
-                charet);
+                charet, new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures, false, false));
         allpairs.runCommand();
 
         assertValidInputFiles(similarities);
@@ -412,7 +410,7 @@ public class FullBuildTest {
 
         ExternalKnnSimsCommand knn = new ExternalKnnSimsCommand(
                 similarities, neighbours, charet,
-                new IndexDeligate(preindexedEntries), 5);
+                new IndexDeligateImpl(preindexedEntries), 5);
         knn.runCommand();
 
         assertValidInputFiles(neighbours);
@@ -441,8 +439,7 @@ public class FullBuildTest {
         boolean skipIndex1 = true;
         boolean skipIndex2 = true;
 
-        File instancesIndexed = new File(TEST_OUTPUT_DIR, affix + instances.
-                getName() + ".indexed");
+        File instancesIndexed = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".indexed");
         File entryIndex = new File(TEST_OUTPUT_DIR,
                                    affix + instances.getName() + ".entry-index");
         File featureIndex = new File(TEST_OUTPUT_DIR,
@@ -490,10 +487,9 @@ public class FullBuildTest {
 
         CountCommand count = new CountCommand(
                 instancesIndexed, events, entries, features,
-                new IndexDeligatePair(preindexedEntries, preindexedFeatures),
+                new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2),
                 charet);
-        count.getIndexDeligate().setSkipIndexed1(skipIndex1);
-        count.getIndexDeligate().setSkipIndexed2(skipIndex2);
+
         count.runCommand();
 
         assertValidInputFiles(entries, features, events);
@@ -534,10 +530,9 @@ public class FullBuildTest {
 
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
-                charet);
+                charet,
+                new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2));
         allpairs.setnThreads(1);
-        allpairs.getIndexDeligate().setSkipIndexed1(skipIndex1);
-        allpairs.getIndexDeligate().setSkipIndexed2(skipIndex2);
         allpairs.runCommand();
 
         assertValidInputFiles(similarities);
@@ -575,8 +570,7 @@ public class FullBuildTest {
         boolean skipIndex1 = true;
         boolean skipIndex2 = true;
 
-        File instancesIndexed = new File(TEST_OUTPUT_DIR, affix + instances.
-                getName() + ".indexed");
+        File instancesIndexed = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".indexed");
         File entryIndex = new File(TEST_OUTPUT_DIR,
                                    affix + instances.getName() + ".entry-index");
         File featureIndex = new File(TEST_OUTPUT_DIR,
@@ -627,10 +621,7 @@ public class FullBuildTest {
         count.setEntriesFile(entries);
         count.setFeaturesFile(features);
         count.setEntryFeaturesFile(events);
-        count.getIndexDeligate().setPreindexedTokens1(preindexedEntries);
-        count.getIndexDeligate().setPreindexedTokens2(preindexedFeatures);
-        count.getIndexDeligate().setSkipIndexed1(skipIndex1);
-        count.getIndexDeligate().setSkipIndexed2(skipIndex2);
+        count.setIndexDeligate(new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2));
         count.getFileDeligate().setCharset(charet);
         count.runCommand();
 
@@ -672,9 +663,7 @@ public class FullBuildTest {
 
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
-                charet);
-        allpairs.getIndexDeligate().setSkipIndexed1(skipIndex1);
-        allpairs.getIndexDeligate().setSkipIndexed2(skipIndex2);
+                charet, new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2));
         allpairs.runCommand();
 
         assertValidInputFiles(similarities);
@@ -739,9 +728,7 @@ public class FullBuildTest {
 
         KnnSimsCommand knn = new KnnSimsCommand(
                 from, to, DEFAULT_CHARSET,
-                new IndexDeligate(enumerated), 5);
-        knn.getIndexDeligate().setSkipIndexed1(skip1);
-        knn.getIndexDeligate().setSkipIndexed2(skip2);
+                new IndexDeligateImpl(enumerated, null, null, skip1, skip2), 5);
         knn.runCommand();
 
         assertValidInputFiles(to);
@@ -756,9 +743,7 @@ public class FullBuildTest {
 
         ExternalKnnSimsCommand knn = new ExternalKnnSimsCommand(
                 from, to, DEFAULT_CHARSET,
-                new IndexDeligate(enumerated), 5);
-        knn.getIndexDeligate().setSkipIndexed1(skip1);
-        knn.getIndexDeligate().setSkipIndexed2(skip2);
+                new IndexDeligateImpl(enumerated, null, null, skip1, skip2), 5);
         knn.runCommand();
 
         assertValidInputFiles(to);
@@ -770,16 +755,15 @@ public class FullBuildTest {
                                 boolean skip1, boolean skip2)
             throws Exception {
         assertValidInputFiles(from);
+        assertValidOutputFiles(to, index1, index2);
 
         IndexTPCommand unindex = new IndexTPCommand();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(false);
-        unindex.getIndexDeligate().setIndexFile1(index1);
-        unindex.getIndexDeligate().setIndexFile2(index2);
-        unindex.getIndexDeligate().setSkipIndexed1(skip1);
-        unindex.getIndexDeligate().setSkipIndexed2(skip2);
+        unindex.setIndexDeligate(new IndexDeligatePairImpl(
+                true, true, index1, index2, skip1, skip2));
         unindex.runCommand();
 
         assertValidInputFiles(to, index1, index2);
@@ -796,9 +780,7 @@ public class FullBuildTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(false);
-        unindex.getIndexDeligate().setIndexFile(index);
-        unindex.getIndexDeligate().setSkipIndexed1(skip1);
-        unindex.getIndexDeligate().setSkipIndexed2(skip2);
+        unindex.setIndexDeligate(new IndexDeligateImpl(true, index, null, skip1, skip2));
         unindex.runCommand();
 
         assertValidInputFiles(to);
@@ -815,9 +797,7 @@ public class FullBuildTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(false);
-        unindex.getIndexDeligate().setIndexFile(index);
-        unindex.getIndexDeligate().setSkipIndexed1(skip1);
-        unindex.getIndexDeligate().setSkipIndexed2(skip2);
+        unindex.setIndexDeligate(new IndexDeligateImpl(true, index, null, skip1, skip2));
         unindex.runCommand();
 
         assertValidInputFiles(to);
@@ -835,10 +815,7 @@ public class FullBuildTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(false);
-        unindex.getIndexDeligate().setIndexFile1(index1);
-        unindex.getIndexDeligate().setIndexFile2(index2);
-        unindex.getIndexDeligate().setSkipIndexed1(skip1);
-        unindex.getIndexDeligate().setSkipIndexed2(skip2);
+        unindex.setIndexDeligate(new IndexDeligatePairImpl(true, true, index1, index2, skip1, skip2));
         unindex.runCommand();
 
         assertValidInputFiles(to);
@@ -856,13 +833,11 @@ public class FullBuildTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(false);
-        unindex.getIndexDeligate().setIndexFile1(index1);
-        unindex.getIndexDeligate().setIndexFile2(index2);
-        unindex.getIndexDeligate().setSkipIndexed1(skip1);
-        unindex.getIndexDeligate().setSkipIndexed2(skip2);
+        unindex.setIndexDeligate(new IndexDeligatePairImpl(true, true, index1, index2, skip1, skip2));
         unindex.runCommand();
 
         assertValidInputFiles(to);
         assertSizeGT(to, from);
     }
+
 }

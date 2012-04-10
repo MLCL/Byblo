@@ -122,7 +122,7 @@ public class IndexTPCommandTest {
         TokenPairSource.equal(out, out2, DEFAULT_CHARSET);
 
     }
-    
+
     private static void indexTP(File from, File to, File index1, File index2,
                                 boolean skip1, boolean skip2, boolean compact)
             throws Exception {
@@ -134,10 +134,7 @@ public class IndexTPCommandTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
-        unindex.getIndexDeligate().setIndexFile1(index1);
-        unindex.getIndexDeligate().setIndexFile2(index2);
-        unindex.getIndexDeligate().setSkipIndexed1(skip1);
-        unindex.getIndexDeligate().setSkipIndexed2(skip2);
+        unindex.setIndexDeligate(new IndexDeligatePairImpl(true, true, index1, index2, skip1, skip2));
         unindex.runCommand();
 
         assertValidInputFiles(to, index1, index2);
@@ -155,13 +152,12 @@ public class IndexTPCommandTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
-        unindex.getIndexDeligate().setIndexFile1(index1);
-        unindex.getIndexDeligate().setIndexFile2(index2);
-        unindex.getIndexDeligate().setSkipIndexed1(skip1);
-        unindex.getIndexDeligate().setSkipIndexed2(skip2);
+
+        unindex.setIndexDeligate(new IndexDeligatePairImpl(true, true, index1, index2, skip1, skip2));
         unindex.runCommand();
 
         assertValidInputFiles(to);
         assertSizeGT(to, from);
     }
+
 }

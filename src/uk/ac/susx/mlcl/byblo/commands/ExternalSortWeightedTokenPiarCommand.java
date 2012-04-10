@@ -4,7 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +20,7 @@ import uk.ac.susx.mlcl.lib.io.*;
 public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
-    private IndexDeligatePair indexDeligate = new IndexDeligatePair();
+    private IndexDeligatePair indexDeligate = new IndexDeligatePairImpl();
 
     public ExternalSortWeightedTokenPiarCommand(
             File sourceFile, File destinationFile, Charset charset,
@@ -38,7 +38,6 @@ public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCo
                 file, getFileDeligate().getCharset(),
                 getIndexDeligate(),
                 !getFileDeligate().isCompactFormatDisabled());
-//        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
         return new WeightSumReducerSink<TokenPair>(s);
     }
 

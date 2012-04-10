@@ -53,7 +53,7 @@ public class EntryFeatureTest {
     public void testLMMedlineSample() throws FileNotFoundException, IOException {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-input-sample");
         Charset charset = Charset.forName("UTF-8");
-        IndexDeligatePair idx = new IndexDeligatePair(false, false);
+        IndexDeligatePair idx = new IndexDeligatePairImpl(false, false);
         TokenPairSource efSrc = TokenPairSource.open(
                 testSample, charset, idx);
         assertTrue("EntryFeatureSource is empty", efSrc.hasNext());
@@ -65,7 +65,7 @@ public class EntryFeatureTest {
     }
 
     private void copyEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        IndexDeligatePair idx = new IndexDeligatePair(false, false);
+        IndexDeligatePair idx = new IndexDeligatePairImpl(false, false);
         TokenPairSource src = TokenPairSource.open(
                 a, DEFAULT_CHARSET, idx);
         TokenPairSink sink = TokenPairSink.open(
@@ -108,13 +108,13 @@ public class EntryFeatureTest {
 
         {
             Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
-            IndexDeligatePair idx = new IndexDeligatePair(false, false, strEnum,
+            IndexDeligatePair idx = new IndexDeligatePairImpl(false, false, strEnum,
                                                           strEnum);
             TokenPairSource aSrc = TokenPairSource.open(
                     a, DEFAULT_CHARSET, idx);
             TokenPairSink bSink = TokenPairSink.open(
                     b, DEFAULT_CHARSET,
-                    new IndexDeligatePair(true, true), true);
+                    new IndexDeligatePairImpl(true, true), true);
             IOUtil.copy(aSrc, bSink);
             Enumerators.saveStringEnumerator(strEnum, idxFile);
 
@@ -127,11 +127,11 @@ public class EntryFeatureTest {
         {
             Enumerator<String> strEnum = Enumerators.loadStringEnumerator(
                     idxFile);
-            IndexDeligatePair idx = new IndexDeligatePair(false, false, strEnum,
+            IndexDeligatePair idx = new IndexDeligatePairImpl(false, false, strEnum,
                                                           strEnum);
             TokenPairSource bSrc = TokenPairSource.open(
                     b, DEFAULT_CHARSET,
-                    new IndexDeligatePair(true, true));
+                    new IndexDeligatePairImpl(true, true));
             TokenPairSink cSink = TokenPairSink.open(
                     c, DEFAULT_CHARSET, idx,
                     false);

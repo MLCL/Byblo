@@ -132,7 +132,7 @@ public class TokenPairSource
             throws IOException {
         final Enumerator<String> stringIndex = Enumerators.
                 newDefaultStringEnumerator();
-        IndexDeligatePair idx = new IndexDeligatePair(false, false, stringIndex,
+        IndexDeligatePair idx = new IndexDeligatePairImpl(false, false, stringIndex,
                                                       stringIndex);
 //        final TokenPairSource srcA = new TokenPairSource(
 //                new TSVSource(fileA, charset), idx);

@@ -42,6 +42,7 @@ import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
 import static org.junit.Assert.*;
 import uk.ac.susx.mlcl.byblo.Main;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
@@ -65,8 +66,7 @@ public class ExternalCountCommandTest {
         countTask.setEntryFeaturesFile(outEF);
         countTask.getFileDeligate().setCharset(charset);
         countTask.setMaxChunkSize(chunkSize);
-        countTask.getIndexDeligate().setPreindexedTokens1(preindexedEntries);
-        countTask.getIndexDeligate().setPreindexedTokens2(preindexedFeatures);
+        countTask.setIndexDeligate(new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures));
         countTask.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
 
         countTask.run();

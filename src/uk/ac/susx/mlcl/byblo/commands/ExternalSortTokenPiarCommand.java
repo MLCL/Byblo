@@ -4,14 +4,12 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import uk.ac.susx.mlcl.byblo.io.TokenPair;
-import uk.ac.susx.mlcl.byblo.io.TokenPairSink;
-import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
+import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.*;
 
@@ -24,7 +22,7 @@ public class ExternalSortTokenPiarCommand extends AbstractExternalSortCommand<To
     private static final long serialVersionUID = 1L;
 
     @ParametersDelegate
-    private IndexDeligatePair indexDeligate = new IndexDeligatePair();
+    private IndexDeligatePair indexDeligate = new IndexDeligatePairImpl();
 
     public ExternalSortTokenPiarCommand(
             File sourceFile, File destinationFile, Charset charset,

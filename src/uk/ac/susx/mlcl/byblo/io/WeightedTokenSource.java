@@ -223,7 +223,7 @@ public class WeightedTokenSource
         
         
         tsv = Compact.compact(tsv, 2);
-        if (!idx.isPreindexedTokens())
+        if (!idx.isEnumerated())
             tsv = Enumerated.enumerated(tsv, idx.getEnumerator());
         return new WeightedTokenSource(tsv);
     }
@@ -231,7 +231,7 @@ public class WeightedTokenSource
     public static boolean equal(File a, File b, Charset charset) throws IOException {
         final Enumerator<String> stringIndex = Enumerators.
                 newDefaultStringEnumerator();
-        IndexDeligate idx = new IndexDeligate();
+        IndexDeligate idx = new IndexDeligateImpl();
         final WeightedTokenSource srcA = open(a, charset, idx);
         final WeightedTokenSource srcB = open(b, charset, idx);
 

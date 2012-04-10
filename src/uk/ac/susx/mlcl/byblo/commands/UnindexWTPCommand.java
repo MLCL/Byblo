@@ -4,7 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,14 +22,13 @@ import uk.ac.susx.mlcl.lib.io.Source;
 public class UnindexWTPCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
-    private IndexDeligatePair indexDeligate = new IndexDeligatePair();
+    private IndexDeligatePair indexDeligate = new IndexDeligatePairImpl(false, false);
 
     public UnindexWTPCommand(
             File sourceFile, File destinationFile, Charset charset,
-            File indexFile1, File indexFile2) {
+            IndexDeligatePair indexDeligate) {
         super(sourceFile, destinationFile, charset);
-        indexDeligate.setIndexFile1(indexFile1);
-        indexDeligate.setIndexFile2(indexFile2);
+        this.indexDeligate = indexDeligate;
     }
 
     public UnindexWTPCommand() {
@@ -46,24 +45,20 @@ public class UnindexWTPCommand extends AbstractCopyCommand<Weighted<TokenPair>> 
     @Override
     protected Source<Weighted<TokenPair>> openSource(File file)
             throws FileNotFoundException, IOException {
-        IndexDeligatePair dstIdx = new IndexDeligatePair(true, true);
-        dstIdx.setSkipIndexed1(indexDeligate.isSkipIndexed1());
-        dstIdx.setSkipIndexed2(indexDeligate.isSkipIndexed2());
+
         return WeightedTokenPairSource.open(
                 file, getFilesDeligate().getCharset(),
-                dstIdx);
+                sourceIndexDeligate());
     }
 
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file)
             throws FileNotFoundException, IOException {
-        IndexDeligatePair srcIdx = new IndexDeligatePair(
-                false, false,
-                indexDeligate.getEnumerator1(),
-                indexDeligate.getEnumerator2(), false, false);
+
         return WeightedTokenPairSink.open(
                 file, getFilesDeligate().getCharset(),
-                srcIdx, !getFilesDeligate().isCompactFormatDisabled());
+                sinkIndexDeligate(),
+                !getFilesDeligate().isCompactFormatDisabled());
     }
 
     public IndexDeligatePair getIndexDeligate() {
@@ -73,4 +68,13 @@ public class UnindexWTPCommand extends AbstractCopyCommand<Weighted<TokenPair>> 
     public void setIndexDeligate(IndexDeligatePair indexDeligate) {
         this.indexDeligate = indexDeligate;
     }
+
+    protected IndexDeligatePair sourceIndexDeligate() {
+        return IndexDeligates.decorateEnumerated(indexDeligate, true);
+    }
+
+    protected IndexDeligatePair sinkIndexDeligate() {
+        return IndexDeligates.decorateEnumerated(indexDeligate, false);
+    }
+
 }

@@ -58,7 +58,7 @@ public class EntryTest {
             throws FileNotFoundException, IOException {
 
         Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
-        IndexDeligate idx = new IndexDeligate(false, strEnum);
+        IndexDeligate idx = new IndexDeligateImpl(false, strEnum);
         WeightedTokenSource aSrc;
         WeightedTokenSink bSink;
         if (enumIn)
@@ -112,10 +112,10 @@ public class EntryTest {
         {
             WeightedTokenSource aSrc = WeightedTokenSource.open(
                     a, DEFAULT_CHARSET,
-                    new IndexDeligate(false, strEnum));
+                    new IndexDeligateImpl(false, strEnum));
             WeightedTokenSink bSink = WeightedTokenSink.open(
                     b, DEFAULT_CHARSET,
-                    new IndexDeligate(true));
+                    new IndexDeligateImpl(true));
             IOUtil.copy(aSrc, bSink);
             bSink.close();
         }
@@ -126,10 +126,10 @@ public class EntryTest {
         {
             WeightedTokenSource bSrc = WeightedTokenSource.open(
                     b, DEFAULT_CHARSET,
-                    new IndexDeligate(true));
+                    new IndexDeligateImpl(true));
             WeightedTokenSink cSink = WeightedTokenSink.open(
                     c, DEFAULT_CHARSET,
-                    new IndexDeligate(false, strEnum));
+                    new IndexDeligateImpl(false, strEnum));
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }
@@ -150,7 +150,7 @@ public class EntryTest {
         Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
         WeightedTokenSource src = WeightedTokenSource.open(
                 file, DEFAULT_CHARSET,
-                new IndexDeligate(false, idx));
+                new IndexDeligateImpl(false, idx));
         {
             while (src.hasNext()) {
 

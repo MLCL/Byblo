@@ -40,7 +40,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.Main;
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
@@ -104,13 +104,13 @@ public class ThreadedApssTaskTest {
                 new WeightedTokenPairVectorSource(
                 WeightedTokenPairSource.open(
                 TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
-                new IndexDeligatePair(false, false, idx, idx)));
+                new IndexDeligatePairImpl(false, false, idx, idx)));
 
         WeightedTokenPairVectorSource vsb =
                 new WeightedTokenPairVectorSource(
                 WeightedTokenPairSource.open(
                 TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
-                new IndexDeligatePair(false, false, idx, idx)));
+                new IndexDeligatePairImpl(false, false, idx, idx)));
 
         List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
         Sink<Weighted<TokenPair>> sink = IOUtil.asSink(result);
@@ -142,13 +142,13 @@ public class ThreadedApssTaskTest {
                 new WeightedTokenPairVectorSource(
                 WeightedTokenPairSource.open(
                 TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
-                new IndexDeligatePair(false, false, idx, idx)));
+                new IndexDeligatePairImpl(false, false, idx, idx)));
 
         WeightedTokenPairVectorSource vsb =
                 new WeightedTokenPairVectorSource(
                 WeightedTokenPairSource.open(
                 TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
-                new IndexDeligatePair(false, false, idx, idx)));
+                new IndexDeligatePairImpl(false, false, idx, idx)));
         List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
         Sink<Weighted<TokenPair>> sink = IOUtil.asSink(result);
         ThreadedApssTask<Tell> instance = new ThreadedApssTask<Tell>(
@@ -183,13 +183,13 @@ public class ThreadedApssTaskTest {
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
                     TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
-                    new IndexDeligatePair(false, false, idx, idx)));
+                    new IndexDeligatePairImpl(false, false, idx, idx)));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
                     TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
-                    new IndexDeligatePair(false, false, idx, idx)));
+                    new IndexDeligatePairImpl(false, false, idx, idx)));
 
 
             List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
@@ -214,13 +214,13 @@ public class ThreadedApssTaskTest {
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
                     TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
-                    new IndexDeligatePair(false, false, idx, idx)));
+                    new IndexDeligatePairImpl(false, false, idx, idx)));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
                     TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
-                    new IndexDeligatePair(false, false, idx, idx)));
+                    new IndexDeligatePairImpl(false, false, idx, idx)));
 
 
             List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
@@ -260,13 +260,13 @@ public class ThreadedApssTaskTest {
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
                     TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
-                    new IndexDeligatePair(false, false, idx, idx)));
+                    new IndexDeligatePairImpl(false, false, idx, idx)));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
                     TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
-                    new IndexDeligatePair(false, false, idx, idx)));
+                    new IndexDeligatePairImpl(false, false, idx, idx)));
 
 
             Sink<Weighted<TokenPair>> sink = IOUtil.asSink(threadedResults);
@@ -293,13 +293,13 @@ public class ThreadedApssTaskTest {
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
                     TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
-                    new IndexDeligatePair(false, false, idx, idx)));
+                    new IndexDeligatePairImpl(false, false, idx, idx)));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
                     TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
-                    new IndexDeligatePair(false, false, idx, idx)));
+                    new IndexDeligatePairImpl(false, false, idx, idx)));
 
             instance.setSourceA(vsa);
             instance.setSourceB(vsb);
@@ -334,13 +334,13 @@ public class ThreadedApssTaskTest {
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
                     TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
-                    new IndexDeligatePair(false, false, idx, idx)));
+                    new IndexDeligatePairImpl(false, false, idx, idx)));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
                     TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
-                    new IndexDeligatePair(false, false, idx, idx)));
+                    new IndexDeligatePairImpl(false, false, idx, idx)));
 
             Sink<Weighted<TokenPair>> sink = IOUtil.asSink(threadedResults);
             ThreadedApssTask<Tell> instance = new ThreadedApssTask<Tell>(
@@ -366,13 +366,13 @@ public class ThreadedApssTaskTest {
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
                     TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
-                    new IndexDeligatePair(false, false, idx, idx)));
+                    new IndexDeligatePairImpl(false, false, idx, idx)));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
                     TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
-                    new IndexDeligatePair(false, false, idx, idx)));
+                    new IndexDeligatePairImpl(false, false, idx, idx)));
 
             instance.setSourceA(vsa);
             instance.setSourceB(vsb);

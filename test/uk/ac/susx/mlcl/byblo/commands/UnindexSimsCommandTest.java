@@ -7,6 +7,7 @@ package uk.ac.susx.mlcl.byblo.commands;
 import java.io.File;
 import org.junit.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligateImpl;
 import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
 
 /**
@@ -88,7 +89,7 @@ public class UnindexSimsCommandTest {
         deleteIfExist(out);
 
         unindexSims(TEST_FRUIT_INDEXED_SIMS, out, idx, skip1, skip2,
-                  compact);
+                    compact);
 
         deleteIfExist(idx2);
         indexSims(out, out2, idx2, skip1, skip2, compact);
@@ -98,7 +99,7 @@ public class UnindexSimsCommandTest {
     }
 
     private static void indexSims(File from, File to, File index,
-                                boolean skip1, boolean skip2, boolean compact)
+                                  boolean skip1, boolean skip2, boolean compact)
             throws Exception {
         assertValidInputFiles(from);
         assertValidOutputFiles(to, index);
@@ -108,9 +109,7 @@ public class UnindexSimsCommandTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
-        unindex.getIndexDeligate().setIndexFile(index);
-        unindex.getIndexDeligate().setSkipIndexed1(skip1);
-        unindex.getIndexDeligate().setSkipIndexed2(skip2);
+        unindex.setIndexDeligate(new IndexDeligateImpl(true, index, null, skip1, skip2));
         unindex.runCommand();
 
         assertValidInputFiles(to, index);
@@ -118,7 +117,7 @@ public class UnindexSimsCommandTest {
     }
 
     private static void unindexSims(File from, File to, File index,
-                                  boolean skip1, boolean skip2, boolean compact)
+                                    boolean skip1, boolean skip2, boolean compact)
             throws Exception {
         assertValidInputFiles(from, index);
         assertValidOutputFiles(to);
@@ -128,12 +127,11 @@ public class UnindexSimsCommandTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
-        unindex.getIndexDeligate().setIndexFile(index);
-        unindex.getIndexDeligate().setSkipIndexed1(skip1);
-        unindex.getIndexDeligate().setSkipIndexed2(skip2);
+        unindex.setIndexDeligate(new IndexDeligateImpl(true, index, null, skip1, skip2));
         unindex.runCommand();
 
         assertValidInputFiles(to);
         assertSizeGT(to, from);
     }
+
 }

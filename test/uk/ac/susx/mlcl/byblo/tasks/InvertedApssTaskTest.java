@@ -43,7 +43,7 @@ import java.util.List;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePair;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.io.Tell;
@@ -71,12 +71,12 @@ public class InvertedApssTaskTest {
         Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
         WeightedTokenPairSource mdbsa = WeightedTokenPairSource.open(
                 TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
-                new IndexDeligatePair(false, false, idx, idx));
+                new IndexDeligatePairImpl(false, false, idx, idx));
         WeightedTokenPairVectorSource vsa = mdbsa.getVectorSource();
 
         WeightedTokenPairSource mdbsb = WeightedTokenPairSource.open(
                 TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
-                new IndexDeligatePair(false, false, idx, idx));
+                new IndexDeligatePairImpl(false, false, idx, idx));
         WeightedTokenPairVectorSource vsb = mdbsb.getVectorSource();
 
         List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();

@@ -173,7 +173,7 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
             });
         }
         
-        if (!idx.isPreindexedTokens())
+        if (!idx.isEnumerated())
             tsv = Enumerated.enumerated(tsv, idx.getEnumerator());
         return new WeightedTokenSink(tsv);
     }

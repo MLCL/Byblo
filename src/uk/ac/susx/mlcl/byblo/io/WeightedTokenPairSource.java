@@ -194,7 +194,7 @@ public class WeightedTokenPairSource
     }
 
     public static boolean equal(File a, File b, Charset charset) throws IOException {
-        IndexDeligatePair idx = new IndexDeligatePair(false, false);
+        IndexDeligatePair idx = new IndexDeligatePairImpl(false, false);
         final WeightedTokenPairSource srcA = WeightedTokenPairSource.open(
                 a, charset, idx);
         final WeightedTokenPairSource srcB = WeightedTokenPairSource.open(
