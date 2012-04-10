@@ -86,7 +86,7 @@ public class FullBuildTest {
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
                 charet);
-        allpairs.setSerial(true);
+        allpairs.setnThreads(1);
         allpairs.runCommand();
 
         // KNN
@@ -171,7 +171,6 @@ public class FullBuildTest {
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
                 charet);
-        allpairs.setSerial(false);
         allpairs.runCommand();
 
         // KNN
@@ -283,7 +282,7 @@ public class FullBuildTest {
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
                 charet);
-        allpairs.setSerial(true);
+        allpairs.setnThreads(1);
         allpairs.runCommand();
 
         assertValidInputFiles(similarities);
@@ -401,7 +400,6 @@ public class FullBuildTest {
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
                 charet);
-        allpairs.setSerial(false);
         allpairs.runCommand();
 
         assertValidInputFiles(similarities);
@@ -537,7 +535,7 @@ public class FullBuildTest {
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
                 charet);
-        allpairs.setSerial(true);
+        allpairs.setnThreads(1);
         allpairs.getIndexDeligate().setSkipIndexed1(skipIndex1);
         allpairs.getIndexDeligate().setSkipIndexed2(skipIndex2);
         allpairs.runCommand();
@@ -564,8 +562,7 @@ public class FullBuildTest {
                     skipIndex1, skipIndex2);
 
     }
-    
-    
+
     @Test
     public void parallelBuildTest_SkipIndexed() throws Exception {
         System.out.println("Testing Full Build (parallel, preindexed, skip)");
@@ -676,7 +673,6 @@ public class FullBuildTest {
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
                 charet);
-        allpairs.setSerial(false);
         allpairs.getIndexDeligate().setSkipIndexed1(skipIndex1);
         allpairs.getIndexDeligate().setSkipIndexed2(skipIndex2);
         allpairs.runCommand();
@@ -693,7 +689,7 @@ public class FullBuildTest {
         deleteIfExist(neighbours);
 
         extknn(similarities, neighbours, preindexedEntries,
-            skipIndex1, skipIndex2);
+               skipIndex1, skipIndex2);
 
         // Finally, convert neighbours back to strings
 
@@ -751,11 +747,10 @@ public class FullBuildTest {
         assertValidInputFiles(to);
         assertSizeGT(from, to);
     }
-    
-    
+
     private static void extknn(File from, File to,
-                            boolean enumerated,
-                            boolean skip1, boolean skip2)
+                               boolean enumerated,
+                               boolean skip1, boolean skip2)
             throws Exception {
         assertValidInputFiles(from);
 
