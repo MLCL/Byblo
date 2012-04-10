@@ -23,11 +23,11 @@ public class ExternalSortWeightedTokenCommand extends AbstractExternalSortComman
     private static final long serialVersionUID = 1L;
 
     @ParametersDelegate
-    private IndexDeligate indexDeligate = new IndexDeligateImpl();
+    private IndexDeligateSingle indexDeligate = new IndexDeligateSingleImpl();
 
     public ExternalSortWeightedTokenCommand(
             File sourceFile, File destinationFile, Charset charset,
-            IndexDeligate indexDeligate) {
+            IndexDeligateSingle indexDeligate) {
         super(sourceFile, destinationFile, charset);
         setIndexDeligate(indexDeligate);
     }
@@ -49,11 +49,11 @@ public class ExternalSortWeightedTokenCommand extends AbstractExternalSortComman
                                         getIndexDeligate());
     }
 
-    public final IndexDeligate getIndexDeligate() {
+    public final IndexDeligateSingle getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(IndexDeligate indexDeligate) {
+    public final void setIndexDeligate(IndexDeligateSingle indexDeligate) {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }

@@ -37,8 +37,8 @@ public class UnindexWTPCommand extends AbstractCopyCommand<Weighted<TokenPair>> 
 
     @Override
     public void runCommand() throws Exception {
-        Checks.checkNotNull("indexFile1", indexDeligate.getIndexFile1());
-        Checks.checkNotNull("indexFile2", indexDeligate.getIndexFile2());
+        Checks.checkNotNull("indexFile1", indexDeligate.getEntryIndexFile());
+        Checks.checkNotNull("indexFile2", indexDeligate.getFeatureIndexFile());
         super.runCommand();
     }
 

@@ -21,11 +21,11 @@ import uk.ac.susx.mlcl.lib.io.Source;
 public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
-    private IndexDeligate indexDeligate = new IndexDeligateImpl(false);
+    private IndexDeligateSingle indexDeligate = new IndexDeligateSingleImpl(false);
 
     public UnindexSimsCommand(
             File sourceFile, File destinationFile, Charset charset,
-            IndexDeligate indexDeligate) {
+            IndexDeligateSingle indexDeligate) {
         super(sourceFile, destinationFile, charset);
         this.indexDeligate = indexDeligate;
     }
@@ -56,11 +56,11 @@ public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>>
                 sinkIndexDeligate(), !getFilesDeligate().isCompactFormatDisabled());
     }
 
-    public IndexDeligate getIndexDeligate() {
+    public IndexDeligateSingle getIndexDeligate() {
         return indexDeligate;
     }
 
-    public void setIndexDeligate(IndexDeligate indexDeligate) {
+    public void setIndexDeligate(IndexDeligateSingle indexDeligate) {
         this.indexDeligate = indexDeligate;
     }
 

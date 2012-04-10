@@ -84,7 +84,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
     public static final int FILTERED_ID = 0;
 
     @ParametersDelegate
-    private IndexDeligatePairImpl indexDeligate = new IndexDeligatePairImpl();
+    private IndexDeligatePair indexDeligate = new IndexDeligatePairImpl();
 
     /*
      * === INPUT FILES ===
@@ -217,11 +217,11 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         setOutputEntriesFile(outputEntriesFile);
     }
 
-    public final IndexDeligatePairImpl getIndexDeligate() {
+    public final IndexDeligatePair getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(IndexDeligatePairImpl indexDeligate) {
+    public final void setIndexDeligate(IndexDeligatePair indexDeligate) {
         this.indexDeligate = indexDeligate;
     }
 
@@ -353,7 +353,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
         WeightedTokenSource entriesSource = WeightedTokenSource.open(
                 activeEntriesFile, charset,
-                IndexDeligates.toSingle1(getIndexDeligate()));
+                IndexDeligates.toSingleEntries(getIndexDeligate()));
 
 //                new WeightedTokenSource(
 //                new TSVSource(activeEntriesFile, charset), getIndexDeligate().
@@ -363,7 +363,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         outputFile.deleteOnExit();
 
         WeightedTokenSink entriesSink = WeightedTokenSink.open(
-                outputFile, charset, IndexDeligates.toSingle1(getIndexDeligate()));
+                outputFile, charset, IndexDeligates.toSingleEntries(getIndexDeligate()));
 //        
 //                new WeightedTokenSink(
 //                new TSVSink(outputFile, charset),
@@ -374,7 +374,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
                     "Filtering entries from " + activeEntriesFile + " to " + outputFile + ".");
         }
 
-        final int filteredEntry = getIndexDeligate().getEnumerator1().index(
+        final int filteredEntry = getIndexDeligate().getEntryEnumerator().index(
                 FILTERED_STRING);
         double filteredWeight = 0;
 
@@ -452,9 +452,9 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
         // Store the id of the special filtered feature and entry
         // TODO This can probably be removed now but need to check
-        final int filteredEntry = getIndexDeligate().getEnumerator1().index(
+        final int filteredEntry = getIndexDeligate().getEntryEnumerator().index(
                 FILTERED_STRING);
-        final int filteredFeature = getIndexDeligate().getEnumerator2().index(
+        final int filteredFeature = getIndexDeligate().getFeatureEnumerator().index(
                 FILTERED_STRING);
 
         int currentEntryId = -1;
@@ -565,7 +565,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         IntSet rejectedFeatures = new IntOpenHashSet();
 
         WeightedTokenSource featureSource = WeightedTokenSource.open(
-                activeFeaturesFile, charset, IndexDeligates.toSingle2(getIndexDeligate()));
+                activeFeaturesFile, charset, IndexDeligates.toSingleFeatures(getIndexDeligate()));
 //new WeightedTokenSource(
 //                new TSVSource(activeFeaturesFile, charset),
 //                getIndexDeligate().single2());
@@ -574,7 +574,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         outputFile.deleteOnExit();
 
         WeightedTokenSink featureSink = WeightedTokenSink.open(
-                outputFile, charset, IndexDeligates.toSingle2(getIndexDeligate()));
+                outputFile, charset, IndexDeligates.toSingleFeatures(getIndexDeligate()));
 //        new WeightedTokenSink(
 //                new TSVSink(outputFile, charset),
 //                getIndexDeligate().single2());
@@ -587,7 +587,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         // Store an filtered wieght here and record it so as to maintain
         // accurate priors for those features that remain
         double filteredWeight = 0;
-        int filteredId = getIndexDeligate().getEnumerator2().index(
+        int filteredId = getIndexDeligate().getFeatureEnumerator().index(
                 FILTERED_STRING);
 
         while (featureSource.hasNext()) {
@@ -728,7 +728,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
     public void addFeaturesWhitelist(List<String> strings) throws IOException {
         IntSet featureIdSet = new IntOpenHashSet();
         for (String string : strings) {
-            final int id = getIndexDeligate().getEnumerator2().index(string);
+            final int id = getIndexDeligate().getFeatureEnumerator().index(string);
             featureIdSet.add(id);
         }
         setAcceptFeatures(Predicates2.<Weighted<Token>>and(
@@ -739,7 +739,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
     public void addFeaturesBlacklist(List<String> strings) throws IOException {
         IntSet featureIdSet = new IntOpenHashSet();
         for (String string : strings) {
-            final int id = getIndexDeligate().getEnumerator2().index(string);
+            final int id = getIndexDeligate().getFeatureEnumerator().index(string);
             featureIdSet.add(id);
         }
         setAcceptFeatures(Predicates2.<Weighted<Token>>and(
@@ -816,7 +816,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
     public void addEntryWhitelist(List<String> strings) throws IOException {
         IntSet entryIdSet = new IntOpenHashSet();
         for (String string : strings) {
-            final int id = getIndexDeligate().getEnumerator1().index(string);
+            final int id = getIndexDeligate().getEntryEnumerator().index(string);
             entryIdSet.add(id);
         }
         setAcceptEntry(Predicates2.<Weighted<Token>>and(
@@ -828,7 +828,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
     public void addEntryBlacklist(List<String> strings) throws IOException {
         IntSet entryIdSet = new IntOpenHashSet();
         for (String string : strings) {
-            final int id = getIndexDeligate().getEnumerator1().index(string);
+            final int id = getIndexDeligate().getEntryEnumerator().index(string);
             entryIdSet.add(id);
         }
         setAcceptEntry(Predicates2.<Weighted<Token>>and(
@@ -957,7 +957,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             @Override
             public String apply(Weighted<Token> input) {
                 try {
-                    return getIndexDeligate().getEnumerator1().value(input.record().id());
+                    return getIndexDeligate().getEntryEnumerator().value(input.record().id());
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -977,7 +977,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             @Override
             public String apply(Weighted<Token> input) {
                 try {
-                    return getIndexDeligate().getEnumerator2().value(input.record().id());
+                    return getIndexDeligate().getFeatureEnumerator().value(input.record().id());
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -1029,7 +1029,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             @Override
             public String apply(Weighted<TokenPair> input) {
                 try {
-                    return getIndexDeligate().getEnumerator2().value(input.record().id2());
+                    return getIndexDeligate().getFeatureEnumerator().value(input.record().id2());
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -1049,7 +1049,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             @Override
             public String apply(Weighted<TokenPair> input) {
                 try {
-                    return getIndexDeligate().getEnumerator1().value(input.record().id1());
+                    return getIndexDeligate().getEntryEnumerator().value(input.record().id1());
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }

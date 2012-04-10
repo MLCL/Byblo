@@ -67,7 +67,7 @@ public class KnnSimsCommand extends SortWeightedTokenPairCommand {
             Comparators.reverse(Weighted.<TokenPair>weightOrder());
 
     public KnnSimsCommand(File sourceFile, File destinationFile, Charset charset,
-                          IndexDeligate indexDeligate, int k) throws IOException {
+                          IndexDeligateSingle indexDeligate, int k) throws IOException {
         super(sourceFile, destinationFile, charset, IndexDeligates.toPair(indexDeligate));
         super.setComparator(Comparators.fallback(
                 classComparator, nearnessComparator));

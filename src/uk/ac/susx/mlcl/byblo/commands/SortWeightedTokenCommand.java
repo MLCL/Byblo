@@ -4,7 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligateImpl;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligateSingleImpl;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,10 +27,10 @@ public class SortWeightedTokenCommand extends AbstractSortCommand<Weighted<Token
             SortWeightedTokenCommand.class);
 
     @ParametersDelegate
-    private IndexDeligate indexDeligate = new IndexDeligateImpl();
+    private IndexDeligateSingle indexDeligate = new IndexDeligateSingleImpl();
 
     public SortWeightedTokenCommand(File sourceFile, File destinationFile,
-                                    Charset charset, IndexDeligate indexDeligate) {
+                                    Charset charset, IndexDeligateSingle indexDeligate) {
         super(sourceFile, destinationFile, charset, Weighted.recordOrder(Token.indexOrder()));
         setIndexDeligate(indexDeligate);
     }
@@ -53,11 +53,11 @@ public class SortWeightedTokenCommand extends AbstractSortCommand<Weighted<Token
 
     }
 
-    public final IndexDeligate getIndexDeligate() {
+    public final IndexDeligateSingle getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(IndexDeligate indexDeligate) {
+    public final void setIndexDeligate(IndexDeligateSingle indexDeligate) {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }

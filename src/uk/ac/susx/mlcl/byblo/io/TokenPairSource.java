@@ -197,12 +197,12 @@ public class TokenPairSource
 
         tsv = Compact.compact(tsv, 2);
         
-        if (!idx.isEnumerated1() || !idx.isEnumerated2()) {
+        if (!idx.isEntriesEnumerated() || !idx.isFeaturesEnumerated()) {
             Enumerator<String>[] enumerators = (Enumerator<String>[]) new Enumerator[2];
-            if (!idx.isEnumerated1())
-                enumerators[0] = idx.getEnumerator1();
-            if (!idx.isEnumerated2())
-                enumerators[1] = idx.getEnumerator2();
+            if (!idx.isEntriesEnumerated())
+                enumerators[0] = idx.getEntryEnumerator();
+            if (!idx.isFeaturesEnumerated())
+                enumerators[1] = idx.getFeatureEnumerator();
             tsv = Enumerated.enumerated(tsv, enumerators);
         }
         return new TokenPairSource(tsv);

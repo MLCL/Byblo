@@ -7,7 +7,7 @@ package uk.ac.susx.mlcl.byblo.commands;
 import java.io.File;
 import org.junit.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.io.IndexDeligateImpl;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligateSingleImpl;
 import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
 
 /**
@@ -109,7 +109,7 @@ public class UnindexSimsCommandTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
-        unindex.setIndexDeligate(new IndexDeligateImpl(true, index, null, skip1, skip2));
+        unindex.setIndexDeligate(new IndexDeligateSingleImpl(true, index, null, skip1, skip2));
         unindex.runCommand();
 
         assertValidInputFiles(to, index);
@@ -127,7 +127,7 @@ public class UnindexSimsCommandTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
-        unindex.setIndexDeligate(new IndexDeligateImpl(true, index, null, skip1, skip2));
+        unindex.setIndexDeligate(new IndexDeligateSingleImpl(true, index, null, skip1, skip2));
         unindex.runCommand();
 
         assertValidInputFiles(to);

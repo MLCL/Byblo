@@ -295,8 +295,8 @@ public class WeightedTokenPairSource
                 }
             });
         }
-        if (!idx.isEnumerated1()) {
-            tsv = Enumerated.enumerated(tsv, idx.getEnumerator1(),
+        if (!idx.isEntriesEnumerated()) {
+            tsv = Enumerated.enumerated(tsv, idx.getEntryEnumerator(),
                                         new Predicate<Integer>() {
 
                 @Override
@@ -306,8 +306,8 @@ public class WeightedTokenPairSource
             });
         }
 
-        if (!idx.isEnumerated2()) {
-            tsv = Enumerated.enumerated(tsv, idx.getEnumerator2(),
+        if (!idx.isFeaturesEnumerated()) {
+            tsv = Enumerated.enumerated(tsv, idx.getFeatureEnumerator(),
                                         new Predicate<Integer>() {
 
                 @Override

@@ -251,7 +251,7 @@ public class WeightedEntryFeatureTest {
                    c.length() >= b.length());
         assertTrue(
                 "Double converted file is not equal to origion: " + a + " => " + c,
-                   Files.equal(a, c));
+                Files.equal(a, c));
     }
 
     @Test
@@ -296,7 +296,7 @@ public class WeightedEntryFeatureTest {
                    c.length() >= b.length());
         assertTrue(
                 "Double converted file is not equal to origion: " + a + " " + c,
-                   Files.equal(a, c));
+                Files.equal(a, c));
     }
 
     @Test
@@ -314,12 +314,9 @@ public class WeightedEntryFeatureTest {
                     a, DEFAULT_CHARSET,
                     new IndexDeligatePairImpl(false, false, enumerator, enumerator));
 
-            IndexDeligatePairImpl tmpIdx = new IndexDeligatePairImpl(true, true);
-            tmpIdx.setSkipIndexed1(true);
-            tmpIdx.setSkipIndexed2(true);
+            IndexDeligatePairImpl tmpIdx = new IndexDeligatePairImpl(true, true, true, true);
             WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
                     b, DEFAULT_CHARSET, tmpIdx, true);
-//            bSink.setCompactFormatEnabled(true);
             IOUtil.copy(aSrc, bSink);
             bSink.close();
         }
@@ -328,16 +325,13 @@ public class WeightedEntryFeatureTest {
                    b.length() <= a.length());
 
         {
-            IndexDeligatePairImpl tmpIdx = new IndexDeligatePairImpl(true, true);
-            tmpIdx.setSkipIndexed1(true);
-            tmpIdx.setSkipIndexed2(true);
+            IndexDeligatePairImpl tmpIdx = new IndexDeligatePairImpl(true, true, true, true);
             WeightedTokenPairSource bSrc = WeightedTokenPairSource.open(
                     b, DEFAULT_CHARSET, tmpIdx);
             WeightedTokenPairSink cSink = WeightedTokenPairSink.open(
                     c, DEFAULT_CHARSET,
                     new IndexDeligatePairImpl(false, false, enumerator, enumerator),
                     false);
-//            cSink.setCompactFormatEnabled(false);
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }
@@ -346,6 +340,7 @@ public class WeightedEntryFeatureTest {
                    c.length() >= b.length());
         assertTrue(
                 "Double converted file is not equal to origion: " + a + " " + c,
-                   Files.equal(a, c));
+                Files.equal(a, c));
     }
+
 }

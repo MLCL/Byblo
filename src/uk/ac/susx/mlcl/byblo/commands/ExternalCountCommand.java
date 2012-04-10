@@ -516,21 +516,21 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     }
 
     private Comparator<Weighted<Token>> getEntryOrder() throws IOException {
-        return indexDeligate.isEnumerated1()
+        return indexDeligate.isEntriesEnumerated()
                ? Weighted.recordOrder(Token.indexOrder())
-               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getEnumerator1()));
+               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getEntryEnumerator()));
     }
 
     private Comparator<Weighted<Token>> getFeatureOrder() throws IOException {
-        return indexDeligate.isEnumerated2()
+        return indexDeligate.isFeaturesEnumerated()
                ? Weighted.recordOrder(Token.indexOrder())
-               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getEnumerator2()));
+               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getFeatureEnumerator()));
     }
 
     private Comparator<Weighted<TokenPair>> getEventOrder() throws IOException {
-        return (indexDeligate.isEnumerated1() && indexDeligate.isEnumerated2())
+        return (indexDeligate.isEntriesEnumerated() && indexDeligate.isFeaturesEnumerated())
                ? Weighted.recordOrder(TokenPair.indexOrder())
-               : Weighted.recordOrder(TokenPair.stringOrder(indexDeligate.getEnumerator1(), indexDeligate.getEnumerator2()));
+               : Weighted.recordOrder(TokenPair.stringOrder(indexDeligate.getEntryEnumerator(), indexDeligate.getFeatureEnumerator()));
     }
 
     protected void submitCountTask(Source<TokenPair> instanceSource,
@@ -705,7 +705,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     protected SeekableSource<Weighted<Token>, Tell> openEntriesSource(File file) throws FileNotFoundException, IOException {
         return WeightedTokenSource.open(file, getFileDeligate().getCharset(),
-                                        IndexDeligates.toSingle1(getIndexDeligate()));
+                                        IndexDeligates.toSingleEntries(getIndexDeligate()));
 //        return new WeightedTokenSource(
 //                new TSVSource(file, getFileDeligate().getCharset()),
 //                indexDeligate.single1());
@@ -713,7 +713,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     protected Sink<Weighted<Token>> openEntriesSink(File file) throws FileNotFoundException, IOException {
         WeightedTokenSink s = WeightedTokenSink.open(
-                file, getFileDeligate().getCharset(), IndexDeligates.toSingle1(getIndexDeligate()));
+                file, getFileDeligate().getCharset(), IndexDeligates.toSingleEntries(getIndexDeligate()));
 //                new WeightedTokenSink(new TSVSink(file, getFileDeligate().getCharset()),
 //                                                    indexDeligate.single1());
         s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
@@ -722,7 +722,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     protected SeekableSource<Weighted<Token>, Tell> openFeaturesSource(File file) throws FileNotFoundException, IOException {
         return WeightedTokenSource.open(file, getFileDeligate().getCharset(),
-                                        IndexDeligates.toSingle2(getIndexDeligate()));
+                                        IndexDeligates.toSingleFeatures(getIndexDeligate()));
 //        return new WeightedTokenSource(
 //                new TSVSource(file, getFileDeligate().getCharset()),
 //                indexDeligate.single2());
@@ -731,7 +731,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     protected Sink<Weighted<Token>> openFeaturesSink(File file) throws FileNotFoundException, IOException {
 
         WeightedTokenSink s = WeightedTokenSink.open(
-                file, getFileDeligate().getCharset(), IndexDeligates.toSingle2(getIndexDeligate()));
+                file, getFileDeligate().getCharset(), IndexDeligates.toSingleFeatures(getIndexDeligate()));
 //                new WeightedTokenSink(new TSVSink(file, getFileDeligate().getCharset()),
 //                                                    indexDeligate.single2());
         s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());

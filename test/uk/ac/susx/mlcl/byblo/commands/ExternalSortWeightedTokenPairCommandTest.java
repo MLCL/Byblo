@@ -67,7 +67,7 @@ public class ExternalSortWeightedTokenPairCommandTest {
 
         Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(
                 Weighted.recordOrder(TokenPair.firstStringOrder(idx.
-                getEnumerator1())),
+                getEntryEnumerator())),
                 Comparators.reverse(Weighted.<TokenPair>weightOrder()));
 
         testSortWeightedTokenPairCommand(inputFile, randomisedFile, sortedFile,

@@ -160,7 +160,7 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
     }
 
     public static WeightedTokenSink open(
-            File f, Charset charset, IndexDeligate idx) throws IOException {
+            File f, Charset charset, IndexDeligateSingle idx) throws IOException {
         DataSink tsv = new TSV.Sink(f, charset);
 
         if (idx.isSkipIndexed1()) {

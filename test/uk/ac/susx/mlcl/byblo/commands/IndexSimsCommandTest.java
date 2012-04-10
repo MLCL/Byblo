@@ -232,7 +232,7 @@ public class IndexSimsCommandTest {
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
 
-        unindex.setIndexDeligate(new IndexDeligateImpl(true, index, null, skip1, skip2));
+        unindex.setIndexDeligate(new IndexDeligateSingleImpl(true, index, null, skip1, skip2));
         unindex.runCommand();
 
         assertValidInputFiles(to, index);
@@ -251,7 +251,7 @@ public class IndexSimsCommandTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
-        unindex.setIndexDeligate(new IndexDeligateImpl(true, index, null, skip1, skip2));
+        unindex.setIndexDeligate(new IndexDeligateSingleImpl(true, index, null, skip1, skip2));
         unindex.runCommand();
 
         assertValidInputFiles(to);

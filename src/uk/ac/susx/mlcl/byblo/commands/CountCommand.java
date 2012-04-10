@@ -224,21 +224,21 @@ public class CountCommand extends AbstractCommand implements Serializable {
 //        checkState();
 //    }
     private Comparator<Weighted<Token>> getEntryOrder() throws IOException {
-        return indexDeligate.isEnumerated1()
+        return indexDeligate.isEntriesEnumerated()
                ? Weighted.recordOrder(Token.indexOrder())
-               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getEnumerator1()));
+               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getEntryEnumerator()));
     }
 
     private Comparator<Weighted<Token>> getFeatureOrder() throws IOException {
-        return indexDeligate.isEnumerated2()
+        return indexDeligate.isFeaturesEnumerated()
                ? Weighted.recordOrder(Token.indexOrder())
-               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getEnumerator2()));
+               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getFeatureEnumerator()));
     }
 
     private Comparator<Weighted<TokenPair>> getEventOrder() throws IOException {
-        return (indexDeligate.isEnumerated1() && indexDeligate.isEnumerated2())
+        return (indexDeligate.isEntriesEnumerated() && indexDeligate.isFeaturesEnumerated())
                ? Weighted.recordOrder(TokenPair.indexOrder())
-               : Weighted.recordOrder(TokenPair.stringOrder(indexDeligate.getEnumerator1(), indexDeligate.getEnumerator2()));
+               : Weighted.recordOrder(TokenPair.stringOrder(indexDeligate.getEntryEnumerator(), indexDeligate.getFeatureEnumerator()));
     }
 
     @Override
@@ -254,7 +254,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
 
         WeightedTokenSink entrySink =
                 WeightedTokenSink.open(
-                entriesFile, charset, IndexDeligates.toSingle1(indexDeligate));
+                entriesFile, charset, IndexDeligates.toSingleEntries(indexDeligate));
 //        
 //                new WeightedTokenSink(
 //                new TSVSink(entriesFile, charset),
@@ -262,7 +262,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
 
         WeightedTokenSink featureSink =
                 WeightedTokenSink.open(
-                featuresFile, charset, IndexDeligates.toSingle2(indexDeligate));
+                featuresFile, charset, IndexDeligates.toSingleFeatures(indexDeligate));
 //        
 //                new WeightedTokenSink(
 //                new TSVSink(featuresFile, charset),

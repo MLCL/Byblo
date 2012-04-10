@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.lib.Enumerators;
 
 /**
  *
@@ -45,16 +46,33 @@ public class IndexDeligates {
     private IndexDeligates() {
     }
 
-    public static IndexDeligate toSingle1(final IndexDeligatePair outer) {
+    public static IndexDeligateSingle toSingleEntries(final IndexDeligatePair outer) {
         return new PairToSingle2Adapter(outer);
     }
 
-    public static IndexDeligate toSingle2(final IndexDeligatePair outer) {
+    public static IndexDeligateSingle toSingleFeatures(final IndexDeligatePair outer) {
         return new PairToSingle1Adapter(outer);
     }
 
-    public static IndexDeligatePair toPair(final IndexDeligate inner) {
+    public static IndexDeligatePair toPair(final IndexDeligateSingle inner) {
         return new SingleToPairAdapter(inner);
+    }
+
+    public static Enumerator<String> instantiateEnumerator(
+            final boolean enumerated, final File indexFile)
+            throws IOException {
+        if (enumerated) {
+            if (indexFile != null && indexFile.exists())
+                return Enumerators.loadStringEnumerator(indexFile);
+            else
+                return Enumerators.nullEnumerator();
+        } else {
+            if (indexFile != null && indexFile.exists()) {
+                return Enumerators.loadStringEnumerator(indexFile);
+            } else {
+                return Enumerators.newDefaultStringEnumerator();
+            }
+        }
     }
 
     public static IndexDeligatePair decorateEnumerated(
@@ -62,20 +80,20 @@ public class IndexDeligates {
         return new IndexDeligates.PairToPairAdapter(inner) {
 
             @Override
-            public boolean isEnumerated1() {
+            public boolean isEntriesEnumerated() {
                 return enumerated;
             }
 
             @Override
-            public boolean isEnumerated2() {
+            public boolean isFeaturesEnumerated() {
                 return enumerated;
             }
 
         };
     }
 
-    public static IndexDeligate decorateEnumerated(
-            final IndexDeligate inner, final boolean enumerated) {
+    public static IndexDeligateSingle decorateEnumerated(
+            final IndexDeligateSingle inner, final boolean enumerated) {
         return new IndexDeligates.SingleToSingleAdapter(inner) {
 
             @Override
@@ -86,7 +104,8 @@ public class IndexDeligates {
         };
     }
 
-    public abstract static class AdapterBase<T> {
+    public abstract static class AdapterBase<T extends IndexDeligate>
+            implements IndexDeligate {
 
         private final T inner;
 
@@ -112,6 +131,16 @@ public class IndexDeligates {
         }
 
         @Override
+        public boolean isSkipIndexed1() {
+            return getInner().isSkipIndexed1();
+        }
+
+        @Override
+        public boolean isSkipIndexed2() {
+            return getInner().isSkipIndexed2();
+        }
+
+        @Override
         public int hashCode() {
             return 59 * 5 + (this.inner != null ? this.inner.hashCode() : 0);
         }
@@ -124,58 +153,48 @@ public class IndexDeligates {
     }
 
     public static class SingleToPairAdapter
-            extends AdapterBase<IndexDeligate>
+            extends AdapterBase<IndexDeligateSingle>
             implements IndexDeligatePair {
 
-        public SingleToPairAdapter(IndexDeligate inner) {
+        public SingleToPairAdapter(IndexDeligateSingle inner) {
             super(inner);
         }
 
         @Override
-        public Enumerator<String> getEnumerator1() throws IOException {
+        public Enumerator<String> getEntryEnumerator() throws IOException {
             return getInner().getEnumerator();
         }
 
         @Override
-        public Enumerator<String> getEnumerator2() throws IOException {
+        public Enumerator<String> getFeatureEnumerator() throws IOException {
             return getInner().getEnumerator();
         }
 
         @Override
-        public File getIndexFile1() {
+        public File getEntryIndexFile() {
             return getInner().getIndexFile();
         }
 
         @Override
-        public File getIndexFile2() {
+        public File getFeatureIndexFile() {
             return getInner().getIndexFile();
         }
 
         @Override
-        public boolean isEnumerated1() {
+        public boolean isEntriesEnumerated() {
             return getInner().isEnumerated();
         }
 
         @Override
-        public boolean isEnumerated2() {
+        public boolean isFeaturesEnumerated() {
             return getInner().isEnumerated();
-        }
-
-        @Override
-        public boolean isSkipIndexed1() {
-            return getInner().isSkipIndexed1();
-        }
-
-        @Override
-        public boolean isSkipIndexed2() {
-            return getInner().isSkipIndexed2();
         }
 
     }
 
     public static class PairToSingle1Adapter
             extends AdapterBase<IndexDeligatePair>
-            implements IndexDeligate {
+            implements IndexDeligateSingle {
 
         public PairToSingle1Adapter(IndexDeligatePair inner) {
             super(inner);
@@ -183,34 +202,24 @@ public class IndexDeligates {
 
         @Override
         public Enumerator<String> getEnumerator() throws IOException {
-            return getInner().getEnumerator2();
+            return getInner().getFeatureEnumerator();
         }
 
         @Override
         public File getIndexFile() {
-            return getInner().getIndexFile2();
+            return getInner().getFeatureIndexFile();
         }
 
         @Override
         public boolean isEnumerated() {
-            return getInner().isEnumerated2();
-        }
-
-        @Override
-        public boolean isSkipIndexed1() {
-            return getInner().isSkipIndexed1();
-        }
-
-        @Override
-        public boolean isSkipIndexed2() {
-            return getInner().isSkipIndexed2();
+            return getInner().isFeaturesEnumerated();
         }
 
     }
 
     public static class PairToSingle2Adapter
             extends AdapterBase<IndexDeligatePair>
-            implements IndexDeligate {
+            implements IndexDeligateSingle {
 
         public PairToSingle2Adapter(final IndexDeligatePair inner) {
             super(inner);
@@ -218,36 +227,26 @@ public class IndexDeligates {
 
         @Override
         public Enumerator<String> getEnumerator() throws IOException {
-            return getInner().getEnumerator1();
+            return getInner().getEntryEnumerator();
         }
 
         @Override
         public File getIndexFile() {
-            return getInner().getIndexFile1();
+            return getInner().getEntryIndexFile();
         }
 
         @Override
         public boolean isEnumerated() {
-            return getInner().isEnumerated1();
-        }
-
-        @Override
-        public boolean isSkipIndexed1() {
-            return getInner().isSkipIndexed1();
-        }
-
-        @Override
-        public boolean isSkipIndexed2() {
-            return getInner().isSkipIndexed2();
+            return getInner().isEntriesEnumerated();
         }
 
     }
 
     public abstract static class SingleToSingleAdapter
-            extends AdapterBase<IndexDeligate>
-            implements IndexDeligate {
+            extends AdapterBase<IndexDeligateSingle>
+            implements IndexDeligateSingle {
 
-        public SingleToSingleAdapter(final IndexDeligate inner) {
+        public SingleToSingleAdapter(final IndexDeligateSingle inner) {
             super(inner);
         }
 
@@ -264,16 +263,6 @@ public class IndexDeligates {
         @Override
         public boolean isEnumerated() {
             return getInner().isEnumerated();
-        }
-
-        @Override
-        public boolean isSkipIndexed1() {
-            return getInner().isSkipIndexed1();
-        }
-
-        @Override
-        public boolean isSkipIndexed2() {
-            return getInner().isSkipIndexed2();
         }
 
     }
@@ -287,43 +276,33 @@ public class IndexDeligates {
         }
 
         @Override
-        public Enumerator<String> getEnumerator1() throws IOException {
-            return getInner().getEnumerator1();
+        public Enumerator<String> getEntryEnumerator() throws IOException {
+            return getInner().getEntryEnumerator();
         }
 
         @Override
-        public Enumerator<String> getEnumerator2() throws IOException {
-            return getInner().getEnumerator2();
+        public Enumerator<String> getFeatureEnumerator() throws IOException {
+            return getInner().getFeatureEnumerator();
         }
 
         @Override
-        public File getIndexFile1() {
-            return getInner().getIndexFile1();
+        public File getEntryIndexFile() {
+            return getInner().getEntryIndexFile();
         }
 
         @Override
-        public File getIndexFile2() {
-            return getInner().getIndexFile2();
+        public File getFeatureIndexFile() {
+            return getInner().getFeatureIndexFile();
         }
 
         @Override
-        public boolean isEnumerated1() {
-            return getInner().isEnumerated1();
+        public boolean isEntriesEnumerated() {
+            return getInner().isEntriesEnumerated();
         }
 
         @Override
-        public boolean isEnumerated2() {
-            return getInner().isEnumerated2();
-        }
-
-        @Override
-        public boolean isSkipIndexed1() {
-            return getInner().isSkipIndexed1();
-        }
-
-        @Override
-        public boolean isSkipIndexed2() {
-            return getInner().isSkipIndexed2();
+        public boolean isFeaturesEnumerated() {
+            return getInner().isFeaturesEnumerated();
         }
 
     }

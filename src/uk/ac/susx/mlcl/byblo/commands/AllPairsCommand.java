@@ -314,7 +314,7 @@ public class AllPairsCommand extends AbstractCommand {
     private WeightedTokenSource openFeaturesSource() throws IOException {
         return WeightedTokenSource.open(
                 getFeaturesFile(), getCharset(),
-                IndexDeligates.toSingle2(getIndexDeligate()));
+                IndexDeligates.toSingleFeatures(getIndexDeligate()));
 
     }
 
@@ -327,7 +327,7 @@ public class AllPairsCommand extends AbstractCommand {
     private WeightedTokenPairSink openSimsSink() throws IOException {
         return WeightedTokenPairSink.open(
                 getOutputFile(), getCharset(),
-                IndexDeligates.toPair(IndexDeligates.toSingle1(getIndexDeligate())),
+                IndexDeligates.toPair(IndexDeligates.toSingleEntries(getIndexDeligate())),
                 fileDeligate.isCompactFormatDisabled());
 
     }

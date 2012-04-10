@@ -39,15 +39,15 @@ public class IndexTPCommand extends AbstractCopyCommand<TokenPair> {
 
     @Override
     public void runCommand() throws Exception {
-        Checks.checkNotNull("indexFile1", indexDeligate.getIndexFile1());
-        Checks.checkNotNull("indexFile2", indexDeligate.getIndexFile2());
+        Checks.checkNotNull("indexFile1", indexDeligate.getEntryIndexFile());
+        Checks.checkNotNull("indexFile2", indexDeligate.getFeatureIndexFile());
 
         super.runCommand();
 
-        Enumerators.saveStringEnumerator(indexDeligate.getEnumerator1(),
-                                         indexDeligate.getIndexFile1());
-        Enumerators.saveStringEnumerator(indexDeligate.getEnumerator2(),
-                                         indexDeligate.getIndexFile2());
+        Enumerators.saveStringEnumerator(indexDeligate.getEntryEnumerator(),
+                                         indexDeligate.getEntryIndexFile());
+        Enumerators.saveStringEnumerator(indexDeligate.getFeatureEnumerator(),
+                                         indexDeligate.getFeatureIndexFile());
     }
 
     @Override

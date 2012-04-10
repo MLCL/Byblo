@@ -89,12 +89,12 @@ public class CountCommandTest {
 
         if (preindexedEntries) {
             List<String> tmp = new ArrayList<String>(Arrays.asList(args));
-            tmp.add("--preindexed1");
+            tmp.add("--enumerated-entries");
             args = tmp.toArray(new String[0]);
         }
         if (preindexedFeatures) {
             List<String> tmp = new ArrayList<String>(Arrays.asList(args));
-            tmp.add("--preindexed2");
+            tmp.add("--enumerated-features");
             args = tmp.toArray(new String[0]);
         }
 

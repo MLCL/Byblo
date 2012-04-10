@@ -21,11 +21,11 @@ import uk.ac.susx.mlcl.lib.io.Source;
 public class UnindexWTCommand extends AbstractCopyCommand<Weighted<Token>> {
 
     @ParametersDelegate
-    private IndexDeligate indexDeligate = new IndexDeligateImpl(false);
+    private IndexDeligateSingle indexDeligate = new IndexDeligateSingleImpl(false);
 
     public UnindexWTCommand(
             File sourceFile, File destinationFile, Charset charset,
-            IndexDeligate indexDeligate) {
+            IndexDeligateSingle indexDeligate) {
         super(sourceFile, destinationFile, charset);
         this.indexDeligate = indexDeligate;
     }
@@ -56,19 +56,19 @@ public class UnindexWTCommand extends AbstractCopyCommand<Weighted<Token>> {
                 sinkIndexDeligate());
     }
 
-    public IndexDeligate getIndexDeligate() {
+    public IndexDeligateSingle getIndexDeligate() {
         return indexDeligate;
     }
 
-    public void setIndexDeligate(IndexDeligate indexDeligate) {
+    public void setIndexDeligate(IndexDeligateSingle indexDeligate) {
         this.indexDeligate = indexDeligate;
     }
 
-    protected IndexDeligate sourceIndexDeligate() {
+    protected IndexDeligateSingle sourceIndexDeligate() {
         return IndexDeligates.decorateEnumerated(indexDeligate, true);
     }
 
-    protected IndexDeligate sinkIndexDeligate() {
+    protected IndexDeligateSingle sinkIndexDeligate() {
         return IndexDeligates.decorateEnumerated(indexDeligate, false);
     }
 

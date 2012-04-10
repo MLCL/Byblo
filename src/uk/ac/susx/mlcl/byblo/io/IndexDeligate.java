@@ -31,25 +31,15 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import java.io.File;
-import java.io.IOException;
-import uk.ac.susx.mlcl.lib.Enumerator;
-
 /**
  *
  * @author hiam20
  */
 public interface IndexDeligate {
 
-    boolean DEFAULT_ENUMERATED = false;
+    boolean DEFAULT_IS_ENUMERATED = false;
 
     boolean DEFAULT_SKIP_INDEXING = false;
-
-    Enumerator<String> getEnumerator() throws IOException;
-
-    File getIndexFile();
-
-    boolean isEnumerated();
 
     boolean isSkipIndexed1();
 

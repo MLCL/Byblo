@@ -10,7 +10,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.commands.*;
-import uk.ac.susx.mlcl.byblo.io.IndexDeligateImpl;
+import uk.ac.susx.mlcl.byblo.io.IndexDeligateSingleImpl;
 import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
 
 /**
@@ -95,7 +95,7 @@ public class FullBuildTest {
 
         KnnSimsCommand knn = new KnnSimsCommand(
                 similarities, neighbours, charet,
-                new IndexDeligateImpl(preindexedEntries), 5);
+                new IndexDeligateSingleImpl(preindexedEntries), 5);
         knn.runCommand();
 
         assertValidInputFiles(neighbours);
@@ -179,7 +179,7 @@ public class FullBuildTest {
 
         ExternalKnnSimsCommand knn = new ExternalKnnSimsCommand(
                 similarities, neighbours, charet,
-                new IndexDeligateImpl(preindexedEntries), 5);
+                new IndexDeligateSingleImpl(preindexedEntries), 5);
         knn.runCommand();
 
         assertValidInputFiles(neighbours);
@@ -258,17 +258,11 @@ public class FullBuildTest {
 
         deleteIfExist(eventsFiltered, featuresFiltered, entriesFiltered);
 
-        FilterCommand filter = new FilterCommand(
-                events, entries, features,
-                eventsFiltered, entriesFiltered, featuresFiltered, charet);
-        filter.getIndexDeligate().setIndexFile1(entryIndex);
-        filter.getIndexDeligate().setIndexFile2(featureIndex);
-        filter.getIndexDeligate().setPreindexedTokens1(preindexedEntries);
-        filter.getIndexDeligate().setPreindexedTokens2(preindexedFeatures);
-        filter.addEntryFeatureMinimumFrequency(2);
 
+        filter(events, entries, features,
+               eventsFiltered, entriesFiltered, featuresFiltered,
+               entryIndex, featureIndex, preindexedEntries, preindexedFeatures, false, false);
 
-        filter.runCommand();
         assertSizeGT(events, eventsFiltered);
         assertSizeGT(entries, entriesFiltered);
         assertSizeGT(features, featuresFiltered);
@@ -294,7 +288,7 @@ public class FullBuildTest {
 
         KnnSimsCommand knn = new KnnSimsCommand(
                 similarities, neighbours, charet,
-                new IndexDeligateImpl(preindexedEntries), 5);
+                new IndexDeligateSingleImpl(preindexedEntries), 5);
         knn.runCommand();
 
         assertValidInputFiles(neighbours);
@@ -410,7 +404,7 @@ public class FullBuildTest {
 
         ExternalKnnSimsCommand knn = new ExternalKnnSimsCommand(
                 similarities, neighbours, charet,
-                new IndexDeligateImpl(preindexedEntries), 5);
+                new IndexDeligateSingleImpl(preindexedEntries), 5);
         knn.runCommand();
 
         assertValidInputFiles(neighbours);
@@ -703,13 +697,10 @@ public class FullBuildTest {
                 events, entries, features,
                 eventsFiltered, entriesFiltered, featuresFiltered,
                 DEFAULT_CHARSET);
-        filter.getIndexDeligate().setIndexFile1(entryIndex);
-        filter.getIndexDeligate().setIndexFile2(featureIndex);
-        filter.getIndexDeligate().setPreindexedTokens1(preindexedEntries);
-        filter.getIndexDeligate().setPreindexedTokens2(preindexedFeatures);
+        filter.setIndexDeligate(new IndexDeligatePairImpl(
+                preindexedEntries, preindexedFeatures,
+                entryIndex, featureIndex, skipIndex1, skipIndex2));
         filter.addEntryFeatureMinimumFrequency(2);
-        filter.getIndexDeligate().setSkipIndexed1(skipIndex1);
-        filter.getIndexDeligate().setSkipIndexed2(skipIndex2);
 
         filter.runCommand();
 
@@ -728,7 +719,7 @@ public class FullBuildTest {
 
         KnnSimsCommand knn = new KnnSimsCommand(
                 from, to, DEFAULT_CHARSET,
-                new IndexDeligateImpl(enumerated, null, null, skip1, skip2), 5);
+                new IndexDeligateSingleImpl(enumerated, null, null, skip1, skip2), 5);
         knn.runCommand();
 
         assertValidInputFiles(to);
@@ -743,7 +734,7 @@ public class FullBuildTest {
 
         ExternalKnnSimsCommand knn = new ExternalKnnSimsCommand(
                 from, to, DEFAULT_CHARSET,
-                new IndexDeligateImpl(enumerated, null, null, skip1, skip2), 5);
+                new IndexDeligateSingleImpl(enumerated, null, null, skip1, skip2), 5);
         knn.runCommand();
 
         assertValidInputFiles(to);
@@ -780,7 +771,7 @@ public class FullBuildTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(false);
-        unindex.setIndexDeligate(new IndexDeligateImpl(true, index, null, skip1, skip2));
+        unindex.setIndexDeligate(new IndexDeligateSingleImpl(true, index, null, skip1, skip2));
         unindex.runCommand();
 
         assertValidInputFiles(to);
@@ -797,7 +788,7 @@ public class FullBuildTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(false);
-        unindex.setIndexDeligate(new IndexDeligateImpl(true, index, null, skip1, skip2));
+        unindex.setIndexDeligate(new IndexDeligateSingleImpl(true, index, null, skip1, skip2));
         unindex.runCommand();
 
         assertValidInputFiles(to);
