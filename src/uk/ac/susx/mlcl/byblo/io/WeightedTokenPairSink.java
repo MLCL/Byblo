@@ -199,7 +199,7 @@ public class WeightedTokenPairSink
     }
 
     public static WeightedTokenPairSink open(
-            File file, Charset charset, IndexDeligatePair idx, boolean compact)
+            File file, Charset charset, EnumeratorPairBaring idx, boolean compact)
             throws IOException {
         DataSink tsv = new TSV.Sink(file, charset);
 

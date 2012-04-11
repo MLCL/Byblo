@@ -102,7 +102,7 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
     public String toString(Enumerator<String> stringIndex) {
         return Objects.toStringHelper(this).
                 add("id", id).
-                add("string", stringIndex.value(id)).
+                add("string", stringIndex.valueOf(id)).
                 toString();
     }
 
@@ -222,8 +222,14 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
 
             @Override
             public int compare(final Token a, final Token b) {
-                return enumerator.value(a.id()).compareTo(
-                        enumerator.value(b.id()));
+                String s1 = enumerator.valueOf(a.id());
+                String s2 = enumerator.valueOf(b.id());
+
+                assert s1 != null : "s1 ia null";
+                assert s2 != null : "s2 ia null";
+                return s1.compareTo(s2);
+//                return enumerator.get(a.id()).compareTo(
+//                        enumerator.get(b.id()));
             }
 
         };

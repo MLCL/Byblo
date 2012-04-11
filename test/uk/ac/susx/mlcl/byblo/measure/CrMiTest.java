@@ -38,9 +38,10 @@ import org.junit.Test;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
+import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
+import uk.ac.susx.mlcl.lib.MemoryStringEnumerator;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
@@ -84,7 +85,7 @@ public class CrMiTest {
         testCrmiCli(0, 0);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testCrmiCli_beta_0_5_gamma_0() throws Exception {
         testCrmiCli(0.5, 0);
     }
@@ -257,11 +258,11 @@ public class CrMiTest {
         // will be different.
 
 
-        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
+        Enumerator<String> idx = MemoryStringEnumerator.newInstance();
         WeightedTokenPairSource expected =  WeightedTokenPairSource.open(
-                expectedOutput, DEFAULT_CHARSET, new IndexDeligatePairImpl(false, false, idx, idx));
+                expectedOutput, DEFAULT_CHARSET, new EnumeratorPairBaringDeligate(false, false, idx, idx));
         WeightedTokenPairSource actual =  WeightedTokenPairSource.open(
-                crmiOutput, DEFAULT_CHARSET, new IndexDeligatePairImpl(false, false, idx, idx));
+                crmiOutput, DEFAULT_CHARSET, new EnumeratorPairBaringDeligate(false, false, idx, idx));
 
         while (expected.hasNext() && actual.hasNext()) {
             Weighted<TokenPair> e = expected.read();

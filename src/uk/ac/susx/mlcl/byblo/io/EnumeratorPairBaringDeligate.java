@@ -10,16 +10,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.commands.AbstractDeligate;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 
 /**
  *
  * @author hiam20
  */
-public class IndexDeligatePairImpl
-        extends IndexDeligateImpl
-        implements Serializable, IndexDeligatePair {
+public class EnumeratorPairBaringDeligate
+        extends EnumeratorBaringDeligate
+        implements Serializable, EnumeratorPairBaring {
 
     private static final long serialVersionUID = 1L;
 
@@ -45,7 +44,7 @@ public class IndexDeligatePairImpl
 
     private Enumerator<String> featureEnumerator = null;
 
-    protected IndexDeligatePairImpl(
+    protected EnumeratorPairBaringDeligate(
             boolean enumeratedEntries, boolean enumeratedFeatures,
             File entryIndexFile, File featureIndexFile,
             Enumerator<String> entryEnumerator, Enumerator<String> featureEnumerator,
@@ -59,7 +58,7 @@ public class IndexDeligatePairImpl
         this.featureEnumerator = featureEnumerator;
     }
 
-    public IndexDeligatePairImpl(
+    public EnumeratorPairBaringDeligate(
             boolean enumeratedEntries, boolean enumeratedFeatures,
             File entryIndexFile, File featureIndexFile,
             boolean skipIndexed1, boolean skipIndexed2) {
@@ -67,7 +66,7 @@ public class IndexDeligatePairImpl
              null, null, skipIndexed1, skipIndexed2);
     }
 
-    public IndexDeligatePairImpl(
+    public EnumeratorPairBaringDeligate(
             boolean enumeratedEntries, boolean enumeratedFeatures,
             Enumerator<String> entryEnumerator, Enumerator<String> featureEnumerator,
             boolean skipIndexed1, boolean skipIndexed2) {
@@ -75,30 +74,30 @@ public class IndexDeligatePairImpl
              entryEnumerator, featureEnumerator, skipIndexed1, skipIndexed2);
     }
 
-    public IndexDeligatePairImpl(boolean enumeratedEntries,
-                                 boolean enumeratedFeatures,
-                                 boolean skipIndexed1,
-                                 boolean skipIndexed2) {
+    public EnumeratorPairBaringDeligate(boolean enumeratedEntries,
+                                        boolean enumeratedFeatures,
+                                        boolean skipIndexed1,
+                                        boolean skipIndexed2) {
         this(enumeratedEntries, enumeratedFeatures, null, null,
              null, null, skipIndexed1, skipIndexed2);
     }
 
-    public IndexDeligatePairImpl(boolean enumeratedEntries,
-                                 boolean enumeratedFeatures) {
+    public EnumeratorPairBaringDeligate(boolean enumeratedEntries,
+                                        boolean enumeratedFeatures) {
         this(enumeratedEntries, enumeratedFeatures, null, null, null, null,
              DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
     }
 
-    public IndexDeligatePairImpl(boolean enumeratedEntries,
-                                 boolean enumeratedFeatures,
-                                 Enumerator<String> entryEnumerator,
-                                 Enumerator<String> featureEnumerator) {
+    public EnumeratorPairBaringDeligate(boolean enumeratedEntries,
+                                        boolean enumeratedFeatures,
+                                        Enumerator<String> entryEnumerator,
+                                        Enumerator<String> featureEnumerator) {
         this(enumeratedEntries, enumeratedFeatures, null, null,
              entryEnumerator, featureEnumerator,
              DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
     }
 
-    public IndexDeligatePairImpl() {
+    public EnumeratorPairBaringDeligate() {
         this(DEFAULT_IS_ENUMERATED, DEFAULT_IS_ENUMERATED,
              null, null, null, null,
              DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
@@ -109,8 +108,9 @@ public class IndexDeligatePairImpl
         if (entryEnumerator == null) {
             // if tokens are preindexed then a file MUST be available
             // otherwise the file will be loaded if it exists
-            entryEnumerator = IndexDeligates.instantiateEnumerator(
-                    isEntriesEnumerated(), getEntryIndexFile());
+            openEntries();
+//            entryEnumerator = EnumeratorDeligates.instantiateEnumerator(
+//                    isEntriesEnumerated(), getEntryIndexFile());
         }
         return entryEnumerator;
     }
@@ -118,8 +118,9 @@ public class IndexDeligatePairImpl
     @Override
     public final Enumerator<String> getFeatureEnumerator() throws IOException {
         if (featureEnumerator == null) {
-            featureEnumerator = IndexDeligates.instantiateEnumerator(
-                    isFeaturesEnumerated(), getFeatureIndexFile());
+            openFeatures();
+//            featureEnumerator = EnumeratorDeligates.instantiateEnumerator(
+//                    isFeaturesEnumerated(), getFeatureIndexFile());
         }
         return featureEnumerator;
     }
@@ -142,6 +143,55 @@ public class IndexDeligatePairImpl
     @Override
     public final File getFeatureIndexFile() {
         return featuresIndexFile;
+    }
+
+    @Override
+    public void openEntries() throws IOException {
+        entryEnumerator = open(entriesIndexFile);;
+    }
+
+    @Override
+    public void saveEntries() throws IOException {
+        save(entryEnumerator);
+    }
+
+    @Override
+    public void closeEntries() throws IOException {
+        close(entryEnumerator);
+        entryEnumerator = null;
+    }
+
+    @Override
+    public void openFeatures() throws IOException {
+        featureEnumerator = open(featuresIndexFile);
+    }
+
+    @Override
+    public void saveFeatures() throws IOException {
+        save(featureEnumerator);
+    }
+
+    @Override
+    public void closeFeatures() throws IOException {
+        close(featureEnumerator);
+        featureEnumerator = null;
+    }
+
+    public void close() throws IOException {
+        closeFeatures();
+        closeEntries();
+    }
+
+    @Override
+    public void save() throws IOException {
+        saveEntries();
+        saveFeatures();
+    }
+
+    @Override
+    public void open() throws IOException {
+        openEntries();
+        openFeatures();
     }
 
     @Override

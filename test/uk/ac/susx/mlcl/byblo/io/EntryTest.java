@@ -45,6 +45,7 @@ import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
+import uk.ac.susx.mlcl.lib.MemoryStringEnumerator;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
@@ -57,8 +58,7 @@ public class EntryTest {
                        boolean enumOut)
             throws FileNotFoundException, IOException {
 
-        Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
-        IndexDeligateSingle idx = new IndexDeligateSingleImpl(false, strEnum);
+        EnumeratorSingleBaring idx = new EnumeratorSingleBaringDeligate(false);
         WeightedTokenSource aSrc;
         WeightedTokenSink bSink;
         if (enumIn)
@@ -106,16 +106,15 @@ public class EntryTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_ENTRIES.getName() + ".str");
 
-//        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
-        Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
+        Enumerator<String> strEnum = MemoryStringEnumerator.newInstance();
 
         {
             WeightedTokenSource aSrc = WeightedTokenSource.open(
                     a, DEFAULT_CHARSET,
-                    new IndexDeligateSingleImpl(false, strEnum));
+                    new EnumeratorSingleBaringDeligate(false, strEnum));
             WeightedTokenSink bSink = WeightedTokenSink.open(
                     b, DEFAULT_CHARSET,
-                    new IndexDeligateSingleImpl(true));
+                    new EnumeratorSingleBaringDeligate(true));
             IOUtil.copy(aSrc, bSink);
             bSink.close();
         }
@@ -126,10 +125,10 @@ public class EntryTest {
         {
             WeightedTokenSource bSrc = WeightedTokenSource.open(
                     b, DEFAULT_CHARSET,
-                    new IndexDeligateSingleImpl(true));
+                    new EnumeratorSingleBaringDeligate(true));
             WeightedTokenSink cSink = WeightedTokenSink.open(
                     c, DEFAULT_CHARSET,
-                    new IndexDeligateSingleImpl(false, strEnum));
+                    new EnumeratorSingleBaringDeligate(false, strEnum));
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }
@@ -144,13 +143,11 @@ public class EntryTest {
         final Map<Tell, Weighted<Token>> hist =
                 new HashMap<Tell, Weighted<Token>>();
 
-        Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
+        Enumerator<String> idx = MemoryStringEnumerator.newInstance();
 
-
-        Enumerator<String> idx = Enumerators.newDefaultStringEnumerator();
         WeightedTokenSource src = WeightedTokenSource.open(
                 file, DEFAULT_CHARSET,
-                new IndexDeligateSingleImpl(false, idx));
+                new EnumeratorSingleBaringDeligate(false, idx));
         {
             while (src.hasNext()) {
 
@@ -196,4 +193,5 @@ public class EntryTest {
             throws FileNotFoundException, IOException {
         testRandomAccess(TEST_FRUIT_ENTRIES);
     }
+
 }

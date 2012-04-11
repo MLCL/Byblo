@@ -10,8 +10,10 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.commands.*;
-import uk.ac.susx.mlcl.byblo.io.IndexDeligateSingleImpl;
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
+import uk.ac.susx.mlcl.byblo.io.EnumeratorSingleBaringDeligate;
+import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
+import static uk.ac.susx.mlcl.byblo.commands.UnindexSimsCommandTest.*;
+import static uk.ac.susx.mlcl.byblo.commands.IndexTPCommandTest.*;
 
 /**
  *
@@ -51,18 +53,18 @@ public class FullBuildTest {
 
         // Count the entries, features and events
 
-        assertValidInputFiles(instances);
+        assertValidPlaintextInputFiles(instances);
         deleteIfExist(events, entries, features);
 
         CountCommand count = new CountCommand(
                 instances, events, entries, features,
-                new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures),
+                new EnumeratorPairBaringDeligate(preindexedEntries, preindexedFeatures),
                 charet);
         count.runCommand();
 
         // Filter 
 
-        assertValidInputFiles(entries, features, events);
+        assertValidPlaintextInputFiles(entries, features, events);
         deleteIfExist(eventsFiltered, entriesFiltered, featuresFiltered);
 
         FilterCommand filter = new FilterCommand(
@@ -80,25 +82,25 @@ public class FullBuildTest {
 
         // All pairs
 
-        assertValidInputFiles(eventsFiltered, entriesFiltered, featuresFiltered);
+        assertValidPlaintextInputFiles(eventsFiltered, entriesFiltered, featuresFiltered);
         deleteIfExist(similarities);
 
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
-                charet, new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures, false, false));
+                charet, new EnumeratorPairBaringDeligate(preindexedEntries, preindexedFeatures, false, false));
         allpairs.setnThreads(1);
         allpairs.runCommand();
 
         // KNN
-        assertValidInputFiles(similarities);
+        assertValidPlaintextInputFiles(similarities);
         deleteIfExist(neighbours);
 
         KnnSimsCommand knn = new KnnSimsCommand(
                 similarities, neighbours, charet,
-                new IndexDeligateSingleImpl(preindexedEntries), 5);
+                new EnumeratorSingleBaringDeligate(preindexedEntries), 5);
         knn.runCommand();
 
-        assertValidInputFiles(neighbours);
+        assertValidPlaintextInputFiles(neighbours);
         assertTrue("Neighbours file is no smaller that similarities file.",
                    neighbours.length() < similarities.length());
 
@@ -136,18 +138,18 @@ public class FullBuildTest {
 
         // Count the entries, features and events
 
-        assertValidInputFiles(instances);
+        assertValidPlaintextInputFiles(instances);
         deleteIfExist(events, entries, features);
 
 
         ExternalCountCommand count = new ExternalCountCommand(
                 instances, events, entries, features, charet,
-                new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures));
+                new EnumeratorPairBaringDeligate(preindexedEntries, preindexedFeatures));
         count.runCommand();
 
         // Filter 
 
-        assertValidInputFiles(entries, features, events);
+        assertValidPlaintextInputFiles(entries, features, events);
         deleteIfExist(eventsFiltered, entriesFiltered, featuresFiltered);
 
         FilterCommand filter = new FilterCommand(
@@ -165,24 +167,24 @@ public class FullBuildTest {
 
         // All pairs
 
-        assertValidInputFiles(eventsFiltered, entriesFiltered, featuresFiltered);
+        assertValidPlaintextInputFiles(eventsFiltered, entriesFiltered, featuresFiltered);
         deleteIfExist(similarities);
 
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
-                charet, new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures, false, false));
+                charet, new EnumeratorPairBaringDeligate(preindexedEntries, preindexedFeatures, false, false));
         allpairs.runCommand();
 
         // KNN
-        assertValidInputFiles(similarities);
+        assertValidPlaintextInputFiles(similarities);
         deleteIfExist(neighbours);
 
         ExternalKnnSimsCommand knn = new ExternalKnnSimsCommand(
                 similarities, neighbours, charet,
-                new IndexDeligateSingleImpl(preindexedEntries), 5);
+                new EnumeratorSingleBaringDeligate(preindexedEntries), 5);
         knn.runCommand();
 
-        assertValidInputFiles(neighbours);
+        assertValidPlaintextInputFiles(neighbours);
         assertTrue("Neighbours file is no smaller that similarities file.",
                    neighbours.length() < similarities.length());
 
@@ -234,7 +236,7 @@ public class FullBuildTest {
         deleteIfExist(entryIndex, featureIndex, instancesIndexed);
 
         indexTP(instances, instancesIndexed, entryIndex, featureIndex, false,
-                false);
+                false, false);
 
 
         // Count the entries, features and events
@@ -243,11 +245,11 @@ public class FullBuildTest {
 
         CountCommand count = new CountCommand(
                 instancesIndexed, events, entries, features,
-                new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures),
+                new EnumeratorPairBaringDeligate(preindexedEntries, preindexedFeatures),
                 charet);
         count.runCommand();
 
-        assertValidInputFiles(entries, features, events);
+        assertValidPlaintextInputFiles(entries, features, events);
         assertSizeGT(TEST_FRUIT_ENTRY_FEATURES, events);
         assertSizeGT(TEST_FRUIT_ENTRIES, entries);
         assertSizeGT(TEST_FRUIT_FEATURES, features);
@@ -269,16 +271,16 @@ public class FullBuildTest {
 
         // All pairs
 
-        assertValidInputFiles(eventsFiltered, entriesFiltered, featuresFiltered);
+        assertValidPlaintextInputFiles(eventsFiltered, entriesFiltered, featuresFiltered);
         deleteIfExist(similarities);
 
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
-                charet, new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures, false, false));
+                charet, new EnumeratorPairBaringDeligate(preindexedEntries, preindexedFeatures, false, false));
         allpairs.setnThreads(1);
         allpairs.runCommand();
 
-        assertValidInputFiles(similarities);
+        assertValidPlaintextInputFiles(similarities);
         assertSizeGT(TEST_FRUIT_SIMS, similarities);
 
         // KNN
@@ -288,10 +290,10 @@ public class FullBuildTest {
 
         KnnSimsCommand knn = new KnnSimsCommand(
                 similarities, neighbours, charet,
-                new IndexDeligateSingleImpl(preindexedEntries), 5);
+                new EnumeratorSingleBaringDeligate(preindexedEntries), 5);
         knn.runCommand();
 
-        assertValidInputFiles(neighbours);
+        assertValidPlaintextInputFiles(neighbours);
         assertSizeGT(similarities, neighbours);
         assertSizeGT(TEST_FRUIT_SIMS_100NN, neighbours);
 
@@ -300,9 +302,9 @@ public class FullBuildTest {
         deleteIfExist(neighboursStrings);
 
         unindexSims(neighbours, suffix(neighbours, ".strings"), entryIndex,
-                    false, false);
+                    false, false, false);
 
-        assertValidInputFiles(neighboursStrings);
+        assertValidPlaintextInputFiles(neighboursStrings);
     }
 
     @Test
@@ -351,7 +353,7 @@ public class FullBuildTest {
         deleteIfExist(entryIndex, featureIndex, instancesIndexed);
 
         indexTP(instances, instancesIndexed, entryIndex, featureIndex, false,
-                false);
+                false, false);
 
 
         // Count the entries, features and events
@@ -363,12 +365,12 @@ public class FullBuildTest {
         count.setEntriesFile(entries);
         count.setFeaturesFile(features);
         count.setEntryFeaturesFile(events);
-        count.setIndexDeligate(new IndexDeligatePairImpl(preindexedEntries,
-                                                         preindexedFeatures));
+        count.setIndexDeligate(new EnumeratorPairBaringDeligate(preindexedEntries,
+                                                                preindexedFeatures));
         count.getFileDeligate().setCharset(charet);
         count.runCommand();
 
-        assertValidInputFiles(entries, features, events);
+        assertValidPlaintextInputFiles(entries, features, events);
         assertSizeGT(TEST_FRUIT_ENTRY_FEATURES, events);
         assertSizeGT(TEST_FRUIT_ENTRIES, entries);
         assertSizeGT(TEST_FRUIT_FEATURES, features);
@@ -386,15 +388,15 @@ public class FullBuildTest {
 
         // All pairs
 
-        assertValidInputFiles(eventsFiltered, entriesFiltered, featuresFiltered);
+        assertValidPlaintextInputFiles(eventsFiltered, entriesFiltered, featuresFiltered);
         deleteIfExist(similarities);
 
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
-                charet, new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures, false, false));
+                charet, new EnumeratorPairBaringDeligate(preindexedEntries, preindexedFeatures, false, false));
         allpairs.runCommand();
 
-        assertValidInputFiles(similarities);
+        assertValidPlaintextInputFiles(similarities);
         assertSizeGT(TEST_FRUIT_SIMS, similarities);
 
         // KNN
@@ -404,10 +406,10 @@ public class FullBuildTest {
 
         ExternalKnnSimsCommand knn = new ExternalKnnSimsCommand(
                 similarities, neighbours, charet,
-                new IndexDeligateSingleImpl(preindexedEntries), 5);
+                new EnumeratorSingleBaringDeligate(preindexedEntries), 5);
         knn.runCommand();
 
-        assertValidInputFiles(neighbours);
+        assertValidPlaintextInputFiles(neighbours);
         assertSizeGT(similarities, neighbours);
         assertSizeGT(TEST_FRUIT_SIMS_100NN, neighbours);
 
@@ -416,9 +418,9 @@ public class FullBuildTest {
         deleteIfExist(neighboursStrings);
 
         unindexSims(neighbours, suffix(neighbours, ".strings"), entryIndex,
-                    false, false);
+                    false, false, false);
 
-        assertValidInputFiles(neighboursStrings);
+        assertValidPlaintextInputFiles(neighboursStrings);
     }
 
     @Test
@@ -469,7 +471,7 @@ public class FullBuildTest {
         deleteIfExist(entryIndex, featureIndex, instancesIndexed);
 
         indexTP(instances, instancesIndexed, entryIndex, featureIndex,
-                skipIndex1, skipIndex2);
+                skipIndex1, skipIndex2, false);
 
         unindexTP(instancesIndexed, suffix(instancesIndexed, ".strings"),
                   entryIndex, featureIndex,
@@ -481,12 +483,12 @@ public class FullBuildTest {
 
         CountCommand count = new CountCommand(
                 instancesIndexed, events, entries, features,
-                new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2),
+                new EnumeratorPairBaringDeligate(preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2),
                 charet);
 
         count.runCommand();
 
-        assertValidInputFiles(entries, features, events);
+        assertValidPlaintextInputFiles(entries, features, events);
         assertSizeGT(TEST_FRUIT_ENTRY_FEATURES, events);
         assertSizeGT(TEST_FRUIT_ENTRIES, entries);
         assertSizeGT(TEST_FRUIT_FEATURES, features);
@@ -519,21 +521,21 @@ public class FullBuildTest {
 
         // All pairs
 
-        assertValidInputFiles(eventsFiltered, entriesFiltered, featuresFiltered);
+        assertValidPlaintextInputFiles(eventsFiltered, entriesFiltered, featuresFiltered);
         deleteIfExist(similarities);
 
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
                 charet,
-                new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2));
+                new EnumeratorPairBaringDeligate(preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2));
         allpairs.setnThreads(1);
         allpairs.runCommand();
 
-        assertValidInputFiles(similarities);
+        assertValidPlaintextInputFiles(similarities);
         assertSizeGT(TEST_FRUIT_SIMS, similarities);
 
         unindexSims(similarities, suffix(similarities, ".strings"), entryIndex,
-                    skipIndex1, skipIndex2);
+                    skipIndex1, skipIndex2, false);
 
         // KNN
 
@@ -548,7 +550,7 @@ public class FullBuildTest {
         deleteIfExist(neighboursStrings);
 
         unindexSims(neighbours, suffix(neighbours, ".strings"), entryIndex,
-                    skipIndex1, skipIndex2);
+                    skipIndex1, skipIndex2, false);
 
     }
 
@@ -600,7 +602,7 @@ public class FullBuildTest {
         deleteIfExist(entryIndex, featureIndex, instancesIndexed);
 
         indexTP(instances, instancesIndexed, entryIndex, featureIndex,
-                skipIndex1, skipIndex2);
+                skipIndex1, skipIndex2, false);
 
         unindexTP(instancesIndexed, suffix(instancesIndexed, ".strings"),
                   entryIndex, featureIndex,
@@ -615,11 +617,11 @@ public class FullBuildTest {
         count.setEntriesFile(entries);
         count.setFeaturesFile(features);
         count.setEntryFeaturesFile(events);
-        count.setIndexDeligate(new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2));
+        count.setIndexDeligate(new EnumeratorPairBaringDeligate(preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2));
         count.getFileDeligate().setCharset(charet);
         count.runCommand();
 
-        assertValidInputFiles(entries, features, events);
+        assertValidPlaintextInputFiles(entries, features, events);
         assertSizeGT(TEST_FRUIT_ENTRY_FEATURES, events);
         assertSizeGT(TEST_FRUIT_ENTRIES, entries);
         assertSizeGT(TEST_FRUIT_FEATURES, features);
@@ -652,19 +654,19 @@ public class FullBuildTest {
 
         // All pairs
 
-        assertValidInputFiles(eventsFiltered, entriesFiltered, featuresFiltered);
+        assertValidPlaintextInputFiles(eventsFiltered, entriesFiltered, featuresFiltered);
         deleteIfExist(similarities);
 
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
-                charet, new IndexDeligatePairImpl(preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2));
+                charet, new EnumeratorPairBaringDeligate(preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2));
         allpairs.runCommand();
 
-        assertValidInputFiles(similarities);
+        assertValidPlaintextInputFiles(similarities);
         assertSizeGT(TEST_FRUIT_SIMS, similarities);
 
         unindexSims(similarities, suffix(similarities, ".strings"), entryIndex,
-                    skipIndex1, skipIndex2);
+                    skipIndex1, skipIndex2, false);
 
         // KNN
 
@@ -679,7 +681,7 @@ public class FullBuildTest {
         deleteIfExist(neighboursStrings);
 
         unindexSims(neighbours, suffix(neighbours, ".strings"), entryIndex,
-                    skipIndex1, skipIndex2);
+                    skipIndex1, skipIndex2, false);
 
     }
 
@@ -690,14 +692,14 @@ public class FullBuildTest {
             boolean preindexedEntries, boolean preindexedFeatures,
             boolean skipIndex1, boolean skipIndex2) throws Exception {
 
-        assertValidInputFiles(events, entries, features);
+        assertValidPlaintextInputFiles(events, entries, features);
         assertValidOutputFiles(eventsFiltered, entriesFiltered, featuresFiltered);
 
         FilterCommand filter = new FilterCommand(
                 events, entries, features,
                 eventsFiltered, entriesFiltered, featuresFiltered,
                 DEFAULT_CHARSET);
-        filter.setIndexDeligate(new IndexDeligatePairImpl(
+        filter.setIndexDeligate(new EnumeratorPairBaringDeligate(
                 preindexedEntries, preindexedFeatures,
                 entryIndex, featureIndex, skipIndex1, skipIndex2));
         filter.addEntryFeatureMinimumFrequency(2);
@@ -705,7 +707,7 @@ public class FullBuildTest {
         filter.runCommand();
 
 
-        assertValidInputFiles(eventsFiltered, entriesFiltered, featuresFiltered);
+        assertValidPlaintextInputFiles(eventsFiltered, entriesFiltered, featuresFiltered);
         assertSizeGT(events, eventsFiltered);
         assertSizeGT(entries, entriesFiltered);
         assertSizeGT(features, featuresFiltered);
@@ -715,14 +717,14 @@ public class FullBuildTest {
                             boolean enumerated,
                             boolean skip1, boolean skip2)
             throws Exception {
-        assertValidInputFiles(from);
+        assertValidPlaintextInputFiles(from);
 
         KnnSimsCommand knn = new KnnSimsCommand(
                 from, to, DEFAULT_CHARSET,
-                new IndexDeligateSingleImpl(enumerated, null, null, skip1, skip2), 5);
+                new EnumeratorSingleBaringDeligate(enumerated, null, null, skip1, skip2), 5);
         knn.runCommand();
 
-        assertValidInputFiles(to);
+        assertValidPlaintextInputFiles(to);
         assertSizeGT(from, to);
     }
 
@@ -730,68 +732,68 @@ public class FullBuildTest {
                                boolean enumerated,
                                boolean skip1, boolean skip2)
             throws Exception {
-        assertValidInputFiles(from);
+        assertValidPlaintextInputFiles(from);
 
         ExternalKnnSimsCommand knn = new ExternalKnnSimsCommand(
                 from, to, DEFAULT_CHARSET,
-                new IndexDeligateSingleImpl(enumerated, null, null, skip1, skip2), 5);
+                new EnumeratorSingleBaringDeligate(enumerated, null, null, skip1, skip2), 5);
         knn.runCommand();
 
-        assertValidInputFiles(to);
+        assertValidPlaintextInputFiles(to);
         assertSizeGT(from, to);
     }
 
-    private static void indexTP(File from, File to,
-                                File index1, File index2,
-                                boolean skip1, boolean skip2)
-            throws Exception {
-        assertValidInputFiles(from);
-        assertValidOutputFiles(to, index1, index2);
-
-        IndexTPCommand unindex = new IndexTPCommand();
-        unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-        unindex.getFilesDeligate().setSourceFile(from);
-        unindex.getFilesDeligate().setDestinationFile(to);
-        unindex.getFilesDeligate().setCompactFormatDisabled(false);
-        unindex.setIndexDeligate(new IndexDeligatePairImpl(
-                true, true, index1, index2, skip1, skip2));
-        unindex.runCommand();
-
-        assertValidInputFiles(to, index1, index2);
-        assertSizeGT(from, to);
-    }
-
-    private static void unindexSims(File from, File to, File index,
-                                    boolean skip1, boolean skip2)
-            throws Exception {
-        assertValidInputFiles(from, index);
-
-        UnindexSimsCommand unindex = new UnindexSimsCommand();
-        unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-        unindex.getFilesDeligate().setSourceFile(from);
-        unindex.getFilesDeligate().setDestinationFile(to);
-        unindex.getFilesDeligate().setCompactFormatDisabled(false);
-        unindex.setIndexDeligate(new IndexDeligateSingleImpl(true, index, null, skip1, skip2));
-        unindex.runCommand();
-
-        assertValidInputFiles(to);
-        assertSizeGT(to, from);
-    }
+//    private static void indexTP(File from, File to,
+//                                File index1, File index2,
+//                                boolean skip1, boolean skip2)
+//            throws Exception {
+//        assertValidPlaintextInputFiles(from);
+//        assertValidOutputFiles(to);
+//
+//        IndexTPCommand unindex = new IndexTPCommand();
+//        unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
+//        unindex.getFilesDeligate().setSourceFile(from);
+//        unindex.getFilesDeligate().setDestinationFile(to);
+//        unindex.getFilesDeligate().setCompactFormatDisabled(false);
+//        unindex.setIndexDeligate(new EnumeratorPairBaringDeligate(
+//                true, true, index1, index2, skip1, skip2));
+//        unindex.runCommand();
+//
+//        assertValidPlaintextInputFiles(to);
+//        assertSizeGT(from, to);
+//    }
+//
+//    private static void unindexSims(File from, File to, File index,
+//                                    boolean skip1, boolean skip2)
+//            throws Exception {
+//        assertValidPlaintextInputFiles(from);
+//
+//        UnindexSimsCommand unindex = new UnindexSimsCommand();
+//        unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
+//        unindex.getFilesDeligate().setSourceFile(from);
+//        unindex.getFilesDeligate().setDestinationFile(to);
+//        unindex.getFilesDeligate().setCompactFormatDisabled(false);
+//        unindex.setIndexDeligate(new EnumeratorSingleBaringDeligate(true, index, null, skip1, skip2));
+//        unindex.runCommand();
+//
+//        assertValidPlaintextInputFiles(to);
+//        assertSizeGT(to, from);
+//    }
 
     private static void unindexWT(File from, File to, File index,
                                   boolean skip1, boolean skip2)
             throws Exception {
-        assertValidInputFiles(from, index);
+        assertValidPlaintextInputFiles(from);
 
         UnindexWTCommand unindex = new UnindexWTCommand();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(false);
-        unindex.setIndexDeligate(new IndexDeligateSingleImpl(true, index, null, skip1, skip2));
+        unindex.setIndexDeligate(new EnumeratorSingleBaringDeligate(true, index, null, skip1, skip2));
         unindex.runCommand();
 
-        assertValidInputFiles(to);
+        assertValidPlaintextInputFiles(to);
         assertSizeGT(to, from);
     }
 
@@ -799,17 +801,17 @@ public class FullBuildTest {
                                    File index1, File index2,
                                    boolean skip1, boolean skip2)
             throws Exception {
-        assertValidInputFiles(from, index1, index2);
+        assertValidPlaintextInputFiles(from);
 
         UnindexWTPCommand unindex = new UnindexWTPCommand();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(false);
-        unindex.setIndexDeligate(new IndexDeligatePairImpl(true, true, index1, index2, skip1, skip2));
+        unindex.setIndexDeligate(new EnumeratorPairBaringDeligate(true, true, index1, index2, skip1, skip2));
         unindex.runCommand();
 
-        assertValidInputFiles(to);
+        assertValidPlaintextInputFiles(to);
         assertSizeGT(to, from);
     }
 
@@ -817,17 +819,17 @@ public class FullBuildTest {
                                   File index1, File index2,
                                   boolean skip1, boolean skip2)
             throws Exception {
-        assertValidInputFiles(from, index1, index2);
+        assertValidPlaintextInputFiles(from);
 
         UnindexTPCommand unindex = new UnindexTPCommand();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(false);
-        unindex.setIndexDeligate(new IndexDeligatePairImpl(true, true, index1, index2, skip1, skip2));
+        unindex.setIndexDeligate(new EnumeratorPairBaringDeligate(true, true, index1, index2, skip1, skip2));
         unindex.runCommand();
 
-        assertValidInputFiles(to);
+        assertValidPlaintextInputFiles(to);
         assertSizeGT(to, from);
     }
 

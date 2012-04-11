@@ -23,11 +23,11 @@ public class ExternalSortWeightedTokenCommand extends AbstractExternalSortComman
     private static final long serialVersionUID = 1L;
 
     @ParametersDelegate
-    private IndexDeligateSingle indexDeligate = new IndexDeligateSingleImpl();
+    private EnumeratorSingleBaring indexDeligate = new EnumeratorSingleBaringDeligate();
 
     public ExternalSortWeightedTokenCommand(
             File sourceFile, File destinationFile, Charset charset,
-            IndexDeligateSingle indexDeligate) {
+            EnumeratorSingleBaring indexDeligate) {
         super(sourceFile, destinationFile, charset);
         setIndexDeligate(indexDeligate);
     }
@@ -35,6 +35,13 @@ public class ExternalSortWeightedTokenCommand extends AbstractExternalSortComman
     public ExternalSortWeightedTokenCommand() {
     }
 
+    @Override
+    public void runCommand() throws Exception {
+        super.runCommand();
+        indexDeligate.save();
+        indexDeligate.close();
+
+    }
     @Override
     protected Sink<Weighted<Token>> openSink(File file) throws IOException {
         WeightedTokenSink s = WeightedTokenSink.open(
@@ -49,11 +56,11 @@ public class ExternalSortWeightedTokenCommand extends AbstractExternalSortComman
                                         getIndexDeligate());
     }
 
-    public final IndexDeligateSingle getIndexDeligate() {
+    public final EnumeratorSingleBaring getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(IndexDeligateSingle indexDeligate) {
+    public final void setIndexDeligate(EnumeratorSingleBaring indexDeligate) {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }

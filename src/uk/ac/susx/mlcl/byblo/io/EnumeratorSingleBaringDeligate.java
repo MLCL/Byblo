@@ -10,15 +10,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.Enumerators;
-import uk.ac.susx.mlcl.lib.commands.AbstractDeligate;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 
 /**
  *
  * @author hiam20
  */
-public class IndexDeligateSingleImpl extends IndexDeligateImpl implements Serializable, IndexDeligateSingle {
+public class EnumeratorSingleBaringDeligate extends EnumeratorBaringDeligate
+        implements Serializable, EnumeratorSingleBaring {
 
     private static final long serialVersionUID = 1L;
 
@@ -33,7 +32,7 @@ public class IndexDeligateSingleImpl extends IndexDeligateImpl implements Serial
 
     private Enumerator<String> enumerator = null;
 
-    public IndexDeligateSingleImpl(
+    public EnumeratorSingleBaringDeligate(
             boolean enumerated, File indexFile, Enumerator<String> enumerator,
             boolean skipIndexed1, boolean skipIndexed2) {
         super(skipIndexed1, skipIndexed2);
@@ -42,17 +41,26 @@ public class IndexDeligateSingleImpl extends IndexDeligateImpl implements Serial
         this.enumerator = enumerator;
     }
 
-    public IndexDeligateSingleImpl(boolean enumerated, Enumerator<String> enumerator) {
+  public EnumeratorSingleBaringDeligate(
+            boolean enumerated, File indexFile,
+            boolean skipIndexed1, boolean skipIndexed2) {
+        super(skipIndexed1, skipIndexed2);
+        this.enumerated = enumerated;
+        this.indexFile = indexFile;
+        this.enumerator = null;
+    }
+
+    public EnumeratorSingleBaringDeligate(boolean enumerated, Enumerator<String> enumerator) {
         this(enumerated, null, enumerator,
              DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
     }
 
-    public IndexDeligateSingleImpl(boolean enumerated) {
+    public EnumeratorSingleBaringDeligate(boolean enumerated) {
         this(enumerated, null, null,
              DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
     }
 
-    public IndexDeligateSingleImpl() {
+    public EnumeratorSingleBaringDeligate() {
         this(DEFAULT_IS_ENUMERATED, null, null,
              DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
     }
@@ -70,9 +78,25 @@ public class IndexDeligateSingleImpl extends IndexDeligateImpl implements Serial
     @Override
     public final Enumerator<String> getEnumerator() throws IOException {
         if (enumerator == null) {
-            enumerator = IndexDeligates.instantiateEnumerator(enumerated, indexFile);
+            open();
         }
         return enumerator;
+    }
+
+    @Override
+    public void open() throws IOException {
+        enumerator = open(indexFile);
+    }
+
+    @Override
+    public void save() throws IOException {
+        save(enumerator);
+    }
+
+    @Override
+    public void close() throws IOException {
+        close(enumerator);
+        enumerator = null;
     }
 
     @Override

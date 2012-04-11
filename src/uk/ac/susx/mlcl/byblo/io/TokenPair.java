@@ -109,7 +109,7 @@ public class TokenPair implements
     public String toString(Enumerator<String> stringIndex1,
                            Enumerator<String> stringIndex2) {
         return Objects.toStringHelper(this).
-                add("1", stringIndex1.value(id1)).add("2", stringIndex2.value(
+                add("1", stringIndex1.valueOf(id1)).add("2", stringIndex2.valueOf(
                 id2)).
                 toString();
     }
@@ -319,10 +319,10 @@ public class TokenPair implements
 
             @Override
             public int compare(final TokenPair a, final TokenPair b) {
-                int c = enum1.value(a.id1()).compareTo(
-                        enum1.value(b.id1()));
-                return c != 0 ? c : enum2.value(a.id2()).compareTo(
-                        enum2.value(b.id2()));
+                int c = enum1.valueOf(a.id1()).compareTo(
+                        enum1.valueOf(b.id1()));
+                return c != 0 ? c : enum2.valueOf(a.id2()).compareTo(
+                        enum2.valueOf(b.id2()));
             }
 
         };
@@ -334,8 +334,8 @@ public class TokenPair implements
 
             @Override
             public int compare(final TokenPair a, final TokenPair b) {
-                return enumerator.value(a.id1()).compareTo(
-                        enumerator.value(b.id1()));
+                return enumerator.valueOf(a.id1()).compareTo(
+                        enumerator.valueOf(b.id1()));
             }
 
         };
@@ -347,8 +347,8 @@ public class TokenPair implements
 
             @Override
             public int compare(final TokenPair a, final TokenPair b) {
-                return enumerator.value(a.id2()).compareTo(
-                        enumerator.value(b.id2()));
+                return enumerator.valueOf(a.id2()).compareTo(
+                        enumerator.valueOf(b.id2()));
             }
 
         };

@@ -4,7 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligateSingleImpl;
+import uk.ac.susx.mlcl.byblo.io.EnumeratorSingleBaringDeligate;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
 import java.io.File;
@@ -23,11 +23,11 @@ import uk.ac.susx.mlcl.lib.io.Source;
 public class MergeWeightedTokenCommand extends AbstractMergeCommand<Weighted<Token>> {
 
     @ParametersDelegate
-    private IndexDeligateSingle indexDeligate = new IndexDeligateSingleImpl();
+    private EnumeratorSingleBaring indexDeligate = new EnumeratorSingleBaringDeligate();
 
     public MergeWeightedTokenCommand(
             File sourceFileA, File sourceFileB, File destinationFile, 
-            Charset charset, IndexDeligateSingle indexDeligate) {
+            Charset charset, EnumeratorSingleBaring indexDeligate) {
         super(sourceFileA, sourceFileB, destinationFile, charset,
               Weighted.recordOrder(Token.indexOrder()));
         setIndexDeligate(indexDeligate);
@@ -36,11 +36,20 @@ public class MergeWeightedTokenCommand extends AbstractMergeCommand<Weighted<Tok
     public MergeWeightedTokenCommand() {
     }
 
-    public final IndexDeligateSingle getIndexDeligate() {
+    @Override
+    public void runCommand() throws Exception {
+        super.runCommand();
+        indexDeligate.save();
+        indexDeligate.close();
+
+    }
+    
+    
+    public final EnumeratorSingleBaring getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(IndexDeligateSingle indexDeligate) {
+    public final void setIndexDeligate(EnumeratorSingleBaring indexDeligate) {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }

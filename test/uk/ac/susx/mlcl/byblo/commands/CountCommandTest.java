@@ -41,7 +41,7 @@ import org.junit.Test;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
+import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
@@ -62,7 +62,7 @@ public class CountCommandTest {
         countTask.setFeaturesFile(outF);
         countTask.setEntryFeaturesFile(outEF);
         countTask.setCharset(charset);
-        countTask.setIndexDeligate(new IndexDeligatePairImpl(preIndexEntries, preIndexFeatures));
+        countTask.setIndexDeligate(new EnumeratorPairBaringDeligate(preIndexEntries, preIndexFeatures));
         countTask.runCommand();
 
         assertTrue("Output files not created: " + outE, outE.exists());

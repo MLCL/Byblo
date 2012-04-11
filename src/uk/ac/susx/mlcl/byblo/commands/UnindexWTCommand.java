@@ -21,11 +21,11 @@ import uk.ac.susx.mlcl.lib.io.Source;
 public class UnindexWTCommand extends AbstractCopyCommand<Weighted<Token>> {
 
     @ParametersDelegate
-    private IndexDeligateSingle indexDeligate = new IndexDeligateSingleImpl(false);
+    private EnumeratorSingleBaring indexDeligate = new EnumeratorSingleBaringDeligate(false);
 
     public UnindexWTCommand(
             File sourceFile, File destinationFile, Charset charset,
-            IndexDeligateSingle indexDeligate) {
+            EnumeratorSingleBaring indexDeligate) {
         super(sourceFile, destinationFile, charset);
         this.indexDeligate = indexDeligate;
     }
@@ -38,6 +38,7 @@ public class UnindexWTCommand extends AbstractCopyCommand<Weighted<Token>> {
     public void runCommand() throws Exception {
         Checks.checkNotNull("indexFile", indexDeligate.getIndexFile());
         super.runCommand();
+        indexDeligate.close();
     }
 
     @Override
@@ -56,20 +57,20 @@ public class UnindexWTCommand extends AbstractCopyCommand<Weighted<Token>> {
                 sinkIndexDeligate());
     }
 
-    public IndexDeligateSingle getIndexDeligate() {
+    public EnumeratorSingleBaring getIndexDeligate() {
         return indexDeligate;
     }
 
-    public void setIndexDeligate(IndexDeligateSingle indexDeligate) {
+    public void setIndexDeligate(EnumeratorSingleBaring indexDeligate) {
         this.indexDeligate = indexDeligate;
     }
 
-    protected IndexDeligateSingle sourceIndexDeligate() {
-        return IndexDeligates.decorateEnumerated(indexDeligate, true);
+    protected EnumeratorSingleBaring sourceIndexDeligate() {
+        return EnumeratorDeligates.decorateEnumerated(indexDeligate, true);
     }
 
-    protected IndexDeligateSingle sinkIndexDeligate() {
-        return IndexDeligates.decorateEnumerated(indexDeligate, false);
+    protected EnumeratorSingleBaring sinkIndexDeligate() {
+        return EnumeratorDeligates.decorateEnumerated(indexDeligate, false);
     }
 
 }

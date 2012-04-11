@@ -4,7 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
+import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.IOException;
@@ -22,11 +22,11 @@ public class ExternalSortTokenPiarCommand extends AbstractExternalSortCommand<To
     private static final long serialVersionUID = 1L;
 
     @ParametersDelegate
-    private IndexDeligatePair indexDeligate = new IndexDeligatePairImpl();
+    private EnumeratorPairBaring indexDeligate = new EnumeratorPairBaringDeligate();
 
     public ExternalSortTokenPiarCommand(
             File sourceFile, File destinationFile, Charset charset,
-            IndexDeligatePair indexDeligate) {
+            EnumeratorPairBaring indexDeligate) {
         super(sourceFile, destinationFile, charset);
         setIndexDeligate(indexDeligate);
     }
@@ -35,8 +35,16 @@ public class ExternalSortTokenPiarCommand extends AbstractExternalSortCommand<To
     }
 
     @Override
+    public void runCommand() throws Exception {
+        super.runCommand();
+        indexDeligate.save();
+        indexDeligate.close();
+
+    }
+
+    @Override
     protected Sink<TokenPair> openSink(File file) throws IOException {
-        TokenPairSink s =  TokenPairSink.open(
+        TokenPairSink s = TokenPairSink.open(
                 file, getFileDeligate().getCharset(),
                 getIndexDeligate(),
                 !getFileDeligate().isCompactFormatDisabled());
@@ -46,16 +54,16 @@ public class ExternalSortTokenPiarCommand extends AbstractExternalSortCommand<To
 
     @Override
     protected SeekableSource<TokenPair, Tell> openSource(File file) throws IOException {
-        return  TokenPairSource.open(
+        return TokenPairSource.open(
                 file, getFileDeligate().getCharset(),
                 getIndexDeligate());
     }
 
-    public final IndexDeligatePair getIndexDeligate() {
+    public final EnumeratorPairBaring getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(IndexDeligatePair indexDeligate) {
+    public final void setIndexDeligate(EnumeratorPairBaring indexDeligate) {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }

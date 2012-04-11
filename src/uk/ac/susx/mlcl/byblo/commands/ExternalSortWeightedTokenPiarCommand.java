@@ -4,7 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
+import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.IOException;
@@ -20,11 +20,11 @@ import uk.ac.susx.mlcl.lib.io.*;
 public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
-    private IndexDeligatePair indexDeligate = new IndexDeligatePairImpl();
+    private EnumeratorPairBaring indexDeligate = new EnumeratorPairBaringDeligate();
 
     public ExternalSortWeightedTokenPiarCommand(
             File sourceFile, File destinationFile, Charset charset,
-            IndexDeligatePair indexDeligate) {
+            EnumeratorPairBaring indexDeligate) {
         super(sourceFile, destinationFile, charset);
         setIndexDeligate(indexDeligate);
     }
@@ -32,6 +32,15 @@ public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCo
     public ExternalSortWeightedTokenPiarCommand() {
     }
 
+    @Override
+    public void runCommand() throws Exception {
+        super.runCommand();
+        indexDeligate.save();
+        indexDeligate.close();
+
+    }
+    
+    
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file) throws IOException {
         WeightedTokenPairSink s = WeightedTokenPairSink.open(
@@ -48,11 +57,11 @@ public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCo
                 getIndexDeligate());
     }
 
-    public final IndexDeligatePair getIndexDeligate() {
+    public final EnumeratorPairBaring getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(IndexDeligatePair indexDeligate) {
+    public final void setIndexDeligate(EnumeratorPairBaring indexDeligate) {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }

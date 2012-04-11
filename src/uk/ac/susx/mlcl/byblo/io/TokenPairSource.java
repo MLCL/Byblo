@@ -130,14 +130,19 @@ public class TokenPairSource
 //    }
     public static boolean equal(File fileA, File fileB, Charset charset)
             throws IOException {
-        final Enumerator<String> stringIndex = Enumerators.
-                newDefaultStringEnumerator();
-        IndexDeligatePair idx = new IndexDeligatePairImpl(false, false, stringIndex,
-                                                      stringIndex);
-//        final TokenPairSource srcA = new TokenPairSource(
-//                new TSVSource(fileA, charset), idx);
-//        final TokenPairSource srcB = new TokenPairSource(
-//                new TSVSource(fileB, charset), idx);
+//        final Enumerator<String> stringIndex = Enumerators.
+//                newDefaultStringEnumerator();
+//        
+        EnumeratorPairBaring idx = EnumeratorDeligates.toPair(
+                new EnumeratorSingleBaringDeligate(false));
+
+
+        //.new EnumeratorPairBaringDeligate(false, false, stringIndex,
+        //                                    stringIndex);
+        //        final TokenPairSource srcA = new TokenPairSource(
+        //                new TSVSource(fileA, charset), idx);
+        //        final TokenPairSource srcB = new TokenPairSource(
+        //                new TSVSource(fileB, charset), idx);
         final TokenPairSource srcA = open(fileA, charset, idx);
         final TokenPairSource srcB = open(fileB, charset, idx);
 
@@ -172,7 +177,7 @@ public class TokenPairSource
     }
 
     public static TokenPairSource open(
-            File file, Charset charset, IndexDeligatePair idx)
+            File file, Charset charset, EnumeratorPairBaring idx)
             throws IOException {
         SeekableDataSource tsv = new TSV.Source(file, charset);
 
@@ -183,6 +188,7 @@ public class TokenPairSource
                 public boolean apply(Integer column) {
                     return column == 0;
                 }
+
             });
         }
         if (idx.isSkipIndexed2()) {
@@ -192,11 +198,12 @@ public class TokenPairSource
                 public boolean apply(Integer column) {
                     return column > 0;
                 }
+
             });
         }
 
         tsv = Compact.compact(tsv, 2);
-        
+
         if (!idx.isEntriesEnumerated() || !idx.isFeaturesEnumerated()) {
             Enumerator<String>[] enumerators = (Enumerator<String>[]) new Enumerator[2];
             if (!idx.isEntriesEnumerated())
@@ -207,4 +214,5 @@ public class TokenPairSource
         }
         return new TokenPairSource(tsv);
     }
+
 }

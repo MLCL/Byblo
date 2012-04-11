@@ -7,8 +7,9 @@ package uk.ac.susx.mlcl.byblo.commands;
 import java.io.File;
 import org.junit.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.io.IndexDeligateSingleImpl;
+import uk.ac.susx.mlcl.byblo.io.EnumeratorSingleBaringDeligate;
 import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
+import static uk.ac.susx.mlcl.byblo.commands.IndexSimsCommandTest.*;
 
 /**
  *
@@ -91,35 +92,19 @@ public class UnindexSimsCommandTest {
         unindexSims(TEST_FRUIT_INDEXED_SIMS, out, idx, skip1, skip2,
                     compact);
 
-        deleteIfExist(idx2);
+        deleteJDBCIfExist(idx2);
         indexSims(out, out2, idx2, skip1, skip2, compact);
 
         TokenPairSource.equal(out, out2, DEFAULT_CHARSET);
 
     }
 
-    private static void indexSims(File from, File to, File index,
-                                  boolean skip1, boolean skip2, boolean compact)
+    public static void unindexSims(File from, File to, File index,
+                                   boolean skip1, boolean skip2,
+                                   boolean compact)
             throws Exception {
-        assertValidInputFiles(from);
-        assertValidOutputFiles(to, index);
-
-        IndexSimsCommand unindex = new IndexSimsCommand();
-        unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-        unindex.getFilesDeligate().setSourceFile(from);
-        unindex.getFilesDeligate().setDestinationFile(to);
-        unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
-        unindex.setIndexDeligate(new IndexDeligateSingleImpl(true, index, null, skip1, skip2));
-        unindex.runCommand();
-
-        assertValidInputFiles(to, index);
-        assertSizeGT(from, to);
-    }
-
-    private static void unindexSims(File from, File to, File index,
-                                    boolean skip1, boolean skip2, boolean compact)
-            throws Exception {
-        assertValidInputFiles(from, index);
+        assertValidPlaintextInputFiles(from);
+        assertValidJDBCInputFiles(index);
         assertValidOutputFiles(to);
 
         UnindexSimsCommand unindex = new UnindexSimsCommand();
@@ -127,10 +112,10 @@ public class UnindexSimsCommandTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
-        unindex.setIndexDeligate(new IndexDeligateSingleImpl(true, index, null, skip1, skip2));
+        unindex.setIndexDeligate(new EnumeratorSingleBaringDeligate(true, index, null, skip1, skip2));
         unindex.runCommand();
 
-        assertValidInputFiles(to);
+        assertValidPlaintextInputFiles(to);
         assertSizeGT(to, from);
     }
 

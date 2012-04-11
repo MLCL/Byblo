@@ -40,6 +40,7 @@ import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.Enumerators;
+import uk.ac.susx.mlcl.lib.MemoryStringEnumerator;
 
 /**
  *
@@ -48,13 +49,13 @@ import uk.ac.susx.mlcl.lib.Enumerators;
 public class FeatureTest {
 
     private void copyF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
+        Enumerator<String> strEnum = MemoryStringEnumerator.newInstance();
         WeightedTokenSource aSrc = WeightedTokenSource.open(
                 a, DEFAULT_CHARSET,
-                new IndexDeligateSingleImpl(false, strEnum));
+                new EnumeratorSingleBaringDeligate(false, strEnum));
         WeightedTokenSink bSink = WeightedTokenSink.open(
                 b, DEFAULT_CHARSET,
-                new IndexDeligateSingleImpl(false, strEnum));
+                new EnumeratorSingleBaringDeligate(false, strEnum));
         bSink.setCompactFormatEnabled(compact);
 
         IOUtil.copy(aSrc, bSink);
@@ -91,15 +92,15 @@ public class FeatureTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_FEATURES.getName() + ".str");
 
-        Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
+        Enumerator<String> strEnum = MemoryStringEnumerator.newInstance();
 
         {
             WeightedTokenSource aSrc = WeightedTokenSource.open(
                     a, DEFAULT_CHARSET,
-                    new IndexDeligateSingleImpl(false, strEnum));
+                    new EnumeratorSingleBaringDeligate(false, strEnum));
             WeightedTokenSink bSink = WeightedTokenSink.open(
                     b, DEFAULT_CHARSET,
-                    new IndexDeligateSingleImpl(true));
+                    new EnumeratorSingleBaringDeligate(true));
             IOUtil.copy(aSrc, bSink);
             bSink.close();
         }
@@ -110,10 +111,10 @@ public class FeatureTest {
         {
             WeightedTokenSource bSrc = WeightedTokenSource.open(
                     b, DEFAULT_CHARSET,
-                    new IndexDeligateSingleImpl(true));
+                    new EnumeratorSingleBaringDeligate(true));
             WeightedTokenSink cSink = WeightedTokenSink.open(
                     c, DEFAULT_CHARSET,
-                    new IndexDeligateSingleImpl(false, strEnum));
+                    new EnumeratorSingleBaringDeligate(false, strEnum));
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }

@@ -4,7 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
+import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,10 +28,10 @@ public class SortTokenPairCommand extends AbstractSortCommand<TokenPair> {
     private static final Log LOG = LogFactory.getLog(SortWeightedTokenCommand.class);
 
     @ParametersDelegate
-    private IndexDeligatePairImpl indexDeligate = new IndexDeligatePairImpl();
+    private EnumeratorPairBaringDeligate indexDeligate = new EnumeratorPairBaringDeligate();
 
     public SortTokenPairCommand(File sourceFile, File destinationFile, Charset charset,
-                                IndexDeligatePairImpl indexDeligate) {
+                                EnumeratorPairBaringDeligate indexDeligate) {
         super(sourceFile, destinationFile, charset, TokenPair.indexOrder());
         setIndexDeligate(indexDeligate);
     }
@@ -39,6 +39,15 @@ public class SortTokenPairCommand extends AbstractSortCommand<TokenPair> {
     public SortTokenPairCommand() {
     }
 
+    @Override
+    public void runCommand() throws Exception {
+        super.runCommand();
+        indexDeligate.save();
+        indexDeligate.close();
+
+    }
+    
+    
     @Override
     protected Source<TokenPair> openSource(File file) throws FileNotFoundException, IOException {
         return TokenPairSource.open(file, getFilesDeligate().getCharset(),
@@ -52,11 +61,11 @@ public class SortTokenPairCommand extends AbstractSortCommand<TokenPair> {
                 !getFilesDeligate().isCompactFormatDisabled());
     }
 
-    public final IndexDeligatePairImpl getIndexDeligate() {
+    public final EnumeratorPairBaringDeligate getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(IndexDeligatePairImpl indexDeligate) {
+    public final void setIndexDeligate(EnumeratorPairBaringDeligate indexDeligate) {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }

@@ -41,43 +41,57 @@ import uk.ac.susx.mlcl.lib.Enumerators;
  *
  * @author hiam20
  */
-public class IndexDeligates {
+public class EnumeratorDeligates {
 
-    private IndexDeligates() {
+    private EnumeratorDeligates() {
     }
 
-    public static IndexDeligateSingle toSingleEntries(final IndexDeligatePair outer) {
-        return new PairToSingle2Adapter(outer);
+    public static EnumeratorSingleBaring toSingleEntries(final EnumeratorPairBaring outer) {
+        return new PairToEntriesSingleAdapter(outer);
     }
 
-    public static IndexDeligateSingle toSingleFeatures(final IndexDeligatePair outer) {
-        return new PairToSingle1Adapter(outer);
+    public static EnumeratorSingleBaring toSingleFeatures(final EnumeratorPairBaring outer) {
+        return new PairToFeaturesSingleAdapter(outer);
     }
 
-    public static IndexDeligatePair toPair(final IndexDeligateSingle inner) {
+    public static EnumeratorPairBaring toPair(final EnumeratorSingleBaring inner) {
         return new SingleToPairAdapter(inner);
     }
+//
+//    public static Enumerator<String> instantiateEnumerator(
+//            final boolean enumerated, final File indexFile)
+//            throws IOException {
+//        if (enumerated) {
+//            if (indexFile != null && indexFile.exists())
+//                return Enumerators.loadStringEnumerator(indexFile);
+//            else
+//                return Enumerators.nullEnumerator();
+//        } else {
+//            if (indexFile != null && indexFile.exists()) {
+//                return Enumerators.loadStringEnumerator(indexFile);
+//            } else {
+//                return Enumerators.newDefaultStringEnumerator();
+//            }
+//        }
+//    }
+//
+//    public static Enumerator<String> loadEnumerator(File file) {
+//
+//        return null;
+//    }
+//
+//    public static Enumerator<String> newEnumerator(File file) {
+////        return Enumerators.loadStringEnumerator(File file);
+//        return null;
+//    }
+//
+//    public static void saveEnumerator(File file) {
+////        return Enumerators.loadStringEnumerator(File file);
+//    }
 
-    public static Enumerator<String> instantiateEnumerator(
-            final boolean enumerated, final File indexFile)
-            throws IOException {
-        if (enumerated) {
-            if (indexFile != null && indexFile.exists())
-                return Enumerators.loadStringEnumerator(indexFile);
-            else
-                return Enumerators.nullEnumerator();
-        } else {
-            if (indexFile != null && indexFile.exists()) {
-                return Enumerators.loadStringEnumerator(indexFile);
-            } else {
-                return Enumerators.newDefaultStringEnumerator();
-            }
-        }
-    }
-
-    public static IndexDeligatePair decorateEnumerated(
-            final IndexDeligatePair inner, final boolean enumerated) {
-        return new IndexDeligates.PairToPairAdapter(inner) {
+    public static EnumeratorPairBaring decorateEnumerated(
+            final EnumeratorPairBaring inner, final boolean enumerated) {
+        return new EnumeratorDeligates.PairToPairAdapter(inner) {
 
             @Override
             public boolean isEntriesEnumerated() {
@@ -92,9 +106,9 @@ public class IndexDeligates {
         };
     }
 
-    public static IndexDeligateSingle decorateEnumerated(
-            final IndexDeligateSingle inner, final boolean enumerated) {
-        return new IndexDeligates.SingleToSingleAdapter(inner) {
+    public static EnumeratorSingleBaring decorateEnumerated(
+            final EnumeratorSingleBaring inner, final boolean enumerated) {
+        return new EnumeratorDeligates.SingleToSingleAdapter(inner) {
 
             @Override
             public boolean isEnumerated() {
@@ -104,8 +118,8 @@ public class IndexDeligates {
         };
     }
 
-    public abstract static class AdapterBase<T extends IndexDeligate>
-            implements IndexDeligate {
+    public abstract static class AdapterBase<T extends EnumeratorBaring>
+            implements EnumeratorBaring {
 
         private final T inner;
 
@@ -141,6 +155,21 @@ public class IndexDeligates {
         }
 
         @Override
+        public void close() throws IOException {
+            getInner().close();
+        }
+
+        @Override
+        public void save() throws IOException {
+            getInner().save();
+        }
+
+        @Override
+        public void open() throws IOException {
+            getInner().open();
+        }
+
+        @Override
         public int hashCode() {
             return 59 * 5 + (this.inner != null ? this.inner.hashCode() : 0);
         }
@@ -153,10 +182,10 @@ public class IndexDeligates {
     }
 
     public static class SingleToPairAdapter
-            extends AdapterBase<IndexDeligateSingle>
-            implements IndexDeligatePair {
+            extends AdapterBase<EnumeratorSingleBaring>
+            implements EnumeratorPairBaring {
 
-        public SingleToPairAdapter(IndexDeligateSingle inner) {
+        public SingleToPairAdapter(EnumeratorSingleBaring inner) {
             super(inner);
         }
 
@@ -190,13 +219,43 @@ public class IndexDeligates {
             return getInner().isEnumerated();
         }
 
+        @Override
+        public void openEntries() throws IOException {
+            getInner().open();
+        }
+
+        @Override
+        public void openFeatures() throws IOException {
+            getInner().open();
+        }
+
+        @Override
+        public void saveEntries() throws IOException {
+            getInner().save();
+        }
+
+        @Override
+        public void saveFeatures() throws IOException {
+            getInner().save();
+        }
+
+        @Override
+        public void closeEntries() throws IOException {
+            getInner().close();
+        }
+
+        @Override
+        public void closeFeatures() throws IOException {
+            getInner().close();
+        }
+
     }
 
-    public static class PairToSingle1Adapter
-            extends AdapterBase<IndexDeligatePair>
-            implements IndexDeligateSingle {
+    public static class PairToFeaturesSingleAdapter
+            extends AdapterBase<EnumeratorPairBaring>
+            implements EnumeratorSingleBaring {
 
-        public PairToSingle1Adapter(IndexDeligatePair inner) {
+        public PairToFeaturesSingleAdapter(EnumeratorPairBaring inner) {
             super(inner);
         }
 
@@ -215,13 +274,28 @@ public class IndexDeligates {
             return getInner().isFeaturesEnumerated();
         }
 
+        @Override
+        public void open() throws IOException {
+            getInner().openFeatures();
+        }
+
+        @Override
+        public void save() throws IOException {
+            getInner().saveFeatures();
+        }
+
+        @Override
+        public void close() throws IOException {
+            getInner().closeFeatures();
+        }
+
     }
 
-    public static class PairToSingle2Adapter
-            extends AdapterBase<IndexDeligatePair>
-            implements IndexDeligateSingle {
+    public static class PairToEntriesSingleAdapter
+            extends AdapterBase<EnumeratorPairBaring>
+            implements EnumeratorSingleBaring {
 
-        public PairToSingle2Adapter(final IndexDeligatePair inner) {
+        public PairToEntriesSingleAdapter(final EnumeratorPairBaring inner) {
             super(inner);
         }
 
@@ -238,15 +312,30 @@ public class IndexDeligates {
         @Override
         public boolean isEnumerated() {
             return getInner().isEntriesEnumerated();
+        }
+
+        @Override
+        public void open() throws IOException {
+            getInner().openEntries();
+        }
+
+        @Override
+        public void save() throws IOException {
+            getInner().saveEntries();
+        }
+
+        @Override
+        public void close() throws IOException {
+            getInner().closeEntries();
         }
 
     }
 
     public abstract static class SingleToSingleAdapter
-            extends AdapterBase<IndexDeligateSingle>
-            implements IndexDeligateSingle {
+            extends AdapterBase<EnumeratorSingleBaring>
+            implements EnumeratorSingleBaring {
 
-        public SingleToSingleAdapter(final IndexDeligateSingle inner) {
+        public SingleToSingleAdapter(final EnumeratorSingleBaring inner) {
             super(inner);
         }
 
@@ -265,13 +354,28 @@ public class IndexDeligates {
             return getInner().isEnumerated();
         }
 
+        @Override
+        public void open() throws IOException {
+            getInner().open();
+        }
+
+        @Override
+        public void save() throws IOException {
+            getInner().save();
+        }
+
+        @Override
+        public void close() throws IOException {
+            getInner().close();
+        }
+
     }
 
     public abstract static class PairToPairAdapter
-            extends AdapterBase<IndexDeligatePair>
-            implements IndexDeligatePair {
+            extends AdapterBase<EnumeratorPairBaring>
+            implements EnumeratorPairBaring {
 
-        public PairToPairAdapter(final IndexDeligatePair inner) {
+        public PairToPairAdapter(final EnumeratorPairBaring inner) {
             super(inner);
         }
 
@@ -303,6 +407,36 @@ public class IndexDeligates {
         @Override
         public boolean isFeaturesEnumerated() {
             return getInner().isFeaturesEnumerated();
+        }
+
+        @Override
+        public void openEntries() throws IOException {
+            getInner().openEntries();
+        }
+
+        @Override
+        public void openFeatures() throws IOException {
+            getInner().openFeatures();
+        }
+
+        @Override
+        public void saveEntries() throws IOException {
+            getInner().saveEntries();
+        }
+
+        @Override
+        public void saveFeatures() throws IOException {
+            getInner().saveFeatures();
+        }
+
+        @Override
+        public void closeEntries() throws IOException {
+            getInner().closeEntries();
+        }
+
+        @Override
+        public void closeFeatures() throws IOException {
+            getInner().closeFeatures();
         }
 
     }

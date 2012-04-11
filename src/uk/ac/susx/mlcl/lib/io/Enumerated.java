@@ -147,7 +147,7 @@ public class Enumerated {
 
         @Override
         public int readInt() throws IOException {
-            return enumerator.index(super.readString());
+            return enumerator.indexOf(super.readString());
         }
     }
 
@@ -165,7 +165,7 @@ public class Enumerated {
 
         @Override
         public int readInt() throws IOException {
-            return enumerator.index(super.readString());
+            return enumerator.indexOf(super.readString());
         }
     }
 
@@ -185,7 +185,7 @@ public class Enumerated {
 
         @Override
         public void writeInt(int val) throws IOException {
-            super.writeString(enumerator.value(val));
+            super.writeString(enumerator.valueOf(val));
         }
     }
 
@@ -233,7 +233,7 @@ public class Enumerated {
         public int readInt() throws IOException {
             final int val =
                     (column < enumerators.length && enumerators[column] != null)
-                    ? enumerators[column].index(getInner().readString())
+                    ? enumerators[column].indexOf(getInner().readString())
                     : getInner().readInt();
             ++column;
             return val;
@@ -334,7 +334,7 @@ public class Enumerated {
             if (column >= enumerators.length || enumerators[column] == null)
                 getInner().writeInt(val);
             else
-                getInner().writeString(enumerators[column].value(val));
+                getInner().writeString(enumerators[column].valueOf(val));
             ++column;
         }
 
@@ -405,7 +405,7 @@ public class Enumerated {
         public int readInt() throws IOException {
             final int val =
                     enumColumn.apply(column)
-                    ? enumerator.index(getInner().readString())
+                    ? enumerator.indexOf(getInner().readString())
                     : getInner().readInt();
             ++column;
             return val;
@@ -509,7 +509,7 @@ public class Enumerated {
         @Override
         public void writeInt(int val) throws IOException {
             if (enumColumn.apply(column))
-                getInner().writeString(enumerator.value(val));
+                getInner().writeString(enumerator.valueOf(val));
             else
                 getInner().writeInt(val);
             ++column;

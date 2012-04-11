@@ -4,7 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
+import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects.ToStringHelper;
 import java.io.File;
@@ -27,11 +27,11 @@ import uk.ac.susx.mlcl.lib.io.Source;
 public class MergeWeightedTokenPairCommand extends AbstractMergeCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
-    private IndexDeligatePairImpl indexDeligate = new IndexDeligatePairImpl();
+    private EnumeratorPairBaringDeligate indexDeligate = new EnumeratorPairBaringDeligate();
 
     public MergeWeightedTokenPairCommand(
             File sourceFileA, File sourceFileB, File destinationFile,
-            Charset charset, IndexDeligatePairImpl indexDeligate) {
+            Charset charset, EnumeratorPairBaringDeligate indexDeligate) {
         super(sourceFileA, sourceFileB, destinationFile, charset, Weighted.recordOrder(TokenPair.indexOrder()));
         setIndexDeligate(indexDeligate);
     }
@@ -39,11 +39,20 @@ public class MergeWeightedTokenPairCommand extends AbstractMergeCommand<Weighted
     public MergeWeightedTokenPairCommand() {
     }
 
-    public final IndexDeligatePairImpl getIndexDeligate() {
+    @Override
+    public void runCommand() throws Exception {
+        super.runCommand();
+        indexDeligate.save();
+        indexDeligate.close();
+
+    }
+    
+    
+    public final EnumeratorPairBaringDeligate getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(IndexDeligatePairImpl indexDeligate) {
+    public final void setIndexDeligate(EnumeratorPairBaringDeligate indexDeligate) {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }

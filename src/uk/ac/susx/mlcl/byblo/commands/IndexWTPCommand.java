@@ -4,7 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
+import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,11 +23,11 @@ import uk.ac.susx.mlcl.lib.io.Source;
 public class IndexWTPCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
-    private IndexDeligatePair indexDeligate = new IndexDeligatePairImpl(false, false);
+    private EnumeratorPairBaring indexDeligate = new EnumeratorPairBaringDeligate(false, false);
 
     public IndexWTPCommand(
             File sourceFile, File destinationFile, Charset charset,
-            IndexDeligatePair indexDeligate) {
+            EnumeratorPairBaring indexDeligate) {
         super(sourceFile, destinationFile, charset);
         this.indexDeligate = indexDeligate;
     }
@@ -43,10 +43,8 @@ public class IndexWTPCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
 
         super.runCommand();
 
-        Enumerators.saveStringEnumerator(indexDeligate.getEntryEnumerator(),
-                                         indexDeligate.getEntryIndexFile());
-        Enumerators.saveStringEnumerator(indexDeligate.getFeatureEnumerator(),
-                                         indexDeligate.getFeatureIndexFile());
+        indexDeligate.save();
+        indexDeligate.close();
     }
 
     @Override
@@ -67,20 +65,20 @@ public class IndexWTPCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
                 sinkIndexDeligate(), !getFilesDeligate().isCompactFormatDisabled());
     }
 
-    public IndexDeligatePair getIndexDeligate() {
+    public EnumeratorPairBaring getIndexDeligate() {
         return indexDeligate;
     }
 
-    public void setIndexDeligate(IndexDeligatePair indexDeligate) {
+    public void setIndexDeligate(EnumeratorPairBaring indexDeligate) {
         this.indexDeligate = indexDeligate;
     }
 
-    protected IndexDeligatePair sourceIndexDeligate() {
-        return IndexDeligates.decorateEnumerated(indexDeligate, false);
+    protected EnumeratorPairBaring sourceIndexDeligate() {
+        return EnumeratorDeligates.decorateEnumerated(indexDeligate, false);
     }
 
-    protected IndexDeligatePair sinkIndexDeligate() {
-        return IndexDeligates.decorateEnumerated(indexDeligate, true);
+    protected EnumeratorPairBaring sinkIndexDeligate() {
+        return EnumeratorDeligates.decorateEnumerated(indexDeligate, true);
     }
 
 }

@@ -39,12 +39,18 @@ import uk.ac.susx.mlcl.lib.Enumerator;
  *
  * @author hiam20
  */
-public interface IndexDeligateSingle extends IndexDeligate {
+public interface EnumeratorSingleBaring extends EnumeratorBaring {
 
     Enumerator<String> getEnumerator() throws IOException;
 
     File getIndexFile();
 
     boolean isEnumerated();
+
+    void open() throws IOException;
+
+    void save() throws IOException;
+
+    void close() throws IOException;
 
 }

@@ -121,6 +121,8 @@ public abstract class TSV {
 
         @Override
         public void writeString(String str) throws IOException {
+            Checks.checkNotNull("str", str);
+            
             assert str.indexOf(VALUE_DELIM) == -1;
             assert str.indexOf(RECORD_DELIM) == -1;
             if (column > 0)

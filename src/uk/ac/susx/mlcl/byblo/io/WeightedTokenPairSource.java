@@ -194,7 +194,7 @@ public class WeightedTokenPairSource
     }
 
     public static boolean equal(File a, File b, Charset charset) throws IOException {
-        IndexDeligatePair idx = new IndexDeligatePairImpl(false, false);
+        EnumeratorPairBaring idx = new EnumeratorPairBaringDeligate(false, false);
         final WeightedTokenPairSource srcA = WeightedTokenPairSource.open(
                 a, charset, idx);
         final WeightedTokenPairSource srcB = WeightedTokenPairSource.open(
@@ -272,7 +272,7 @@ public class WeightedTokenPairSource
 //    }
 
     public static WeightedTokenPairSource open(
-            File file, Charset charset, IndexDeligatePair idx)
+            File file, Charset charset, EnumeratorPairBaring idx)
             throws IOException {
         SeekableDataSource tsv = new TSV.Source(file, charset);
 

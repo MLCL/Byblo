@@ -23,11 +23,11 @@ import uk.ac.susx.mlcl.lib.io.Source;
 public class IndexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
-    private IndexDeligateSingle indexDeligate = new IndexDeligateSingleImpl(false);
+    private EnumeratorSingleBaring indexDeligate = new EnumeratorSingleBaringDeligate(false);
 
     public IndexSimsCommand(
             File sourceFile, File destinationFile, Charset charset,
-            IndexDeligateSingle indexDeligate) {
+            EnumeratorSingleBaring indexDeligate) {
         super(sourceFile, destinationFile, charset);
         this.indexDeligate = indexDeligate;
     }
@@ -42,8 +42,9 @@ public class IndexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
 
         super.runCommand();
 
-        Enumerators.saveStringEnumerator(indexDeligate.getEnumerator(),
-                                         indexDeligate.getIndexFile());
+        indexDeligate.save();
+        indexDeligate.close();
+
     }
 
     @Override
@@ -63,22 +64,22 @@ public class IndexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
                 !getFilesDeligate().isCompactFormatDisabled());
     }
 
-    public IndexDeligateSingle getIndexDeligate() {
+    public EnumeratorSingleBaring getIndexDeligate() {
         return indexDeligate;
     }
 
-    public void setIndexDeligate(IndexDeligateSingle indexDeligate) {
+    public void setIndexDeligate(EnumeratorSingleBaring indexDeligate) {
         this.indexDeligate = indexDeligate;
     }
 
-    protected IndexDeligatePair sourceIndexDeligate() {
-        return new IndexDeligates.SingleToPairAdapter(
-                IndexDeligates.decorateEnumerated(indexDeligate, false));
+    protected EnumeratorPairBaring sourceIndexDeligate() {
+        return new EnumeratorDeligates.SingleToPairAdapter(
+                EnumeratorDeligates.decorateEnumerated(indexDeligate, false));
     }
 
-    protected IndexDeligatePair sinkIndexDeligate() {
-        return new IndexDeligates.SingleToPairAdapter(
-                IndexDeligates.decorateEnumerated(indexDeligate, true));
+    protected EnumeratorPairBaring sinkIndexDeligate() {
+        return new EnumeratorDeligates.SingleToPairAdapter(
+                EnumeratorDeligates.decorateEnumerated(indexDeligate, true));
     }
 
 }

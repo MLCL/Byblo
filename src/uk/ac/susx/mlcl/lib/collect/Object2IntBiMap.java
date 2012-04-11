@@ -29,28 +29,30 @@
  * POSSIBILITY OF SUCH DAMAGE.To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.byblo.io;
+package uk.ac.susx.mlcl.lib.collect;
 
-import java.io.File;
-import java.io.IOException;
-import uk.ac.susx.mlcl.lib.Enumerator;
+import com.google.common.collect.BiMap;
+import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
+import java.util.Map;
 
 /**
  *
+ * @param <T>
  * @author hiam20
  */
-public interface IndexDeligatePair extends IndexDeligate {
+public interface Object2IntBiMap<T> extends BiMap<T, Integer>, Object2IntMap<T> {
 
-    Enumerator<String> getEntryEnumerator() throws IOException;
+    int forcePut(T k, int v);
 
-    Enumerator<String> getFeatureEnumerator() throws IOException;
+    @Override
+    ObjectSet<Map.Entry<T, Integer>> entrySet();
 
-    File getEntryIndexFile();
+    @Override
+    IntSet values();
 
-    File getFeatureIndexFile();
-
-    boolean isEntriesEnumerated();
-
-    boolean isFeaturesEnumerated();
+    @Override
+    Int2ObjectBiMap<T> inverse();
 
 }

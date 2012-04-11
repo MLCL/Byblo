@@ -4,7 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligatePairImpl;
+import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,14 +59,16 @@ public class SortWeightedTokenPairCommandTest {
         File randomisedFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".sims.randomised");
         File sortedFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".sims.sorted");
 
-        final IndexDeligatePairImpl idx = new IndexDeligatePairImpl(
+        final EnumeratorPairBaringDeligate idx = new EnumeratorPairBaringDeligate(
                 preindexedTokens1, preindexedTokens2);
 
         Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(
                 Weighted.recordOrder(TokenPair.firstStringOrder(idx.getEntryEnumerator())),
                 Comparators.reverse(Weighted.<TokenPair>weightOrder()));
 
-        testSortWeightedTokenPairCommand(inputFile, randomisedFile, sortedFile, idx, comparator);
+        testSortWeightedTokenPairCommand(
+                inputFile, randomisedFile, sortedFile,
+                idx, comparator);
 
     }
 
@@ -83,7 +85,7 @@ public class SortWeightedTokenPairCommandTest {
         File sortedFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".indexed.sims.sorted");
 
 
-        final IndexDeligatePairImpl idx = new IndexDeligatePairImpl(
+        final EnumeratorPairBaringDeligate idx = new EnumeratorPairBaringDeligate(
                 preindexedTokens1, preindexedTokens2);
 
 
@@ -98,7 +100,7 @@ public class SortWeightedTokenPairCommandTest {
 
     private void testSortWeightedTokenPairCommand(
             File inputFile, File randomisedFile,
-            File sortedFile, IndexDeligatePairImpl idx,
+            File sortedFile, EnumeratorPairBaringDeligate idx,
             Comparator<Weighted<TokenPair>> comparator)
             throws IOException, Exception {
 
@@ -184,7 +186,7 @@ public class SortWeightedTokenPairCommandTest {
             swap(list, i, rand.nextInt(list.size()));
     }
 
-    private static WeightedTokenPairSource openSource(File file, IndexDeligatePairImpl idx)
+    private static WeightedTokenPairSource openSource(File file, EnumeratorPairBaringDeligate idx)
             throws IOException {
         return  WeightedTokenPairSource.open(
                 file, DEFAULT_CHARSET,
@@ -192,7 +194,7 @@ public class SortWeightedTokenPairCommandTest {
     }
 
     private static WeightedTokenPairSink openSink(
-            File file, IndexDeligatePairImpl idx, boolean compact)
+            File file, EnumeratorPairBaringDeligate idx, boolean compact)
             throws IOException {
         WeightedTokenPairSink sink = WeightedTokenPairSink.open(
                 file, DEFAULT_CHARSET,

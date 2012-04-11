@@ -4,7 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.IndexDeligateSingleImpl;
+import uk.ac.susx.mlcl.byblo.io.EnumeratorSingleBaringDeligate;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,10 +27,10 @@ public class SortWeightedTokenCommand extends AbstractSortCommand<Weighted<Token
             SortWeightedTokenCommand.class);
 
     @ParametersDelegate
-    private IndexDeligateSingle indexDeligate = new IndexDeligateSingleImpl();
+    private EnumeratorSingleBaring indexDeligate = new EnumeratorSingleBaringDeligate();
 
     public SortWeightedTokenCommand(File sourceFile, File destinationFile,
-                                    Charset charset, IndexDeligateSingle indexDeligate) {
+                                    Charset charset, EnumeratorSingleBaring indexDeligate) {
         super(sourceFile, destinationFile, charset, Weighted.recordOrder(Token.indexOrder()));
         setIndexDeligate(indexDeligate);
     }
@@ -38,6 +38,15 @@ public class SortWeightedTokenCommand extends AbstractSortCommand<Weighted<Token
     public SortWeightedTokenCommand() {
     }
 
+    @Override
+    public void runCommand() throws Exception {
+        super.runCommand();
+        indexDeligate.save();
+        indexDeligate.close();
+
+    }
+    
+    
     @Override
     protected Source<Weighted<Token>> openSource(File file) throws FileNotFoundException, IOException {
         return WeightedTokenSource.open(file, getFilesDeligate().getCharset(),
@@ -53,11 +62,11 @@ public class SortWeightedTokenCommand extends AbstractSortCommand<Weighted<Token
 
     }
 
-    public final IndexDeligateSingle getIndexDeligate() {
+    public final EnumeratorSingleBaring getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(IndexDeligateSingle indexDeligate) {
+    public final void setIndexDeligate(EnumeratorSingleBaring indexDeligate) {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }

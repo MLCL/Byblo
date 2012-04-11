@@ -68,7 +68,7 @@ public class AllPairsCommand extends AbstractCommand {
     private static final Log LOG = LogFactory.getLog(AllPairsCommand.class);
 
     @ParametersDelegate
-    private IndexDeligatePair indexDeligate = new IndexDeligatePairImpl();
+    private EnumeratorPairBaring indexDeligate = new EnumeratorPairBaringDeligate();
 
     @ParametersDelegate
     private FileDeligate fileDeligate = new FileDeligate();
@@ -174,7 +174,7 @@ public class AllPairsCommand extends AbstractCommand {
 
     public AllPairsCommand(File entriesFile, File featuresFile,
                            File entryFeaturesFile, File outputFile,
-                           Charset charset, IndexDeligatePair indexDeligate) {
+                           Charset charset, EnumeratorPairBaring indexDeligate) {
         setEntryFeaturesFile(entryFeaturesFile);
         setEntriesFile(entriesFile);
         setFeaturesFile(featuresFile);
@@ -291,6 +291,9 @@ public class AllPairsCommand extends AbstractCommand {
         if (apss.isExceptionThrown())
             apss.throwException();
 
+        indexDeligate.save();
+        indexDeligate.close();
+
         if (LOG.isInfoEnabled()) {
             LOG.info("Completed all-pairs similarity search.");
         }
@@ -314,7 +317,7 @@ public class AllPairsCommand extends AbstractCommand {
     private WeightedTokenSource openFeaturesSource() throws IOException {
         return WeightedTokenSource.open(
                 getFeaturesFile(), getCharset(),
-                IndexDeligates.toSingleFeatures(getIndexDeligate()));
+                EnumeratorDeligates.toSingleFeatures(getIndexDeligate()));
 
     }
 
@@ -327,7 +330,7 @@ public class AllPairsCommand extends AbstractCommand {
     private WeightedTokenPairSink openSimsSink() throws IOException {
         return WeightedTokenPairSink.open(
                 getOutputFile(), getCharset(),
-                IndexDeligates.toPair(IndexDeligates.toSingleEntries(getIndexDeligate())),
+                EnumeratorDeligates.toPair(EnumeratorDeligates.toSingleEntries(getIndexDeligate())),
                 fileDeligate.isCompactFormatDisabled());
 
     }
@@ -581,11 +584,11 @@ public class AllPairsCommand extends AbstractCommand {
         this.minkP = minkP;
     }
 
-    public final IndexDeligatePair getIndexDeligate() {
+    public final EnumeratorPairBaring getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(IndexDeligatePair indexDeligate) {
+    public final void setIndexDeligate(EnumeratorPairBaring indexDeligate) {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }

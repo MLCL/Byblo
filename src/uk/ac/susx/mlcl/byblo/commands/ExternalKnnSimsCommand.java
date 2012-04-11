@@ -71,18 +71,18 @@ public class ExternalKnnSimsCommand extends ExternalSortWeightedTokenPiarCommand
 
     public ExternalKnnSimsCommand(
             File sourceFile, File destinationFile, Charset charset,
-            IndexDeligateSingle indexDeligate,
+            EnumeratorSingleBaring indexDeligate,
             int k, int maxChunkSize) throws IOException {
-        super(sourceFile, destinationFile, charset, IndexDeligates.toPair(indexDeligate));
+        super(sourceFile, destinationFile, charset, EnumeratorDeligates.toPair(indexDeligate));
         setMaxChunkSize(maxChunkSize);
         setK(k);
     }
 
     public ExternalKnnSimsCommand(
             File sourceFile, File destinationFile, Charset charset,
-            IndexDeligateSingle indexDeligate,
+            EnumeratorSingleBaring indexDeligate,
             int k) throws IOException {
-        super(sourceFile, destinationFile, charset, IndexDeligates.toPair(indexDeligate));
+        super(sourceFile, destinationFile, charset, EnumeratorDeligates.toPair(indexDeligate));
         setK(k);
     }
 

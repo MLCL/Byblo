@@ -31,11 +31,13 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import java.io.IOException;
+
 /**
  *
  * @author hiam20
  */
-public interface IndexDeligate {
+public interface EnumeratorBaring {
 
     boolean DEFAULT_IS_ENUMERATED = false;
 
@@ -44,5 +46,11 @@ public interface IndexDeligate {
     boolean isSkipIndexed1();
 
     boolean isSkipIndexed2();
+
+    void close() throws IOException;
+
+    void save() throws IOException;
+
+    void open() throws IOException;
 
 }

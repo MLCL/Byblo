@@ -269,7 +269,7 @@ public class LpTest {
                                                  DEFAULT_CHARSET));
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void test_L2_Symmetry() throws Exception {
         System.out.println("Testing symmetry.");
 

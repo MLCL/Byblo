@@ -207,7 +207,7 @@ public class WeightedTokenSource
     }
 
     public static WeightedTokenSource open(
-            File f, Charset charset, IndexDeligateSingle idx) throws IOException {
+            File f, Charset charset, EnumeratorSingleBaring idx) throws IOException {
         SeekableDataSource tsv = new TSV.Source(f, charset);
         
         if (idx.isSkipIndexed1()) {
@@ -229,9 +229,7 @@ public class WeightedTokenSource
     }
 
     public static boolean equal(File a, File b, Charset charset) throws IOException {
-        final Enumerator<String> stringIndex = Enumerators.
-                newDefaultStringEnumerator();
-        IndexDeligateSingle idx = new IndexDeligateSingleImpl();
+        EnumeratorSingleBaring idx = new EnumeratorSingleBaringDeligate();
         final WeightedTokenSource srcA = open(a, charset, idx);
         final WeightedTokenSource srcB = open(b, charset, idx);
 
