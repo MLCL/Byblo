@@ -20,7 +20,7 @@ target
 /nbproject/*
 nbbuild.xml
 manifest.mf
-/libs/*.jar
+/libs/*
 
 
 # Emacs
