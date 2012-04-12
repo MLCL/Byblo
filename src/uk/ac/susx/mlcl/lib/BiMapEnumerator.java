@@ -37,7 +37,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import uk.ac.susx.mlcl.lib.collect.ForwardingBiMap;
-import uk.ac.susx.mlcl.lib.collect.Int2ObjectBiMap;
 
 /**
  * A simple of bimap for indexing complex objects (usually strings).
@@ -68,15 +67,14 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
     }
 
     protected synchronized void put(final int id, final T obj) {
-         map.put(id, obj);
-         if(nextId.get() <= id)
-             nextId.set(id + 1);
+        map.put(id, obj);
+        if (nextId.get() <= id)
+            nextId.set(id + 1);
     }
 
     public int getNextId() {
         return nextId.get();
     }
-    
 
     @Override
     public synchronized final int indexOf(final T obj) {
@@ -160,7 +158,7 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
             AtomicInteger nextId = new AtomicInteger(0);
             nextId.set(in.readInt());
             @SuppressWarnings("unchecked")
-            Int2ObjectBiMap<T> map = (Int2ObjectBiMap<T>) in.readObject();
+            BiMap<Integer, T> map = (BiMap<Integer, T>) in.readObject();
             this.se = new BiMapEnumerator<T>(map, nextId);
         }
 
