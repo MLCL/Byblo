@@ -16,7 +16,8 @@ import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
  *
  * @author hiam20
  */
-public class EnumeratorSingleBaringDeligate extends EnumeratorBaringDeligate
+public class EnumeratorSingleBaringDeligate
+        extends EnumeratorBaringDeligate
         implements Serializable, EnumeratorSingleBaring {
 
     private static final long serialVersionUID = 1L;
@@ -41,7 +42,7 @@ public class EnumeratorSingleBaringDeligate extends EnumeratorBaringDeligate
         this.enumerator = enumerator;
     }
 
-  public EnumeratorSingleBaringDeligate(
+    public EnumeratorSingleBaringDeligate(
             boolean enumerated, File indexFile,
             boolean skipIndexed1, boolean skipIndexed2) {
         super(skipIndexed1, skipIndexed2);
@@ -105,5 +106,12 @@ public class EnumeratorSingleBaringDeligate extends EnumeratorBaringDeligate
                 add("isEnumerated", isEnumerated()).
                 add("indexFile", getIndexFile());
     }
+
+    @Override
+    public EnumeratorPairBaring getEnumeratorPairCarriar() {
+        return EnumeratorDeligates.toPair(this);
+    }
+    
+    
 
 }

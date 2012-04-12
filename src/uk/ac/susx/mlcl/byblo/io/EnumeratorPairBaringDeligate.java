@@ -203,4 +203,16 @@ public class EnumeratorPairBaringDeligate
                 add("index2", getFeatureIndexFile());
     }
 
+    @Override
+    public EnumeratorSingleBaring getEntriesEnumeratorCarriar() {
+        return EnumeratorDeligates.toSingleEntries(this);
+    }
+
+    @Override
+    public EnumeratorSingleBaring getFeaturesEnumeratorCarriar() {
+        return EnumeratorDeligates.toSingleFeatures(this);
+    }
+    
+    
+
 }

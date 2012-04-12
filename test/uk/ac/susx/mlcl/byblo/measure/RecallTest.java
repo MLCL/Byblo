@@ -75,7 +75,7 @@ public class RecallTest {
 
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testMainMethodRun_PrecisionMI() throws Exception {
         System.out.println("Testing PrecisionMI from main method.");
 

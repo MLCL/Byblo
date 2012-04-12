@@ -120,7 +120,7 @@ public class CrMiTest {
         testCrmiCli(0, 1.001);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testCrmiCli_recallCheck() throws Exception {
         System.out.println(
                 "Testing CrMi(beta=0, gamma=0) equals RecallMi from main method.");

@@ -154,57 +154,6 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
         }
 
     }
-//    // XXX: Broken
-//    @Deprecated
-//    public static Function<Integer, String> deltaEncoder() {
-//        return new Function<Integer, String>() {
-//
-//            private int previous = 0;
-//
-//            @Override
-//            public String apply(Integer token) {
-//                final int delta = token - previous;
-//                previous = token;
-//                return (deltaNumDigits(delta) < idxNumDigits(token))
-//                       ? (delta < 0 ? '-' : '+') + Integer.toString(delta)
-//                       : Integer.toString(token);
-//
-//            }
-//
-//            private int deltaNumDigits(int delta) {
-//                return (int) (Math.floor(Math.log10(Math.abs(delta)))) + 2;
-//            }
-//
-//            private int idxNumDigits(int idx) {
-//                assert idx >= 0 : "num must be a positive index";
-//                return (int) (Math.floor(Math.log10(idx))) + 1;
-//            }
-//
-//        };
-//    }
-//
-//    // XXX: Broken
-//    @Deprecated
-//    public static Function<String, Integer> deltaDecoder() {
-//        return new Function<String, Integer>() {
-//
-//            private int previous = 0;
-//
-//            @Override
-//            public Integer apply(String str) {
-//                switch (str.charAt(0)) {
-//                    case '-':
-//                        previous -= Integer.parseInt(str.substring(1));
-//                    case '+':
-//                        previous += Integer.parseInt(str.substring(1));
-//                        return previous;
-//                    default:
-//                        return Integer.parseInt(str);
-//                }
-//            }
-//
-//        };
-//    }
 
     public static Comparator<Token> indexOrder() {
         return new Comparator<Token>() {
@@ -217,19 +166,22 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
         };
     }
 
-    public static Comparator<Token> stringOrder(final Enumerator<String> enumerator) {
+    public static Comparator<Token> stringOrder(
+            final EnumeratorSingleBaring idx) {
         return new Comparator<Token>() {
 
             @Override
             public int compare(final Token a, final Token b) {
-                String s1 = enumerator.valueOf(a.id());
-                String s2 = enumerator.valueOf(b.id());
+                try {
+                    String s1 = idx.getEnumerator().valueOf(a.id());
+                    String s2 = idx.getEnumerator().valueOf(b.id());
 
-                assert s1 != null : "s1 ia null";
-                assert s2 != null : "s2 ia null";
-                return s1.compareTo(s2);
-//                return enumerator.get(a.id()).compareTo(
-//                        enumerator.get(b.id()));
+                    assert s1 != null : "s1 ia null";
+                    assert s2 != null : "s2 ia null";
+                    return s1.compareTo(s2);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
 
         };

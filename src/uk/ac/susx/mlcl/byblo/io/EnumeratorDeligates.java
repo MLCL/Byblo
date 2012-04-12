@@ -35,7 +35,6 @@ import java.io.File;
 import java.io.IOException;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.Enumerators;
 
 /**
  *
@@ -249,6 +248,16 @@ public class EnumeratorDeligates {
             getInner().close();
         }
 
+        @Override
+        public EnumeratorSingleBaring getEntriesEnumeratorCarriar() {
+            return getInner();
+        }
+
+        @Override
+        public EnumeratorSingleBaring getFeaturesEnumeratorCarriar() {
+            return getInner();
+        }
+
     }
 
     public static class PairToFeaturesSingleAdapter
@@ -287,6 +296,11 @@ public class EnumeratorDeligates {
         @Override
         public void close() throws IOException {
             getInner().closeFeatures();
+        }
+
+        @Override
+        public EnumeratorPairBaring getEnumeratorPairCarriar() {
+            return getInner();
         }
 
     }
@@ -329,6 +343,11 @@ public class EnumeratorDeligates {
             getInner().closeEntries();
         }
 
+        @Override
+        public EnumeratorPairBaring getEnumeratorPairCarriar() {
+            return getInner();
+        }
+
     }
 
     public abstract static class SingleToSingleAdapter
@@ -367,6 +386,11 @@ public class EnumeratorDeligates {
         @Override
         public void close() throws IOException {
             getInner().close();
+        }
+
+        @Override
+        public EnumeratorPairBaring getEnumeratorPairCarriar() {
+            return toPair(this);
         }
 
     }
@@ -437,6 +461,16 @@ public class EnumeratorDeligates {
         @Override
         public void closeFeatures() throws IOException {
             getInner().closeFeatures();
+        }
+
+        @Override
+        public EnumeratorSingleBaring getEntriesEnumeratorCarriar() {
+            return toSingleEntries(this);
+        }
+
+        @Override
+        public EnumeratorSingleBaring getFeaturesEnumeratorCarriar() {
+            return toSingleFeatures(this);
         }
 
     }

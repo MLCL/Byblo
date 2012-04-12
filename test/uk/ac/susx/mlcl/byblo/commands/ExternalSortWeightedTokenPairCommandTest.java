@@ -22,6 +22,7 @@ import uk.ac.susx.mlcl.lib.io.IOUtil;
 import static org.junit.Assert.*;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Comparators;
+import uk.ac.susx.mlcl.lib.MemoryStringEnumerator;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 
 /**
@@ -66,8 +67,7 @@ public class ExternalSortWeightedTokenPairCommandTest {
                 preindexedTokens1, preindexedTokens2);
 
         Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(
-                Weighted.recordOrder(TokenPair.firstStringOrder(idx.
-                getEntryEnumerator())),
+                Weighted.recordOrder(TokenPair.firstStringOrder(idx.getEntriesEnumeratorCarriar())),
                 Comparators.reverse(Weighted.<TokenPair>weightOrder()));
 
         testSortWeightedTokenPairCommand(inputFile, randomisedFile, sortedFile,

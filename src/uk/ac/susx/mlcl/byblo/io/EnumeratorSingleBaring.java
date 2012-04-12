@@ -47,10 +47,15 @@ public interface EnumeratorSingleBaring extends EnumeratorBaring {
 
     boolean isEnumerated();
 
+    @Override
     void open() throws IOException;
 
+    @Override
     void save() throws IOException;
 
+    @Override
     void close() throws IOException;
+
+    EnumeratorPairBaring getEnumeratorPairCarriar();
 
 }

@@ -71,7 +71,7 @@ public class JensenTest {
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testJensen_Symmetry() throws Exception {
         System.out.println("Testing Jensen symmetry.");
 

@@ -65,4 +65,8 @@ public interface EnumeratorPairBaring extends EnumeratorBaring {
 
     void closeFeatures() throws IOException;
 
+    EnumeratorSingleBaring getEntriesEnumeratorCarriar();
+
+    EnumeratorSingleBaring getFeaturesEnumeratorCarriar();
+
 }
