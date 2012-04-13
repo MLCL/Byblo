@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import com.google.common.io.Files;
 import java.io.File;
@@ -38,9 +39,8 @@ import java.io.IOException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.Enumerators;
-import uk.ac.susx.mlcl.lib.MemoryStringEnumerator;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
+import uk.ac.susx.mlcl.byblo.enumerators.MemoryBasedStringEnumerator;
 
 /**
  *
@@ -49,13 +49,13 @@ import uk.ac.susx.mlcl.lib.MemoryStringEnumerator;
 public class FeatureTest {
 
     private void copyF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        Enumerator<String> strEnum = MemoryStringEnumerator.newInstance();
+        Enumerator<String> strEnum = MemoryBasedStringEnumerator.newInstance();
         WeightedTokenSource aSrc = WeightedTokenSource.open(
                 a, DEFAULT_CHARSET,
-                new EnumeratorSingleBaringDeligate(false, strEnum));
+                new SingleEnumeratingDeligate(false, strEnum));
         WeightedTokenSink bSink = WeightedTokenSink.open(
                 b, DEFAULT_CHARSET,
-                new EnumeratorSingleBaringDeligate(false, strEnum));
+                new SingleEnumeratingDeligate(false, strEnum));
         bSink.setCompactFormatEnabled(compact);
 
         IOUtil.copy(aSrc, bSink);
@@ -92,15 +92,15 @@ public class FeatureTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_FEATURES.getName() + ".str");
 
-        Enumerator<String> strEnum = MemoryStringEnumerator.newInstance();
+        Enumerator<String> strEnum = MemoryBasedStringEnumerator.newInstance();
 
         {
             WeightedTokenSource aSrc = WeightedTokenSource.open(
                     a, DEFAULT_CHARSET,
-                    new EnumeratorSingleBaringDeligate(false, strEnum));
+                    new SingleEnumeratingDeligate(false, strEnum));
             WeightedTokenSink bSink = WeightedTokenSink.open(
                     b, DEFAULT_CHARSET,
-                    new EnumeratorSingleBaringDeligate(true));
+                    new SingleEnumeratingDeligate(true));
             IOUtil.copy(aSrc, bSink);
             bSink.close();
         }
@@ -111,10 +111,10 @@ public class FeatureTest {
         {
             WeightedTokenSource bSrc = WeightedTokenSource.open(
                     b, DEFAULT_CHARSET,
-                    new EnumeratorSingleBaringDeligate(true));
+                    new SingleEnumeratingDeligate(true));
             WeightedTokenSink cSink = WeightedTokenSink.open(
                     c, DEFAULT_CHARSET,
-                    new EnumeratorSingleBaringDeligate(false, strEnum));
+                    new SingleEnumeratingDeligate(false, strEnum));
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }
@@ -124,4 +124,5 @@ public class FeatureTest {
         assertTrue("Double converted file is not equal to origion.",
                    Files.equal(a, c));
     }
+
 }

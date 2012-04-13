@@ -2,23 +2,22 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.byblo.io;
+package uk.ac.susx.mlcl.byblo.enumerators;
 
 import com.beust.jcommander.Parameter;
 import com.google.common.base.Objects;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 
 /**
  *
  * @author hiam20
  */
-public class EnumeratorSingleBaringDeligate
-        extends EnumeratorBaringDeligate
-        implements Serializable, EnumeratorSingleBaring {
+public class SingleEnumeratingDeligate
+        extends EnumeratingDeligate
+        implements Serializable, SingleEnumerating {
 
     private static final long serialVersionUID = 1L;
 
@@ -33,7 +32,7 @@ public class EnumeratorSingleBaringDeligate
 
     private Enumerator<String> enumerator = null;
 
-    public EnumeratorSingleBaringDeligate(
+    public SingleEnumeratingDeligate(
             boolean enumerated, File indexFile, Enumerator<String> enumerator,
             boolean skipIndexed1, boolean skipIndexed2) {
         super(skipIndexed1, skipIndexed2);
@@ -42,7 +41,7 @@ public class EnumeratorSingleBaringDeligate
         this.enumerator = enumerator;
     }
 
-    public EnumeratorSingleBaringDeligate(
+    public SingleEnumeratingDeligate(
             boolean enumerated, File indexFile,
             boolean skipIndexed1, boolean skipIndexed2) {
         super(skipIndexed1, skipIndexed2);
@@ -51,51 +50,51 @@ public class EnumeratorSingleBaringDeligate
         this.enumerator = null;
     }
 
-    public EnumeratorSingleBaringDeligate(boolean enumerated, Enumerator<String> enumerator) {
+    public SingleEnumeratingDeligate(boolean enumerated, Enumerator<String> enumerator) {
         this(enumerated, null, enumerator,
              DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
     }
 
-    public EnumeratorSingleBaringDeligate(boolean enumerated) {
+    public SingleEnumeratingDeligate(boolean enumerated) {
         this(enumerated, null, null,
              DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
     }
 
-    public EnumeratorSingleBaringDeligate() {
+    public SingleEnumeratingDeligate() {
         this(DEFAULT_IS_ENUMERATED, null, null,
              DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
     }
 
     @Override
-    public File getIndexFile() {
+    public File getEnumeratorFile() {
         return indexFile;
     }
 
     @Override
-    public final boolean isEnumerated() {
+    public final boolean isEnumerationEnabled() {
         return enumerated;
     }
 
     @Override
     public final Enumerator<String> getEnumerator() throws IOException {
         if (enumerator == null) {
-            open();
+            openEnumerator();
         }
         return enumerator;
     }
 
     @Override
-    public void open() throws IOException {
+    public void openEnumerator() throws IOException {
         enumerator = open(indexFile);
     }
 
     @Override
-    public void save() throws IOException {
+    public void saveEnumerator() throws IOException {
         save(enumerator);
     }
 
     @Override
-    public void close() throws IOException {
+    public void closeEnumerator() throws IOException {
         close(enumerator);
         enumerator = null;
     }
@@ -103,13 +102,13 @@ public class EnumeratorSingleBaringDeligate
     @Override
     protected Objects.ToStringHelper toStringHelper() {
         return super.toStringHelper().
-                add("isEnumerated", isEnumerated()).
-                add("indexFile", getIndexFile());
+                add("isEnumerated", isEnumerationEnabled()).
+                add("indexFile", getEnumeratorFile());
     }
 
     @Override
-    public EnumeratorPairBaring getEnumeratorPairCarriar() {
-        return EnumeratorDeligates.toPair(this);
+    public DoubleEnumerating getEnumeratorPairCarriar() {
+        return EnumeratingDeligates.toPair(this);
     }
     
     

@@ -30,9 +30,9 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaring;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorDeligates;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
@@ -71,7 +71,7 @@ public class AllPairsCommand extends AbstractCommand {
     private static final Log LOG = LogFactory.getLog(AllPairsCommand.class);
 
     @ParametersDelegate
-    private EnumeratorPairBaring indexDeligate = new EnumeratorPairBaringDeligate();
+    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
 
     @ParametersDelegate
     private FileDeligate fileDeligate = new FileDeligate();
@@ -177,7 +177,7 @@ public class AllPairsCommand extends AbstractCommand {
 
     public AllPairsCommand(File entriesFile, File featuresFile,
                            File entryFeaturesFile, File outputFile,
-                           Charset charset, EnumeratorPairBaring indexDeligate) {
+                           Charset charset, DoubleEnumerating indexDeligate) {
         setEntryFeaturesFile(entryFeaturesFile);
         setEntriesFile(entriesFile);
         setFeaturesFile(featuresFile);
@@ -294,8 +294,8 @@ public class AllPairsCommand extends AbstractCommand {
         if (apss.isExceptionThrown())
             apss.throwException();
 
-        indexDeligate.save();
-        indexDeligate.close();
+        indexDeligate.saveEnumerator();
+        indexDeligate.closeEnumerator();
 
         if (LOG.isInfoEnabled()) {
             LOG.info("Completed all-pairs similarity search.");
@@ -320,7 +320,7 @@ public class AllPairsCommand extends AbstractCommand {
     private WeightedTokenSource openFeaturesSource() throws IOException {
         return WeightedTokenSource.open(
                 getFeaturesFile(), getCharset(),
-                EnumeratorDeligates.toSingleFeatures(getIndexDeligate()));
+                EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
 
     }
 
@@ -333,7 +333,7 @@ public class AllPairsCommand extends AbstractCommand {
     private WeightedTokenPairSink openSimsSink() throws IOException {
         return WeightedTokenPairSink.open(
                 getOutputFile(), getCharset(),
-                EnumeratorDeligates.toPair(EnumeratorDeligates.toSingleEntries(getIndexDeligate())),
+                EnumeratingDeligates.toPair(EnumeratingDeligates.toSingleEntries(getIndexDeligate())),
                 fileDeligate.isCompactFormatDisabled());
 
     }
@@ -587,11 +587,11 @@ public class AllPairsCommand extends AbstractCommand {
         this.minkP = minkP;
     }
 
-    public final EnumeratorPairBaring getIndexDeligate() {
+    public final DoubleEnumerating getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(EnumeratorPairBaring indexDeligate) {
+    public final void setIndexDeligate(DoubleEnumerating indexDeligate) {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }

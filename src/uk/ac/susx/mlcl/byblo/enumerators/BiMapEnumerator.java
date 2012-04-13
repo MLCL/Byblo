@@ -28,42 +28,97 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.lib;
+package uk.ac.susx.mlcl.byblo.enumerators;
 
 import com.google.common.collect.BiMap;
+import com.google.common.collect.Maps;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.ForwardingBiMap;
 
 /**
- * A simple of bimap for indexing complex objects (usually strings).
+ * A simple enumerator that delegates to BiMap for enumeration storage, and
+ * assigns current max + 1 as the next key.
  *
  * @param <T> type of object being indexed.
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
 
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 1L;
 
     private final BiMap<Integer, T> map;
 
     private final AtomicInteger nextId;
 
+    /**
+     * Dependency injection constructor to be used by subclasses only.
+     *
+     * Checks nextId with an assert only, so will accept invalid nextId's when
+     * assertions are disabled.
+     *
+     * @param map BiMap to delegate storage too.
+     * @param nextId Integer value of key to assign to next added element.
+     */
     protected BiMapEnumerator(
-            BiMap<Integer, T> map,
-            AtomicInteger nextId) {
+            final BiMap<Integer, T> map,
+            final AtomicInteger nextId) {
+        Checks.checkNotNull("map", map);
+        Checks.checkNotNull("nextId", nextId);
+        assert max(map) < nextId.get();
+
         this.map = map;
         this.nextId = nextId;
     }
 
-    protected BiMapEnumerator() {
-        this(ForwardingBiMap.<Integer, T>create(
-                new HashMap<Integer, T>(),
-                new HashMap<T, Integer>()),
-             new AtomicInteger(0));
+    public BiMapEnumerator(final BiMap<Integer, T> map) {
+        this(map, new AtomicInteger(max(map) + 1));
+    }
+
+    protected BiMapEnumerator(Map<Integer, T> forwards, Map<T, Integer> backwards) {
+        Checks.checkNotNull("forwards", forwards);
+        Checks.checkNotNull("backwards", backwards);
+        assert forwards.size() == backwards.size();
+        assert forwards.keySet().containsAll(backwards.values());
+        assert backwards.keySet().containsAll(forwards.values());
+
+        map = ForwardingBiMap.<Integer, T>create(forwards, backwards);
+        nextId = new AtomicInteger(max(forwards));
+    }
+
+    public BiMapEnumerator() {
+        this(new HashMap<Integer, T>(), new HashMap<T, Integer>());
+    }
+
+    public int getNextId() {
+        return nextId.get();
+    }
+
+    public BiMap<Integer, T> getMap() {
+        return Maps.unmodifiableBiMap(map);
+    }
+
+    @Override
+    public synchronized final int indexOf(final T value) {
+        Checks.checkNotNull("value", value);
+
+        if (!map.containsValue(value))
+            put(nextId.getAndIncrement(), value);
+        return map.inverse().get(value);
+    }
+
+    @Override
+    public synchronized final T valueOf(final int index) {
+        Checks.checkRangeIncl("index", index, 0, Integer.MAX_VALUE);
+
+        final T value = map.get(index);
+        assert value != null : "value is null";
+        return value;
     }
 
     protected synchronized void put(final int id, final T obj) {
@@ -72,52 +127,30 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
             nextId.set(id + 1);
     }
 
-    public int getNextId() {
-        return nextId.get();
-    }
-
-    @Override
-    public synchronized final int indexOf(final T obj) {
-        Checks.checkNotNull("obj", obj);
-        if (!map.containsValue(obj))
-            put(nextId.getAndIncrement(), obj);
-        return map.inverse().get(obj);
-    }
-
-    @Override
-    public synchronized final T valueOf(final int id) {
-        Checks.checkRangeIncl("id", id, 0, Integer.MAX_VALUE);
-
-        final T value = map.get(id);
-        assert value != null : "value is null";
-        return value;
-    }
-
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
+        return obj != null
+                && getClass() != obj.getClass()
+                && equals((BiMapEnumerator<?>) obj);
+    }
+
+    public boolean equals(BiMapEnumerator<?> other) {
+        if (nextId != other.nextId && (nextId == null || !nextId.equals(other.nextId)))
             return false;
-        if (getClass() != obj.getClass())
-            return false;
-        final BiMapEnumerator<T> other = (BiMapEnumerator<T>) obj;
-        if (this.map != other.map && (this.map == null || !this.map.equals(other.map)))
-            return false;
-        if (this.nextId != other.nextId && (this.nextId == null || !this.nextId.equals(other.nextId)))
+        if (map != other.map && (map == null || !map.equals(other.map)))
             return false;
         return true;
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 29 * hash + (this.map != null ? this.map.hashCode() : 0);
-        hash = 29 * hash + (this.nextId != null ? this.nextId.hashCode() : 0);
-        return hash;
+        return 29 * (29 * 7 + (map != null ? map.hashCode() : 0))
+                + (nextId != null ? nextId.hashCode() : 0);
     }
 
     @Override
     public String toString() {
-        return "MemoryBasedEnumerator{" + "map=" + map + ", nextId=" + nextId + '}';
+        return "BiMapEnumerator{" + "map=" + map + ", nextId=" + nextId + '}';
     }
 
     @Override
@@ -129,27 +162,27 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
         return new Serializer<T>(this);
     }
 
-    static final class Serializer<T> implements Externalizable {
+    private static final class Serializer<T> implements Externalizable {
 
         private static final long serialVersionUID = 1;
 
-        private BiMapEnumerator<T> se;
+        private BiMapEnumerator<T> instance;
 
         Serializer() {
         }
 
-        Serializer(final BiMapEnumerator<T> se) {
-            if (se == null) {
+        Serializer(final BiMapEnumerator<T> instance) {
+            if (instance == null) {
                 throw new NullPointerException("se == null");
             }
-            this.se = se;
+            this.instance = instance;
         }
 
         @Override
         public final void writeExternal(final ObjectOutput out)
                 throws IOException {
-            out.writeInt(se.nextId.get());
-            out.writeObject(se.map);
+            out.writeInt(instance.nextId.get());
+            out.writeObject(instance.map);
         }
 
         @Override
@@ -159,12 +192,25 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
             nextId.set(in.readInt());
             @SuppressWarnings("unchecked")
             BiMap<Integer, T> map = (BiMap<Integer, T>) in.readObject();
-            this.se = new BiMapEnumerator<T>(map, nextId);
+            this.instance = new BiMapEnumerator<T>(map, nextId);
         }
 
         final Object readResolve() {
-            return se;
+            return instance;
         }
 
     }
+
+    private static <T> int max(final Map<Integer, T> map) {
+        if (map instanceof SortedMap) {
+            return ((SortedMap<Integer, T>) map).lastKey();
+        } else {
+            int max = -1;
+            for (int key : map.keySet())
+                if (max < key)
+                    max = key;
+            return max;
+        }
+    }
+
 }

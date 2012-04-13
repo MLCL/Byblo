@@ -30,9 +30,9 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaring;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorDeligates;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
@@ -86,7 +86,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
     public static final int FILTERED_ID = 0;
 
     @ParametersDelegate
-    private EnumeratorPairBaring indexDeligate = new EnumeratorPairBaringDeligate();
+    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
 
     /*
      * === INPUT FILES ===
@@ -219,11 +219,11 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         setOutputEntriesFile(outputEntriesFile);
     }
 
-    public final EnumeratorPairBaring getIndexDeligate() {
+    public final DoubleEnumerating getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(EnumeratorPairBaring indexDeligate) {
+    public final void setIndexDeligate(DoubleEnumerating indexDeligate) {
         this.indexDeligate = indexDeligate;
     }
 
@@ -340,8 +340,8 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         }
         com.google.common.io.Files.copy(activeFeaturesFile, outputFeaturesFile);
 
-        indexDeligate.save();
-        indexDeligate.close();
+        indexDeligate.saveEnumerator();
+        indexDeligate.closeEnumerator();
 
 
         if (LOG.isInfoEnabled()) {
@@ -359,7 +359,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
         WeightedTokenSource entriesSource = WeightedTokenSource.open(
                 activeEntriesFile, charset,
-                EnumeratorDeligates.toSingleEntries(getIndexDeligate()));
+                EnumeratingDeligates.toSingleEntries(getIndexDeligate()));
 
 //                new WeightedTokenSource(
 //                new TSVSource(activeEntriesFile, charset), getIndexDeligate().
@@ -369,7 +369,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         outputFile.deleteOnExit();
 
         WeightedTokenSink entriesSink = WeightedTokenSink.open(
-                outputFile, charset, EnumeratorDeligates.toSingleEntries(getIndexDeligate()));
+                outputFile, charset, EnumeratingDeligates.toSingleEntries(getIndexDeligate()));
 //        
 //                new WeightedTokenSink(
 //                new TSVSink(outputFile, charset),
@@ -571,7 +571,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         IntSet rejectedFeatures = new IntOpenHashSet();
 
         WeightedTokenSource featureSource = WeightedTokenSource.open(
-                activeFeaturesFile, charset, EnumeratorDeligates.toSingleFeatures(getIndexDeligate()));
+                activeFeaturesFile, charset, EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
 //new WeightedTokenSource(
 //                new TSVSource(activeFeaturesFile, charset),
 //                getIndexDeligate().single2());
@@ -580,7 +580,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         outputFile.deleteOnExit();
 
         WeightedTokenSink featureSink = WeightedTokenSink.open(
-                outputFile, charset, EnumeratorDeligates.toSingleFeatures(getIndexDeligate()));
+                outputFile, charset, EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
 //        new WeightedTokenSink(
 //                new TSVSink(outputFile, charset),
 //                getIndexDeligate().single2());

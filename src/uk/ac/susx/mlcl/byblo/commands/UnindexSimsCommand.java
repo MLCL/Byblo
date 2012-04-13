@@ -4,10 +4,10 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaring;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorSingleBaringDeligate;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorDeligates;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorSingleBaring;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,11 +25,11 @@ import uk.ac.susx.mlcl.lib.io.Source;
 public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
-    private EnumeratorSingleBaring indexDeligate = new EnumeratorSingleBaringDeligate(false);
+    private SingleEnumerating indexDeligate = new SingleEnumeratingDeligate(false);
 
     public UnindexSimsCommand(
             File sourceFile, File destinationFile, Charset charset,
-            EnumeratorSingleBaring indexDeligate) {
+            SingleEnumerating indexDeligate) {
         super(sourceFile, destinationFile, charset);
         this.indexDeligate = indexDeligate;
     }
@@ -40,10 +40,10 @@ public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>>
 
     @Override
     public void runCommand() throws Exception {
-        Checks.checkNotNull("indexFile", indexDeligate.getIndexFile());
+        Checks.checkNotNull("indexFile", indexDeligate.getEnumeratorFile());
         super.runCommand();
 
-        indexDeligate.close();
+        indexDeligate.closeEnumerator();
 
     
     }
@@ -64,22 +64,22 @@ public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>>
                 sinkIndexDeligate(), !getFilesDeligate().isCompactFormatDisabled());
     }
 
-    public EnumeratorSingleBaring getIndexDeligate() {
+    public SingleEnumerating getIndexDeligate() {
         return indexDeligate;
     }
 
-    public void setIndexDeligate(EnumeratorSingleBaring indexDeligate) {
+    public void setIndexDeligate(SingleEnumerating indexDeligate) {
         this.indexDeligate = indexDeligate;
     }
 
-    protected EnumeratorPairBaring sourceIndexDeligate() {
-        return new EnumeratorDeligates.SingleToPairAdapter(
-                EnumeratorDeligates.decorateEnumerated(indexDeligate, true));
+    protected DoubleEnumerating sourceIndexDeligate() {
+        return new EnumeratingDeligates.SingleToPairAdapter(
+                EnumeratingDeligates.decorateEnumerated(indexDeligate, true));
     }
 
-    protected EnumeratorPairBaring sinkIndexDeligate() {
-        return new EnumeratorDeligates.SingleToPairAdapter(
-                EnumeratorDeligates.decorateEnumerated(indexDeligate, false));
+    protected DoubleEnumerating sinkIndexDeligate() {
+        return new EnumeratingDeligates.SingleToPairAdapter(
+                EnumeratingDeligates.decorateEnumerated(indexDeligate, false));
     }
 
 }

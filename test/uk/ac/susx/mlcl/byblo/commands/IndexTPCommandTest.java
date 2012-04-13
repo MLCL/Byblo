@@ -4,7 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import com.google.common.io.Files;
 import java.io.File;
 import static java.text.MessageFormat.*;
@@ -138,7 +138,7 @@ public class IndexTPCommandTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
-        unindex.setIndexDeligate(new EnumeratorPairBaringDeligate(true, true, index1, index2, skip1, skip2));
+        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(true, true, index1, index2, skip1, skip2));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);
@@ -159,7 +159,7 @@ public class IndexTPCommandTest {
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
 
-        unindex.setIndexDeligate(new EnumeratorPairBaringDeligate(true, true, index1, index2, skip1, skip2));
+        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(true, true, index1, index2, skip1, skip2));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);

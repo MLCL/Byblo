@@ -30,12 +30,14 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import java.io.*;
 import java.util.Comparator;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 
 /**
  * TokenPair holds the unique ids of two indexed strings.
@@ -240,7 +242,7 @@ public class TokenPair implements
     }
 
     public static Comparator<TokenPair> stringOrder(
-            final EnumeratorPairBaring idx) {
+            final DoubleEnumerating idx) {
         return new Comparator<TokenPair>() {
 
             @Override
@@ -260,7 +262,7 @@ public class TokenPair implements
     }
 
     public static Comparator<TokenPair> firstStringOrder(
-            final EnumeratorSingleBaring idx) {
+            final SingleEnumerating idx) {
         return new Comparator<TokenPair>() {
 
             @Override
@@ -277,7 +279,7 @@ public class TokenPair implements
     }
 
     public static Comparator<TokenPair> secondStringOrder(
-            final EnumeratorSingleBaring idx) {
+            final SingleEnumerating idx) {
         return new Comparator<TokenPair>() {
 
             @Override

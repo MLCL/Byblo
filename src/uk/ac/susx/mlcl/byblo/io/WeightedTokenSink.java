@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 import com.google.common.base.Predicate;
 import java.io.*;
 import java.nio.charset.Charset;
@@ -160,10 +161,10 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
     }
 
     public static WeightedTokenSink open(
-            File f, Charset charset, EnumeratorSingleBaring idx) throws IOException {
+            File f, Charset charset, SingleEnumerating idx) throws IOException {
         DataSink tsv = new TSV.Sink(f, charset);
 
-        if (idx.isSkipIndexed1()) {
+        if (idx.isEnumeratorSkipIndexed1()) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override
@@ -173,7 +174,7 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
             });
         }
         
-        if (!idx.isEnumerated())
+        if (!idx.isEnumerationEnabled())
             tsv = Enumerated.enumerated(tsv, idx.getEnumerator());
         return new WeightedTokenSink(tsv);
     }

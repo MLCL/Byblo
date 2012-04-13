@@ -30,8 +30,8 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.EnumeratorDeligates;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorSingleBaring;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects.ToStringHelper;
@@ -73,18 +73,18 @@ public class ExternalKnnSimsCommand extends ExternalSortWeightedTokenPiarCommand
 
     public ExternalKnnSimsCommand(
             File sourceFile, File destinationFile, Charset charset,
-            EnumeratorSingleBaring indexDeligate,
+            SingleEnumerating indexDeligate,
             int k, int maxChunkSize) throws IOException {
-        super(sourceFile, destinationFile, charset, EnumeratorDeligates.toPair(indexDeligate));
+        super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(indexDeligate));
         setMaxChunkSize(maxChunkSize);
         setK(k);
     }
 
     public ExternalKnnSimsCommand(
             File sourceFile, File destinationFile, Charset charset,
-            EnumeratorSingleBaring indexDeligate,
+            SingleEnumerating indexDeligate,
             int k) throws IOException {
-        super(sourceFile, destinationFile, charset, EnumeratorDeligates.toPair(indexDeligate));
+        super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(indexDeligate));
         setK(k);
     }
 

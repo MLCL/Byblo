@@ -29,33 +29,43 @@
  * POSSIBILITY OF SUCH DAMAGE.To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.byblo.io;
+package uk.ac.susx.mlcl.byblo.enumerators;
 
 import java.io.File;
 import java.io.IOException;
-import uk.ac.susx.mlcl.lib.Enumerator;
 
 /**
  *
  * @author hiam20
  */
-public interface EnumeratorSingleBaring extends EnumeratorBaring {
+public interface DoubleEnumerating extends Enumerating {
 
-    Enumerator<String> getEnumerator() throws IOException;
+    Enumerator<String> getEntryEnumerator() throws IOException;
 
-    File getIndexFile();
+    Enumerator<String> getFeatureEnumerator() throws IOException;
 
-    boolean isEnumerated();
+    File getEntryEnumeratorFile();
 
-    @Override
-    void open() throws IOException;
+    File getFeatureEnumeratorFile();
 
-    @Override
-    void save() throws IOException;
+    boolean isEntriesEnumerated();
 
-    @Override
-    void close() throws IOException;
+    boolean isFeaturesEnumerated();
 
-    EnumeratorPairBaring getEnumeratorPairCarriar();
+    void openEntriesEnumerator() throws IOException;
+
+    void saveEntriesEnumerator() throws IOException;
+
+    void closeEntriesEnumerator() throws IOException;
+
+    void openFeaturesEnumerator() throws IOException;
+
+    void saveFeaturesEnumerator() throws IOException;
+
+    void closeFeaturesEnumerator() throws IOException;
+
+    SingleEnumerating getEntriesEnumeratorCarriar();
+
+    SingleEnumerating getFeaturesEnumeratorCarriar();
 
 }

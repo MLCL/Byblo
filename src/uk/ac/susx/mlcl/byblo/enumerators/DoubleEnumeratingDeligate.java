@@ -2,23 +2,22 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.byblo.io;
+package uk.ac.susx.mlcl.byblo.enumerators;
 
 import com.beust.jcommander.Parameter;
 import com.google.common.base.Objects;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 
 /**
  *
  * @author hiam20
  */
-public class EnumeratorPairBaringDeligate
-        extends EnumeratorBaringDeligate
-        implements Serializable, EnumeratorPairBaring {
+public class DoubleEnumeratingDeligate
+        extends EnumeratingDeligate
+        implements Serializable, DoubleEnumerating {
 
     private static final long serialVersionUID = 1L;
 
@@ -44,7 +43,7 @@ public class EnumeratorPairBaringDeligate
 
     private Enumerator<String> featureEnumerator = null;
 
-    protected EnumeratorPairBaringDeligate(
+    protected DoubleEnumeratingDeligate(
             boolean enumeratedEntries, boolean enumeratedFeatures,
             File entryIndexFile, File featureIndexFile,
             Enumerator<String> entryEnumerator, Enumerator<String> featureEnumerator,
@@ -58,7 +57,7 @@ public class EnumeratorPairBaringDeligate
         this.featureEnumerator = featureEnumerator;
     }
 
-    public EnumeratorPairBaringDeligate(
+    public DoubleEnumeratingDeligate(
             boolean enumeratedEntries, boolean enumeratedFeatures,
             File entryIndexFile, File featureIndexFile,
             boolean skipIndexed1, boolean skipIndexed2) {
@@ -66,7 +65,7 @@ public class EnumeratorPairBaringDeligate
              null, null, skipIndexed1, skipIndexed2);
     }
 
-    public EnumeratorPairBaringDeligate(
+    public DoubleEnumeratingDeligate(
             boolean enumeratedEntries, boolean enumeratedFeatures,
             Enumerator<String> entryEnumerator, Enumerator<String> featureEnumerator,
             boolean skipIndexed1, boolean skipIndexed2) {
@@ -74,7 +73,7 @@ public class EnumeratorPairBaringDeligate
              entryEnumerator, featureEnumerator, skipIndexed1, skipIndexed2);
     }
 
-    public EnumeratorPairBaringDeligate(boolean enumeratedEntries,
+    public DoubleEnumeratingDeligate(boolean enumeratedEntries,
                                         boolean enumeratedFeatures,
                                         boolean skipIndexed1,
                                         boolean skipIndexed2) {
@@ -82,13 +81,13 @@ public class EnumeratorPairBaringDeligate
              null, null, skipIndexed1, skipIndexed2);
     }
 
-    public EnumeratorPairBaringDeligate(boolean enumeratedEntries,
+    public DoubleEnumeratingDeligate(boolean enumeratedEntries,
                                         boolean enumeratedFeatures) {
         this(enumeratedEntries, enumeratedFeatures, null, null, null, null,
              DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
     }
 
-    public EnumeratorPairBaringDeligate(boolean enumeratedEntries,
+    public DoubleEnumeratingDeligate(boolean enumeratedEntries,
                                         boolean enumeratedFeatures,
                                         Enumerator<String> entryEnumerator,
                                         Enumerator<String> featureEnumerator) {
@@ -97,7 +96,7 @@ public class EnumeratorPairBaringDeligate
              DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
     }
 
-    public EnumeratorPairBaringDeligate() {
+    public DoubleEnumeratingDeligate() {
         this(DEFAULT_IS_ENUMERATED, DEFAULT_IS_ENUMERATED,
              null, null, null, null,
              DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
@@ -108,7 +107,7 @@ public class EnumeratorPairBaringDeligate
         if (entryEnumerator == null) {
             // if tokens are preindexed then a file MUST be available
             // otherwise the file will be loaded if it exists
-            openEntries();
+            openEntriesEnumerator();
 //            entryEnumerator = EnumeratorDeligates.instantiateEnumerator(
 //                    isEntriesEnumerated(), getEntryIndexFile());
         }
@@ -118,7 +117,7 @@ public class EnumeratorPairBaringDeligate
     @Override
     public final Enumerator<String> getFeatureEnumerator() throws IOException {
         if (featureEnumerator == null) {
-            openFeatures();
+            openFeaturesEnumerator();
 //            featureEnumerator = EnumeratorDeligates.instantiateEnumerator(
 //                    isFeaturesEnumerated(), getFeatureIndexFile());
         }
@@ -136,62 +135,62 @@ public class EnumeratorPairBaringDeligate
     }
 
     @Override
-    public final File getEntryIndexFile() {
+    public final File getEntryEnumeratorFile() {
         return entriesIndexFile;
     }
 
     @Override
-    public final File getFeatureIndexFile() {
+    public final File getFeatureEnumeratorFile() {
         return featuresIndexFile;
     }
 
     @Override
-    public void openEntries() throws IOException {
+    public void openEntriesEnumerator() throws IOException {
         entryEnumerator = open(entriesIndexFile);;
     }
 
     @Override
-    public void saveEntries() throws IOException {
+    public void saveEntriesEnumerator() throws IOException {
         save(entryEnumerator);
     }
 
     @Override
-    public void closeEntries() throws IOException {
+    public void closeEntriesEnumerator() throws IOException {
         close(entryEnumerator);
         entryEnumerator = null;
     }
 
     @Override
-    public void openFeatures() throws IOException {
+    public void openFeaturesEnumerator() throws IOException {
         featureEnumerator = open(featuresIndexFile);
     }
 
     @Override
-    public void saveFeatures() throws IOException {
+    public void saveFeaturesEnumerator() throws IOException {
         save(featureEnumerator);
     }
 
     @Override
-    public void closeFeatures() throws IOException {
+    public void closeFeaturesEnumerator() throws IOException {
         close(featureEnumerator);
         featureEnumerator = null;
     }
 
-    public void close() throws IOException {
-        closeFeatures();
-        closeEntries();
+    public void closeEnumerator() throws IOException {
+        closeFeaturesEnumerator();
+        closeEntriesEnumerator();
     }
 
     @Override
-    public void save() throws IOException {
-        saveEntries();
-        saveFeatures();
+    public void saveEnumerator() throws IOException {
+        saveEntriesEnumerator();
+        saveFeaturesEnumerator();
     }
 
     @Override
-    public void open() throws IOException {
-        openEntries();
-        openFeatures();
+    public void openEnumerator() throws IOException {
+        openEntriesEnumerator();
+        openFeaturesEnumerator();
     }
 
     @Override
@@ -199,18 +198,18 @@ public class EnumeratorPairBaringDeligate
         return super.toStringHelper().
                 add("preindexed1", isEntriesEnumerated()).
                 add("preindexed2", isFeaturesEnumerated()).
-                add("index1", getEntryIndexFile()).
-                add("index2", getFeatureIndexFile());
+                add("index1", getEntryEnumeratorFile()).
+                add("index2", getFeatureEnumeratorFile());
     }
 
     @Override
-    public EnumeratorSingleBaring getEntriesEnumeratorCarriar() {
-        return EnumeratorDeligates.toSingleEntries(this);
+    public SingleEnumerating getEntriesEnumeratorCarriar() {
+        return EnumeratingDeligates.toSingleEntries(this);
     }
 
     @Override
-    public EnumeratorSingleBaring getFeaturesEnumeratorCarriar() {
-        return EnumeratorDeligates.toSingleFeatures(this);
+    public SingleEnumerating getFeaturesEnumeratorCarriar() {
+        return EnumeratingDeligates.toSingleFeatures(this);
     }
     
     

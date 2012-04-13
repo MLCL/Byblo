@@ -29,28 +29,47 @@
  * POSSIBILITY OF SUCH DAMAGE.To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.byblo.io;
+package uk.ac.susx.mlcl.byblo.enumerators;
 
-import java.io.IOException;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 /**
+ * A stub implementation of an enumerator, used a placeholder.
  *
- * @author hiam20
+ * It should never be actually used, so functionality results in an
+ * UnsupportedOperationException.
+ *
+ * @param <T> type of object being indexed.
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public interface EnumeratorBaring {
+public final class NullEnumerator<T> implements Enumerator<T> {
 
-    boolean DEFAULT_IS_ENUMERATED = false;
+    private static final String ERROR_MESSAGE =
+            "Null Enumerator should never be accessed.";
 
-    boolean DEFAULT_SKIP_INDEXING = false;
+    public NullEnumerator() {
+    }
 
-    boolean isSkipIndexed1();
+    @Override
+    public int indexOf(final T value) {
+        throw new UnsupportedOperationException(ERROR_MESSAGE);
+    }
 
-    boolean isSkipIndexed2();
+    @Override
+    public T valueOf(final int index) {
+        throw new UnsupportedOperationException(ERROR_MESSAGE);
+    }
 
-    void close() throws IOException;
+    @Override
+    public Iterator<Entry<Integer, T>> iterator() {
+        return Collections.<Integer, T>emptyMap().entrySet().iterator();
+    }
 
-    void save() throws IOException;
-
-    void open() throws IOException;
+    @Override
+    public String toString() {
+        return "NullEnumerator{}";
+    }
 
 }

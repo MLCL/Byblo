@@ -4,9 +4,9 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaring;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorDeligates;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.io.Source;
 
@@ -25,11 +24,11 @@ import uk.ac.susx.mlcl.lib.io.Source;
 public class IndexWTPCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
-    private EnumeratorPairBaring indexDeligate = new EnumeratorPairBaringDeligate(false, false);
+    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate(false, false);
 
     public IndexWTPCommand(
             File sourceFile, File destinationFile, Charset charset,
-            EnumeratorPairBaring indexDeligate) {
+            DoubleEnumerating indexDeligate) {
         super(sourceFile, destinationFile, charset);
         this.indexDeligate = indexDeligate;
     }
@@ -40,13 +39,13 @@ public class IndexWTPCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
 
     @Override
     public void runCommand() throws Exception {
-        Checks.checkNotNull("indexFile1", indexDeligate.getEntryIndexFile());
-        Checks.checkNotNull("indexFile2", indexDeligate.getFeatureIndexFile());
+        Checks.checkNotNull("indexFile1", indexDeligate.getEntryEnumeratorFile());
+        Checks.checkNotNull("indexFile2", indexDeligate.getFeatureEnumeratorFile());
 
         super.runCommand();
 
-        indexDeligate.save();
-        indexDeligate.close();
+        indexDeligate.saveEnumerator();
+        indexDeligate.closeEnumerator();
     }
 
     @Override
@@ -67,20 +66,20 @@ public class IndexWTPCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
                 sinkIndexDeligate(), !getFilesDeligate().isCompactFormatDisabled());
     }
 
-    public EnumeratorPairBaring getIndexDeligate() {
+    public DoubleEnumerating getIndexDeligate() {
         return indexDeligate;
     }
 
-    public void setIndexDeligate(EnumeratorPairBaring indexDeligate) {
+    public void setIndexDeligate(DoubleEnumerating indexDeligate) {
         this.indexDeligate = indexDeligate;
     }
 
-    protected EnumeratorPairBaring sourceIndexDeligate() {
-        return EnumeratorDeligates.decorateEnumerated(indexDeligate, false);
+    protected DoubleEnumerating sourceIndexDeligate() {
+        return EnumeratingDeligates.decorateEnumerated(indexDeligate, false);
     }
 
-    protected EnumeratorPairBaring sinkIndexDeligate() {
-        return EnumeratorDeligates.decorateEnumerated(indexDeligate, true);
+    protected DoubleEnumerating sinkIndexDeligate() {
+        return EnumeratingDeligates.decorateEnumerated(indexDeligate, true);
     }
 
 }

@@ -4,7 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,10 +28,10 @@ public class SortTokenPairCommand extends AbstractSortCommand<TokenPair> {
     private static final Log LOG = LogFactory.getLog(SortWeightedTokenCommand.class);
 
     @ParametersDelegate
-    private EnumeratorPairBaringDeligate indexDeligate = new EnumeratorPairBaringDeligate();
+    private DoubleEnumeratingDeligate indexDeligate = new DoubleEnumeratingDeligate();
 
     public SortTokenPairCommand(File sourceFile, File destinationFile, Charset charset,
-                                EnumeratorPairBaringDeligate indexDeligate) {
+                                DoubleEnumeratingDeligate indexDeligate) {
         super(sourceFile, destinationFile, charset, TokenPair.indexOrder());
         setIndexDeligate(indexDeligate);
     }
@@ -42,8 +42,8 @@ public class SortTokenPairCommand extends AbstractSortCommand<TokenPair> {
     @Override
     public void runCommand() throws Exception {
         super.runCommand();
-        indexDeligate.save();
-        indexDeligate.close();
+        indexDeligate.saveEnumerator();
+        indexDeligate.closeEnumerator();
 
     }
     
@@ -61,11 +61,11 @@ public class SortTokenPairCommand extends AbstractSortCommand<TokenPair> {
                 !getFilesDeligate().isCompactFormatDisabled());
     }
 
-    public final EnumeratorPairBaringDeligate getIndexDeligate() {
+    public final DoubleEnumeratingDeligate getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(EnumeratorPairBaringDeligate indexDeligate) {
+    public final void setIndexDeligate(DoubleEnumeratingDeligate indexDeligate) {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }

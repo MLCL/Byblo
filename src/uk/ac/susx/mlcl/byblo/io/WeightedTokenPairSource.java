@@ -30,6 +30,8 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import com.google.common.base.Predicate;
 import java.io.Closeable;
 import java.io.File;
@@ -40,7 +42,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import uk.ac.susx.mlcl.lib.Comparators;
-import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.lib.io.*;
 
 /**
@@ -194,7 +196,7 @@ public class WeightedTokenPairSource
     }
 
     public static boolean equal(File a, File b, Charset charset) throws IOException {
-        EnumeratorPairBaring idx = new EnumeratorPairBaringDeligate(false, false);
+        DoubleEnumerating idx = new DoubleEnumeratingDeligate(false, false);
         final WeightedTokenPairSource srcA = WeightedTokenPairSource.open(
                 a, charset, idx);
         final WeightedTokenPairSource srcB = WeightedTokenPairSource.open(
@@ -272,12 +274,12 @@ public class WeightedTokenPairSource
 //    }
 
     public static WeightedTokenPairSource open(
-            File file, Charset charset, EnumeratorPairBaring idx)
+            File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
         SeekableDataSource tsv = new TSV.Source(file, charset);
 
 
-        if (idx.isSkipIndexed1()) {
+        if (idx.isEnumeratorSkipIndexed1()) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override
@@ -286,7 +288,7 @@ public class WeightedTokenPairSource
                 }
             });
         }
-        if (idx.isSkipIndexed2()) {
+        if (idx.isEnumeratorSkipIndexed2()) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override

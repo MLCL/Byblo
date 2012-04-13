@@ -4,8 +4,8 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.EnumeratorSingleBaringDeligate;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorSingleBaring;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.IOException;
@@ -25,11 +25,11 @@ public class ExternalSortWeightedTokenCommand extends AbstractExternalSortComman
     private static final long serialVersionUID = 1L;
 
     @ParametersDelegate
-    private EnumeratorSingleBaring indexDeligate = new EnumeratorSingleBaringDeligate();
+    private SingleEnumerating indexDeligate = new SingleEnumeratingDeligate();
 
     public ExternalSortWeightedTokenCommand(
             File sourceFile, File destinationFile, Charset charset,
-            EnumeratorSingleBaring indexDeligate) {
+            SingleEnumerating indexDeligate) {
         super(sourceFile, destinationFile, charset);
         setIndexDeligate(indexDeligate);
     }
@@ -40,8 +40,8 @@ public class ExternalSortWeightedTokenCommand extends AbstractExternalSortComman
     @Override
     public void runCommand() throws Exception {
         super.runCommand();
-        indexDeligate.save();
-        indexDeligate.close();
+        indexDeligate.saveEnumerator();
+        indexDeligate.closeEnumerator();
 
     }
     @Override
@@ -58,11 +58,11 @@ public class ExternalSortWeightedTokenCommand extends AbstractExternalSortComman
                                         getIndexDeligate());
     }
 
-    public final EnumeratorSingleBaring getIndexDeligate() {
+    public final SingleEnumerating getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(EnumeratorSingleBaring indexDeligate) {
+    public final void setIndexDeligate(SingleEnumerating indexDeligate) {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }

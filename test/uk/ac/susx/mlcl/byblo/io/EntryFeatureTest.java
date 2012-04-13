@@ -30,6 +30,10 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -39,9 +43,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.Enumerators;
-import uk.ac.susx.mlcl.lib.MemoryStringEnumerator;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
+import uk.ac.susx.mlcl.byblo.enumerators.MemoryBasedStringEnumerator;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 
 /**
@@ -54,7 +57,7 @@ public class EntryFeatureTest {
     public void testLMMedlineSample() throws FileNotFoundException, IOException {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-input-sample");
         Charset charset = Charset.forName("UTF-8");
-        EnumeratorPairBaring idx = new EnumeratorPairBaringDeligate(false, false);
+        DoubleEnumerating idx = new DoubleEnumeratingDeligate(false, false);
         TokenPairSource efSrc = TokenPairSource.open(
                 testSample, charset, idx);
         assertTrue("EntryFeatureSource is empty", efSrc.hasNext());
@@ -66,7 +69,7 @@ public class EntryFeatureTest {
     }
 
     private void copyEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        EnumeratorPairBaring idx = new EnumeratorPairBaringDeligate(false, false);
+        DoubleEnumerating idx = new DoubleEnumeratingDeligate(false, false);
         TokenPairSource src = TokenPairSource.open(
                 a, DEFAULT_CHARSET, idx);
         TokenPairSink sink = TokenPairSink.open(
@@ -109,8 +112,8 @@ public class EntryFeatureTest {
 
         {
 //            Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
-            EnumeratorPairBaring idx = EnumeratorDeligates.toPair(
-                    new EnumeratorSingleBaringDeligate(true, idxFile, false, false));
+            DoubleEnumerating idx = EnumeratingDeligates.toPair(
+                    new SingleEnumeratingDeligate(true, idxFile, false, false));
 
 
 //                    
@@ -120,10 +123,10 @@ public class EntryFeatureTest {
                     a, DEFAULT_CHARSET, idx);
             TokenPairSink bSink = TokenPairSink.open(
                     b, DEFAULT_CHARSET,
-                    new EnumeratorPairBaringDeligate(true, true), true);
+                    new DoubleEnumeratingDeligate(true, true), true);
             IOUtil.copy(aSrc, bSink);
 
-            idx.saveEntries();
+            idx.saveEntriesEnumerator();
 
 //            Enumerators.saveStringEnumerator(strEnum, idxFile);
 
@@ -134,12 +137,12 @@ public class EntryFeatureTest {
                    b.length() <= a.length());
 
         {
-            Enumerator<String> strEnum = MemoryStringEnumerator.load(idxFile);
-            EnumeratorPairBaring idx = new EnumeratorPairBaringDeligate(false, false, strEnum,
+            Enumerator<String> strEnum = MemoryBasedStringEnumerator.load(idxFile);
+            DoubleEnumerating idx = new DoubleEnumeratingDeligate(false, false, strEnum,
                                                                         strEnum);
             TokenPairSource bSrc = TokenPairSource.open(
                     b, DEFAULT_CHARSET,
-                    new EnumeratorPairBaringDeligate(true, true));
+                    new DoubleEnumeratingDeligate(true, true));
             TokenPairSink cSink = TokenPairSink.open(
                     c, DEFAULT_CHARSET, idx,
                     false);

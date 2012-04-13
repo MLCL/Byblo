@@ -4,8 +4,8 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.EnumeratorSingleBaringDeligate;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -137,10 +137,10 @@ public class IndexSimsCommandTest {
         {
             WeightedTokenPairSource wtpsa = WeightedTokenPairSource.open(
                     outa, DEFAULT_CHARSET,
-                    new EnumeratorPairBaringDeligate(true, true, skip1a, skip2a));
+                    new DoubleEnumeratingDeligate(true, true, skip1a, skip2a));
             WeightedTokenPairSource wtpsb = WeightedTokenPairSource.open(
                     outb, DEFAULT_CHARSET,
-                    new EnumeratorPairBaringDeligate(true, true, skip1b, skip2b));
+                    new DoubleEnumeratingDeligate(true, true, skip1b, skip2b));
             List<Tell> pa = new ArrayList<Tell>();
             List<Tell> pb = new ArrayList<Tell>();
             List<Weighted<TokenPair>> va = new ArrayList<Weighted<TokenPair>>();
@@ -178,11 +178,11 @@ public class IndexSimsCommandTest {
         {
             WeightedTokenPairVectorSource wtpsa = WeightedTokenPairSource.open(
                     outa, DEFAULT_CHARSET,
-                    new EnumeratorPairBaringDeligate(true, true, skip1a, skip2a)).
+                    new DoubleEnumeratingDeligate(true, true, skip1a, skip2a)).
                     getVectorSource();
             WeightedTokenPairVectorSource wtpsb = WeightedTokenPairSource.open(
                     outb, DEFAULT_CHARSET,
-                    new EnumeratorPairBaringDeligate(true, true, skip1b, skip2b)).
+                    new DoubleEnumeratingDeligate(true, true, skip1b, skip2b)).
                     getVectorSource();
 
             List<Tell> pa = new ArrayList<Tell>();
@@ -236,7 +236,7 @@ public class IndexSimsCommandTest {
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
 
-        unindex.setIndexDeligate(new EnumeratorSingleBaringDeligate(true, index, null, skip1, skip2));
+        unindex.setIndexDeligate(new SingleEnumeratingDeligate(true, index, null, skip1, skip2));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);

@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.lib;
+package uk.ac.susx.mlcl.byblo.enumerators;
 
 import com.google.common.collect.BiMap;
 import java.io.File;
@@ -48,38 +48,49 @@ import uk.ac.susx.mlcl.lib.io.TSV;
  *
  * @author hiam20
  */
-public class MemoryStringEnumerator extends BiMapEnumerator<String> {
+public class MemoryBasedStringEnumerator extends BiMapEnumerator<String> {
 
     private static final long serialVersionUID = 1L;
 
-    private File file;
+    private final File file;
 
-    public MemoryStringEnumerator(File file) {
+    public MemoryBasedStringEnumerator(File file) {
+        super();
         this.file = null;
     }
 
-    public MemoryStringEnumerator(File file, BiMap<Integer, String> map, AtomicInteger nextId) {
+    public MemoryBasedStringEnumerator(
+            File file, BiMap<Integer, String> map, AtomicInteger nextId) {
         super(map, nextId);
         this.file = file;
     }
-    public static MemoryStringEnumerator newInstance() {
+
+    public File getFile() {
+        return file;
+    }
+
+    public boolean isFileSet() {
+        return file != null;
+    }
+
+    public static MemoryBasedStringEnumerator newInstance() {
         return newInstance(null);
     }
 
-    public static MemoryStringEnumerator newInstance(File file) {
+    public static MemoryBasedStringEnumerator newInstance(File file) {
         ForwardingBiMap<Integer, String> map = ForwardingBiMap.<Integer, String>create(
                 new HashMap<Integer, String>(),
                 new HashMap<String, Integer>());
 
-        MemoryStringEnumerator instance = new MemoryStringEnumerator(
+        MemoryBasedStringEnumerator instance = new MemoryBasedStringEnumerator(
                 file, map, new AtomicInteger(0));
 
         instance.put(FilterCommand.FILTERED_ID, FilterCommand.FILTERED_STRING);
         return instance;
     }
 
-    public static MemoryStringEnumerator load(File file) throws IOException {
-        MemoryStringEnumerator instance = newInstance(file);
+    public static MemoryBasedStringEnumerator load(File file) throws IOException {
+        MemoryBasedStringEnumerator instance = newInstance(file);
         TSV.Source in = new TSV.Source(file, Files.DEFAULT_CHARSET);
         while (in.canRead()) {
             int id = in.readInt();
@@ -93,12 +104,12 @@ public class MemoryStringEnumerator extends BiMapEnumerator<String> {
 
     public void save()
             throws IOException {
-        if(file == null) {
-            Logger.getLogger(MemoryStringEnumerator.class.getName()).log(Level.WARNING,
-                "Attempt made to save an enumerator with no attached file.");
+        if (file == null) {
+            Logger.getLogger(this.getClass().getName()).log(
+                    Level.WARNING, "Attempt made to save an enumerator with no attached file.");
             return;
         }
-        
+
         TSV.Sink out = new TSV.Sink(file, Files.DEFAULT_CHARSET);
 
         for (Map.Entry<Integer, String> e : this) {

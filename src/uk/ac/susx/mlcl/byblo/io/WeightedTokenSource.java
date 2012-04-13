@@ -30,6 +30,8 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 import com.google.common.base.Predicate;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
@@ -45,8 +47,6 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Comparators;
-import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.Enumerators;
 import uk.ac.susx.mlcl.lib.io.*;
 
 /**
@@ -207,29 +207,30 @@ public class WeightedTokenSource
     }
 
     public static WeightedTokenSource open(
-            File f, Charset charset, EnumeratorSingleBaring idx) throws IOException {
+            File f, Charset charset, SingleEnumerating idx) throws IOException {
         SeekableDataSource tsv = new TSV.Source(f, charset);
-        
-        if (idx.isSkipIndexed1()) {
+
+        if (idx.isEnumeratorSkipIndexed1()) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override
                 public boolean apply(Integer column) {
                     return column == 0;
                 }
+
             });
         }
-        
-        
-        
+
+
+
         tsv = Compact.compact(tsv, 2);
-        if (!idx.isEnumerated())
+        if (!idx.isEnumerationEnabled())
             tsv = Enumerated.enumerated(tsv, idx.getEnumerator());
         return new WeightedTokenSource(tsv);
     }
 
     public static boolean equal(File a, File b, Charset charset) throws IOException {
-        EnumeratorSingleBaring idx = new EnumeratorSingleBaringDeligate();
+        SingleEnumerating idx = new SingleEnumeratingDeligate();
         final WeightedTokenSource srcA = open(a, charset, idx);
         final WeightedTokenSource srcB = open(b, charset, idx);
 
@@ -253,4 +254,5 @@ public class WeightedTokenSource
         if (inner instanceof Closeable)
             ((Closeable) inner).close();
     }
+
 }

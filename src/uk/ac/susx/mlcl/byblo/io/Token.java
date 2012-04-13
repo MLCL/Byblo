@@ -30,10 +30,11 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 import com.google.common.base.Objects;
 import java.io.*;
 import java.util.Comparator;
-import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 
 /**
  * <tt>Token</tt> objects represent a single instance of an indexed string.
@@ -167,7 +168,7 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
     }
 
     public static Comparator<Token> stringOrder(
-            final EnumeratorSingleBaring idx) {
+            final SingleEnumerating idx) {
         return new Comparator<Token>() {
 
             @Override

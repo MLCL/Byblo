@@ -4,7 +4,7 @@
  * 
  * Redistribution and use in source and binary forms, with or without 
  * modification, are permitted provided that the following conditions are met:
- *  
+ * 
  *  * Redistributions of source code must retain the above copyright notice, 
  *    this list of conditions and the following disclaimer.
  * 
@@ -15,7 +15,7 @@
  *  * Neither the name of the University of Sussex nor the names of its 
  *    contributors may be used to endorse or promote products derived from this 
  *    software without specific prior written permission.
- *  
+ * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
@@ -26,47 +26,47 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
- * POSSIBILITY OF SUCH DAMAGE.To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo.io;
+package uk.ac.susx.mlcl.byblo.enumerators;
 
-import java.io.File;
-import java.io.IOException;
-import uk.ac.susx.mlcl.lib.Enumerator;
+import java.util.Map.Entry;
 
 /**
+ * Interface defining a unique indexing of complex objects (usually strings).
  *
- * @author hiam20
+ * Implementations of this interface are expected to associate each unique
+ * object with an integer value. When an object is queried using indexOf for the
+ * first time a new unique integer is returned. On subsequent queries of of the
+ * same object, the same unique integer will be returned. After an object has 
+ * been assigned a unique id it can be retrieved using the valueOf method.
+ *
+ * @param <T> type of object being indexed.
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public interface EnumeratorPairBaring extends EnumeratorBaring {
+public interface Enumerator<T> extends Iterable<Entry<Integer, T>> {
 
-    Enumerator<String> getEntryEnumerator() throws IOException;
+    /**
+     * Index value that implies the object has not been enumerated.
+     */
+    int NULL_INDEX = -1;
 
-    Enumerator<String> getFeatureEnumerator() throws IOException;
+    /**
+     * Retrieve the unique index for the given object.
+     *
+     * @param value object to index
+     * @return the index
+     * @throws NullPointerException when value is null
+     */
+    int indexOf(final T value);
 
-    File getEntryIndexFile();
-
-    File getFeatureIndexFile();
-
-    boolean isEntriesEnumerated();
-
-    boolean isFeaturesEnumerated();
-
-    void openEntries() throws IOException;
-
-    void saveEntries() throws IOException;
-
-    void closeEntries() throws IOException;
-
-    void openFeatures() throws IOException;
-
-    void saveFeatures() throws IOException;
-
-    void closeFeatures() throws IOException;
-
-    EnumeratorSingleBaring getEntriesEnumeratorCarriar();
-
-    EnumeratorSingleBaring getFeaturesEnumeratorCarriar();
+    /**
+     * Retrieve the object for the given unique index.
+     *
+     * @param index index of object to retrieve
+     * @return the object
+     * @throws IllegalArgumentException when index is negative
+     */
+    T valueOf(final int index);
 
 }

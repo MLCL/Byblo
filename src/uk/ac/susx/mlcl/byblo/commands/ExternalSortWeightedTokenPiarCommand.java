@@ -4,8 +4,8 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaring;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.IOException;
@@ -21,11 +21,11 @@ import uk.ac.susx.mlcl.lib.io.*;
 public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
-    private EnumeratorPairBaring indexDeligate = new EnumeratorPairBaringDeligate();
+    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
 
     public ExternalSortWeightedTokenPiarCommand(
             File sourceFile, File destinationFile, Charset charset,
-            EnumeratorPairBaring indexDeligate) {
+            DoubleEnumerating indexDeligate) {
         super(sourceFile, destinationFile, charset);
         setIndexDeligate(indexDeligate);
     }
@@ -36,8 +36,8 @@ public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCo
     @Override
     public void runCommand() throws Exception {
         super.runCommand();
-        indexDeligate.save();
-        indexDeligate.close();
+        indexDeligate.saveEnumerator();
+        indexDeligate.closeEnumerator();
 
     }
     
@@ -58,11 +58,11 @@ public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCo
                 getIndexDeligate());
     }
 
-    public final EnumeratorPairBaring getIndexDeligate() {
+    public final DoubleEnumerating getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(EnumeratorPairBaring indexDeligate) {
+    public final void setIndexDeligate(DoubleEnumerating indexDeligate) {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }

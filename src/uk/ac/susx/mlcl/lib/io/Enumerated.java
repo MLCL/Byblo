@@ -34,7 +34,7 @@ import com.google.common.base.Predicate;
 import java.io.Closeable;
 import java.io.IOException;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 
 /**
  *

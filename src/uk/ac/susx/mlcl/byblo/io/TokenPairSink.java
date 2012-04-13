@@ -30,10 +30,11 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import com.google.common.base.Predicate;
 import java.io.*;
 import java.nio.charset.Charset;
-import uk.ac.susx.mlcl.lib.Enumerator;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.lib.io.*;
 
 /**
@@ -158,10 +159,10 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
     }
 
     public static TokenPairSink open(
-            File file, Charset charset, EnumeratorPairBaring idx, boolean compact)
+            File file, Charset charset, DoubleEnumerating idx, boolean compact)
             throws IOException {
         DataSink tsv = new TSV.Sink(file, charset);
-        if (idx.isSkipIndexed1()) {
+        if (idx.isEnumeratorSkipIndexed1()) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override
@@ -170,7 +171,7 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
                 }
             });
         }
-        if (idx.isSkipIndexed2()) {
+        if (idx.isEnumeratorSkipIndexed2()) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override

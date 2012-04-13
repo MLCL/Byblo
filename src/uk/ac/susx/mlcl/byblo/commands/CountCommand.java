@@ -30,9 +30,9 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaring;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorDeligates;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
@@ -102,7 +102,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
     private Charset charset = Files.DEFAULT_CHARSET;
 
     @ParametersDelegate
-    private EnumeratorPairBaring indexDeligate = new EnumeratorPairBaringDeligate();
+    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
 
     /**
      * Dependency injection constructor with all fields parameterised.
@@ -120,7 +120,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
      */
     public CountCommand(final File instancesFile, final File entryFeaturesFile,
                         final File entriesFile, final File featuresFile,
-                        EnumeratorPairBaring indexDeligate,
+                        DoubleEnumerating indexDeligate,
                         final Charset charset) throws NullPointerException {
         this(instancesFile, entryFeaturesFile, entriesFile, featuresFile);
         setCharset(charset);
@@ -155,11 +155,11 @@ public class CountCommand extends AbstractCommand implements Serializable {
         setFeaturesFile(featuresFile);
     }
 
-    public EnumeratorPairBaring getIndexDeligate() {
+    public DoubleEnumerating getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(EnumeratorPairBaring indexDeligate) {
+    public final void setIndexDeligate(DoubleEnumerating indexDeligate) {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }
@@ -257,7 +257,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
 
         WeightedTokenSink entrySink =
                 WeightedTokenSink.open(
-                entriesFile, charset, EnumeratorDeligates.toSingleEntries(indexDeligate));
+                entriesFile, charset, EnumeratingDeligates.toSingleEntries(indexDeligate));
 //        
 //                new WeightedTokenSink(
 //                new TSVSink(entriesFile, charset),
@@ -265,7 +265,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
 
         WeightedTokenSink featureSink =
                 WeightedTokenSink.open(
-                featuresFile, charset, EnumeratorDeligates.toSingleFeatures(indexDeligate));
+                featuresFile, charset, EnumeratingDeligates.toSingleFeatures(indexDeligate));
 //        
 //                new WeightedTokenSink(
 //                new TSVSink(featuresFile, charset),
@@ -297,8 +297,8 @@ public class CountCommand extends AbstractCommand implements Serializable {
         eventsSink.flush();
         eventsSink.close();
 
-        indexDeligate.save();
-        indexDeligate.close();
+        indexDeligate.saveEnumerator();
+        indexDeligate.closeEnumerator();
 
 
 //        int i = 0;

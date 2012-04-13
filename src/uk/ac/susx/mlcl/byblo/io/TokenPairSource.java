@@ -30,6 +30,9 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
 import com.google.common.base.Predicate;
 import java.io.Closeable;
 import java.io.File;
@@ -39,8 +42,7 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.Enumerators;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.lib.io.*;
 
 /**
@@ -133,8 +135,8 @@ public class TokenPairSource
 //        final Enumerator<String> stringIndex = Enumerators.
 //                newDefaultStringEnumerator();
 //        
-        EnumeratorPairBaring idx = EnumeratorDeligates.toPair(
-                new EnumeratorSingleBaringDeligate(false));
+        DoubleEnumerating idx = EnumeratingDeligates.toPair(
+                new SingleEnumeratingDeligate(false));
 
 
         //.new EnumeratorPairBaringDeligate(false, false, stringIndex,
@@ -177,11 +179,11 @@ public class TokenPairSource
     }
 
     public static TokenPairSource open(
-            File file, Charset charset, EnumeratorPairBaring idx)
+            File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
         SeekableDataSource tsv = new TSV.Source(file, charset);
 
-        if (idx.isSkipIndexed1()) {
+        if (idx.isEnumeratorSkipIndexed1()) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override
@@ -191,7 +193,7 @@ public class TokenPairSource
 
             });
         }
-        if (idx.isSkipIndexed2()) {
+        if (idx.isEnumeratorSkipIndexed2()) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override

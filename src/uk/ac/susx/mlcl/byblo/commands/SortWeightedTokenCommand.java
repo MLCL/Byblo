@@ -4,8 +4,8 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.EnumeratorSingleBaring;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorSingleBaringDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,10 +28,10 @@ public class SortWeightedTokenCommand extends AbstractSortCommand<Weighted<Token
             SortWeightedTokenCommand.class);
 
     @ParametersDelegate
-    private EnumeratorSingleBaring indexDeligate = new EnumeratorSingleBaringDeligate();
+    private SingleEnumerating indexDeligate = new SingleEnumeratingDeligate();
 
     public SortWeightedTokenCommand(File sourceFile, File destinationFile,
-                                    Charset charset, EnumeratorSingleBaring indexDeligate) {
+                                    Charset charset, SingleEnumerating indexDeligate) {
         super(sourceFile, destinationFile, charset, Weighted.recordOrder(Token.indexOrder()));
         setIndexDeligate(indexDeligate);
     }
@@ -42,8 +42,8 @@ public class SortWeightedTokenCommand extends AbstractSortCommand<Weighted<Token
     @Override
     public void runCommand() throws Exception {
         super.runCommand();
-        indexDeligate.save();
-        indexDeligate.close();
+        indexDeligate.saveEnumerator();
+        indexDeligate.closeEnumerator();
 
     }
     
@@ -63,11 +63,11 @@ public class SortWeightedTokenCommand extends AbstractSortCommand<Weighted<Token
 
     }
 
-    public final EnumeratorSingleBaring getIndexDeligate() {
+    public final SingleEnumerating getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(EnumeratorSingleBaring indexDeligate) {
+    public final void setIndexDeligate(SingleEnumerating indexDeligate) {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }

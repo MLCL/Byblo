@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.lib;
+package uk.ac.susx.mlcl.byblo.enumerators;
 
 import com.google.common.collect.BiMap;
 import java.io.File;
@@ -52,13 +52,13 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String FORWARDS = "forwards";
+    private static final String COLLECTION_FORWARDS = "forwards";
 
-    private static final String BACKWARDS = "backwards";
+    private static final String COLLECTION_BACKWARDS = "backwards";
 
-    private static final String PROPERTIES = "properties";
+    private static final String COLLECTION_PROPERTIES = "properties";
 
-    private static final String NEXT_ID = "__next_id__";
+    private static final String COLLECTION_NEXT_ID = "__next_id__";
 
     private static final int TRANSACTION_LIMIT = 1000;
 
@@ -89,40 +89,9 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
         }
     }
 
+    
     public static synchronized Enumerator<String> newInstance(File file) {
         return load(file);
-//        final boolean anonymous;
-//        if (file == null) {
-//            anonymous = true;
-//            try {
-//                file = File.createTempFile("jdbc-", ".tmp");
-//            } catch (IOException ex) {
-//                Logger.getLogger(JDBCStringEnumerator.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//        } else {
-//            anonymous = false;
-//        }
-//
-//        DBMaker maker = DBMaker.openFile(file.toString());
-//        if (anonymous)
-//            maker.deleteFilesAfterClose();
-//        DB db = maker.make();
-//
-//        Map<Integer, String> forwards = db.<Integer, String>createHashMap(FORWARDS);
-//        Map<String, Integer> backwards = db.<String, Integer>createHashMap(BACKWARDS);
-//        Map<String, String> props = db.<String, String>createHashMap(PROPERTIES);
-//
-//        ForwardingBiMap<Integer, String> map = ForwardingBiMap.<Integer, String>create(
-//                forwards, backwards);
-//        props.put(NEXT_ID, Integer.toString(0));
-//
-//        JDBCStringEnumerator instance = new JDBCStringEnumerator(
-//                db, file, map, new AtomicInteger(0));
-//
-//        instance.put(FilterCommand.FILTERED_ID, FilterCommand.FILTERED_STRING);
-//        db.commit();
-//
-//        return instance;
     }
 
     public static synchronized Enumerator<String> load(File file) {
@@ -152,32 +121,32 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
         Map<String, String> props;
         AtomicInteger nextId;
 
-        if (collections.contains(FORWARDS)) {
+        if (collections.contains(COLLECTION_FORWARDS)) {
             // collection exists            
-            assert collections.contains(BACKWARDS);
-            assert collections.contains(PROPERTIES);
+            assert collections.contains(COLLECTION_BACKWARDS);
+            assert collections.contains(COLLECTION_PROPERTIES);
             
-            forwards = db.<Integer, String>getHashMap(FORWARDS);
-            backwards = db.<String, Integer>getHashMap(BACKWARDS);
-            props = db.<String, String>getHashMap(PROPERTIES);
+            forwards = db.<Integer, String>getHashMap(COLLECTION_FORWARDS);
+            backwards = db.<String, Integer>getHashMap(COLLECTION_BACKWARDS);
+            props = db.<String, String>getHashMap(COLLECTION_PROPERTIES);
             
             assert backwards.containsKey(FilterCommand.FILTERED_STRING);
             assert forwards.containsKey(FilterCommand.FILTERED_ID);
             assert backwards.get(FilterCommand.FILTERED_STRING) == FilterCommand.FILTERED_ID;
             assert forwards.get(FilterCommand.FILTERED_ID).equals(FilterCommand.FILTERED_STRING);
             
-            assert props.containsKey(NEXT_ID);
-            nextId = new AtomicInteger(Integer.valueOf(props.get(NEXT_ID)));
+            assert props.containsKey(COLLECTION_NEXT_ID);
+            nextId = new AtomicInteger(Integer.valueOf(props.get(COLLECTION_NEXT_ID)));
             
         } else {
             
-            forwards = db.<Integer, String>createHashMap(FORWARDS);
-            backwards = db.<String, Integer>createHashMap(BACKWARDS);
-            props = db.<String, String>createHashMap(PROPERTIES);
+            forwards = db.<Integer, String>createHashMap(COLLECTION_FORWARDS);
+            backwards = db.<String, Integer>createHashMap(COLLECTION_BACKWARDS);
+            props = db.<String, String>createHashMap(COLLECTION_PROPERTIES);
             forwards.put(FilterCommand.FILTERED_ID, FilterCommand.FILTERED_STRING);
             backwards.put(FilterCommand.FILTERED_STRING, FilterCommand.FILTERED_ID);
             nextId = new AtomicInteger(0);
-            props.put(NEXT_ID, Integer.toString(0));
+            props.put(COLLECTION_NEXT_ID, Integer.toString(0));
             db.commit();
         }
 
@@ -201,8 +170,8 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
             return;
         }
 
-        db.<String, String>getHashMap(PROPERTIES).put(
-                NEXT_ID, Integer.toString(getNextId()));
+        db.<String, String>getHashMap(COLLECTION_PROPERTIES).put(
+                COLLECTION_NEXT_ID, Integer.toString(getNextId()));
         db.commit();
     }
 

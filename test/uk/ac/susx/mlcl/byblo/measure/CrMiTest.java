@@ -38,10 +38,9 @@ import org.junit.Test;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
-import uk.ac.susx.mlcl.lib.Enumerator;
-import uk.ac.susx.mlcl.lib.Enumerators;
-import uk.ac.susx.mlcl.lib.MemoryStringEnumerator;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
+import uk.ac.susx.mlcl.byblo.enumerators.MemoryBasedStringEnumerator;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
@@ -258,11 +257,11 @@ public class CrMiTest {
         // will be different.
 
 
-        Enumerator<String> idx = MemoryStringEnumerator.newInstance();
-        WeightedTokenPairSource expected =  WeightedTokenPairSource.open(
-                expectedOutput, DEFAULT_CHARSET, new EnumeratorPairBaringDeligate(false, false, idx, idx));
-        WeightedTokenPairSource actual =  WeightedTokenPairSource.open(
-                crmiOutput, DEFAULT_CHARSET, new EnumeratorPairBaringDeligate(false, false, idx, idx));
+        Enumerator<String> idx = MemoryBasedStringEnumerator.newInstance();
+        WeightedTokenPairSource expected = WeightedTokenPairSource.open(
+                expectedOutput, DEFAULT_CHARSET, new DoubleEnumeratingDeligate(false, false, idx, idx));
+        WeightedTokenPairSource actual = WeightedTokenPairSource.open(
+                crmiOutput, DEFAULT_CHARSET, new DoubleEnumeratingDeligate(false, false, idx, idx));
 
         while (expected.hasNext() && actual.hasNext()) {
             Weighted<TokenPair> e = expected.read();

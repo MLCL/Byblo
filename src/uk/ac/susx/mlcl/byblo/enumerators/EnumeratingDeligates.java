@@ -29,31 +29,30 @@
  * POSSIBILITY OF SUCH DAMAGE.To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.byblo.io;
+package uk.ac.susx.mlcl.byblo.enumerators;
 
 import java.io.File;
 import java.io.IOException;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.Enumerator;
 
 /**
  *
  * @author hiam20
  */
-public class EnumeratorDeligates {
+public class EnumeratingDeligates {
 
-    private EnumeratorDeligates() {
+    private EnumeratingDeligates() {
     }
 
-    public static EnumeratorSingleBaring toSingleEntries(final EnumeratorPairBaring outer) {
+    public static SingleEnumerating toSingleEntries(final DoubleEnumerating outer) {
         return new PairToEntriesSingleAdapter(outer);
     }
 
-    public static EnumeratorSingleBaring toSingleFeatures(final EnumeratorPairBaring outer) {
+    public static SingleEnumerating toSingleFeatures(final DoubleEnumerating outer) {
         return new PairToFeaturesSingleAdapter(outer);
     }
 
-    public static EnumeratorPairBaring toPair(final EnumeratorSingleBaring inner) {
+    public static DoubleEnumerating toPair(final SingleEnumerating inner) {
         return new SingleToPairAdapter(inner);
     }
 //
@@ -88,9 +87,9 @@ public class EnumeratorDeligates {
 ////        return Enumerators.loadStringEnumerator(File file);
 //    }
 
-    public static EnumeratorPairBaring decorateEnumerated(
-            final EnumeratorPairBaring inner, final boolean enumerated) {
-        return new EnumeratorDeligates.PairToPairAdapter(inner) {
+    public static DoubleEnumerating decorateEnumerated(
+            final DoubleEnumerating inner, final boolean enumerated) {
+        return new EnumeratingDeligates.DoubleToDoubleAdapter(inner) {
 
             @Override
             public boolean isEntriesEnumerated() {
@@ -105,20 +104,20 @@ public class EnumeratorDeligates {
         };
     }
 
-    public static EnumeratorSingleBaring decorateEnumerated(
-            final EnumeratorSingleBaring inner, final boolean enumerated) {
-        return new EnumeratorDeligates.SingleToSingleAdapter(inner) {
+    public static SingleEnumerating decorateEnumerated(
+            final SingleEnumerating inner, final boolean enumerated) {
+        return new EnumeratingDeligates.SingleToSingleAdapter(inner) {
 
             @Override
-            public boolean isEnumerated() {
+            public boolean isEnumerationEnabled() {
                 return enumerated;
             }
 
         };
     }
 
-    public abstract static class AdapterBase<T extends EnumeratorBaring>
-            implements EnumeratorBaring {
+    public abstract static class AdapterBase<T extends Enumerating>
+            implements Enumerating {
 
         private final T inner;
 
@@ -144,28 +143,28 @@ public class EnumeratorDeligates {
         }
 
         @Override
-        public boolean isSkipIndexed1() {
-            return getInner().isSkipIndexed1();
+        public boolean isEnumeratorSkipIndexed1() {
+            return getInner().isEnumeratorSkipIndexed1();
         }
 
         @Override
-        public boolean isSkipIndexed2() {
-            return getInner().isSkipIndexed2();
+        public boolean isEnumeratorSkipIndexed2() {
+            return getInner().isEnumeratorSkipIndexed2();
         }
 
         @Override
-        public void close() throws IOException {
-            getInner().close();
+        public void closeEnumerator() throws IOException {
+            getInner().closeEnumerator();
         }
 
         @Override
-        public void save() throws IOException {
-            getInner().save();
+        public void saveEnumerator() throws IOException {
+            getInner().saveEnumerator();
         }
 
         @Override
-        public void open() throws IOException {
-            getInner().open();
+        public void openEnumerator() throws IOException {
+            getInner().openEnumerator();
         }
 
         @Override
@@ -181,10 +180,10 @@ public class EnumeratorDeligates {
     }
 
     public static class SingleToPairAdapter
-            extends AdapterBase<EnumeratorSingleBaring>
-            implements EnumeratorPairBaring {
+            extends AdapterBase<SingleEnumerating>
+            implements DoubleEnumerating {
 
-        public SingleToPairAdapter(EnumeratorSingleBaring inner) {
+        public SingleToPairAdapter(SingleEnumerating inner) {
             super(inner);
         }
 
@@ -199,72 +198,72 @@ public class EnumeratorDeligates {
         }
 
         @Override
-        public File getEntryIndexFile() {
-            return getInner().getIndexFile();
+        public File getEntryEnumeratorFile() {
+            return getInner().getEnumeratorFile();
         }
 
         @Override
-        public File getFeatureIndexFile() {
-            return getInner().getIndexFile();
+        public File getFeatureEnumeratorFile() {
+            return getInner().getEnumeratorFile();
         }
 
         @Override
         public boolean isEntriesEnumerated() {
-            return getInner().isEnumerated();
+            return getInner().isEnumerationEnabled();
         }
 
         @Override
         public boolean isFeaturesEnumerated() {
-            return getInner().isEnumerated();
+            return getInner().isEnumerationEnabled();
         }
 
         @Override
-        public void openEntries() throws IOException {
-            getInner().open();
+        public void openEntriesEnumerator() throws IOException {
+            getInner().openEnumerator();
         }
 
         @Override
-        public void openFeatures() throws IOException {
-            getInner().open();
+        public void openFeaturesEnumerator() throws IOException {
+            getInner().openEnumerator();
         }
 
         @Override
-        public void saveEntries() throws IOException {
-            getInner().save();
+        public void saveEntriesEnumerator() throws IOException {
+            getInner().saveEnumerator();
         }
 
         @Override
-        public void saveFeatures() throws IOException {
-            getInner().save();
+        public void saveFeaturesEnumerator() throws IOException {
+            getInner().saveEnumerator();
         }
 
         @Override
-        public void closeEntries() throws IOException {
-            getInner().close();
+        public void closeEntriesEnumerator() throws IOException {
+            getInner().closeEnumerator();
         }
 
         @Override
-        public void closeFeatures() throws IOException {
-            getInner().close();
+        public void closeFeaturesEnumerator() throws IOException {
+            getInner().closeEnumerator();
         }
 
         @Override
-        public EnumeratorSingleBaring getEntriesEnumeratorCarriar() {
+        public SingleEnumerating getEntriesEnumeratorCarriar() {
             return getInner();
         }
 
         @Override
-        public EnumeratorSingleBaring getFeaturesEnumeratorCarriar() {
+        public SingleEnumerating getFeaturesEnumeratorCarriar() {
             return getInner();
         }
 
     }
 
     public static class PairToFeaturesSingleAdapter
-            extends AdapterBase<EnumeratorPairBaring>
-            implements EnumeratorSingleBaring {
+            extends AdapterBase<DoubleEnumerating>
+            implements SingleEnumerating {
 
-        public PairToFeaturesSingleAdapter(EnumeratorPairBaring inner) {
+        public PairToFeaturesSingleAdapter(DoubleEnumerating inner) {
             super(inner);
         }
 
@@ -274,42 +273,42 @@ public class EnumeratorDeligates {
         }
 
         @Override
-        public File getIndexFile() {
-            return getInner().getFeatureIndexFile();
+        public File getEnumeratorFile() {
+            return getInner().getFeatureEnumeratorFile();
         }
 
         @Override
-        public boolean isEnumerated() {
+        public boolean isEnumerationEnabled() {
             return getInner().isFeaturesEnumerated();
         }
 
         @Override
-        public void open() throws IOException {
-            getInner().openFeatures();
+        public void openEnumerator() throws IOException {
+            getInner().openFeaturesEnumerator();
         }
 
         @Override
-        public void save() throws IOException {
-            getInner().saveFeatures();
+        public void saveEnumerator() throws IOException {
+            getInner().saveFeaturesEnumerator();
         }
 
         @Override
-        public void close() throws IOException {
-            getInner().closeFeatures();
+        public void closeEnumerator() throws IOException {
+            getInner().closeFeaturesEnumerator();
         }
 
         @Override
-        public EnumeratorPairBaring getEnumeratorPairCarriar() {
+        public DoubleEnumerating getEnumeratorPairCarriar() {
             return getInner();
         }
 
     }
 
     public static class PairToEntriesSingleAdapter
-            extends AdapterBase<EnumeratorPairBaring>
-            implements EnumeratorSingleBaring {
+            extends AdapterBase<DoubleEnumerating>
+            implements SingleEnumerating {
 
-        public PairToEntriesSingleAdapter(final EnumeratorPairBaring inner) {
+        public PairToEntriesSingleAdapter(final DoubleEnumerating inner) {
             super(inner);
         }
 
@@ -319,42 +318,42 @@ public class EnumeratorDeligates {
         }
 
         @Override
-        public File getIndexFile() {
-            return getInner().getEntryIndexFile();
+        public File getEnumeratorFile() {
+            return getInner().getEntryEnumeratorFile();
         }
 
         @Override
-        public boolean isEnumerated() {
+        public boolean isEnumerationEnabled() {
             return getInner().isEntriesEnumerated();
         }
 
         @Override
-        public void open() throws IOException {
-            getInner().openEntries();
+        public void openEnumerator() throws IOException {
+            getInner().openEntriesEnumerator();
         }
 
         @Override
-        public void save() throws IOException {
-            getInner().saveEntries();
+        public void saveEnumerator() throws IOException {
+            getInner().saveEntriesEnumerator();
         }
 
         @Override
-        public void close() throws IOException {
-            getInner().closeEntries();
+        public void closeEnumerator() throws IOException {
+            getInner().closeEntriesEnumerator();
         }
 
         @Override
-        public EnumeratorPairBaring getEnumeratorPairCarriar() {
+        public DoubleEnumerating getEnumeratorPairCarriar() {
             return getInner();
         }
 
     }
 
     public abstract static class SingleToSingleAdapter
-            extends AdapterBase<EnumeratorSingleBaring>
-            implements EnumeratorSingleBaring {
+            extends AdapterBase<SingleEnumerating>
+            implements SingleEnumerating {
 
-        public SingleToSingleAdapter(final EnumeratorSingleBaring inner) {
+        public SingleToSingleAdapter(final SingleEnumerating inner) {
             super(inner);
         }
 
@@ -364,42 +363,42 @@ public class EnumeratorDeligates {
         }
 
         @Override
-        public File getIndexFile() {
-            return getInner().getIndexFile();
+        public File getEnumeratorFile() {
+            return getInner().getEnumeratorFile();
         }
 
         @Override
-        public boolean isEnumerated() {
-            return getInner().isEnumerated();
+        public boolean isEnumerationEnabled() {
+            return getInner().isEnumerationEnabled();
         }
 
         @Override
-        public void open() throws IOException {
-            getInner().open();
+        public void openEnumerator() throws IOException {
+            getInner().openEnumerator();
         }
 
         @Override
-        public void save() throws IOException {
-            getInner().save();
+        public void saveEnumerator() throws IOException {
+            getInner().saveEnumerator();
         }
 
         @Override
-        public void close() throws IOException {
-            getInner().close();
+        public void closeEnumerator() throws IOException {
+            getInner().closeEnumerator();
         }
 
         @Override
-        public EnumeratorPairBaring getEnumeratorPairCarriar() {
+        public DoubleEnumerating getEnumeratorPairCarriar() {
             return toPair(this);
         }
 
     }
 
-    public abstract static class PairToPairAdapter
-            extends AdapterBase<EnumeratorPairBaring>
-            implements EnumeratorPairBaring {
+    public abstract static class DoubleToDoubleAdapter
+            extends AdapterBase<DoubleEnumerating>
+            implements DoubleEnumerating {
 
-        public PairToPairAdapter(final EnumeratorPairBaring inner) {
+        public DoubleToDoubleAdapter(final DoubleEnumerating inner) {
             super(inner);
         }
 
@@ -414,13 +413,13 @@ public class EnumeratorDeligates {
         }
 
         @Override
-        public File getEntryIndexFile() {
-            return getInner().getEntryIndexFile();
+        public File getEntryEnumeratorFile() {
+            return getInner().getEntryEnumeratorFile();
         }
 
         @Override
-        public File getFeatureIndexFile() {
-            return getInner().getFeatureIndexFile();
+        public File getFeatureEnumeratorFile() {
+            return getInner().getFeatureEnumeratorFile();
         }
 
         @Override
@@ -434,42 +433,42 @@ public class EnumeratorDeligates {
         }
 
         @Override
-        public void openEntries() throws IOException {
-            getInner().openEntries();
+        public void openEntriesEnumerator() throws IOException {
+            getInner().openEntriesEnumerator();
         }
 
         @Override
-        public void openFeatures() throws IOException {
-            getInner().openFeatures();
+        public void openFeaturesEnumerator() throws IOException {
+            getInner().openFeaturesEnumerator();
         }
 
         @Override
-        public void saveEntries() throws IOException {
-            getInner().saveEntries();
+        public void saveEntriesEnumerator() throws IOException {
+            getInner().saveEntriesEnumerator();
         }
 
         @Override
-        public void saveFeatures() throws IOException {
-            getInner().saveFeatures();
+        public void saveFeaturesEnumerator() throws IOException {
+            getInner().saveFeaturesEnumerator();
         }
 
         @Override
-        public void closeEntries() throws IOException {
-            getInner().closeEntries();
+        public void closeEntriesEnumerator() throws IOException {
+            getInner().closeEntriesEnumerator();
         }
 
         @Override
-        public void closeFeatures() throws IOException {
-            getInner().closeFeatures();
+        public void closeFeaturesEnumerator() throws IOException {
+            getInner().closeFeaturesEnumerator();
         }
 
         @Override
-        public EnumeratorSingleBaring getEntriesEnumeratorCarriar() {
+        public SingleEnumerating getEntriesEnumeratorCarriar() {
             return toSingleEntries(this);
         }
 
         @Override
-        public EnumeratorSingleBaring getFeaturesEnumeratorCarriar() {
+        public SingleEnumerating getFeaturesEnumeratorCarriar() {
             return toSingleFeatures(this);
         }
 

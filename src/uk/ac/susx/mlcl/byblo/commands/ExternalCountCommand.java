@@ -30,10 +30,10 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaring;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorDeligates;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
 import uk.ac.susx.mlcl.byblo.tasks.DeleteFileTask;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.lib.commands.CopyCommand;
 import uk.ac.susx.mlcl.lib.tasks.MergeTask;
 import com.beust.jcommander.Parameter;
@@ -108,7 +108,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     private static final boolean DEBUG = false;
 
     @ParametersDelegate
-    private EnumeratorPairBaring indexDeligate = new EnumeratorPairBaringDeligate();
+    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
 
     @ParametersDelegate
     private FileDeligate fileDeligate = new FileDeligate();
@@ -154,7 +154,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     public ExternalCountCommand(
             final File instancesFile, final File entryFeaturesFile,
             final File entriesFile, final File featuresFile, Charset charset,
-            EnumeratorPairBaring indexDeligate,
+            DoubleEnumerating indexDeligate,
             int maxChunkSize) {
         this(instancesFile, entryFeaturesFile, entriesFile, featuresFile);
         fileDeligate.setCharset(charset);
@@ -167,7 +167,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             final File instancesFile, final File entryFeaturesFile,
             final File entriesFile, final File featuresFile,
             final Charset charset,
-            EnumeratorPairBaring indexDeligate) {
+            DoubleEnumerating indexDeligate) {
         setInstancesFile(instancesFile);
         setEntryFeaturesFile(entryFeaturesFile);
         setEntriesFile(entriesFile);
@@ -197,11 +197,11 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         this.fileDeligate = fileDeligate;
     }
 
-    public final EnumeratorPairBaring getIndexDeligate() {
+    public final DoubleEnumerating getIndexDeligate() {
         return indexDeligate;
     }
 
-    public final void setIndexDeligate(EnumeratorPairBaring indexDeligate) {
+    public final void setIndexDeligate(DoubleEnumerating indexDeligate) {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }
@@ -284,8 +284,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         reduce();
         finish();
 
-        indexDeligate.save();
-        indexDeligate.close();
+        indexDeligate.saveEnumerator();
+        indexDeligate.closeEnumerator();
 
 
         if (LOG.isInfoEnabled())
@@ -711,7 +711,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     protected SeekableSource<Weighted<Token>, Tell> openEntriesSource(File file) throws FileNotFoundException, IOException {
         return WeightedTokenSource.open(file, getFileDeligate().getCharset(),
-                                        EnumeratorDeligates.toSingleEntries(getIndexDeligate()));
+                                        EnumeratingDeligates.toSingleEntries(getIndexDeligate()));
 //        return new WeightedTokenSource(
 //                new TSVSource(file, getFileDeligate().getCharset()),
 //                indexDeligate.single1());
@@ -719,7 +719,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     protected Sink<Weighted<Token>> openEntriesSink(File file) throws FileNotFoundException, IOException {
         WeightedTokenSink s = WeightedTokenSink.open(
-                file, getFileDeligate().getCharset(), EnumeratorDeligates.toSingleEntries(getIndexDeligate()));
+                file, getFileDeligate().getCharset(), EnumeratingDeligates.toSingleEntries(getIndexDeligate()));
 //                new WeightedTokenSink(new TSVSink(file, getFileDeligate().getCharset()),
 //                                                    indexDeligate.single1());
         s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
@@ -728,7 +728,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     protected SeekableSource<Weighted<Token>, Tell> openFeaturesSource(File file) throws FileNotFoundException, IOException {
         return WeightedTokenSource.open(file, getFileDeligate().getCharset(),
-                                        EnumeratorDeligates.toSingleFeatures(getIndexDeligate()));
+                                        EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
 //        return new WeightedTokenSource(
 //                new TSVSource(file, getFileDeligate().getCharset()),
 //                indexDeligate.single2());
@@ -737,7 +737,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     protected Sink<Weighted<Token>> openFeaturesSink(File file) throws FileNotFoundException, IOException {
 
         WeightedTokenSink s = WeightedTokenSink.open(
-                file, getFileDeligate().getCharset(), EnumeratorDeligates.toSingleFeatures(getIndexDeligate()));
+                file, getFileDeligate().getCharset(), EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
 //                new WeightedTokenSink(new TSVSink(file, getFileDeligate().getCharset()),
 //                                                    indexDeligate.single2());
         s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());

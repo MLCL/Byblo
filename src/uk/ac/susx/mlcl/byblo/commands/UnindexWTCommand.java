@@ -4,9 +4,9 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.EnumeratorSingleBaringDeligate;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorDeligates;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorSingleBaring;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,11 +24,11 @@ import uk.ac.susx.mlcl.lib.io.Source;
 public class UnindexWTCommand extends AbstractCopyCommand<Weighted<Token>> {
 
     @ParametersDelegate
-    private EnumeratorSingleBaring indexDeligate = new EnumeratorSingleBaringDeligate(false);
+    private SingleEnumerating indexDeligate = new SingleEnumeratingDeligate(false);
 
     public UnindexWTCommand(
             File sourceFile, File destinationFile, Charset charset,
-            EnumeratorSingleBaring indexDeligate) {
+            SingleEnumerating indexDeligate) {
         super(sourceFile, destinationFile, charset);
         this.indexDeligate = indexDeligate;
     }
@@ -39,9 +39,9 @@ public class UnindexWTCommand extends AbstractCopyCommand<Weighted<Token>> {
 
     @Override
     public void runCommand() throws Exception {
-        Checks.checkNotNull("indexFile", indexDeligate.getIndexFile());
+        Checks.checkNotNull("indexFile", indexDeligate.getEnumeratorFile());
         super.runCommand();
-        indexDeligate.close();
+        indexDeligate.closeEnumerator();
     }
 
     @Override
@@ -60,20 +60,20 @@ public class UnindexWTCommand extends AbstractCopyCommand<Weighted<Token>> {
                 sinkIndexDeligate());
     }
 
-    public EnumeratorSingleBaring getIndexDeligate() {
+    public SingleEnumerating getIndexDeligate() {
         return indexDeligate;
     }
 
-    public void setIndexDeligate(EnumeratorSingleBaring indexDeligate) {
+    public void setIndexDeligate(SingleEnumerating indexDeligate) {
         this.indexDeligate = indexDeligate;
     }
 
-    protected EnumeratorSingleBaring sourceIndexDeligate() {
-        return EnumeratorDeligates.decorateEnumerated(indexDeligate, true);
+    protected SingleEnumerating sourceIndexDeligate() {
+        return EnumeratingDeligates.decorateEnumerated(indexDeligate, true);
     }
 
-    protected EnumeratorSingleBaring sinkIndexDeligate() {
-        return EnumeratorDeligates.decorateEnumerated(indexDeligate, false);
+    protected SingleEnumerating sinkIndexDeligate() {
+        return EnumeratingDeligates.decorateEnumerated(indexDeligate, false);
     }
 
 }

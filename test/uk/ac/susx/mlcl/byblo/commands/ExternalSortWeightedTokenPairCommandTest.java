@@ -4,8 +4,8 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
-import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaring;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import java.io.File;
 import java.io.IOException;
 import static java.text.MessageFormat.*;
@@ -65,7 +65,7 @@ public class ExternalSortWeightedTokenPairCommandTest {
         File entryIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".entry-index");
         File featureIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".feature-index");
 
-        final EnumeratorPairBaring idx = new EnumeratorPairBaringDeligate(
+        final DoubleEnumerating idx = new DoubleEnumeratingDeligate(
                 preindexedTokens1, preindexedTokens2,
                 entryIndex, featureIndex, false, false);
 
@@ -96,7 +96,7 @@ public class ExternalSortWeightedTokenPairCommandTest {
         File featureIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".feature-index");
 
 
-        final EnumeratorPairBaring idx = new EnumeratorPairBaringDeligate(
+        final DoubleEnumerating idx = new DoubleEnumeratingDeligate(
                 preindexedTokens1, preindexedTokens2,
                 entryIndex, featureIndex, false, false);
 
@@ -113,7 +113,7 @@ public class ExternalSortWeightedTokenPairCommandTest {
 
     private void testSortWeightedTokenPairCommand(
             File inputFile, File randomisedFile,
-            File sortedFile, EnumeratorPairBaring idx,
+            File sortedFile, DoubleEnumerating idx,
             Comparator<Weighted<TokenPair>> comparator)
             throws IOException, Exception {
 
@@ -211,7 +211,7 @@ public class ExternalSortWeightedTokenPairCommandTest {
     }
 
     private static WeightedTokenPairSource openSource(
-            File file, EnumeratorPairBaring idx)
+            File file, DoubleEnumerating idx)
             throws IOException {
         return WeightedTokenPairSource.open(
                 file, DEFAULT_CHARSET,
@@ -219,7 +219,7 @@ public class ExternalSortWeightedTokenPairCommandTest {
     }
 
     private static WeightedTokenPairSink openSink(
-            File file, EnumeratorPairBaring idx, boolean compact)
+            File file, DoubleEnumerating idx, boolean compact)
             throws IOException {
         return WeightedTokenPairSink.open(
                 file, DEFAULT_CHARSET,
