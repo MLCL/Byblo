@@ -11,6 +11,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.io.*;
 
 /**
@@ -50,7 +51,7 @@ public class IndexTPCommandTest {
 
         deleteIfExist(out, idx1, idx2);
 
-        indexTP(TEST_FRUIT_INPUT, out, idx1, idx2, false, false, true);
+        indexTP(TEST_FRUIT_INPUT, out, idx1, idx2, EnumeratorType.Memory, false, false, true);
 
 
         assertTrue(format(
@@ -67,7 +68,7 @@ public class IndexTPCommandTest {
 
 
         File out2 = suffix(out, ".unindexed");
-        unindexTP(out, out2, idx1, idx2, false, false, true);
+        unindexTP(out, out2, idx1, idx2, EnumeratorType.Memory, false, false, true);
 
 
 
@@ -77,36 +78,66 @@ public class IndexTPCommandTest {
 
     @Test
     public void testRunOnFruitAPI_skipboth_compact() throws Exception {
-        testRunOnFruitAPI("compact-skipboth-", true, true, true);
+        testRunOnFruitAPI("compact-skipboth-", EnumeratorType.Memory, true, true, true);
     }
 
     @Test
     public void testRunOnFruitAPI_skipleft_compact() throws Exception {
-        testRunOnFruitAPI("compact-skipleft-", true, false, true);
+        testRunOnFruitAPI("compact-skipleft-", EnumeratorType.Memory, true, false, true);
     }
 
     @Test
     public void testRunOnFruitAPI_skipright_compact() throws Exception {
-        testRunOnFruitAPI("compact-skipright-", false, true, true);
+        testRunOnFruitAPI("compact-skipright-", EnumeratorType.Memory, false, true, true);
     }
 
     @Test
     public void testRunOnFruitAPI_skipboth_verbose() throws Exception {
-        testRunOnFruitAPI("verbose-skipboth-", true, true, false);
+        testRunOnFruitAPI("verbose-skipboth-", EnumeratorType.Memory, true, true, false);
     }
 
     @Test
     public void testRunOnFruitAPI_skipleft_verbose() throws Exception {
-        testRunOnFruitAPI("verbose-skipleft-", true, false, false);
+        testRunOnFruitAPI("verbose-skipleft-", EnumeratorType.Memory, true, false, false);
     }
 
     @Test
     public void testRunOnFruitAPI_skipright_verbose() throws Exception {
-        testRunOnFruitAPI("verbose-skipright-", false, true, false);
+        testRunOnFruitAPI("verbose-skipright-", EnumeratorType.Memory, false, true, false);
+    }
+
+    @Test
+    public void testRunOnFruitAPI_skipboth_compact_JDBC() throws Exception {
+        testRunOnFruitAPI("compact-skipboth-jdbc-", EnumeratorType.JDBC, true, true, true);
+    }
+
+    @Test
+    public void testRunOnFruitAPI_skipleft_compact_JDBC() throws Exception {
+        testRunOnFruitAPI("compact-skipleft-jdbc-", EnumeratorType.JDBC, true, false, true);
+    }
+
+    @Test
+    public void testRunOnFruitAPI_skipright_compact_JDBC() throws Exception {
+        testRunOnFruitAPI("compact-skipright-jdbc-", EnumeratorType.JDBC, false, true, true);
+    }
+
+    @Test
+    public void testRunOnFruitAPI_skipboth_verbose_JDBC() throws Exception {
+        testRunOnFruitAPI("verbose-skipboth-jdbc-", EnumeratorType.JDBC, true, true, false);
+    }
+
+    @Test
+    public void testRunOnFruitAPI_skipleft_verbose_JDBC() throws Exception {
+        testRunOnFruitAPI("verbose-skipleft-jdbc-", EnumeratorType.JDBC, true, false, false);
+    }
+
+    @Test
+    public void testRunOnFruitAPI_skipright_verbose_JDBC() throws Exception {
+        testRunOnFruitAPI("verbose-skipright-jdbc-", EnumeratorType.JDBC, false, true, false);
     }
 
     public void testRunOnFruitAPI(
-            String prefix, boolean skip1, boolean skip2, boolean compact) throws Exception {
+            String prefix, EnumeratorType type, boolean skip1, boolean skip2, boolean compact) throws Exception {
         System.out.println("Testing " + IndexTPCommandTest.class.getName()
                 + " on " + TEST_FRUIT_INPUT);
 
@@ -118,39 +149,49 @@ public class IndexTPCommandTest {
 
         deleteIfExist(out, idx1, idx2);
 
-        indexTP(TEST_FRUIT_INPUT, out, idx1, idx2, skip1, skip2, compact);
+        indexTP(TEST_FRUIT_INPUT, out, idx1, idx2, type, skip1, skip2, compact);
 
-        unindexTP(out, out2, idx1, idx2, skip1, skip2, compact);
+        unindexTP(out, out2, idx1, idx2, type, skip1, skip2, compact);
 
         TokenPairSource.equal(out, out2, DEFAULT_CHARSET);
 
     }
 
     public static void indexTP(File from, File to, File index1, File index2,
-                               boolean skip1, boolean skip2, boolean compact)
+                               EnumeratorType type, boolean skip1, boolean skip2, boolean compact)
             throws Exception {
         assertValidPlaintextInputFiles(from);
         assertValidOutputFiles(to);
-        assertValidJDBCOutputFiles(index1, index2);
+        if (type == EnumeratorType.JDBC)
+            assertValidJDBCOutputFiles(index1, index2);
+        else
+            assertValidOutputFiles(index1, index2);
 
         IndexTPCommand unindex = new IndexTPCommand();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
-        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, index1, index2, skip1, skip2));
+        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(type, true, true, index1, index2, skip1, skip2));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);
-        assertValidJDBCInputFiles(index1, index2);
+
+        if (type == EnumeratorType.JDBC)
+            assertValidJDBCInputFiles(index1, index2);
+        else
+            assertValidInputFiles(index1, index2);
         assertSizeGT(from, to);
     }
 
     public static void unindexTP(File from, File to, File index1, File index2,
-                                 boolean skip1, boolean skip2, boolean compact)
+                                 EnumeratorType type, boolean skip1, boolean skip2, boolean compact)
             throws Exception {
         assertValidPlaintextInputFiles(from);
-        assertValidJDBCInputFiles(index1, index2);
+        if (type == EnumeratorType.JDBC)
+            assertValidJDBCInputFiles(index1, index2);
+        else
+            assertValidInputFiles(index1, index2);
         assertValidOutputFiles(to);
 
         UnindexTPCommand unindex = new UnindexTPCommand();
@@ -159,7 +200,7 @@ public class IndexTPCommandTest {
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
 
-        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, index1, index2, skip1, skip2));
+        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(type, true, true, index1, index2, skip1, skip2));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);

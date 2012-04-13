@@ -112,12 +112,12 @@ public class EntryFeatureTest {
                                 TEST_FRUIT_INPUT.getName() + ".index");
 
 
-        {
+        DoubleEnumerating indel = EnumeratingDeligates.toPair(
+                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false, idxFile, false, false));
+        DoubleEnumerating outdel = EnumeratingDeligates.toPair(
+                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, idxFile, true, true));
 
-            DoubleEnumerating indel = EnumeratingDeligates.toPair(
-                    new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false, idxFile, false, false));
-            DoubleEnumerating outdel = EnumeratingDeligates.toPair(
-                    new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, idxFile, true, true));
+        {
 
 
             TokenPairSource aSrc = TokenPairSource.open(
@@ -135,15 +135,10 @@ public class EntryFeatureTest {
                    b.length() <= a.length());
 
         {
-            DoubleEnumerating bdel = new DoubleEnumeratingDeligate(
-                    Enumerating.DEFAULT_TYPE, true, true, null, null, false, false);
-            DoubleEnumerating cdel = new DoubleEnumeratingDeligate(
-                    Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
-
             TokenPairSource bSrc = TokenPairSource.open(
-                    b, DEFAULT_CHARSET, bdel);
+                    b, DEFAULT_CHARSET, outdel);
             TokenPairSink cSink = TokenPairSink.open(
-                    c, DEFAULT_CHARSET, cdel,
+                    c, DEFAULT_CHARSET, indel,
                     false);
             IOUtil.copy(bSrc, cSink);
             cSink.close();

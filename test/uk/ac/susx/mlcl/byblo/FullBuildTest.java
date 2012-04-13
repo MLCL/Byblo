@@ -12,9 +12,10 @@ import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.commands.*;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
-import static uk.ac.susx.mlcl.byblo.commands.UnindexSimsCommandTest.*;
+import static uk.ac.susx.mlcl.byblo.commands.IndexSimsCommandTest.*;
 import static uk.ac.susx.mlcl.byblo.commands.IndexTPCommandTest.*;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 
 /**
  *
@@ -245,7 +246,8 @@ public class FullBuildTest {
 
         deleteIfExist(entryIndex, featureIndex, instancesIndexed);
 
-        indexTP(instances, instancesIndexed, entryIndex, featureIndex, false,
+        indexTP(instances, instancesIndexed, entryIndex, featureIndex, Enumerating.DEFAULT_TYPE,
+                false,
                 false, false);
 
 
@@ -317,7 +319,7 @@ public class FullBuildTest {
         deleteIfExist(neighboursStrings);
 
         unindexSims(neighbours, suffix(neighbours, ".strings"), entryIndex,
-                    false, false, false);
+                    EnumeratorType.Memory, false, false, false);
 
         assertValidPlaintextInputFiles(neighboursStrings);
     }
@@ -367,7 +369,7 @@ public class FullBuildTest {
 
         deleteIfExist(entryIndex, featureIndex, instancesIndexed);
 
-        indexTP(instances, instancesIndexed, entryIndex, featureIndex, false,
+        indexTP(instances, instancesIndexed, entryIndex, featureIndex, Enumerating.DEFAULT_TYPE, false,
                 false, false);
 
 
@@ -437,7 +439,7 @@ public class FullBuildTest {
         deleteIfExist(neighboursStrings);
 
         unindexSims(neighbours, suffix(neighbours, ".strings"), entryIndex,
-                    false, false, false);
+                    EnumeratorType.Memory, false, false, false);
 
         assertValidPlaintextInputFiles(neighboursStrings);
     }
@@ -489,7 +491,7 @@ public class FullBuildTest {
 
         deleteIfExist(entryIndex, featureIndex, instancesIndexed);
 
-        indexTP(instances, instancesIndexed, entryIndex, featureIndex,
+        indexTP(instances, instancesIndexed, entryIndex, featureIndex, Enumerating.DEFAULT_TYPE,
                 skipIndex1, skipIndex2, false);
 
         unindexTP(instancesIndexed, suffix(instancesIndexed, ".strings"),
@@ -558,7 +560,7 @@ public class FullBuildTest {
         assertSizeGT(TEST_FRUIT_SIMS, similarities);
 
         unindexSims(similarities, suffix(similarities, ".strings"), entryIndex,
-                    skipIndex1, skipIndex2, false);
+                    EnumeratorType.Memory, skipIndex1, skipIndex2, false);
 
         // KNN
 
@@ -573,7 +575,7 @@ public class FullBuildTest {
         deleteIfExist(neighboursStrings);
 
         unindexSims(neighbours, suffix(neighbours, ".strings"), entryIndex,
-                    skipIndex1, skipIndex2, false);
+                    EnumeratorType.Memory, skipIndex1, skipIndex2, false);
 
     }
 
@@ -624,7 +626,7 @@ public class FullBuildTest {
 
         deleteIfExist(entryIndex, featureIndex, instancesIndexed);
 
-        indexTP(instances, instancesIndexed, entryIndex, featureIndex,
+        indexTP(instances, instancesIndexed, entryIndex, featureIndex, Enumerating.DEFAULT_TYPE,
                 skipIndex1, skipIndex2, false);
 
         unindexTP(instancesIndexed, suffix(instancesIndexed, ".strings"),
@@ -693,7 +695,7 @@ public class FullBuildTest {
         assertSizeGT(TEST_FRUIT_SIMS, similarities);
 
         unindexSims(similarities, suffix(similarities, ".strings"), entryIndex,
-                    skipIndex1, skipIndex2, false);
+                    EnumeratorType.Memory, skipIndex1, skipIndex2, false);
 
         // KNN
 
@@ -708,7 +710,7 @@ public class FullBuildTest {
         deleteIfExist(neighboursStrings);
 
         unindexSims(neighbours, suffix(neighbours, ".strings"), entryIndex,
-                    skipIndex1, skipIndex2, false);
+                    EnumeratorType.Memory, skipIndex1, skipIndex2, false);
 
     }
 

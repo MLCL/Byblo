@@ -17,8 +17,8 @@ import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.Tell;
 import static org.junit.Assert.*;
-import static uk.ac.susx.mlcl.byblo.commands.UnindexSimsCommandTest.*;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 
 /**
  *
@@ -47,60 +47,104 @@ public class IndexSimsCommandTest {
 
     @Test
     public void testRunOnFruitAPI_noskip_compact() throws Exception {
-        testRunOnFruitAPI("compact-noskip-", false, false, true);
+        testRunOnFruitAPI("compact-noskip-", EnumeratorType.Memory, false, false, true);
     }
 
     @Test
     public void testRunOnFruitAPI_skipboth_compact() throws Exception {
-        testRunOnFruitAPI("compact-skipboth-", true, true, true);
+        testRunOnFruitAPI("compact-skipboth-", EnumeratorType.Memory, true, true, true);
     }
 
     @Test
     public void testRunOnFruitAPI_skipleft_compact() throws Exception {
-        testRunOnFruitAPI("compact-skipleft-", true, false, true);
+        testRunOnFruitAPI("compact-skipleft-", EnumeratorType.Memory, true, false, true);
     }
 
     @Test
     public void testRunOnFruitAPI_skipright_compact() throws Exception {
-        testRunOnFruitAPI("compact-skipright-", false, true, true);
+        testRunOnFruitAPI("compact-skipright-", EnumeratorType.Memory, false, true, true);
     }
 
     @Test
     public void testRunOnFruitAPI_noskip_verbose() throws Exception {
-        testRunOnFruitAPI("verbose-noskip-", false, false, false);
+        testRunOnFruitAPI("verbose-noskip-", EnumeratorType.Memory, false, false, false);
     }
 
     @Test
     public void testRunOnFruitAPI_skipboth_verbose() throws Exception {
-        testRunOnFruitAPI("verbose-skipboth-", true, true, false);
+        testRunOnFruitAPI("verbose-skipboth-", EnumeratorType.Memory, true, true, false);
     }
 
     @Test
     public void testRunOnFruitAPI_skipleft_verbose() throws Exception {
-        testRunOnFruitAPI("verbose-skipleft-", true, false, false);
+        testRunOnFruitAPI("verbose-skipleft-", EnumeratorType.Memory, true, false, false);
     }
 
     @Test
     public void testRunOnFruitAPI_skipright_verbose() throws Exception {
-        testRunOnFruitAPI("verbose-skipright-", false, true, false);
+        testRunOnFruitAPI("verbose-skipright-", EnumeratorType.Memory, false, true, false);
+    }
+
+    @Test
+    public void testRunOnFruitAPI_noskip_compact_JDBC() throws Exception {
+        testRunOnFruitAPI("compact-noskip-jdbc-", EnumeratorType.JDBC, false, false, true);
+    }
+
+    @Test
+    public void testRunOnFruitAPI_skipboth_compact_JDBC() throws Exception {
+        testRunOnFruitAPI("compact-skipboth-jdbc-", EnumeratorType.JDBC, true, true, true);
+    }
+
+    @Test
+    public void testRunOnFruitAPI_skipleft_compact_JDBC() throws Exception {
+        testRunOnFruitAPI("compact-skipleft-jdbc-", EnumeratorType.JDBC, true, false, true);
+    }
+
+    @Test
+    public void testRunOnFruitAPI_skipright_compact_JDBC() throws Exception {
+        testRunOnFruitAPI("compact-skipright-jdbc-", EnumeratorType.JDBC, false, true, true);
+    }
+
+    @Test
+    public void testRunOnFruitAPI_noskip_verbose_JDBC() throws Exception {
+        testRunOnFruitAPI("verbose-noskip-jdbc-",
+                          EnumeratorType.JDBC, false, false, false);
+    }
+
+    @Test
+    public void testRunOnFruitAPI_skipboth_verbose_JDBC() throws Exception {
+        testRunOnFruitAPI("verbose-skipboth-jdbc-",
+                          EnumeratorType.JDBC, true, true, false);
+    }
+
+    @Test
+    public void testRunOnFruitAPI_skipleft_verbose_JDBC() throws Exception {
+        testRunOnFruitAPI("verbose-skipleft-jdbc-",
+                          EnumeratorType.JDBC, true, false, false);
+    }
+
+    @Test
+    public void testRunOnFruitAPI_skipright_verbose_JDBC() throws Exception {
+        testRunOnFruitAPI("verbose-skipright-jdbc-",
+                          EnumeratorType.JDBC, false, true, false);
     }
 
     public void testRunOnFruitAPI(
-            String prefix, boolean skip1, boolean skip2, boolean compact) throws Exception {
+            String prefix, EnumeratorType type, boolean skip1, boolean skip2, boolean compact) throws Exception {
         System.out.println("Testing " + IndexSimsCommandTest.class.getName()
                 + " on " + TEST_FRUIT_SIMS_100NN);
 
         final String name = TEST_FRUIT_SIMS_100NN.getName();
         final File out = new File(TEST_OUTPUT_DIR, prefix + name + ".indexed");
         File out2 = suffix(out, ".unindexed");
-        final File idx = new File(TEST_OUTPUT_DIR, name + ".entry-index");
+        final File idx = new File(TEST_OUTPUT_DIR, prefix + name + ".entry-index");
 
         deleteIfExist(out, idx);
 
-        indexSims(TEST_FRUIT_SIMS_100NN, out, idx, skip1, skip2,
+        indexSims(TEST_FRUIT_SIMS_100NN, out, idx, type, skip1, skip2,
                   compact);
 
-        unindexSims(out, out2, idx, skip1, skip2, compact);
+        unindexSims(out, out2, idx, type, skip1, skip2, compact);
 
         TokenPairSource.equal(out, out2, DEFAULT_CHARSET);
 
@@ -131,8 +175,8 @@ public class IndexSimsCommandTest {
 
         deleteIfExist(outa, idxa, outb, idxb);
 
-        indexSims(TEST_FRUIT_SIMS, outa, idxa, skip1a, skip2a, true);
-        indexSims(TEST_FRUIT_SIMS, outb, idxb, skip1b, skip2b, true);
+        indexSims(TEST_FRUIT_SIMS, outa, idxa, EnumeratorType.Memory, skip1a, skip2a, true);
+        indexSims(TEST_FRUIT_SIMS, outb, idxb, EnumeratorType.Memory, skip1b, skip2b, true);
 
         // Read back the data checking it's identical
         {
@@ -225,11 +269,15 @@ public class IndexSimsCommandTest {
     }
 
     public static void indexSims(File from, File to, File index,
-                                 boolean skip1, boolean skip2, boolean compact)
+                                 EnumeratorType type, boolean skip1, boolean skip2, boolean compact)
             throws Exception {
         assertValidPlaintextInputFiles(from);
         assertValidOutputFiles(to);
-        assertValidJDBCOutputFiles(index);
+
+        if (type == EnumeratorType.JDBC)
+            assertValidJDBCOutputFiles(index);
+        else
+            assertValidOutputFiles(index);
 
         IndexSimsCommand unindex = new IndexSimsCommand();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
@@ -237,12 +285,41 @@ public class IndexSimsCommandTest {
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
 
-        unindex.setIndexDeligate(new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, index, skip1, skip2));
+        unindex.setIndexDeligate(new SingleEnumeratingDeligate(type, true, index, skip1, skip2));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);
-        assertValidJDBCInputFiles(index);
         assertSizeGT(from, to);
+
+        if (type == EnumeratorType.JDBC)
+            assertValidJDBCInputFiles(index);
+        else
+            assertValidInputFiles(index);
+    }
+
+    public static void unindexSims(
+            File from, File to, File index,
+            EnumeratorType type, boolean skip1, boolean skip2, boolean compact)
+            throws Exception {
+        assertValidPlaintextInputFiles(from);
+
+        if (type == EnumeratorType.JDBC)
+            assertValidJDBCInputFiles(index);
+        else
+            assertValidInputFiles(index);
+        assertValidOutputFiles(to);
+
+        UnindexSimsCommand unindex = new UnindexSimsCommand();
+        unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
+        unindex.getFilesDeligate().setSourceFile(from);
+        unindex.getFilesDeligate().setDestinationFile(to);
+        unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
+        unindex.setIndexDeligate(new SingleEnumeratingDeligate(
+                type, true, index, skip1, skip2));
+        unindex.runCommand();
+
+        assertValidPlaintextInputFiles(to);
+        assertSizeGT(to, from);
     }
 
 }
