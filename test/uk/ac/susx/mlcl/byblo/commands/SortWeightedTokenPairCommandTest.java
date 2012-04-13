@@ -20,6 +20,7 @@ import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import static org.junit.Assert.*;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.lib.Comparators;
 
 /**
@@ -62,7 +63,7 @@ public class SortWeightedTokenPairCommandTest {
         File featuresIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".feature-index");
 
         final DoubleEnumeratingDeligate idx = new DoubleEnumeratingDeligate(
-                preindexedTokens1, preindexedTokens2, entriesIndex, featuresIndex, false, false);
+                Enumerating.DEFAULT_TYPE, preindexedTokens1, preindexedTokens2, entriesIndex, featuresIndex, false, false);
 
         Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(
                 Weighted.recordOrder(TokenPair.firstStringOrder(idx.getEntriesEnumeratorCarriar())),
@@ -90,7 +91,7 @@ public class SortWeightedTokenPairCommandTest {
 
 
         final DoubleEnumeratingDeligate idx = new DoubleEnumeratingDeligate(
-                preindexedTokens1, preindexedTokens2, entriesIndex, featuresIndex, false, false);
+                Enumerating.DEFAULT_TYPE, preindexedTokens1, preindexedTokens2, entriesIndex, featuresIndex, false, false);
 
 
         Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(

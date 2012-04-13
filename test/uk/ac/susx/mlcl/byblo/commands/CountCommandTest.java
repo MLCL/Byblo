@@ -42,6 +42,7 @@ import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
@@ -62,7 +63,8 @@ public class CountCommandTest {
         countTask.setFeaturesFile(outF);
         countTask.setEntryFeaturesFile(outEF);
         countTask.setCharset(charset);
-        countTask.setIndexDeligate(new DoubleEnumeratingDeligate(preIndexEntries, preIndexFeatures));
+        countTask.setIndexDeligate(new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, preIndexEntries, preIndexFeatures, null, null, false, false));
         countTask.runCommand();
 
         assertTrue("Output files not created: " + outE, outE.exists());
@@ -215,7 +217,7 @@ public class CountCommandTest {
         runWithAPI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
                    DEFAULT_CHARSET, true, true);
 
-        assertTrue(MessageFormat.format("Output entries file \"{0}\" differs from expected file \"{1}\".",eActual,TEST_FRUIT_INDEXED_ENTRIES),
+        assertTrue(MessageFormat.format("Output entries file \"{0}\" differs from expected file \"{1}\".", eActual, TEST_FRUIT_INDEXED_ENTRIES),
                    WeightedTokenSource.equal(eActual,
                                              TEST_FRUIT_INDEXED_ENTRIES,
                                              DEFAULT_CHARSET));

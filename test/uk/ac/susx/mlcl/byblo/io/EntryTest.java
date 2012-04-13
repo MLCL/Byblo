@@ -45,8 +45,7 @@ import java.io.IOException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
-import uk.ac.susx.mlcl.byblo.enumerators.MemoryBasedStringEnumerator;
+import uk.ac.susx.mlcl.byblo.enumerators.*;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
@@ -59,7 +58,9 @@ public class EntryTest {
                        boolean enumOut)
             throws FileNotFoundException, IOException {
 
-        SingleEnumerating idx = new SingleEnumeratingDeligate(false);
+        SingleEnumeratingDeligate idx = new SingleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, null, false, false);
+
         WeightedTokenSource aSrc;
         WeightedTokenSink bSink;
         if (enumIn)
@@ -107,15 +108,18 @@ public class EntryTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_ENTRIES.getName() + ".str");
 
-        Enumerator<String> strEnum = MemoryBasedStringEnumerator.newInstance();
+        SingleEnumeratingDeligate indel = new SingleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, null, false, false);
+        SingleEnumeratingDeligate outdel = new SingleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, true, null, false, false);
+
+
 
         {
             WeightedTokenSource aSrc = WeightedTokenSource.open(
-                    a, DEFAULT_CHARSET,
-                    new SingleEnumeratingDeligate(false, strEnum));
+                    a, DEFAULT_CHARSET, indel);
             WeightedTokenSink bSink = WeightedTokenSink.open(
-                    b, DEFAULT_CHARSET,
-                    new SingleEnumeratingDeligate(true));
+                    b, DEFAULT_CHARSET, outdel);
             IOUtil.copy(aSrc, bSink);
             bSink.close();
         }
@@ -125,11 +129,9 @@ public class EntryTest {
 
         {
             WeightedTokenSource bSrc = WeightedTokenSource.open(
-                    b, DEFAULT_CHARSET,
-                    new SingleEnumeratingDeligate(true));
+                    b, DEFAULT_CHARSET, outdel);
             WeightedTokenSink cSink = WeightedTokenSink.open(
-                    c, DEFAULT_CHARSET,
-                    new SingleEnumeratingDeligate(false, strEnum));
+                    c, DEFAULT_CHARSET, indel);
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }
@@ -144,11 +146,11 @@ public class EntryTest {
         final Map<Tell, Weighted<Token>> hist =
                 new HashMap<Tell, Weighted<Token>>();
 
-        Enumerator<String> idx = MemoryBasedStringEnumerator.newInstance();
+        SingleEnumeratingDeligate indel = new SingleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, null, false, false);
 
         WeightedTokenSource src = WeightedTokenSource.open(
-                file, DEFAULT_CHARSET,
-                new SingleEnumeratingDeligate(false, idx));
+                file, DEFAULT_CHARSET, indel);
         {
             while (src.hasNext()) {
 
@@ -156,7 +158,7 @@ public class EntryTest {
                 final Weighted<Token> record = src.read();
 
                 System.out.println(pos.toString() + ": " + record.record().
-                        toString(idx));
+                        toString(indel.getEnumerator()));
 
                 assertNotNull("Found null EntryRecord", record);
                 hist.put(pos, record);
@@ -173,7 +175,7 @@ public class EntryTest {
 
                 System.out.println("expected tell: " + pos);
                 System.out.println(
-                        "expected: " + expected.record().toString(idx));
+                        "expected: " + expected.record().toString(indel.getEnumerator()));
 
                 src.position(pos);
 
@@ -182,7 +184,7 @@ public class EntryTest {
 
                 Weighted<Token> actual = src.read();
                 System.out.println("actual tell: " + src.position());
-                System.out.println("actual: " + actual.record().toString(idx));
+                System.out.println("actual: " + actual.record().toString(indel.getEnumerator()));
 
                 assertEquals(expected, actual);
             }

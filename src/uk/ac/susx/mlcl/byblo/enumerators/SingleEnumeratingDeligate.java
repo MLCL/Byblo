@@ -32,36 +32,36 @@ public class SingleEnumeratingDeligate
 
     private Enumerator<String> enumerator = null;
 
+//    public SingleEnumeratingDeligate(
+//            EnumeratorType type, boolean enumerated, File indexFile, Enumerator<String> enumerator,
+//            boolean skipIndexed1, boolean skipIndexed2) {
+//        super(type, skipIndexed1, skipIndexed2);
+//        this.enumerated = enumerated;
+//        this.indexFile = indexFile;
+//        this.enumerator = enumerator;
+//    }
     public SingleEnumeratingDeligate(
-            boolean enumerated, File indexFile, Enumerator<String> enumerator,
+            EnumeratorType type, boolean enumerated, File indexFile,
             boolean skipIndexed1, boolean skipIndexed2) {
-        super(skipIndexed1, skipIndexed2);
-        this.enumerated = enumerated;
-        this.indexFile = indexFile;
-        this.enumerator = enumerator;
-    }
-
-    public SingleEnumeratingDeligate(
-            boolean enumerated, File indexFile,
-            boolean skipIndexed1, boolean skipIndexed2) {
-        super(skipIndexed1, skipIndexed2);
+        super(type, skipIndexed1, skipIndexed2);
         this.enumerated = enumerated;
         this.indexFile = indexFile;
         this.enumerator = null;
     }
-
-    public SingleEnumeratingDeligate(boolean enumerated, Enumerator<String> enumerator) {
-        this(enumerated, null, enumerator,
-             DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
-    }
-
-    public SingleEnumeratingDeligate(boolean enumerated) {
-        this(enumerated, null, null,
-             DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
-    }
+//
+//    public SingleEnumeratingDeligate(EnumeratorType type, boolean enumerated, Enumerator<String> enumerator) {
+//        this(type, enumerated, null, enumerator,
+//             DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
+//    }
+//
+//    public SingleEnumeratingDeligate(EnumeratorType type, boolean enumerated) {
+//        this(type, enumerated, null, null,
+//             DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
+//    }
+//
 
     public SingleEnumeratingDeligate() {
-        this(DEFAULT_IS_ENUMERATED, null, null,
+        this(DEFAULT_TYPE, DEFAULT_IS_ENUMERATED, null,
              DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
     }
 
@@ -110,7 +110,5 @@ public class SingleEnumeratingDeligate
     public DoubleEnumerating getEnumeratorPairCarriar() {
         return EnumeratingDeligates.toPair(this);
     }
-    
-    
 
 }

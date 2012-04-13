@@ -33,15 +33,16 @@ public abstract class EnumeratingDeligate
     private boolean skipIndexed2 = DEFAULT_SKIP_INDEXING;
 
     @Parameter(names = {"-et", "--enumerator-type"})
-    private Type type = Type.JDBC;
+    private EnumeratorType type = DEFAULT_TYPE;
 
-    public EnumeratingDeligate(boolean skipIndexed1, boolean skipIndexed2) {
+    public EnumeratingDeligate(EnumeratorType type, boolean skipIndexed1, boolean skipIndexed2) {
         this.skipIndexed1 = skipIndexed1;
         this.skipIndexed2 = skipIndexed2;
+        this.type = type;
     }
 
     public EnumeratingDeligate() {
-        this(DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
+        this(DEFAULT_TYPE, DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
     }
 
     @Override
@@ -54,9 +55,18 @@ public abstract class EnumeratingDeligate
         return skipIndexed2;
     }
 
+    public EnumeratorType getType() {
+        return type;
+    }
+
+    public void setType(EnumeratorType type) {
+        this.type = type;
+    }
+
     protected Enumerator<String> open(File file) throws IOException {
         Enumerator<String> out = type.open(file);
-        assert out.indexOf(FilterCommand.FILTERED_STRING) == FilterCommand.FILTERED_ID;
+        if (out.indexOf(FilterCommand.FILTERED_STRING) != FilterCommand.FILTERED_ID)
+            throw new AssertionError();
         return out;
     }
 
@@ -67,6 +77,8 @@ public abstract class EnumeratingDeligate
             return;
         }
         type.save(enumerator);
+        if (enumerator.indexOf(FilterCommand.FILTERED_STRING) != FilterCommand.FILTERED_ID)
+            throw new AssertionError();
     }
 
     protected void close(Enumerator<String> enumerator) throws IOException {
@@ -75,6 +87,8 @@ public abstract class EnumeratingDeligate
                     Level.WARNING, "Attempt made to save an enumerator that was not open.");
             return;
         }
+        if (enumerator.indexOf(FilterCommand.FILTERED_STRING) != FilterCommand.FILTERED_ID)
+            throw new AssertionError();
         type.close(enumerator);
     }
 
@@ -85,58 +99,4 @@ public abstract class EnumeratingDeligate
                 add("skipIndexed2", isEnumeratorSkipIndexed2());
     }
 
-    private enum Type {
-
-        Memory {
-
-            @Override
-            public Enumerator<String> open(File file) throws IOException {
-                if (file != null && file.exists())
-                    return MemoryBasedStringEnumerator.load(file);
-                else
-                    return MemoryBasedStringEnumerator.newInstance(file);
-            }
-
-            @Override
-            public void save(Enumerator<String> enumerator) throws IOException {
-                ((MemoryBasedStringEnumerator) enumerator).save();
-            }
-
-            @Override
-            public void close(Enumerator<String> enumerator) throws IOException {
-            }
-
-        },
-        JDBC {
-
-            @Override
-            public Enumerator<String> open(File file) {
-                if (file == null) {
-                    return JDBCStringEnumerator.newInstance(file);
-                } else if (!file.exists()) {
-                    return JDBCStringEnumerator.newInstance(file);
-                } else {
-                    return JDBCStringEnumerator.load(file);
-                }
-            }
-
-            @Override
-            public void save(Enumerator<String> enumerator) throws IOException {
-                ((JDBCStringEnumerator) enumerator).save();
-            }
-
-            @Override
-            public void close(Enumerator<String> enumerator) throws IOException {
-                ((JDBCStringEnumerator) enumerator).close();
-            }
-
-        };
-
-        public abstract Enumerator<String> open(File file) throws IOException;
-
-        public abstract void save(Enumerator<String> enumerator) throws IOException;
-
-        public abstract void close(Enumerator<String> enumerator) throws IOException;
-
-    }
 }

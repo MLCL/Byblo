@@ -44,11 +44,11 @@ public class DoubleEnumeratingDeligate
     private Enumerator<String> featureEnumerator = null;
 
     protected DoubleEnumeratingDeligate(
-            boolean enumeratedEntries, boolean enumeratedFeatures,
+            EnumeratorType type, boolean enumeratedEntries, boolean enumeratedFeatures,
             File entryIndexFile, File featureIndexFile,
             Enumerator<String> entryEnumerator, Enumerator<String> featureEnumerator,
             boolean skipindexed1, boolean skipindexed2) {
-        super(skipindexed1, skipindexed2);
+        super(type, skipindexed1, skipindexed2);
         this.enumeratedEntries = enumeratedEntries;
         this.enumeratedFeatures = enumeratedFeatures;
         this.entriesIndexFile = entryIndexFile;
@@ -58,47 +58,50 @@ public class DoubleEnumeratingDeligate
     }
 
     public DoubleEnumeratingDeligate(
-            boolean enumeratedEntries, boolean enumeratedFeatures,
+            EnumeratorType type, boolean enumeratedEntries, boolean enumeratedFeatures,
             File entryIndexFile, File featureIndexFile,
             boolean skipIndexed1, boolean skipIndexed2) {
-        this(enumeratedEntries, enumeratedFeatures, entryIndexFile, featureIndexFile,
+        this(type, enumeratedEntries, enumeratedFeatures, entryIndexFile, featureIndexFile,
              null, null, skipIndexed1, skipIndexed2);
     }
-
-    public DoubleEnumeratingDeligate(
-            boolean enumeratedEntries, boolean enumeratedFeatures,
-            Enumerator<String> entryEnumerator, Enumerator<String> featureEnumerator,
-            boolean skipIndexed1, boolean skipIndexed2) {
-        this(enumeratedEntries, enumeratedFeatures, null, null,
-             entryEnumerator, featureEnumerator, skipIndexed1, skipIndexed2);
-    }
-
-    public DoubleEnumeratingDeligate(boolean enumeratedEntries,
-                                        boolean enumeratedFeatures,
-                                        boolean skipIndexed1,
-                                        boolean skipIndexed2) {
-        this(enumeratedEntries, enumeratedFeatures, null, null,
-             null, null, skipIndexed1, skipIndexed2);
-    }
-
-    public DoubleEnumeratingDeligate(boolean enumeratedEntries,
-                                        boolean enumeratedFeatures) {
-        this(enumeratedEntries, enumeratedFeatures, null, null, null, null,
-             DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
-    }
-
-    public DoubleEnumeratingDeligate(boolean enumeratedEntries,
-                                        boolean enumeratedFeatures,
-                                        Enumerator<String> entryEnumerator,
-                                        Enumerator<String> featureEnumerator) {
-        this(enumeratedEntries, enumeratedFeatures, null, null,
-             entryEnumerator, featureEnumerator,
-             DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
-    }
-
+//
+//    public DoubleEnumeratingDeligate(
+//            EnumeratorType type, boolean enumeratedEntries, boolean enumeratedFeatures,
+//            Enumerator<String> entryEnumerator, Enumerator<String> featureEnumerator,
+//            boolean skipIndexed1, boolean skipIndexed2) {
+//        this(type, enumeratedEntries, enumeratedFeatures, null, null,
+//             entryEnumerator, featureEnumerator, skipIndexed1, skipIndexed2);
+//    }
+//
+//    public DoubleEnumeratingDeligate(
+//            EnumeratorType type, boolean enumeratedEntries,
+//            boolean enumeratedFeatures,
+//            boolean skipIndexed1,
+//            boolean skipIndexed2) {
+//        this(type, enumeratedEntries, enumeratedFeatures, null, null,
+//             null, null, skipIndexed1, skipIndexed2);
+//    }
+//
+//    public DoubleEnumeratingDeligate(
+//            EnumeratorType type, boolean enumeratedEntries,
+//            boolean enumeratedFeatures) {
+//        this(type, enumeratedEntries, enumeratedFeatures, null, null, null, null,
+//             DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
+//    }
+//
+//    public DoubleEnumeratingDeligate(
+//            EnumeratorType type, boolean enumeratedEntries,
+//                                     boolean enumeratedFeatures,
+//                                     Enumerator<String> entryEnumerator,
+//                                     Enumerator<String> featureEnumerator) {
+//        this(type, enumeratedEntries, enumeratedFeatures, null, null,
+//             entryEnumerator, featureEnumerator,
+//             DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
+//    }
+//
     public DoubleEnumeratingDeligate() {
-        this(DEFAULT_IS_ENUMERATED, DEFAULT_IS_ENUMERATED,
-             null, null, null, null,
+        this(DEFAULT_TYPE, DEFAULT_IS_ENUMERATED, DEFAULT_IS_ENUMERATED,
+             null, null,
              DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
     }
 
@@ -211,7 +214,5 @@ public class DoubleEnumeratingDeligate
     public SingleEnumerating getFeaturesEnumeratorCarriar() {
         return EnumeratingDeligates.toSingleFeatures(this);
     }
-    
-    
 
 }

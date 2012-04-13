@@ -14,6 +14,7 @@ import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import static org.junit.Assert.*;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
@@ -144,10 +145,10 @@ public class IndexWTPCommandTest {
         {
             WeightedTokenPairSource wtpsa = WeightedTokenPairSource.open(
                     outa, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(true, true, skip1a, skip2a));
+                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null, skip1a, skip2a));
             WeightedTokenPairSource wtpsb = WeightedTokenPairSource.open(
                     outb, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(true, true, skip1b, skip2b));
+                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null, skip1b, skip2b));
             List<Tell> pa = new ArrayList<Tell>();
             List<Tell> pb = new ArrayList<Tell>();
             List<Weighted<TokenPair>> va = new ArrayList<Weighted<TokenPair>>();
@@ -185,11 +186,11 @@ public class IndexWTPCommandTest {
         {
             WeightedTokenPairVectorSource wtpsa = WeightedTokenPairSource.open(
                     outa, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(true, true, skip1a, skip2a)).
+                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null, skip1a, skip2a)).
                     getVectorSource();
             WeightedTokenPairVectorSource wtpsb = WeightedTokenPairSource.open(
                     outb, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(true, true, skip1b, skip2b)).
+                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null, skip1b, skip2b)).
                     getVectorSource();
 
             List<Tell> pa = new ArrayList<Tell>();
@@ -231,7 +232,7 @@ public class IndexWTPCommandTest {
     }
 
     public static void indexWTP(File from, File to, File index1, File index2,
-                                 boolean skip1, boolean skip2, boolean compact)
+                                boolean skip1, boolean skip2, boolean compact)
             throws Exception {
         assertValidPlaintextInputFiles(from);
         assertValidOutputFiles(to);
@@ -242,7 +243,7 @@ public class IndexWTPCommandTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
-        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(true, true, index1, index2, skip1, skip2));
+        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, index1, index2, skip1, skip2));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);
@@ -251,7 +252,7 @@ public class IndexWTPCommandTest {
     }
 
     public static void unindexWTP(File from, File to, File index1, File index2,
-                                   boolean skip1, boolean skip2, boolean compact)
+                                  boolean skip1, boolean skip2, boolean compact)
             throws Exception {
         assertValidPlaintextInputFiles(from);
         assertValidJDBCInputFiles(index1, index2);
@@ -262,10 +263,11 @@ public class IndexWTPCommandTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
-        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(true, true, index1, index2, skip1, skip2));
+        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, index1, index2, skip1, skip2));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);
         assertSizeGT(to, from);
     }
+
 }

@@ -43,8 +43,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
-import uk.ac.susx.mlcl.byblo.enumerators.MemoryBasedStringEnumerator;
+import uk.ac.susx.mlcl.byblo.enumerators.*;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 
 /**
@@ -57,9 +56,11 @@ public class EntryFeatureTest {
     public void testLMMedlineSample() throws FileNotFoundException, IOException {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-input-sample");
         Charset charset = Charset.forName("UTF-8");
-        DoubleEnumerating idx = new DoubleEnumeratingDeligate(false, false);
+        DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
+
         TokenPairSource efSrc = TokenPairSource.open(
-                testSample, charset, idx);
+                testSample, charset, del);
         assertTrue("EntryFeatureSource is empty", efSrc.hasNext());
 
         while (efSrc.hasNext()) {
@@ -69,7 +70,8 @@ public class EntryFeatureTest {
     }
 
     private void copyEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        DoubleEnumerating idx = new DoubleEnumeratingDeligate(false, false);
+        DoubleEnumeratingDeligate idx = new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
         TokenPairSource src = TokenPairSource.open(
                 a, DEFAULT_CHARSET, idx);
         TokenPairSink sink = TokenPairSink.open(
@@ -111,24 +113,20 @@ public class EntryFeatureTest {
 
 
         {
-//            Enumerator<String> strEnum = Enumerators.newDefaultStringEnumerator();
-            DoubleEnumerating idx = EnumeratingDeligates.toPair(
-                    new SingleEnumeratingDeligate(true, idxFile, false, false));
+
+            DoubleEnumerating indel = EnumeratingDeligates.toPair(
+                    new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false, idxFile, false, false));
+            DoubleEnumerating outdel = EnumeratingDeligates.toPair(
+                    new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, idxFile, true, true));
 
 
-//                    
-//                    )aringDeligate(true)new EnumeratorPairBaringDeligate(false, false, strEnum,
-//                                                          strEnum);
             TokenPairSource aSrc = TokenPairSource.open(
-                    a, DEFAULT_CHARSET, idx);
+                    a, DEFAULT_CHARSET, indel);
             TokenPairSink bSink = TokenPairSink.open(
-                    b, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(true, true), true);
+                    b, DEFAULT_CHARSET, outdel, true);
             IOUtil.copy(aSrc, bSink);
 
-            idx.saveEntriesEnumerator();
-
-//            Enumerators.saveStringEnumerator(strEnum, idxFile);
+            indel.saveEntriesEnumerator();
 
             bSink.close();
         }
@@ -137,14 +135,15 @@ public class EntryFeatureTest {
                    b.length() <= a.length());
 
         {
-            Enumerator<String> strEnum = MemoryBasedStringEnumerator.load(idxFile);
-            DoubleEnumerating idx = new DoubleEnumeratingDeligate(false, false, strEnum,
-                                                                        strEnum);
+            DoubleEnumerating bdel = new DoubleEnumeratingDeligate(
+                    Enumerating.DEFAULT_TYPE, true, true, null, null, false, false);
+            DoubleEnumerating cdel = new DoubleEnumeratingDeligate(
+                    Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
+
             TokenPairSource bSrc = TokenPairSource.open(
-                    b, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(true, true));
+                    b, DEFAULT_CHARSET, bdel);
             TokenPairSink cSink = TokenPairSink.open(
-                    c, DEFAULT_CHARSET, idx,
+                    c, DEFAULT_CHARSET, cdel,
                     false);
             IOUtil.copy(bSrc, cSink);
             cSink.close();

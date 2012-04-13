@@ -42,7 +42,7 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
+import uk.ac.susx.mlcl.byblo.enumerators.*;
 import uk.ac.susx.mlcl.lib.io.*;
 
 /**
@@ -136,7 +136,7 @@ public class TokenPairSource
 //                newDefaultStringEnumerator();
 //        
         DoubleEnumerating idx = EnumeratingDeligates.toPair(
-                new SingleEnumeratingDeligate(false));
+                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false,null,false,false));
 
 
         //.new EnumeratorPairBaringDeligate(false, false, stringIndex,

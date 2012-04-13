@@ -43,6 +43,7 @@ import static org.junit.Assert.*;
 import uk.ac.susx.mlcl.byblo.Main;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
@@ -66,7 +67,8 @@ public class ExternalCountCommandTest {
         countTask.setEntryFeaturesFile(outEF);
         countTask.getFileDeligate().setCharset(charset);
         countTask.setMaxChunkSize(chunkSize);
-        countTask.setIndexDeligate(new DoubleEnumeratingDeligate(preindexedEntries, preindexedFeatures));
+        countTask.setIndexDeligate(new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, preindexedEntries, preindexedFeatures, null, null, false, false));
         countTask.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
 
         countTask.run();

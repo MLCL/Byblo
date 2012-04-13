@@ -33,6 +33,7 @@ package uk.ac.susx.mlcl.byblo.enumerators;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.Maps;
 import java.io.*;
+import static java.text.MessageFormat.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -70,7 +71,9 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
             final AtomicInteger nextId) {
         Checks.checkNotNull("map", map);
         Checks.checkNotNull("nextId", nextId);
-        assert max(map) < nextId.get();
+        assert max(map) < nextId.get() : format(
+                "next id ({0}) is not greater than largest in map ({1})",
+                nextId.get(), max(map));
 
         this.map = map;
         this.nextId = nextId;
@@ -202,8 +205,14 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
     }
 
     private static <T> int max(final Map<Integer, T> map) {
-        if (map instanceof SortedMap) {
-            return ((SortedMap<Integer, T>) map).lastKey();
+        assert map != null : "map is null";
+        if (map.isEmpty()) {
+            return -1;
+        } else if (map instanceof SortedMap) {
+            final SortedMap<Integer, T> smap = ((SortedMap<Integer, T>) map);
+            assert smap.lastKey() > smap.firstKey() :
+                    "Expecting last key in sorted map to be greatest.";
+            return smap.lastKey();
         } else {
             int max = -1;
             for (int key : map.keySet())

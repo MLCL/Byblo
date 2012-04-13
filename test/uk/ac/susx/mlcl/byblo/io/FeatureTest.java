@@ -39,8 +39,7 @@ import java.io.IOException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
-import uk.ac.susx.mlcl.byblo.enumerators.MemoryBasedStringEnumerator;
+import uk.ac.susx.mlcl.byblo.enumerators.*;
 
 /**
  *
@@ -50,12 +49,13 @@ public class FeatureTest {
 
     private void copyF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
         Enumerator<String> strEnum = MemoryBasedStringEnumerator.newInstance();
+
+        SingleEnumeratingDeligate del = new SingleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, null, false, false);
         WeightedTokenSource aSrc = WeightedTokenSource.open(
-                a, DEFAULT_CHARSET,
-                new SingleEnumeratingDeligate(false, strEnum));
+                a, DEFAULT_CHARSET, del);
         WeightedTokenSink bSink = WeightedTokenSink.open(
-                b, DEFAULT_CHARSET,
-                new SingleEnumeratingDeligate(false, strEnum));
+                b, DEFAULT_CHARSET, del);
         bSink.setCompactFormatEnabled(compact);
 
         IOUtil.copy(aSrc, bSink);
@@ -92,15 +92,17 @@ public class FeatureTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_FEATURES.getName() + ".str");
 
-        Enumerator<String> strEnum = MemoryBasedStringEnumerator.newInstance();
+        SingleEnumeratingDeligate indel = new SingleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, null, false, false);
+        SingleEnumeratingDeligate outdel = new SingleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, true, null, false, false);
+
 
         {
             WeightedTokenSource aSrc = WeightedTokenSource.open(
-                    a, DEFAULT_CHARSET,
-                    new SingleEnumeratingDeligate(false, strEnum));
+                    a, DEFAULT_CHARSET, indel);
             WeightedTokenSink bSink = WeightedTokenSink.open(
-                    b, DEFAULT_CHARSET,
-                    new SingleEnumeratingDeligate(true));
+                    b, DEFAULT_CHARSET, outdel);
             IOUtil.copy(aSrc, bSink);
             bSink.close();
         }
@@ -110,11 +112,9 @@ public class FeatureTest {
 
         {
             WeightedTokenSource bSrc = WeightedTokenSource.open(
-                    b, DEFAULT_CHARSET,
-                    new SingleEnumeratingDeligate(true));
+                    b, DEFAULT_CHARSET, outdel);
             WeightedTokenSink cSink = WeightedTokenSink.open(
-                    c, DEFAULT_CHARSET,
-                    new SingleEnumeratingDeligate(false, strEnum));
+                    c, DEFAULT_CHARSET, indel);
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }

@@ -145,7 +145,7 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
             props = db.<String, String>createHashMap(COLLECTION_PROPERTIES);
             forwards.put(FilterCommand.FILTERED_ID, FilterCommand.FILTERED_STRING);
             backwards.put(FilterCommand.FILTERED_STRING, FilterCommand.FILTERED_ID);
-            nextId = new AtomicInteger(0);
+            nextId = new AtomicInteger(FilterCommand.FILTERED_ID+1);
             props.put(COLLECTION_NEXT_ID, Integer.toString(0));
             db.commit();
         }

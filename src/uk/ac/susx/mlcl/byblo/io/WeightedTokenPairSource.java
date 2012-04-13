@@ -41,6 +41,7 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.lib.io.*;
@@ -196,7 +197,7 @@ public class WeightedTokenPairSource
     }
 
     public static boolean equal(File a, File b, Charset charset) throws IOException {
-        DoubleEnumerating idx = new DoubleEnumeratingDeligate(false, false);
+        DoubleEnumerating idx = new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
         final WeightedTokenPairSource srcA = WeightedTokenPairSource.open(
                 a, charset, idx);
         final WeightedTokenPairSource srcB = WeightedTokenPairSource.open(
@@ -286,6 +287,7 @@ public class WeightedTokenPairSource
                 public boolean apply(Integer column) {
                     return column == 0;
                 }
+
             });
         }
         if (idx.isEnumeratorSkipIndexed2()) {
@@ -295,6 +297,7 @@ public class WeightedTokenPairSource
                 public boolean apply(Integer column) {
                     return (column + 1) % 2 == 0;
                 }
+
             });
         }
         if (!idx.isEntriesEnumerated()) {
@@ -305,6 +308,7 @@ public class WeightedTokenPairSource
                 public boolean apply(Integer column) {
                     return column == 0;
                 }
+
             });
         }
 
@@ -316,6 +320,7 @@ public class WeightedTokenPairSource
                 public boolean apply(Integer column) {
                     return (column + 1) % 2 == 0;
                 }
+
             });
         }
 
@@ -334,4 +339,5 @@ public class WeightedTokenPairSource
 
         return new WeightedTokenPairSource(tsv);
     }
+
 }

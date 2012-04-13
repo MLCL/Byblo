@@ -22,6 +22,7 @@ import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import static org.junit.Assert.*;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
@@ -66,6 +67,7 @@ public class ExternalSortWeightedTokenPairCommandTest {
         File featureIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".feature-index");
 
         final DoubleEnumerating idx = new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, 
                 preindexedTokens1, preindexedTokens2,
                 entryIndex, featureIndex, false, false);
 
@@ -97,6 +99,7 @@ public class ExternalSortWeightedTokenPairCommandTest {
 
 
         final DoubleEnumerating idx = new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, 
                 preindexedTokens1, preindexedTokens2,
                 entryIndex, featureIndex, false, false);
 

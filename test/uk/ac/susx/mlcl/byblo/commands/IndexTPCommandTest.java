@@ -5,12 +5,12 @@
 package uk.ac.susx.mlcl.byblo.commands;
 
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
-import com.google.common.io.Files;
 import java.io.File;
 import static java.text.MessageFormat.*;
 import org.junit.*;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.io.*;
 
 /**
@@ -127,7 +127,7 @@ public class IndexTPCommandTest {
     }
 
     public static void indexTP(File from, File to, File index1, File index2,
-                                boolean skip1, boolean skip2, boolean compact)
+                               boolean skip1, boolean skip2, boolean compact)
             throws Exception {
         assertValidPlaintextInputFiles(from);
         assertValidOutputFiles(to);
@@ -138,7 +138,7 @@ public class IndexTPCommandTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
-        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(true, true, index1, index2, skip1, skip2));
+        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, index1, index2, skip1, skip2));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);
@@ -147,7 +147,7 @@ public class IndexTPCommandTest {
     }
 
     public static void unindexTP(File from, File to, File index1, File index2,
-                                  boolean skip1, boolean skip2, boolean compact)
+                                 boolean skip1, boolean skip2, boolean compact)
             throws Exception {
         assertValidPlaintextInputFiles(from);
         assertValidJDBCInputFiles(index1, index2);
@@ -159,7 +159,7 @@ public class IndexTPCommandTest {
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
 
-        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(true, true, index1, index2, skip1, skip2));
+        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, index1, index2, skip1, skip2));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);

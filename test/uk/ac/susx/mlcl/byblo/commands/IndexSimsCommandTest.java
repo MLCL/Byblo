@@ -18,6 +18,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.Tell;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.byblo.commands.UnindexSimsCommandTest.*;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 
 /**
  *
@@ -137,10 +138,10 @@ public class IndexSimsCommandTest {
         {
             WeightedTokenPairSource wtpsa = WeightedTokenPairSource.open(
                     outa, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(true, true, skip1a, skip2a));
+                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null, skip1a, skip2a));
             WeightedTokenPairSource wtpsb = WeightedTokenPairSource.open(
                     outb, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(true, true, skip1b, skip2b));
+                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null, skip1b, skip2b));
             List<Tell> pa = new ArrayList<Tell>();
             List<Tell> pb = new ArrayList<Tell>();
             List<Weighted<TokenPair>> va = new ArrayList<Weighted<TokenPair>>();
@@ -178,11 +179,11 @@ public class IndexSimsCommandTest {
         {
             WeightedTokenPairVectorSource wtpsa = WeightedTokenPairSource.open(
                     outa, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(true, true, skip1a, skip2a)).
+                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null, skip1a, skip2a)).
                     getVectorSource();
             WeightedTokenPairVectorSource wtpsb = WeightedTokenPairSource.open(
                     outb, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(true, true, skip1b, skip2b)).
+                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null, skip1b, skip2b)).
                     getVectorSource();
 
             List<Tell> pa = new ArrayList<Tell>();
@@ -224,7 +225,7 @@ public class IndexSimsCommandTest {
     }
 
     public static void indexSims(File from, File to, File index,
-                                  boolean skip1, boolean skip2, boolean compact)
+                                 boolean skip1, boolean skip2, boolean compact)
             throws Exception {
         assertValidPlaintextInputFiles(from);
         assertValidOutputFiles(to);
@@ -236,13 +237,12 @@ public class IndexSimsCommandTest {
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
 
-        unindex.setIndexDeligate(new SingleEnumeratingDeligate(true, index, null, skip1, skip2));
+        unindex.setIndexDeligate(new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, index, skip1, skip2));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);
         assertValidJDBCInputFiles(index);
         assertSizeGT(from, to);
     }
-
 
 }

@@ -39,6 +39,7 @@ import org.junit.Ignore;
 import uk.ac.susx.mlcl.byblo.Main;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.Comparators;
@@ -68,14 +69,15 @@ public class ExternalSimsKnnCommandTest {
         knnTask.getFileDeligate().setSourceFile(in);
         knnTask.getFileDeligate().setDestinationFile(out);
         knnTask.getFileDeligate().setCharset(DEFAULT_CHARSET);
-        
-        knnTask.setIndexDeligate(new DoubleEnumeratingDeligate(false, false));
+
+        knnTask.setIndexDeligate(new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, false, null, null, false, false));
 
         knnTask.setMaxChunkSize(100000);
         knnTask.setClassComparator(Weighted.recordOrder(TokenPair.firstIndexOrder()));
         knnTask.setNearnessComparator(Comparators.reverse(Weighted.<TokenPair>weightOrder()));
         knnTask.setK(100);
-        
+
         knnTask.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
 
         knnTask.runCommand();

@@ -49,6 +49,7 @@ import org.junit.Test;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.byblo.enumerators.MemoryBasedStringEnumerator;
 import uk.ac.susx.mlcl.lib.io.Tell;
@@ -60,31 +61,31 @@ import uk.ac.susx.mlcl.lib.io.Tell;
 public class WeightedEntryFeatureTest {
 
     private void copyWEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        Enumerator<String> idx = MemoryBasedStringEnumerator.newInstance();
+        DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
+
         WeightedTokenPairSource aSrc = WeightedTokenPairSource.open(
-                a, DEFAULT_CHARSET,
-                new DoubleEnumeratingDeligate(false, false, idx, idx));
+                a, DEFAULT_CHARSET, del);
         WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
-                b, DEFAULT_CHARSET,
-                new DoubleEnumeratingDeligate(false, false, idx, idx), compact);
+                b, DEFAULT_CHARSET, del, compact);
 
         IOUtil.copy(aSrc, bSink);
         bSink.close();
     }
 
     private void copyWEFV(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        Enumerator<String> idx = MemoryBasedStringEnumerator.newInstance();
+        DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
+
         WeightedTokenPairVectorSource aSrc = new WeightedTokenPairVectorSource(
                 WeightedTokenPairSource.open(
-                a, DEFAULT_CHARSET,
-                new DoubleEnumeratingDeligate(false, false, idx, idx)));
+                a, DEFAULT_CHARSET, del));
 
         List<Indexed<SparseDoubleVector>> list = IOUtil.readAll(aSrc);
         Collections.sort(list);
 
         WeightedTokenPairSink tmp = WeightedTokenPairSink.open(
-                b, DEFAULT_CHARSET,
-                new DoubleEnumeratingDeligate(false, false, idx, idx), compact);
+                b, DEFAULT_CHARSET, del, compact);
 
         WeightedTokenPairVectorSink bSink = new WeightedTokenPairVectorSink(
                 tmp);
@@ -147,10 +148,11 @@ public class WeightedEntryFeatureTest {
     public void testLMSample() throws FileNotFoundException, IOException {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-ef-sample");
         Charset charset = Charset.forName("UTF-8");
-        Enumerator<String> idx = MemoryBasedStringEnumerator.newInstance();
+        DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
+
         WeightedTokenPairSource efSrc = WeightedTokenPairSource.open(
-                testSample, charset,
-                new DoubleEnumeratingDeligate(false, false, idx, idx));
+                testSample, charset, del);
         assertTrue("EntryFeatureSource is empty", efSrc.hasNext());
 
         while (efSrc.hasNext()) {
@@ -163,11 +165,12 @@ public class WeightedEntryFeatureTest {
         final Map<Tell, Weighted<TokenPair>> hist =
                 new HashMap<Tell, Weighted<TokenPair>>();
 
-        Enumerator<String> idx = MemoryBasedStringEnumerator.newInstance();
+        DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
+
         WeightedTokenPairSource src =
                 WeightedTokenPairSource.open(
-                file, DEFAULT_CHARSET,
-                new DoubleEnumeratingDeligate(false, false, idx, idx));
+                file, DEFAULT_CHARSET, del);
         {
             while (src.hasNext()) {
                 final Tell pos = src.position();
@@ -187,7 +190,7 @@ public class WeightedEntryFeatureTest {
 
                 System.out.println("expected tell: " + pos);
                 System.out.println(
-                        "expected: " + expected.record().toString(idx, idx));
+                        "expected: " + expected.record().toString(del.getEntryEnumerator(), del.getFeatureEnumerator()));
 
                 src.position(pos);
 
@@ -197,8 +200,8 @@ public class WeightedEntryFeatureTest {
 
                 Weighted<TokenPair> actual = src.read();
                 System.out.println("actual tell: " + src.position());
-                System.out.println("actual: " + actual.record().toString(idx,
-                                                                         idx));
+                System.out.println("actual: " + actual.record().toString(del.getEntryEnumerator(),
+                                                                         del.getFeatureEnumerator()));
                 System.out.flush();
 
                 assertEquals(expected, actual);
@@ -219,15 +222,17 @@ public class WeightedEntryFeatureTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_ENTRY_FEATURES.getName() + ".str");
 
-        Enumerator<String> idx = MemoryBasedStringEnumerator.newInstance();
+        DoubleEnumeratingDeligate indel = new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
+        DoubleEnumeratingDeligate outdel = new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, true, true, null, null, false, false);
+
 
         {
             WeightedTokenPairSource aSrc = WeightedTokenPairSource.open(
-                    a, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(false, false, idx, idx));
+                    a, DEFAULT_CHARSET, indel);
             WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
-                    b, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(true, true), false);
+                    b, DEFAULT_CHARSET, outdel, false);
 //            bSink.setCompactFormatEnabled(false);
             IOUtil.copy(aSrc, bSink);
             bSink.close();
@@ -238,11 +243,9 @@ public class WeightedEntryFeatureTest {
 
         {
             WeightedTokenPairSource bSrc = WeightedTokenPairSource.open(
-                    b, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(true, true));
+                    b, DEFAULT_CHARSET, outdel);
             WeightedTokenPairSink cSink = WeightedTokenPairSink.open(
-                    c, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(false, false, idx, idx), false);
+                    c, DEFAULT_CHARSET, indel, false);
 //            cSink.setCompactFormatEnabled(false);
             IOUtil.copy(bSrc, cSink);
             cSink.close();
@@ -263,16 +266,20 @@ public class WeightedEntryFeatureTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_ENTRY_FEATURES.getName() + ".enum.compact.str");
 
+        DoubleEnumeratingDeligate indel = new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
+        DoubleEnumeratingDeligate outdel = new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, true, true, null, null, false, false);
+
+
         Enumerator<String> idx = MemoryBasedStringEnumerator.newInstance();
 
         {
             WeightedTokenPairSource aSrc = WeightedTokenPairSource.open(
-                    a, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(false, false, idx, idx));
+                    a, DEFAULT_CHARSET, indel);
 
             WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
-                    b, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(true, true), true);
+                    b, DEFAULT_CHARSET, outdel, true);
 //            bSink.setCompactFormatEnabled(true);
             IOUtil.copy(aSrc, bSink);
             bSink.close();
@@ -283,11 +290,9 @@ public class WeightedEntryFeatureTest {
 
         {
             WeightedTokenPairSource bSrc = WeightedTokenPairSource.open(
-                    b, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(true, true));
+                    b, DEFAULT_CHARSET, outdel);
             WeightedTokenPairSink cSink = WeightedTokenPairSink.open(
-                    c, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(false, false, idx, idx), false);
+                    c, DEFAULT_CHARSET, indel, false);
 //            cSink.setCompactFormatEnabled(false);
             IOUtil.copy(bSrc, cSink);
             cSink.close();
@@ -308,16 +313,18 @@ public class WeightedEntryFeatureTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_ENTRY_FEATURES.getName() + ".enum.skip.compact.str");
 
-        Enumerator<String> enumerator = MemoryBasedStringEnumerator.newInstance();
+        DoubleEnumeratingDeligate indel = new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
+        DoubleEnumeratingDeligate outdel = new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, true, true, null, null, true, true);
+
 
         {
             WeightedTokenPairSource aSrc = WeightedTokenPairSource.open(
-                    a, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(false, false, enumerator, enumerator));
+                    a, DEFAULT_CHARSET, indel);
 
-            DoubleEnumeratingDeligate tmpIdx = new DoubleEnumeratingDeligate(true, true, true, true);
             WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
-                    b, DEFAULT_CHARSET, tmpIdx, true);
+                    b, DEFAULT_CHARSET, outdel, true);
             IOUtil.copy(aSrc, bSink);
             bSink.close();
         }
@@ -326,12 +333,10 @@ public class WeightedEntryFeatureTest {
                    b.length() <= a.length());
 
         {
-            DoubleEnumeratingDeligate tmpIdx = new DoubleEnumeratingDeligate(true, true, true, true);
             WeightedTokenPairSource bSrc = WeightedTokenPairSource.open(
-                    b, DEFAULT_CHARSET, tmpIdx);
+                    b, DEFAULT_CHARSET, outdel);
             WeightedTokenPairSink cSink = WeightedTokenPairSink.open(
-                    c, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(false, false, enumerator, enumerator),
+                    c, DEFAULT_CHARSET, indel,
                     false);
             IOUtil.copy(bSrc, cSink);
             cSink.close();

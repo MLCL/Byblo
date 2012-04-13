@@ -131,6 +131,11 @@ public class EnumeratingDeligates {
         }
 
         @Override
+        public EnumeratorType getType() {
+            return inner.getType();
+        }
+
+        @Override
         public boolean equals(final Object obj) {
             if (obj == null)
                 return false;

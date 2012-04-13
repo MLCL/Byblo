@@ -44,6 +44,7 @@ import uk.ac.susx.mlcl.byblo.io.Weighted;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.byblo.enumerators.MemoryBasedStringEnumerator;
 import uk.ac.susx.mlcl.lib.io.Tell;
@@ -68,15 +69,14 @@ public class NaiveApssTaskTest {
 
         NaiveApssTask<Tell> instance = new NaiveApssTask<Tell>();
 
-        Enumerator<String> idx = MemoryBasedStringEnumerator.newInstance();
+        DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
         WeightedTokenPairSource mdbsa = WeightedTokenPairSource.open(
-                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
-                new DoubleEnumeratingDeligate(false, false, idx, idx));
+                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, del);
         WeightedTokenPairVectorSource vsa = mdbsa.getVectorSource();
 
         WeightedTokenPairSource mdbsb = WeightedTokenPairSource.open(
-                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,
-                new DoubleEnumeratingDeligate(false, false, idx, idx));
+                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, del);
         WeightedTokenPairVectorSource vsb = mdbsb.getVectorSource();
 
         List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();

@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import uk.ac.susx.mlcl.byblo.enumerators.*;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.Sink;
@@ -25,7 +26,8 @@ import uk.ac.susx.mlcl.lib.io.Source;
 public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
-    private SingleEnumerating indexDeligate = new SingleEnumeratingDeligate(false);
+    private SingleEnumerating indexDeligate = new SingleEnumeratingDeligate(
+            Enumerating.DEFAULT_TYPE, false, null, false, false);
 
     public UnindexSimsCommand(
             File sourceFile, File destinationFile, Charset charset,
@@ -45,7 +47,7 @@ public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>>
 
         indexDeligate.closeEnumerator();
 
-    
+
     }
 
     @Override

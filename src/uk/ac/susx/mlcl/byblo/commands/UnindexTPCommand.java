@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.Sink;
@@ -24,7 +25,8 @@ import uk.ac.susx.mlcl.lib.io.Source;
 public class UnindexTPCommand extends AbstractCopyCommand<TokenPair> {
 
     @ParametersDelegate
-    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate(false, false);
+    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate(
+            Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
 
     public UnindexTPCommand(
             File sourceFile, File destinationFile, Charset charset,

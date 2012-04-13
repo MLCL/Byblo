@@ -39,6 +39,7 @@ import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.byblo.enumerators.MemoryBasedStringEnumerator;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
@@ -256,12 +257,13 @@ public class CrMiTest {
         // The ranking should be identical, but the absolute similarity values
         // will be different.
 
-
+        DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
         Enumerator<String> idx = MemoryBasedStringEnumerator.newInstance();
         WeightedTokenPairSource expected = WeightedTokenPairSource.open(
-                expectedOutput, DEFAULT_CHARSET, new DoubleEnumeratingDeligate(false, false, idx, idx));
+                expectedOutput, DEFAULT_CHARSET, del);
         WeightedTokenPairSource actual = WeightedTokenPairSource.open(
-                crmiOutput, DEFAULT_CHARSET, new DoubleEnumeratingDeligate(false, false, idx, idx));
+                crmiOutput, DEFAULT_CHARSET, del);
 
         while (expected.hasNext() && actual.hasNext()) {
             Weighted<TokenPair> e = expected.read();

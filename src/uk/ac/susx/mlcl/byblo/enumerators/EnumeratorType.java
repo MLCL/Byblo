@@ -31,32 +31,58 @@
  */
 package uk.ac.susx.mlcl.byblo.enumerators;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
- * Denotes an object which while perform string enumeration on some or all of
- * the data it reads and writes.
  *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @author hiam20
  */
-public interface Enumerating {
+public enum EnumeratorType {
+    Memory {
+        @Override
+        public Enumerator<String> open(File file) throws IOException {
+            if (file != null && file.exists())
+                return MemoryBasedStringEnumerator.load(file);
+            else
+                return MemoryBasedStringEnumerator.newInstance(file);
+        }
 
-    boolean DEFAULT_IS_ENUMERATED = false;
+        @Override
+        public void save(Enumerator<String> enumerator) throws IOException {
+            ((MemoryBasedStringEnumerator) enumerator).save();
+        }
 
-    boolean DEFAULT_SKIP_INDEXING = false;
+        @Override
+        public void close(Enumerator<String> enumerator) throws IOException {
+        }
+    }, JDBC {
+        @Override
+        public Enumerator<String> open(File file) {
+            if (file == null) {
+                return JDBCStringEnumerator.newInstance(file);
+            } else if (!file.exists()) {
+                return JDBCStringEnumerator.newInstance(file);
+            } else {
+                return JDBCStringEnumerator.load(file);
+            }
+        }
 
-    EnumeratorType DEFAULT_TYPE = EnumeratorType.Memory;
+        @Override
+        public void save(Enumerator<String> enumerator) throws IOException {
+            ((JDBCStringEnumerator) enumerator).save();
+        }
 
-    boolean isEnumeratorSkipIndexed1();
+        @Override
+        public void close(Enumerator<String> enumerator) throws IOException {
+            ((JDBCStringEnumerator) enumerator).close();
+        }
+    };
 
-    boolean isEnumeratorSkipIndexed2();
+    public abstract Enumerator<String> open(File file) throws IOException;
 
-    void closeEnumerator() throws IOException;
+    public abstract void save(Enumerator<String> enumerator) throws IOException;
 
-    void saveEnumerator() throws IOException;
-
-    void openEnumerator() throws IOException;
-
-    EnumeratorType getType();
-
+    public abstract void close(Enumerator<String> enumerator) throws IOException;
+    
 }

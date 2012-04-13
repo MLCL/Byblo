@@ -14,6 +14,7 @@ import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import static uk.ac.susx.mlcl.byblo.commands.UnindexSimsCommandTest.*;
 import static uk.ac.susx.mlcl.byblo.commands.IndexTPCommandTest.*;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 
 /**
  *
@@ -58,7 +59,9 @@ public class FullBuildTest {
 
         CountCommand count = new CountCommand(
                 instances, events, entries, features,
-                new DoubleEnumeratingDeligate(preindexedEntries, preindexedFeatures),
+                new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+                                              preindexedEntries, preindexedFeatures,
+                                              null, null, false, false),
                 charet);
         count.runCommand();
 
@@ -87,7 +90,9 @@ public class FullBuildTest {
 
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
-                charet, new DoubleEnumeratingDeligate(preindexedEntries, preindexedFeatures, false, false));
+                charet, new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+                                                      preindexedEntries, preindexedFeatures,
+                                                      null, null, false, false));
         allpairs.setnThreads(1);
         allpairs.runCommand();
 
@@ -97,7 +102,7 @@ public class FullBuildTest {
 
         KnnSimsCommand knn = new KnnSimsCommand(
                 similarities, neighbours, charet,
-                new SingleEnumeratingDeligate(preindexedEntries), 5);
+                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, preindexedEntries, null, false, false), 5);
         knn.runCommand();
 
         assertValidPlaintextInputFiles(neighbours);
@@ -144,7 +149,9 @@ public class FullBuildTest {
 
         ExternalCountCommand count = new ExternalCountCommand(
                 instances, events, entries, features, charet,
-                new DoubleEnumeratingDeligate(preindexedEntries, preindexedFeatures));
+                new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+                                              preindexedEntries, preindexedFeatures,
+                                              null, null, false, false));
         count.runCommand();
 
         // Filter 
@@ -172,7 +179,9 @@ public class FullBuildTest {
 
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
-                charet, new DoubleEnumeratingDeligate(preindexedEntries, preindexedFeatures, false, false));
+                charet, new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+                                                      preindexedEntries, preindexedFeatures,
+                                                      null, null, false, false));
         allpairs.runCommand();
 
         // KNN
@@ -181,7 +190,8 @@ public class FullBuildTest {
 
         ExternalKnnSimsCommand knn = new ExternalKnnSimsCommand(
                 similarities, neighbours, charet,
-                new SingleEnumeratingDeligate(preindexedEntries), 5);
+                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+                                              preindexedEntries, null, false, false), 5);
         knn.runCommand();
 
         assertValidPlaintextInputFiles(neighbours);
@@ -245,7 +255,9 @@ public class FullBuildTest {
 
         CountCommand count = new CountCommand(
                 instancesIndexed, events, entries, features,
-                new DoubleEnumeratingDeligate(preindexedEntries, preindexedFeatures),
+                new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+                                              preindexedEntries, preindexedFeatures,
+                                              null, null, false, false),
                 charet);
         count.runCommand();
 
@@ -276,7 +288,9 @@ public class FullBuildTest {
 
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
-                charet, new DoubleEnumeratingDeligate(preindexedEntries, preindexedFeatures, false, false));
+                charet, new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+                                                      preindexedEntries, preindexedFeatures,
+                                                      null, null, false, false));
         allpairs.setnThreads(1);
         allpairs.runCommand();
 
@@ -290,7 +304,8 @@ public class FullBuildTest {
 
         KnnSimsCommand knn = new KnnSimsCommand(
                 similarities, neighbours, charet,
-                new SingleEnumeratingDeligate(preindexedEntries), 5);
+                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+                                              preindexedEntries, null, false, false), 5);
         knn.runCommand();
 
         assertValidPlaintextInputFiles(neighbours);
@@ -365,8 +380,9 @@ public class FullBuildTest {
         count.setEntriesFile(entries);
         count.setFeaturesFile(features);
         count.setEntryFeaturesFile(events);
-        count.setIndexDeligate(new DoubleEnumeratingDeligate(preindexedEntries,
-                                                                preindexedFeatures));
+        count.setIndexDeligate(new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+                                                             preindexedEntries, preindexedFeatures,
+                                                             null, null, false, false));
         count.getFileDeligate().setCharset(charet);
         count.runCommand();
 
@@ -393,7 +409,9 @@ public class FullBuildTest {
 
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
-                charet, new DoubleEnumeratingDeligate(preindexedEntries, preindexedFeatures, false, false));
+                charet, new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+                                                      preindexedEntries, preindexedFeatures,
+                                                      null, null, false, false));
         allpairs.runCommand();
 
         assertValidPlaintextInputFiles(similarities);
@@ -406,7 +424,8 @@ public class FullBuildTest {
 
         ExternalKnnSimsCommand knn = new ExternalKnnSimsCommand(
                 similarities, neighbours, charet,
-                new SingleEnumeratingDeligate(preindexedEntries), 5);
+                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+                                              preindexedEntries, null, false, false), 5);
         knn.runCommand();
 
         assertValidPlaintextInputFiles(neighbours);
@@ -483,7 +502,9 @@ public class FullBuildTest {
 
         CountCommand count = new CountCommand(
                 instancesIndexed, events, entries, features,
-                new DoubleEnumeratingDeligate(preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2),
+                new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+                                              preindexedEntries, preindexedFeatures,
+                                              null, null, skipIndex1, skipIndex2),
                 charet);
 
         count.runCommand();
@@ -527,7 +548,9 @@ public class FullBuildTest {
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
                 charet,
-                new DoubleEnumeratingDeligate(preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2));
+                new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+                                              preindexedEntries, preindexedFeatures,
+                                              null, null, skipIndex1, skipIndex2));
         allpairs.setnThreads(1);
         allpairs.runCommand();
 
@@ -617,7 +640,9 @@ public class FullBuildTest {
         count.setEntriesFile(entries);
         count.setFeaturesFile(features);
         count.setEntryFeaturesFile(events);
-        count.setIndexDeligate(new DoubleEnumeratingDeligate(preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2));
+        count.setIndexDeligate(new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+                                                             preindexedEntries, preindexedFeatures,
+                                                             null, null, skipIndex1, skipIndex2));
         count.getFileDeligate().setCharset(charet);
         count.runCommand();
 
@@ -659,7 +684,9 @@ public class FullBuildTest {
 
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
-                charet, new DoubleEnumeratingDeligate(preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2));
+                charet, new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+                                                      preindexedEntries, preindexedFeatures,
+                                                      null, null, skipIndex1, skipIndex2));
         allpairs.runCommand();
 
         assertValidPlaintextInputFiles(similarities);
@@ -699,9 +726,9 @@ public class FullBuildTest {
                 events, entries, features,
                 eventsFiltered, entriesFiltered, featuresFiltered,
                 DEFAULT_CHARSET);
-        filter.setIndexDeligate(new DoubleEnumeratingDeligate(
-                preindexedEntries, preindexedFeatures,
-                entryIndex, featureIndex, skipIndex1, skipIndex2));
+        filter.setIndexDeligate(new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+                                                              preindexedEntries, preindexedFeatures,
+                                                              entryIndex, featureIndex, skipIndex1, skipIndex2));
         filter.addEntryFeatureMinimumFrequency(2);
 
         filter.runCommand();
@@ -721,7 +748,8 @@ public class FullBuildTest {
 
         KnnSimsCommand knn = new KnnSimsCommand(
                 from, to, DEFAULT_CHARSET,
-                new SingleEnumeratingDeligate(enumerated, null, null, skip1, skip2), 5);
+                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+                                              enumerated, null, skip1, skip2), 5);
         knn.runCommand();
 
         assertValidPlaintextInputFiles(to);
@@ -736,7 +764,8 @@ public class FullBuildTest {
 
         ExternalKnnSimsCommand knn = new ExternalKnnSimsCommand(
                 from, to, DEFAULT_CHARSET,
-                new SingleEnumeratingDeligate(enumerated, null, null, skip1, skip2), 5);
+                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+                                              enumerated, null, skip1, skip2), 5);
         knn.runCommand();
 
         assertValidPlaintextInputFiles(to);
@@ -779,7 +808,6 @@ public class FullBuildTest {
 //        assertValidPlaintextInputFiles(to);
 //        assertSizeGT(to, from);
 //    }
-
     private static void unindexWT(File from, File to, File index,
                                   boolean skip1, boolean skip2)
             throws Exception {
@@ -790,7 +818,8 @@ public class FullBuildTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(false);
-        unindex.setIndexDeligate(new SingleEnumeratingDeligate(true, index, null, skip1, skip2));
+        unindex.setIndexDeligate(new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+                                                               true, index, skip1, skip2));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);
@@ -808,7 +837,9 @@ public class FullBuildTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(false);
-        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(true, true, index1, index2, skip1, skip2));
+        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+                                                               true, true,
+                                                               index1, index2, skip1, skip2));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);
@@ -826,7 +857,8 @@ public class FullBuildTest {
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.getFilesDeligate().setCompactFormatDisabled(false);
-        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(true, true, index1, index2, skip1, skip2));
+        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+                                                               true, true, index1, index2, skip1, skip2));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);
