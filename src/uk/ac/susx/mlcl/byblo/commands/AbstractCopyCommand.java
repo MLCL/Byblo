@@ -38,6 +38,7 @@ import java.nio.charset.Charset;
 import java.text.MessageFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.commands.FilePipeDeligate;
 import uk.ac.susx.mlcl.lib.io.Files;
@@ -81,7 +82,8 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand {
                     getFilesDeligate().getSourceFile(),
                     getFilesDeligate().getDestinationFile(),
                     getName()));
-
+        LOG.debug(MiscUtil.memoryInfoString());
+        
         Source<T> src = openSource(getFilesDeligate().getSourceFile());
         Sink<T> snk = openSink(getFilesDeligate().getDestinationFile());
 
@@ -100,6 +102,7 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand {
         if (snk instanceof Closeable)
             ((Closeable) snk).close();
 
+        LOG.debug(MiscUtil.memoryInfoString());
         if (LOG.isInfoEnabled())
             LOG.info(MessageFormat.format("Completed command {0}.", getName()));
     }

@@ -30,13 +30,11 @@ public class DoubleEnumeratingDeligate
     private boolean enumeratedFeatures = DEFAULT_IS_ENUMERATED;
 
     @Parameter(names = {"-Xe", "--entries-index-file"},
-    description = "Index file for enumerating entries.",
-    validateWith = InputFileValidator.class)
+    description = "Index file for enumerating entries.")
     private File entriesIndexFile = null;
 
     @Parameter(names = {"-Xf", "--features-index-file"},
-    description = "Index file for enumerating features.",
-    validateWith = InputFileValidator.class)
+    description = "Index file for enumerating features.")
     private File featuresIndexFile = null;
 
     private Enumerator<String> entryEnumerator = null;

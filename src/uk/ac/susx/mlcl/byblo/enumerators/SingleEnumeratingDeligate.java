@@ -26,8 +26,7 @@ public class SingleEnumeratingDeligate
     private boolean enumerated = DEFAULT_IS_ENUMERATED;
 
     @Parameter(names = {"-X", "--index-file"},
-    description = "Index for the string tokens.",
-    validateWith = InputFileValidator.class)
+    description = "Index for the string tokens.")
     private File indexFile = null;
 
     private Enumerator<String> enumerator = null;
