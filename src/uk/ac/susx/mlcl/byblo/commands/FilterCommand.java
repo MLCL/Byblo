@@ -30,6 +30,8 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaring;
+import uk.ac.susx.mlcl.byblo.io.EnumeratorDeligates;
 import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;

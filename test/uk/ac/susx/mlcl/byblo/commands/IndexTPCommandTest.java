@@ -4,6 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
 import com.google.common.io.Files;
 import java.io.File;
 import static java.text.MessageFormat.*;

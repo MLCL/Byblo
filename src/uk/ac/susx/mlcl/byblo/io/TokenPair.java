@@ -246,10 +246,11 @@ public class TokenPair implements
             @Override
             public int compare(final TokenPair a, final TokenPair b) {
                 try {
-                    int c = idx.getEntryEnumerator().valueOf(a.id1()).compareTo(
-                            idx.getEntryEnumerator().valueOf(b.id1()));
-                    return c != 0 ? c : idx.getFeatureEnumerator().valueOf(a.id2()).compareTo(
-                            idx.getFeatureEnumerator().valueOf(b.id2()));
+                    final Enumerator<String> en1 = idx.getEntryEnumerator();
+                    int c = en1.valueOf(a.id1()).compareTo(en1.valueOf(b.id1()));
+                    final Enumerator<String> en2 = idx.getFeatureEnumerator();
+                    return c != 0 ? c 
+                           : en2.valueOf(a.id2()).compareTo(en2.valueOf(b.id2()));
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -265,8 +266,8 @@ public class TokenPair implements
             @Override
             public int compare(final TokenPair a, final TokenPair b) {
                 try {
-                    return idx.getEnumerator().valueOf(a.id1()).compareTo(
-                            idx.getEnumerator().valueOf(b.id1()));
+                    final Enumerator<String> en = idx.getEnumerator();
+                    return en.valueOf(a.id1()).compareTo(en.valueOf(b.id1()));
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -282,8 +283,8 @@ public class TokenPair implements
             @Override
             public int compare(final TokenPair a, final TokenPair b) {
                 try {
-                    return idx.getEnumerator().valueOf(a.id2()).compareTo(
-                            idx.getEnumerator().valueOf(b.id2()));
+                    final Enumerator<String> en = idx.getEnumerator();
+                    return en.valueOf(a.id2()).compareTo(en.valueOf(b.id2()));
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }

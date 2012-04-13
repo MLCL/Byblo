@@ -30,6 +30,8 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaring;
+import uk.ac.susx.mlcl.byblo.io.EnumeratorDeligates;
 import uk.ac.susx.mlcl.byblo.tasks.DeleteFileTask;
 import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
 import uk.ac.susx.mlcl.lib.commands.CopyCommand;

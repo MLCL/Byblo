@@ -189,7 +189,7 @@ public class JDBCTest {
             map.put(i, x);
             bits += x.bitLength();
             if (i % 5000 == 0) {
-                System.out.println("Fib(" + i + ") = " + map.get(i));
+//                System.out.println("Fib(" + i + ") = " + map.get(i));
                 System.out.println(MiscUtil.memoryInfoString());
                 System.out.println("bits: " + bits);
                 db.commit();

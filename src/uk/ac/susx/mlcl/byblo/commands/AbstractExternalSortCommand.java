@@ -79,7 +79,7 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
 
     protected static final String KEY_DST_FILE = "sort.dst.file";
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     @Parameter(names = {"-C", "--chunk-size"},
                description = "Number of lines that will be read and sorted in RAM at one "

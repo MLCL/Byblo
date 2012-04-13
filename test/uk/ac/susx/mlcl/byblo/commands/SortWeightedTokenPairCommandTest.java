@@ -58,9 +58,11 @@ public class SortWeightedTokenPairCommandTest {
 
         File randomisedFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".sims.randomised");
         File sortedFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".sims.sorted");
+        File entriesIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".entry-index");
+        File featuresIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".feature-index");
 
         final EnumeratorPairBaringDeligate idx = new EnumeratorPairBaringDeligate(
-                preindexedTokens1, preindexedTokens2);
+                preindexedTokens1, preindexedTokens2, entriesIndex, featuresIndex, false, false);
 
         Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(
                 Weighted.recordOrder(TokenPair.firstStringOrder(idx.getEntriesEnumeratorCarriar())),
@@ -83,10 +85,12 @@ public class SortWeightedTokenPairCommandTest {
 
         File randomisedFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".indexed.sims.randomised");
         File sortedFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".indexed.sims.sorted");
+        File entriesIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".entry-index");
+        File featuresIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".feature-index");
 
 
         final EnumeratorPairBaringDeligate idx = new EnumeratorPairBaringDeligate(
-                preindexedTokens1, preindexedTokens2);
+                preindexedTokens1, preindexedTokens2, entriesIndex, featuresIndex, false, false);
 
 
         Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(
@@ -188,7 +192,7 @@ public class SortWeightedTokenPairCommandTest {
 
     private static WeightedTokenPairSource openSource(File file, EnumeratorPairBaringDeligate idx)
             throws IOException {
-        return  WeightedTokenPairSource.open(
+        return WeightedTokenPairSource.open(
                 file, DEFAULT_CHARSET,
                 idx);
     }

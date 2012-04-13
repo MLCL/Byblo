@@ -4,6 +4,8 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.io.EnumeratorSingleBaringDeligate;
+import uk.ac.susx.mlcl.byblo.io.EnumeratorSingleBaring;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.IOException;

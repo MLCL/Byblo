@@ -4,6 +4,8 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.io.EnumeratorSingleBaringDeligate;
+import uk.ac.susx.mlcl.byblo.io.EnumeratorPairBaringDeligate;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;

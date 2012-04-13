@@ -153,14 +153,24 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
         AtomicInteger nextId;
 
         if (collections.contains(FORWARDS)) {
+            // collection exists            
             assert collections.contains(BACKWARDS);
             assert collections.contains(PROPERTIES);
+            
             forwards = db.<Integer, String>getHashMap(FORWARDS);
             backwards = db.<String, Integer>getHashMap(BACKWARDS);
             props = db.<String, String>getHashMap(PROPERTIES);
+            
+            assert backwards.containsKey(FilterCommand.FILTERED_STRING);
+            assert forwards.containsKey(FilterCommand.FILTERED_ID);
+            assert backwards.get(FilterCommand.FILTERED_STRING) == FilterCommand.FILTERED_ID;
+            assert forwards.get(FilterCommand.FILTERED_ID).equals(FilterCommand.FILTERED_STRING);
+            
             assert props.containsKey(NEXT_ID);
             nextId = new AtomicInteger(Integer.valueOf(props.get(NEXT_ID)));
+            
         } else {
+            
             forwards = db.<Integer, String>createHashMap(FORWARDS);
             backwards = db.<String, Integer>createHashMap(BACKWARDS);
             props = db.<String, String>createHashMap(PROPERTIES);
@@ -176,6 +186,7 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
                 forwards, backwards);
         JDBCStringEnumerator instance = new JDBCStringEnumerator(
                 db, file, map, nextId);
+        
         instance.indexOf(FilterCommand.FILTERED_STRING);
 
         assert instance.indexOf(FilterCommand.FILTERED_STRING)

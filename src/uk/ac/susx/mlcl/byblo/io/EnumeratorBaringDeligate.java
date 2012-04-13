@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
 import uk.ac.susx.mlcl.lib.Enumerator;
 import uk.ac.susx.mlcl.lib.JDBCStringEnumerator;
 import uk.ac.susx.mlcl.lib.MemoryStringEnumerator;
@@ -70,18 +71,19 @@ public abstract class EnumeratorBaringDeligate
     }
 
     public Enumerator<String> open(File file) throws IOException {
+        Enumerator<String> out;
         if (type == Type.Memory) {
             if (file != null && file.exists())
-                return MemoryStringEnumerator.load(file);
+                out = MemoryStringEnumerator.load(file);
             else
-                return MemoryStringEnumerator.newInstance(file);
+                out = MemoryStringEnumerator.newInstance(file);
         } else if (type == Type.JDBC) {
             if (file == null) {
-                return JDBCStringEnumerator.newInstance(file);
+                out = JDBCStringEnumerator.newInstance(file);
             } else if (!file.exists()) {
-                return JDBCStringEnumerator.newInstance(file);
+                out = JDBCStringEnumerator.newInstance(file);
             } else {
-                return JDBCStringEnumerator.load(file);
+                out = JDBCStringEnumerator.load(file);
             }
 //            if (file != null && file.exists())
 //                else {
@@ -92,6 +94,9 @@ public abstract class EnumeratorBaringDeligate
         } else {
             throw new AssertionError("Unknown enumerator type " + type);
         }
+        
+        assert out.indexOf(FilterCommand.FILTERED_STRING) == FilterCommand.FILTERED_ID;
+        return out;
     }
 
     public void save(Enumerator<String> enumerator) throws IOException {

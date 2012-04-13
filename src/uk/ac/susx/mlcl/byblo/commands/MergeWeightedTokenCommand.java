@@ -4,6 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.io.EnumeratorSingleBaring;
 import uk.ac.susx.mlcl.byblo.io.EnumeratorSingleBaringDeligate;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
