@@ -220,18 +220,57 @@ function download_mlcllib {
 }
 
 
+
+# Download and build JDBM
+function download_jdbm {
+    jdbm=jdbm
+    jdbm_version=b90079b89d582e7c728ff6590bb02bf8b6ed3bfb
+
+    echo "[${jdbm}] Starting"
+    which -s mvn || die "Can't find maven"
+    which -s javac || die "Can't find javac"
+    which -s unzip || die "Can't find unzip"
+    which -s curl || die "Can't find curl"
+
+
+    jdbm_url="https://github.com/jankotek/JDBM3/zipball/${jdbm_version}"
+    jdbm_dl_file=`mktemp -t ${jdbm_version}-download`
+    echo "[${jdbm}] Downloading from ${jdbm_url} to $jdbm_dl_file"
+    curl -L "${jdbm_url}" > "${jdbm_dl_file}" || die
+
+    jdbm_ext_dir=`mktemp -dt ${jdbm_version}-extracted`
+    echo "[${jdbm}] Extracting to ${jdbm_ext_dir}"
+    unzip -q "${jdbm_dl_file}" -d "${jdbm_ext_dir}" || die
+
+    echo "[${jdbm}] Buildings"
+    cd ${jdbm_ext_dir}/`ls ${jdbm_ext_dir}`
+    mvn clean package || die
+    cp target/*.jar "$libs_dir" || die
+
+    echo "[${jdbm}] Cleaning temporary files"
+    rm -rf "$jdbm_ext_dir"
+    rm -f "$jdbm_dl_file"
+
+    cd "$libs_dir"
+
+    echo "[${jdbm}] Done"
+}
+
+
 function download_all {
     download_jcommander
-
+      
     download_fastutil
-
+      
     download_commons_logging
-
+      
     download_google_guava 
-
+      
     download_junit 
-
+      
     download_mlcllib
+ 
+	download_jdbm
 }
 
 
