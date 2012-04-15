@@ -37,7 +37,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @param V
+ * @param <K> 
+ * @param <V> 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class ForwardingBiMap<K, V>
@@ -73,7 +74,7 @@ public final class ForwardingBiMap<K, V>
     @Override
     public V put(K k, V v) {
         if (containsValue(v)) {
-            if(get(k).equals(v))
+            if (get(k).equals(v))
                 return v;
             throw new IllegalArgumentException(
                     "given value is already bound to a different key in this bimap");
@@ -154,6 +155,7 @@ public final class ForwardingBiMap<K, V>
                 throws IOException, ClassNotFoundException {
             @SuppressWarnings("unchecked")
             Map<K, V> forwards = (Map<K, V>) in.readObject();
+            @SuppressWarnings("unchecked")
             Map<V, K> backwards = (Map<V, K>) in.readObject();
             this.instance = ForwardingBiMap.<K, V>create(forwards, backwards);
         }
@@ -161,6 +163,5 @@ public final class ForwardingBiMap<K, V>
         final Object readResolve() {
             return instance;
         }
-
     }
 }

@@ -12,30 +12,29 @@ import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
-import uk.ac.susx.mlcl.lib.commands.AbstractDeligate;
 
 /**
  *
  * @author hiam20
  */
 public abstract class EnumeratingDeligate
-        extends AbstractDeligate
         implements Serializable, Enumerating {
 
     private static final long serialVersionUID = 1L;
 
     @Parameter(names = {"-s1", "--skipindexed1"},
-    description = "Whether indices will be encoded as deltas in the first column")
+               description = "Whether indices will be encoded as deltas in the first column")
     private boolean skipIndexed1 = DEFAULT_SKIP_INDEXING;
 
     @Parameter(names = {"-s2", "--skipindexed2"},
-    description = "Whether indices will be encoded as deltas in the second column")
+               description = "Whether indices will be encoded as deltas in the second column")
     private boolean skipIndexed2 = DEFAULT_SKIP_INDEXING;
 
     @Parameter(names = {"-et", "--enumerator-type"})
     private EnumeratorType type = DEFAULT_TYPE;
 
-    public EnumeratingDeligate(EnumeratorType type, boolean skipIndexed1, boolean skipIndexed2) {
+    public EnumeratingDeligate(EnumeratorType type, boolean skipIndexed1,
+                               boolean skipIndexed2) {
         this.skipIndexed1 = skipIndexed1;
         this.skipIndexed2 = skipIndexed2;
         this.type = type;
@@ -73,7 +72,8 @@ public abstract class EnumeratingDeligate
     protected void save(Enumerator<String> enumerator) throws IOException {
         if (enumerator == null) {
             Logger.getLogger(EnumeratingDeligate.class.getName()).log(
-                    Level.WARNING, "Attempt made to save an enumerator that was not open.");
+                    Level.WARNING,
+                    "Attempt made to save an enumerator that was not open.");
             return;
         }
         type.save(enumerator);
@@ -84,7 +84,8 @@ public abstract class EnumeratingDeligate
     protected void close(Enumerator<String> enumerator) throws IOException {
         if (enumerator == null) {
             Logger.getLogger(EnumeratingDeligate.class.getName()).log(
-                    Level.WARNING, "Attempt made to save an enumerator that was not open.");
+                    Level.WARNING,
+                    "Attempt made to save an enumerator that was not open.");
             return;
         }
         if (enumerator.indexOf(FilterCommand.FILTERED_STRING) != FilterCommand.FILTERED_ID)
@@ -92,11 +93,14 @@ public abstract class EnumeratingDeligate
         type.close(enumerator);
     }
 
-    @Override
     protected Objects.ToStringHelper toStringHelper() {
-        return super.toStringHelper().
+        return Objects.toStringHelper(this).
                 add("skipIndexed1", isEnumeratorSkipIndexed1()).
                 add("skipIndexed2", isEnumeratorSkipIndexed2());
     }
 
+    @Override
+    public final String toString() {
+        return toStringHelper().toString();
+    }
 }

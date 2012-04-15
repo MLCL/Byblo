@@ -4,6 +4,7 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
+import com.google.common.base.Objects;
 import java.io.Flushable;
 import java.util.Comparator;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -13,10 +14,10 @@ import uk.ac.susx.mlcl.lib.io.Source;
 
 /**
  *
- * @param <T> 
+ * @param <T>
  * @author hiam20
  */
-public class MergeTask<T> extends AbstractTask {
+public class ObjectMergeTask<T> extends AbstractTask {
 
     private Source<T> sourceA;
 
@@ -26,21 +27,22 @@ public class MergeTask<T> extends AbstractTask {
 
     private Comparator<T> comparator;
 
-    public MergeTask(Source<T> sourceA, Source<T> sourceB, Sink<T> sink, Comparator<T> comparator) {
+    public ObjectMergeTask(Source<T> sourceA, Source<T> sourceB, Sink<T> sink,
+                     Comparator<T> comparator) {
         setSourceA(sourceA);
         setSourceB(sourceB);
         setSink(sink);
         setComparator(comparator);
     }
 
-    public MergeTask(Source<T> sourceA, Source<T> sourceB, Sink<T> sink) {
+    public ObjectMergeTask(Source<T> sourceA, Source<T> sourceB, Sink<T> sink) {
         setSourceA(sourceA);
         setSourceB(sourceB);
         setSink(sink);
         setComparator(Comparators.<T>naturalOrderIfPossible());
     }
 
-    public MergeTask() {
+    public ObjectMergeTask() {
         setComparator(Comparators.<T>naturalOrderIfPossible());
     }
 
@@ -80,17 +82,24 @@ public class MergeTask<T> extends AbstractTask {
         this.sourceB = sourceB;
     }
 
-    public boolean equals(MergeTask<?> other) {
+    public boolean equals(ObjectMergeTask<?> other) {
+        if (!super.equals(other))
+            return false;
         if (this.getSourceA() != other.getSourceA()
-                && (this.getSourceA() == null || !this.getSourceA().equals(other.getSourceA())))
+                && (this.getSourceA() == null || !this.getSourceA().equals(other.
+                    getSourceA())))
             return false;
         if (this.getSourceB() != other.getSourceB()
-                && (this.getSourceB() == null || !this.getSourceB().equals(other.getSourceB())))
+                && (this.getSourceB() == null || !this.getSourceB().equals(other.
+                    getSourceB())))
             return false;
-        if (this.getSink() != other.getSink() && (this.getSink() == null || !this.getSink().equals(other.getSink())))
+        if (this.getSink() != other.getSink() && (this.getSink() == null || !this.
+                                                  getSink().equals(
+                                                  other.getSink())))
             return false;
         if (this.getComparator() != other.getComparator()
-                && (this.getComparator() == null || !this.getComparator().equals(other.getComparator())))
+                && (this.getComparator() == null || !this.getComparator().equals(other.
+                    getComparator())))
             return false;
         return true;
     }
@@ -101,12 +110,12 @@ public class MergeTask<T> extends AbstractTask {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        return equals((MergeTask<?>) obj);
+        return equals((ObjectMergeTask<?>) obj);
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
+        int hash = super.hashCode();
         hash = 71 * hash + (this.sourceA != null ? this.sourceA.hashCode() : 0);
         hash = 71 * hash + (this.sourceB != null ? this.sourceB.hashCode() : 0);
         hash = 71 * hash + (this.sink != null ? this.sink.hashCode() : 0);
@@ -157,14 +166,21 @@ public class MergeTask<T> extends AbstractTask {
         }
 
 
-        if (getSink() instanceof Flushable)
-            ((Flushable) getSink()).flush();
-    }
-    
-    @Override
-    protected void finaliseTask() throws Exception {
         if (sink instanceof Flushable)
             ((Flushable) sink).flush();
+    }
+
+    @Override
+    protected void finaliseTask() throws Exception {
+    }
+    
+     @Override
+    protected Objects.ToStringHelper toStringHelper() {
+        return super.toStringHelper().
+                add("sourceA", getSourceA()).
+                add("sourceB", getSourceB()).
+                add("sink", getSink()).
+                add("comparator", getComparator());
     }
 
 }

@@ -22,23 +22,23 @@ import uk.ac.susx.mlcl.lib.io.Source;
  * @param <T>
  * @author hiam20
  */
-public class SortTask<T> extends PipeTask<T> {
+public class ObjectSortTask<T> extends ObjectPipeTask<T> {
 
     private static final long serialVersionUID = 1L;
 
     private Comparator<T> comparator;
 
-    public SortTask(Source<T> source, Sink<T> sink, Comparator<T> comparator) {
+    public ObjectSortTask(Source<T> source, Sink<T> sink, Comparator<T> comparator) {
         super(source, sink);
         setComparator(comparator);
     }
 
-    public SortTask(Source<T> source, Sink<T> sink) {
+    public ObjectSortTask(Source<T> source, Sink<T> sink) {
         super(source, sink);
         setComparator(Comparators.<T>naturalOrderIfPossible());
     }
 
-    public SortTask() {
+    public ObjectSortTask() {
         super();
         setComparator(Comparators.<T>naturalOrderIfPossible());
     }
@@ -52,10 +52,13 @@ public class SortTask<T> extends PipeTask<T> {
         this.comparator = comparator;
     }
 
-    public boolean equals(SortTask<?> other) {
-        super.equals(this);
-        if (this.getComparator() != other.getComparator() && (this.getComparator() == null
-                || !this.getComparator().equals(other.getComparator())))
+    public boolean equals(ObjectSortTask<?> other) {
+        if (!super.equals(this))
+            return false;
+        if (this.getComparator() != other.getComparator()
+                && (this.getComparator() == null
+                    || !this.getComparator().
+                    equals(other.getComparator())))
             return false;
         return true;
 
@@ -65,7 +68,7 @@ public class SortTask<T> extends PipeTask<T> {
     public boolean equals(Object obj) {
         return obj != null
                 && getClass() == obj.getClass()
-                && equals((SortTask<?>) obj);
+                && equals((ObjectSortTask<?>) obj);
     }
 
     @Override
@@ -103,5 +106,6 @@ public class SortTask<T> extends PipeTask<T> {
         return super.toStringHelper().
                 add("comparator", getComparator());
     }
-
+    
+    
 }

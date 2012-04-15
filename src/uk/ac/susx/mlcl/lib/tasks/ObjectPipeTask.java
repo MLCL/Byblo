@@ -42,7 +42,7 @@ import uk.ac.susx.mlcl.lib.io.Source;
  * @param <T>
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-public class PipeTask<T> extends AbstractTask implements Serializable {
+public class ObjectPipeTask<T> extends AbstractTask implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -50,15 +50,14 @@ public class PipeTask<T> extends AbstractTask implements Serializable {
 
     private Sink<T> sink;
 
-    public PipeTask(Source<T> source, Sink<T> sink) {
+    public ObjectPipeTask(Source<T> source, Sink<T> sink) {
         setSource(source);
         setSink(sink);
     }
 
-    public PipeTask() {
+    public ObjectPipeTask() {
     }
 
-    
     public final Sink<T> getSink() {
         return sink;
     }
@@ -81,13 +80,12 @@ public class PipeTask<T> extends AbstractTask implements Serializable {
     protected void initialiseTask() throws Exception {
         Checks.checkNotNull("sink", sink);
         Checks.checkNotNull("source", source);
-        if(getSource().equals(getSink()))
+        if (getSource().equals(getSink()))
             throw new IllegalStateException("Source is the same as the sink.");
     }
 
     @Override
     protected void runTask() throws IOException {
-
 
         while (getSource().hasNext()) {
             getSink().write(getSource().read());
@@ -100,6 +98,7 @@ public class PipeTask<T> extends AbstractTask implements Serializable {
 
     @Override
     protected void finaliseTask() throws Exception {
+        // nothing to do
     }
 
     @Override
@@ -109,12 +108,16 @@ public class PipeTask<T> extends AbstractTask implements Serializable {
                 add("sink", getSink());
     }
 
-    public boolean equals(PipeTask<?> that) {
+    public boolean equals(ObjectPipeTask<?> that) {
+        if (!super.equals((AbstractTask) that))
+            return false;
         if (this.getSource() != that.getSource()
-                && (this.getSource() == null || !this.getSource().equals(that.getSource())))
+                && (this.getSource() == null || !this.getSource().equals(that.
+                    getSource())))
             return false;
         if (this.getSink() != that.getSink()
-                && (this.getSink() == null || !this.getSink().equals(that.getSink())))
+                && (this.getSink() == null || !this.getSink().equals(that.
+                    getSink())))
             return false;
         return true;
     }
@@ -125,15 +128,14 @@ public class PipeTask<T> extends AbstractTask implements Serializable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        return equals((PipeTask<?>) obj);
+        return equals((ObjectPipeTask<?>) obj);
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
+        int hash = super.hashCode();
         hash = 37 * hash + (this.getSource() != null ? this.getSource().hashCode() : 0);
         hash = 37 * hash + (this.getSink() != null ? this.getSink().hashCode() : 0);
         return hash;
     }
-
 }

@@ -15,12 +15,12 @@ import uk.ac.susx.mlcl.lib.io.Files;
  *
  * @author hiam20
  */
-public class FileDeligate extends AbstractDeligate implements Serializable {
+public class FileDeligate implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Parameter(names = {"-c", "--charset"},
-    description = "The character set encoding to use for both reading input and writing output files.")
+               description = "The character set encoding to use for both reading input and writing output files.")
     private Charset charset = Files.DEFAULT_CHARSET;
 
     @Parameter(names = {"--disable-compact-format"}, hidden = true)
@@ -50,11 +50,14 @@ public class FileDeligate extends AbstractDeligate implements Serializable {
         this.charset = charset;
     }
 
-    @Override
     protected Objects.ToStringHelper toStringHelper() {
-        return super.toStringHelper().
+        return Objects.toStringHelper(this).
                 add("charset", getCharset()).
                 add("compact", !isCompactFormatDisabled());
     }
 
+    @Override
+    public final String toString() {
+        return toStringHelper().toString();
+    }
 }

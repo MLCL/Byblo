@@ -72,7 +72,7 @@ public class ExternalCountCommandTest {
         countTask.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
 
         countTask.run();
-        while (countTask.isExceptionThrown()) {
+        while (countTask.isExceptionCaught()) {
             countTask.throwException();
         }
 

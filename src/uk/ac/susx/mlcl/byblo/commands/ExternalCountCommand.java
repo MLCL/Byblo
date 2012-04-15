@@ -30,36 +30,32 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
-import uk.ac.susx.mlcl.byblo.tasks.DeleteFileTask;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
-import uk.ac.susx.mlcl.lib.commands.CopyCommand;
-import uk.ac.susx.mlcl.lib.tasks.MergeTask;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Comparator;
+import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.io.WeightSumReducerSink;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
 import uk.ac.susx.mlcl.byblo.io.*;
-import uk.ac.susx.mlcl.byblo.tasks.Chunk;
-import uk.ac.susx.mlcl.byblo.tasks.Chunker;
 import uk.ac.susx.mlcl.byblo.tasks.CountTask;
-import uk.ac.susx.mlcl.lib.tasks.SortTask;
-import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.io.*;
 import uk.ac.susx.mlcl.lib.AbstractParallelCommandTask;
+import uk.ac.susx.mlcl.lib.Checks;
+import uk.ac.susx.mlcl.lib.commands.CopyCommand;
 import uk.ac.susx.mlcl.lib.commands.FileDeligate;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
-import uk.ac.susx.mlcl.lib.tasks.Task;
+import uk.ac.susx.mlcl.lib.io.*;
+import uk.ac.susx.mlcl.lib.tasks.*;
 
 /**
  *
@@ -70,7 +66,6 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     private static final Log LOG = LogFactory.getLog(ExternalCountCommand.class);
 
-//    private static final int DEFAULT_MAX_CHUNK_SIZE = ChunkTask.DEFAULT_MAX_CHUNK_SIZE;
     protected static final String KEY_TASK_TYPE = "KEY_TASK_TYPE";
 
     protected static final String KEY_DATA_TYPE = "KEY_DATA_TYPE";
@@ -114,35 +109,35 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     private FileDeligate fileDeligate = new FileDeligate();
 
     @Parameter(names = {"-C", "--chunk-size"},
-    description = "Number of lines per work unit. Larger value increase performance and memory usage.")
+               description = "Number of lines per work unit. Larger value increase performance and memory usage.")
     private int maxChunkSize = 500000;
 
     @Parameter(names = {"-i", "--input"},
-    required = true,
-    description = "Input instances file",
-    validateWith = InputFileValidator.class)
+               required = true,
+               description = "Input instances file",
+               validateWith = InputFileValidator.class)
     private File inputFile;
 
     @Parameter(names = {"-oef", "--output-entry-features"},
-    required = true,
-    description = "Output entry-feature frequencies file",
-    validateWith = OutputFileValidator.class)
+               required = true,
+               description = "Output entry-feature frequencies file",
+               validateWith = OutputFileValidator.class)
     private File entryFeaturesFile = null;
 
     @Parameter(names = {"-oe", "--output-entries"},
-    required = true,
-    description = "Output entry frequencies file",
-    validateWith = OutputFileValidator.class)
+               required = true,
+               description = "Output entry frequencies file",
+               validateWith = OutputFileValidator.class)
     private File entriesFile = null;
 
     @Parameter(names = {"-of", "--output-features"},
-    required = true,
-    description = "Output feature frequencies file",
-    validateWith = OutputFileValidator.class)
+               required = true,
+               description = "Output feature frequencies file",
+               validateWith = OutputFileValidator.class)
     private File featuresFile = null;
 
     @Parameter(names = {"-T", "--temporary-directory"},
-    description = "Directory used for holding temporary files.")
+               description = "Directory used for holding temporary files.")
     private TempFileFactory tempFileFactory = new TempFileFactory();
 
     private Queue<File> mergeEntryQueue;
@@ -305,8 +300,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         final SeekableSource<TokenPair, Tell> src =
                 openInstancesSource(getInputFile());
 
-        final Chunker<TokenPair, Tell> chunks =
-                new Chunker<TokenPair, Tell>(src, getMaxChunkSize());
+        final Source<Chunk<TokenPair>> chunks =
+                Chunker.newInstance(src, getMaxChunkSize());
 
         while (chunks.hasNext()) {
             while (!getFutureQueue().isEmpty() && getFutureQueue().peek().isDone()) {
@@ -327,46 +322,6 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
                             chunk_eventsFile);
         }
 
-//
-//
-//
-//
-//        ChunkTask chunkTask = new ChunkTask(getInputFile(), getCharset(),
-//                                            getMaxChunkSize());
-//        chunkTask.setDstFileQueue(chunkQueue);
-//        chunkTask.setChunkFileFactory(tempFileFactory);
-//        Future<ChunkTask> chunkFuture = submitTask(chunkTask);
-//
-//        // Immidiately poll the chunk task so we can start handling other
-//        // completed tasks
-//        if (!getFutureQueue().poll().equals(chunkFuture))
-//            throw new AssertionError("Expecting ChunkTask on future queue.");
-//
-//        while (!chunkFuture.isDone() || !chunkQueue.isEmpty()) {
-//
-//            if (!getFutureQueue().isEmpty() && getFutureQueue().peek().isDone()) {
-//
-//                handleCompletedTask(getFutureQueue().poll().get());
-//
-//            } else if (!chunkQueue.isEmpty()) {
-//
-//                File chunk = chunkQueue.take();
-//
-//                File chunk_entriesFile = tempFileFactory.createFile("cnt.ent.",
-//                                                                    "");
-//                File chunk_featuresFile = tempFileFactory.createFile("cnt.feat.",
-//                                                                     "");
-//                File chunk_entryFeaturesFile = tempFileFactory.createFile(
-//                        "cnt.evnt.", "");
-//
-//                submitCountTask(chunk, chunk_entriesFile, chunk_featuresFile, chunk_entryFeaturesFile);
-//
-//            }
-//
-//            // XXX: Nasty hack to stop it tight looping when both queues are empty
-//            Thread.sleep(1);
-//        }
-//        chunkTask.throwException();
     }
 
     protected void reduce() throws Exception {
@@ -377,14 +332,14 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     }
 
     protected void handleCompletedTask(Task task) throws Exception {
-        while (task.isExceptionThrown())
+        while (task.isExceptionCaught())
             task.throwException();
 
-        final Properties p = task.getProperties();
-        final String taskType = p.getProperty(KEY_TASK_TYPE);
-        final String dataType = p.getProperty(KEY_DATA_TYPE);
+//        final Properties p = task.getProperties();
+        final String taskType = task.getProperty(KEY_TASK_TYPE);
+        final String dataType = task.getProperty(KEY_DATA_TYPE);
 
-        if (task.isExceptionThrown())
+        if (task.isExceptionCaught())
             task.throwException();
 
         if (taskType.equals(VALUE_TASK_TYPE_DELETE)) {
@@ -407,21 +362,22 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             if (countTask.getSource() instanceof Closeable)
                 ((Closeable) countTask.getSource()).close();
 
-            submitSortEntriesTask(new File(p.getProperty(KEY_DST_ENTRIES_FILE)));
+            submitSortEntriesTask(new File(
+                    task.getProperty(KEY_DST_ENTRIES_FILE)));
             submitSortFeaturesTask(
-                    new File(p.getProperty(KEY_DST_FEATURES_FILE)));
-            submitSortEventsTask(new File(p.getProperty(KEY_DST_EVENTS_FILE)));
+                    new File(task.getProperty(KEY_DST_FEATURES_FILE)));
+            submitSortEventsTask(new File(task.getProperty(KEY_DST_EVENTS_FILE)));
 
-            File src = new File(p.getProperty(KEY_SRC_FILE));
+            File src = new File(task.getProperty(KEY_SRC_FILE));
             if (!DEBUG && !this.getInputFile().equals(src))
                 submitDeleteTask(src);
 
         } else if (taskType.equals(VALUE_TASK_TYPE_SORT)) {
 
-            final File src = new File(p.getProperty(KEY_SRC_FILE));
-            final File dst = new File(p.getProperty(KEY_DST_FILE));
+            final File src = new File(task.getProperty(KEY_SRC_FILE));
+            final File dst = new File(task.getProperty(KEY_DST_FILE));
 
-            SortTask<?> sortTask = (SortTask) task;
+            ObjectSortTask<?> sortTask = (ObjectSortTask) task;
             if (sortTask.getSink() instanceof Flushable)
                 ((Flushable) sortTask.getSink()).flush();
             if (sortTask.getSink() instanceof Closeable)
@@ -443,11 +399,11 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
         } else if (taskType.equals(VALUE_TASK_TYPE_MERGE)) {
 
-            final File srca = new File(p.getProperty(KEY_SRC_FILE_A));
-            final File srcb = new File(p.getProperty(KEY_SRC_FILE_B));
-            final File dst = new File(p.getProperty(KEY_DST_FILE));
+            final File srca = new File(task.getProperty(KEY_SRC_FILE_A));
+            final File srcb = new File(task.getProperty(KEY_SRC_FILE_B));
+            final File dst = new File(task.getProperty(KEY_DST_FILE));
 
-            MergeTask<?> mergeTask = (MergeTask) task;
+            ObjectMergeTask<?> mergeTask = (ObjectMergeTask) task;
             if (mergeTask.getSink() instanceof Flushable)
                 ((Flushable) mergeTask.getSink()).flush();
             if (mergeTask.getSink() instanceof Closeable)
@@ -488,9 +444,9 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
                     "The entry merge queue is empty but final copy has not been completed.");
         new CopyCommand(finalMerge, getEntriesFile()).runCommand();
         if (!DEBUG) {
-            DeleteFileTask delete = new DeleteFileTask(finalMerge);
+            FileDeleteTask delete = new FileDeleteTask(finalMerge);
             delete.runTask();
-            if (delete.isExceptionThrown())
+            if (delete.isExceptionCaught())
                 delete.throwException();
         }
 
@@ -500,9 +456,9 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
                     "The entry/feature merge queue is empty but final copy has not been completed.");
         new CopyCommand(finalMerge, getEntryFeaturesFile()).runCommand();
         if (!DEBUG) {
-            DeleteFileTask delete = new DeleteFileTask(finalMerge);
+            FileDeleteTask delete = new FileDeleteTask(finalMerge);
             delete.runTask();
-            if (delete.isExceptionThrown())
+            if (delete.isExceptionCaught())
                 delete.throwException();
 
         }
@@ -513,9 +469,9 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
                     "The feature merge queue is empty but final copy has not been completed.");
         new CopyCommand(finalMerge, getFeaturesFile()).runCommand();
         if (!DEBUG) {
-            DeleteFileTask delete = new DeleteFileTask(finalMerge);
+            FileDeleteTask delete = new FileDeleteTask(finalMerge);
             delete.runTask();
-            if (delete.isExceptionThrown())
+            if (delete.isExceptionCaught())
                 delete.throwException();
 
         }
@@ -523,20 +479,23 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     private Comparator<Weighted<Token>> getEntryOrder() throws IOException {
         return indexDeligate.isEntriesEnumerated()
-               ? Weighted.recordOrder(Token.indexOrder())
-               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getEntriesEnumeratorCarriar()));
+                ? Weighted.recordOrder(Token.indexOrder())
+                : Weighted.recordOrder(Token.stringOrder(indexDeligate.
+                getEntriesEnumeratorCarriar()));
     }
 
     private Comparator<Weighted<Token>> getFeatureOrder() throws IOException {
         return indexDeligate.isFeaturesEnumerated()
-               ? Weighted.recordOrder(Token.indexOrder())
-               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getFeaturesEnumeratorCarriar()));
+                ? Weighted.recordOrder(Token.indexOrder())
+                : Weighted.recordOrder(Token.stringOrder(indexDeligate.
+                getFeaturesEnumeratorCarriar()));
     }
 
     private Comparator<Weighted<TokenPair>> getEventOrder() throws IOException {
-        return (indexDeligate.isEntriesEnumerated() && indexDeligate.isFeaturesEnumerated())
-               ? Weighted.recordOrder(TokenPair.indexOrder())
-               : Weighted.recordOrder(TokenPair.stringOrder(indexDeligate));
+        return (indexDeligate.isEntriesEnumerated() && indexDeligate.
+                isFeaturesEnumerated())
+                ? Weighted.recordOrder(TokenPair.indexOrder())
+                : Weighted.recordOrder(TokenPair.stringOrder(indexDeligate));
     }
 
     protected void submitCountTask(Source<TokenPair> instanceSource,
@@ -553,21 +512,21 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
                 instanceSource, eventsSink, entrySink, featureSink,
                 getEventOrder(), getEntryOrder(), getFeatureOrder());
 
-        task.getProperties().setProperty(KEY_TASK_TYPE, VALUE_TASK_TYPE_COUNT);
+        task.setProperty(KEY_TASK_TYPE, VALUE_TASK_TYPE_COUNT);
 
-        task.getProperties().setProperty(KEY_SRC_FILE, getInputFile().toString());
-        task.getProperties().setProperty(KEY_DST_EVENTS_FILE,
-                                         outEvents.toString());
-        task.getProperties().setProperty(KEY_DST_ENTRIES_FILE, outEntries.toString());
-        task.getProperties().setProperty(KEY_DST_FEATURES_FILE, outFeatures.toString());
+        task.setProperty(KEY_SRC_FILE, getInputFile().toString());
+        task.setProperty(KEY_DST_EVENTS_FILE,
+                         outEvents.toString());
+        task.setProperty(KEY_DST_ENTRIES_FILE, outEntries.toString());
+        task.setProperty(KEY_DST_FEATURES_FILE, outFeatures.toString());
 
         submitTask(task);
     }
 
     protected void submitDeleteTask(File file) {
-        final DeleteFileTask deleteTask = new DeleteFileTask(file);
-        deleteTask.getProperties().setProperty(KEY_TASK_TYPE,
-                                               VALUE_TASK_TYPE_DELETE);
+        final FileDeleteTask deleteTask = new FileDeleteTask(file);
+        deleteTask.setProperty(KEY_TASK_TYPE,
+                               VALUE_TASK_TYPE_DELETE);
         submitTask(deleteTask);
     }
 
@@ -578,14 +537,14 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         Source<Weighted<Token>> src = openEntriesSource(srcFile);
         Sink<Weighted<Token>> snk = openEntriesSink(dstFile);
 
-        SortTask<Weighted<Token>> task =
-                new SortTask<Weighted<Token>>(src, snk);
+        ObjectSortTask<Weighted<Token>> task =
+                new ObjectSortTask<Weighted<Token>>(src, snk);
         task.setComparator(Weighted.recordOrder(Token.indexOrder()));
 
-        task.getProperties().setProperty(KEY_TASK_TYPE, VALUE_TASK_TYPE_SORT);
-        task.getProperties().setProperty(KEY_DATA_TYPE, VALUE_DATA_TYPE_ENTRIES);
-        task.getProperties().setProperty(KEY_SRC_FILE, srcFile.toString());
-        task.getProperties().setProperty(KEY_DST_FILE, dstFile.toString());
+        task.setProperty(KEY_TASK_TYPE, VALUE_TASK_TYPE_SORT);
+        task.setProperty(KEY_DATA_TYPE, VALUE_DATA_TYPE_ENTRIES);
+        task.setProperty(KEY_SRC_FILE, srcFile.toString());
+        task.setProperty(KEY_DST_FILE, dstFile.toString());
         submitTask(task);
     }
 
@@ -596,14 +555,14 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         Source<Weighted<Token>> src = openFeaturesSource(srcFile);
         Sink<Weighted<Token>> snk = openFeaturesSink(dstFile);
 
-        SortTask<Weighted<Token>> task =
-                new SortTask<Weighted<Token>>(src, snk);
+        ObjectSortTask<Weighted<Token>> task =
+                new ObjectSortTask<Weighted<Token>>(src, snk);
         task.setComparator(Weighted.recordOrder(Token.indexOrder()));
 
-        task.getProperties().setProperty(KEY_TASK_TYPE, VALUE_TASK_TYPE_SORT);
-        task.getProperties().setProperty(KEY_DATA_TYPE, VALUE_DATA_TYPE_FEATURES);
-        task.getProperties().setProperty(KEY_SRC_FILE, srcFile.toString());
-        task.getProperties().setProperty(KEY_DST_FILE, dstFile.toString());
+        task.setProperty(KEY_TASK_TYPE, VALUE_TASK_TYPE_SORT);
+        task.setProperty(KEY_DATA_TYPE, VALUE_DATA_TYPE_FEATURES);
+        task.setProperty(KEY_SRC_FILE, srcFile.toString());
+        task.setProperty(KEY_DST_FILE, dstFile.toString());
         submitTask(task);
     }
 
@@ -614,14 +573,14 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         Source<Weighted<TokenPair>> src = openEventsSource(srcFile);
         Sink<Weighted<TokenPair>> snk = openEventsSink(dstFile);
 
-        SortTask<Weighted<TokenPair>> task =
-                new SortTask<Weighted<TokenPair>>(src, snk);
+        ObjectSortTask<Weighted<TokenPair>> task =
+                new ObjectSortTask<Weighted<TokenPair>>(src, snk);
         task.setComparator(Weighted.recordOrder(TokenPair.indexOrder()));
 
-        task.getProperties().setProperty(KEY_TASK_TYPE, VALUE_TASK_TYPE_SORT);
-        task.getProperties().setProperty(KEY_DATA_TYPE, VALUE_DATA_TYPE_EVENTS);
-        task.getProperties().setProperty(KEY_SRC_FILE, srcFile.toString());
-        task.getProperties().setProperty(KEY_DST_FILE, dstFile.toString());
+        task.setProperty(KEY_TASK_TYPE, VALUE_TASK_TYPE_SORT);
+        task.setProperty(KEY_DATA_TYPE, VALUE_DATA_TYPE_EVENTS);
+        task.setProperty(KEY_SRC_FILE, srcFile.toString());
+        task.setProperty(KEY_DST_FILE, dstFile.toString());
         submitTask(task);
     }
 
@@ -636,17 +595,17 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             Source<Weighted<Token>> srcB = openEntriesSource(srcFileB);
             Sink<Weighted<Token>> snk = openEntriesSink(dstFile);
 
-            MergeTask<Weighted<Token>> task =
-                    new MergeTask<Weighted<Token>>(srcA, srcB, snk);
+            ObjectMergeTask<Weighted<Token>> task =
+                    new ObjectMergeTask<Weighted<Token>>(srcA, srcB, snk);
             task.setComparator(Weighted.recordOrder(Token.indexOrder()));
 
-            task.getProperties().setProperty(KEY_TASK_TYPE,
-                                             VALUE_TASK_TYPE_MERGE);
-            task.getProperties().setProperty(KEY_DATA_TYPE,
-                                             VALUE_DATA_TYPE_ENTRIES);
-            task.getProperties().setProperty(KEY_SRC_FILE_A, srcFileA.toString());
-            task.getProperties().setProperty(KEY_SRC_FILE_B, srcFileB.toString());
-            task.getProperties().setProperty(KEY_DST_FILE, dstFile.toString());
+            task.setProperty(KEY_TASK_TYPE,
+                             VALUE_TASK_TYPE_MERGE);
+            task.setProperty(KEY_DATA_TYPE,
+                             VALUE_DATA_TYPE_ENTRIES);
+            task.setProperty(KEY_SRC_FILE_A, srcFileA.toString());
+            task.setProperty(KEY_SRC_FILE_B, srcFileB.toString());
+            task.setProperty(KEY_DST_FILE, dstFile.toString());
 
 
             submitTask(task);
@@ -664,17 +623,17 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             Source<Weighted<Token>> srcB = openFeaturesSource(srcFileB);
             Sink<Weighted<Token>> snk = openFeaturesSink(dstFile);
 
-            MergeTask<Weighted<Token>> task =
-                    new MergeTask<Weighted<Token>>(srcA, srcB, snk);
+            ObjectMergeTask<Weighted<Token>> task =
+                    new ObjectMergeTask<Weighted<Token>>(srcA, srcB, snk);
             task.setComparator(Weighted.recordOrder(Token.indexOrder()));
 
-            task.getProperties().setProperty(KEY_TASK_TYPE,
-                                             VALUE_TASK_TYPE_MERGE);
-            task.getProperties().setProperty(KEY_DATA_TYPE,
-                                             VALUE_DATA_TYPE_FEATURES);
-            task.getProperties().setProperty(KEY_SRC_FILE_A, srcFileA.toString());
-            task.getProperties().setProperty(KEY_SRC_FILE_B, srcFileB.toString());
-            task.getProperties().setProperty(KEY_DST_FILE, dstFile.toString());
+            task.setProperty(KEY_TASK_TYPE,
+                             VALUE_TASK_TYPE_MERGE);
+            task.setProperty(KEY_DATA_TYPE,
+                             VALUE_DATA_TYPE_FEATURES);
+            task.setProperty(KEY_SRC_FILE_A, srcFileA.toString());
+            task.setProperty(KEY_SRC_FILE_B, srcFileB.toString());
+            task.setProperty(KEY_DST_FILE, dstFile.toString());
 
             submitTask(task);
         }
@@ -691,18 +650,18 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             Source<Weighted<TokenPair>> srcB = openEventsSource(srcFileB);
             Sink<Weighted<TokenPair>> snk = openEventsSink(dstFile);
 
-            MergeTask<Weighted<TokenPair>> task =
-                    new MergeTask<Weighted<TokenPair>>(srcA, srcB, snk);
+            ObjectMergeTask<Weighted<TokenPair>> task =
+                    new ObjectMergeTask<Weighted<TokenPair>>(srcA, srcB, snk);
             task.setComparator(Weighted.recordOrder(TokenPair.indexOrder()));
 
 
-            task.getProperties().setProperty(KEY_TASK_TYPE,
-                                             VALUE_TASK_TYPE_MERGE);
-            task.getProperties().setProperty(KEY_DATA_TYPE,
-                                             VALUE_DATA_TYPE_EVENTS);
-            task.getProperties().setProperty(KEY_SRC_FILE_A, srcFileA.toString());
-            task.getProperties().setProperty(KEY_SRC_FILE_B, srcFileB.toString());
-            task.getProperties().setProperty(KEY_DST_FILE, dstFile.toString());
+            task.setProperty(KEY_TASK_TYPE,
+                             VALUE_TASK_TYPE_MERGE);
+            task.setProperty(KEY_DATA_TYPE,
+                             VALUE_DATA_TYPE_EVENTS);
+            task.setProperty(KEY_SRC_FILE_A, srcFileA.toString());
+            task.setProperty(KEY_SRC_FILE_B, srcFileB.toString());
+            task.setProperty(KEY_DST_FILE, dstFile.toString());
 
 
             submitTask(task);
@@ -711,7 +670,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     protected SeekableSource<Weighted<Token>, Tell> openEntriesSource(File file) throws FileNotFoundException, IOException {
         return WeightedTokenSource.open(file, getFileDeligate().getCharset(),
-                                        EnumeratingDeligates.toSingleEntries(getIndexDeligate()));
+                                        EnumeratingDeligates.toSingleEntries(
+                getIndexDeligate()));
 //        return new WeightedTokenSource(
 //                new TSVSource(file, getFileDeligate().getCharset()),
 //                indexDeligate.single1());
@@ -719,7 +679,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     protected Sink<Weighted<Token>> openEntriesSink(File file) throws FileNotFoundException, IOException {
         WeightedTokenSink s = WeightedTokenSink.open(
-                file, getFileDeligate().getCharset(), EnumeratingDeligates.toSingleEntries(getIndexDeligate()));
+                file, getFileDeligate().getCharset(), EnumeratingDeligates.
+                toSingleEntries(getIndexDeligate()));
 //                new WeightedTokenSink(new TSVSink(file, getFileDeligate().getCharset()),
 //                                                    indexDeligate.single1());
         s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
@@ -728,7 +689,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     protected SeekableSource<Weighted<Token>, Tell> openFeaturesSource(File file) throws FileNotFoundException, IOException {
         return WeightedTokenSource.open(file, getFileDeligate().getCharset(),
-                                        EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
+                                        EnumeratingDeligates.toSingleFeatures(
+                getIndexDeligate()));
 //        return new WeightedTokenSource(
 //                new TSVSource(file, getFileDeligate().getCharset()),
 //                indexDeligate.single2());
@@ -737,7 +699,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     protected Sink<Weighted<Token>> openFeaturesSink(File file) throws FileNotFoundException, IOException {
 
         WeightedTokenSink s = WeightedTokenSink.open(
-                file, getFileDeligate().getCharset(), EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
+                file, getFileDeligate().getCharset(), EnumeratingDeligates.
+                toSingleFeatures(getIndexDeligate()));
 //                new WeightedTokenSink(new TSVSink(file, getFileDeligate().getCharset()),
 //                                                    indexDeligate.single2());
         s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
@@ -825,7 +788,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
         // For each output file, check that either it exists and it writeable,
         // or that it does not exist but is creatable
-        if (entriesFile.exists() && (!entriesFile.isFile() || !entriesFile.canWrite()))
+        if (entriesFile.exists() && (!entriesFile.isFile() || !entriesFile.
+                                     canWrite()))
             throw new IllegalStateException(
                     "entries file exists but is not writable: " + entriesFile);
         if (!entriesFile.exists() && !entriesFile.getAbsoluteFile().
@@ -834,7 +798,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             throw new IllegalStateException(
                     "entries file does not exists and can not be reated: " + entriesFile);
         }
-        if (featuresFile.exists() && (!featuresFile.isFile() || !featuresFile.canWrite()))
+        if (featuresFile.exists() && (!featuresFile.isFile() || !featuresFile.
+                                      canWrite()))
             throw new IllegalStateException(
                     "features file exists but is not writable: " + featuresFile);
         if (!featuresFile.exists() && !featuresFile.getAbsoluteFile().
@@ -843,7 +808,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             throw new IllegalStateException(
                     "features file does not exists and can not be reated: " + featuresFile);
         }
-        if (entryFeaturesFile.exists() && (!entryFeaturesFile.isFile() || !entryFeaturesFile.canWrite()))
+        if (entryFeaturesFile.exists() && (!entryFeaturesFile.isFile() || !entryFeaturesFile.
+                                           canWrite()))
             throw new IllegalStateException(
                     "entry-features file exists but is not writable: " + entryFeaturesFile);
         if (!entryFeaturesFile.exists() && !entryFeaturesFile.getAbsoluteFile().
@@ -865,5 +831,4 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
                 add("fd", getFileDeligate()).
                 add("id", getIndexDeligate());
     }
-
 }

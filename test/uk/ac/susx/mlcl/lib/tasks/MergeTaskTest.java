@@ -4,7 +4,7 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
-import uk.ac.susx.mlcl.lib.tasks.MergeTask;
+import uk.ac.susx.mlcl.lib.tasks.ObjectMergeTask;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -71,7 +71,7 @@ public class MergeTaskTest {
 
         };
 
-        MergeTask<Integer> instance = new MergeTask<Integer>();
+        ObjectMergeTask<Integer> instance = new ObjectMergeTask<Integer>();
         instance.setSourceA(src1);
         instance.setSourceB(src2);
         instance.setSink(sink);

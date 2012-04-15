@@ -30,33 +30,13 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
-import java.util.Properties;
+import uk.ac.susx.mlcl.lib.PropertyCarrying;
 
 /**
- *
+ * Define a common interface for worker objects.
+ * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public interface Task extends Runnable {
-
-    @Override
-    void run();
-
-    //
-    // Support for handing exceptions thrown during the process
-    //
-    Throwable getException();
-
-    boolean isExceptionThrown();
-
-    void throwException() throws Exception;
-
-    //
-    // Support for arbitrary properties to be set on each task
-    //
-    Properties getProperties();
-
-    String getProperty(String key);
-
-    void setProperty(String key, String value);
-
+public interface Task
+        extends Runnable, PropertyCarrying, ExceptionCarrying {
 }

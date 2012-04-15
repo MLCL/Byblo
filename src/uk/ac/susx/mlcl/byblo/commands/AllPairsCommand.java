@@ -77,75 +77,75 @@ public class AllPairsCommand extends AbstractCommand {
     private FileDeligate fileDeligate = new FileDeligate();
 
     @Parameter(names = {"-i", "--input"},
-    description = "Entry-feature frequency vectors files.",
-    required = true,
-    validateWith = InputFileValidator.class)
+               description = "Entry-feature frequency vectors files.",
+               required = true,
+               validateWith = InputFileValidator.class)
     private File entryFeaturesFile;
 
     @Parameter(names = {"-if", "--input-features"},
-    description = "Feature frequencies file",
-    validateWith = InputFileValidator.class)
+               description = "Feature frequencies file",
+               validateWith = InputFileValidator.class)
     private File featuresFile;
 
     @Parameter(names = {"-ie", "--input-entries"},
-    description = "Entry frequencies file",
-    validateWith = InputFileValidator.class)
+               description = "Entry frequencies file",
+               validateWith = InputFileValidator.class)
     private File entriesFile;
 
     @Parameter(names = {"-o", "--output"},
-    description = "Output similarity matrix file.",
-    required = true,
-    validateWith = OutputFileValidator.class)
+               description = "Output similarity matrix file.",
+               required = true,
+               validateWith = OutputFileValidator.class)
     private File outputFile;
 
     @Parameter(names = {"-C", "--chunk-size"},
-    description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
+               description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
     private int chunkSize = 2500;
 
     @Parameter(names = {"-t", "--threads"},
-    description = "Number of conccurent processing threads.")
+               description = "Number of conccurent processing threads.")
     private int nThreads = Runtime.getRuntime().availableProcessors() + 1;
 
     @Parameter(names = {"-Smn", "--similarity-min"},
-    description = "Minimum similarity threshold.",
-    converter = DoubleConverter.class)
+               description = "Minimum similarity threshold.",
+               converter = DoubleConverter.class)
     private double minSimilarity = Double.NEGATIVE_INFINITY;
 
     @Parameter(names = {"-Smx", "--similarity-max"},
-    description = "Maximyum similarity threshold.",
-    converter = DoubleConverter.class)
+               description = "Maximyum similarity threshold.",
+               converter = DoubleConverter.class)
     private double maxSimilarity = Double.POSITIVE_INFINITY;
 
     @Parameter(names = {"-ip", "--identity-pairs"},
-    description = "Produce similarity between pair of identical entries.")
+               description = "Produce similarity between pair of identical entries.")
     private boolean outputIdentityPairs = false;
 
     @Parameter(names = {"-m", "--measure"},
-    description = "Similarity measure to use.")
+               description = "Similarity measure to use.")
     private String measureName = "Jaccard";
 
     @Parameter(names = {"--measure-reversed"},
-    description = "Swap similarity measure inputs.")
+               description = "Swap similarity measure inputs.")
     private boolean measureReversed = false;
 
     @Parameter(names = {"--lee-alpha"},
-    description = "Alpha parameter to Lee's alpha-skew divergence measure.",
-    converter = DoubleConverter.class)
+               description = "Alpha parameter to Lee's alpha-skew divergence measure.",
+               converter = DoubleConverter.class)
     private double leeAlpha = Lee.DEFAULT_ALPHA;
 
     @Parameter(names = {"--crmi-beta"},
-    description = "Beta paramter to Weed's CRMI measure.",
-    converter = DoubleConverter.class)
+               description = "Beta paramter to Weed's CRMI measure.",
+               converter = DoubleConverter.class)
     private double crmiBeta = CrMi.DEFAULT_BETA;
 
     @Parameter(names = {"--crmi-gamma"},
-    description = "Gamma paramter to Weed's CRMI measure.",
-    converter = DoubleConverter.class)
+               description = "Gamma paramter to Weed's CRMI measure.",
+               converter = DoubleConverter.class)
     private double crmiGamma = CrMi.DEFAULT_GAMMA;
 
     @Parameter(names = {"--mink-p"},
-    description = "P parameter to Minkowski/Lp space measure.",
-    converter = DoubleConverter.class)
+               description = "P parameter to Minkowski/Lp space measure.",
+               converter = DoubleConverter.class)
     private double minkP = 2;
 
     public enum Algorithm {
@@ -167,12 +167,11 @@ public class AllPairsCommand extends AbstractCommand {
         public NaiveApssTask newInstance() throws InstantiationException, IllegalAccessException {
             return getImplementation().newInstance();
         }
-
     }
 
     @Parameter(names = {"--algorithm"},
-    hidden = true,
-    description = "APPS algorithm to use.")
+               hidden = true,
+               description = "APPS algorithm to use.")
     private Algorithm algorithm = Algorithm.Inverted;
 
     public AllPairsCommand(File entriesFile, File featuresFile,
@@ -190,6 +189,7 @@ public class AllPairsCommand extends AbstractCommand {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void runCommand() throws Exception {
 
         if (LOG.isInfoEnabled()) {
@@ -291,7 +291,7 @@ public class AllPairsCommand extends AbstractCommand {
         if (sourceB instanceof Closeable)
             ((Closeable) sourceB).close();
 
-        if (apss.isExceptionThrown())
+        if (apss.isExceptionCaught())
             apss.throwException();
 
         indexDeligate.saveEnumerator();
@@ -333,7 +333,8 @@ public class AllPairsCommand extends AbstractCommand {
     private WeightedTokenPairSink openSimsSink() throws IOException {
         return WeightedTokenPairSink.open(
                 getOutputFile(), getCharset(),
-                EnumeratingDeligates.toPair(EnumeratingDeligates.toSingleEntries(getIndexDeligate())),
+                EnumeratingDeligates.toPair(EnumeratingDeligates.toSingleEntries(
+                getIndexDeligate())),
                 fileDeligate.isCompactFormatDisabled());
 
     }
@@ -366,6 +367,7 @@ public class AllPairsCommand extends AbstractCommand {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public final Class<? extends Proximity> getMeasureClass()
             throws ClassNotFoundException {
         final Map<String, Class<? extends Proximity>> classLookup =
@@ -374,8 +376,7 @@ public class AllPairsCommand extends AbstractCommand {
         if (classLookup.containsKey(mname)) {
             return classLookup.get(mname);
         } else {
-            return (Class<? extends Proximity>) Class.forName(
-                    getMeasureName());
+            return (Class<? extends Proximity>) Class.forName(getMeasureName());
         }
     }
 
@@ -595,5 +596,4 @@ public class AllPairsCommand extends AbstractCommand {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }
-
 }

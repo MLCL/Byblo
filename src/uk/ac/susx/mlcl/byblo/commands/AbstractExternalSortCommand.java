@@ -41,14 +41,13 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayDeque;
 import java.util.Comparator;
-import java.util.Properties;
 import java.util.Queue;
 import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.tasks.Chunk;
-import uk.ac.susx.mlcl.byblo.tasks.Chunker;
-import uk.ac.susx.mlcl.byblo.tasks.DeleteFileTask;
+import uk.ac.susx.mlcl.lib.tasks.Chunk;
+import uk.ac.susx.mlcl.lib.tasks.Chunker;
+import uk.ac.susx.mlcl.lib.tasks.FileDeleteTask;
 import uk.ac.susx.mlcl.lib.AbstractParallelCommandTask;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Comparators;
@@ -56,8 +55,8 @@ import uk.ac.susx.mlcl.lib.commands.CopyCommand;
 import uk.ac.susx.mlcl.lib.commands.FilePipeDeligate;
 import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
 import uk.ac.susx.mlcl.lib.io.*;
-import uk.ac.susx.mlcl.lib.tasks.MergeTask;
-import uk.ac.susx.mlcl.lib.tasks.SortTask;
+import uk.ac.susx.mlcl.lib.tasks.ObjectMergeTask;
+import uk.ac.susx.mlcl.lib.tasks.ObjectSortTask;
 import uk.ac.susx.mlcl.lib.tasks.Task;
 
 /**
@@ -178,11 +177,10 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
 
         mergeQueue = new ArrayDeque<File>();
 
-//      
         final SeekableSource<T, ?> src = openSource(getFileDeligate().
                 getSourceFile());
-        final Chunker<T, ?> chunks = (Chunker<T, ?>) new Chunker(src,
-                                                                 getMaxChunkSize());
+        final Source<Chunk<T>> chunks = Chunker.newInstance(
+                src, getMaxChunkSize());
 
         while (chunks.hasNext()) {
             while (!getFutureQueue().isEmpty() && getFutureQueue().peek().isDone()) {
@@ -201,10 +199,10 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
         File finalMerge = mergeQueue.poll();
         new CopyCommand(finalMerge, getFileDeligate().getDestinationFile()).
                 runCommand();
-        
-        DeleteFileTask finalDelete = createDeleteTask(finalMerge);
+
+        FileDeleteTask finalDelete = createDeleteTask(finalMerge);
         finalDelete.runTask();
-        if(finalDelete.isExceptionThrown())
+        if (finalDelete.isExceptionCaught())
             finalDelete.throwException();
 
 
@@ -217,14 +215,14 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
     protected void handleCompletedTask(Task task) throws Exception {
         Checks.checkNotNull("task", task);
         task.throwException();
-        final Properties p = task.getProperties();
-        
-        if(task.isExceptionThrown())
+//        final Properties p = task.getProperties();
+
+        if (task.isExceptionCaught())
             task.throwException();
 
-        if (task instanceof SortTask) {
+        if (task instanceof ObjectSortTask) {
 
-            SortTask<?> sortTask = (SortTask) task;
+            ObjectSortTask<?> sortTask = (ObjectSortTask) task;
             if (sortTask.getSink() instanceof Flushable)
                 ((Flushable) sortTask.getSink()).flush();
             if (sortTask.getSink() instanceof Closeable)
@@ -233,11 +231,11 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
                 ((Closeable) sortTask.getSource()).close();
 
 
-            queueMergeTask(new File(p.getProperty(KEY_DST_FILE)));
+            queueMergeTask(new File(task.getProperty(KEY_DST_FILE)));
 
-        } else if (task instanceof MergeTask) {
+        } else if (task instanceof ObjectMergeTask) {
 
-            MergeTask<?> mergeTask = (MergeTask) task;
+            ObjectMergeTask<?> mergeTask = (ObjectMergeTask) task;
             if (mergeTask.getSink() instanceof Flushable)
                 ((Flushable) mergeTask.getSink()).flush();
             if (mergeTask.getSink() instanceof Closeable)
@@ -247,15 +245,15 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
             if (mergeTask.getSourceB() instanceof Closeable)
                 ((Closeable) mergeTask.getSourceB()).close();
 
-            queueMergeTask(new File(p.getProperty(KEY_DST_FILE)));
+            queueMergeTask(new File(task.getProperty(KEY_DST_FILE)));
             if (!DEBUG) {
-                submitTask(createDeleteTask(new File(p.getProperty(
+                submitTask(createDeleteTask(new File(task.getProperty(
                         KEY_SRC_FILE_A))));
-                submitTask(createDeleteTask(new File(p.getProperty(
+                submitTask(createDeleteTask(new File(task.getProperty(
                         KEY_SRC_FILE_B))));
             }
 
-        } else if (task instanceof DeleteFileTask) {
+        } else if (task instanceof FileDeleteTask) {
             // not a sausage
         } else {
             throw new AssertionError(
@@ -281,35 +279,35 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
         }
     }
 
-    protected DeleteFileTask createDeleteTask(File file) {
-        return new DeleteFileTask(file);
+    protected FileDeleteTask createDeleteTask(File file) {
+        return new FileDeleteTask(file);
     }
 
-    protected SortTask<T> createSortTask(Chunk<T> chunk, File dst) throws IOException {
+    protected ObjectSortTask<T> createSortTask(Chunk<T> chunk, File dst) throws IOException {
         Sink<T> sink = openSink(dst);
-        SortTask<T> task = new SortTask<T>();
+        ObjectSortTask<T> task = new ObjectSortTask<T>();
         task.setSource(chunk);
         task.setSink(sink);
         task.setComparator(getComparator());
 
-        task.getProperties().setProperty(KEY_SRC_FILE, getFileDeligate().
+        task.setProperty(KEY_SRC_FILE, getFileDeligate().
                 getSourceFile().toString());
-        task.getProperties().setProperty(KEY_DST_FILE, dst.toString());
+        task.setProperty(KEY_DST_FILE, dst.toString());
         return task;
     }
 
-    protected MergeTask<T> createMergeTask(File srcA, File srcB, File dst) throws IOException {
+    protected ObjectMergeTask<T> createMergeTask(File srcA, File srcB, File dst) throws IOException {
         Source<T> source1 = openSource(srcA);
         Source<T> source2 = openSource(srcB);
         Sink<T> sink = openSink(dst);
 
-        MergeTask<T> mergeTask =
-                new MergeTask<T>(source1, source2, sink);
+        ObjectMergeTask<T> mergeTask =
+                new ObjectMergeTask<T>(source1, source2, sink);
         mergeTask.setComparator(this.getComparator());
 
-        mergeTask.getProperties().setProperty(KEY_SRC_FILE_A, srcA.toString());
-        mergeTask.getProperties().setProperty(KEY_SRC_FILE_B, srcB.toString());
-        mergeTask.getProperties().setProperty(KEY_DST_FILE, dst.toString());
+        mergeTask.setProperty(KEY_SRC_FILE_A, srcA.toString());
+        mergeTask.setProperty(KEY_SRC_FILE_B, srcB.toString());
+        mergeTask.setProperty(KEY_DST_FILE, dst.toString());
 
         return mergeTask;
 

@@ -55,24 +55,12 @@ import uk.ac.susx.mlcl.lib.io.*;
 public class TokenPairSource
         implements SeekableSource<TokenPair, Tell>, Closeable {
 
-//    private IndexDeligatePair indexDeligate;
-//    private TokenPair previousRecord = null;
-//
-//    private long count = 0;
     private final SeekableDataSource inner;
 
-    public TokenPairSource(
-            SeekableDataSource inner //            ,
-            //            IndexDeligatePair indexDeligate
-            )
+    public TokenPairSource(SeekableDataSource inner)
             throws FileNotFoundException, IOException {
         this.inner = inner;
-//        this.indexDeligate = indexDeligate;
     }
-//
-//    public long getCount() {
-//        return count;
-//    }
 
     @Override
     public TokenPair read() throws IOException {
@@ -80,71 +68,13 @@ public class TokenPairSource
         final int id2 = inner.readInt();
         inner.endOfRecord();
         return new TokenPair(id1, id2);
-
-
-
-
-//        final int id1;
-////        if (previousRecord == null) {
-//        id1 = readToken1();
-////        } else {
-////            id1 = previousRecord.id1();
-////        }
-////
-////        if (!hasNext() || inner.isEndOfRecordNext()) {
-////            // Encountered an entry without any features. This is incoherent wrt
-////            // the task at hand, but quite a common scenario in general feature
-////            // extraction. Throw an exception which is caught for end user input
-////            inner.endOfRecord();
-////            throw new IOException("Found entry/feature record with no features.");
-////        }
-//
-//        final int id2 = readToken2();
-//        final TokenPair record = new TokenPair(id1, id2);
-//
-////        if (hasNext() && !inner.isEndOfRecordNext()) {
-////            previousRecord = record;
-////        }
-////
-////        if (hasNext() && inner.isEndOfRecordNext()) {
-//        inner.endOfRecord();
-////            previousRecord = null;
-////        }
-//
-////        ++count;
-//        return record;
     }
 
-//    private int readToken1() throws CharacterCodingException, IOException {
-//        return inner.readInt();
-////        if (indexDeligate.isPreindexedTokens1())
-////            return inner.readInt();
-////        else
-////            return indexDeligate.getEnumerator1().index(inner.readString());
-//    }
-//
-//    private int readToken2() throws CharacterCodingException, IOException {
-//        return inner.readInt();
-////        if (indexDeligate.isPreindexedTokens2())
-////            return inner.readInt();
-////        else
-////            return indexDeligate.getEnumerator2().index(inner.readString());
-//    }
     public static boolean equal(File fileA, File fileB, Charset charset)
             throws IOException {
-//        final Enumerator<String> stringIndex = Enumerators.
-//                newDefaultStringEnumerator();
-//        
         DoubleEnumerating idx = EnumeratingDeligates.toPair(
-                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false,null,false,false));
-
-
-        //.new EnumeratorPairBaringDeligate(false, false, stringIndex,
-        //                                    stringIndex);
-        //        final TokenPairSource srcA = new TokenPairSource(
-        //                new TSVSource(fileA, charset), idx);
-        //        final TokenPairSource srcB = new TokenPairSource(
-        //                new TSVSource(fileB, charset), idx);
+                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false,
+                                              null, false, false));
         final TokenPairSource srcA = open(fileA, charset, idx);
         final TokenPairSource srcB = open(fileB, charset, idx);
 
@@ -190,7 +120,6 @@ public class TokenPairSource
                 public boolean apply(Integer column) {
                     return column == 0;
                 }
-
             });
         }
         if (idx.isEnumeratorSkipIndexed2()) {
@@ -200,13 +129,13 @@ public class TokenPairSource
                 public boolean apply(Integer column) {
                     return column > 0;
                 }
-
             });
         }
 
         tsv = Compact.compact(tsv, 2);
 
         if (!idx.isEntriesEnumerated() || !idx.isFeaturesEnumerated()) {
+            @SuppressWarnings("unchecked")
             Enumerator<String>[] enumerators = (Enumerator<String>[]) new Enumerator[2];
             if (!idx.isEntriesEnumerated())
                 enumerators[0] = idx.getEntryEnumerator();
@@ -216,5 +145,4 @@ public class TokenPairSource
         }
         return new TokenPairSource(tsv);
     }
-
 }

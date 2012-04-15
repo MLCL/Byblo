@@ -28,33 +28,46 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo.tasks;
+package uk.ac.susx.mlcl.lib.tasks;
 
 import com.google.common.base.Objects;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import java.io.Closeable;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import uk.ac.susx.mlcl.lib.io.SeekableSource;
+import uk.ac.susx.mlcl.lib.io.Source;
 
 /**
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T> The atomic data type
  * @param <P> Data offset type for seeking
+ * @param <S>
  */
-public class Chunker<T, P> implements SeekableSource<Chunk<T>, P>, Closeable {
+public class Chunker<T, S extends Source<T>>
+        implements Source<Chunk<T>>, Closeable {
 
     private static final int DEFAULT_MAX_CHUNK_SIZE = 1000;
 
     private int maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
 
-    private final SeekableSource<T, P> inner;
+    private final S inner;
 
-    public Chunker(SeekableSource<T, P> inner, int maxChunkSize) {
+    private Chunker(S inner, int maxChunkSize) {
         this.inner = inner;
         this.maxChunkSize = maxChunkSize;
+    }
+
+    public static <T> Source<Chunk<T>> newInstance(
+            Source<T> source, int maxChunkSize) {
+        return new Chunker<T, Source<T>>(source, maxChunkSize);
+    }
+
+    public static <T, P> SeekableSource<Chunk<T>, P> newSeekableInstance(
+            SeekableSource<T, P> source, int maxChunkSize) {
+        return new SeekableChunker<T, P, SeekableSource<T, P>>(
+                source, maxChunkSize);
     }
 
     public int getMaxChunkSize() {
@@ -66,34 +79,24 @@ public class Chunker<T, P> implements SeekableSource<Chunk<T>, P>, Closeable {
         this.maxChunkSize = maxChunkSize;
     }
 
+    public S getInner() {
+        return inner;
+    }
+
     @Override
     public Chunk<T> read() throws IOException {
-        P start = inner.position();
         final List<T> items = new ArrayList<T>();
         int k = 0;
         while (k < maxChunkSize && inner.hasNext()) {
             items.add(inner.read());
             ++k;
         }
-        P end = inner.position();
-        return new Chunk<T>(
-                MessageFormat.format("{0} to {1}", new Object[]{start, end}),
-                items);
+        return new Chunk<T>("", items);
     }
 
     @Override
     public boolean hasNext() throws IOException {
         return inner.hasNext();
-    }
-
-    @Override
-    public void position(P offset) throws IOException {
-        inner.position(offset);
-    }
-
-    @Override
-    public P position() throws IOException {
-        return inner.position();
     }
 
     @Override
@@ -111,5 +114,24 @@ public class Chunker<T, P> implements SeekableSource<Chunk<T>, P>, Closeable {
         return Objects.toStringHelper(this).
                 add("maxChunkSize", maxChunkSize).
                 add("inner", inner);
+    }
+
+    public static class SeekableChunker<T, P, S extends SeekableSource<T, P>>
+            extends Chunker<T, S>
+            implements SeekableSource<Chunk<T>, P> {
+
+        public SeekableChunker(S inner, int maxChunkSize) {
+            super(inner, maxChunkSize);
+        }
+
+        @Override
+        public void position(P offset) throws IOException {
+            getInner().position(offset);
+        }
+
+        @Override
+        public P position() throws IOException {
+            return getInner().position();
+        }
     }
 }

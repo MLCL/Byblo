@@ -24,7 +24,8 @@ import uk.ac.susx.mlcl.lib.io.Source;
  */
 public class SortWeightedTokenPairCommand extends AbstractSortCommand<Weighted<TokenPair>> {
 
-    private static final Log LOG = LogFactory.getLog(SortWeightedTokenCommand.class);
+    private static final Log LOG = LogFactory.getLog(
+            SortWeightedTokenCommand.class);
 
     @ParametersDelegate
     private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
@@ -32,7 +33,8 @@ public class SortWeightedTokenPairCommand extends AbstractSortCommand<Weighted<T
     public SortWeightedTokenPairCommand(
             File sourceFile, File destinationFile, Charset charset,
             DoubleEnumerating indexDeligate) {
-        super(sourceFile, destinationFile, charset, Weighted.recordOrder(TokenPair.indexOrder()));
+        super(sourceFile, destinationFile, charset,
+              Weighted.recordOrder(TokenPair.indexOrder()));
         setIndexDeligate(indexDeligate);
     }
 
@@ -46,8 +48,7 @@ public class SortWeightedTokenPairCommand extends AbstractSortCommand<Weighted<T
         indexDeligate.closeEnumerator();
 
     }
-    
-    
+
     public final DoubleEnumerating getIndexDeligate() {
         return indexDeligate;
     }
@@ -75,5 +76,4 @@ public class SortWeightedTokenPairCommand extends AbstractSortCommand<Weighted<T
                 !getFilesDeligate().isCompactFormatDisabled());
         return new WeightSumReducerSink<TokenPair>(s);
     }
-
 }

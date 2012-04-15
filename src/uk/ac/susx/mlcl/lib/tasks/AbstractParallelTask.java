@@ -67,7 +67,7 @@ public abstract class AbstractParallelTask extends AbstractTask {
     public void setNumThreads(int numThreads) {
         Checks.checkRangeIncl(numThreads, 1, Integer.MAX_VALUE);
 
-        if (LOG.isWarnEnabled() && numThreads 
+        if (LOG.isWarnEnabled() && numThreads
                 > Runtime.getRuntime().availableProcessors()) {
             LOG.warn("numThreads (" + numThreads + ") > availableProcessors (" + Runtime.
                     getRuntime().
@@ -116,7 +116,7 @@ public abstract class AbstractParallelTask extends AbstractTask {
             if (LOG.isErrorEnabled()) {
                 LOG.error(null, ex);
             }
-            catchException(ex);
+            getExceptionDeligate().catchException(ex);
         } finally {
             executor.shutdownNow();
         }
@@ -145,5 +145,37 @@ public abstract class AbstractParallelTask extends AbstractTask {
                 add("threads", getNumThreads()).
                 add("executor", executor).
                 add("futureQueue", futureQueue);
+    }
+
+    public boolean equals(AbstractParallelTask other) {
+        if (!super.equals(other))
+            return false;
+        if (this.numThreads != other.numThreads)
+            return false;
+        if (this.executor != other.executor && (this.executor == null || !this.executor.
+                                                equals(other.executor)))
+            return false;
+        if (this.futureQueue != other.futureQueue && (this.futureQueue == null || !this.futureQueue.
+                                                      equals(other.futureQueue)))
+            return false;
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        return equals((AbstractParallelTask) obj);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 61 * hash + this.numThreads;
+        hash = 61 * hash + (this.executor != null ? this.executor.hashCode() : 0);
+        hash = 61 * hash + (this.futureQueue != null ? this.futureQueue.hashCode() : 0);
+        return hash;
     }
 }
