@@ -46,6 +46,7 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.tasks.CountTask;
 import uk.ac.susx.mlcl.lib.AbstractParallelCommandTask;
@@ -870,6 +871,10 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     public final Charset getCharset() {
         return fileDeligate.getCharset();
+    }
+
+    public void setEnumeratorType(EnumeratorType type) {
+        indexDeligate.setEnumeratorType(type);
     }
 
     

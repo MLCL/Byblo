@@ -102,8 +102,13 @@ public class EnumeratingDeligates {
         }
 
         @Override
-        public EnumeratorType getType() {
-            return inner.getType();
+        public EnumeratorType getEnuemratorType() {
+            return inner.getEnuemratorType();
+        }
+
+        @Override
+        public void setEnumeratorType(EnumeratorType type) {
+            inner.setEnumeratorType(type);
         }
 
         @Override

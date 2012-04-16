@@ -63,7 +63,8 @@ public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>>
             throws FileNotFoundException, IOException {
         return WeightedTokenPairSink.open(
                 file, getFilesDeligate().getCharset(),
-                sinkIndexDeligate(), !getFilesDeligate().isCompactFormatDisabled());
+                sinkIndexDeligate(),
+                !getFilesDeligate().isCompactFormatDisabled());
     }
 
     public SingleEnumerating getIndexDeligate() {

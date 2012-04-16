@@ -1030,7 +1030,7 @@ public class FullBuildTest2 {
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
                 charet, allpairsIndex);
         if (serial)
-            allpairs.setnThreads(1);
+            allpairs.setNumThreads(1);
         allpairs.runCommand();
 
         assertValidPlaintextInputFiles(similarities);

@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.io.*;
 import static uk.ac.susx.mlcl.lib.Predicates2.*;
 import uk.ac.susx.mlcl.lib.*;
@@ -1188,6 +1189,15 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         this.tempFiles = tempFiles;
     }
 
+    public void setEnumeratorType(EnumeratorType type) {
+        indexDeligate.setEnumeratorType(type);
+    }
+
+    public EnumeratorType getEnuemratorType() {
+        return indexDeligate.getEnuemratorType();
+    }
+
+    
     
     @Override
     protected ToStringHelper toStringHelper() {

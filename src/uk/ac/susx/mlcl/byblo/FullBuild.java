@@ -32,6 +32,7 @@
 package uk.ac.susx.mlcl.byblo;
 
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -41,11 +42,11 @@ import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import static java.text.MessageFormat.format;
-import uk.ac.susx.mlcl.byblo.commands.ExternalCountCommand;
-import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
-import uk.ac.susx.mlcl.byblo.commands.IndexTPCommand;
+import uk.ac.susx.mlcl.byblo.commands.*;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.DoubleConverter;
+import uk.ac.susx.mlcl.lib.commands.FileDeligate;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
 
@@ -57,10 +58,17 @@ public class FullBuild extends AbstractCommand {
 
     private static final Log LOG = LogFactory.getLog(FullBuild.class);
 
-    private Charset charset = Charset.defaultCharset();
+    @ParametersDelegate
+    private FileDeligate fileDeligate = new FileDeligate();
 
+    @Parameter(names = {"-i", "--input"},
+    description = "Input instances file",
+    validateWith = InputFileValidator.class, required = true)
     private File instancesFile;
 
+    @Parameter(names = {"-i", "--input"},
+    description = "Output directory",
+    validateWith = InputFileValidator.class)
     private File outputDir;
 
     @Parameter(names = {"-T", "--temp-dir"},
@@ -72,8 +80,10 @@ public class FullBuild extends AbstractCommand {
 
     private boolean skipIndex2 = false;
 
-    private boolean compactFileFormat = true;
+    private EnumeratorType enumeratorType = EnumeratorType.JDBC;
 
+    @Parameter(names = {"-t", "--threads"},
+    description = "Number of concurrent processing threads.")
     private int numThreads = Runtime.getRuntime().availableProcessors() + 1;
 
     /*
@@ -112,6 +122,15 @@ public class FullBuild extends AbstractCommand {
     description = "Regular expresion that accepted features must match.")
     private String filterFeaturePattern;
 
+    @Parameter(names = {"-Smn", "--similarity-min"},
+    description = "Minimum similarity threshold.",
+    converter = DoubleConverter.class)
+    private double minSimilarity = Double.NEGATIVE_INFINITY;
+
+    @Parameter(names = {"-m", "--measure"},
+    description = "Similarity measure to use.")
+    private String measureName = "Lin";
+
     public FullBuild() {
     }
 
@@ -119,12 +138,20 @@ public class FullBuild extends AbstractCommand {
         this.instancesFile = instancesFile;
     }
 
-    public Charset getCharset() {
-        return charset;
+    public void setCompactFormatDisabled(boolean compactFormatDisabled) {
+        fileDeligate.setCompactFormatDisabled(compactFormatDisabled);
     }
 
-    public void setCharset(Charset charset) {
-        this.charset = charset;
+    public final void setCharset(Charset charset) {
+        fileDeligate.setCharset(charset);
+    }
+
+    public boolean isCompactFormatDisabled() {
+        return fileDeligate.isCompactFormatDisabled();
+    }
+
+    public final Charset getCharset() {
+        return fileDeligate.getCharset();
     }
 
     public File getOutputDir() {
@@ -172,12 +199,14 @@ public class FullBuild extends AbstractCommand {
             IndexTPCommand indexCmd = new IndexTPCommand();
             indexCmd.setSourceFile(instancesFile);
             indexCmd.setDestinationFile(instancesEnumeratedFile);
-            indexCmd.setCharset(charset);
+            indexCmd.setCharset(getCharset());
+
             indexCmd.setEntryEnumeratorFile(entryEnumeratorFile);
             indexCmd.setFeatureEnumeratorFile(featureEnumeratorFile);
             indexCmd.setEnumeratorSkipIndexed1(skipIndex1);
             indexCmd.setEnumeratorSkipIndexed2(skipIndex2);
-            indexCmd.setCompactFormatDisabled(!compactFileFormat);
+            indexCmd.setEnumeratorType(enumeratorType);
+            indexCmd.setCompactFormatDisabled(isCompactFormatDisabled());
 
             indexCmd.runCommand();
 
@@ -201,20 +230,21 @@ public class FullBuild extends AbstractCommand {
             FileFactory countTmpFact = new TempFileFactory(countTempDir);
 
             ExternalCountCommand countCmd = new ExternalCountCommand();
-            countCmd.setCharset(charset);
+            countCmd.setCharset(getCharset());
             countCmd.setInstancesFile(instancesEnumeratedFile);
             countCmd.setEntriesFile(entriesFile);
             countCmd.setFeaturesFile(featuresFile);
             countCmd.setEventsFile(eventsFile);
             countCmd.setTempFileFactory(countTmpFact);
 
-            countCmd.setCompactFormatDisabled(!compactFileFormat);
+            countCmd.setCompactFormatDisabled(isCompactFormatDisabled());
 
             // Configure the enumeration
             countCmd.setEnumeratorSkipIndexed1(skipIndex1);
             countCmd.setEnumeratorSkipIndexed2(skipIndex2);
             countCmd.setEnumeratedEntries(true);
             countCmd.setEnumeratedFeatures(true);
+            countCmd.setEnumeratorType(enumeratorType);
 
             countCmd.setNumThreads(numThreads);
             countCmd.setMaxChunkSize(countMaxChunkSize);
@@ -231,6 +261,12 @@ public class FullBuild extends AbstractCommand {
             if (!countTempDir.delete())
                 throw new IOException(format("Unable to delete count temporary directory is not empty: {0}", countTempDir));
         }
+
+
+
+
+
+
 
 
         File entriesFilteredFile = suffixed(entriesFile, ".filtered");
@@ -250,7 +286,7 @@ public class FullBuild extends AbstractCommand {
             FileFactory filterTmpFact = new TempFileFactory(filterTempDir);
 
             FilterCommand filterCmd = new FilterCommand();
-            filterCmd.setCharset(charset);
+            filterCmd.setCharset(getCharset());
             filterCmd.setInputEntriesFile(entriesFile);
             filterCmd.setInputFeaturesFile(featuresFile);
             filterCmd.setInputEventsFile(eventsFile);
@@ -273,8 +309,9 @@ public class FullBuild extends AbstractCommand {
             filterCmd.setEnumeratorSkipIndexed2(skipIndex2);
             filterCmd.setEntryEnumeratorFile(entryEnumeratorFile);
             filterCmd.setFeatureEnumeratorFile(featureEnumeratorFile);
+            filterCmd.setEnumeratorType(enumeratorType);
 
-            filterCmd.setCompactFormatDisabled(!compactFileFormat);
+            filterCmd.setCompactFormatDisabled(isCompactFormatDisabled());
 
             filterCmd.runCommand();
 
@@ -287,6 +324,115 @@ public class FullBuild extends AbstractCommand {
             if (!filterTempDir.delete())
                 throw new IOException(format("Unable to delete filter temporary directory is not empty: {0}", filterTempDir));
         }
+
+
+
+
+
+        File simsFile = new File(outputDir, instancesFile.getName() + ".sims");
+
+        {
+            int allPairsChunksSize = 2500;
+
+            checkValidInputFile("Filtered entries file", entriesFilteredFile);
+            checkValidInputFile("Filtered features file", featuresFilteredFile);
+            checkValidInputFile("Filtered events file", eventsFilteredFile);
+            checkValidOutputFile("Sims file", simsFile);
+
+
+            AllPairsCommand allpairsCmd = new AllPairsCommand();
+            allpairsCmd.setCharset(getCharset());
+            allpairsCmd.setCompactFormatDisabled(isCompactFormatDisabled());
+
+            allpairsCmd.setEntriesFile(entriesFilteredFile);
+            allpairsCmd.setFeaturesFile(featuresFilteredFile);
+            allpairsCmd.setEventsFile(eventsFilteredFile);
+            allpairsCmd.setOutputFile(simsFile);
+
+            allpairsCmd.setNumThreads(numThreads);
+            allpairsCmd.setChunkSize(allPairsChunksSize);
+
+            allpairsCmd.setMeasureName(measureName);
+            allpairsCmd.setMinSimilarity(minSimilarity);
+
+            allpairsCmd.setEnumeratedEntries(true);
+            allpairsCmd.setEnumeratedFeatures(true);
+            allpairsCmd.setEnumeratorSkipIndexed1(skipIndex1);
+            allpairsCmd.setEnumeratorSkipIndexed2(skipIndex2);
+            allpairsCmd.setEnumeratorType(enumeratorType);
+
+            allpairsCmd.runCommand();
+            checkValidInputFile("Sims file", simsFile);
+        }
+
+
+
+
+
+        File neighboursFile = suffixed(simsFile, ".neighbours");
+
+        {
+            checkValidInputFile("Sims file", simsFile);
+            checkValidOutputFile("Neighbours file", neighboursFile);
+
+            File knnTempDir = createTempSubdirDir(tempBaseDir);
+            FileFactory knnTmpFact = new TempFileFactory(knnTempDir);
+
+            ExternalKnnSimsCommand knnCmd = new ExternalKnnSimsCommand();
+            knnCmd.setCharset(getCharset());
+            knnCmd.setSourceFile(simsFile);
+            knnCmd.setDestinationFile(neighboursFile);
+
+            knnCmd.setEnumeratedEntries(true);
+            knnCmd.setEnumeratedFeatures(true);
+            knnCmd.setEnumeratorSkipIndexed1(skipIndex1);
+            knnCmd.setEnumeratorSkipIndexed2(skipIndex2);
+            knnCmd.setEnumeratorType(enumeratorType);
+
+            knnCmd.setTempFileFactory(knnTmpFact);
+            knnCmd.setCompactFormatDisabled(isCompactFormatDisabled());
+            knnCmd.setNumThreads(numThreads);
+
+            knnCmd.runCommand();
+
+            checkValidInputFile("Neighbours file", neighboursFile);
+
+            if (knnTempDir.list().length > 0)
+                throw new IllegalStateException(format("Filter temporary directory is not empty: {0}", knnTempDir));
+            if (!knnTempDir.delete())
+                throw new IOException(format("Unable to delete filter temporary directory is not empty: {0}", knnTempDir));
+
+        }
+
+
+
+
+        File neighboursStringsFile = suffixed(neighboursFile, ".strings");
+
+        {
+            checkValidInputFile("Neighbours file", neighboursFile);
+            checkValidOutputFile("Neighbours strings file", neighboursStringsFile);
+
+
+            UnindexSimsCommand unindexCmd = new UnindexSimsCommand();
+            unindexCmd.setSourceFile(neighboursFile);
+            unindexCmd.setDestinationFile(neighboursStringsFile);
+            unindexCmd.setCharset(getCharset());
+            unindexCmd.setCompactFormatDisabled(false);
+
+            unindexCmd.getIndexDeligate().setEnumerationEnabled(true);
+            unindexCmd.getIndexDeligate().setEnumeratorSkipIndexed1(skipIndex1);
+            unindexCmd.getIndexDeligate().setEnumeratorSkipIndexed2(skipIndex2);
+            unindexCmd.getIndexDeligate().setEnumeratorFile(entryEnumeratorFile);
+            unindexCmd.getIndexDeligate().setEnumeratorType(enumeratorType);
+
+            unindexCmd.runCommand();
+
+            checkValidInputFile("Neighbours strings file", neighboursStringsFile);
+
+        }
+
+
 
     }
 

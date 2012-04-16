@@ -180,4 +180,6 @@ public class KnnSimsCommand extends SortWeightedTokenPairCommand {
                 add("k", k);
     }
 
+    
+    
 }

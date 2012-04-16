@@ -62,8 +62,8 @@ public interface Enumerating {
 
     void openEnumerator() throws IOException;
 
-    EnumeratorType getType();
+    EnumeratorType getEnuemratorType();
 
-
+    void setEnumeratorType(EnumeratorType type);
 
 }

@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.Sink;
@@ -115,6 +116,14 @@ public class IndexTPCommand extends AbstractCopyCommand<TokenPair> {
 
     public void setEnumeratorSkipIndexed1(boolean b) {
         indexDeligate.setEnumeratorSkipIndexed1(b);
+    }
+
+    public void setEnumeratorType(EnumeratorType type) {
+        indexDeligate.setEnumeratorType(type);
+    }
+
+    public EnumeratorType getEnumeratorType() {
+        return indexDeligate.getEnuemratorType();
     }
     
     

@@ -10,6 +10,7 @@ import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.*;
@@ -66,4 +67,46 @@ public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCo
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }
+
+    public void setEnumeratorType(EnumeratorType type) {
+        indexDeligate.setEnumeratorType(type);
+    }
+
+    public void setEnumeratorSkipIndexed2(boolean b) {
+        indexDeligate.setEnumeratorSkipIndexed2(b);
+    }
+
+    public void setEnumeratorSkipIndexed1(boolean b) {
+        indexDeligate.setEnumeratorSkipIndexed1(b);
+    }
+
+    public boolean isEnumeratorSkipIndexed2() {
+        return indexDeligate.isEnumeratorSkipIndexed2();
+    }
+
+    public boolean isEnumeratorSkipIndexed1() {
+        return indexDeligate.isEnumeratorSkipIndexed1();
+    }
+
+    public EnumeratorType getEnuemratorType() {
+        return indexDeligate.getEnuemratorType();
+    }
+
+    public void setEnumeratedFeatures(boolean enumeratedFeatures) {
+        indexDeligate.setEnumeratedFeatures(enumeratedFeatures);
+    }
+
+    public void setEnumeratedEntries(boolean enumeratedEntries) {
+        indexDeligate.setEnumeratedEntries(enumeratedEntries);
+    }
+
+    public boolean isEnumeratedFeatures() {
+        return indexDeligate.isEnumeratedFeatures();
+    }
+
+    public boolean isEnumeratedEntries() {
+        return indexDeligate.isEnumeratedEntries();
+    }
+    
+    
 }

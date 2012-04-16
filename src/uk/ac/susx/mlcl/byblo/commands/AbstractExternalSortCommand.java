@@ -322,6 +322,39 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
                 add("temp", getTempFileFactory());
     }
 
+    public void setCompactFormatDisabled(boolean compactFormatDisabled) {
+        fileDeligate.setCompactFormatDisabled(compactFormatDisabled);
+    }
+
+    public final void setCharset(Charset charset) {
+        fileDeligate.setCharset(charset);
+    }
+
+    public boolean isCompactFormatDisabled() {
+        return fileDeligate.isCompactFormatDisabled();
+    }
+
+    public final Charset getCharset() {
+        return fileDeligate.getCharset();
+    }
+
+    public final void setSourceFile(File sourceFile) throws NullPointerException {
+        fileDeligate.setSourceFile(sourceFile);
+    }
+
+    public final void setDestinationFile(File destFile) throws NullPointerException {
+        fileDeligate.setDestinationFile(destFile);
+    }
+
+    public final File getSourceFile() {
+        return fileDeligate.getSourceFile();
+    }
+
+    public final File getDestinationFile() {
+        return fileDeligate.getDestinationFile();
+    }
+
+    
     protected abstract SeekableSource<T, ?> openSource(File file) throws IOException;
 
     protected abstract Sink<T> openSink(File file) throws IOException;

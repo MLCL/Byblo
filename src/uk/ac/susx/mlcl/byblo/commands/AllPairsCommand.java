@@ -47,6 +47,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.measure.*;
 import uk.ac.susx.mlcl.byblo.tasks.InvertedApssTask;
@@ -77,10 +78,10 @@ public class AllPairsCommand extends AbstractCommand {
     private FileDeligate fileDeligate = new FileDeligate();
 
     @Parameter(names = {"-i", "--input"},
-               description = "Entry-feature frequency vectors files.",
+               description = "Event frequency vectors files.",
                required = true,
                validateWith = InputFileValidator.class)
-    private File entryFeaturesFile;
+    private File eventsFile;
 
     @Parameter(names = {"-if", "--input-features"},
                description = "Feature frequencies file",
@@ -177,7 +178,7 @@ public class AllPairsCommand extends AbstractCommand {
     public AllPairsCommand(File entriesFile, File featuresFile,
                            File entryFeaturesFile, File outputFile,
                            Charset charset, DoubleEnumerating indexDeligate) {
-        setEntryFeaturesFile(entryFeaturesFile);
+        setEventsFile(entryFeaturesFile);
         setEntriesFile(entriesFile);
         setFeaturesFile(featuresFile);
         setOutputFile(outputFile);
@@ -194,7 +195,7 @@ public class AllPairsCommand extends AbstractCommand {
 
         if (LOG.isInfoEnabled()) {
             LOG.info(
-                    "Running all-pairs similarity search from \"" + getEntryFeaturesFile() + "\" to \"" + getOutputFile() + "\"");
+                    "Running all-pairs similarity search from \"" + getEventsFile() + "\" to \"" + getOutputFile() + "\"");
         }
 
         // Instantiate the denote proxmity measure
@@ -326,7 +327,7 @@ public class AllPairsCommand extends AbstractCommand {
 
     private WeightedTokenPairVectorSource openEventsSource() throws IOException {
         return WeightedTokenPairSource.open(
-                getEntryFeaturesFile(), getCharset(),
+                getEventsFile(), getCharset(),
                 getIndexDeligate()).getVectorSource();
     }
 
@@ -412,7 +413,7 @@ public class AllPairsCommand extends AbstractCommand {
     @Override
     protected ToStringHelper toStringHelper() {
         return super.toStringHelper().
-                add("eventsIn", getEntryFeaturesFile()).
+                add("eventsIn", getEventsFile()).
                 add("entriesIn", getEntriesFile()).
                 add("featuresIn", getFeaturesFile()).
                 add("simsOut", getOutputFile()).
@@ -439,13 +440,13 @@ public class AllPairsCommand extends AbstractCommand {
         this.algorithm = algorithm;
     }
 
-    public final File getEntryFeaturesFile() {
-        return entryFeaturesFile;
+    public final File getEventsFile() {
+        return eventsFile;
     }
 
-    public final void setEntryFeaturesFile(File entryFeaturesFile) {
-        Checks.checkNotNull("entryFeaturesFile", entryFeaturesFile);
-        this.entryFeaturesFile = entryFeaturesFile;
+    public final void setEventsFile(File eventsFile) {
+        Checks.checkNotNull("eventsFile", eventsFile);
+        this.eventsFile = eventsFile;
     }
 
     public final File getFeaturesFile() {
@@ -505,7 +506,7 @@ public class AllPairsCommand extends AbstractCommand {
         return nThreads;
     }
 
-    public final void setnThreads(int nThreads) {
+    public final void setNumThreads(int nThreads) {
         Checks.checkRangeIncl("nThreads", nThreads, 1, Integer.MAX_VALUE);
         this.nThreads = nThreads;
     }
@@ -515,8 +516,8 @@ public class AllPairsCommand extends AbstractCommand {
     }
 
     public final void setMinSimilarity(double minSimilarity) {
-        Checks.checkRangeIncl("minSimilarity", minSimilarity, 0,
-                              Double.POSITIVE_INFINITY);
+//        Checks.checkRangeIncl("minSimilarity", minSimilarity, 0,
+//                              Double.POSITIVE_INFINITY);
         this.minSimilarity = minSimilarity;
     }
 
@@ -596,4 +597,48 @@ public class AllPairsCommand extends AbstractCommand {
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }
+
+    public void setEnumeratorSkipIndexed2(boolean b) {
+        indexDeligate.setEnumeratorSkipIndexed2(b);
+    }
+
+    public void setEnumeratorSkipIndexed1(boolean b) {
+        indexDeligate.setEnumeratorSkipIndexed1(b);
+    }
+
+    public boolean isEnumeratorSkipIndexed2() {
+        return indexDeligate.isEnumeratorSkipIndexed2();
+    }
+
+    public boolean isEnumeratorSkipIndexed1() {
+        return indexDeligate.isEnumeratorSkipIndexed1();
+    }
+
+    public void setEnumeratedFeatures(boolean enumeratedFeatures) {
+        indexDeligate.setEnumeratedFeatures(enumeratedFeatures);
+    }
+
+    public void setEnumeratedEntries(boolean enumeratedEntries) {
+        indexDeligate.setEnumeratedEntries(enumeratedEntries);
+    }
+
+    public boolean isEnumeratedFeatures() {
+        return indexDeligate.isEnumeratedFeatures();
+    }
+
+    public boolean isEnumeratedEntries() {
+        return indexDeligate.isEnumeratedEntries();
+    }
+
+    public void setEnumeratorType(EnumeratorType type) {
+        indexDeligate.setEnumeratorType(type);
+    }
+
+    public EnumeratorType getEnuemratorType() {
+        return indexDeligate.getEnuemratorType();
+    }
+    
+    
+    
+    
 }

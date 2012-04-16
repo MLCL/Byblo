@@ -64,11 +64,12 @@ public abstract class EnumeratingDeligate
         skipIndexed2 = b;
     }
 
-    public EnumeratorType getType() {
+    @Override
+    public EnumeratorType getEnuemratorType() {
         return type;
     }
 
-    public void setType(EnumeratorType type) {
+    public void setEnumeratorType(EnumeratorType type) {
         this.type = type;
     }
 

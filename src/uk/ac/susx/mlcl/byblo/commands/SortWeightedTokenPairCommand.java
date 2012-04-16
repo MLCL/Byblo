@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.Sink;
@@ -76,4 +77,48 @@ public class SortWeightedTokenPairCommand extends AbstractSortCommand<Weighted<T
                 !getFilesDeligate().isCompactFormatDisabled());
         return new WeightSumReducerSink<TokenPair>(s);
     }
+
+    public void setEnumeratorSkipIndexed2(boolean b) {
+        indexDeligate.setEnumeratorSkipIndexed2(b);
+    }
+
+    public void setEnumeratorSkipIndexed1(boolean b) {
+        indexDeligate.setEnumeratorSkipIndexed1(b);
+    }
+
+    public boolean isEnumeratorSkipIndexed2() {
+        return indexDeligate.isEnumeratorSkipIndexed2();
+    }
+
+    public boolean isEnumeratorSkipIndexed1() {
+        return indexDeligate.isEnumeratorSkipIndexed1();
+    }
+
+    public EnumeratorType getEnuemratorType() {
+        return indexDeligate.getEnuemratorType();
+    }
+
+    public void setEnumeratedFeatures(boolean enumeratedFeatures) {
+        indexDeligate.setEnumeratedFeatures(enumeratedFeatures);
+    }
+
+    public void setEnumeratedEntries(boolean enumeratedEntries) {
+        indexDeligate.setEnumeratedEntries(enumeratedEntries);
+    }
+
+    public boolean isEnumeratedFeatures() {
+        return indexDeligate.isEnumeratedFeatures();
+    }
+
+    public boolean isEnumeratedEntries() {
+        return indexDeligate.isEnumeratedEntries();
+    }
+
+    public void setEnumeratorType(EnumeratorType type) {
+        indexDeligate.setEnumeratorType(type);
+    }
+    
+    
+    
+    
 }
