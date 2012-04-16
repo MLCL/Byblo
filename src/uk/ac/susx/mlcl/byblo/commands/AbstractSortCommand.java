@@ -38,7 +38,7 @@ import java.nio.charset.Charset;
 import java.util.Comparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.tasks.SortTask;
+import uk.ac.susx.mlcl.lib.tasks.ObjectSortTask;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.io.*;
@@ -109,13 +109,13 @@ public abstract class AbstractSortCommand<T> extends AbstractCopyCommand<T> {
         Source<T> src = openSource(getFilesDeligate().getSourceFile());
         Sink<T> snk = openSink(getFilesDeligate().getDestinationFile());
 
-        SortTask<T> task = new SortTask<T>();
+        ObjectSortTask<T> task = new ObjectSortTask<T>();
         task.setComparator(getComparator());
         task.setSource(src);
         task.setSink(snk);
         task.run();
 
-        while (task.isExceptionThrown())
+        while (task.isExceptionCaught())
             task.throwException();
 
         if (snk instanceof Flushable)

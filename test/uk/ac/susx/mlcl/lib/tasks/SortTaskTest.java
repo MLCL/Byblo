@@ -4,7 +4,7 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
-import uk.ac.susx.mlcl.lib.tasks.SortTask;
+import uk.ac.susx.mlcl.lib.tasks.ObjectSortTask;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -62,7 +62,7 @@ public class SortTaskTest {
             }
         };
 
-        SortTask<Integer> instance = new SortTask<Integer>();
+        ObjectSortTask<Integer> instance = new ObjectSortTask<Integer>();
         instance.setSource(src);
         instance.setSink(sink);
         instance.setComparator(comparator);

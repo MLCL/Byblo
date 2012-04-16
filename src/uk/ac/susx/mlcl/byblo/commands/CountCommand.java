@@ -285,7 +285,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
         task.run();
 
 
-        while (task.isExceptionThrown())
+        while (task.isExceptionCaught())
             task.throwException();
 
 

@@ -28,47 +28,45 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.lib.commands;
-
-import uk.ac.susx.mlcl.lib.tasks.FileCopyTask;
-import com.beust.jcommander.Parameters;
-import com.beust.jcommander.ParametersDelegate;
-import com.google.common.base.Objects;
-import java.io.File;
+package uk.ac.susx.mlcl.lib.tasks;
 
 /**
- * Copy a source file to a destination.
- *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
+ * Defines an interface for an object when stores exceptions, rather than 
+ * throwing them directly. This is useful for certain functionality, such as
+ * when code executing inside another thread.
+ * 
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-@Parameters(commandDescription = "Copy a file.")
-public class CopyCommand extends AbstractCommand {
+public interface ExceptionCarrying {
 
-    @ParametersDelegate
-    protected final FilePipeDeligate filesDeligate = new FilePipeDeligate();
+    /**
+     * Whether or not at leat 1 exception is currently caught by this object.
+     *
+     * @return True if an exception has been caught, false otherwise
+     */
+    boolean isExceptionCaught();
 
-    public CopyCommand(File sourceFile, File destinationFile) {
-        filesDeligate.setSourceFile(sourceFile);
-        filesDeligate.setDestinationFile(destinationFile);
-    }
+    
+    /**
+     * Return the oldest exception that was previously caught, clearing it
+     * internally.
+     *
+     * Repeated calls to this method may return addition exceptions; in a
+     * first-in/first-out order. When no exception remain this method returns
+     * null.
+     *
+     * @return Exception the exception, or null if no exception is caught
+     */
+    Exception getException();
 
-    public CopyCommand() {
-    }
-
-    @Override
-    public void runCommand() throws Exception {
-
-        FileCopyTask task = new FileCopyTask(filesDeligate.getSourceFile(),
-                                             filesDeligate.getDestinationFile());
-        task.run();
-        while (task.isExceptionCaught())
-            task.throwException();
-    }
-
-    @Override
-    protected Objects.ToStringHelper toStringHelper() {
-        return super.toStringHelper().
-                add("in", filesDeligate.getSourceFile()).
-                add("out", filesDeligate.getDestinationFile());
-    }
+    /**
+     * Throws the oldest exception that was previously caught.
+     *
+     * Repeated calls to this method may throw addition exceptions; in a 
+     * first-in/first-out order. When no exception remain this method does
+     * nothing.
+     *
+     * @throws Exception the exception
+     */
+    void throwException() throws Exception;
 }

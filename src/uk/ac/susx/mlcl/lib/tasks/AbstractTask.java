@@ -31,9 +31,8 @@
 package uk.ac.susx.mlcl.lib.tasks;
 
 import com.google.common.base.Objects;
-import java.util.ArrayDeque;
+import static java.text.MessageFormat.format;
 import java.util.Properties;
-import java.util.Queue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -47,113 +46,56 @@ public abstract class AbstractTask implements Task {
 
     private final Properties properties = new Properties();
 
-    private Queue<Exception> exceptions = null;
-
-    public enum State {
-
-        STOPPED, INITIALISING, RUNNING, FINALISING
-
-    }
-
-    private State state = State.STOPPED;
+    private final ExceptionDeligate exceptionDeligate =
+            new ExceptionDeligate();
 
     public AbstractTask() {
     }
 
-    protected abstract void initialiseTask() throws Exception;
+    protected void initialiseTask() throws Exception {
+        
+    }
 
     protected abstract void runTask() throws Exception;
 
-    protected abstract void finaliseTask() throws Exception;
+    protected void finaliseTask() throws Exception {
+        
+    }
 
     @Override
     public final void run() {
         try {
+            if (LOG.isTraceEnabled())
+                LOG.trace(format("Initialising task: {0}", this));
 
-            setState(State.INITIALISING);
-            if (LOG.isDebugEnabled())
-                LOG.debug("Initialising task: " + this);
             initialiseTask();
 
+            if (LOG.isTraceEnabled())
+                LOG.trace(format("Running task: ", this));
 
-            setState(State.RUNNING);
-            if (LOG.isDebugEnabled())
-                LOG.debug("Running task: " + this);
             runTask();
 
         } catch (Exception ex) {
-            catchException(ex);
+            exceptionDeligate.catchException(ex);
         } catch (Throwable t) {
-            catchException(new RuntimeException(t));
+            exceptionDeligate.catchException(new RuntimeException(t));
         } finally {
+
             try {
 
-                setState(State.FINALISING);
-                if (LOG.isDebugEnabled())
-                    LOG.debug("Finalising task: " + this);
+                if (LOG.isTraceEnabled())
+                    LOG.trace(format("Finalising task: {0}", this));
                 finaliseTask();
 
             } catch (Exception ex) {
-                catchException(ex);
+                exceptionDeligate.catchException(ex);
+            } catch (Throwable t) {
+                exceptionDeligate.catchException(new RuntimeException(t));
             }
 
-            setState(State.STOPPED);
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Completed task: " + this);
-            }
+            if (LOG.isTraceEnabled())
+                LOG.trace(format("Completed task: {0}" + this));
         }
-    }
-
-    @Override
-    public Properties getProperties() {
-        return properties;
-    }
-    
-    public String getProperty(String key) {
-        return getProperty(key);
-    }
-    
-    public void setProperty(String key, String value) {
-        getProperties().setProperty(key, value);
-    }
-  
-    public State getState() {
-        return state;
-    }
-
-    private void setState(State state) {
-        this.state = state;
-    }
-
-    protected final void catchException(Exception throwable) {
-        if (LOG.isWarnEnabled())
-            LOG.warn("Exception caught and queued.", throwable);
-        if (exceptions == null)
-            exceptions = new ArrayDeque<Exception>();
-        exceptions.offer(throwable);
-    }
-
-    @Override
-    public final Throwable getException() {
-        return exceptions == null ? null : exceptions.poll();
-    }
-
-    @Override
-    public final boolean isExceptionThrown() {
-        return exceptions != null && !exceptions.isEmpty();
-    }
-
-    /**
-     * Throws one exception that was caught during task execution. Repeated
-     * calls to this method will throw the exception in first-in/first-out
-     * order. When no exception remain this method does nothing.
-     *
-     * @throws Exception
-     */
-    @Override
-    public final void throwException() throws Exception {
-        if (isExceptionThrown())
-            throw exceptions.poll();
     }
 
     @Override
@@ -163,8 +105,70 @@ public abstract class AbstractTask implements Task {
 
     protected Objects.ToStringHelper toStringHelper() {
         return Objects.toStringHelper(this).
-                add("state", getState()).
-                add("exceptions", isExceptionThrown()).add("properties", getProperties());
+                add("exceptions", getExceptionDeligate()).
+                add("properties", properties);
     }
 
+    protected boolean equals(AbstractTask other) {
+        if (this.properties != other.properties
+                && (this.properties == null || !this.properties.equals(
+                    other.properties)))
+            return false;
+        if (this.exceptionDeligate != other.exceptionDeligate
+                && (this.exceptionDeligate == null || !this.exceptionDeligate.
+                    equals(other.exceptionDeligate)))
+            return false;
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        return equals((AbstractTask) obj);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 11 * hash + (this.properties != null ? this.properties.hashCode() : 0);
+        hash = 11 * hash + (this.exceptionDeligate != null ? this.exceptionDeligate.
+                            hashCode() : 0);
+        return hash;
+    }
+
+    protected ExceptionDeligate getExceptionDeligate() {
+        return exceptionDeligate;
+    }
+
+    @Override
+    public String getProperty(String key) {
+        return properties.getProperty(key);
+    }
+
+    @Override
+    public void setProperty(String key, String value) {
+        properties.setProperty(key, value);
+    }
+
+    public final void catchException(Exception exception) {
+        exceptionDeligate.catchException(exception);
+    }
+
+    @Override
+    public final synchronized void throwException() throws Exception {
+        exceptionDeligate.throwException();
+    }
+
+    @Override
+    public final synchronized boolean isExceptionCaught() {
+        return exceptionDeligate.isExceptionCaught();
+    }
+
+    @Override
+    public final synchronized Exception getException() {
+        return exceptionDeligate.getException();
+    }
 }

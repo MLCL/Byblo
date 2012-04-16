@@ -417,4 +417,7 @@ public final class Predicates2 {
                     toString();
         }
     }
+
+    private Predicates2() {
+    }
 }

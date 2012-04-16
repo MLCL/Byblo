@@ -28,56 +28,49 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo.tasks;
+package uk.ac.susx.mlcl.lib.tasks;
 
-import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import static java.text.MessageFormat.format;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
-import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
+import uk.ac.susx.mlcl.lib.Checks;
 
 /**
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Delete a file.")
-public class DeleteFileTask extends AbstractTask {
+public class FileDeleteTask extends AbstractTask {
 
-    private static final Log LOG = LogFactory.getLog(DeleteFileTask.class);
+    private static final Log LOG = LogFactory.getLog(FileDeleteTask.class);
 
     private File file = null;
 
-    public DeleteFileTask(File file) {
+    public FileDeleteTask(final File file) {
         setFile(file);
     }
 
-    public DeleteFileTask() {
-    }
-
-    @Override
-    protected void initialiseTask() throws Exception {
-    }
-
-    @Override
-    protected void finaliseTask() throws Exception {
+    public FileDeleteTask() {
     }
 
     @Override
     public void runTask() throws Exception {
         if (LOG.isInfoEnabled())
             LOG.info("Deleting file \"" + getFile() + "\".");
-        if (file == null)
-            throw new NullPointerException("file is null");
-        if (!file.exists())
-            throw new FileNotFoundException("Unnable to delete file because it "
-                    + "doesn't exist: \"" + file + "\"");
-        if (!file.delete())
-            throw new IOException("Unnable to delete file: \"" + file + "\"");
+        Checks.checkNotNull("file", getFile());
+        if (!getFile().exists())
+            throw new FileNotFoundException(format(
+                    "Unnable to delete file because it doesn't exist: \"{0}\"",
+                    getFile()));
+
+        if (!getFile().delete())
+            throw new IOException(
+                    "Unnable to delete file: \"" + getFile() + "\"");
     }
 
     public final File getFile() {
@@ -86,8 +79,7 @@ public class DeleteFileTask extends AbstractTask {
 
     public final void setFile(final File file)
             throws NullPointerException {
-        if (file == null)
-            throw new NullPointerException("file is null");
+        Checks.checkNotNull("file", file);
         this.file = file;
     }
 

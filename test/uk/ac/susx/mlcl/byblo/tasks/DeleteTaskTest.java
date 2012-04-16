@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.tasks;
 
-import uk.ac.susx.mlcl.byblo.tasks.DeleteFileTask;
+import uk.ac.susx.mlcl.lib.tasks.FileDeleteTask;
 import com.beust.jcommander.JCommander;
 import java.util.ResourceBundle;
 import java.io.File;
@@ -50,9 +50,9 @@ public class DeleteTaskTest {
         System.out.println("Testing run() -- expecting success");
         File tmp = File.createTempFile(getClass().getName(), "");
         assertTrue(tmp.exists());
-        DeleteFileTask instance = new DeleteFileTask(tmp);
+        FileDeleteTask instance = new FileDeleteTask(tmp);
         instance.run();
-        while(instance.isExceptionThrown())
+        while(instance.isExceptionCaught())
             instance.throwException();
         assertFalse(tmp.exists());
     }
@@ -63,7 +63,7 @@ public class DeleteTaskTest {
         File tmp = File.createTempFile(getClass().getName(), "");
         tmp.delete();
         assertFalse(tmp.exists());
-        DeleteFileTask instance = new DeleteFileTask(tmp);
+        FileDeleteTask instance = new FileDeleteTask(tmp);
         instance.run();
         instance.throwException();
     }
@@ -74,7 +74,7 @@ public class DeleteTaskTest {
         File tmp = File.createTempFile(getClass().getName(), "");
         tmp.delete();
         assertFalse(tmp.exists());
-        DeleteFileTask instance = new DeleteFileTask(tmp);
+        FileDeleteTask instance = new FileDeleteTask(tmp);
         instance.run();
         instance.throwException();
     }
@@ -83,10 +83,10 @@ public class DeleteTaskTest {
     public void testGetSetFile() throws IOException {
         System.out.println("Testing getFile() and setFile()");
         File tmp = File.createTempFile(getClass().getName(), "");
-        DeleteFileTask instance = new DeleteFileTask(tmp);
+        FileDeleteTask instance = new FileDeleteTask(tmp);
         File expResult = tmp;
         assertEquals(expResult, instance.getFile());
-        instance = new DeleteFileTask();
+        instance = new FileDeleteTask();
         instance.setFile(tmp);
         assertEquals(tmp, instance.getFile());
         tmp.delete();

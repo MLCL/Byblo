@@ -30,10 +30,10 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import com.google.common.base.Predicate;
 import java.io.*;
 import java.nio.charset.Charset;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.lib.io.*;
 
@@ -73,81 +73,22 @@ import uk.ac.susx.mlcl.lib.io.*;
  */
 public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
 
-//    private IndexDeligatePair indexDeligate;
-//    private boolean compactFormatEnabled = true;
-//    private TokenPair previousRecord = null;
-//    private long count = 0;
     private final DataSink inner;
 
-    public TokenPairSink(DataSink inner //, IndexDeligatePair indexDeligate
-            )
+    public TokenPairSink(DataSink inner)
             throws FileNotFoundException, IOException {
         this.inner = inner;
-//        this.indexDeligate = indexDeligate;
     }
-//
-//    public boolean isCompactFormatEnabled() {
-//        return compactFormatEnabled;
-//    }
-//
-//    public void setCompactFormatEnabled(boolean compactFormatEnabled) {
-//        this.compactFormatEnabled = compactFormatEnabled;
-//    }
-//
-//    public long getCount() {
-//        return count;
-//    }
 
     @Override
     public void write(final TokenPair record) throws IOException {
         inner.writeInt(record.id1());
         inner.writeInt(record.id2());
         inner.endOfRecord();
-//        if (isCompactFormatEnabled()) {
-//            writeCompact(record);
-//        } else {
-//            writeVerbose(record);
-//        }
-//        ++count;
     }
 
-//    private void writeVerbose(final TokenPair record) throws IOException {
-//        writeToken1(record.id1());
-//        writeToken2(record.id2());
-//        inner.endOfRecord();
-//    }
-//
-//    private void writeCompact(final TokenPair record) throws IOException {
-//        if (previousRecord == null) {
-//            writeToken1(record.id1());
-//        } else if (previousRecord.id1() != record.id1()) {
-//            inner.endOfRecord();
-//            writeToken1(record.id1());
-//        }
-//        writeToken2(record.id2());
-//        previousRecord = record;
-//    }
-//
-//    private void writeToken1(int stringId) throws IOException {
-//        inner.writeInt(stringId);
-////        if (indexDeligate.isPreindexedTokens1())
-////            inner.writeInt(stringId);
-////        else
-////            inner.writeString(indexDeligate.getEnumerator1().value(stringId));
-//    }
-//
-//    private void writeToken2(int stringId) throws IOException {
-//        inner.writeInt(stringId);
-////        if (indexDeligate.isPreindexedTokens2())
-////            inner.writeInt(stringId);
-////        else
-////            inner.writeString(indexDeligate.getEnumerator2().value(stringId));
-//    }
     @Override
     public void close() throws IOException {
-//        if (isCompactFormatEnabled() && previousRecord != null) {
-//            inner.endOfRecord();
-//        }
         if (inner instanceof Closeable)
             ((Closeable) inner).close();
     }
@@ -183,8 +124,9 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
 
         if (compact)
             tsv = Compact.compact(tsv, 2);
-        
+
         if (!idx.isEntriesEnumerated() || !idx.isFeaturesEnumerated()) {
+            @SuppressWarnings("unchecked")
             Enumerator<String>[] enumerators = (Enumerator<String>[]) new Enumerator[2];
             if (!idx.isEntriesEnumerated())
                 enumerators[0] = idx.getEntryEnumerator();

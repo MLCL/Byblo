@@ -25,7 +25,7 @@ import uk.ac.susx.mlcl.lib.io.Source;
 public class IndexWTPCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
-    private DoubleEnumerating indexDeligate =  new DoubleEnumeratingDeligate(
+    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate(
             Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
 
     public IndexWTPCommand(
@@ -42,7 +42,8 @@ public class IndexWTPCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
     @Override
     public void runCommand() throws Exception {
         Checks.checkNotNull("indexFile1", indexDeligate.getEntryEnumeratorFile());
-        Checks.checkNotNull("indexFile2", indexDeligate.getFeatureEnumeratorFile());
+        Checks.checkNotNull("indexFile2",
+                            indexDeligate.getFeatureEnumeratorFile());
 
         super.runCommand();
 
@@ -65,7 +66,8 @@ public class IndexWTPCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
 
         return WeightedTokenPairSink.open(
                 file, getFilesDeligate().getCharset(),
-                sinkIndexDeligate(), !getFilesDeligate().isCompactFormatDisabled());
+                sinkIndexDeligate(),
+                !getFilesDeligate().isCompactFormatDisabled());
     }
 
     public DoubleEnumerating getIndexDeligate() {
@@ -83,5 +85,4 @@ public class IndexWTPCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
     protected DoubleEnumerating sinkIndexDeligate() {
         return EnumeratingDeligates.decorateEnumerated(indexDeligate, true);
     }
-
 }

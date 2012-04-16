@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo.tasks;
+package uk.ac.susx.mlcl.lib.tasks;
 
 import com.google.common.base.Objects;
 import uk.ac.susx.mlcl.lib.io.SeekableSource;
@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
+import uk.ac.susx.mlcl.lib.Checks;
 
 /**
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
@@ -51,6 +52,8 @@ public class Chunk<T> extends AbstractList<T>
     private Integer nextIndex;
 
     public Chunk(String name, List<T> items) {
+        Checks.checkNotNull(items);
+
         this.name = name;
         this.items = items;
         nextIndex = 0;

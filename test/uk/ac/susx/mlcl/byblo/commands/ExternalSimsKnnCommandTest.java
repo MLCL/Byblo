@@ -83,7 +83,7 @@ public class ExternalSimsKnnCommandTest {
         knnTask.runCommand();
 
 
-        while (knnTask.isExceptionThrown()) {
+        while (knnTask.isExceptionCaught()) {
             knnTask.throwException();
         }
 

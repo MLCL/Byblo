@@ -28,29 +28,15 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.lib.commands;
-
-import com.google.common.base.Objects;
-import java.io.Serializable;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+package uk.ac.susx.mlcl.lib;
 
 /**
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public abstract class AbstractDeligate implements Serializable {
+public interface PropertyCarrying {
 
-    public AbstractDeligate() {
-    }
+    String getProperty(String key);
 
-    @Override
-    public final String toString() {
-        return toStringHelper().toString();
-    }
-
-    protected Objects.ToStringHelper toStringHelper() {
-        return Objects.toStringHelper(this);
-    }
-
+    void setProperty(String key, String value);
 }

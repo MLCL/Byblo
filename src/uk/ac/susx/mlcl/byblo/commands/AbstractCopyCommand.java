@@ -44,7 +44,7 @@ import uk.ac.susx.mlcl.lib.commands.FilePipeDeligate;
 import uk.ac.susx.mlcl.lib.io.Files;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.io.Source;
-import uk.ac.susx.mlcl.lib.tasks.PipeTask;
+import uk.ac.susx.mlcl.lib.tasks.ObjectPipeTask;
 
 /**
  *
@@ -87,12 +87,12 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand {
         Source<T> src = openSource(getFilesDeligate().getSourceFile());
         Sink<T> snk = openSink(getFilesDeligate().getDestinationFile());
 
-        PipeTask<T> task = new PipeTask<T>();
+        ObjectPipeTask<T> task = new ObjectPipeTask<T>();
         task.setSource(src);
         task.setSink(snk);
         task.run();
 
-        while (task.isExceptionThrown())
+        while (task.isExceptionCaught())
             task.throwException();
 
         if (src instanceof Closeable)

@@ -124,7 +124,7 @@ public class ThreadedApssTaskTest {
 
         instance.run();
 
-        while (instance.isExceptionThrown()) {
+        while (instance.isExceptionCaught()) {
             instance.throwException();
         }
 
@@ -160,7 +160,7 @@ public class ThreadedApssTaskTest {
         instance.setProducatePair(PAIR_FILTER);
 
         instance.run();
-        while (instance.isExceptionThrown()) {
+        while (instance.isExceptionCaught()) {
             instance.throwException();
         }
 
@@ -204,7 +204,7 @@ public class ThreadedApssTaskTest {
 
             instance.run();
 
-            while (instance.isExceptionThrown()) {
+            while (instance.isExceptionCaught()) {
                 instance.throwException();
             }
         }
@@ -234,7 +234,7 @@ public class ThreadedApssTaskTest {
             instance.setProducatePair(PAIR_FILTER);
 
             instance.run();
-            while (instance.isExceptionThrown()) {
+            while (instance.isExceptionCaught()) {
                 instance.throwException();
             }
         }
@@ -280,7 +280,7 @@ public class ThreadedApssTaskTest {
 
             instance.run();
 
-            while (instance.isExceptionThrown()) {
+            while (instance.isExceptionCaught()) {
                 instance.throwException();
             }
         }
@@ -308,7 +308,7 @@ public class ThreadedApssTaskTest {
             instance.setProducatePair(PAIR_FILTER);
 
             instance.run();
-            while (instance.isExceptionThrown()) {
+            while (instance.isExceptionCaught()) {
                 instance.throwException();
             }
         }
@@ -351,7 +351,7 @@ public class ThreadedApssTaskTest {
 
             instance.run();
 
-            while (instance.isExceptionThrown()) {
+            while (instance.isExceptionCaught()) {
                 instance.throwException();
             }
         }
@@ -379,7 +379,7 @@ public class ThreadedApssTaskTest {
             instance.setProducatePair(PAIR_FILTER);
 
             instance.run();
-            while (instance.isExceptionThrown()) {
+            while (instance.isExceptionCaught()) {
                 instance.throwException();
             }
         }

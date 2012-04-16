@@ -30,6 +30,8 @@
  */
 package uk.ac.susx.mlcl.byblo.tasks;
 
+import uk.ac.susx.mlcl.lib.tasks.Chunker;
+import uk.ac.susx.mlcl.lib.tasks.Chunk;
 import com.google.common.base.Objects.ToStringHelper;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -124,16 +126,14 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
         if (LOG.isTraceEnabled()) {
             LOG.trace("Initialising chunker A.");
         }
-        Chunker<Indexed<SparseDoubleVector>, S> chunkerA =
-                new Chunker<Indexed<SparseDoubleVector>, S>(
-                getSourceA(), maxChunkSize);
+        SeekableSource<Chunk<Indexed<SparseDoubleVector>>, S> chunkerA =
+                Chunker.newSeekableInstance(getSourceA(), maxChunkSize);
 
         if (LOG.isTraceEnabled()) {
             LOG.trace("Initialising chunker B.");
         }
-        Chunker<Indexed<SparseDoubleVector>, S> chunkerB =
-                new Chunker<Indexed<SparseDoubleVector>, S>(
-                getSourceB(), maxChunkSize);
+        SeekableSource<Chunk<Indexed<SparseDoubleVector>>, S> chunkerB =
+                Chunker.newSeekableInstance(getSourceB(), maxChunkSize);
 
         int nChunks = 0;
         int i = 0;
@@ -179,10 +179,11 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 queueTask(task);
 
                 // retrieve the results
-                while (!getFutureQueue().isEmpty() && getFutureQueue().peek().isDone()) {
+                while (!getFutureQueue().isEmpty() && getFutureQueue().peek().
+                        isDone()) {
                     Future<? extends Task> completed = getFutureQueue().poll();
                     Task t = completed.get();
-                    while (t.isExceptionThrown()) {
+                    while (t.isExceptionCaught()) {
                         t.throwException();
                     }
                 }
@@ -196,7 +197,7 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
         while (!getFutureQueue().isEmpty()) {
             Future<? extends Task> completed = getFutureQueue().poll();
             Task t = completed.get();
-            while (t.isExceptionThrown()) {
+            while (t.isExceptionCaught()) {
                 t.throwException();
             }
         }

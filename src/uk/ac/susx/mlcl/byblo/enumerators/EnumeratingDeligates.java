@@ -44,48 +44,19 @@ public class EnumeratingDeligates {
     private EnumeratingDeligates() {
     }
 
-    public static SingleEnumerating toSingleEntries(final DoubleEnumerating outer) {
+    public static SingleEnumerating toSingleEntries(
+            final DoubleEnumerating outer) {
         return new PairToEntriesSingleAdapter(outer);
     }
 
-    public static SingleEnumerating toSingleFeatures(final DoubleEnumerating outer) {
+    public static SingleEnumerating toSingleFeatures(
+            final DoubleEnumerating outer) {
         return new PairToFeaturesSingleAdapter(outer);
     }
 
     public static DoubleEnumerating toPair(final SingleEnumerating inner) {
         return new SingleToPairAdapter(inner);
     }
-//
-//    public static Enumerator<String> instantiateEnumerator(
-//            final boolean enumerated, final File indexFile)
-//            throws IOException {
-//        if (enumerated) {
-//            if (indexFile != null && indexFile.exists())
-//                return Enumerators.loadStringEnumerator(indexFile);
-//            else
-//                return Enumerators.nullEnumerator();
-//        } else {
-//            if (indexFile != null && indexFile.exists()) {
-//                return Enumerators.loadStringEnumerator(indexFile);
-//            } else {
-//                return Enumerators.newDefaultStringEnumerator();
-//            }
-//        }
-//    }
-//
-//    public static Enumerator<String> loadEnumerator(File file) {
-//
-//        return null;
-//    }
-//
-//    public static Enumerator<String> newEnumerator(File file) {
-////        return Enumerators.loadStringEnumerator(File file);
-//        return null;
-//    }
-//
-//    public static void saveEnumerator(File file) {
-////        return Enumerators.loadStringEnumerator(File file);
-//    }
 
     public static DoubleEnumerating decorateEnumerated(
             final DoubleEnumerating inner, final boolean enumerated) {
@@ -100,7 +71,6 @@ public class EnumeratingDeligates {
             public boolean isFeaturesEnumerated() {
                 return enumerated;
             }
-
         };
     }
 
@@ -112,7 +82,6 @@ public class EnumeratingDeligates {
             public boolean isEnumerationEnabled() {
                 return enumerated;
             }
-
         };
     }
 
@@ -141,8 +110,9 @@ public class EnumeratingDeligates {
                 return false;
             if (getClass() != obj.getClass())
                 return false;
-            final AdapterBase<T> other = (AdapterBase<T>) obj;
-            if (this.inner != other.inner && (this.inner == null || !this.inner.equals(other.inner)))
+            final AdapterBase<?> other = (AdapterBase<?>) obj;
+            if (this.inner != other.inner && (this.inner == null || !this.inner.
+                                              equals(other.inner)))
                 return false;
             return true;
         }
@@ -181,7 +151,6 @@ public class EnumeratingDeligates {
         public String toString() {
             return this.getClass().getSimpleName() + "{" + "inner=" + inner + '}';
         }
-
     }
 
     public static class SingleToPairAdapter
@@ -261,7 +230,6 @@ public class EnumeratingDeligates {
         public SingleEnumerating getFeaturesEnumeratorCarriar() {
             return getInner();
         }
-
     }
 
     public static class PairToFeaturesSingleAdapter
@@ -306,7 +274,6 @@ public class EnumeratingDeligates {
         public DoubleEnumerating getEnumeratorPairCarriar() {
             return getInner();
         }
-
     }
 
     public static class PairToEntriesSingleAdapter
@@ -351,7 +318,6 @@ public class EnumeratingDeligates {
         public DoubleEnumerating getEnumeratorPairCarriar() {
             return getInner();
         }
-
     }
 
     public abstract static class SingleToSingleAdapter
@@ -396,7 +362,6 @@ public class EnumeratingDeligates {
         public DoubleEnumerating getEnumeratorPairCarriar() {
             return toPair(this);
         }
-
     }
 
     public abstract static class DoubleToDoubleAdapter
@@ -476,6 +441,5 @@ public class EnumeratingDeligates {
         public SingleEnumerating getFeaturesEnumeratorCarriar() {
             return toSingleFeatures(this);
         }
-
     }
 }

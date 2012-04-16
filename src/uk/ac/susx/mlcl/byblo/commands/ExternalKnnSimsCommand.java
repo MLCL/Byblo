@@ -30,8 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
-import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects.ToStringHelper;
@@ -42,11 +40,15 @@ import java.util.Comparator;
 import javax.naming.OperationNotSupportedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.io.*;
-import uk.ac.susx.mlcl.byblo.tasks.Chunk;
-import uk.ac.susx.mlcl.lib.tasks.MergeTask;
-import uk.ac.susx.mlcl.lib.tasks.SortTask;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
+import uk.ac.susx.mlcl.byblo.io.KFirstReducerSink;
+import uk.ac.susx.mlcl.byblo.io.TokenPair;
+import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.Comparators;
+import uk.ac.susx.mlcl.lib.tasks.Chunk;
+import uk.ac.susx.mlcl.lib.tasks.ObjectMergeTask;
+import uk.ac.susx.mlcl.lib.tasks.ObjectSortTask;
 
 /**
  *
@@ -55,14 +57,15 @@ import uk.ac.susx.mlcl.lib.Comparators;
 @Parameters(commandDescription = "Perform k-nearest-neighbours on a similarity file.")
 public class ExternalKnnSimsCommand extends ExternalSortWeightedTokenPiarCommand {
 
-    private static final Log LOG = LogFactory.getLog(ExternalKnnSimsCommand.class);
+    private static final Log LOG = LogFactory.getLog(
+            ExternalKnnSimsCommand.class);
 
     public static final int DEFAULT_K = 100;
 
     private static final long serialVersionUID = 1L;
 
     @Parameter(names = {"-k"},
-    description = "The number of neighbours to produce for each base entry.")
+               description = "The number of neighbours to produce for each base entry.")
     private int k = DEFAULT_K;
 
     private Comparator<Weighted<TokenPair>> classComparator =
@@ -75,7 +78,8 @@ public class ExternalKnnSimsCommand extends ExternalSortWeightedTokenPiarCommand
             File sourceFile, File destinationFile, Charset charset,
             SingleEnumerating indexDeligate,
             int k, int maxChunkSize) throws IOException {
-        super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(indexDeligate));
+        super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(
+                indexDeligate));
         setMaxChunkSize(maxChunkSize);
         setK(k);
     }
@@ -84,7 +88,8 @@ public class ExternalKnnSimsCommand extends ExternalSortWeightedTokenPiarCommand
             File sourceFile, File destinationFile, Charset charset,
             SingleEnumerating indexDeligate,
             int k) throws IOException {
-        super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(indexDeligate));
+        super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(
+                indexDeligate));
         setK(k);
     }
 
@@ -148,107 +153,31 @@ public class ExternalKnnSimsCommand extends ExternalSortWeightedTokenPiarCommand
     protected void finaliseTask() throws Exception {
         super.finaliseTask();
     }
-//
-//    @Override
-//    protected void runTask() throws Exception {
-//
-//        if (LOG.isInfoEnabled()) {
-//            LOG.info("Running external K-Nearest-Neighbours from \""
-//                    + getFileDeligate().getSourceFile()
-//                    + "\" to \"" + getFileDeligate().getDestinationFile() + "\".");
-//        }
-//
-//        map();
-//        reduce();
-//        finish();
-//
-//        if (LOG.isInfoEnabled()) {
-//            LOG.info("Completed external K-Nearest-Neighbours.");
-//        }
-//
-//    }
 
     @Override
-    protected MergeTask<Weighted<TokenPair>> createMergeTask(File srcA, File srcB, File dst) throws IOException {
-        MergeTask<Weighted<TokenPair>> task = super.createMergeTask(srcA, srcB, dst);
+    protected ObjectMergeTask<Weighted<TokenPair>> createMergeTask(File srcA,
+                                                                   File srcB,
+                                                                   File dst) throws IOException {
+        ObjectMergeTask<Weighted<TokenPair>> task = super.createMergeTask(srcA,
+                                                                          srcB,
+                                                                          dst);
         task.setSink(new KFirstReducerSink<Weighted<TokenPair>>(
                 task.getSink(), getClassComparator(), getK()));
         return task;
     }
 
     @Override
-    protected SortTask<Weighted<TokenPair>> createSortTask(Chunk<Weighted<TokenPair>> chunk, File dst) throws IOException {
-        SortTask<Weighted<TokenPair>> task = super.createSortTask(chunk, dst);
+    protected ObjectSortTask<Weighted<TokenPair>> createSortTask(
+            Chunk<Weighted<TokenPair>> chunk, File dst) throws IOException {
+        ObjectSortTask<Weighted<TokenPair>> task = super.createSortTask(chunk,
+                                                                        dst);
         task.setSink(new KFirstReducerSink<Weighted<TokenPair>>(
                 task.getSink(), getClassComparator(), getK()));
         return task;
     }
 
-//    private KnnTask<Weighted<TokenPair>> createKnnTask(File from, File to) throws IOException {
-//        Checks.checkNotNull("from", from);
-//        Checks.checkNotNull("to", to);
-//
-//        Source<Weighted<TokenPair>> src = openSource(from);
-//        Sink<Weighted<TokenPair>> snk = openSink(to);
-//
-//        KnnTask<Weighted<TokenPair>> task = new KnnTask<Weighted<TokenPair>>();
-//        task.setSink(snk);
-//        task.setSource(src);
-//        task.setClassComparator(getClassComparator());
-//        task.setNearnessComparator(getNearnessComparator());
-//        task.setK(k);
-//
-//        task.getProperties().setProperty(KEY_SRC_FILE, from.toString());
-//        task.getProperties().setProperty(KEY_DST_FILE, to.toString());
-//
-//        return task;
-//    }
-//
-//    @Override
-//    protected void handleCompletedTask(Task task) throws Exception {
-//        Checks.checkNotNull(task);
-//        task.throwException();
-//        Properties p = task.getProperties();
-//        if (task instanceof MergeTask) {
-//
-//            File srca = new File(p.getProperty(KEY_SRC_FILE_A));
-//            File srcb = new File(p.getProperty(KEY_SRC_FILE_B));
-//            File dst = new File(p.getProperty(KEY_DST_FILE));
-//
-//            assert !srca.equals(dst);
-//            assert !srcb.equals(dst);
-//
-//            submitTask(new DeleteTask(srca));
-//            submitTask(new DeleteTask(srcb));
-//            submitTask(createKnnTask(dst, dst));
-//
-//        } else if (task instanceof SortTask) {
-//
-//            File src = new File(p.getProperty(KEY_SRC_FILE));
-//            File dst = new File(p.getProperty(KEY_DST_FILE));
-//
-//            assert src.equals(getFileDeligate().getSourceFile());
-//
-//            submitTask(createKnnTask(dst, dst));
-//
-//        } else if (task instanceof KnnTask) {
-//
-//            File src = new File(p.getProperty(KEY_SRC_FILE));
-//            File dst = new File(p.getProperty(KEY_DST_FILE));
-//            assert src.equals(dst);
-//            queueMergeTask(dst);
-//
-//        } else if (task instanceof DeleteTask) {
-//            // not a sausage
-//        } else {
-//            throw new AssertionError(
-//                    "Task type " + task.getClass()
-//                    + " should not have been queued.");
-//        }
-//    }
     @Override
     protected ToStringHelper toStringHelper() {
         return super.toStringHelper().add("k", k);
     }
-
 }

@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.lib.tasks.MergeTask;
+import uk.ac.susx.mlcl.lib.tasks.ObjectMergeTask;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
@@ -120,10 +120,10 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
         Source<T> srcB = openSource(getFileDeligate().getSourceFileB());
         Sink<T> snk = openSink(getFileDeligate().getDestinationFile());
 
-        MergeTask<T> task = new MergeTask<T>(
+        ObjectMergeTask<T> task = new ObjectMergeTask<T>(
                 srcA, srcB, snk, getComparator());
         task.run();
-        while (task.isExceptionThrown())
+        while (task.isExceptionCaught())
             task.throwException();
 
         if (snk instanceof Flushable)

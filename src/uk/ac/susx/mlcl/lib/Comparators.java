@@ -60,6 +60,7 @@ public class Comparators {
         return new Comparator<T>() {
 
             @Override
+            @SuppressWarnings("unchecked")
             public int compare(final T a, final T b) {
                 return ((Comparable<T>) a).compareTo(b);
             }
