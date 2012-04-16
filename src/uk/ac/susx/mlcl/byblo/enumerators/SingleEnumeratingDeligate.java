@@ -23,41 +23,22 @@ public class SingleEnumeratingDeligate
 
     @Parameter(names = {"-E", "--enumerated"},
     description = "Whether tokens in the input file are enumerated.")
-    private boolean enumerated = DEFAULT_IS_ENUMERATED;
+    private boolean enumerationEnabled = DEFAULT_IS_ENUMERATED;
 
     @Parameter(names = {"-X", "--index-file"},
     description = "Index for the string tokens.")
-    private File indexFile = null;
+    private File enumeratorFile = null;
 
     private Enumerator<String> enumerator = null;
 
-//    public SingleEnumeratingDeligate(
-//            EnumeratorType type, boolean enumerated, File indexFile, Enumerator<String> enumerator,
-//            boolean skipIndexed1, boolean skipIndexed2) {
-//        super(type, skipIndexed1, skipIndexed2);
-//        this.enumerated = enumerated;
-//        this.indexFile = indexFile;
-//        this.enumerator = enumerator;
-//    }
     public SingleEnumeratingDeligate(
             EnumeratorType type, boolean enumerated, File indexFile,
             boolean skipIndexed1, boolean skipIndexed2) {
         super(type, skipIndexed1, skipIndexed2);
-        this.enumerated = enumerated;
-        this.indexFile = indexFile;
+        this.enumerationEnabled = enumerated;
+        this.enumeratorFile = indexFile;
         this.enumerator = null;
     }
-//
-//    public SingleEnumeratingDeligate(EnumeratorType type, boolean enumerated, Enumerator<String> enumerator) {
-//        this(type, enumerated, null, enumerator,
-//             DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
-//    }
-//
-//    public SingleEnumeratingDeligate(EnumeratorType type, boolean enumerated) {
-//        this(type, enumerated, null, null,
-//             DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
-//    }
-//
 
     public SingleEnumeratingDeligate() {
         this(DEFAULT_TYPE, DEFAULT_IS_ENUMERATED, null,
@@ -66,12 +47,22 @@ public class SingleEnumeratingDeligate
 
     @Override
     public File getEnumeratorFile() {
-        return indexFile;
+        return enumeratorFile;
+    }
+
+    @Override
+    public void setEnumeratorFile(File enumeratorFile) {
+        this.enumeratorFile = enumeratorFile;
     }
 
     @Override
     public final boolean isEnumerationEnabled() {
-        return enumerated;
+        return enumerationEnabled;
+    }
+
+    @Override
+    public void setEnumerationEnabled(boolean enumerationEnabled) {
+        this.enumerationEnabled = enumerationEnabled;
     }
 
     @Override
@@ -84,7 +75,7 @@ public class SingleEnumeratingDeligate
 
     @Override
     public void openEnumerator() throws IOException {
-        enumerator = open(indexFile);
+        enumerator = open(enumeratorFile);
     }
 
     @Override

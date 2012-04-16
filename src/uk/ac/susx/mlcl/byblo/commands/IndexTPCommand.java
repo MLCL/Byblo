@@ -84,4 +84,27 @@ public class IndexTPCommand extends AbstractCopyCommand<TokenPair> {
         return EnumeratingDeligates.decorateEnumerated(indexDeligate, true);
     }
 
+    public void setFeatureEnumeratorFile(File featureEnumeratorFile) {
+        indexDeligate.setFeatureEnumeratorFile(featureEnumeratorFile);
+    }
+
+    public void setEntryEnumeratorFile(File entryEnumeratorFile) {
+        indexDeligate.setEntryEnumeratorFile(entryEnumeratorFile);
+    }
+
+   
+    public File getFeatureEnumeratorFile() {
+        return indexDeligate.getFeatureEnumeratorFile();
+    }
+
+    public File getEntryEnumeratorFile() {
+        return indexDeligate.getEntryEnumeratorFile();
+    }
+    
+    
+    
+    
+    
+    
+
 }

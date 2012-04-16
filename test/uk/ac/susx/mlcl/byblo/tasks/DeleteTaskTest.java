@@ -31,8 +31,6 @@
 package uk.ac.susx.mlcl.byblo.tasks;
 
 import uk.ac.susx.mlcl.lib.tasks.FileDeleteTask;
-import com.beust.jcommander.JCommander;
-import java.util.ResourceBundle;
 import java.io.File;
 import java.io.IOException;
 import org.junit.Test;
@@ -44,20 +42,19 @@ import static org.junit.Assert.*;
  */
 public class DeleteTaskTest {
 
- 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testRun_success() throws Exception {
         System.out.println("Testing run() -- expecting success");
         File tmp = File.createTempFile(getClass().getName(), "");
         assertTrue(tmp.exists());
         FileDeleteTask instance = new FileDeleteTask(tmp);
         instance.run();
-        while(instance.isExceptionCaught())
+        while (instance.isExceptionCaught())
             instance.throwException();
         assertFalse(tmp.exists());
     }
 
-    @Test(expected = IOException.class, timeout=1000)
+    @Test(expected = IOException.class, timeout = 1000)
     public void testRunTask_failure() throws Exception {
         System.out.println("Testing runTask() -- expecting failure");
         File tmp = File.createTempFile(getClass().getName(), "");
@@ -68,7 +65,7 @@ public class DeleteTaskTest {
         instance.throwException();
     }
 
-    @Test(expected = IOException.class,timeout=1000)
+    @Test(expected = IOException.class, timeout = 1000)
     public void testRun_failure() throws Exception {
         System.out.println("Testing runTask() -- expecting failure");
         File tmp = File.createTempFile(getClass().getName(), "");
@@ -79,7 +76,7 @@ public class DeleteTaskTest {
         instance.throwException();
     }
 
-    @Test(timeout=1000)
+    @Test(timeout = 1000)
     public void testGetSetFile() throws IOException {
         System.out.println("Testing getFile() and setFile()");
         File tmp = File.createTempFile(getClass().getName(), "");

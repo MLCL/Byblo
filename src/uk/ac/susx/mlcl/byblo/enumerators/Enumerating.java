@@ -31,6 +31,7 @@
  */
 package uk.ac.susx.mlcl.byblo.enumerators;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -58,5 +59,7 @@ public interface Enumerating {
     void openEnumerator() throws IOException;
 
     EnumeratorType getType();
+
+
 
 }

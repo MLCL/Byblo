@@ -48,9 +48,9 @@ public interface DoubleEnumerating extends Enumerating {
 
     File getFeatureEnumeratorFile();
 
-    boolean isEntriesEnumerated();
+    void setEntryEnumeratorFile(File entryEnumeratorFile);
 
-    boolean isFeaturesEnumerated();
+    void setFeatureEnumeratorFile(File featureEnumeratorFile);
 
     void openEntriesEnumerator() throws IOException;
 
@@ -67,5 +67,13 @@ public interface DoubleEnumerating extends Enumerating {
     SingleEnumerating getEntriesEnumeratorCarriar();
 
     SingleEnumerating getFeaturesEnumeratorCarriar();
+
+    boolean isEnumeratedEntries();
+
+    void setEnumeratedEntries(boolean enumeratedEntries);
+
+    boolean isEnumeratedFeatures();
+
+    void setEnumeratedFeatures(boolean enumeratedFeatures);
 
 }

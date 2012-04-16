@@ -63,14 +63,15 @@ public class EnumeratingDeligates {
         return new EnumeratingDeligates.DoubleToDoubleAdapter(inner) {
 
             @Override
-            public boolean isEntriesEnumerated() {
+            public boolean isEnumeratedEntries() {
                 return enumerated;
             }
 
             @Override
-            public boolean isFeaturesEnumerated() {
+            public boolean isEnumeratedFeatures() {
                 return enumerated;
             }
+
         };
     }
 
@@ -82,6 +83,7 @@ public class EnumeratingDeligates {
             public boolean isEnumerationEnabled() {
                 return enumerated;
             }
+
         };
     }
 
@@ -111,8 +113,7 @@ public class EnumeratingDeligates {
             if (getClass() != obj.getClass())
                 return false;
             final AdapterBase<?> other = (AdapterBase<?>) obj;
-            if (this.inner != other.inner && (this.inner == null || !this.inner.
-                                              equals(other.inner)))
+            if (this.inner != other.inner && (this.inner == null || !this.inner.equals(other.inner)))
                 return false;
             return true;
         }
@@ -151,6 +152,7 @@ public class EnumeratingDeligates {
         public String toString() {
             return this.getClass().getSimpleName() + "{" + "inner=" + inner + '}';
         }
+
     }
 
     public static class SingleToPairAdapter
@@ -182,13 +184,33 @@ public class EnumeratingDeligates {
         }
 
         @Override
-        public boolean isEntriesEnumerated() {
+        public boolean isEnumeratedEntries() {
             return getInner().isEnumerationEnabled();
         }
 
         @Override
-        public boolean isFeaturesEnumerated() {
+        public boolean isEnumeratedFeatures() {
             return getInner().isEnumerationEnabled();
+        }
+
+        @Override
+        public void setEntryEnumeratorFile(File entryEnumeratorFile) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public void setEnumeratedEntries(boolean enumeratedEntries) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public void setEnumeratedFeatures(boolean enumeratedFeatures) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public void setFeatureEnumeratorFile(File featureEnumeratorFile) {
+            throw new UnsupportedOperationException("Not supported yet.");
         }
 
         @Override
@@ -230,6 +252,7 @@ public class EnumeratingDeligates {
         public SingleEnumerating getFeaturesEnumeratorCarriar() {
             return getInner();
         }
+
     }
 
     public static class PairToFeaturesSingleAdapter
@@ -252,7 +275,17 @@ public class EnumeratingDeligates {
 
         @Override
         public boolean isEnumerationEnabled() {
-            return getInner().isFeaturesEnumerated();
+            return getInner().isEnumeratedFeatures();
+        }
+
+        @Override
+        public void setEnumerationEnabled(boolean enumerationEnabled) {
+            getInner().setEnumeratedFeatures(enumerationEnabled);
+        }
+
+        @Override
+        public void setEnumeratorFile(File enumeratorFile) {
+            getInner().setFeatureEnumeratorFile(enumeratorFile);
         }
 
         @Override
@@ -274,6 +307,7 @@ public class EnumeratingDeligates {
         public DoubleEnumerating getEnumeratorPairCarriar() {
             return getInner();
         }
+
     }
 
     public static class PairToEntriesSingleAdapter
@@ -296,7 +330,17 @@ public class EnumeratingDeligates {
 
         @Override
         public boolean isEnumerationEnabled() {
-            return getInner().isEntriesEnumerated();
+            return getInner().isEnumeratedEntries();
+        }
+
+        @Override
+        public void setEnumerationEnabled(boolean enumerationEnabled) {
+            getInner().setEnumeratedEntries(enumerationEnabled);
+        }
+
+        @Override
+        public void setEnumeratorFile(File enumeratorFile) {
+            getInner().setEntryEnumeratorFile(enumeratorFile);
         }
 
         @Override
@@ -318,6 +362,7 @@ public class EnumeratingDeligates {
         public DoubleEnumerating getEnumeratorPairCarriar() {
             return getInner();
         }
+
     }
 
     public abstract static class SingleToSingleAdapter
@@ -359,9 +404,20 @@ public class EnumeratingDeligates {
         }
 
         @Override
+        public void setEnumeratorFile(File enumeratorFile) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public void setEnumerationEnabled(boolean enumerationEnabled) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
         public DoubleEnumerating getEnumeratorPairCarriar() {
             return toPair(this);
         }
+
     }
 
     public abstract static class DoubleToDoubleAdapter
@@ -393,13 +449,23 @@ public class EnumeratingDeligates {
         }
 
         @Override
-        public boolean isEntriesEnumerated() {
-            return getInner().isEntriesEnumerated();
+        public boolean isEnumeratedEntries() {
+            return getInner().isEnumeratedEntries();
         }
 
         @Override
-        public boolean isFeaturesEnumerated() {
-            return getInner().isFeaturesEnumerated();
+        public boolean isEnumeratedFeatures() {
+            return getInner().isEnumeratedFeatures();
+        }
+
+        @Override
+        public void setEnumeratedEntries(boolean enumeratedEntries) {
+            getInner().setEnumeratedEntries(enumeratedEntries);
+        }
+
+        @Override
+        public void setEnumeratedFeatures(boolean enumeratedFeatures) {
+            getInner().setEnumeratedFeatures(enumeratedFeatures);
         }
 
         @Override
@@ -441,5 +507,16 @@ public class EnumeratingDeligates {
         public SingleEnumerating getFeaturesEnumeratorCarriar() {
             return toSingleFeatures(this);
         }
+
+        @Override
+        public void setEntryEnumeratorFile(File entryEnumeratorFile) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public void setFeatureEnumeratorFile(File featureEnumeratorFile) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
+
     }
 }

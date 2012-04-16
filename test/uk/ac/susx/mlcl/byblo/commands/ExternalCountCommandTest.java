@@ -60,21 +60,18 @@ public class ExternalCountCommandTest {
             File outEF, Charset charset, int chunkSize,
             boolean preindexedEntries, boolean preindexedFeatures)
             throws Exception {
-        final ExternalCountCommand countTask = new ExternalCountCommand();
-        countTask.setInstancesFile(inInst);
-        countTask.setEntriesFile(outE);
-        countTask.setFeaturesFile(outF);
-        countTask.setEntryFeaturesFile(outEF);
-        countTask.getFileDeligate().setCharset(charset);
-        countTask.setMaxChunkSize(chunkSize);
-        countTask.setIndexDeligate(new DoubleEnumeratingDeligate(
+        final ExternalCountCommand countCmd = new ExternalCountCommand();
+        countCmd.setInstancesFile(inInst);
+        countCmd.setEntriesFile(outE);
+        countCmd.setFeaturesFile(outF);
+        countCmd.setEntryFeaturesFile(outEF);
+        countCmd.getFileDeligate().setCharset(charset);
+        countCmd.setMaxChunkSize(chunkSize);
+        countCmd.setIndexDeligate(new DoubleEnumeratingDeligate(
                 Enumerating.DEFAULT_TYPE, preindexedEntries, preindexedFeatures, null, null, false, false));
-        countTask.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
+        countCmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
 
-        countTask.run();
-        while (countTask.isExceptionCaught()) {
-            countTask.throwException();
-        }
+        countCmd.runCommand();
 
         assertTrue("Output files not created: " + outE, outE.exists());
         assertTrue("Output files not created: " + outF, outF.exists());

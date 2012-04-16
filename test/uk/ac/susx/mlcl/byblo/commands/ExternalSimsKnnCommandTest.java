@@ -64,28 +64,24 @@ public class ExternalSimsKnnCommandTest {
         assertTrue(in.exists());
         assertTrue(in.length() > 0);
 
-        final ExternalKnnSimsCommand knnTask = new ExternalKnnSimsCommand();
+        final ExternalKnnSimsCommand knnCmd = new ExternalKnnSimsCommand();
 
-        knnTask.getFileDeligate().setSourceFile(in);
-        knnTask.getFileDeligate().setDestinationFile(out);
-        knnTask.getFileDeligate().setCharset(DEFAULT_CHARSET);
+        knnCmd.getFileDeligate().setSourceFile(in);
+        knnCmd.getFileDeligate().setDestinationFile(out);
+        knnCmd.getFileDeligate().setCharset(DEFAULT_CHARSET);
 
-        knnTask.setIndexDeligate(new DoubleEnumeratingDeligate(
+        knnCmd.setIndexDeligate(new DoubleEnumeratingDeligate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null, false, false));
 
-        knnTask.setMaxChunkSize(100000);
-        knnTask.setClassComparator(Weighted.recordOrder(TokenPair.firstIndexOrder()));
-        knnTask.setNearnessComparator(Comparators.reverse(Weighted.<TokenPair>weightOrder()));
-        knnTask.setK(100);
+        knnCmd.setMaxChunkSize(100000);
+        knnCmd.setClassComparator(Weighted.recordOrder(TokenPair.firstIndexOrder()));
+        knnCmd.setNearnessComparator(Comparators.reverse(Weighted.<TokenPair>weightOrder()));
+        knnCmd.setK(100);
 
-        knnTask.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
+        knnCmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
 
-        knnTask.runCommand();
+        knnCmd.runCommand();
 
-
-        while (knnTask.isExceptionCaught()) {
-            knnTask.throwException();
-        }
 
         assertTrue("Output files not created.", out.exists());
         assertTrue("Empty output file found.", out.length() > 0);

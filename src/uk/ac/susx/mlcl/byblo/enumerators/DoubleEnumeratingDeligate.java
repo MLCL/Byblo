@@ -31,11 +31,11 @@ public class DoubleEnumeratingDeligate
 
     @Parameter(names = {"-Xe", "--entries-index-file"},
     description = "Index file for enumerating entries.")
-    private File entriesIndexFile = null;
+    private File entryEnumeratorFile = null;
 
     @Parameter(names = {"-Xf", "--features-index-file"},
     description = "Index file for enumerating features.")
-    private File featuresIndexFile = null;
+    private File featureEnumeratorFile = null;
 
     private Enumerator<String> entryEnumerator = null;
 
@@ -49,8 +49,8 @@ public class DoubleEnumeratingDeligate
         super(type, skipindexed1, skipindexed2);
         this.enumeratedEntries = enumeratedEntries;
         this.enumeratedFeatures = enumeratedFeatures;
-        this.entriesIndexFile = entryIndexFile;
-        this.featuresIndexFile = featureIndexFile;
+        this.entryEnumeratorFile = entryIndexFile;
+        this.featureEnumeratorFile = featureIndexFile;
         this.entryEnumerator = entryEnumerator;
         this.featureEnumerator = featureEnumerator;
     }
@@ -62,41 +62,7 @@ public class DoubleEnumeratingDeligate
         this(type, enumeratedEntries, enumeratedFeatures, entryIndexFile, featureIndexFile,
              null, null, skipIndexed1, skipIndexed2);
     }
-//
-//    public DoubleEnumeratingDeligate(
-//            EnumeratorType type, boolean enumeratedEntries, boolean enumeratedFeatures,
-//            Enumerator<String> entryEnumerator, Enumerator<String> featureEnumerator,
-//            boolean skipIndexed1, boolean skipIndexed2) {
-//        this(type, enumeratedEntries, enumeratedFeatures, null, null,
-//             entryEnumerator, featureEnumerator, skipIndexed1, skipIndexed2);
-//    }
-//
-//    public DoubleEnumeratingDeligate(
-//            EnumeratorType type, boolean enumeratedEntries,
-//            boolean enumeratedFeatures,
-//            boolean skipIndexed1,
-//            boolean skipIndexed2) {
-//        this(type, enumeratedEntries, enumeratedFeatures, null, null,
-//             null, null, skipIndexed1, skipIndexed2);
-//    }
-//
-//    public DoubleEnumeratingDeligate(
-//            EnumeratorType type, boolean enumeratedEntries,
-//            boolean enumeratedFeatures) {
-//        this(type, enumeratedEntries, enumeratedFeatures, null, null, null, null,
-//             DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
-//    }
-//
-//    public DoubleEnumeratingDeligate(
-//            EnumeratorType type, boolean enumeratedEntries,
-//                                     boolean enumeratedFeatures,
-//                                     Enumerator<String> entryEnumerator,
-//                                     Enumerator<String> featureEnumerator) {
-//        this(type, enumeratedEntries, enumeratedFeatures, null, null,
-//             entryEnumerator, featureEnumerator,
-//             DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
-//    }
-//
+
     public DoubleEnumeratingDeligate() {
         this(DEFAULT_TYPE, DEFAULT_IS_ENUMERATED, DEFAULT_IS_ENUMERATED,
              null, null,
@@ -109,8 +75,6 @@ public class DoubleEnumeratingDeligate
             // if tokens are preindexed then a file MUST be available
             // otherwise the file will be loaded if it exists
             openEntriesEnumerator();
-//            entryEnumerator = EnumeratorDeligates.instantiateEnumerator(
-//                    isEntriesEnumerated(), getEntryIndexFile());
         }
         return entryEnumerator;
     }
@@ -119,35 +83,31 @@ public class DoubleEnumeratingDeligate
     public final Enumerator<String> getFeatureEnumerator() throws IOException {
         if (featureEnumerator == null) {
             openFeaturesEnumerator();
-//            featureEnumerator = EnumeratorDeligates.instantiateEnumerator(
-//                    isFeaturesEnumerated(), getFeatureIndexFile());
         }
         return featureEnumerator;
     }
 
     @Override
-    public final boolean isEntriesEnumerated() {
-        return enumeratedEntries;
-    }
-
-    @Override
-    public final boolean isFeaturesEnumerated() {
-        return enumeratedFeatures;
-    }
-
-    @Override
     public final File getEntryEnumeratorFile() {
-        return entriesIndexFile;
+        return entryEnumeratorFile;
     }
 
     @Override
     public final File getFeatureEnumeratorFile() {
-        return featuresIndexFile;
+        return featureEnumeratorFile;
+    }
+
+    public void setEntryEnumeratorFile(File entryEnumeratorFile) {
+        this.entryEnumeratorFile = entryEnumeratorFile;
+    }
+
+    public void setFeatureEnumeratorFile(File featureEnumeratorFile) {
+        this.featureEnumeratorFile = featureEnumeratorFile;
     }
 
     @Override
     public void openEntriesEnumerator() throws IOException {
-        entryEnumerator = open(entriesIndexFile);;
+        entryEnumerator = open(entryEnumeratorFile);;
     }
 
     @Override
@@ -163,7 +123,7 @@ public class DoubleEnumeratingDeligate
 
     @Override
     public void openFeaturesEnumerator() throws IOException {
-        featureEnumerator = open(featuresIndexFile);
+        featureEnumerator = open(featureEnumeratorFile);
     }
 
     @Override
@@ -177,6 +137,7 @@ public class DoubleEnumeratingDeligate
         featureEnumerator = null;
     }
 
+    @Override
     public void closeEnumerator() throws IOException {
         closeFeaturesEnumerator();
         closeEntriesEnumerator();
@@ -195,10 +156,30 @@ public class DoubleEnumeratingDeligate
     }
 
     @Override
+    public boolean isEnumeratedEntries() {
+        return enumeratedEntries;
+    }
+
+    @Override
+    public void setEnumeratedEntries(boolean enumeratedEntries) {
+        this.enumeratedEntries = enumeratedEntries;
+    }
+
+    @Override
+    public boolean isEnumeratedFeatures() {
+        return enumeratedFeatures;
+    }
+
+    @Override
+    public void setEnumeratedFeatures(boolean enumeratedFeatures) {
+        this.enumeratedFeatures = enumeratedFeatures;
+    }
+
+    @Override
     protected Objects.ToStringHelper toStringHelper() {
         return super.toStringHelper().
-                add("preindexed1", isEntriesEnumerated()).
-                add("preindexed2", isFeaturesEnumerated()).
+                add("preindexed1", isEnumeratedEntries()).
+                add("preindexed2", isEnumeratedFeatures()).
                 add("index1", getEntryEnumeratorFile()).
                 add("index2", getFeatureEnumeratorFile());
     }
@@ -212,5 +193,6 @@ public class DoubleEnumeratingDeligate
     public SingleEnumerating getFeaturesEnumeratorCarriar() {
         return EnumeratingDeligates.toSingleFeatures(this);
     }
+    
 
 }

@@ -300,7 +300,7 @@ public class WeightedTokenPairSource
 
             });
         }
-        if (!idx.isEntriesEnumerated()) {
+        if (!idx.isEnumeratedEntries()) {
             tsv = Enumerated.enumerated(tsv, idx.getEntryEnumerator(),
                                         new Predicate<Integer>() {
 
@@ -312,7 +312,7 @@ public class WeightedTokenPairSource
             });
         }
 
-        if (!idx.isFeaturesEnumerated()) {
+        if (!idx.isEnumeratedFeatures()) {
             tsv = Enumerated.enumerated(tsv, idx.getFeatureEnumerator(),
                                         new Predicate<Integer>() {
 

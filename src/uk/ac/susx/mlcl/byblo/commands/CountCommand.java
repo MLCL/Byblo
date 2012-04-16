@@ -226,19 +226,19 @@ public class CountCommand extends AbstractCommand implements Serializable {
 //        checkState();
 //    }
     private Comparator<Weighted<Token>> getEntryOrder() throws IOException {
-        return indexDeligate.isEntriesEnumerated()
+        return indexDeligate.isEnumeratedEntries()
                ? Weighted.recordOrder(Token.indexOrder())
                : Weighted.recordOrder(Token.stringOrder(indexDeligate.getEntriesEnumeratorCarriar()));
     }
 
     private Comparator<Weighted<Token>> getFeatureOrder() throws IOException {
-        return indexDeligate.isFeaturesEnumerated()
+        return indexDeligate.isEnumeratedFeatures()
                ? Weighted.recordOrder(Token.indexOrder())
                : Weighted.recordOrder(Token.stringOrder(indexDeligate.getFeaturesEnumeratorCarriar()));
     }
 
     private Comparator<Weighted<TokenPair>> getEventOrder() throws IOException {
-        return (indexDeligate.isEntriesEnumerated() && indexDeligate.isFeaturesEnumerated())
+        return (indexDeligate.isEnumeratedEntries() && indexDeligate.isEnumeratedFeatures())
                ? Weighted.recordOrder(TokenPair.indexOrder())
                : Weighted.recordOrder(TokenPair.stringOrder(
                indexDeligate));

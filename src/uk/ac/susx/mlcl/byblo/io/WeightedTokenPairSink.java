@@ -204,7 +204,7 @@ public class WeightedTokenPairSink
             throws IOException {
         DataSink tsv = new TSV.Sink(file, charset);
 
-        
+
         if (idx.isEnumeratorSkipIndexed1()) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
@@ -212,6 +212,7 @@ public class WeightedTokenPairSink
                 public boolean apply(Integer column) {
                     return column == 0;
                 }
+
             });
         }
         if (idx.isEnumeratorSkipIndexed2()) {
@@ -221,12 +222,13 @@ public class WeightedTokenPairSink
                 public boolean apply(Integer column) {
                     return (column + 1) % 2 == 0;
                 }
+
             });
         }
-        
-        
-        
-        if (!idx.isEntriesEnumerated()) {
+
+
+
+        if (!idx.isEnumeratedEntries()) {
             tsv = Enumerated.enumerated(tsv, idx.getEntryEnumerator(),
                                         new Predicate<Integer>() {
 
@@ -234,10 +236,11 @@ public class WeightedTokenPairSink
                 public boolean apply(Integer column) {
                     return column == 0;
                 }
+
             });
         }
 
-        if (!idx.isFeaturesEnumerated()) {
+        if (!idx.isEnumeratedFeatures()) {
             tsv = Enumerated.enumerated(tsv, idx.getFeatureEnumerator(),
                                         new Predicate<Integer>() {
 
@@ -245,10 +248,11 @@ public class WeightedTokenPairSink
                 public boolean apply(Integer column) {
                     return (column + 1) % 2 == 0;
                 }
+
             });
         }
-        
-        
+
+
         if (compact)
             tsv = Compact.compact(tsv, 3);
 
@@ -266,4 +270,5 @@ public class WeightedTokenPairSink
 //        }
         return new WeightedTokenPairSink(tsv);
     }
+
 }

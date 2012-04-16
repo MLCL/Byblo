@@ -134,12 +134,12 @@ public class TokenPairSource
 
         tsv = Compact.compact(tsv, 2);
 
-        if (!idx.isEntriesEnumerated() || !idx.isFeaturesEnumerated()) {
+        if (!idx.isEnumeratedEntries() || !idx.isEnumeratedFeatures()) {
             @SuppressWarnings("unchecked")
             Enumerator<String>[] enumerators = (Enumerator<String>[]) new Enumerator[2];
-            if (!idx.isEntriesEnumerated())
+            if (!idx.isEnumeratedEntries())
                 enumerators[0] = idx.getEntryEnumerator();
-            if (!idx.isFeaturesEnumerated())
+            if (!idx.isEnumeratedFeatures())
                 enumerators[1] = idx.getFeatureEnumerator();
             tsv = Enumerated.enumerated(tsv, enumerators);
         }

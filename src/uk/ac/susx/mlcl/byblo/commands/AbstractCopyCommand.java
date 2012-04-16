@@ -74,14 +74,48 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand {
         return filesDeligate;
     }
 
+    public void setCompactFormatDisabled(boolean compactFormatDisabled) {
+        filesDeligate.setCompactFormatDisabled(compactFormatDisabled);
+    }
+
+    public final void setCharset(Charset charset) {
+        filesDeligate.setCharset(charset);
+    }
+
+    public boolean isCompactFormatDisabled() {
+        return filesDeligate.isCompactFormatDisabled();
+    }
+
+    public final Charset getCharset() {
+        return filesDeligate.getCharset();
+    }
+
+    public final void setSourceFile(File sourceFile) throws NullPointerException {
+        filesDeligate.setSourceFile(sourceFile);
+    }
+
+    public final void setDestinationFile(File destFile) throws NullPointerException {
+        filesDeligate.setDestinationFile(destFile);
+    }
+
+    public final File getSourceFile() {
+        return filesDeligate.getSourceFile();
+    }
+
+    public final File getDestinationFile() {
+        return filesDeligate.getDestinationFile();
+    }
+
+    
     @Override
     public void runCommand() throws Exception {
         if (LOG.isInfoEnabled())
             LOG.info(MessageFormat.format(
                     "Running command {0} from \"{1}\" to \"{2}\".",
+                    getName(),
                     getFilesDeligate().getSourceFile(),
-                    getFilesDeligate().getDestinationFile(),
-                    getName()));
+                    getFilesDeligate().getDestinationFile()
+                    ));
         LOG.debug(MiscUtil.memoryInfoString());
         
         Source<T> src = openSource(getFilesDeligate().getSourceFile());
