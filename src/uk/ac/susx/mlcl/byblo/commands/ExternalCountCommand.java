@@ -138,7 +138,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     @Parameter(names = {"-T", "--temporary-directory"},
     description = "Directory used for holding temporary files.")
-    private TempFileFactory tempFileFactory = new TempFileFactory();
+    private FileFactory tempFileFactory = new TempFileFactory();
 
     private Queue<File> mergeEntryQueue;
 
@@ -164,7 +164,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             final Charset charset,
             DoubleEnumerating indexDeligate) {
         setInstancesFile(instancesFile);
-        setEntryFeaturesFile(entryFeaturesFile);
+        setEventsFile(entryFeaturesFile);
         setEntriesFile(entriesFile);
         setFeaturesFile(featuresFile);
         fileDeligate.setCharset(charset);
@@ -175,7 +175,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             final File instancesFile, final File entryFeaturesFile,
             final File entriesFile, final File featuresFile) {
         setInstancesFile(instancesFile);
-        setEntryFeaturesFile(entryFeaturesFile);
+        setEventsFile(entryFeaturesFile);
         setEntriesFile(entriesFile);
         setFeaturesFile(featuresFile);
     }
@@ -201,11 +201,11 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         this.indexDeligate = indexDeligate;
     }
 
-    public TempFileFactory getTempFileFactory() {
+    public FileFactory getTempFileFactory() {
         return tempFileFactory;
     }
 
-    public void setTempFileFactory(TempFileFactory tempFileFactory) {
+    public void setTempFileFactory(FileFactory tempFileFactory) {
         Checks.checkNotNull("tempFileFactory", tempFileFactory);
         this.tempFileFactory = tempFileFactory;
     }
@@ -231,11 +231,11 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         this.featuresFile = contextsFile;
     }
 
-    public final File getEntryFeaturesFile() {
+    public final File getEventsFile() {
         return entryFeaturesFile;
     }
 
-    public final void setEntryFeaturesFile(final File featuresFile)
+    public final void setEventsFile(final File featuresFile)
             throws NullPointerException {
         if (featuresFile == null)
             throw new NullPointerException("featuresFile is null");
@@ -454,7 +454,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         if (finalMerge == null)
             throw new AssertionError(
                     "The entry/feature merge queue is empty but final copy has not been completed.");
-        new CopyCommand(finalMerge, getEntryFeaturesFile()).runCommand();
+        new CopyCommand(finalMerge, getEventsFile()).runCommand();
         if (!DEBUG) {
             FileDeleteTask delete = new FileDeleteTask(finalMerge);
             delete.runTask();
@@ -824,4 +824,55 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
                 add("id", getIndexDeligate());
     }
 
+    public boolean isEnumeratorSkipIndexed2() {
+        return indexDeligate.isEnumeratorSkipIndexed2();
+    }
+
+    public boolean isEnumeratorSkipIndexed1() {
+        return indexDeligate.isEnumeratorSkipIndexed1();
+    }
+
+    public void setEnumeratedFeatures(boolean enumeratedFeatures) {
+        indexDeligate.setEnumeratedFeatures(enumeratedFeatures);
+    }
+
+    public void setEnumeratedEntries(boolean enumeratedEntries) {
+        indexDeligate.setEnumeratedEntries(enumeratedEntries);
+    }
+
+    public boolean isEnumeratedFeatures() {
+        return indexDeligate.isEnumeratedFeatures();
+    }
+
+    public boolean isEnumeratedEntries() {
+        return indexDeligate.isEnumeratedEntries();
+    }
+
+    public void setEnumeratorSkipIndexed2(boolean b) {
+        indexDeligate.setEnumeratorSkipIndexed2(b);
+    }
+
+    public void setEnumeratorSkipIndexed1(boolean b) {
+        indexDeligate.setEnumeratorSkipIndexed1(b);
+    }
+
+    public void setCompactFormatDisabled(boolean compactFormatDisabled) {
+        fileDeligate.setCompactFormatDisabled(compactFormatDisabled);
+    }
+
+    public final void setCharset(Charset charset) {
+        fileDeligate.setCharset(charset);
+    }
+
+    public boolean isCompactFormatDisabled() {
+        return fileDeligate.isCompactFormatDisabled();
+    }
+
+    public final Charset getCharset() {
+        return fileDeligate.getCharset();
+    }
+
+    
+    
+    
 }

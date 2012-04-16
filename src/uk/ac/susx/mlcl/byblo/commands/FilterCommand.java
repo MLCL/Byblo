@@ -56,6 +56,7 @@ import uk.ac.susx.mlcl.byblo.io.*;
 import static uk.ac.susx.mlcl.lib.Predicates2.*;
 import uk.ac.susx.mlcl.lib.*;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
+import uk.ac.susx.mlcl.lib.commands.FileDeligate;
 import uk.ac.susx.mlcl.lib.io.*;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
@@ -91,11 +92,11 @@ public class FilterCommand extends AbstractCommand implements Serializable {
     /*
      * === INPUT FILES ===
      */
-    @Parameter(names = {"-ief", "--input-entry-features"},
+    @Parameter(names = {"-iv", "--input-events"},
     required = true,
-    description = "Input entry/feature pair frequencies file.",
+    description = "Input event frequencies file.",
     validateWith = InputFileValidator.class)
-    private File inputEntryFeaturesFile;
+    private File inputEventsFile;
 
     @Parameter(names = {"-ie", "--input-entries"},
     required = true,
@@ -112,11 +113,11 @@ public class FilterCommand extends AbstractCommand implements Serializable {
      * === OUTPUT FILES ===
      */
 
-    @Parameter(names = {"-oef", "--output-entry-features"},
+    @Parameter(names = {"-ov", "--output-events"},
     required = true,
-    description = "Output entry/feature pair frequencies file.",
+    description = "Output event frequencies file.",
     validateWith = OutputFileValidator.class)
-    private File outputEntryFeaturesFile;
+    private File outputEventsFile;
 
     @Parameter(names = {"-oe", "--output-entries"},
     required = true,
@@ -130,12 +131,8 @@ public class FilterCommand extends AbstractCommand implements Serializable {
     validateWith = OutputFileValidator.class)
     private File outputFeaturesFile;
 
-    /*
-     * === CHARACTER ENCODING ===
-     */
-    @Parameter(names = {"-c", "--charset"},
-    description = "Character encoding to use for both input and output.")
-    private Charset charset = Files.DEFAULT_CHARSET;
+    @ParametersDelegate
+    private FileDeligate fileDeligate = new FileDeligate();
 
     /*
      * === FILTER PARAMATERISATION ===
@@ -154,10 +151,10 @@ public class FilterCommand extends AbstractCommand implements Serializable {
     description = "Regular expresion that accepted entries must match.")
     private String filterEntryPattern;
 
-    @Parameter(names = {"-feff", "--filter-entry-feature-freq"},
-    description = "Minimum entry/feature pair frequency threshold.",
+    @Parameter(names = {"-fvf", "--filter-event-freq"},
+    description = "Minimum event frequency threshold.",
     converter = DoubleConverter.class)
-    private double filterEntryFeatureMinFreq;
+    private double filterEventMinFreq;
 
     @Parameter(names = {"-fff", "--filter-feature-freq"},
     description = "Minimum feature pair frequency threshold.",
@@ -206,16 +203,16 @@ public class FilterCommand extends AbstractCommand implements Serializable {
     }
 
     public FilterCommand(
-            File inputEntryFeaturesFile, File inputEntriesFile,
-            File inputFeaturesFile, File outputEntryFeaturesFile,
+            File inputEventsFile, File inputEntriesFile,
+            File inputFeaturesFile, File outputEventsFile,
             File outputEntriesFile, File outputFeaturesFile,
             Charset charset) {
         setCharset(charset);
         setInputFeaturesFile(inputFeaturesFile);
-        setInputEntryFeaturesFile(inputEntryFeaturesFile);
+        setInputEventsFile(inputEventsFile);
         setInputEntriesFile(inputEntriesFile);
         setOutputFeaturesFile(outputFeaturesFile);
-        setOutputEntryFeaturesFile(outputEntryFeaturesFile);
+        setOutputEventsFile(outputEventsFile);
         setOutputEntriesFile(outputEntriesFile);
     }
 
@@ -243,7 +240,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         }
         if (filterFeatureWhitelist != null) {
             addFeaturesWhitelist(com.google.common.io.Files.readLines(
-                    filterFeatureWhitelist, charset));
+                    filterFeatureWhitelist, getCharset()));
         }
 
         if (filterEntryMinFreq > 0) {
@@ -254,15 +251,15 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         }
         if (filterEntryWhitelist != null) {
             addEntryWhitelist(com.google.common.io.Files.readLines(
-                    filterEntryWhitelist, charset));
+                    filterEntryWhitelist, getCharset()));
         }
 
-        if (filterEntryFeatureMinFreq > 0) {
-            addEntryFeatureMinimumFrequency(filterEntryFeatureMinFreq);
+        if (filterEventMinFreq > 0) {
+            addEntryFeatureMinimumFrequency(filterEventMinFreq);
         }
 
         checkState();
-        activeEntryFeaturesFile = inputEntryFeaturesFile;
+        activeEntryFeaturesFile = inputEventsFile;
         activeEntriesFile = inputEntriesFile;
         activeFeaturesFile = inputFeaturesFile;
 
@@ -329,10 +326,10 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Copying features from " + activeEntryFeaturesFile
-                    + " to " + outputEntryFeaturesFile + ".");
+                    + " to " + outputEventsFile + ".");
         }
         com.google.common.io.Files.copy(activeEntryFeaturesFile,
-                                        outputEntryFeaturesFile);
+                                        outputEventsFile);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Copying features from " + activeFeaturesFile
@@ -358,7 +355,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         final IntSet rejected = new IntOpenHashSet();
 
         WeightedTokenSource entriesSource = WeightedTokenSource.open(
-                activeEntriesFile, charset,
+                activeEntriesFile, getCharset(),
                 EnumeratingDeligates.toSingleEntries(getIndexDeligate()));
 
 //                new WeightedTokenSource(
@@ -369,7 +366,8 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         outputFile.deleteOnExit();
 
         WeightedTokenSink entriesSink = WeightedTokenSink.open(
-                outputFile, charset, EnumeratingDeligates.toSingleEntries(getIndexDeligate()));
+                outputFile, getCharset(), EnumeratingDeligates.toSingleEntries(getIndexDeligate()));
+        entriesSink.setCompactFormatEnabled(!isCompactFormatDisabled());
 //        
 //                new WeightedTokenSink(
 //                new TSVSink(outputFile, charset),
@@ -440,16 +438,16 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         IntSet acceptedFeatures = new IntOpenHashSet();
 
         WeightedTokenPairSource efSrc = WeightedTokenPairSource.open(
-                activeEntryFeaturesFile, charset,
+                activeEntryFeaturesFile, getCharset(),
                 getIndexDeligate());
 
         File outputFile = tempFiles.createFile();
         outputFile.deleteOnExit();
 
         WeightedTokenPairSink efSink = WeightedTokenPairSink.open(
-                outputFile, charset,
+                outputFile, getCharset(),
                 getIndexDeligate(),
-                true);
+                !isCompactFormatDisabled());
 
         if (LOG.isInfoEnabled()) {
             LOG.info("Filtering entry/features pairs from "
@@ -571,7 +569,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         IntSet rejectedFeatures = new IntOpenHashSet();
 
         WeightedTokenSource featureSource = WeightedTokenSource.open(
-                activeFeaturesFile, charset, EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
+                activeFeaturesFile, getCharset(), EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
 //new WeightedTokenSource(
 //                new TSVSource(activeFeaturesFile, charset),
 //                getIndexDeligate().single2());
@@ -580,7 +578,8 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         outputFile.deleteOnExit();
 
         WeightedTokenSink featureSink = WeightedTokenSink.open(
-                outputFile, charset, EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
+                outputFile, getCharset(), EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
+        featureSink.setCompactFormatEnabled(!isCompactFormatDisabled());
 //        new WeightedTokenSink(
 //                new TSVSink(outputFile, charset),
 //                getIndexDeligate().single2());
@@ -640,14 +639,6 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         }
     }
 
-    public final Charset getCharset() {
-        return charset;
-    }
-
-    public final void setCharset(Charset charset) {
-        this.charset = checkNotNull(charset);
-    }
-
     public final File getInputFeaturesFile() {
         return inputFeaturesFile;
     }
@@ -656,12 +647,12 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         this.inputFeaturesFile = checkNotNull(inputFeaturesFile);
     }
 
-    public final File getInputEntryFeaturesFile() {
-        return inputEntryFeaturesFile;
+    public final File getInputEventsFile() {
+        return inputEventsFile;
     }
 
-    public final void setInputEntryFeaturesFile(File inputEntryFeaturesFile) {
-        this.inputEntryFeaturesFile = checkNotNull(inputEntryFeaturesFile);
+    public final void setInputEventsFile(File inputEntryFeaturesFile) {
+        this.inputEventsFile = checkNotNull(inputEntryFeaturesFile);
     }
 
     public final File getInputEntriesFile() {
@@ -680,12 +671,12 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         this.outputFeaturesFile = checkNotNull(outputFeaturesFile);
     }
 
-    public final File getOutputEntryFeaturesFile() {
-        return outputEntryFeaturesFile;
+    public final File getOutputEventsFile() {
+        return outputEventsFile;
     }
 
-    public final void setOutputEntryFeaturesFile(File outputEntryFeaturesFile) {
-        this.outputEntryFeaturesFile = checkNotNull(outputEntryFeaturesFile);
+    public final void setOutputEventsFile(File outputEventsFile) {
+        this.outputEventsFile = checkNotNull(outputEventsFile);
     }
 
     public final File getOutputEntriesFile() {
@@ -858,12 +849,12 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         final Map<String, File> inputFiles = new HashMap<String, File>();
         inputFiles.put("inputEntries", inputEntriesFile);
         inputFiles.put("inputFeatures", inputFeaturesFile);
-        inputFiles.put("inputEntryFeatures", inputEntryFeaturesFile);
+        inputFiles.put("inputEntryFeatures", inputEventsFile);
 
         final Map<String, File> outputFiles = new HashMap<String, File>();
         outputFiles.put("outputEntries", outputEntriesFile);
         outputFiles.put("outputFeatures", outputFeaturesFile);
-        outputFiles.put("outputEntryFeatures", outputEntryFeaturesFile);
+        outputFiles.put("outputEntryFeatures", outputEventsFile);
 
         final Map<String, File> allFiles = new HashMap<String, File>();
         allFiles.putAll(inputFiles);
@@ -875,7 +866,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
                 throw new NullPointerException(entry.getKey() + " is null");
             }
         }
-        if (charset == null) {
+        if (getCharset() == null) {
             throw new NullPointerException("charset is null");
         }
 
@@ -1069,20 +1060,149 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         };
     }
 
+    public double getFilterEventMinFreq() {
+        return filterEventMinFreq;
+    }
+
+    public void setFilterEventMinFreq(double filterEventMinFreq) {
+        this.filterEventMinFreq = filterEventMinFreq;
+    }
+
+    public double getFilterEntryMinFreq() {
+        return filterEntryMinFreq;
+    }
+
+    public void setFilterEntryMinFreq(double filterEntryMinFreq) {
+        this.filterEntryMinFreq = filterEntryMinFreq;
+    }
+
+    public String getFilterEntryPattern() {
+        return filterEntryPattern;
+    }
+
+    public void setFilterEntryPattern(String filterEntryPattern) {
+        this.filterEntryPattern = filterEntryPattern;
+    }
+
+    public File getFilterEntryWhitelist() {
+        return filterEntryWhitelist;
+    }
+
+    public void setFilterEntryWhitelist(File filterEntryWhitelist) {
+        this.filterEntryWhitelist = filterEntryWhitelist;
+    }
+
+    public double getFilterFeatureMinFreq() {
+        return filterFeatureMinFreq;
+    }
+
+    public void setFilterFeatureMinFreq(double filterFeatureMinFreq) {
+        this.filterFeatureMinFreq = filterFeatureMinFreq;
+    }
+
+    public String getFilterFeaturePattern() {
+        return filterFeaturePattern;
+    }
+
+    public void setFilterFeaturePattern(String filterFeaturePattern) {
+        this.filterFeaturePattern = filterFeaturePattern;
+    }
+
+    public File getFilterFeatureWhitelist() {
+        return filterFeatureWhitelist;
+    }
+
+    public void setFilterFeatureWhitelist(File filterFeatureWhitelist) {
+        this.filterFeatureWhitelist = filterFeatureWhitelist;
+    }
+
+    public void setEnumeratorSkipIndexed2(boolean b) {
+        indexDeligate.setEnumeratorSkipIndexed2(b);
+    }
+
+    public void setEnumeratorSkipIndexed1(boolean b) {
+        indexDeligate.setEnumeratorSkipIndexed1(b);
+    }
+
+    public boolean isEnumeratorSkipIndexed2() {
+        return indexDeligate.isEnumeratorSkipIndexed2();
+    }
+
+    public boolean isEnumeratorSkipIndexed1() {
+        return indexDeligate.isEnumeratorSkipIndexed1();
+    }
+
+    public void setFeatureEnumeratorFile(File featureEnumeratorFile) {
+        indexDeligate.setFeatureEnumeratorFile(featureEnumeratorFile);
+    }
+
+    public void setEnumeratedFeatures(boolean enumeratedFeatures) {
+        indexDeligate.setEnumeratedFeatures(enumeratedFeatures);
+    }
+
+    public void setEnumeratedEntries(boolean enumeratedEntries) {
+        indexDeligate.setEnumeratedEntries(enumeratedEntries);
+    }
+
+    public void setEntryEnumeratorFile(File entryEnumeratorFile) {
+        indexDeligate.setEntryEnumeratorFile(entryEnumeratorFile);
+    }
+
+    public boolean isEnumeratedFeatures() {
+        return indexDeligate.isEnumeratedFeatures();
+    }
+
+    public boolean isEnumeratedEntries() {
+        return indexDeligate.isEnumeratedEntries();
+    }
+
+    public File getFeatureEnumeratorFile() {
+        return indexDeligate.getFeatureEnumeratorFile();
+    }
+
+    public File getEntryEnumeratorFile() {
+        return indexDeligate.getEntryEnumeratorFile();
+    }
+
+    public void setCompactFormatDisabled(boolean compactFormatDisabled) {
+        fileDeligate.setCompactFormatDisabled(compactFormatDisabled);
+    }
+
+    public final void setCharset(Charset charset) {
+        fileDeligate.setCharset(charset);
+    }
+
+    public boolean isCompactFormatDisabled() {
+        return fileDeligate.isCompactFormatDisabled();
+    }
+
+    public final Charset getCharset() {
+        return fileDeligate.getCharset();
+    }
+
+    public FileFactory getTempFiles() {
+        return tempFiles;
+    }
+
+    public void setTempFiles(FileFactory tempFiles) {
+        this.tempFiles = tempFiles;
+    }
+
+    
     @Override
     protected ToStringHelper toStringHelper() {
         return super.toStringHelper().
-                add("eventsIn", inputEntryFeaturesFile).
+                add("eventsIn", inputEventsFile).
                 add("entriesIn", inputEntriesFile).
                 add("featuresIn", inputFeaturesFile).
-                add("eventsOut", outputEntryFeaturesFile).
+                add("eventsOut", outputEventsFile).
                 add("entriesOut", outputEntriesFile).
                 add("featuresOut", outputFeaturesFile).
-                add("charset", charset).
+                add("charset", getCharset()).
                 add("entryMinFreq", filterEntryMinFreq).
                 add("entryWhitelist", filterEntryWhitelist).
                 add("entryPattern", filterEntryPattern).
-                add("eventMinFreq", filterEntryFeatureMinFreq).
+                add("eventMinFreq", filterEventMinFreq).
                 add("featureMinFreq", filterFeatureMinFreq).
                 add("featureWhitelist", filterFeatureWhitelist).
                 add("featurePattern", filterFeaturePattern).

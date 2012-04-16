@@ -23,11 +23,11 @@ public abstract class EnumeratingDeligate
     private static final long serialVersionUID = 1L;
 
     @Parameter(names = {"-s1", "--skipindexed1"},
-               description = "Whether indices will be encoded as deltas in the first column")
+    description = "Whether indices will be encoded as deltas in the first column")
     private boolean skipIndexed1 = DEFAULT_SKIP_INDEXING;
 
     @Parameter(names = {"-s2", "--skipindexed2"},
-               description = "Whether indices will be encoded as deltas in the second column")
+    description = "Whether indices will be encoded as deltas in the second column")
     private boolean skipIndexed2 = DEFAULT_SKIP_INDEXING;
 
     @Parameter(names = {"-et", "--enumerator-type"})
@@ -52,6 +52,16 @@ public abstract class EnumeratingDeligate
     @Override
     public boolean isEnumeratorSkipIndexed2() {
         return skipIndexed2;
+    }
+
+    @Override
+    public void setEnumeratorSkipIndexed1(boolean b) {
+        skipIndexed1 = b;
+    }
+
+    @Override
+    public void setEnumeratorSkipIndexed2(boolean b) {
+        skipIndexed2 = b;
     }
 
     public EnumeratorType getType() {
@@ -103,4 +113,5 @@ public abstract class EnumeratingDeligate
     public final String toString() {
         return toStringHelper().toString();
     }
+
 }

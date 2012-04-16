@@ -144,6 +144,16 @@ public class EnumeratingDeligates {
         }
 
         @Override
+        public void setEnumeratorSkipIndexed1(boolean b) {
+            getInner().setEnumeratorSkipIndexed1(b);
+        }
+
+        @Override
+        public void setEnumeratorSkipIndexed2(boolean b) {
+            getInner().setEnumeratorSkipIndexed2(b);
+        }
+
+        @Override
         public int hashCode() {
             return 59 * 5 + (this.inner != null ? this.inner.hashCode() : 0);
         }

@@ -33,10 +33,20 @@ public class FileDeligate implements Serializable {
     public FileDeligate() {
     }
 
+    /**
+     * @return 
+     * @deprecated TODO: Replace with isCompactFormatEnabled()
+     */
+    @Deprecated
     public boolean isCompactFormatDisabled() {
         return compactFormatDisabled;
     }
 
+    /**
+     * @param compactFormatDisabled 
+     * @deprecated TODO: Replace with setCompactFormatEnabled(boolean)
+     */
+    @Deprecated
     public void setCompactFormatDisabled(boolean compactFormatDisabled) {
         this.compactFormatDisabled = compactFormatDisabled;
     }

@@ -997,7 +997,7 @@ public class FullBuildTest2 {
             count.setInstancesFile(instances);
             count.setEntriesFile(entries);
             count.setFeaturesFile(features);
-            count.setEntryFeaturesFile(events);
+            count.setEventsFile(events);
             count.setIndexDeligate(countIndex);
             count.getFileDeligate().setCharset(charet);
             count.runCommand();

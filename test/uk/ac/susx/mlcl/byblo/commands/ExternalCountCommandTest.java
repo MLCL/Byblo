@@ -64,7 +64,7 @@ public class ExternalCountCommandTest {
         countCmd.setInstancesFile(inInst);
         countCmd.setEntriesFile(outE);
         countCmd.setFeaturesFile(outF);
-        countCmd.setEntryFeaturesFile(outEF);
+        countCmd.setEventsFile(outEF);
         countCmd.getFileDeligate().setCharset(charset);
         countCmd.setMaxChunkSize(chunkSize);
         countCmd.setIndexDeligate(new DoubleEnumeratingDeligate(

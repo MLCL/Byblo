@@ -52,6 +52,10 @@ public interface Enumerating {
 
     boolean isEnumeratorSkipIndexed2();
 
+    void setEnumeratorSkipIndexed1(boolean b);
+
+    void setEnumeratorSkipIndexed2(boolean b);
+
     void closeEnumerator() throws IOException;
 
     void saveEnumerator() throws IOException;
