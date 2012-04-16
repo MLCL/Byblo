@@ -96,7 +96,7 @@ public abstract class EnumeratingDeligate
         if (enumerator == null) {
             Logger.getLogger(EnumeratingDeligate.class.getName()).log(
                     Level.WARNING,
-                    "Attempt made to save an enumerator that was not open.");
+                    "Attempt made to close an enumerator that was not open.");
             return;
         }
         if (enumerator.indexOf(FilterCommand.FILTERED_STRING) != FilterCommand.FILTERED_ID)

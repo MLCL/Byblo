@@ -67,14 +67,13 @@ public class FullBuild extends AbstractCommand {
     validateWith = InputFileValidator.class, required = true)
     private File instancesFile;
 
-    @Parameter(names = {"-i", "--input"},
-    description = "Output directory",
-    validateWith = InputFileValidator.class)
+    @Parameter(names = {"-o", "--output"},
+    description = "Output directory")
     private File outputDir;
 
     @Parameter(names = {"-T", "--temp-dir"},
     description = "Temorary directory which will be used during filtering.",
-    converter = TempFileFactoryConverter.class)
+    converter = TempFileFactoryConverter.class, hidden=true)
     private File tempBaseDir;
 
     private boolean skipIndex1 = false;
@@ -617,4 +616,8 @@ public class FullBuild extends AbstractCommand {
         this.skipIndex2 = skipIndex2;
     }
 
+    
+    public static void main(String[] args) throws Exception {
+        new FullBuild().runCommand(args);
+    }
 }

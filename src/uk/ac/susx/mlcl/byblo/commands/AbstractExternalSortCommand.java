@@ -250,7 +250,7 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
     protected void handleCompletedTask(Task task) throws Exception {
         Checks.checkNotNull("task", task);
         task.throwException();
-//        final Properties p = task.getProperties();
+//        final Properties 2p = task.getProperties();
 
         if (task.isExceptionCaught())
             task.throwException();

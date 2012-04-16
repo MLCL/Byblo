@@ -282,8 +282,6 @@ public class Lexer implements Seekable<Tell>, Closeable {
         if (!hasNext())
             throw new NoSuchElementException("iteration has no more elements.");
 
-//        tell.channelOffset = channelRestartOffset;
-//        tell.bufferOffset = cbuf.position() - charBufferRestartOffset;
         channelOffset = channelRestartOffset;
         bufferOffset = cbuf.position() - charBufferRestartOffset;
 
