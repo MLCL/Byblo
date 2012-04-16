@@ -48,7 +48,7 @@ public class FileMoveTask extends FileCopyTask {
         if (getSrcFile().equals(getDstFile()))
             throw new IllegalStateException("sourceFile equals destinationFile");
 
-        copy(getSrcFile(), getDstFile());
+        move(getSrcFile(), getDstFile());
 
         if (LOG.isInfoEnabled())
             LOG.info("Completed move.");

@@ -64,10 +64,14 @@ public class TokenPairSource
 
     @Override
     public TokenPair read() throws IOException {
-        final int id1 = inner.readInt();
-        final int id2 = inner.readInt();
-        inner.endOfRecord();
-        return new TokenPair(id1, id2);
+        try {
+            final int id1 = inner.readInt();
+            final int id2 = inner.readInt();
+            inner.endOfRecord();
+            return new TokenPair(id1, id2);
+        } catch (Throwable ex) {
+            throw new IOException("Error at position " + position(), ex);
+        }
     }
 
     public static boolean equal(File fileA, File fileB, Charset charset)
@@ -120,6 +124,7 @@ public class TokenPairSource
                 public boolean apply(Integer column) {
                     return column == 0;
                 }
+
             });
         }
         if (idx.isEnumeratorSkipIndexed2()) {
@@ -129,6 +134,7 @@ public class TokenPairSource
                 public boolean apply(Integer column) {
                     return column > 0;
                 }
+
             });
         }
 
@@ -145,4 +151,5 @@ public class TokenPairSource
         }
         return new TokenPairSource(tsv);
     }
+
 }

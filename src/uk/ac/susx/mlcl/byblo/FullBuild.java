@@ -42,6 +42,7 @@ import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import static java.text.MessageFormat.format;
+import java.util.Arrays;
 import uk.ac.susx.mlcl.byblo.commands.*;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -320,7 +321,10 @@ public class FullBuild extends AbstractCommand {
             checkValidInputFile("Filtered events file", eventsFilteredFile);
 
             if (filterTempDir.list().length > 0)
-                throw new IllegalStateException(format("Filter temporary directory is not empty: {0}", filterTempDir));
+                throw new IllegalStateException(format(
+                        "Filter temporary directory is not empty: {0} --- countains {1}",
+                        filterTempDir, Arrays.toString(filterTempDir.list())));
+            
             if (!filterTempDir.delete())
                 throw new IOException(format("Unable to delete filter temporary directory is not empty: {0}", filterTempDir));
         }
@@ -418,7 +422,7 @@ public class FullBuild extends AbstractCommand {
             unindexCmd.setSourceFile(neighboursFile);
             unindexCmd.setDestinationFile(neighboursStringsFile);
             unindexCmd.setCharset(getCharset());
-            unindexCmd.setCompactFormatDisabled(false);
+            unindexCmd.setCompactFormatDisabled(isCompactFormatDisabled());
 
             unindexCmd.getIndexDeligate().setEnumerationEnabled(true);
             unindexCmd.getIndexDeligate().setEnumeratorSkipIndexed1(skipIndex1);
@@ -507,6 +511,110 @@ public class FullBuild extends AbstractCommand {
             throw new IllegalArgumentException(format(
                     "{0} is not a directory: ", name, file));
 
+    }
+
+    public EnumeratorType getEnumeratorType() {
+        return enumeratorType;
+    }
+
+    public void setEnumeratorType(EnumeratorType enumeratorType) {
+        this.enumeratorType = enumeratorType;
+    }
+
+    public double getFilterEntryMinFreq() {
+        return filterEntryMinFreq;
+    }
+
+    public void setFilterEntryMinFreq(double filterEntryMinFreq) {
+        this.filterEntryMinFreq = filterEntryMinFreq;
+    }
+
+    public String getFilterEntryPattern() {
+        return filterEntryPattern;
+    }
+
+    public void setFilterEntryPattern(String filterEntryPattern) {
+        this.filterEntryPattern = filterEntryPattern;
+    }
+
+    public File getFilterEntryWhitelist() {
+        return filterEntryWhitelist;
+    }
+
+    public void setFilterEntryWhitelist(File filterEntryWhitelist) {
+        this.filterEntryWhitelist = filterEntryWhitelist;
+    }
+
+    public double getFilterEventMinFreq() {
+        return filterEventMinFreq;
+    }
+
+    public void setFilterEventMinFreq(double filterEventMinFreq) {
+        this.filterEventMinFreq = filterEventMinFreq;
+    }
+
+    public double getFilterFeatureMinFreq() {
+        return filterFeatureMinFreq;
+    }
+
+    public void setFilterFeatureMinFreq(double filterFeatureMinFreq) {
+        this.filterFeatureMinFreq = filterFeatureMinFreq;
+    }
+
+    public String getFilterFeaturePattern() {
+        return filterFeaturePattern;
+    }
+
+    public void setFilterFeaturePattern(String filterFeaturePattern) {
+        this.filterFeaturePattern = filterFeaturePattern;
+    }
+
+    public File getFilterFeatureWhitelist() {
+        return filterFeatureWhitelist;
+    }
+
+    public void setFilterFeatureWhitelist(File filterFeatureWhitelist) {
+        this.filterFeatureWhitelist = filterFeatureWhitelist;
+    }
+
+    public String getMeasureName() {
+        return measureName;
+    }
+
+    public void setMeasureName(String measureName) {
+        this.measureName = measureName;
+    }
+
+    public double getMinSimilarity() {
+        return minSimilarity;
+    }
+
+    public void setMinSimilarity(double minSimilarity) {
+        this.minSimilarity = minSimilarity;
+    }
+
+    public int getNumThreads() {
+        return numThreads;
+    }
+
+    public void setNumThreads(int numThreads) {
+        this.numThreads = numThreads;
+    }
+
+    public boolean isSkipIndex1() {
+        return skipIndex1;
+    }
+
+    public void setSkipIndex1(boolean skipIndex1) {
+        this.skipIndex1 = skipIndex1;
+    }
+
+    public boolean isSkipIndex2() {
+        return skipIndex2;
+    }
+
+    public void setSkipIndex2(boolean skipIndex2) {
+        this.skipIndex2 = skipIndex2;
     }
 
 }

@@ -35,6 +35,7 @@ import com.google.common.collect.ForwardingMap;
 import java.io.*;
 import java.util.Map;
 import java.util.Set;
+import uk.ac.susx.mlcl.lib.Checks;
 
 /**
  * @param <K> 
@@ -73,6 +74,9 @@ public final class ForwardingBiMap<K, V>
 
     @Override
     public V put(K k, V v) {
+        Checks.checkNotNull("key", k);
+        Checks.checkNotNull("value", v);
+        
         if (containsValue(v)) {
             if (get(k).equals(v))
                 return v;
@@ -85,6 +89,9 @@ public final class ForwardingBiMap<K, V>
 
     @Override
     public V forcePut(K k, V v) {
+        Checks.checkNotNull("key", k);
+        Checks.checkNotNull("value", v);
+
         inverse.deligate.put(v, k);
         return deligate.put(k, v);
     }

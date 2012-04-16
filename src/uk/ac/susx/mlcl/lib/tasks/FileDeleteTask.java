@@ -60,8 +60,8 @@ public class FileDeleteTask extends AbstractTask {
 
     @Override
     public void runTask() throws Exception {
-        if (LOG.isInfoEnabled())
-            LOG.info("Deleting file \"" + getFile() + "\".");
+        if (LOG.isDebugEnabled())
+            LOG.debug("Deleting file \"" + getFile() + "\".");
         Checks.checkNotNull("file", getFile());
         if (!getFile().exists())
             throw new FileNotFoundException(format(

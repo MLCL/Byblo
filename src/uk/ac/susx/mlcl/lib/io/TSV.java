@@ -59,8 +59,8 @@ public abstract class TSV {
     protected long column;
 
     protected TSV(File file, Charset charset) throws FileNotFoundException, IOException {
-        Checks.checkNotNull("file", "file");
-        Checks.checkNotNull("charset", "charset");
+        Checks.checkNotNull("file", file);
+        Checks.checkNotNull("charset", charset);
         this.file = file;
         this.charset = charset;
         row = 0;

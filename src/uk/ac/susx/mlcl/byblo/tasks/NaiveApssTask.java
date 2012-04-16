@@ -238,7 +238,7 @@ public class NaiveApssTask<P> extends AbstractTask {
 
                 double sim = sim(a, b);
                 Weighted<TokenPair> pair = new Weighted<TokenPair>(
-                        new TokenPair(a.key(), b.key()), sim);
+                        new TokenPair(b.key(), a.key()), sim);
                 if (pruducePair.apply(pair)) {
                     pairs.add(pair);
                     stats.incrementProductionCount();

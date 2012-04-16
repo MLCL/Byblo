@@ -194,7 +194,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 //    final Enumerator<String> entryIndex = Enumerators.newDefaultStringEnumerator();
 //
 //    final Enumerator<String> featureIndex = Enumerators.newDefaultStringEnumerator();
-    private File activeEntryFeaturesFile;
+    private File activeEventsFile;
 
     private File activeEntriesFile;
 
@@ -260,7 +260,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         }
 
         checkState();
-        activeEntryFeaturesFile = inputEventsFile;
+        activeEventsFile = inputEventsFile;
         activeEntriesFile = inputEntriesFile;
         activeFeaturesFile = inputFeaturesFile;
 
@@ -323,20 +323,38 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             LOG.debug("Copying entries from " + activeEntriesFile
                     + " to " + outputEntriesFile + ".");
         }
-        com.google.common.io.Files.copy(activeEntriesFile, outputEntriesFile);
+        
+        outputEntriesFile.delete();
+        if (!activeEntriesFile.renameTo(outputEntriesFile)) {
+            com.google.common.io.Files.copy(activeEntriesFile, outputEntriesFile);
+            if (!activeEntriesFile.equals(inputEntriesFile))
+                activeEntriesFile.delete();
+        }
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Copying features from " + activeEntryFeaturesFile
+            LOG.debug("Copying features from " + activeEventsFile
                     + " to " + outputEventsFile + ".");
         }
-        com.google.common.io.Files.copy(activeEntryFeaturesFile,
-                                        outputEventsFile);
+
+        outputEventsFile.delete();
+        if (!activeEventsFile.renameTo(outputEventsFile)) {
+            com.google.common.io.Files.copy(activeEventsFile,
+                                            outputEventsFile);
+            if (!activeEventsFile.equals(inputEventsFile))
+                activeEventsFile.delete();
+        }
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Copying features from " + activeFeaturesFile
                     + " to " + outputFeaturesFile + ".");
         }
-        com.google.common.io.Files.copy(activeFeaturesFile, outputFeaturesFile);
+
+        outputFeaturesFile.delete();
+        if (!activeFeaturesFile.renameTo(outputFeaturesFile)) {
+            com.google.common.io.Files.copy(activeFeaturesFile, outputFeaturesFile);
+            if (!activeFeaturesFile.equals(inputFeaturesFile))
+                activeFeaturesFile.delete();
+        }
 
         indexDeligate.saveEnumerator();
         indexDeligate.closeEnumerator();
@@ -364,7 +382,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 //                single1());
 
         File outputFile = tempFiles.createFile();
-        outputFile.deleteOnExit();
+//        outputFile.deleteOnExit();
 
         WeightedTokenSink entriesSink = WeightedTokenSink.open(
                 outputFile, getCharset(), EnumeratingDeligates.toSingleEntries(getIndexDeligate()));
@@ -414,6 +432,12 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         entriesSource.close();
         entriesSink.flush();
         entriesSink.close();
+
+
+        if (!activeEntriesFile.equals(inputEntriesFile)) {
+            activeEntriesFile.delete();
+        }
+
         entryFilterRequired = false;
         activeEntriesFile = outputFile;
 
@@ -424,6 +448,9 @@ public class FilterCommand extends AbstractCommand implements Serializable {
                                      compose(not(in(rejected)),
                                              entryFeatureEntryId()));
         }
+
+
+
     }
 
     // Filter the AllPairsTask file, rejecting all entires that contain entries
@@ -439,11 +466,11 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         IntSet acceptedFeatures = new IntOpenHashSet();
 
         WeightedTokenPairSource efSrc = WeightedTokenPairSource.open(
-                activeEntryFeaturesFile, getCharset(),
+                activeEventsFile, getCharset(),
                 getIndexDeligate());
 
         File outputFile = tempFiles.createFile();
-        outputFile.deleteOnExit();
+//        outputFile.deleteOnExit();
 
         WeightedTokenPairSink efSink = WeightedTokenPairSink.open(
                 outputFile, getCharset(),
@@ -452,7 +479,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
         if (LOG.isInfoEnabled()) {
             LOG.info("Filtering entry/features pairs from "
-                    + activeEntryFeaturesFile + " to " + outputFile + ".");
+                    + activeEventsFile + " to " + outputFile + ".");
         }
 
         // Store the id of the special filtered feature and entry
@@ -543,8 +570,15 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         efSrc.close();
         efSink.flush();
         efSink.close();
+
+
+        if (!activeEventsFile.equals(inputEventsFile)) {
+            activeEventsFile.delete();
+        }
+
+
         entryFeatureFilterRequired = false;
-        activeEntryFeaturesFile = outputFile;
+        activeEventsFile = outputFile;
 
         rejectedFeatures.removeAll(acceptedFeatures);
         rejectedEntries.removeAll(acceptedEntries);
@@ -561,6 +595,10 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             featureFilterRequired = true;
 
         }
+
+
+
+
     }
 
     // Filter the AllPairsTask file, rejecting all entries that where found to
@@ -576,7 +614,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 //                getIndexDeligate().single2());
 
         File outputFile = tempFiles.createFile();
-        outputFile.deleteOnExit();
+//        outputFile.deleteOnExit();
 
         WeightedTokenSink featureSink = WeightedTokenSink.open(
                 outputFile, getCharset(), EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
@@ -625,6 +663,13 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         featureSource.close();
         featureSink.flush();
         featureSink.close();
+
+
+        if (!activeFeaturesFile.equals(inputFeaturesFile)) {
+            activeFeaturesFile.delete();
+        }
+
+
         featureFilterRequired = false;
         activeFeaturesFile = outputFile;
 
@@ -1197,8 +1242,6 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         return indexDeligate.getEnuemratorType();
     }
 
-    
-    
     @Override
     protected ToStringHelper toStringHelper() {
         return super.toStringHelper().

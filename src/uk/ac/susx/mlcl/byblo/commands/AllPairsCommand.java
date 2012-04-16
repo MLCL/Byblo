@@ -336,7 +336,7 @@ public class AllPairsCommand extends AbstractCommand {
                 getOutputFile(), getCharset(),
                 EnumeratingDeligates.toPair(EnumeratingDeligates.toSingleEntries(
                 getIndexDeligate())),
-                fileDeligate.isCompactFormatDisabled());
+                !fileDeligate.isCompactFormatDisabled());
 
     }
 

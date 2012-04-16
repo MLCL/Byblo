@@ -96,7 +96,7 @@ public class InvertedApssTask<S> extends NaiveApssTask<S> {
 
                 double sim = sim(a, b);
                 Weighted<TokenPair> pair = new Weighted<TokenPair>(
-                        new TokenPair(a.key(), b.key()), sim);
+                        new TokenPair(b.key(), a.key()), sim);
                 if (getProducatePair().apply(pair)) {
                     pairs.add(pair);
                     getStats().incrementProductionCount();

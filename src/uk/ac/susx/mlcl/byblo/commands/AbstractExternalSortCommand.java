@@ -39,9 +39,7 @@ import java.io.File;
 import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayDeque;
 import java.util.Comparator;
-import java.util.Queue;
 import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,13 +49,10 @@ import uk.ac.susx.mlcl.lib.tasks.FileDeleteTask;
 import uk.ac.susx.mlcl.lib.AbstractParallelCommandTask;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Comparators;
-import uk.ac.susx.mlcl.lib.commands.CopyCommand;
 import uk.ac.susx.mlcl.lib.commands.FilePipeDeligate;
 import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
 import uk.ac.susx.mlcl.lib.io.*;
-import uk.ac.susx.mlcl.lib.tasks.ObjectMergeTask;
-import uk.ac.susx.mlcl.lib.tasks.ObjectSortTask;
-import uk.ac.susx.mlcl.lib.tasks.Task;
+import uk.ac.susx.mlcl.lib.tasks.*;
 
 /**
  *
@@ -81,7 +76,7 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
     private static final boolean DEBUG = false;
 
     @Parameter(names = {"-C", "--chunk-size"},
-               description = "Number of lines that will be read and sorted in RAM at one "
+    description = "Number of lines that will be read and sorted in RAM at one "
     + "time (per thread). Larger values increase memory usage and performace.")
     private int maxChunkSize = 1000000;
 
@@ -89,17 +84,17 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
     private final FilePipeDeligate fileDeligate = new FilePipeDeligate();
 
     @Parameter(names = {"-T", "--temporary-directory"},
-               description = "Directory which will be used for storing temporary files.",
-               converter = TempFileFactoryConverter.class)
+    description = "Directory which will be used for storing temporary files.",
+    converter = TempFileFactoryConverter.class)
     private FileFactory tempFileFactory = new TempFileFactory();
 
     @Parameter(names = {"-r", "--reverse"},
-               description = "Reverse the result of comparisons.")
+    description = "Reverse the result of comparisons.")
     private boolean reverse = false;
 
     private Comparator<T> comparator;
 
-    private Queue<File> mergeQueue;
+    private File[] nextFileToMerge;
 
     public AbstractExternalSortCommand(File src, File dst, Charset charset,
                                        Comparator<T> comparator,
@@ -175,7 +170,8 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
         }
 
 
-        mergeQueue = new ArrayDeque<File>();
+
+        nextFileToMerge = new File[64];
 
         final SeekableSource<T, ?> src = openSource(getFileDeligate().
                 getSourceFile());
@@ -196,14 +192,53 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
             Task task = getFutureQueue().poll().get();
             handleCompletedTask(task);
         }
-        File finalMerge = mergeQueue.poll();
-        new CopyCommand(finalMerge, getFileDeligate().getDestinationFile()).
-                runCommand();
 
-        FileDeleteTask finalDelete = createDeleteTask(finalMerge);
-        finalDelete.runTask();
-        if (finalDelete.isExceptionCaught())
-            finalDelete.throwException();
+        // Finally merge any remaining files up the stack
+        // XXX ideal this should happen automatically.
+        for (int i = 0; i < nextFileToMerge.length - 1; i++) {
+            if (nextFileToMerge[i] == null) {
+
+                continue;
+
+            } else if (nextFileToMerge[i + 1] == null) {
+
+                nextFileToMerge[i + 1] = nextFileToMerge[i];
+                nextFileToMerge[i] = null;
+
+            } else {
+                File tmp = getTempFileFactory().createFile();
+                ObjectMergeTask<T> mergeTask = createMergeTask(
+                        nextFileToMerge[i], nextFileToMerge[i + 1], tmp);
+
+                mergeTask.run();
+
+                if (mergeTask.isExceptionCaught())
+                    mergeTask.throwException();
+                if (mergeTask.getSink() instanceof Flushable)
+                    ((Flushable) mergeTask.getSink()).flush();
+                if (mergeTask.getSink() instanceof Closeable)
+                    ((Closeable) mergeTask.getSink()).close();
+                if (mergeTask.getSourceA() instanceof Closeable)
+                    ((Closeable) mergeTask.getSourceA()).close();
+                if (mergeTask.getSourceB() instanceof Closeable)
+                    ((Closeable) mergeTask.getSourceB()).close();
+
+                nextFileToMerge[i].delete();
+                nextFileToMerge[i + 1].delete();
+                nextFileToMerge[i] = null;
+                nextFileToMerge[i + 1] = tmp;
+            }
+
+        }
+
+        File finalMerge = nextFileToMerge[nextFileToMerge.length - 1];
+
+        FileMoveTask moveTask = new FileMoveTask(
+                finalMerge, getFileDeligate().getDestinationFile());
+        moveTask.run();
+
+        if (moveTask.isExceptionCaught())
+            moveTask.throwException();
 
 
         if (LOG.isInfoEnabled()) {
@@ -229,9 +264,7 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
                 ((Closeable) sortTask.getSink()).close();
             if (sortTask.getSource() instanceof Closeable)
                 ((Closeable) sortTask.getSource()).close();
-
-
-            queueMergeTask(new File(task.getProperty(KEY_DST_FILE)));
+            queueMergeTask(new File(task.getProperty(KEY_DST_FILE)), 0);
 
         } else if (task instanceof ObjectMergeTask) {
 
@@ -245,7 +278,10 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
             if (mergeTask.getSourceB() instanceof Closeable)
                 ((Closeable) mergeTask.getSourceB()).close();
 
-            queueMergeTask(new File(task.getProperty(KEY_DST_FILE)));
+            int depth = Integer.parseInt(mergeTask.getProperty("depth"));
+            queueMergeTask(new File(task.getProperty(KEY_DST_FILE)), depth + 1);
+
+
             if (!DEBUG) {
                 submitTask(createDeleteTask(new File(task.getProperty(
                         KEY_SRC_FILE_A))));
@@ -267,15 +303,24 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
         return super.submitTask(task);
     }
 
-    protected void queueMergeTask(File file) throws IOException, Exception {
+    protected void queueMergeTask(File file, int depth) throws IOException, Exception {
         Checks.checkNotNull("file", file);
 
-        mergeQueue.add(file);
-        if (mergeQueue.size() >= 2) {
-            File srcA = mergeQueue.poll();
-            File srcB = mergeQueue.poll();
+        if (nextFileToMerge[depth] == null) {
+
+            nextFileToMerge[depth] = file;
+
+        } else {
+
+            File srcA = nextFileToMerge[depth];
+            nextFileToMerge[depth] = null;
+            File srcB = file;
             File dst = getTempFileFactory().createFile();
-            submitTask(createMergeTask(srcA, srcB, dst));
+            ObjectMergeTask<T> mergeTask = createMergeTask(srcA, srcB, dst);
+            mergeTask.setProperty("depth", Integer.toString(depth));
+            submitTask(mergeTask);
+
+
         }
     }
 
@@ -354,8 +399,8 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
         return fileDeligate.getDestinationFile();
     }
 
-    
     protected abstract SeekableSource<T, ?> openSource(File file) throws IOException;
 
     protected abstract Sink<T> openSink(File file) throws IOException;
+
 }

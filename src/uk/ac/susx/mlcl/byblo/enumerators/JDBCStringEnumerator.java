@@ -80,7 +80,7 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
     }
 
     @Override
-    protected synchronized void put(int id, String obj) {
+    protected void put(int id, String obj) {
         super.put(id, obj);
         ++modCount;
         if (modCount > TRANSACTION_LIMIT) {
@@ -89,12 +89,13 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
         }
     }
 
-    
-    public static synchronized Enumerator<String> newInstance(File file) {
+    public static Enumerator<String> newInstance(File file) {
         return load(file);
     }
 
-    public static synchronized Enumerator<String> load(File file) {
+    private static final boolean MAP_TYPE_HASH = false;
+
+    public static Enumerator<String> load(File file) {
 
         final boolean anonymous;
         if (file == null) {
@@ -109,6 +110,8 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
         }
 
         DBMaker maker = DBMaker.openFile(file.toString());
+        maker.enableMRUCache();
+//        maker.disableTransactions();
         if (anonymous)
             maker.deleteFilesAfterClose();
         maker.closeOnExit();
@@ -125,27 +128,38 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
             // collection exists            
             assert collections.contains(COLLECTION_BACKWARDS);
             assert collections.contains(COLLECTION_PROPERTIES);
-            
-            forwards = db.<Integer, String>getHashMap(COLLECTION_FORWARDS);
-            backwards = db.<String, Integer>getHashMap(COLLECTION_BACKWARDS);
-            props = db.<String, String>getHashMap(COLLECTION_PROPERTIES);
-            
+//            
+            if (MAP_TYPE_HASH) {
+                forwards = db.<Integer, String>getHashMap(COLLECTION_FORWARDS);
+                backwards = db.<String, Integer>getHashMap(COLLECTION_BACKWARDS);
+                props = db.<String, String>getHashMap(COLLECTION_PROPERTIES);
+            } else {
+                forwards = db.<Integer, String>getTreeMap(COLLECTION_FORWARDS);
+                backwards = db.<String, Integer>getTreeMap(COLLECTION_BACKWARDS);
+                props = db.<String, String>getTreeMap(COLLECTION_PROPERTIES);
+            }
             assert backwards.containsKey(FilterCommand.FILTERED_STRING);
             assert forwards.containsKey(FilterCommand.FILTERED_ID);
             assert backwards.get(FilterCommand.FILTERED_STRING) == FilterCommand.FILTERED_ID;
             assert forwards.get(FilterCommand.FILTERED_ID).equals(FilterCommand.FILTERED_STRING);
-            
+
             assert props.containsKey(COLLECTION_NEXT_ID);
             nextId = new AtomicInteger(Integer.valueOf(props.get(COLLECTION_NEXT_ID)));
-            
+
         } else {
-            
-            forwards = db.<Integer, String>createHashMap(COLLECTION_FORWARDS);
-            backwards = db.<String, Integer>createHashMap(COLLECTION_BACKWARDS);
-            props = db.<String, String>createHashMap(COLLECTION_PROPERTIES);
+//            
+            if (MAP_TYPE_HASH) {
+                forwards = db.<Integer, String>createHashMap(COLLECTION_FORWARDS);
+                backwards = db.<String, Integer>createHashMap(COLLECTION_BACKWARDS);
+                props = db.<String, String>createHashMap(COLLECTION_PROPERTIES);
+            } else {
+                forwards = db.<Integer, String>createTreeMap(COLLECTION_FORWARDS);
+                backwards = db.<String, Integer>createTreeMap(COLLECTION_BACKWARDS);
+                props = db.<String, String>createTreeMap(COLLECTION_PROPERTIES);
+            }
             forwards.put(FilterCommand.FILTERED_ID, FilterCommand.FILTERED_STRING);
             backwards.put(FilterCommand.FILTERED_STRING, FilterCommand.FILTERED_ID);
-            nextId = new AtomicInteger(FilterCommand.FILTERED_ID+1);
+            nextId = new AtomicInteger(FilterCommand.FILTERED_ID + 1);
             props.put(COLLECTION_NEXT_ID, Integer.toString(0));
             db.commit();
         }
@@ -155,7 +169,7 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
                 forwards, backwards);
         JDBCStringEnumerator instance = new JDBCStringEnumerator(
                 db, file, map, nextId);
-        
+
         instance.indexOf(FilterCommand.FILTERED_STRING);
 
         assert instance.indexOf(FilterCommand.FILTERED_STRING)
@@ -163,25 +177,33 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
         return instance;
     }
 
-    public synchronized void save() {
-        if(file == null) {
+    public void save() {
+        if (file == null) {
             Logger.getLogger(JDBCStringEnumerator.class.getName()).log(Level.WARNING,
-                "Attempt made to save an enumerator with no attached file.");
+                                                                       "Attempt made to save an enumerator with no attached file.");
             return;
         }
 
-        db.<String, String>getHashMap(COLLECTION_PROPERTIES).put(
-                COLLECTION_NEXT_ID, Integer.toString(getNextId()));
+        if (MAP_TYPE_HASH) {
+            db.<String, String>getHashMap(COLLECTION_PROPERTIES).put(
+                    COLLECTION_NEXT_ID, Integer.toString(getNextId()));
+        } else {
+            db.<String, String>getTreeMap(COLLECTION_PROPERTIES).put(
+                    COLLECTION_NEXT_ID, Integer.toString(getNextId()));
+        }
+
+
         db.commit();
     }
 
-    public synchronized void close() {
-        if(db == null || db.isClosed()) {
+    public void close() {
+        if (db == null || db.isClosed()) {
             Logger.getLogger(JDBCStringEnumerator.class.getName()).log(Level.WARNING,
-                "Attempt made to close an enumerator that was not open.");
+                                                                       "Attempt made to close an enumerator that was not open.");
             return;
         }
 
+//        db.defrag(true);
         save();
         db.close();
     }

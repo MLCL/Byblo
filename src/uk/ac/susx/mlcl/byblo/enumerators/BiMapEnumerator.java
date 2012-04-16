@@ -107,16 +107,22 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
     }
 
     @Override
-    public synchronized final int indexOf(final T value) {
+    public final int indexOf(final T value) {
         Checks.checkNotNull("value", value);
 
-        if (!map.containsValue(value))
-            put(nextId.getAndIncrement(), value);
-        return map.inverse().get(value);
+        final Integer result = map.inverse().get(value);
+        if (result == null) {
+            final int id = nextId.getAndIncrement();
+            put(id, value);
+            return id;
+        } else {
+            return result;
+        }
+
     }
 
     @Override
-    public synchronized final T valueOf(final int index) {
+    public final T valueOf(final int index) {
         Checks.checkRangeIncl("index", index, 0, Integer.MAX_VALUE);
 
         final T value = map.get(index);
@@ -124,7 +130,7 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
         return value;
     }
 
-    protected synchronized void put(final int id, final T obj) {
+    protected void put(final int id, final T obj) {
         map.put(id, obj);
         if (nextId.get() <= id)
             nextId.set(id + 1);
