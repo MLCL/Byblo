@@ -30,11 +30,11 @@
  */
 package uk.ac.susx.mlcl.lib.commands;
 
-import uk.ac.susx.mlcl.lib.tasks.FileCopyTask;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
 import java.io.File;
+import uk.ac.susx.mlcl.lib.tasks.FileCopyTask;
 
 /**
  * Copy a source file to a destination.
@@ -42,25 +42,44 @@ import java.io.File;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Copy a file.")
-public class CopyCommand extends AbstractCommand {
+public class FileCopyCommand extends AbstractCommand {
 
     @ParametersDelegate
     protected final FilePipeDeligate filesDeligate = new FilePipeDeligate();
 
-    public CopyCommand(File sourceFile, File destinationFile) {
+    public FileCopyCommand(File sourceFile, File destinationFile) {
         filesDeligate.setSourceFile(sourceFile);
         filesDeligate.setDestinationFile(destinationFile);
     }
 
-    public CopyCommand() {
+    public FileCopyCommand() {
+    }
+
+    public final void setSourceFile(File sourceFile) {
+        filesDeligate.setSourceFile(sourceFile);
+    }
+
+    public final void setDestinationFile(File destFile)  {
+        filesDeligate.setDestinationFile(destFile);
+    }
+
+    public final File getSourceFile() {
+        return filesDeligate.getSourceFile();
+    }
+
+    public final File getDestinationFile() {
+        return filesDeligate.getDestinationFile();
     }
 
     @Override
     public void runCommand() throws Exception {
 
-        FileCopyTask task = new FileCopyTask(filesDeligate.getSourceFile(),
-                                             filesDeligate.getDestinationFile());
+        FileCopyTask task = new FileCopyTask(
+                filesDeligate.getSourceFile(),
+                filesDeligate.getDestinationFile());
+
         task.run();
+
         while (task.isExceptionCaught())
             task.throwException();
     }
@@ -68,7 +87,8 @@ public class CopyCommand extends AbstractCommand {
     @Override
     protected Objects.ToStringHelper toStringHelper() {
         return super.toStringHelper().
-                add("in", filesDeligate.getSourceFile()).
-                add("out", filesDeligate.getDestinationFile());
+                add("from", filesDeligate.getSourceFile()).
+                add("to", filesDeligate.getDestinationFile());
     }
+
 }

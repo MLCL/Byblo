@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.lib.commands;
 
-import uk.ac.susx.mlcl.lib.commands.CopyCommand;
+import uk.ac.susx.mlcl.lib.commands.FileCopyCommand;
 import uk.ac.susx.mlcl.lib.io.Files;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
@@ -50,7 +50,7 @@ public class CopyCommandTest {
     public void testGetSrcFile() {
         System.out.println("Testing getSrcFile() and setSrcFile()");
         File x = new File("x");
-        CopyCommand instance = new CopyCommand();
+        FileCopyCommand instance = new FileCopyCommand();
         instance.filesDeligate.setSourceFile(x);
         File expResult = x;
         File result = instance.filesDeligate.getSourceFile();
@@ -61,7 +61,7 @@ public class CopyCommandTest {
     public void testGetDstFile() {
         System.out.println("Testing getDstFile() and setDstFile()");
         File x = new File("x");
-        CopyCommand instance = new CopyCommand();
+        FileCopyCommand instance = new FileCopyCommand();
         instance.filesDeligate.setDestinationFile(x);
         File expResult = x;
         File result = instance.filesDeligate.getDestinationFile();
@@ -75,7 +75,7 @@ public class CopyCommandTest {
         String str = "blah blah yackaty schmackaty";
         Files.writeAll(in, Files.DEFAULT_CHARSET, str);
         File out = File.createTempFile(getClass().getName(), "out");
-        CopyCommand instance = new CopyCommand(in, out);
+        FileCopyCommand instance = new FileCopyCommand(in, out);
         instance.runCommand();
         assertTrue(out.exists());
         assertEquals(in.length(), out.length());
@@ -93,7 +93,7 @@ public class CopyCommandTest {
         File in = File.createTempFile(getClass().getName(), "in");
         in.delete();
         File out = File.createTempFile(getClass().getName(), "out");
-        CopyCommand instance = new CopyCommand(in, out);
+        FileCopyCommand instance = new FileCopyCommand(in, out);
         instance.runCommand();
         in.delete();
         out.delete();
@@ -103,7 +103,7 @@ public class CopyCommandTest {
     public void testCLI() throws IOException {
         System.out.println("Testing command line usage.");
         File x = new File("x"), y = new File("y");
-        CopyCommand instance = new CopyCommand();
+        FileCopyCommand instance = new FileCopyCommand();
         String[] args = {"-i", x.toString(), "-o", y.toString()};
         JCommander jc = new JCommander();
         jc.addObject(instance);

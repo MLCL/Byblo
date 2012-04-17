@@ -9,8 +9,6 @@ import com.google.common.base.Objects;
 import java.io.File;
 import java.io.Serializable;
 import java.nio.charset.Charset;
-import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.io.Files;
 
 /**
  *
@@ -25,8 +23,6 @@ public class FilePipeDeligate extends FileDeligate implements Serializable {
 
     @Parameter(names = {"-o", "--output"}, description = "Destination file that will be writen to.", validateWith = OutputFileValidator.class, required = true)
     private File destFile;
-
-  
 
     public FilePipeDeligate(File sourceFile, File destinationFile, Charset charset) {
         super(charset);
@@ -45,13 +41,13 @@ public class FilePipeDeligate extends FileDeligate implements Serializable {
         return destFile;
     }
 
-    public final void setSourceFile(final File sourceFile) throws NullPointerException {
+    public final void setSourceFile(final File sourceFile) {
         if (sourceFile == null)
             throw new NullPointerException("sourceFile is null");
         this.sourceFile = sourceFile;
     }
 
-    public final void setDestinationFile(final File destFile) throws NullPointerException {
+    public final void setDestinationFile(final File destFile) {
         if (destFile == null)
             throw new NullPointerException("destinationFile is null");
         this.destFile = destFile;

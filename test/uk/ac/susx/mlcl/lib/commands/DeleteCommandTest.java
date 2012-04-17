@@ -4,7 +4,7 @@
  */
 package uk.ac.susx.mlcl.lib.commands;
 
-import uk.ac.susx.mlcl.lib.commands.DeleteCommand;
+import uk.ac.susx.mlcl.lib.commands.FileDeleteCommand;
 import com.beust.jcommander.JCommander;
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +21,7 @@ public class DeleteCommandTest {
     public void testCLI() throws IOException, Exception {
         System.out.println("Testing command line usage.");
         File tmp = File.createTempFile(getClass().getName(), "");
-        DeleteCommand instance = new DeleteCommand();
+        FileDeleteCommand instance = new FileDeleteCommand();
         String[] args = {"-f", tmp.toString()};
         JCommander jc = new JCommander();
         jc.addObject(instance);

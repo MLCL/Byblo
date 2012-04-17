@@ -30,64 +30,68 @@
  */
 package uk.ac.susx.mlcl.lib.commands;
 
-import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
-import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
+import uk.ac.susx.mlcl.lib.tasks.FileMoveTask;
 
 /**
+ * Move source file to a destination.
+ *
+ * Attempts to perform a fast rename if possible. Otherwise it falls back to
+ * slower copy and delete.
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
-@Parameters(commandDescription = "Delete a file.")
-public class DeleteCommand extends AbstractCommand {
+@Parameters(commandDescription = "Move a file.")
+public class FileMoveCommand extends AbstractCommand {
 
-    private static final Log LOG = LogFactory.getLog(DeleteCommand.class);
+    @ParametersDelegate
+    protected final FilePipeDeligate filesDeligate = new FilePipeDeligate();
 
-    @Parameter(names = {"-f", "--file"},
-               description = "File to deleted",
-               validateWith = InputFileValidator.class, required=true)
-    private File file = null;
-
-    public DeleteCommand(File file) {
-        setFile(file);
+    public FileMoveCommand(File sourceFile, File destinationFile) {
+        filesDeligate.setSourceFile(sourceFile);
+        filesDeligate.setDestinationFile(destinationFile);
     }
 
-    public DeleteCommand() {
+    public FileMoveCommand() {
+    }
+
+    public final void setSourceFile(File sourceFile) {
+        filesDeligate.setSourceFile(sourceFile);
+    }
+
+    public final void setDestinationFile(File destFile) {
+        filesDeligate.setDestinationFile(destFile);
+    }
+
+    public final File getSourceFile() {
+        return filesDeligate.getSourceFile();
+    }
+
+    public final File getDestinationFile() {
+        return filesDeligate.getDestinationFile();
     }
 
     @Override
     public void runCommand() throws Exception {
-        if (LOG.isInfoEnabled())
-            LOG.info("Deleting file \"" + getFile() + "\".");
-        if (file == null)
-            throw new NullPointerException("file is null");
-        if (!file.exists())
-            throw new FileNotFoundException("Unnable to delete file because it "
-                    + "doesn't exist: \"" + file + "\"");
-        if (!file.delete())
-            throw new IOException("Unnable to delete file: \"" + file + "\"");
-    }
 
-    public final File getFile() {
-        return file;
-    }
+        FileMoveTask task = new FileMoveTask(
+                filesDeligate.getSourceFile(),
+                filesDeligate.getDestinationFile());
 
-    public final void setFile(final File file)
-            throws NullPointerException {
-        if (file == null)
-            throw new NullPointerException("file is null");
-        this.file = file;
+        task.run();
+
+        while (task.isExceptionCaught())
+            task.throwException();
     }
 
     @Override
     protected Objects.ToStringHelper toStringHelper() {
-        return super.toStringHelper().add("file", file);
+        return super.toStringHelper().
+                add("from", filesDeligate.getSourceFile()).
+                add("to", filesDeligate.getDestinationFile());
     }
+
 }

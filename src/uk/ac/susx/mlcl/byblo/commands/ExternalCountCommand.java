@@ -51,10 +51,11 @@ import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.tasks.CountTask;
 import uk.ac.susx.mlcl.lib.AbstractParallelCommandTask;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.commands.CopyCommand;
 import uk.ac.susx.mlcl.lib.commands.FileDeligate;
+import uk.ac.susx.mlcl.lib.commands.FileMoveCommand;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
+import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
 import uk.ac.susx.mlcl.lib.io.*;
 import uk.ac.susx.mlcl.lib.tasks.*;
 
@@ -138,7 +139,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     private File featuresFile = null;
 
     @Parameter(names = {"-T", "--temporary-directory"},
-    description = "Directory used for holding temporary files.")
+    description = "Directory used for holding temporary files.",
+    converter = TempFileFactoryConverter.class)
     private FileFactory tempFileFactory = new TempFileFactory();
 
     private Queue<File> mergeEntryQueue;
@@ -443,39 +445,20 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         if (finalMerge == null)
             throw new AssertionError(
                     "The entry merge queue is empty but final copy has not been completed.");
-        new CopyCommand(finalMerge, getEntriesFile()).runCommand();
-        if (!DEBUG) {
-            FileDeleteTask delete = new FileDeleteTask(finalMerge);
-            delete.runTask();
-            if (delete.isExceptionCaught())
-                delete.throwException();
-        }
+        new FileMoveCommand(finalMerge, getEntriesFile()).runCommand();
 
         finalMerge = mergeEntryFeatureQueue.poll();
         if (finalMerge == null)
             throw new AssertionError(
                     "The entry/feature merge queue is empty but final copy has not been completed.");
-        new CopyCommand(finalMerge, getEventsFile()).runCommand();
-        if (!DEBUG) {
-            FileDeleteTask delete = new FileDeleteTask(finalMerge);
-            delete.runTask();
-            if (delete.isExceptionCaught())
-                delete.throwException();
-
-        }
+        new FileMoveCommand(finalMerge, getEventsFile()).runCommand();
 
         finalMerge = mergeFeaturesQueue.poll();
         if (finalMerge == null)
             throw new AssertionError(
                     "The feature merge queue is empty but final copy has not been completed.");
-        new CopyCommand(finalMerge, getFeaturesFile()).runCommand();
-        if (!DEBUG) {
-            FileDeleteTask delete = new FileDeleteTask(finalMerge);
-            delete.runTask();
-            if (delete.isExceptionCaught())
-                delete.throwException();
+        new FileMoveCommand(finalMerge, getFeaturesFile()).runCommand();
 
-        }
     }
 
     private Comparator<Weighted<Token>> getEntryOrder() throws IOException {
@@ -877,7 +860,4 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         indexDeligate.setEnumeratorType(type);
     }
 
-    
-    
-    
 }
