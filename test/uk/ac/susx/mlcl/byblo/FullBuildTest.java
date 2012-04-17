@@ -63,7 +63,6 @@ public class FullBuildTest {
 //
 
     @Test
-    @Ignore
     public void testRunCommand_Fruit() throws Exception {
         System.out.println("Test on fruit");
 
@@ -79,7 +78,6 @@ public class FullBuildTest {
     }
 
     @Test
-    @Ignore
     public void testRunCommand_Medtest100k() throws Exception {
         System.out.println("Test on fruit");
 
@@ -124,6 +122,7 @@ public class FullBuildTest {
     }
 
     @Test
+    @Ignore
     public void testRunCommand_Medtest10m() throws Exception {
         System.out.println("Test on fruit");
 

@@ -4,8 +4,6 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import java.io.Closeable;
-import java.io.Flushable;
 import java.io.IOException;
 import uk.ac.susx.mlcl.lib.io.Sink;
 
@@ -13,16 +11,15 @@ import uk.ac.susx.mlcl.lib.io.Sink;
  *
  * @author hiam20
  */
-public class WeightSumReducerSink<T> implements Sink<Weighted<T>>, Flushable, Closeable {
-
-    private final Sink<Weighted<T>> inner;
+public class WeightSumReducerSink<T>
+        extends ForwardingSink<Sink<Weighted<T>>, Weighted<T>> {
 
     private T currentRecord = null;
 
     private double weightSum = 0;
 
     public WeightSumReducerSink(Sink<Weighted<T>> inner) {
-        this.inner = inner;
+        super(inner);
     }
 
     @Override
@@ -33,7 +30,7 @@ public class WeightSumReducerSink<T> implements Sink<Weighted<T>>, Flushable, Cl
         } else if (currentRecord.equals(o.record())) {
             weightSum += o.weight();
         } else {
-            inner.write(new Weighted<T>(currentRecord, weightSum));
+            super.write(new Weighted<T>(currentRecord, weightSum));
             currentRecord = o.record();
             weightSum = o.weight();
         }
@@ -42,18 +39,17 @@ public class WeightSumReducerSink<T> implements Sink<Weighted<T>>, Flushable, Cl
     @Override
     public void flush() throws IOException {
         if (currentRecord != null) {
-            inner.write(new Weighted<T>(currentRecord, weightSum));
+            super.write(new Weighted<T>(currentRecord, weightSum));
             currentRecord = null;
             weightSum = 0;
         }
-        if (inner instanceof Flushable)
-            ((Flushable) inner).flush();
+        super.flush();
     }
 
     @Override
     public void close() throws IOException {
         flush();
-        if (inner instanceof Closeable)
-            ((Closeable) inner).close();
+        super.close();
     }
+
 }

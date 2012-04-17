@@ -54,7 +54,7 @@ import uk.ac.susx.mlcl.lib.io.Tell;
  */
 public class EntryTest {
 
-    private void copyE(File a, File b, boolean compact, boolean enumIn,
+    private void copyE(File a, File b,boolean enumIn,
                        boolean enumOut)
             throws FileNotFoundException, IOException {
 
@@ -72,7 +72,6 @@ public class EntryTest {
             bSink = WeightedTokenSink.open(b, DEFAULT_CHARSET, idx);
         else
             bSink = WeightedTokenSink.open(b, DEFAULT_CHARSET, idx);
-        bSink.setCompactFormatEnabled(compact);
 
         IOUtil.copy(aSrc, bSink);
         bSink.close();
@@ -86,12 +85,12 @@ public class EntryTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_ENTRIES.getName() + ".verbose");
 
-        copyE(a, b, true, true, true);
+        copyE(a, b, true, true);
 
         assertTrue("Compact copy is smaller that verbose source.",
                    b.length() <= a.length());
 
-        copyE(b, c, false, true, true);
+        copyE(b, c, false, true);
 
 
         assertTrue("Verbose copy is smaller that compact source.",

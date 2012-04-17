@@ -58,8 +58,6 @@ public class WeightedTokenPairVectorSource
 
     private Tell tell;
 
-    private long count = 0;
-
     public WeightedTokenPairVectorSource(
             SeekableSource<Weighted<TokenPair>, Tell> inner) throws IOException {
         this.inner = inner;
@@ -91,12 +89,7 @@ public class WeightedTokenPairVectorSource
 
         SparseDoubleVector v = toDoubleVector(features, cardinality);
 
-        ++count;
         return new Indexed<SparseDoubleVector>(start.record().id1(), v);
-    }
-
-    public long getCount() {
-        return count;
     }
 
     @Override
@@ -129,8 +122,7 @@ public class WeightedTokenPairVectorSource
             throw new IllegalArgumentException();
         }
 
-        List<Int2DoubleMap.Entry> entries = new ArrayList<Int2DoubleMap.Entry>(map.
-                int2DoubleEntrySet());
+        List<Int2DoubleMap.Entry> entries = new ArrayList<Int2DoubleMap.Entry>(map.int2DoubleEntrySet());
         Collections.sort(entries, new Comparator<Int2DoubleMap.Entry>() {
 
             @Override
@@ -138,6 +130,7 @@ public class WeightedTokenPairVectorSource
                                      final Int2DoubleMap.Entry t1) {
                 return t.getIntKey() - t1.getIntKey();
             }
+
         });
 
         int[] keys = new int[entries.size()];
@@ -153,4 +146,5 @@ public class WeightedTokenPairVectorSource
         vec.compact();
         return vec;
     }
+
 }

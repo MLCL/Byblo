@@ -30,11 +30,11 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 import com.google.common.base.Objects;
 import java.io.*;
 import java.util.Comparator;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 
 /**
  * <tt>Token</tt> objects represent a single instance of an indexed string.

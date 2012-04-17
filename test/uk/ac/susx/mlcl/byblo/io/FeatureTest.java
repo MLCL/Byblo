@@ -47,7 +47,7 @@ import uk.ac.susx.mlcl.byblo.enumerators.*;
  */
 public class FeatureTest {
 
-    private void copyF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
+    private void copyF(File a, File b) throws FileNotFoundException, IOException {
         Enumerator<String> strEnum = MemoryBasedStringEnumerator.newInstance();
 
         SingleEnumeratingDeligate del = new SingleEnumeratingDeligate(
@@ -56,7 +56,6 @@ public class FeatureTest {
                 a, DEFAULT_CHARSET, del);
         WeightedTokenSink bSink = WeightedTokenSink.open(
                 b, DEFAULT_CHARSET, del);
-        bSink.setCompactFormatEnabled(compact);
 
         IOUtil.copy(aSrc, bSink);
         bSink.close();
@@ -70,12 +69,12 @@ public class FeatureTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_FEATURES.getName() + ".verbose");
 
-        copyF(a, b, true);
+        copyF(a, b);
 
         assertTrue("Compact copy is smaller that verbose source.",
                    b.length() <= a.length());
 
-        copyF(b, c, false);
+        copyF(b, c);
 
 
         assertTrue("Verbose copy is smaller that compact source.",

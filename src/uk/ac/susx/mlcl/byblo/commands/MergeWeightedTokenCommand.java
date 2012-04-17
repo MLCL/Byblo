@@ -27,7 +27,7 @@ public class MergeWeightedTokenCommand extends AbstractMergeCommand<Weighted<Tok
     private SingleEnumerating indexDeligate = new SingleEnumeratingDeligate();
 
     public MergeWeightedTokenCommand(
-            File sourceFileA, File sourceFileB, File destinationFile, 
+            File sourceFileA, File sourceFileB, File destinationFile,
             Charset charset, SingleEnumerating indexDeligate) {
         super(sourceFileA, sourceFileB, destinationFile, charset,
               Weighted.recordOrder(Token.indexOrder()));
@@ -44,8 +44,7 @@ public class MergeWeightedTokenCommand extends AbstractMergeCommand<Weighted<Tok
         indexDeligate.closeEnumerator();
 
     }
-    
-    
+
     public final SingleEnumerating getIndexDeligate() {
         return indexDeligate;
     }
@@ -55,31 +54,23 @@ public class MergeWeightedTokenCommand extends AbstractMergeCommand<Weighted<Tok
         this.indexDeligate = indexDeligate;
     }
 
-    
     @Override
     protected Source<Weighted<Token>> openSource(File file) throws FileNotFoundException, IOException {
-        return  WeightedTokenSource.open(file, getFileDeligate().getCharset(),
+        return WeightedTokenSource.open(file, getFileDeligate().getCharset(),
                                         indexDeligate);
-//
-//                new WeightedTokenSource(
-//                new TSVSource(file, getFileDeligate().getCharset()),
-//                indexDeligate);
     }
 
     @Override
     protected Sink<Weighted<Token>> openSink(File file) throws FileNotFoundException, IOException {
         WeightedTokenSink s = WeightedTokenSink.open(
                 file, getFileDeligate().getCharset(), indexDeligate);
-//        new WeightedTokenSink(
-//                new TSVSink(file, getFileDeligate().getCharset()),
-//                indexDeligate);
-        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
         return new WeightSumReducerSink<Token>(s);
     }
 
     public static void main(String[] args) throws Exception {
         new MergeWeightedTokenCommand().runCommand(args);
     }
+
     @Override
     protected Objects.ToStringHelper toStringHelper() {
         return super.toStringHelper().add("indexing", indexDeligate);

@@ -4,8 +4,6 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import java.io.Closeable;
-import java.io.Flushable;
 import java.io.IOException;
 import java.util.Comparator;
 import uk.ac.susx.mlcl.lib.io.Sink;
@@ -14,9 +12,7 @@ import uk.ac.susx.mlcl.lib.io.Sink;
  *
  * @author hiam20
  */
-public class KFirstReducerSink<T> implements Sink<T>, Flushable, Closeable {
-
-    private final Sink<T> inner;
+public class KFirstReducerSink<T> extends ForwardingSink<Sink<T>, T> {
 
     private Comparator<T> comparator = null;
 
@@ -27,7 +23,7 @@ public class KFirstReducerSink<T> implements Sink<T>, Flushable, Closeable {
     private int count = -1;
 
     public KFirstReducerSink(Sink<T> inner, Comparator<T> comparator, int limit) {
-        this.inner = inner;
+        super(inner);
         this.limit = limit;
         this.comparator = comparator;
     }
@@ -42,21 +38,8 @@ public class KFirstReducerSink<T> implements Sink<T>, Flushable, Closeable {
         ++count;
 
         if (count <= limit) {
-            inner.write(o);
+            super.write(o);
         }
-    }
-
-    @Override
-    public void flush() throws IOException {
-        if (inner instanceof Flushable)
-            ((Flushable) inner).flush();
-    }
-
-    @Override
-    public void close() throws IOException {
-        flush();
-        if (inner instanceof Closeable)
-            ((Closeable) inner).close();
     }
 
 }

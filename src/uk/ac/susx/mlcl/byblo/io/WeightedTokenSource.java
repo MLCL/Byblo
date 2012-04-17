@@ -61,58 +61,16 @@ public class WeightedTokenSource
 
     private static final Log LOG = LogFactory.getLog(WeightedTokenSource.class);
 
-//    private IndexDeligate indexDeligate;
-    private double weightSum = 0;
-
-    private double weightMax = 0;
-
-    private int widthSum = 0;
-
-    private int widthMax = 0;
-
-    private int cardinality = 0;
-
-    private int count = 0;
-
-    private Weighted<Token> previousRecord = null;
-
     private final SeekableDataSource inner;
 
-    public WeightedTokenSource(SeekableDataSource inner //                             ,  IndexDeligate indexDeligate
-            )
+    public WeightedTokenSource(SeekableDataSource inner)
             throws FileNotFoundException, IOException {
         this.inner = inner;
-//        this.indexDeligate = indexDeligate;
-    }
-
-    public double getWeightSum() {
-        return weightSum;
-    }
-
-    public double getWeightMax() {
-        return weightMax;
-    }
-
-    public int getWidthMax() {
-        return widthMax;
-    }
-
-    public int getWidthSum() {
-        return widthSum;
-    }
-
-    public int getCardinality() {
-        return cardinality;
-    }
-
-    public int getCount() {
-        return count;
     }
 
     @Override
     public void position(Tell offset) throws IOException {
         inner.position(offset);
-        previousRecord = null;
     }
 
     @Override
@@ -120,53 +78,20 @@ public class WeightedTokenSource
         return inner.position();
     }
 
-    private int readTokenId() throws IOException {
-        return inner.readInt();
-//        if (indexDeligate.isPreindexedTokens()) {
-//            return inner.readInt();
-//        } else
-//            return indexDeligate.getEnumerator().index(inner.readString());
-    }
-
     @Override
     public Weighted<Token> read() throws IOException {
-        final int tokenId;
-        if (previousRecord == null) {
-            tokenId = readTokenId();
-        } else {
-            tokenId = previousRecord.record().id();
-        }
-
-        if (!hasNext() || inner.isEndOfRecordNext()) {
-            inner.endOfRecord();
-            throw new IOException("Found entry record with no weights.");
-        }
-
+        final int tokenId = inner.readInt();
         final double weight = inner.readDouble();
+        inner.endOfRecord();
 
-        cardinality = Math.max(cardinality, tokenId + 1);
-        weightSum += weight;
-        weightMax = Math.max(weightMax, weight);
-        ++count;
-        final Weighted<Token> record = new Weighted<Token>(new Token(tokenId),
-                                                           weight);
+        return new Weighted<Token>(new Token(tokenId), weight);
 
-        if (inner.canRead() && !inner.isEndOfRecordNext()) {
-            previousRecord = record;
-        }
-
-        if (hasNext() && inner.isEndOfRecordNext()) {
-            inner.endOfRecord();
-            previousRecord = null;
-        }
-
-        return record;
     }
 
-    public Int2DoubleMap readAll() throws IOException {
+    public static Int2DoubleMap readAll(Source<Weighted<Token>> src) throws IOException {
         Int2DoubleMap entityFrequenciesMap = new Int2DoubleOpenHashMap();
-        while (this.hasNext()) {
-            Weighted<Token> entry = this.read();
+        while (src.hasNext()) {
+            Weighted<Token> entry = src.read();
             if (entityFrequenciesMap.containsKey(entry.record().id())) {
                 // If we encounter the same Token more than once, it means
                 // the perl has decided two strings are not-equal, which java
@@ -194,9 +119,14 @@ public class WeightedTokenSource
         return entityFrequenciesMap;
     }
 
-    public double[] readAllAsArray() throws IOException {
-        Int2DoubleMap tmp = readAll();
-        double[] entryFreqs = new double[getCardinality()];
+    public static double[] readAllAsArray(Source<Weighted<Token>> src) throws IOException {
+        Int2DoubleMap tmp = readAll(src);
+        int maxId = 0;
+        for (int k : tmp.keySet()) {
+            if (k > maxId)
+                maxId = k;
+        }
+        double[] entryFreqs = new double[maxId + 1];
         ObjectIterator<Int2DoubleMap.Entry> it = tmp.int2DoubleEntrySet().
                 iterator();
         while (it.hasNext()) {
@@ -221,9 +151,8 @@ public class WeightedTokenSource
             });
         }
 
-
-
         tsv = Compact.compact(tsv, 2);
+
         if (!idx.isEnumerationEnabled())
             tsv = Enumerated.enumerated(tsv, idx.getEnumerator());
         return new WeightedTokenSource(tsv);
@@ -255,4 +184,85 @@ public class WeightedTokenSource
             ((Closeable) inner).close();
     }
 
+    public static class WeightStatsSource<T>
+            extends ForwardingSource<Source<Weighted<T>>, Weighted<T>> {
+
+        private double weightMin = Double.POSITIVE_INFINITY;
+
+        private double weightMax = Double.NEGATIVE_INFINITY;
+
+        private double weightSum = 0;
+
+        private long count = 0;
+
+        public WeightStatsSource(Source<Weighted<T>> inner) {
+            super(inner);
+        }
+
+        public double getWeightSum() {
+            return weightSum;
+        }
+
+        public double getWeightMax() {
+            return weightMax;
+        }
+
+        public double getWeightMin() {
+            return weightMin;
+        }
+
+        public double getWeightRange() {
+            return getWeightMax() - getWeightMin();
+        }
+
+        public double getWeightMean() {
+            return getWeightSum() / getCount();
+        }
+
+        public long getCount() {
+            return count;
+        }
+
+        @Override
+        public Weighted<T> read() throws IOException {
+            Weighted<T> wt = super.read();
+
+            weightSum += wt.weight();
+            weightMax = Math.max(weightMax, wt.weight());
+            weightMin = Math.min(weightMin, wt.weight());
+            ++count;
+
+            return wt;
+        }
+
+    }
+
+    public static class WTStatsSource
+            extends WeightStatsSource<Token> {
+
+        private int minId = 0;
+
+        private int maxId = 0;
+
+        public WTStatsSource(WeightedTokenSource inner) {
+            super(inner);
+        }
+
+        public int getMaxId() {
+            return maxId;
+        }
+
+        public int getMinId() {
+            return minId;
+        }
+
+        @Override
+        public Weighted<Token> read() throws IOException {
+            final Weighted<Token> wt = super.read();
+            minId = Math.min(minId, wt.record().id());
+            maxId = Math.max(maxId, wt.record().id());
+            return wt;
+        }
+
+    }
 }

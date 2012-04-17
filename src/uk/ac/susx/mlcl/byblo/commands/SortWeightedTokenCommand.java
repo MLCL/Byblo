@@ -46,8 +46,7 @@ public class SortWeightedTokenCommand extends AbstractSortCommand<Weighted<Token
         indexDeligate.closeEnumerator();
 
     }
-    
-    
+
     @Override
     protected Source<Weighted<Token>> openSource(File file) throws FileNotFoundException, IOException {
         return WeightedTokenSource.open(file, getFilesDeligate().getCharset(),
@@ -58,7 +57,6 @@ public class SortWeightedTokenCommand extends AbstractSortCommand<Weighted<Token
     protected Sink<Weighted<Token>> openSink(File file) throws FileNotFoundException, IOException {
         WeightedTokenSink s = WeightedTokenSink.open(
                 file, getFilesDeligate().getCharset(), indexDeligate);
-        s.setCompactFormatEnabled(!getFilesDeligate().isCompactFormatDisabled());
         return new WeightSumReducerSink<Token>(s);
 
     }

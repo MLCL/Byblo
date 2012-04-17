@@ -44,11 +44,11 @@ public class ExternalSortWeightedTokenCommand extends AbstractExternalSortComman
         indexDeligate.closeEnumerator();
 
     }
+
     @Override
     protected Sink<Weighted<Token>> openSink(File file) throws IOException {
         WeightedTokenSink s = WeightedTokenSink.open(
                 file, getFileDeligate().getCharset(), getIndexDeligate());
-        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
         return new WeightSumReducerSink<Token>(s);
     }
 

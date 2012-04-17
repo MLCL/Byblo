@@ -653,17 +653,11 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         return WeightedTokenSource.open(file, getFileDeligate().getCharset(),
                                         EnumeratingDeligates.toSingleEntries(
                 getIndexDeligate()));
-//        return new WeightedTokenSource(
-//                new TSVSource(file, getFileDeligate().getCharset()),
-//                indexDeligate.single1());
     }
 
     protected Sink<Weighted<Token>> openEntriesSink(File file) throws FileNotFoundException, IOException {
         WeightedTokenSink s = WeightedTokenSink.open(
                 file, getFileDeligate().getCharset(), EnumeratingDeligates.toSingleEntries(getIndexDeligate()));
-//                new WeightedTokenSink(new TSVSink(file, getFileDeligate().getCharset()),
-//                                                    indexDeligate.single1());
-        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
         return new WeightSumReducerSink<Token>(s);
     }
 
@@ -671,18 +665,12 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         return WeightedTokenSource.open(file, getFileDeligate().getCharset(),
                                         EnumeratingDeligates.toSingleFeatures(
                 getIndexDeligate()));
-//        return new WeightedTokenSource(
-//                new TSVSource(file, getFileDeligate().getCharset()),
-//                indexDeligate.single2());
     }
 
     protected Sink<Weighted<Token>> openFeaturesSink(File file) throws FileNotFoundException, IOException {
 
         WeightedTokenSink s = WeightedTokenSink.open(
                 file, getFileDeligate().getCharset(), EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
-//                new WeightedTokenSink(new TSVSink(file, getFileDeligate().getCharset()),
-//                                                    indexDeligate.single2());
-        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
         return new WeightSumReducerSink<Token>(s);
     }
 

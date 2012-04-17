@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
 import uk.ac.susx.mlcl.lib.test.ExitTrapper;
 import com.google.common.io.Files;
 import java.nio.charset.Charset;
@@ -52,16 +51,13 @@ public class FilterCommandTest {
     private static final String SUBJECT = FilterCommand.class.getName();
 
     private final static File OUTPUT_ENTRIES = new File(TEST_OUTPUT_DIR,
-                                                        TEST_FRUIT_ENTRIES_FILTERED.
-            getName());
+                                                        TEST_FRUIT_ENTRIES_FILTERED.getName());
 
     private final static File OUTPUT_FEATURES = new File(TEST_OUTPUT_DIR,
-                                                         TEST_FRUIT_FEATURES_FILTERED.
-            getName());
+                                                         TEST_FRUIT_FEATURES_FILTERED.getName());
 
     private final static File OUTPUT_ENTRY_FEATURES = new File(TEST_OUTPUT_DIR,
-                                                               TEST_FRUIT_ENTRY_FEATURES_FILTERED.
-            getName());
+                                                               TEST_FRUIT_ENTRY_FEATURES_FILTERED.getName());
 
     @Before
     public void setUp() {
@@ -81,10 +77,10 @@ public class FilterCommandTest {
             "--charset", "UTF-8",
             "--input-entries", TEST_FRUIT_ENTRIES.toString(),
             "--input-features", TEST_FRUIT_FEATURES.toString(),
-            "--input-entry-features", TEST_FRUIT_ENTRY_FEATURES.toString(),
+            "--input-events", TEST_FRUIT_ENTRY_FEATURES.toString(),
             "--output-entries", OUTPUT_ENTRIES.toString(),
             "--output-features", OUTPUT_FEATURES.toString(),
-            "--output-entry-features", OUTPUT_ENTRY_FEATURES.toString(),};
+            "--output-events", OUTPUT_ENTRY_FEATURES.toString(),};
 
         String[] args = new String[commonArgs.length + runArgs.length];
         System.arraycopy(commonArgs, 0, args, 0, commonArgs.length);
@@ -97,9 +93,6 @@ public class FilterCommandTest {
         } finally {
             disableExitTrapping();
         }
-
-
-
 
         assertTrue("Output file " + OUTPUT_ENTRIES + " does not exist.",
                    OUTPUT_ENTRIES.exists());
@@ -130,7 +123,7 @@ public class FilterCommandTest {
         System.out.println(
                 "Testing FilterTask on fruit from main method, filter by feature freqency.");
 
-        runWithCLI(new String[]{"--filter-entry-feature-freq", "5"});
+        runWithCLI(new String[]{"--filter-event-freq", "5"});
     }
 
     @Test(timeout = 1000)
@@ -141,8 +134,7 @@ public class FilterCommandTest {
         File entryWorldList = new File(TEST_OUTPUT_DIR,
                                        TEST_FRUIT_INPUT.getName() + ".entry-whitelist");
 
-        Files.write("apple\norange\npear\nbanana", entryWorldList, Charset.
-                forName("UTF-8"));
+        Files.write("apple\norange\npear\nbanana", entryWorldList, Charset.forName("UTF-8"));
 
         runWithCLI(new String[]{"--filter-entry-whitelist",
                     entryWorldList.toString()});
@@ -153,14 +145,12 @@ public class FilterCommandTest {
         System.out.println(
                 "Testing FilterTask: on fruit, from main method, filter by context word list.");
 
-        File contextWorldList = new File(TEST_OUTPUT_DIR, TEST_FRUIT_INPUT.
-                getName() + ".contextWordList");
+        File contextWorldList = new File(TEST_OUTPUT_DIR, TEST_FRUIT_INPUT.getName() + ".contextWordList");
 
         Files.write("det:the\ndet:a\niobj:of\nncmod:back\nncmod:for\npassive",
                     contextWorldList, Charset.forName("UTF-8"));
 
-        runWithCLI(new String[]{"--filter-feature-whitelist", contextWorldList.
-                    toString()});
+        runWithCLI(new String[]{"--filter-feature-whitelist", contextWorldList.toString()});
     }
 
     @Test(timeout = 1000)
@@ -202,14 +192,13 @@ public class FilterCommandTest {
                     "--filter-entry-whitelist", entryWorldList.toString(), // a-k
                     "--filter-entry-freq", "10",
                     "--filter-feature-freq", "5",
-                    "--filter-entry-feature-freq", "2",
+                    "--filter-event-freq", "2",
                     "--filter-feature-pattern", ":",
                     "--filter-feature-whitelist", contextWorldList.toString(),
                     "--filter-entry-pattern", "a"
                 });
     }
-    
-    
+
     @Test
     public void testExitStatus() throws Exception {
         try {
@@ -221,4 +210,5 @@ public class FilterCommandTest {
             ExitTrapper.disableExitTrapping();
         }
     }
+
 }

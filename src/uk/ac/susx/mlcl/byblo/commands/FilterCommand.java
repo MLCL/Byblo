@@ -47,6 +47,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.Charset;
+import static java.text.MessageFormat.format;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -323,7 +324,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             LOG.debug("Copying entries from " + activeEntriesFile
                     + " to " + outputEntriesFile + ".");
         }
-        
+
         outputEntriesFile.delete();
         if (!activeEntriesFile.renameTo(outputEntriesFile)) {
             com.google.common.io.Files.copy(activeEntriesFile, outputEntriesFile);
@@ -377,20 +378,10 @@ public class FilterCommand extends AbstractCommand implements Serializable {
                 activeEntriesFile, getCharset(),
                 EnumeratingDeligates.toSingleEntries(getIndexDeligate()));
 
-//                new WeightedTokenSource(
-//                new TSVSource(activeEntriesFile, charset), getIndexDeligate().
-//                single1());
-
         File outputFile = tempFiles.createFile();
-//        outputFile.deleteOnExit();
 
         WeightedTokenSink entriesSink = WeightedTokenSink.open(
                 outputFile, getCharset(), EnumeratingDeligates.toSingleEntries(getIndexDeligate()));
-        entriesSink.setCompactFormatEnabled(!isCompactFormatDisabled());
-//        
-//                new WeightedTokenSink(
-//                new TSVSink(outputFile, charset),
-//                getIndexDeligate().single1());
 
         if (LOG.isInfoEnabled()) {
             LOG.info(
@@ -402,24 +393,25 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         double filteredWeight = 0;
 
 
+        long inCount = 0;
+        long outCount = 0;
         while (entriesSource.hasNext()) {
+            ++inCount;
             Weighted<Token> record = entriesSource.read();
 
             if (record.record().id() == filteredEntry) {
                 filteredWeight += record.weight();
             } else if (acceptEntry.apply(record)) {
                 entriesSink.write(record);
+                ++outCount;
             } else {
                 rejected.add(record.record().id());
                 filteredWeight += record.weight();
             }
 
-            if ((entriesSource.getCount() % PROGRESS_INTERVAL == 0 || !entriesSource.hasNext())
+            if ((inCount % PROGRESS_INTERVAL == 0 || !entriesSource.hasNext())
                     && LOG.isInfoEnabled()) {
-                LOG.info(
-                        "Accepted " + entriesSink.getCount()
-                        + " of " + entriesSource.getCount()
-                        + " entries.");
+                LOG.info(format("Accepted {0} of {1} entries.", outCount, inCount));
                 LOG.debug(MiscUtil.memoryInfoString());
             }
         }
@@ -609,19 +601,11 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
         WeightedTokenSource featureSource = WeightedTokenSource.open(
                 activeFeaturesFile, getCharset(), EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
-//new WeightedTokenSource(
-//                new TSVSource(activeFeaturesFile, charset),
-//                getIndexDeligate().single2());
 
         File outputFile = tempFiles.createFile();
-//        outputFile.deleteOnExit();
 
         WeightedTokenSink featureSink = WeightedTokenSink.open(
                 outputFile, getCharset(), EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
-        featureSink.setCompactFormatEnabled(!isCompactFormatDisabled());
-//        new WeightedTokenSink(
-//                new TSVSink(outputFile, charset),
-//                getIndexDeligate().single2());
 
         if (LOG.isInfoEnabled()) {
             LOG.info(
@@ -634,24 +618,26 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         int filteredId = getIndexDeligate().getFeatureEnumerator().indexOf(
                 FILTERED_STRING);
 
+        long inCount = 0;
+        long outCount = 0;
         while (featureSource.hasNext()) {
             Weighted<Token> feature = featureSource.read();
+            ++inCount;
 
             if (feature.record().id() == filteredId) {
                 filteredWeight += feature.weight();
             } else if (acceptFeature.apply(feature)) {
                 featureSink.write(feature);
+                ++outCount;
             } else {
                 rejectedFeatures.add(feature.record().id());
                 filteredWeight += feature.weight();
             }
 
-            if ((featureSource.getCount() % PROGRESS_INTERVAL == 0
+            if ((inCount % PROGRESS_INTERVAL == 0
                     || !featureSource.hasNext())
                     && LOG.isInfoEnabled()) {
-                LOG.info(
-                        "Accepted " + featureSink.getCount() + " of " + featureSource.getCount()
-                        + " features.");
+                LOG.info(format("Accepted {0} of {1} features.", outCount, inCount));
                 LOG.debug(MiscUtil.memoryInfoString());
             }
         }

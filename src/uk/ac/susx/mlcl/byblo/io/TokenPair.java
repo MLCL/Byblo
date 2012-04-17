@@ -67,7 +67,9 @@ public class TokenPair implements
      * Constructor used during cloning. Sub-classes should implement a similar
      * constructor and call this one.
      *
+     * @param that 
      * @throws NullPointerException if the argument is null
+     * @throws IllegalArgumentException  
      */
     protected TokenPair(final TokenPair that)
             throws NullPointerException, IllegalArgumentException {
