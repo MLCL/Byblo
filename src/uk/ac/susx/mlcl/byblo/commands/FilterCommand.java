@@ -374,14 +374,13 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
         final IntSet rejected = new IntOpenHashSet();
 
-        WeightedTokenSource entriesSource = WeightedTokenSource.open(
-                activeEntriesFile, getCharset(),
-                EnumeratingDeligates.toSingleEntries(getIndexDeligate()));
+        WeightedTokenSource entriesSource = BybloIO.openEntriesSource(
+                activeEntriesFile, getCharset(), getIndexDeligate());
 
         File outputFile = tempFiles.createFile();
 
-        WeightedTokenSink entriesSink = WeightedTokenSink.open(
-                outputFile, getCharset(), EnumeratingDeligates.toSingleEntries(getIndexDeligate()));
+        WeightedTokenSink entriesSink = BybloIO.openEntriesSink(
+                outputFile, getCharset(), getIndexDeligate());
 
         if (LOG.isInfoEnabled()) {
             LOG.info(
@@ -457,17 +456,12 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         IntSet rejectedFeatures = new IntOpenHashSet();
         IntSet acceptedFeatures = new IntOpenHashSet();
 
-        WeightedTokenPairSource efSrc = WeightedTokenPairSource.open(
-                activeEventsFile, getCharset(),
-                getIndexDeligate());
+        WeightedTokenPairSource efSrc = BybloIO.openEventsSource(activeEventsFile, getCharset(), indexDeligate);
 
         File outputFile = tempFiles.createFile();
 //        outputFile.deleteOnExit();
 
-        WeightedTokenPairSink efSink = WeightedTokenPairSink.open(
-                outputFile, getCharset(),
-                getIndexDeligate(),
-                !isCompactFormatDisabled());
+        WeightedTokenPairSink efSink = BybloIO.openEventsSink(outputFile, getCharset(), indexDeligate);
 
         if (LOG.isInfoEnabled()) {
             LOG.info("Filtering entry/features pairs from "
@@ -599,13 +593,11 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             throws FileNotFoundException, IOException {
         IntSet rejectedFeatures = new IntOpenHashSet();
 
-        WeightedTokenSource featureSource = WeightedTokenSource.open(
-                activeFeaturesFile, getCharset(), EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
+        WeightedTokenSource featureSource = BybloIO.openFeaturesSource(activeFeaturesFile, getCharset(), indexDeligate);
 
         File outputFile = tempFiles.createFile();
 
-        WeightedTokenSink featureSink = WeightedTokenSink.open(
-                outputFile, getCharset(), EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
+        WeightedTokenSink featureSink = BybloIO.openFeaturesSink(outputFile, getCharset(), indexDeligate);
 
         if (LOG.isInfoEnabled()) {
             LOG.info(
@@ -1148,22 +1140,6 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         this.filterFeatureWhitelist = filterFeatureWhitelist;
     }
 
-    public void setEnumeratorSkipIndexed2(boolean b) {
-        indexDeligate.setEnumeratorSkipIndexed2(b);
-    }
-
-    public void setEnumeratorSkipIndexed1(boolean b) {
-        indexDeligate.setEnumeratorSkipIndexed1(b);
-    }
-
-    public boolean isEnumeratorSkipIndexed2() {
-        return indexDeligate.isEnumeratorSkipIndexed2();
-    }
-
-    public boolean isEnumeratorSkipIndexed1() {
-        return indexDeligate.isEnumeratorSkipIndexed1();
-    }
-
     public void setFeatureEnumeratorFile(File featureEnumeratorFile) {
         indexDeligate.setFeatureEnumeratorFile(featureEnumeratorFile);
     }
@@ -1196,16 +1172,8 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         return indexDeligate.getEntryEnumeratorFile();
     }
 
-    public void setCompactFormatDisabled(boolean compactFormatDisabled) {
-        fileDeligate.setCompactFormatDisabled(compactFormatDisabled);
-    }
-
     public final void setCharset(Charset charset) {
         fileDeligate.setCharset(charset);
-    }
-
-    public boolean isCompactFormatDisabled() {
-        return fileDeligate.isCompactFormatDisabled();
     }
 
     public final Charset getCharset() {

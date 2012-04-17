@@ -278,7 +278,7 @@ public class JaccardTest {
         }
 
         assertTrue(WeightedTokenPairSource.equal(output1, output2,
-                                                 DEFAULT_CHARSET));
+                                                 DEFAULT_CHARSET, false, false));
     }
 
     @Test(timeout = 2000)
@@ -321,6 +321,6 @@ public class JaccardTest {
 
 
         assertTrue(WeightedTokenPairSource.equal(output1, output2,
-                                                 DEFAULT_CHARSET));
+                                                 DEFAULT_CHARSET, false, false));
     }
 }

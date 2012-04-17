@@ -982,7 +982,7 @@ public class FullBuildTest2 {
 
         DoubleEnumeratingDeligate countIndex = new DoubleEnumeratingDeligate(
                 type, preindexedEntries, preindexedFeatures,
-                entryIndex, featureIndex, skipIndex1, skipIndex2);
+                entryIndex, featureIndex);
         if (serial) {
             CountCommand count = new CountCommand();
             count.setInstancesFile(instances);
@@ -1025,7 +1025,7 @@ public class FullBuildTest2 {
 
         DoubleEnumeratingDeligate allpairsIndex = new DoubleEnumeratingDeligate(
                 type, preindexedEntries, preindexedFeatures,
-                entryIndex, featureIndex, skipIndex1, skipIndex2);
+                entryIndex, featureIndex);
         AllPairsCommand allpairs = new AllPairsCommand(
                 entriesFiltered, featuresFiltered, eventsFiltered, similarities,
                 charet, allpairsIndex);
@@ -1078,7 +1078,7 @@ public class FullBuildTest2 {
         filter.setIndexDeligate(new DoubleEnumeratingDeligate(
                 type,
                 preindexedEntries, preindexedFeatures,
-                entryIndex, featureIndex, skipIndex1, skipIndex2));
+                entryIndex, featureIndex));
         filter.addEntryFeatureMinimumFrequency(2);
 
         filter.runCommand();
@@ -1098,7 +1098,7 @@ public class FullBuildTest2 {
         KnnSimsCommand knn = new KnnSimsCommand(
                 from, to, DEFAULT_CHARSET,
                 new SingleEnumeratingDeligate(type,
-                                              enumerated, null, skip1, skip2), 5);
+                                              enumerated, null), 5);
         knn.runCommand();
 
         assertValidPlaintextInputFiles(to);
@@ -1114,7 +1114,7 @@ public class FullBuildTest2 {
         ExternalKnnSimsCommand knn = new ExternalKnnSimsCommand(
                 from, to, DEFAULT_CHARSET,
                 new SingleEnumeratingDeligate(type,
-                                              enumerated, null, skip1, skip2), 5);
+                                              enumerated, null), 5);
         knn.runCommand();
 
         assertValidPlaintextInputFiles(to);
@@ -1162,12 +1162,11 @@ public class FullBuildTest2 {
             throws Exception {
         assertValidPlaintextInputFiles(from);
 
-        UnindexWTCommand unindex = new UnindexWTCommand();
+        UnindexEntriesCommand unindex = new UnindexEntriesCommand();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
-        unindex.getFilesDeligate().setCompactFormatDisabled(false);
-        unindex.setIndexDeligate(new SingleEnumeratingDeligate(type, true, index, skip1, skip2));
+        unindex.setIndexDeligate(new SingleEnumeratingDeligate(type, true, index));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);
@@ -1180,13 +1179,12 @@ public class FullBuildTest2 {
             throws Exception {
         assertValidPlaintextInputFiles(from);
 
-        UnindexWTPCommand unindex = new UnindexWTPCommand();
+        UnindexEventsCommand unindex = new UnindexEventsCommand();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
-        unindex.getFilesDeligate().setCompactFormatDisabled(false);
         unindex.setIndexDeligate(new DoubleEnumeratingDeligate(type, true, true,
-                                                               index1, index2, skip1, skip2));
+                                                               index1, index2));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);
@@ -1199,12 +1197,11 @@ public class FullBuildTest2 {
             throws Exception {
         assertValidPlaintextInputFiles(from);
 
-        UnindexTPCommand unindex = new UnindexTPCommand();
+        UnindexInstancesCommand unindex = new UnindexInstancesCommand();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
-        unindex.getFilesDeligate().setCompactFormatDisabled(false);
-        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(type, true, true, index1, index2, skip1, skip2));
+        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(type, true, true, index1, index2));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);

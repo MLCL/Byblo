@@ -19,19 +19,19 @@ import uk.ac.susx.mlcl.lib.io.*;
  *
  * @author hiam20
  */
-public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCommand<Weighted<TokenPair>> {
+public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
     private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
 
-    public ExternalSortWeightedTokenPiarCommand(
+    public ExternalSortEventsCommand(
             File sourceFile, File destinationFile, Charset charset,
             DoubleEnumerating indexDeligate) {
         super(sourceFile, destinationFile, charset);
         setIndexDeligate(indexDeligate);
     }
 
-    public ExternalSortWeightedTokenPiarCommand() {
+    public ExternalSortEventsCommand() {
     }
 
     @Override
@@ -41,22 +41,15 @@ public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCo
         indexDeligate.closeEnumerator();
 
     }
-    
-    
+
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file) throws IOException {
-        WeightedTokenPairSink s = WeightedTokenPairSink.open(
-                file, getFileDeligate().getCharset(),
-                getIndexDeligate(),
-                !getFileDeligate().isCompactFormatDisabled());
-        return new WeightSumReducerSink<TokenPair>(s);
+        return new WeightSumReducerSink<TokenPair>(BybloIO.openEventsSink(file, getCharset(), indexDeligate));
     }
 
     @Override
     protected WeightedTokenPairSource openSource(File file) throws IOException {
-        return WeightedTokenPairSource.open(
-                file, getFileDeligate().getCharset(),
-                getIndexDeligate());
+        return BybloIO.openEventsSource(file, getCharset(), indexDeligate);
     }
 
     public final DoubleEnumerating getIndexDeligate() {
@@ -70,22 +63,6 @@ public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCo
 
     public void setEnumeratorType(EnumeratorType type) {
         indexDeligate.setEnumeratorType(type);
-    }
-
-    public void setEnumeratorSkipIndexed2(boolean b) {
-        indexDeligate.setEnumeratorSkipIndexed2(b);
-    }
-
-    public void setEnumeratorSkipIndexed1(boolean b) {
-        indexDeligate.setEnumeratorSkipIndexed1(b);
-    }
-
-    public boolean isEnumeratorSkipIndexed2() {
-        return indexDeligate.isEnumeratorSkipIndexed2();
-    }
-
-    public boolean isEnumeratorSkipIndexed1() {
-        return indexDeligate.isEnumeratorSkipIndexed1();
     }
 
     public EnumeratorType getEnuemratorType() {
@@ -107,6 +84,5 @@ public class ExternalSortWeightedTokenPiarCommand extends AbstractExternalSortCo
     public boolean isEnumeratedEntries() {
         return indexDeligate.isEnumeratedEntries();
     }
-    
-    
+
 }

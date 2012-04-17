@@ -145,7 +145,7 @@ public class IndexWTPCommandTest {
 
         unindexWTP(out, out2, idx1, idx2, type, skip1, skip2, compact);
 
-        TokenPairSource.equal(out, out2, DEFAULT_CHARSET);
+        TokenPairSource.equal(out, out2, DEFAULT_CHARSET, skip1, skip2);
 
     }
 
@@ -186,10 +186,10 @@ public class IndexWTPCommandTest {
         {
             WeightedTokenPairSource wtpsa = WeightedTokenPairSource.open(
                     outa, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null, skip1a, skip2a));
+                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null), skip1a, skip2a);
             WeightedTokenPairSource wtpsb = WeightedTokenPairSource.open(
                     outb, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null, skip1b, skip2b));
+                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null), skip1b, skip2b);
             List<Tell> pa = new ArrayList<Tell>();
             List<Tell> pb = new ArrayList<Tell>();
             List<Weighted<TokenPair>> va = new ArrayList<Weighted<TokenPair>>();
@@ -227,11 +227,11 @@ public class IndexWTPCommandTest {
         {
             WeightedTokenPairVectorSource wtpsa = WeightedTokenPairSource.open(
                     outa, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null, skip1a, skip2a)).
+                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null), skip1a, skip2a).
                     getVectorSource();
             WeightedTokenPairVectorSource wtpsb = WeightedTokenPairSource.open(
                     outb, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null, skip1b, skip2b)).
+                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null), skip1b, skip2b).
                     getVectorSource();
 
             List<Tell> pa = new ArrayList<Tell>();
@@ -283,13 +283,12 @@ public class IndexWTPCommandTest {
         else
             assertValidOutputFiles(index1, index2);
 
-        IndexWTPCommand unindex = new IndexWTPCommand();
+        IndexEventsCommand unindex = new IndexEventsCommand();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
-        unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
         unindex.setIndexDeligate(new DoubleEnumeratingDeligate(
-                type, true, true, index1, index2, skip1, skip2));
+                type, true, true, index1, index2));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);
@@ -312,13 +311,12 @@ public class IndexWTPCommandTest {
             assertValidInputFiles(index1, index2);
         assertValidOutputFiles(to);
 
-        UnindexWTPCommand unindex = new UnindexWTPCommand();
+        UnindexEventsCommand unindex = new UnindexEventsCommand();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
-        unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
         unindex.setIndexDeligate(new DoubleEnumeratingDeligate(
-                type, true, true, index1, index2, skip1, skip2));
+                type, true, true, index1, index2));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);

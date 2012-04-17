@@ -63,7 +63,7 @@ public class SortWeightedTokenPairCommandTest {
         File featuresIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".feature-index");
 
         final DoubleEnumeratingDeligate idx = new DoubleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, preindexedTokens1, preindexedTokens2, entriesIndex, featuresIndex, false, false);
+                Enumerating.DEFAULT_TYPE, preindexedTokens1, preindexedTokens2, entriesIndex, featuresIndex);
 
         Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(
                 Weighted.recordOrder(TokenPair.firstStringOrder(idx.getEntriesEnumeratorCarriar())),
@@ -91,7 +91,7 @@ public class SortWeightedTokenPairCommandTest {
 
 
         final DoubleEnumeratingDeligate idx = new DoubleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, preindexedTokens1, preindexedTokens2, entriesIndex, featuresIndex, false, false);
+                Enumerating.DEFAULT_TYPE, preindexedTokens1, preindexedTokens2, entriesIndex, featuresIndex);
 
 
         Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(
@@ -142,13 +142,12 @@ public class SortWeightedTokenPairCommandTest {
 
 
 
-        SortWeightedTokenPairCommand cmd =
-                new SortWeightedTokenPairCommand(
+        SortEventsCommand cmd =
+                new SortEventsCommand(
                 randomisedFile, sortedFile, DEFAULT_CHARSET,
                 idx);
         cmd.setIndexDeligate(idx);
         cmd.setComparator(comparator);
-        cmd.getFilesDeligate().setCompactFormatDisabled(true);
         cmd.runCommand();
 
 
@@ -195,7 +194,7 @@ public class SortWeightedTokenPairCommandTest {
             throws IOException {
         return WeightedTokenPairSource.open(
                 file, DEFAULT_CHARSET,
-                idx);
+                idx, false, false);
     }
 
     private static WeightedTokenPairSink openSink(
@@ -203,8 +202,7 @@ public class SortWeightedTokenPairCommandTest {
             throws IOException {
         WeightedTokenPairSink sink = WeightedTokenPairSink.open(
                 file, DEFAULT_CHARSET,
-                idx, compact);
-//        sink.setCompactFormatEnabled(false);
+                idx, false, false, compact);
         return sink;
     }
 

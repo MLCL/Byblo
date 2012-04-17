@@ -366,18 +366,18 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
                 add("chunkSize", maxChunkSize).
                 add("temp", getTempFileFactory());
     }
-
-    public void setCompactFormatDisabled(boolean compactFormatDisabled) {
-        fileDeligate.setCompactFormatDisabled(compactFormatDisabled);
-    }
+//
+//    public void setCompactFormatDisabled(boolean compactFormatDisabled) {
+//        fileDeligate.setCompactFormatDisabled(compactFormatDisabled);
+//    }
 
     public final void setCharset(Charset charset) {
         fileDeligate.setCharset(charset);
     }
-
-    public boolean isCompactFormatDisabled() {
-        return fileDeligate.isCompactFormatDisabled();
-    }
+//
+//    public boolean isCompactFormatDisabled() {
+//        return fileDeligate.isCompactFormatDisabled();
+//    }
 
     public final Charset getCharset() {
         return fileDeligate.getCharset();

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.TokenPairSink;
 import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
@@ -23,20 +24,20 @@ import uk.ac.susx.mlcl.lib.io.Source;
  *
  * @author hiam20
  */
-public class SortTokenPairCommand extends AbstractSortCommand<TokenPair> {
+public class SortInstancesCommand extends AbstractSortCommand<TokenPair> {
 
-    private static final Log LOG = LogFactory.getLog(SortWeightedTokenCommand.class);
+    private static final Log LOG = LogFactory.getLog(SortEntriesCommand.class);
 
     @ParametersDelegate
     private DoubleEnumeratingDeligate indexDeligate = new DoubleEnumeratingDeligate();
 
-    public SortTokenPairCommand(File sourceFile, File destinationFile, Charset charset,
+    public SortInstancesCommand(File sourceFile, File destinationFile, Charset charset,
                                 DoubleEnumeratingDeligate indexDeligate) {
         super(sourceFile, destinationFile, charset, TokenPair.indexOrder());
         setIndexDeligate(indexDeligate);
     }
 
-    public SortTokenPairCommand() {
+    public SortInstancesCommand() {
     }
 
     @Override
@@ -47,18 +48,14 @@ public class SortTokenPairCommand extends AbstractSortCommand<TokenPair> {
 
     }
     
-    
     @Override
     protected Source<TokenPair> openSource(File file) throws FileNotFoundException, IOException {
-        return TokenPairSource.open(file, getFilesDeligate().getCharset(),
-                                    indexDeligate);
+        return BybloIO.openInstancesSource(file, getCharset(), indexDeligate);
     }
 
     @Override
     protected Sink<TokenPair> openSink(File file) throws FileNotFoundException, IOException {
-        return TokenPairSink.open(
-                file, getFilesDeligate().getCharset(), indexDeligate,
-                !getFilesDeligate().isCompactFormatDisabled());
+        return BybloIO.openInstancesSink(file, getCharset(), indexDeligate);
     }
 
     public final DoubleEnumeratingDeligate getIndexDeligate() {

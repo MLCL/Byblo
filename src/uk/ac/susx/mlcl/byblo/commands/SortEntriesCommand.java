@@ -22,21 +22,21 @@ import uk.ac.susx.mlcl.lib.io.Source;
  *
  * @author hiam20
  */
-public class SortWeightedTokenCommand extends AbstractSortCommand<Weighted<Token>> {
+public class SortEntriesCommand extends AbstractSortCommand<Weighted<Token>> {
 
     private static final Log LOG = LogFactory.getLog(
-            SortWeightedTokenCommand.class);
+            SortEntriesCommand.class);
 
     @ParametersDelegate
     private SingleEnumerating indexDeligate = new SingleEnumeratingDeligate();
 
-    public SortWeightedTokenCommand(File sourceFile, File destinationFile,
-                                    Charset charset, SingleEnumerating indexDeligate) {
+    public SortEntriesCommand(File sourceFile, File destinationFile,
+                              Charset charset, SingleEnumerating indexDeligate) {
         super(sourceFile, destinationFile, charset, Weighted.recordOrder(Token.indexOrder()));
         setIndexDeligate(indexDeligate);
     }
 
-    public SortWeightedTokenCommand() {
+    public SortEntriesCommand() {
     }
 
     @Override
@@ -49,15 +49,12 @@ public class SortWeightedTokenCommand extends AbstractSortCommand<Weighted<Token
 
     @Override
     protected Source<Weighted<Token>> openSource(File file) throws FileNotFoundException, IOException {
-        return WeightedTokenSource.open(file, getFilesDeligate().getCharset(),
-                                        indexDeligate);
+        return BybloIO.openEntriesSource(file, getCharset(), indexDeligate);
     }
 
     @Override
     protected Sink<Weighted<Token>> openSink(File file) throws FileNotFoundException, IOException {
-        WeightedTokenSink s = WeightedTokenSink.open(
-                file, getFilesDeligate().getCharset(), indexDeligate);
-        return new WeightSumReducerSink<Token>(s);
+        return new WeightSumReducerSink<Token>(BybloIO.openEntriesSink(file, getCharset(), indexDeligate));
 
     }
 

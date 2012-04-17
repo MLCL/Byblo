@@ -21,12 +21,12 @@ import uk.ac.susx.mlcl.lib.io.Source;
  *
  * @author hiam20
  */
-public class MergeWeightedTokenCommand extends AbstractMergeCommand<Weighted<Token>> {
+public class MergeEntriesCommand extends AbstractMergeCommand<Weighted<Token>> {
 
     @ParametersDelegate
     private SingleEnumerating indexDeligate = new SingleEnumeratingDeligate();
 
-    public MergeWeightedTokenCommand(
+    public MergeEntriesCommand(
             File sourceFileA, File sourceFileB, File destinationFile,
             Charset charset, SingleEnumerating indexDeligate) {
         super(sourceFileA, sourceFileB, destinationFile, charset,
@@ -34,7 +34,7 @@ public class MergeWeightedTokenCommand extends AbstractMergeCommand<Weighted<Tok
         setIndexDeligate(indexDeligate);
     }
 
-    public MergeWeightedTokenCommand() {
+    public MergeEntriesCommand() {
     }
 
     @Override
@@ -56,19 +56,17 @@ public class MergeWeightedTokenCommand extends AbstractMergeCommand<Weighted<Tok
 
     @Override
     protected Source<Weighted<Token>> openSource(File file) throws FileNotFoundException, IOException {
-        return WeightedTokenSource.open(file, getFileDeligate().getCharset(),
-                                        indexDeligate);
+        return BybloIO.openEntriesSource(file, getFileDeligate().getCharset(), indexDeligate);
     }
 
     @Override
     protected Sink<Weighted<Token>> openSink(File file) throws FileNotFoundException, IOException {
-        WeightedTokenSink s = WeightedTokenSink.open(
-                file, getFileDeligate().getCharset(), indexDeligate);
-        return new WeightSumReducerSink<Token>(s);
+        return new WeightSumReducerSink<Token>(
+                BybloIO.openEntriesSink(file, getFileDeligate().getCharset(), indexDeligate));
     }
 
     public static void main(String[] args) throws Exception {
-        new MergeWeightedTokenCommand().runCommand(args);
+        new MergeEntriesCommand().runCommand(args);
     }
 
     @Override

@@ -100,10 +100,10 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
     }
 
     public static TokenPairSink open(
-            File file, Charset charset, DoubleEnumerating idx, boolean compact)
+            File file, Charset charset, DoubleEnumerating idx, boolean skip1, boolean skip2, boolean compact)
             throws IOException {
         DataSink tsv = new TSV.Sink(file, charset);
-        if (idx.isEnumeratorSkipIndexed1()) {
+        if (skip1) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override
@@ -112,7 +112,7 @@ public class TokenPairSink implements Sink<TokenPair>, Closeable, Flushable {
                 }
             });
         }
-        if (idx.isEnumeratorSkipIndexed2()) {
+        if (skip2) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override

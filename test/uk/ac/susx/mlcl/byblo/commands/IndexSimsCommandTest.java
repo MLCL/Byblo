@@ -146,7 +146,7 @@ public class IndexSimsCommandTest {
 
         unindexSims(out, out2, idx, type, skip1, skip2, compact);
 
-        TokenPairSource.equal(out, out2, DEFAULT_CHARSET);
+        TokenPairSource.equal(out, out2, DEFAULT_CHARSET, false, false);
 
     }
 
@@ -182,10 +182,10 @@ public class IndexSimsCommandTest {
         {
             WeightedTokenPairSource wtpsa = WeightedTokenPairSource.open(
                     outa, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null, skip1a, skip2a));
+                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null), skip1a, skip2a);
             WeightedTokenPairSource wtpsb = WeightedTokenPairSource.open(
                     outb, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null, skip1b, skip2b));
+                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null), skip1a, skip2a);
             List<Tell> pa = new ArrayList<Tell>();
             List<Tell> pb = new ArrayList<Tell>();
             List<Weighted<TokenPair>> va = new ArrayList<Weighted<TokenPair>>();
@@ -223,11 +223,11 @@ public class IndexSimsCommandTest {
         {
             WeightedTokenPairVectorSource wtpsa = WeightedTokenPairSource.open(
                     outa, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null, skip1a, skip2a)).
+                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null), skip1a, skip2a).
                     getVectorSource();
             WeightedTokenPairVectorSource wtpsb = WeightedTokenPairSource.open(
                     outb, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null, skip1b, skip2b)).
+                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null), skip1b, skip2b).
                     getVectorSource();
 
             List<Tell> pa = new ArrayList<Tell>();
@@ -283,9 +283,8 @@ public class IndexSimsCommandTest {
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
-        unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
 
-        unindex.setIndexDeligate(new SingleEnumeratingDeligate(type, true, index, skip1, skip2));
+        unindex.setIndexDeligate(new SingleEnumeratingDeligate(type, true, index));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);
@@ -313,9 +312,8 @@ public class IndexSimsCommandTest {
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
-        unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
         unindex.setIndexDeligate(new SingleEnumeratingDeligate(
-                type, true, index, skip1, skip2));
+                type, true, index));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);

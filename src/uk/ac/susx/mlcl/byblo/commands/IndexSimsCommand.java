@@ -26,7 +26,7 @@ public class IndexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
     private SingleEnumerating indexDeligate = new SingleEnumeratingDeligate(
-            Enumerating.DEFAULT_TYPE, false, null, false, false);
+            Enumerating.DEFAULT_TYPE, false, null);
 
     public IndexSimsCommand(
             File sourceFile, File destinationFile, Charset charset,
@@ -53,18 +53,13 @@ public class IndexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
     @Override
     protected Source<Weighted<TokenPair>> openSource(File file)
             throws FileNotFoundException, IOException {
-        return WeightedTokenPairSource.open(
-                file, getFilesDeligate().getCharset(),
-                sourceIndexDeligate());
+        return BybloIO.openSimsSource(file, getCharset(), sourceIndexDeligate());
     }
 
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file)
             throws FileNotFoundException, IOException {
-        return WeightedTokenPairSink.open(
-                file, getFilesDeligate().getCharset(),
-                sinkIndexDeligate(),
-                !getFilesDeligate().isCompactFormatDisabled());
+        return BybloIO.openSimsSink(file, getCharset(), sinkIndexDeligate());
     }
 
     public SingleEnumerating getIndexDeligate() {

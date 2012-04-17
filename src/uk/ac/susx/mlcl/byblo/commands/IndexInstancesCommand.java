@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.Sink;
@@ -22,64 +22,85 @@ import uk.ac.susx.mlcl.lib.io.Source;
  *
  * @author hiam20
  */
-public class UnindexTPCommand extends AbstractCopyCommand<TokenPair> {
+public class IndexInstancesCommand extends AbstractCopyCommand<TokenPair> {
 
     @ParametersDelegate
-    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate(
-            Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
+    private DoubleEnumerating indexDeligate;
 
-    public UnindexTPCommand(
+    public IndexInstancesCommand(
             File sourceFile, File destinationFile, Charset charset,
             DoubleEnumerating indexDeligate) {
         super(sourceFile, destinationFile, charset);
         this.indexDeligate = indexDeligate;
     }
 
-    public UnindexTPCommand() {
+    public IndexInstancesCommand() {
         super();
+        indexDeligate = new DoubleEnumeratingDeligate();
     }
 
     @Override
     public void runCommand() throws Exception {
         Checks.checkNotNull("indexFile1", indexDeligate.getEntryEnumeratorFile());
         Checks.checkNotNull("indexFile2", indexDeligate.getFeatureEnumeratorFile());
+
         super.runCommand();
-                indexDeligate.closeEnumerator();
+
+        indexDeligate.saveEnumerator();
+        indexDeligate.closeEnumerator();
 
     }
 
     @Override
     protected Source<TokenPair> openSource(File file)
             throws FileNotFoundException, IOException {
-        return TokenPairSource.open(
-                file, getFilesDeligate().getCharset(),
-                sourceIndexDeligate());
+        return BybloIO.openInstancesSource(file, getCharset(), sourceIndexDeligate());
     }
 
     @Override
     protected Sink<TokenPair> openSink(File file)
             throws FileNotFoundException, IOException {
-
-        return TokenPairSink.open(
-                file, getFilesDeligate().getCharset(),
-                sinkIndexDeligate(),
-                !getFilesDeligate().isCompactFormatDisabled());
+        return BybloIO.openInstancesSink(file, getCharset(), sinkIndexDeligate());
     }
 
     public DoubleEnumerating getIndexDeligate() {
         return indexDeligate;
     }
 
-    public void setIndexDeligate(DoubleEnumeratingDeligate indexDeligate) {
+    public void setIndexDeligate(DoubleEnumerating indexDeligate) {
         this.indexDeligate = indexDeligate;
     }
 
     protected DoubleEnumerating sourceIndexDeligate() {
-        return EnumeratingDeligates.decorateEnumerated(indexDeligate, true);
+        return EnumeratingDeligates.decorateEnumerated(indexDeligate, false);
     }
 
     protected DoubleEnumerating sinkIndexDeligate() {
-        return EnumeratingDeligates.decorateEnumerated(indexDeligate, false);
+        return EnumeratingDeligates.decorateEnumerated(indexDeligate, true);
+    }
+
+    public void setFeatureEnumeratorFile(File featureEnumeratorFile) {
+        indexDeligate.setFeatureEnumeratorFile(featureEnumeratorFile);
+    }
+
+    public void setEntryEnumeratorFile(File entryEnumeratorFile) {
+        indexDeligate.setEntryEnumeratorFile(entryEnumeratorFile);
+    }
+
+    public File getFeatureEnumeratorFile() {
+        return indexDeligate.getFeatureEnumeratorFile();
+    }
+
+    public File getEntryEnumeratorFile() {
+        return indexDeligate.getEntryEnumeratorFile();
+    }
+
+    public void setEnumeratorType(EnumeratorType type) {
+        indexDeligate.setEnumeratorType(type);
+    }
+
+    public EnumeratorType getEnumeratorType() {
+        return indexDeligate.getEnuemratorType();
     }
 
 }

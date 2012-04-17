@@ -5,15 +5,14 @@
 package uk.ac.susx.mlcl.byblo.commands;
 
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
-import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import uk.ac.susx.mlcl.byblo.enumerators.*;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.Sink;
@@ -23,61 +22,59 @@ import uk.ac.susx.mlcl.lib.io.Source;
  *
  * @author hiam20
  */
-public class UnindexSimsCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
+public class UnindexEventsCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
-    private SingleEnumerating indexDeligate = new SingleEnumeratingDeligate(
-            Enumerating.DEFAULT_TYPE, false, null);
+    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate(
+            Enumerating.DEFAULT_TYPE, false, false, null, null);
 
-    public UnindexSimsCommand(
+    public UnindexEventsCommand(
             File sourceFile, File destinationFile, Charset charset,
-            SingleEnumerating indexDeligate) {
+            DoubleEnumerating indexDeligate) {
         super(sourceFile, destinationFile, charset);
         this.indexDeligate = indexDeligate;
     }
 
-    public UnindexSimsCommand() {
+    public UnindexEventsCommand() {
         super();
     }
 
     @Override
     public void runCommand() throws Exception {
-        Checks.checkNotNull("indexFile", indexDeligate.getEnumeratorFile());
+        Checks.checkNotNull("indexFile1", indexDeligate.getEntryEnumeratorFile());
+        Checks.checkNotNull("indexFile2", indexDeligate.getFeatureEnumeratorFile());
+
         super.runCommand();
 
         indexDeligate.closeEnumerator();
-
-
     }
 
     @Override
     protected Source<Weighted<TokenPair>> openSource(File file)
             throws FileNotFoundException, IOException {
-        return BybloIO.openSimsSource(file, getCharset(), sourceIndexDeligate());
+        return BybloIO.openEventsSource(file, getCharset(), sourceIndexDeligate());
     }
 
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file)
             throws FileNotFoundException, IOException {
-        return BybloIO.openSimsSink(file, getCharset(), sinkIndexDeligate());
+        return BybloIO.openEventsSink(file, getCharset(), sinkIndexDeligate());
     }
 
-    public SingleEnumerating getIndexDeligate() {
+    public DoubleEnumerating getIndexDeligate() {
         return indexDeligate;
     }
 
-    public void setIndexDeligate(SingleEnumerating indexDeligate) {
+    public void setIndexDeligate(DoubleEnumerating indexDeligate) {
         this.indexDeligate = indexDeligate;
     }
 
     protected DoubleEnumerating sourceIndexDeligate() {
-        return new EnumeratingDeligates.SingleToPairAdapter(
-                EnumeratingDeligates.decorateEnumerated(indexDeligate, true));
+        return EnumeratingDeligates.decorateEnumerated(indexDeligate, true);
     }
 
     protected DoubleEnumerating sinkIndexDeligate() {
-        return new EnumeratingDeligates.SingleToPairAdapter(
-                EnumeratingDeligates.decorateEnumerated(indexDeligate, false));
+        return EnumeratingDeligates.decorateEnumerated(indexDeligate, false);
     }
 
 }

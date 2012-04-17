@@ -53,12 +53,12 @@ public class WeightedEntryPairTest {
         Enumerator<String> idx = MemoryBasedStringEnumerator.newInstance();
 
         DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
+                Enumerating.DEFAULT_TYPE, false, false, null, null);
 
         WeightedTokenPairSource aSrc = WeightedTokenPairSource.open(
-                a, DEFAULT_CHARSET, del);
+                a, DEFAULT_CHARSET, del, false, false);
         WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
-                b, DEFAULT_CHARSET, del, compact);
+                b, DEFAULT_CHARSET, del, false, false, compact);
 //        bSink.setCompactFormatEnabled(compact);
 
         IOUtil.copy(aSrc, bSink);
@@ -96,14 +96,14 @@ public class WeightedEntryPairTest {
                           TEST_FRUIT_SIMS.getName() + ".str");
 
         DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
+                Enumerating.DEFAULT_TYPE, false, false, null, null);
 
 
         {
             WeightedTokenPairSource aSrc = WeightedTokenPairSource.open(
-                    a, DEFAULT_CHARSET, del);
+                    a, DEFAULT_CHARSET, del, false, false);
             WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
-                    b, DEFAULT_CHARSET, del, true);
+                    b, DEFAULT_CHARSET, del, false, false, true);
             IOUtil.copy(aSrc, bSink);
             bSink.close();
         }
@@ -113,9 +113,9 @@ public class WeightedEntryPairTest {
 
         {
             WeightedTokenPairSource bSrc = WeightedTokenPairSource.open(
-                    b, DEFAULT_CHARSET, del);
+                    b, DEFAULT_CHARSET, del, false, false);
             WeightedTokenPairSink cSink = WeightedTokenPairSink.open(
-                    c, DEFAULT_CHARSET, del, true);
+                    c, DEFAULT_CHARSET, del, false, false, true);
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }

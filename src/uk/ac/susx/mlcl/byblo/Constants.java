@@ -29,40 +29,36 @@
  * POSSIBILITY OF SUCH DAMAGE.To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.byblo.enumerators;
-
-import java.io.IOException;
+package uk.ac.susx.mlcl.byblo;
 
 /**
- * Denotes an object which while perform string enumeration on some or all of
- * the data it reads and writes.
  *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @author hiam20
  */
-public interface Enumerating {
+public class Constants {
 
-    boolean DEFAULT_IS_ENUMERATED = false;
-//
-//    boolean DEFAULT_SKIP_INDEXING = false;
+    public static final boolean INSTANCES_SKIP_INDEXED_COLUMN_1 = false;
 
-    EnumeratorType DEFAULT_TYPE = EnumeratorType.Memory;
+    public static final boolean INSTANCES_SKIP_INDEXED_COLUMN_2 = false;
 
-//    boolean isEnumeratorSkipIndexed1();
-//
-//    boolean isEnumeratorSkipIndexed2();
-//
-//    void setEnumeratorSkipIndexed1(boolean b);
-//
-//    void setEnumeratorSkipIndexed2(boolean b);
+    public static final boolean ENTRIES_SKIP_INDEXED_COLUMN_1 = true;
 
-    void closeEnumerator() throws IOException;
+    public static final boolean ENTRIES_SKIP_INDEXED_COLUMN_2 = true;
 
-    void saveEnumerator() throws IOException;
+    public static final boolean FEATURES_SKIP_INDEXED_COLUMN_1 = true;
 
-    void openEnumerator() throws IOException;
+    public static final boolean FEATURES_SKIP_INDEXED_COLUMN_2 = true;
 
-    EnumeratorType getEnuemratorType();
+    public static final boolean EVENTS_SKIP_INDEXED_COLUMN_1 = true;
 
-    void setEnumeratorType(EnumeratorType type);
+    public static final boolean EVENTS_SKIP_INDEXED_COLUMN_2 = true;
+
+    public static final boolean SIMS_SKIP_INDEXED_COLUMN_1 = true;
+
+    public static final boolean SIMS_SKIP_INDEXED_COLUMN_2 = true;
+
+    public static final boolean NEIGHBOURS_SKIP_INDEXED_COLUMN_1 = true;
+
+    public static final boolean NEIGHBOURS_SKIP_INDEXED_COLUMN_2 = false;
 
 }

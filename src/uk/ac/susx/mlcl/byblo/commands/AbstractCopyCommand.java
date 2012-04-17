@@ -74,17 +74,17 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand {
         return filesDeligate;
     }
 
-    public void setCompactFormatDisabled(boolean compactFormatDisabled) {
-        filesDeligate.setCompactFormatDisabled(compactFormatDisabled);
-    }
+//    public void setCompactFormatDisabled(boolean compactFormatDisabled) {
+//        filesDeligate.setCompactFormatDisabled(compactFormatDisabled);
+//    }
 
     public final void setCharset(Charset charset) {
         filesDeligate.setCharset(charset);
     }
 
-    public boolean isCompactFormatDisabled() {
-        return filesDeligate.isCompactFormatDisabled();
-    }
+//    public boolean isCompactFormatDisabled() {
+//        return filesDeligate.isCompactFormatDisabled();
+//    }
 
     public final Charset getCharset() {
         return filesDeligate.getCharset();

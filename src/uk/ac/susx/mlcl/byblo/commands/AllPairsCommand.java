@@ -322,24 +322,21 @@ public class AllPairsCommand extends AbstractCommand {
     }
 
     private WeightedTokenSource openFeaturesSource() throws IOException {
-        return WeightedTokenSource.open(
+        return BybloIO.openFeaturesSource(
                 getFeaturesFile(), getCharset(),
                 EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
-
     }
 
     private WeightedTokenPairVectorSource openEventsSource() throws IOException {
-        return WeightedTokenPairSource.open(
+        return BybloIO.openEventsVectorSource(
                 getEventsFile(), getCharset(),
-                getIndexDeligate()).getVectorSource();
+                getIndexDeligate());
     }
 
     private WeightedTokenPairSink openSimsSink() throws IOException {
-        return WeightedTokenPairSink.open(
+        return BybloIO.openSimsSink(
                 getOutputFile(), getCharset(),
-                EnumeratingDeligates.toPair(EnumeratingDeligates.toSingleEntries(
-                getIndexDeligate())),
-                !fileDeligate.isCompactFormatDisabled());
+                EnumeratingDeligates.toSingleEntries(getIndexDeligate()));
 
     }
 
@@ -492,13 +489,13 @@ public class AllPairsCommand extends AbstractCommand {
         return chunkSize;
     }
 
-    public void setCompactFormatDisabled(boolean compactFormatDisabled) {
-        fileDeligate.setCompactFormatDisabled(compactFormatDisabled);
-    }
-
-    public boolean isCompactFormatDisabled() {
-        return fileDeligate.isCompactFormatDisabled();
-    }
+//    public void setCompactFormatDisabled(boolean compactFormatDisabled) {
+//        fileDeligate.setCompactFormatDisabled(compactFormatDisabled);
+//    }
+//
+//    public boolean isCompactFormatDisabled() {
+//        return fileDeligate.isCompactFormatDisabled();
+//    }
 
     public final void setChunkSize(int chunkSize) {
         Checks.checkRangeIncl("chunkSize", chunkSize, 1, Integer.MAX_VALUE);
@@ -519,8 +516,6 @@ public class AllPairsCommand extends AbstractCommand {
     }
 
     public final void setMinSimilarity(double minSimilarity) {
-//        Checks.checkRangeIncl("minSimilarity", minSimilarity, 0,
-//                              Double.POSITIVE_INFINITY);
         this.minSimilarity = minSimilarity;
     }
 
@@ -601,21 +596,21 @@ public class AllPairsCommand extends AbstractCommand {
         this.indexDeligate = indexDeligate;
     }
 
-    public void setEnumeratorSkipIndexed2(boolean b) {
-        indexDeligate.setEnumeratorSkipIndexed2(b);
-    }
-
-    public void setEnumeratorSkipIndexed1(boolean b) {
-        indexDeligate.setEnumeratorSkipIndexed1(b);
-    }
-
-    public boolean isEnumeratorSkipIndexed2() {
-        return indexDeligate.isEnumeratorSkipIndexed2();
-    }
-
-    public boolean isEnumeratorSkipIndexed1() {
-        return indexDeligate.isEnumeratorSkipIndexed1();
-    }
+//    public void setEnumeratorSkipIndexed2(boolean b) {
+//        indexDeligate.setEnumeratorSkipIndexed2(b);
+//    }
+//
+//    public void setEnumeratorSkipIndexed1(boolean b) {
+//        indexDeligate.setEnumeratorSkipIndexed1(b);
+//    }
+////
+//    public boolean isEnumeratorSkipIndexed2() {
+//        return indexDeligate.isEnumeratorSkipIndexed2();
+//    }
+//
+//    public boolean isEnumeratorSkipIndexed1() {
+//        return indexDeligate.isEnumeratorSkipIndexed1();
+//    }
 
     public void setEnumeratedFeatures(boolean enumeratedFeatures) {
         indexDeligate.setEnumeratedFeatures(enumeratedFeatures);

@@ -11,9 +11,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
-import uk.ac.susx.mlcl.byblo.io.TokenPairSink;
-import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.io.Source;
@@ -22,19 +21,19 @@ import uk.ac.susx.mlcl.lib.io.Source;
  *
  * @author hiam20
  */
-public class MergeTokenPairCommand extends AbstractMergeCommand<TokenPair> {
+public class MergeInstancesCommand extends AbstractMergeCommand<TokenPair> {
 
     @ParametersDelegate
     private DoubleEnumeratingDeligate indexDeligate = new DoubleEnumeratingDeligate();
 
-    public MergeTokenPairCommand(
+    public MergeInstancesCommand(
             File sourceFileA, File sourceFileB, File destinationFile,
             Charset charset, DoubleEnumeratingDeligate indexDeligate) {
         super(sourceFileA, sourceFileB, destinationFile, charset, TokenPair.indexOrder());
         setIndexDeligate(indexDeligate);
     }
 
-    public MergeTokenPairCommand() {
+    public MergeInstancesCommand() {
     }
 
     @Override
@@ -44,8 +43,7 @@ public class MergeTokenPairCommand extends AbstractMergeCommand<TokenPair> {
         indexDeligate.closeEnumerator();
 
     }
-    
-    
+
     public final DoubleEnumeratingDeligate getIndexDeligate() {
         return indexDeligate;
     }
@@ -57,23 +55,16 @@ public class MergeTokenPairCommand extends AbstractMergeCommand<TokenPair> {
 
     @Override
     protected Source<TokenPair> openSource(File file) throws FileNotFoundException, IOException {
-        return TokenPairSource.open(
-                file, getFileDeligate().getCharset(),
-                indexDeligate);
+        return BybloIO.openInstancesSource(file, getFileDeligate().getCharset(), indexDeligate);
     }
 
     @Override
     protected Sink<TokenPair> openSink(File file) throws FileNotFoundException, IOException {
-        TokenPairSink s = TokenPairSink.open(
-                file, getFileDeligate().getCharset(),
-                indexDeligate,
-                !getFileDeligate().isCompactFormatDisabled());
-//        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
-        return s;
+        return BybloIO.openInstancesSink(file, getFileDeligate().getCharset(), indexDeligate);
     }
 
     public static void main(String[] args) throws Exception {
-        new MergeTokenPairCommand().runCommand(args);
+        new MergeInstancesCommand().runCommand(args);
     }
 
     @Override

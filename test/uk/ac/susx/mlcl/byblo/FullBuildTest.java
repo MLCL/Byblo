@@ -63,6 +63,7 @@ public class FullBuildTest {
 //
 
     @Test
+    @Ignore
     public void testRunCommand_Fruit() throws Exception {
         System.out.println("Test on fruit");
 
@@ -78,6 +79,7 @@ public class FullBuildTest {
     }
 
     @Test
+    @Ignore
     public void testRunCommand_Medtest100k() throws Exception {
         System.out.println("Test on fruit");
 
@@ -98,24 +100,55 @@ public class FullBuildTest {
 
     }
 
+//
+//    @Test
+//    public void testRunCommand_Medtest100k_skip1() throws Exception {
+//        testRunCommand_Medtest100k(true, false);
+//    }
+//
+//    @Test
+//    public void testRunCommand_Medtest100k_skip2() throws Exception {
+//        testRunCommand_Medtest100k(false, true);
+//    }
+
     @Test
-    @Ignore
-    public void testRunCommand_Medtest1m() throws Exception {
+    public void testRunCommand_Medtest100k_skipboth() throws Exception {
+        testRunCommand_Medtest100k(true, true);
+    }
+//
+//    @Test
+//    public void testRunCommand_Medtest100k_noskip() throws Exception {
+//        testRunCommand_Medtest100k(false, false);
+//    }
+
+    public static void testRunCommand_Medtest100k(boolean skip1, boolean skip2) throws Exception {
         System.out.println("Test on fruit");
 
         File medtestDir = new File(TEST_DATA_DIR, "medtest");
-        File input = new File(medtestDir, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample1m");
+        File input = new File(medtestDir, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample100k");
+
+        String name = "medtest-100k";
+        if (skip1 && skip2)
+            name += "-skipboth";
+        else if (skip1)
+            name += "-skip1";
+        else if (skip2)
+            name += "-skip2";
+
+        File out = new File(TEST_OUTPUT_DIR, name);
+        out.mkdir();
 
         FullBuild instance = new FullBuild();
         instance.setCharset(DEFAULT_CHARSET);
         instance.setInstancesFile(input);
-        instance.setOutputDir(TEST_OUTPUT_DIR);
-        instance.setTempBaseDir(TEST_OUTPUT_DIR);
+        instance.setOutputDir(out);
+        instance.setTempBaseDir(out);
         instance.setMinSimilarity(0.1);
-        instance.setFilterEntryMinFreq(16);
-        instance.setFilterFeatureMinFreq(9);
-        instance.setFilterEventMinFreq(4);
-        instance.setCompactFormatDisabled(false);
+        instance.setFilterEntryMinFreq(2);
+        instance.setFilterFeatureMinFreq(2);
+        instance.setFilterEventMinFreq(2);
+        instance.setSkipIndex1(skip1);
+        instance.setSkipIndex2(skip2);
         instance.runCommand();
 
 
@@ -138,7 +171,6 @@ public class FullBuildTest {
         instance.setFilterEntryMinFreq(160);
         instance.setFilterFeatureMinFreq(90);
         instance.setFilterEventMinFreq(40);
-        instance.setCompactFormatDisabled(false);
         instance.runCommand();
 
 

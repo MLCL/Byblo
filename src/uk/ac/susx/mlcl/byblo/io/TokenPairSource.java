@@ -74,13 +74,13 @@ public class TokenPairSource
         }
     }
 
-    public static boolean equal(File fileA, File fileB, Charset charset)
+    public static boolean equal(File fileA, File fileB, Charset charset, boolean skip1, boolean skip2)
             throws IOException {
         DoubleEnumerating idx = EnumeratingDeligates.toPair(
                 new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false,
-                                              null, false, false));
-        final TokenPairSource srcA = open(fileA, charset, idx);
-        final TokenPairSource srcB = open(fileB, charset, idx);
+                                              null));
+        final TokenPairSource srcA = open(fileA, charset, idx, skip1, skip2);
+        final TokenPairSource srcB = open(fileB, charset, idx, skip1, skip2);
 
 
         List<TokenPair> listA = IOUtil.readAll(srcA);
@@ -113,11 +113,11 @@ public class TokenPairSource
     }
 
     public static TokenPairSource open(
-            File file, Charset charset, DoubleEnumerating idx)
+            File file, Charset charset, DoubleEnumerating idx, boolean skip1, boolean skip2)
             throws IOException {
         SeekableDataSource tsv = new TSV.Source(file, charset);
 
-        if (idx.isEnumeratorSkipIndexed1()) {
+        if (skip1) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override
@@ -127,7 +127,7 @@ public class TokenPairSource
 
             });
         }
-        if (idx.isEnumeratorSkipIndexed2()) {
+        if (skip2) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override

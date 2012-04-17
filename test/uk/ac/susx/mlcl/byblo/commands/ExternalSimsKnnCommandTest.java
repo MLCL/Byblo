@@ -71,7 +71,7 @@ public class ExternalSimsKnnCommandTest {
         knnCmd.getFileDeligate().setCharset(DEFAULT_CHARSET);
 
         knnCmd.setIndexDeligate(new DoubleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, false, false, null, null, false, false));
+                Enumerating.DEFAULT_TYPE, false, false, null, null));
 
         knnCmd.setMaxChunkSize(100000);
         knnCmd.setClassComparator(Weighted.recordOrder(TokenPair.firstIndexOrder()));

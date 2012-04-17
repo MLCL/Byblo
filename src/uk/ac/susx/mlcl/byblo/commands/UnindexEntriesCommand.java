@@ -4,9 +4,9 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,65 +22,55 @@ import uk.ac.susx.mlcl.lib.io.Source;
  *
  * @author hiam20
  */
-public class UnindexWTPCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
+public class UnindexEntriesCommand extends AbstractCopyCommand<Weighted<Token>> {
 
     @ParametersDelegate
-    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate(
-            Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
+    private SingleEnumerating indexDeligate = new SingleEnumeratingDeligate(
+            Enumerating.DEFAULT_TYPE, false, null);
 
-    public UnindexWTPCommand(
+    public UnindexEntriesCommand(
             File sourceFile, File destinationFile, Charset charset,
-            DoubleEnumerating indexDeligate) {
+            SingleEnumerating indexDeligate) {
         super(sourceFile, destinationFile, charset);
         this.indexDeligate = indexDeligate;
     }
 
-    public UnindexWTPCommand() {
+    public UnindexEntriesCommand() {
         super();
     }
 
     @Override
     public void runCommand() throws Exception {
-        Checks.checkNotNull("indexFile1", indexDeligate.getEntryEnumeratorFile());
-        Checks.checkNotNull("indexFile2", indexDeligate.getFeatureEnumeratorFile());
-
+        Checks.checkNotNull("indexFile", indexDeligate.getEnumeratorFile());
         super.runCommand();
-
         indexDeligate.closeEnumerator();
     }
 
     @Override
-    protected Source<Weighted<TokenPair>> openSource(File file)
+    protected Source<Weighted<Token>> openSource(File file)
             throws FileNotFoundException, IOException {
-
-        return WeightedTokenPairSource.open(
-                file, getFilesDeligate().getCharset(),
-                sourceIndexDeligate());
+        return BybloIO.openEntriesSource(file, getCharset(), sourceIndexDeligate());
     }
 
     @Override
-    protected Sink<Weighted<TokenPair>> openSink(File file)
+    protected Sink<Weighted<Token>> openSink(File file)
             throws FileNotFoundException, IOException {
-
-        return WeightedTokenPairSink.open(
-                file, getFilesDeligate().getCharset(),
-                sinkIndexDeligate(),
-                !getFilesDeligate().isCompactFormatDisabled());
+        return BybloIO.openEntriesSink(file, getCharset(), sinkIndexDeligate());
     }
 
-    public DoubleEnumerating getIndexDeligate() {
+    public SingleEnumerating getIndexDeligate() {
         return indexDeligate;
     }
 
-    public void setIndexDeligate(DoubleEnumerating indexDeligate) {
+    public void setIndexDeligate(SingleEnumerating indexDeligate) {
         this.indexDeligate = indexDeligate;
     }
 
-    protected DoubleEnumerating sourceIndexDeligate() {
+    protected SingleEnumerating sourceIndexDeligate() {
         return EnumeratingDeligates.decorateEnumerated(indexDeligate, true);
     }
 
-    protected DoubleEnumerating sinkIndexDeligate() {
+    protected SingleEnumerating sinkIndexDeligate() {
         return EnumeratingDeligates.decorateEnumerated(indexDeligate, false);
     }
 

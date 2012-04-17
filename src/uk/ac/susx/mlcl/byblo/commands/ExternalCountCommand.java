@@ -649,62 +649,41 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         }
     }
 
-    protected SeekableSource<Weighted<Token>, Tell> openEntriesSource(File file) throws FileNotFoundException, IOException {
-        return WeightedTokenSource.open(file, getFileDeligate().getCharset(),
-                                        EnumeratingDeligates.toSingleEntries(
-                getIndexDeligate()));
+    protected SeekableSource<Weighted<Token>, Tell> openEntriesSource(File file)
+            throws FileNotFoundException, IOException {
+        return BybloIO.openEntriesSource(file, getCharset(), indexDeligate);
     }
 
     protected Sink<Weighted<Token>> openEntriesSink(File file) throws FileNotFoundException, IOException {
-        WeightedTokenSink s = WeightedTokenSink.open(
-                file, getFileDeligate().getCharset(), EnumeratingDeligates.toSingleEntries(getIndexDeligate()));
-        return new WeightSumReducerSink<Token>(s);
+        return new WeightSumReducerSink<Token>(BybloIO.openEntriesSink(file, getCharset(), indexDeligate));
     }
 
-    protected SeekableSource<Weighted<Token>, Tell> openFeaturesSource(File file) throws FileNotFoundException, IOException {
-        return WeightedTokenSource.open(file, getFileDeligate().getCharset(),
-                                        EnumeratingDeligates.toSingleFeatures(
-                getIndexDeligate()));
+    protected SeekableSource<Weighted<Token>, Tell> openFeaturesSource(File file)
+            throws FileNotFoundException, IOException {
+        return BybloIO.openFeaturesSource(file, getCharset(), indexDeligate);
     }
 
     protected Sink<Weighted<Token>> openFeaturesSink(File file) throws FileNotFoundException, IOException {
-
-        WeightedTokenSink s = WeightedTokenSink.open(
-                file, getFileDeligate().getCharset(), EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
-        return new WeightSumReducerSink<Token>(s);
+        return new WeightSumReducerSink<Token>(BybloIO.openFeaturesSink(file, getCharset(), indexDeligate));
     }
 
     protected WeightedTokenPairSource openEventsSource(File file)
             throws FileNotFoundException, IOException {
-        WeightedTokenPairSource s = WeightedTokenPairSource.open(
-                file, getFileDeligate().getCharset(),
-                indexDeligate);
-        return s;
+        return BybloIO.openEventsSource(file, getCharset(), indexDeligate);
     }
 
     protected Sink<Weighted<TokenPair>> openEventsSink(File file)
             throws FileNotFoundException, IOException {
-        WeightedTokenPairSink s = WeightedTokenPairSink.open(
-                file, getFileDeligate().getCharset(),
-                indexDeligate,
-                !getFileDeligate().isCompactFormatDisabled());
-//        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
-        return new WeightSumReducerSink<TokenPair>(s);
+        return new WeightSumReducerSink<TokenPair>(BybloIO.openEventsSink(
+                file, getCharset(), indexDeligate));
     }
 
     protected SeekableSource<TokenPair, Tell> openInstancesSource(File file) throws FileNotFoundException, IOException {
-        return TokenPairSource.open(
-                file, getFileDeligate().getCharset(),
-                indexDeligate);
+        return BybloIO.openInstancesSource(file, getCharset(), indexDeligate);
     }
 
     protected Sink<TokenPair> openInstancesSink(File file) throws FileNotFoundException, IOException {
-        TokenPairSink s = TokenPairSink.open(
-                file, getFileDeligate().getCharset(),
-                indexDeligate,
-                !getFileDeligate().isCompactFormatDisabled());
-//        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
-        return s;
+        return BybloIO.openInstancesSink(file, getCharset(), indexDeligate);
     }
 
     /**
@@ -796,14 +775,13 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
                 add("id", getIndexDeligate());
     }
 
-    public boolean isEnumeratorSkipIndexed2() {
-        return indexDeligate.isEnumeratorSkipIndexed2();
-    }
-
-    public boolean isEnumeratorSkipIndexed1() {
-        return indexDeligate.isEnumeratorSkipIndexed1();
-    }
-
+//    public boolean isEnumeratorSkipIndexed2() {
+//        return indexDeligate.isEnumeratorSkipIndexed2();
+//    }
+//
+//    public boolean isEnumeratorSkipIndexed1() {
+//        return indexDeligate.isEnumeratorSkipIndexed1();
+//    }
     public void setEnumeratedFeatures(boolean enumeratedFeatures) {
         indexDeligate.setEnumeratedFeatures(enumeratedFeatures);
     }
@@ -819,26 +797,18 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     public boolean isEnumeratedEntries() {
         return indexDeligate.isEnumeratedEntries();
     }
-
-    public void setEnumeratorSkipIndexed2(boolean b) {
-        indexDeligate.setEnumeratorSkipIndexed2(b);
-    }
-
-    public void setEnumeratorSkipIndexed1(boolean b) {
-        indexDeligate.setEnumeratorSkipIndexed1(b);
-    }
-
-    public void setCompactFormatDisabled(boolean compactFormatDisabled) {
-        fileDeligate.setCompactFormatDisabled(compactFormatDisabled);
-    }
+//
+//    public void setCompactFormatDisabled(boolean compactFormatDisabled) {
+//        fileDeligate.setCompactFormatDisabled(compactFormatDisabled);
+//    }
 
     public final void setCharset(Charset charset) {
         fileDeligate.setCharset(charset);
     }
-
-    public boolean isCompactFormatDisabled() {
-        return fileDeligate.isCompactFormatDisabled();
-    }
+//
+//    public boolean isCompactFormatDisabled() {
+//        return fileDeligate.isCompactFormatDisabled();
+//    }
 
     public final Charset getCharset() {
         return fileDeligate.getCharset();

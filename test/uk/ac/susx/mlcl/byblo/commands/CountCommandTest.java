@@ -64,7 +64,7 @@ public class CountCommandTest {
         countTask.setEntryFeaturesFile(outEF);
         countTask.setCharset(charset);
         countTask.setIndexDeligate(new DoubleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, preIndexEntries, preIndexFeatures, null, null, false, false));
+                Enumerating.DEFAULT_TYPE, preIndexEntries, preIndexFeatures, null, null));
         countTask.runCommand();
 
         assertTrue("Output files not created: " + outE, outE.exists());
@@ -162,13 +162,13 @@ public class CountCommandTest {
 
         assertTrue("Output entries file differs from sampledata file.",
                    WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
-                                             DEFAULT_CHARSET));
+                                             DEFAULT_CHARSET, true, false));
         assertTrue("Output features file differs from test data file.",
                    WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
-                                             DEFAULT_CHARSET));
+                                             DEFAULT_CHARSET, true, false));
         assertTrue("Output entry/features file differs from test data file.",
                    TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
-                                         DEFAULT_CHARSET));
+                                         DEFAULT_CHARSET, true, true));
     }
 
     @Test
@@ -190,13 +190,13 @@ public class CountCommandTest {
 
         assertTrue("Output entries file differs from sampledata file.",
                    WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
-                                             DEFAULT_CHARSET));
+                                             DEFAULT_CHARSET, true, false));
         assertTrue("Output features file differs from test data file.",
                    WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
-                                             DEFAULT_CHARSET));
+                                             DEFAULT_CHARSET, true, false));
         assertTrue("Output entry/features file differs from test data file.",
                    TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
-                                         DEFAULT_CHARSET));
+                                         DEFAULT_CHARSET, true, true));
     }
 
     @Test
@@ -220,15 +220,15 @@ public class CountCommandTest {
         assertTrue(MessageFormat.format("Output entries file \"{0}\" differs from expected file \"{1}\".", eActual, TEST_FRUIT_INDEXED_ENTRIES),
                    WeightedTokenSource.equal(eActual,
                                              TEST_FRUIT_INDEXED_ENTRIES,
-                                             DEFAULT_CHARSET));
+                                             DEFAULT_CHARSET, true, false));
         assertTrue("Output features file differs from test data file.",
                    WeightedTokenSource.equal(fActual,
                                              TEST_FRUIT_INDEXED_FEATURES,
-                                             DEFAULT_CHARSET));
+                                             DEFAULT_CHARSET, true, false));
         assertTrue("Output entry/features file differs from test data file.",
                    TokenPairSource.equal(efActual,
                                          TEST_FRUIT_INDEXED_ENTRY_FEATURES,
-                                         DEFAULT_CHARSET));
+                                         DEFAULT_CHARSET, true, true));
     }
 
     @Test
@@ -252,15 +252,15 @@ public class CountCommandTest {
         assertTrue("Output entries file differs from sampledata file.",
                    WeightedTokenSource.equal(eActual,
                                              TEST_FRUIT_INDEXED_ENTRIES,
-                                             DEFAULT_CHARSET));
+                                             DEFAULT_CHARSET, true, false));
         assertTrue("Output features file differs from test data file.",
                    WeightedTokenSource.equal(fActual,
                                              TEST_FRUIT_INDEXED_FEATURES,
-                                             DEFAULT_CHARSET));
+                                             DEFAULT_CHARSET, true, false));
         assertTrue("Output entry/features file differs from test data file.",
                    TokenPairSource.equal(efActual,
                                          TEST_FRUIT_INDEXED_ENTRY_FEATURES,
-                                         DEFAULT_CHARSET));
+                                         DEFAULT_CHARSET, true, true));
     }
 
     @Test(timeout = 1000)

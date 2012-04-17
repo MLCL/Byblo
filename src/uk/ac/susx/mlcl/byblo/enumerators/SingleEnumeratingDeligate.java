@@ -32,17 +32,15 @@ public class SingleEnumeratingDeligate
     private Enumerator<String> enumerator = null;
 
     public SingleEnumeratingDeligate(
-            EnumeratorType type, boolean enumerated, File indexFile,
-            boolean skipIndexed1, boolean skipIndexed2) {
-        super(type, skipIndexed1, skipIndexed2);
+            EnumeratorType type, boolean enumerated, File indexFile) {
+        super(type);
         this.enumerationEnabled = enumerated;
         this.enumeratorFile = indexFile;
         this.enumerator = null;
     }
 
     public SingleEnumeratingDeligate() {
-        this(DEFAULT_TYPE, DEFAULT_IS_ENUMERATED, null,
-             DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
+        this(DEFAULT_TYPE, DEFAULT_IS_ENUMERATED, null);
     }
 
     @Override

@@ -73,7 +73,7 @@ public class FullBuild extends AbstractCommand {
 
     @Parameter(names = {"-T", "--temp-dir"},
     description = "Temorary directory which will be used during filtering.",
-    converter = TempFileFactoryConverter.class, hidden=true)
+    converter = TempFileFactoryConverter.class, hidden = true)
     private File tempBaseDir;
 
     private boolean skipIndex1 = false;
@@ -138,16 +138,8 @@ public class FullBuild extends AbstractCommand {
         this.instancesFile = instancesFile;
     }
 
-    public void setCompactFormatDisabled(boolean compactFormatDisabled) {
-        fileDeligate.setCompactFormatDisabled(compactFormatDisabled);
-    }
-
     public final void setCharset(Charset charset) {
         fileDeligate.setCharset(charset);
-    }
-
-    public boolean isCompactFormatDisabled() {
-        return fileDeligate.isCompactFormatDisabled();
     }
 
     public final Charset getCharset() {
@@ -196,17 +188,14 @@ public class FullBuild extends AbstractCommand {
             checkValidOutputFile("Feature index file", featureEnumeratorFile);
             checkValidOutputFile("Entry index file", entryEnumeratorFile);
 
-            IndexTPCommand indexCmd = new IndexTPCommand();
+            IndexInstancesCommand indexCmd = new IndexInstancesCommand();
             indexCmd.setSourceFile(instancesFile);
             indexCmd.setDestinationFile(instancesEnumeratedFile);
             indexCmd.setCharset(getCharset());
 
             indexCmd.setEntryEnumeratorFile(entryEnumeratorFile);
             indexCmd.setFeatureEnumeratorFile(featureEnumeratorFile);
-            indexCmd.setEnumeratorSkipIndexed1(skipIndex1);
-            indexCmd.setEnumeratorSkipIndexed2(skipIndex2);
             indexCmd.setEnumeratorType(enumeratorType);
-            indexCmd.setCompactFormatDisabled(isCompactFormatDisabled());
 
             indexCmd.runCommand();
 
@@ -237,11 +226,7 @@ public class FullBuild extends AbstractCommand {
             countCmd.setEventsFile(eventsFile);
             countCmd.setTempFileFactory(countTmpFact);
 
-            countCmd.setCompactFormatDisabled(isCompactFormatDisabled());
-
             // Configure the enumeration
-            countCmd.setEnumeratorSkipIndexed1(skipIndex1);
-            countCmd.setEnumeratorSkipIndexed2(skipIndex2);
             countCmd.setEnumeratedEntries(true);
             countCmd.setEnumeratedFeatures(true);
             countCmd.setEnumeratorType(enumeratorType);
@@ -305,13 +290,9 @@ public class FullBuild extends AbstractCommand {
 
             filterCmd.setEnumeratedEntries(true);
             filterCmd.setEnumeratedFeatures(true);
-            filterCmd.setEnumeratorSkipIndexed1(skipIndex1);
-            filterCmd.setEnumeratorSkipIndexed2(skipIndex2);
             filterCmd.setEntryEnumeratorFile(entryEnumeratorFile);
             filterCmd.setFeatureEnumeratorFile(featureEnumeratorFile);
             filterCmd.setEnumeratorType(enumeratorType);
-
-            filterCmd.setCompactFormatDisabled(isCompactFormatDisabled());
 
             filterCmd.runCommand();
 
@@ -323,7 +304,7 @@ public class FullBuild extends AbstractCommand {
                 throw new IllegalStateException(format(
                         "Filter temporary directory is not empty: {0} --- countains {1}",
                         filterTempDir, Arrays.toString(filterTempDir.list())));
-            
+
             if (!filterTempDir.delete())
                 throw new IOException(format("Unable to delete filter temporary directory is not empty: {0}", filterTempDir));
         }
@@ -345,7 +326,6 @@ public class FullBuild extends AbstractCommand {
 
             AllPairsCommand allpairsCmd = new AllPairsCommand();
             allpairsCmd.setCharset(getCharset());
-            allpairsCmd.setCompactFormatDisabled(isCompactFormatDisabled());
 
             allpairsCmd.setEntriesFile(entriesFilteredFile);
             allpairsCmd.setFeaturesFile(featuresFilteredFile);
@@ -360,8 +340,6 @@ public class FullBuild extends AbstractCommand {
 
             allpairsCmd.setEnumeratedEntries(true);
             allpairsCmd.setEnumeratedFeatures(true);
-            allpairsCmd.setEnumeratorSkipIndexed1(skipIndex1);
-            allpairsCmd.setEnumeratorSkipIndexed2(skipIndex2);
             allpairsCmd.setEnumeratorType(enumeratorType);
 
             allpairsCmd.runCommand();
@@ -388,12 +366,9 @@ public class FullBuild extends AbstractCommand {
 
             knnCmd.setEnumeratedEntries(true);
             knnCmd.setEnumeratedFeatures(true);
-            knnCmd.setEnumeratorSkipIndexed1(skipIndex1);
-            knnCmd.setEnumeratorSkipIndexed2(skipIndex2);
             knnCmd.setEnumeratorType(enumeratorType);
 
             knnCmd.setTempFileFactory(knnTmpFact);
-            knnCmd.setCompactFormatDisabled(isCompactFormatDisabled());
             knnCmd.setNumThreads(numThreads);
 
             knnCmd.runCommand();
@@ -421,11 +396,8 @@ public class FullBuild extends AbstractCommand {
             unindexCmd.setSourceFile(neighboursFile);
             unindexCmd.setDestinationFile(neighboursStringsFile);
             unindexCmd.setCharset(getCharset());
-            unindexCmd.setCompactFormatDisabled(isCompactFormatDisabled());
 
             unindexCmd.getIndexDeligate().setEnumerationEnabled(true);
-            unindexCmd.getIndexDeligate().setEnumeratorSkipIndexed1(skipIndex1);
-            unindexCmd.getIndexDeligate().setEnumeratorSkipIndexed2(skipIndex2);
             unindexCmd.getIndexDeligate().setEnumeratorFile(entryEnumeratorFile);
             unindexCmd.getIndexDeligate().setEnumeratorType(enumeratorType);
 
@@ -616,8 +588,8 @@ public class FullBuild extends AbstractCommand {
         this.skipIndex2 = skipIndex2;
     }
 
-    
     public static void main(String[] args) throws Exception {
         new FullBuild().runCommand(args);
     }
+
 }

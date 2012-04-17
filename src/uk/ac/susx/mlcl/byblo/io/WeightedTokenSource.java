@@ -137,10 +137,10 @@ public class WeightedTokenSource
     }
 
     public static WeightedTokenSource open(
-            File f, Charset charset, SingleEnumerating idx) throws IOException {
+            File f, Charset charset, SingleEnumerating idx, boolean skip1) throws IOException {
         SeekableDataSource tsv = new TSV.Source(f, charset);
 
-        if (idx.isEnumeratorSkipIndexed1()) {
+        if (skip1) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override
@@ -158,10 +158,10 @@ public class WeightedTokenSource
         return new WeightedTokenSource(tsv);
     }
 
-    public static boolean equal(File a, File b, Charset charset) throws IOException {
+    public static boolean equal(File a, File b, Charset charset, boolean askip1, boolean bskip1) throws IOException {
         SingleEnumerating idx = new SingleEnumeratingDeligate();
-        final WeightedTokenSource srcA = open(a, charset, idx);
-        final WeightedTokenSource srcB = open(b, charset, idx);
+        final WeightedTokenSource srcA = open(a, charset, idx, askip1);
+        final WeightedTokenSource srcB = open(b, charset, idx, bskip1);
 
         List<Weighted<Token>> listA = IOUtil.readAll(srcA);
         List<Weighted<Token>> listB = IOUtil.readAll(srcB);

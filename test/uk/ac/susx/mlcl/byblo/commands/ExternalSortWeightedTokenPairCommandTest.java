@@ -69,7 +69,7 @@ public class ExternalSortWeightedTokenPairCommandTest {
         final DoubleEnumerating idx = new DoubleEnumeratingDeligate(
                 Enumerating.DEFAULT_TYPE, 
                 preindexedTokens1, preindexedTokens2,
-                entryIndex, featureIndex, false, false);
+                entryIndex, featureIndex);
 
         Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(
                 Weighted.recordOrder(TokenPair.firstStringOrder(idx.getEntriesEnumeratorCarriar())),
@@ -101,7 +101,7 @@ public class ExternalSortWeightedTokenPairCommandTest {
         final DoubleEnumerating idx = new DoubleEnumeratingDeligate(
                 Enumerating.DEFAULT_TYPE, 
                 preindexedTokens1, preindexedTokens2,
-                entryIndex, featureIndex, false, false);
+                entryIndex, featureIndex);
 
 
         Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(
@@ -154,8 +154,8 @@ public class ExternalSortWeightedTokenPairCommandTest {
 
         // run the command
 
-        ExternalSortWeightedTokenPiarCommand cmd =
-                new ExternalSortWeightedTokenPiarCommand(
+        ExternalSortEventsCommand cmd =
+                new ExternalSortEventsCommand(
                 randomisedFile, sortedFile, DEFAULT_CHARSET,
                 idx);
         cmd.setMaxChunkSize(1000);
@@ -163,7 +163,6 @@ public class ExternalSortWeightedTokenPairCommandTest {
         cmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
         cmd.setIndexDeligate(idx);
         cmd.setComparator(comparator);
-        cmd.getFileDeligate().setCompactFormatDisabled(true);
 
 
         cmd.runCommand();
@@ -218,7 +217,7 @@ public class ExternalSortWeightedTokenPairCommandTest {
             throws IOException {
         return WeightedTokenPairSource.open(
                 file, DEFAULT_CHARSET,
-                idx);
+                idx, true, true);
     }
 
     private static WeightedTokenPairSink openSink(
@@ -226,7 +225,7 @@ public class ExternalSortWeightedTokenPairCommandTest {
             throws IOException {
         return WeightedTokenPairSink.open(
                 file, DEFAULT_CHARSET,
-                idx, compact);
+                idx, compact, true, true);
     }
 
 }

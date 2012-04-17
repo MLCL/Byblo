@@ -23,15 +23,15 @@ import uk.ac.susx.mlcl.lib.io.Source;
  *
  * @author hiam20
  */
-public class SortWeightedTokenPairCommand extends AbstractSortCommand<Weighted<TokenPair>> {
+public class SortEventsCommand extends AbstractSortCommand<Weighted<TokenPair>> {
 
     private static final Log LOG = LogFactory.getLog(
-            SortWeightedTokenCommand.class);
+            SortEntriesCommand.class);
 
     @ParametersDelegate
     private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
 
-    public SortWeightedTokenPairCommand(
+    public SortEventsCommand(
             File sourceFile, File destinationFile, Charset charset,
             DoubleEnumerating indexDeligate) {
         super(sourceFile, destinationFile, charset,
@@ -39,7 +39,7 @@ public class SortWeightedTokenPairCommand extends AbstractSortCommand<Weighted<T
         setIndexDeligate(indexDeligate);
     }
 
-    public SortWeightedTokenPairCommand() {
+    public SortEventsCommand() {
     }
 
     @Override
@@ -62,36 +62,13 @@ public class SortWeightedTokenPairCommand extends AbstractSortCommand<Weighted<T
     @Override
     protected Source<Weighted<TokenPair>> openSource(File file)
             throws FileNotFoundException, IOException {
-        WeightedTokenPairSource s = WeightedTokenPairSource.open(
-                file, getFilesDeligate().getCharset(),
-                getIndexDeligate());
-        return s;
+        return BybloIO.openEventsSource(file, getCharset(), indexDeligate);
     }
 
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file)
             throws FileNotFoundException, IOException {
-        WeightedTokenPairSink s = WeightedTokenPairSink.open(
-                file, getFilesDeligate().getCharset(),
-                getIndexDeligate(),
-                !getFilesDeligate().isCompactFormatDisabled());
-        return new WeightSumReducerSink<TokenPair>(s);
-    }
-
-    public void setEnumeratorSkipIndexed2(boolean b) {
-        indexDeligate.setEnumeratorSkipIndexed2(b);
-    }
-
-    public void setEnumeratorSkipIndexed1(boolean b) {
-        indexDeligate.setEnumeratorSkipIndexed1(b);
-    }
-
-    public boolean isEnumeratorSkipIndexed2() {
-        return indexDeligate.isEnumeratorSkipIndexed2();
-    }
-
-    public boolean isEnumeratorSkipIndexed1() {
-        return indexDeligate.isEnumeratorSkipIndexed1();
+        return new WeightSumReducerSink<TokenPair>(BybloIO.openEventsSink(file, getCharset(), indexDeligate));
     }
 
     public EnumeratorType getEnuemratorType() {
@@ -117,8 +94,5 @@ public class SortWeightedTokenPairCommand extends AbstractSortCommand<Weighted<T
     public void setEnumeratorType(EnumeratorType type) {
         indexDeligate.setEnumeratorType(type);
     }
-    
-    
-    
-    
+
 }

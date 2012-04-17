@@ -123,15 +123,15 @@ public class EnumeratingDeligates {
             return true;
         }
 
-        @Override
-        public boolean isEnumeratorSkipIndexed1() {
-            return getInner().isEnumeratorSkipIndexed1();
-        }
-
-        @Override
-        public boolean isEnumeratorSkipIndexed2() {
-            return getInner().isEnumeratorSkipIndexed2();
-        }
+//        @Override
+//        public boolean isEnumeratorSkipIndexed1() {
+//            return getInner().isEnumeratorSkipIndexed1();
+//        }
+//
+//        @Override
+//        public boolean isEnumeratorSkipIndexed2() {
+//            return getInner().isEnumeratorSkipIndexed2();
+//        }
 
         @Override
         public void closeEnumerator() throws IOException {
@@ -148,15 +148,15 @@ public class EnumeratingDeligates {
             getInner().openEnumerator();
         }
 
-        @Override
-        public void setEnumeratorSkipIndexed1(boolean b) {
-            getInner().setEnumeratorSkipIndexed1(b);
-        }
-
-        @Override
-        public void setEnumeratorSkipIndexed2(boolean b) {
-            getInner().setEnumeratorSkipIndexed2(b);
-        }
+//        @Override
+//        public void setEnumeratorSkipIndexed1(boolean b) {
+//            getInner().setEnumeratorSkipIndexed1(b);
+//        }
+//
+//        @Override
+//        public void setEnumeratorSkipIndexed2(boolean b) {
+//            getInner().setEnumeratorSkipIndexed2(b);
+//        }
 
         @Override
         public int hashCode() {

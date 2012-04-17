@@ -99,10 +99,10 @@ public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flus
     }
 
     public static WeightedTokenSink open(
-            File f, Charset charset, SingleEnumerating idx) throws IOException {
+            File f, Charset charset, SingleEnumerating idx, boolean skip1) throws IOException {
         DataSink tsv = new TSV.Sink(f, charset);
 
-        if (idx.isEnumeratorSkipIndexed1()) {
+        if (skip1) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override

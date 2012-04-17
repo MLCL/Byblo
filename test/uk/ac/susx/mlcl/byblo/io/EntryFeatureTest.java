@@ -57,10 +57,10 @@ public class EntryFeatureTest {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-input-sample");
         Charset charset = Charset.forName("UTF-8");
         DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
+                Enumerating.DEFAULT_TYPE, false, false, null, null);
 
         TokenPairSource efSrc = TokenPairSource.open(
-                testSample, charset, del);
+                testSample, charset, del, false, false);
         assertTrue("EntryFeatureSource is empty", efSrc.hasNext());
 
         while (efSrc.hasNext()) {
@@ -71,11 +71,11 @@ public class EntryFeatureTest {
 
     private void copyEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
         DoubleEnumeratingDeligate idx = new DoubleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
+                Enumerating.DEFAULT_TYPE, false, false, null, null);
         TokenPairSource src = TokenPairSource.open(
-                a, DEFAULT_CHARSET, idx);
+                a, DEFAULT_CHARSET, idx, false, false);
         TokenPairSink sink = TokenPairSink.open(
-                b, DEFAULT_CHARSET, idx, compact);
+                b, DEFAULT_CHARSET, idx, compact, false, false);
         IOUtil.copy(src, sink);
         sink.close();
     }
@@ -113,17 +113,18 @@ public class EntryFeatureTest {
 
 
         DoubleEnumerating indel = EnumeratingDeligates.toPair(
-                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false, idxFile, false, false));
+                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false, idxFile));
         DoubleEnumerating outdel = EnumeratingDeligates.toPair(
-                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, idxFile, true, true));
+                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, idxFile));
 
         {
 
 
             TokenPairSource aSrc = TokenPairSource.open(
-                    a, DEFAULT_CHARSET, indel);
+                    a, DEFAULT_CHARSET, indel, false, false);
+
             TokenPairSink bSink = TokenPairSink.open(
-                    b, DEFAULT_CHARSET, outdel, true);
+                    b, DEFAULT_CHARSET, outdel, true, true, true);
             IOUtil.copy(aSrc, bSink);
 
             indel.saveEntriesEnumerator();
@@ -136,10 +137,10 @@ public class EntryFeatureTest {
 
         {
             TokenPairSource bSrc = TokenPairSource.open(
-                    b, DEFAULT_CHARSET, outdel);
+                    b, DEFAULT_CHARSET, outdel, true, true);
             TokenPairSink cSink = TokenPairSink.open(
                     c, DEFAULT_CHARSET, indel,
-                    false);
+                    false, false, false);
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }

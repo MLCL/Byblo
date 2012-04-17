@@ -110,8 +110,15 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
         }
 
         DBMaker maker = DBMaker.openFile(file.toString());
-        maker.enableMRUCache();
-//        maker.disableTransactions();
+        maker.disableTransactions();
+//        maker.enableMRUCache();
+//        maker.enableHardCache();
+//        maker.enableSoftCache();
+//        maker.enableWeakCache();        
+//        maker.setMRUCacheSize(10000);
+//        maker.disableCacheAutoClear();
+//        maker.disableCache();
+
         if (anonymous)
             maker.deleteFilesAfterClose();
         maker.closeOnExit();
@@ -128,7 +135,7 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
             // collection exists            
             assert collections.contains(COLLECTION_BACKWARDS);
             assert collections.contains(COLLECTION_PROPERTIES);
-//            
+
             if (MAP_TYPE_HASH) {
                 forwards = db.<Integer, String>getHashMap(COLLECTION_FORWARDS);
                 backwards = db.<String, Integer>getHashMap(COLLECTION_BACKWARDS);
@@ -147,7 +154,7 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
             nextId = new AtomicInteger(Integer.valueOf(props.get(COLLECTION_NEXT_ID)));
 
         } else {
-//            
+
             if (MAP_TYPE_HASH) {
                 forwards = db.<Integer, String>createHashMap(COLLECTION_FORWARDS);
                 backwards = db.<String, Integer>createHashMap(COLLECTION_BACKWARDS);
@@ -203,7 +210,7 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
             return;
         }
 
-//        db.defrag(true);
+//        db.defrag(false);
         save();
         db.close();
     }

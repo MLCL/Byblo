@@ -61,7 +61,7 @@ public class SimsKnnCommandTest {
         knnTask.getFilesDeligate().setDestinationFile(out);
         knnTask.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         knnTask.setK(100);
-        knnTask.setIndexDeligate(new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false, false, null, null, false, false));
+        knnTask.setIndexDeligate(new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false, false, null, null));
         knnTask.setClassComparator(Weighted.recordOrder(TokenPair.firstIndexOrder()));
         knnTask.setNearnessComparator(
                 Comparators.reverse(Weighted.<TokenPair>weightOrder()));
@@ -87,7 +87,7 @@ public class SimsKnnCommandTest {
         knnTask.getFilesDeligate().setDestinationFile(out);
         knnTask.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         knnTask.setK(100);
-        knnTask.setIndexDeligate(new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false, false, null, null, false, false));
+        knnTask.setIndexDeligate(new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false, false, null, null));
         knnTask.setClassComparator(Weighted.recordOrder(TokenPair.firstIndexOrder()));
         knnTask.setNearnessComparator(
                 Comparators.reverse(

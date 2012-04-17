@@ -46,6 +46,7 @@ import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import java.io.Flushable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -245,22 +246,14 @@ public class NaiveApssTask<P> extends AbstractTask {
                 }
             }
         }
+        Collections.sort(pairs, Weighted.recordOrder(TokenPair.indexOrder()));
         synchronized (getSink()) {
             IOUtil.copy(pairs, getSink());
-            if (getSink() instanceof Flushable) {
-                ((Flushable) getSink()).flush();
-            }
         }
     }
 
     @Override
     protected void finaliseTask() throws Exception {
-//        if (sourceA instanceof Closeable) {
-//            ((Closeable) sourceA).close();
-//        }
-//        if (sourceB instanceof Closeable) {
-//            ((Closeable) sourceB).close();
-//        }
         precalcA = null;
         precalcB = null;
     }
@@ -362,4 +355,5 @@ public class NaiveApssTask<P> extends AbstractTask {
                 add("pruducePair", pruducePair).
                 add("stats", stats);
     }
+
 }

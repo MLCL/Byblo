@@ -68,7 +68,7 @@ public class ExternalCountCommandTest {
         countCmd.getFileDeligate().setCharset(charset);
         countCmd.setMaxChunkSize(chunkSize);
         countCmd.setIndexDeligate(new DoubleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, preindexedEntries, preindexedFeatures, null, null, false, false));
+                Enumerating.DEFAULT_TYPE, preindexedEntries, preindexedFeatures, null, null));
         countCmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
 
         countCmd.runCommand();
@@ -172,13 +172,13 @@ public class ExternalCountCommandTest {
 
         assertTrue("Output entries file differs from sampledata file.",
                    WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
-                                             DEFAULT_CHARSET));
+                                             DEFAULT_CHARSET, true, false));
         assertTrue("Output features file differs from test data file.",
                    WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
-                                             DEFAULT_CHARSET));
+                                             DEFAULT_CHARSET, true, false));
         assertTrue("Output entry/features file differs from test data file.",
                    TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
-                                         DEFAULT_CHARSET));
+                                         DEFAULT_CHARSET, true, true));
     }
 
     @Test
@@ -200,13 +200,13 @@ public class ExternalCountCommandTest {
 
         assertTrue("Output entries file differs from sampledata file.",
                    WeightedTokenSource.equal(eActual, TEST_FRUIT_INDEXED_ENTRIES,
-                                             DEFAULT_CHARSET));
+                                             DEFAULT_CHARSET, true, false));
         assertTrue("Output features file differs from test data file.",
                    WeightedTokenSource.equal(fActual, TEST_FRUIT_INDEXED_FEATURES,
-                                             DEFAULT_CHARSET));
+                                             DEFAULT_CHARSET, true, false));
         assertTrue("Output entry/features file differs from test data file.",
                    TokenPairSource.equal(efActual, TEST_FRUIT_INDEXED_ENTRY_FEATURES,
-                                         DEFAULT_CHARSET));
+                                         DEFAULT_CHARSET, true, true));
     }
 
     @Test(timeout = 16000)
@@ -230,13 +230,13 @@ public class ExternalCountCommandTest {
 
         assertTrue("Output entries file differs from sampledata file.",
                    WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
-                                             DEFAULT_CHARSET));
+                                             DEFAULT_CHARSET, true, false));
         assertTrue("Output features file differs from test data file.",
                    WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
-                                             DEFAULT_CHARSET));
+                                             DEFAULT_CHARSET, true, false));
         assertTrue("Output entry/features file differs from test data file.",
                    TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
-                                         DEFAULT_CHARSET));
+                                         DEFAULT_CHARSET, true, true));
     }
 
     @Test(timeout = 2000)
@@ -260,13 +260,13 @@ public class ExternalCountCommandTest {
 
         assertTrue("Output entries file differs from sampledata file.",
                    WeightedTokenSource.equal(eActual, TEST_FRUIT_INDEXED_ENTRIES,
-                                             DEFAULT_CHARSET));
+                                             DEFAULT_CHARSET, true, false));
         assertTrue("Output features file differs from test data file.",
                    WeightedTokenSource.equal(fActual, TEST_FRUIT_INDEXED_FEATURES,
-                                             DEFAULT_CHARSET));
+                                             DEFAULT_CHARSET, true, false));
         assertTrue("Output entry/features file differs from test data file.",
                    TokenPairSource.equal(efActual, TEST_FRUIT_INDEXED_ENTRY_FEATURES,
-                                         DEFAULT_CHARSET));
+                                         DEFAULT_CHARSET, true, true));
     }
 
     @Test(timeout = 2000)
@@ -290,13 +290,13 @@ public class ExternalCountCommandTest {
 
         assertTrue("Output entries file differs from sampledata file.",
                    WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
-                                             DEFAULT_CHARSET));
+                                             DEFAULT_CHARSET, true, false));
         assertTrue("Output features file differs from test data file.",
                    WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
-                                             DEFAULT_CHARSET));
+                                             DEFAULT_CHARSET, true, false));
         assertTrue("Output entry/features file differs from test data file.",
                    TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
-                                         DEFAULT_CHARSET));
+                                         DEFAULT_CHARSET, true, true));
     }
 
     @Test(timeout = 2000)
@@ -320,13 +320,13 @@ public class ExternalCountCommandTest {
 
         assertTrue("Output entries file differs from sampledata file.",
                    WeightedTokenSource.equal(eActual, TEST_FRUIT_INDEXED_ENTRIES,
-                                             DEFAULT_CHARSET));
+                                             DEFAULT_CHARSET, true, false));
         assertTrue("Output features file differs from test data file.",
                    WeightedTokenSource.equal(fActual, TEST_FRUIT_INDEXED_FEATURES,
-                                             DEFAULT_CHARSET));
+                                             DEFAULT_CHARSET, true, false));
         assertTrue("Output entry/features file differs from test data file.",
                    TokenPairSource.equal(efActual, TEST_FRUIT_INDEXED_ENTRY_FEATURES,
-                                         DEFAULT_CHARSET));
+                                         DEFAULT_CHARSET, true, true));
     }
 
     @Test(timeout = 1000)

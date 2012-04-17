@@ -44,9 +44,8 @@ public class DoubleEnumeratingDeligate
     protected DoubleEnumeratingDeligate(
             EnumeratorType type, boolean enumeratedEntries, boolean enumeratedFeatures,
             File entryIndexFile, File featureIndexFile,
-            Enumerator<String> entryEnumerator, Enumerator<String> featureEnumerator,
-            boolean skipindexed1, boolean skipindexed2) {
-        super(type, skipindexed1, skipindexed2);
+            Enumerator<String> entryEnumerator, Enumerator<String> featureEnumerator) {
+        super(type);
         this.enumeratedEntries = enumeratedEntries;
         this.enumeratedFeatures = enumeratedFeatures;
         this.entryEnumeratorFile = entryIndexFile;
@@ -57,16 +56,14 @@ public class DoubleEnumeratingDeligate
 
     public DoubleEnumeratingDeligate(
             EnumeratorType type, boolean enumeratedEntries, boolean enumeratedFeatures,
-            File entryIndexFile, File featureIndexFile,
-            boolean skipIndexed1, boolean skipIndexed2) {
+            File entryIndexFile, File featureIndexFile) {
         this(type, enumeratedEntries, enumeratedFeatures, entryIndexFile, featureIndexFile,
-             null, null, skipIndexed1, skipIndexed2);
+             null, null);
     }
 
     public DoubleEnumeratingDeligate() {
         this(DEFAULT_TYPE, DEFAULT_IS_ENUMERATED, DEFAULT_IS_ENUMERATED,
-             null, null,
-             DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
+             null, null);
     }
 
     @Override

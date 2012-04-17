@@ -70,13 +70,13 @@ public class InvertedApssTaskTest {
         InvertedApssTask<Tell> instance = new InvertedApssTask<Tell>();
 
         DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, false, false, null, null, false,false);
+                Enumerating.DEFAULT_TYPE, false, false, null, null);
         WeightedTokenPairSource mdbsa = WeightedTokenPairSource.open(
-                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,del);
+                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,del, false, false);
         WeightedTokenPairVectorSource vsa = mdbsa.getVectorSource();
 
         WeightedTokenPairSource mdbsb = WeightedTokenPairSource.open(
-                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,del);
+                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET,del, false, false);
         WeightedTokenPairVectorSource vsb = mdbsb.getVectorSource();
 
         List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();

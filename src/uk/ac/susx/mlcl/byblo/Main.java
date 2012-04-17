@@ -51,19 +51,19 @@ public class Main extends AbstractCommand {
     static {
         final Map<String, Class<? extends Command>> tmp =
                 new HashMap<String, Class<? extends Command>>();
-        tmp.put("sort-sims", ExternalSortWeightedTokenPiarCommand.class);
-        tmp.put("sort-ents", ExternalSortWeightedTokenCommand.class);
-        tmp.put("sort-feats", ExternalSortWeightedTokenCommand.class);
-        tmp.put("sort-events", ExternalSortWeightedTokenPiarCommand.class);
-        tmp.put("merge-sims", MergeTokenPairCommand.class);
-        tmp.put("merge-ents", MergeWeightedTokenPairCommand.class);
-        tmp.put("merge-feats", MergeWeightedTokenCommand.class);
-        tmp.put("merge-events", MergeWeightedTokenCommand.class);
+        tmp.put("sort-sims", ExternalSortEventsCommand.class);
+        tmp.put("sort-ents", ExternalSortEntriesCommand.class);
+        tmp.put("sort-feats", ExternalSortEntriesCommand.class);
+        tmp.put("sort-events", ExternalSortEventsCommand.class);
+        tmp.put("merge-sims", MergeInstancesCommand.class);
+        tmp.put("merge-ents", MergeEventsCommand.class);
+        tmp.put("merge-feats", MergeEntriesCommand.class);
+        tmp.put("merge-events", MergeEntriesCommand.class);
         tmp.put("knn-sims", ExternalKnnSimsCommand.class);
         tmp.put("allpairs", AllPairsCommand.class);
         tmp.put("count", ExternalCountCommand.class);
         tmp.put("filter", FilterCommand.class);
-        tmp.put("index", IndexTPCommand.class);
+        tmp.put("index", IndexInstancesCommand.class);
         tmp.put("unindex-sims", UnindexSimsCommand.class);
         SUBCOMMANDS = Collections.unmodifiableMap(tmp);
     }

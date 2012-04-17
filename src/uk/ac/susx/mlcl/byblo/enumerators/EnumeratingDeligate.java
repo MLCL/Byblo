@@ -21,48 +21,46 @@ public abstract class EnumeratingDeligate
         implements Serializable, Enumerating {
 
     private static final long serialVersionUID = 1L;
-
-    @Parameter(names = {"-s1", "--skipindexed1"},
-    description = "Whether indices will be encoded as deltas in the first column")
-    private boolean skipIndexed1 = DEFAULT_SKIP_INDEXING;
-
-    @Parameter(names = {"-s2", "--skipindexed2"},
-    description = "Whether indices will be encoded as deltas in the second column")
-    private boolean skipIndexed2 = DEFAULT_SKIP_INDEXING;
+//
+//    @Parameter(names = {"-s1", "--skipindexed1"},
+//    description = "Whether indices will be encoded as deltas in the first column")
+//    private boolean skipIndexed1 = DEFAULT_SKIP_INDEXING;
+//
+//    @Parameter(names = {"-s2", "--skipindexed2"},
+//    description = "Whether indices will be encoded as deltas in the second column")
+//    private boolean skipIndexed2 = DEFAULT_SKIP_INDEXING;
 
     @Parameter(names = {"-et", "--enumerator-type"})
     private EnumeratorType type = DEFAULT_TYPE;
 
-    public EnumeratingDeligate(EnumeratorType type, boolean skipIndexed1,
-                               boolean skipIndexed2) {
-        this.skipIndexed1 = skipIndexed1;
-        this.skipIndexed2 = skipIndexed2;
+    public EnumeratingDeligate(EnumeratorType type) {
+
         this.type = type;
     }
 
     public EnumeratingDeligate() {
-        this(DEFAULT_TYPE, DEFAULT_SKIP_INDEXING, DEFAULT_SKIP_INDEXING);
+        this(DEFAULT_TYPE);
     }
-
-    @Override
-    public boolean isEnumeratorSkipIndexed1() {
-        return skipIndexed1;
-    }
-
-    @Override
-    public boolean isEnumeratorSkipIndexed2() {
-        return skipIndexed2;
-    }
-
-    @Override
-    public void setEnumeratorSkipIndexed1(boolean b) {
-        skipIndexed1 = b;
-    }
-
-    @Override
-    public void setEnumeratorSkipIndexed2(boolean b) {
-        skipIndexed2 = b;
-    }
+//
+//    @Override
+//    public boolean isEnumeratorSkipIndexed1() {
+//        return skipIndexed1;
+//    }
+//
+//    @Override
+//    public boolean isEnumeratorSkipIndexed2() {
+//        return skipIndexed2;
+//    }
+//
+//    @Override
+//    public void setEnumeratorSkipIndexed1(boolean b) {
+//        skipIndexed1 = b;
+//    }
+//
+//    @Override
+//    public void setEnumeratorSkipIndexed2(boolean b) {
+//        skipIndexed2 = b;
+//    }
 
     @Override
     public EnumeratorType getEnuemratorType() {
@@ -105,9 +103,7 @@ public abstract class EnumeratingDeligate
     }
 
     protected Objects.ToStringHelper toStringHelper() {
-        return Objects.toStringHelper(this).
-                add("skipIndexed1", isEnumeratorSkipIndexed1()).
-                add("skipIndexed2", isEnumeratorSkipIndexed2());
+        return Objects.toStringHelper(this);
     }
 
     @Override

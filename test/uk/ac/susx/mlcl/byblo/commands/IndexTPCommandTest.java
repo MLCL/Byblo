@@ -58,7 +58,7 @@ public class IndexTPCommandTest {
                 "Output entries file \"{0}\" differs from expected file \"{1}\".",
                 out, TEST_FRUIT_INPUT_INDEXED),
                    TokenPairSource.equal(out, TEST_FRUIT_INPUT_INDEXED,
-                                         DEFAULT_CHARSET));
+                                         DEFAULT_CHARSET, false, false));
 
         // XXX: The files can be out of order
         //        assertTrue("Output features file differs from test data file.",
@@ -72,7 +72,7 @@ public class IndexTPCommandTest {
 
 
 
-        TokenPairSource.equal(out, out2, DEFAULT_CHARSET);
+        TokenPairSource.equal(out, out2, DEFAULT_CHARSET, false, false);
 
     }
 
@@ -153,7 +153,7 @@ public class IndexTPCommandTest {
 
         unindexTP(out, out2, idx1, idx2, type, skip1, skip2, compact);
 
-        TokenPairSource.equal(out, out2, DEFAULT_CHARSET);
+        TokenPairSource.equal(out, out2, DEFAULT_CHARSET, skip1, skip2);
 
     }
 
@@ -167,12 +167,11 @@ public class IndexTPCommandTest {
         else
             assertValidOutputFiles(index1, index2);
 
-        IndexTPCommand unindex = new IndexTPCommand();
+        IndexInstancesCommand unindex = new IndexInstancesCommand();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
-        unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
-        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(type, true, true, index1, index2, skip1, skip2));
+        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(type, true, true, index1, index2));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);
@@ -194,13 +193,12 @@ public class IndexTPCommandTest {
             assertValidInputFiles(index1, index2);
         assertValidOutputFiles(to);
 
-        UnindexTPCommand unindex = new UnindexTPCommand();
+        UnindexInstancesCommand unindex = new UnindexInstancesCommand();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
-        unindex.getFilesDeligate().setCompactFormatDisabled(!compact);
 
-        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(type, true, true, index1, index2, skip1, skip2));
+        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(type, true, true, index1, index2));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);

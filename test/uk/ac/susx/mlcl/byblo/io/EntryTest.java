@@ -54,24 +54,24 @@ import uk.ac.susx.mlcl.lib.io.Tell;
  */
 public class EntryTest {
 
-    private void copyE(File a, File b,boolean enumIn,
+    private void copyE(File a, File b, boolean enumIn,
                        boolean enumOut)
             throws FileNotFoundException, IOException {
 
         SingleEnumeratingDeligate idx = new SingleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, false, null, false, false);
+                Enumerating.DEFAULT_TYPE, false, null);
 
         WeightedTokenSource aSrc;
         WeightedTokenSink bSink;
         if (enumIn)
-            aSrc = WeightedTokenSource.open(a, DEFAULT_CHARSET, idx);
+            aSrc = WeightedTokenSource.open(a, DEFAULT_CHARSET, idx, false);
         else
-            aSrc = WeightedTokenSource.open(a, DEFAULT_CHARSET, idx);
+            aSrc = WeightedTokenSource.open(a, DEFAULT_CHARSET, idx, false);
 
         if (enumOut)
-            bSink = WeightedTokenSink.open(b, DEFAULT_CHARSET, idx);
+            bSink = WeightedTokenSink.open(b, DEFAULT_CHARSET, idx, false);
         else
-            bSink = WeightedTokenSink.open(b, DEFAULT_CHARSET, idx);
+            bSink = WeightedTokenSink.open(b, DEFAULT_CHARSET, idx, false);
 
         IOUtil.copy(aSrc, bSink);
         bSink.close();
@@ -108,17 +108,17 @@ public class EntryTest {
                           TEST_FRUIT_ENTRIES.getName() + ".str");
 
         SingleEnumeratingDeligate indel = new SingleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, false, null, false, false);
+                Enumerating.DEFAULT_TYPE, false, null);
         SingleEnumeratingDeligate outdel = new SingleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, true, null, false, false);
+                Enumerating.DEFAULT_TYPE, true, null);
 
 
 
         {
             WeightedTokenSource aSrc = WeightedTokenSource.open(
-                    a, DEFAULT_CHARSET, indel);
+                    a, DEFAULT_CHARSET, indel, false);
             WeightedTokenSink bSink = WeightedTokenSink.open(
-                    b, DEFAULT_CHARSET, outdel);
+                    b, DEFAULT_CHARSET, outdel, false);
             IOUtil.copy(aSrc, bSink);
             bSink.close();
         }
@@ -128,9 +128,9 @@ public class EntryTest {
 
         {
             WeightedTokenSource bSrc = WeightedTokenSource.open(
-                    b, DEFAULT_CHARSET, outdel);
+                    b, DEFAULT_CHARSET, outdel, false);
             WeightedTokenSink cSink = WeightedTokenSink.open(
-                    c, DEFAULT_CHARSET, indel);
+                    c, DEFAULT_CHARSET, indel, false);
             IOUtil.copy(bSrc, cSink);
             cSink.close();
         }
@@ -146,10 +146,10 @@ public class EntryTest {
                 new HashMap<Tell, Weighted<Token>>();
 
         SingleEnumeratingDeligate indel = new SingleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, false, null, false, false);
+                Enumerating.DEFAULT_TYPE, false, null);
 
         WeightedTokenSource src = WeightedTokenSource.open(
-                file, DEFAULT_CHARSET, indel);
+                file, DEFAULT_CHARSET, indel, false);
         {
             while (src.hasNext()) {
 

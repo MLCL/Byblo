@@ -11,11 +11,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import uk.ac.susx.mlcl.byblo.io.WeightSumReducerSink;
-import uk.ac.susx.mlcl.byblo.io.TokenPair;
-import uk.ac.susx.mlcl.byblo.io.Weighted;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
+import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.io.Source;
@@ -24,19 +20,19 @@ import uk.ac.susx.mlcl.lib.io.Source;
  *
  * @author hiam20
  */
-public class MergeWeightedTokenPairCommand extends AbstractMergeCommand<Weighted<TokenPair>> {
+public class MergeEventsCommand extends AbstractMergeCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
     private DoubleEnumeratingDeligate indexDeligate = new DoubleEnumeratingDeligate();
 
-    public MergeWeightedTokenPairCommand(
+    public MergeEventsCommand(
             File sourceFileA, File sourceFileB, File destinationFile,
             Charset charset, DoubleEnumeratingDeligate indexDeligate) {
         super(sourceFileA, sourceFileB, destinationFile, charset, Weighted.recordOrder(TokenPair.indexOrder()));
         setIndexDeligate(indexDeligate);
     }
 
-    public MergeWeightedTokenPairCommand() {
+    public MergeEventsCommand() {
     }
 
     @Override
@@ -59,22 +55,16 @@ public class MergeWeightedTokenPairCommand extends AbstractMergeCommand<Weighted
 
     @Override
     protected Source<Weighted<TokenPair>> openSource(File file) throws FileNotFoundException, IOException {
-        return WeightedTokenPairSource.open(
-                file, getFileDeligate().getCharset(),
-                indexDeligate);
+        return BybloIO.openEventsSource(file, getFileDeligate().getCharset(), indexDeligate);
     }
 
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file) throws FileNotFoundException, IOException {
-        WeightedTokenPairSink s = WeightedTokenPairSink.open(
-                file, getFileDeligate().getCharset(),
-                indexDeligate,
-                !getFileDeligate().isCompactFormatDisabled());
-        return new WeightSumReducerSink<TokenPair>(s);
+        return new WeightSumReducerSink<TokenPair>(BybloIO.openEventsSink(file, getFileDeligate().getCharset(), indexDeligate));
     }
 
     public static void main(String[] args) throws Exception {
-        new MergeWeightedTokenCommand().runCommand(args);
+        new MergeEntriesCommand().runCommand(args);
     }
 
     @Override

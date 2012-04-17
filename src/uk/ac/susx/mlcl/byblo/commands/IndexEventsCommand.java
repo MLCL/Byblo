@@ -22,20 +22,20 @@ import uk.ac.susx.mlcl.lib.io.Source;
  *
  * @author hiam20
  */
-public class IndexWTPCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
+public class IndexEventsCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
     private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate(
-            Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
+            Enumerating.DEFAULT_TYPE, false, false, null, null);
 
-    public IndexWTPCommand(
+    public IndexEventsCommand(
             File sourceFile, File destinationFile, Charset charset,
             DoubleEnumerating indexDeligate) {
         super(sourceFile, destinationFile, charset);
         this.indexDeligate = indexDeligate;
     }
 
-    public IndexWTPCommand() {
+    public IndexEventsCommand() {
         super();
     }
 
@@ -54,20 +54,13 @@ public class IndexWTPCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
     @Override
     protected Source<Weighted<TokenPair>> openSource(File file)
             throws FileNotFoundException, IOException {
-
-        return WeightedTokenPairSource.open(
-                file, getFilesDeligate().getCharset(),
-                sourceIndexDeligate());
+        return BybloIO.openEventsSource(file, getCharset(), sourceIndexDeligate());
     }
 
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file)
             throws FileNotFoundException, IOException {
-
-        return WeightedTokenPairSink.open(
-                file, getFilesDeligate().getCharset(),
-                sinkIndexDeligate(),
-                !getFilesDeligate().isCompactFormatDisabled());
+        return BybloIO.openEventsSink(file, getCharset(), sinkIndexDeligate());
     }
 
     public DoubleEnumerating getIndexDeligate() {

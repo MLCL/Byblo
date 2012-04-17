@@ -107,6 +107,6 @@ public class JensenTest {
         }
 
         assertTrue(WeightedTokenPairSource.equal(output1, output2,
-                                                 DEFAULT_CHARSET));
+                                                 DEFAULT_CHARSET, false, false));
     }
 }

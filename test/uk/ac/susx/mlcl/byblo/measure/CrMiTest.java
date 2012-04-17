@@ -161,7 +161,7 @@ public class CrMiTest {
 
 
         assertTrue(WeightedTokenPairSource.equal(expectedOutput, crmiOutput,
-                                                 DEFAULT_CHARSET));
+                                                 DEFAULT_CHARSET, false, false));
 
     }
 
@@ -208,7 +208,7 @@ public class CrMiTest {
 
 
         assertTrue(WeightedTokenPairSource.equal(expectedOutput, crmiOutput,
-                                                 DEFAULT_CHARSET));
+                                                 DEFAULT_CHARSET, false, false));
 
     }
 
@@ -258,12 +258,12 @@ public class CrMiTest {
         // will be different.
 
         DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
+                Enumerating.DEFAULT_TYPE, false, false, null, null);
         Enumerator<String> idx = MemoryBasedStringEnumerator.newInstance();
         WeightedTokenPairSource expected = WeightedTokenPairSource.open(
-                expectedOutput, DEFAULT_CHARSET, del);
+                expectedOutput, DEFAULT_CHARSET, del, false, false);
         WeightedTokenPairSource actual = WeightedTokenPairSource.open(
-                crmiOutput, DEFAULT_CHARSET, del);
+                crmiOutput, DEFAULT_CHARSET, del, false, false);
 
         while (expected.hasNext() && actual.hasNext()) {
             Weighted<TokenPair> e = expected.read();

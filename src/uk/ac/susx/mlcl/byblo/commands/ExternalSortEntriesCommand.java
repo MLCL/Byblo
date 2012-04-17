@@ -20,21 +20,21 @@ import uk.ac.susx.mlcl.lib.io.Tell;
  *
  * @author hiam20
  */
-public class ExternalSortWeightedTokenCommand extends AbstractExternalSortCommand<Weighted<Token>> {
+public class ExternalSortEntriesCommand extends AbstractExternalSortCommand<Weighted<Token>> {
 
     private static final long serialVersionUID = 1L;
 
     @ParametersDelegate
     private SingleEnumerating indexDeligate = new SingleEnumeratingDeligate();
 
-    public ExternalSortWeightedTokenCommand(
+    public ExternalSortEntriesCommand(
             File sourceFile, File destinationFile, Charset charset,
             SingleEnumerating indexDeligate) {
         super(sourceFile, destinationFile, charset);
         setIndexDeligate(indexDeligate);
     }
 
-    public ExternalSortWeightedTokenCommand() {
+    public ExternalSortEntriesCommand() {
     }
 
     @Override
@@ -47,15 +47,13 @@ public class ExternalSortWeightedTokenCommand extends AbstractExternalSortComman
 
     @Override
     protected Sink<Weighted<Token>> openSink(File file) throws IOException {
-        WeightedTokenSink s = WeightedTokenSink.open(
-                file, getFileDeligate().getCharset(), getIndexDeligate());
-        return new WeightSumReducerSink<Token>(s);
+        return new WeightSumReducerSink<Token>(
+                BybloIO.openEntriesSink(file, getCharset(), indexDeligate));
     }
 
     @Override
     protected SeekableSource<Weighted<Token>, Tell> openSource(File file) throws IOException {
-        return WeightedTokenSource.open(file, getFileDeligate().getCharset(),
-                                        getIndexDeligate());
+        return BybloIO.openEntriesSource(file, getCharset(), indexDeligate);
     }
 
     public final SingleEnumerating getIndexDeligate() {

@@ -54,7 +54,7 @@ import uk.ac.susx.mlcl.lib.io.*;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Perform k-nearest-neighbours on a similarity file.")
-public class KnnSimsCommand extends SortWeightedTokenPairCommand {
+public class KnnSimsCommand extends SortEventsCommand {
 
     private static final Log LOG = LogFactory.getLog(KnnSimsCommand.class);
 
@@ -131,48 +131,6 @@ public class KnnSimsCommand extends SortWeightedTokenPairCommand {
         return new KFirstReducerSink<Weighted<TokenPair>>(
                 super.openSink(file), classComparator, k);
     }
-    
-    
-//
-//    @Override
-//    public void runCommand() throws Exception {
-//        if (LOG.isInfoEnabled())
-//            LOG.info("Running memory K-Nearest-Neighbours from \"" + getFilesDeligate().getSourceFile()
-//                    + "\" to \"" + getFilesDeligate().getDestinationFile() + "\".");
-//
-//        Source<Weighted<TokenPair>> src = openSource(getFilesDeligate().getSourceFile());
-//
-////        final List<Weighted<TokenPair>> items = IOUtil.readAll(src);
-////        Collections.sort(items, getComparator());
-////
-//        Sink<Weighted<TokenPair>> snk = openSink(getFilesDeligate().getDestinationFile());
-//        snk = new KFirstReducerSink<Weighted<TokenPair>>(snk, classComparator, k);
-//
-//        SortTask<Weighted<TokenPair>> task = new SortTask<Weighted<TokenPair>>();
-//        task.setComparator(getComparator());
-//        task.setSource(src);
-//        task.setSink(snk);
-//        task.run();
-//
-//        while (task.isExceptionThrown())
-//            task.throwException();
-////        
-////        KnnTask<Weighted<TokenPair>> task = new KnnTask<Weighted<TokenPair>>();
-////        task.setSink(snk);
-////        task.setSource(src);
-////        task.setClassComparator(classComparator);
-////        task.setNearnessComparator(nearnessComparator);
-////        task.setK(k);
-////
-////        task.run();
-////
-////        if (task.isExceptionThrown())
-////            task.throwException();
-//
-//        if (LOG.isInfoEnabled())
-//            LOG.info("Completed memory K-Nearest-Neighbours.");
-//
-//    }
 
     @Override
     protected Objects.ToStringHelper toStringHelper() {
@@ -180,6 +138,4 @@ public class KnnSimsCommand extends SortWeightedTokenPairCommand {
                 add("k", k);
     }
 
-    
-    
 }

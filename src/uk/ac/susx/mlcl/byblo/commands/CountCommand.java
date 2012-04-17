@@ -252,31 +252,14 @@ public class CountCommand extends AbstractCommand implements Serializable {
 
         checkState();
 
-        final TokenPairSource instanceSource = TokenPairSource.open(
-                inputFile, charset, indexDeligate);
+        final TokenPairSource instanceSource = BybloIO.openInstancesSource(inputFile, charset, indexDeligate);
 
-        WeightedTokenSink entrySink =
-                WeightedTokenSink.open(
-                entriesFile, charset, EnumeratingDeligates.toSingleEntries(indexDeligate));
-//        
-//                new WeightedTokenSink(
-//                new TSVSink(entriesFile, charset),
-//                indexDeligate.single1());
+        WeightedTokenSink entrySink = BybloIO.openEntriesSink(entriesFile, charset, indexDeligate);
 
-        WeightedTokenSink featureSink =
-                WeightedTokenSink.open(
-                featuresFile, charset, EnumeratingDeligates.toSingleFeatures(indexDeligate));
-//        
-//                new WeightedTokenSink(
-//                new TSVSink(featuresFile, charset),
-//                indexDeligate.single2());
+        WeightedTokenSink featureSink =BybloIO.openEntriesSink(featuresFile, charset, indexDeligate);
 
 
-        WeightedTokenPairSink eventsSink = WeightedTokenPairSink.open(
-                entryFeaturesFile, charset,
-                indexDeligate, //                indexDeligate.getEncoder1(), indexDeligate.getEncoder2()
-                true);
-
+        WeightedTokenPairSink eventsSink = BybloIO.openEventsSink(entryFeaturesFile, charset, indexDeligate);
 
         CountTask task = new CountTask(
                 instanceSource, eventsSink, entrySink, featureSink,

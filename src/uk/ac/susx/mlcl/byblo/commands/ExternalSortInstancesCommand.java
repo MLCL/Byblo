@@ -18,21 +18,21 @@ import uk.ac.susx.mlcl.lib.io.*;
  *
  * @author hiam20
  */
-public class ExternalSortTokenPiarCommand extends AbstractExternalSortCommand<TokenPair> {
+public class ExternalSortInstancesCommand extends AbstractExternalSortCommand<TokenPair> {
 
     private static final long serialVersionUID = 1L;
 
     @ParametersDelegate
     private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
 
-    public ExternalSortTokenPiarCommand(
+    public ExternalSortInstancesCommand(
             File sourceFile, File destinationFile, Charset charset,
             DoubleEnumerating indexDeligate) {
         super(sourceFile, destinationFile, charset);
         setIndexDeligate(indexDeligate);
     }
 
-    public ExternalSortTokenPiarCommand() {
+    public ExternalSortInstancesCommand() {
     }
 
     @Override
@@ -45,19 +45,12 @@ public class ExternalSortTokenPiarCommand extends AbstractExternalSortCommand<To
 
     @Override
     protected Sink<TokenPair> openSink(File file) throws IOException {
-        TokenPairSink s = TokenPairSink.open(
-                file, getFileDeligate().getCharset(),
-                getIndexDeligate(),
-                !getFileDeligate().isCompactFormatDisabled());
-//        s.setCompactFormatEnabled(!getFileDeligate().isCompactFormatDisabled());
-        return s;
+        return BybloIO.openInstancesSink(file, getCharset(), indexDeligate);
     }
 
     @Override
     protected SeekableSource<TokenPair, Tell> openSource(File file) throws IOException {
-        return TokenPairSource.open(
-                file, getFileDeligate().getCharset(),
-                getIndexDeligate());
+        return BybloIO.openInstancesSource(file, getCharset(), indexDeligate);
     }
 
     public final DoubleEnumerating getIndexDeligate() {

@@ -55,7 +55,7 @@ import uk.ac.susx.mlcl.lib.tasks.ObjectSortTask;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 @Parameters(commandDescription = "Perform k-nearest-neighbours on a similarity file.")
-public class ExternalKnnSimsCommand extends ExternalSortWeightedTokenPiarCommand {
+public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
 
     private static final Log LOG = LogFactory.getLog(
             ExternalKnnSimsCommand.class);

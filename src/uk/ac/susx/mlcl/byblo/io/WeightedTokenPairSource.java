@@ -100,12 +100,12 @@ public class WeightedTokenPairSource
             ((Closeable) inner).close();
     }
 
-    public static boolean equal(File a, File b, Charset charset) throws IOException {
-        DoubleEnumerating idx = new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false, false, null, null, false, false);
+    public static boolean equal(File a, File b, Charset charset, boolean skip1, boolean skip2) throws IOException {
+        DoubleEnumerating idx = new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false, false, null, null);
         final WeightedTokenPairSource srcA = WeightedTokenPairSource.open(
-                a, charset, idx);
+                a, charset, idx, skip1, skip2);
         final WeightedTokenPairSource srcB = WeightedTokenPairSource.open(
-                b, charset, idx);
+                b, charset, idx, skip1, skip2);
 
         List<Weighted<TokenPair>> listA = IOUtil.readAll(srcA);
         List<Weighted<TokenPair>> listB = IOUtil.readAll(srcB);
@@ -119,12 +119,12 @@ public class WeightedTokenPairSource
     }
 
     public static WeightedTokenPairSource open(
-            File file, Charset charset, DoubleEnumerating idx)
+            File file, Charset charset, DoubleEnumerating idx, boolean skip1, boolean skip2)
             throws IOException {
         SeekableDataSource tsv = new TSV.Source(file, charset);
 
 
-        if (idx.isEnumeratorSkipIndexed1()) {
+        if (skip1) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override
@@ -134,7 +134,7 @@ public class WeightedTokenPairSource
 
             });
         }
-        if (idx.isEnumeratorSkipIndexed2()) {
+        if (skip2) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
                 @Override
