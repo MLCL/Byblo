@@ -44,61 +44,61 @@ public class FullBuildTest {
 
     public FullBuildTest() {
     }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
 //
-
-    @Test
-    @Ignore
-    public void testRunCommand_Fruit() throws Exception {
-        System.out.println("Test on fruit");
-
-
-        FullBuild instance = new FullBuild();
-        instance.setCharset(DEFAULT_CHARSET);
-        instance.setInstancesFile(TEST_FRUIT_INPUT);
-        instance.setOutputDir(TEST_OUTPUT_DIR);
-        instance.setTempBaseDir(TEST_OUTPUT_DIR);
-        instance.runCommand();
-
-
-    }
-
-    @Test
-    @Ignore
-    public void testRunCommand_Medtest100k() throws Exception {
-        System.out.println("Test on fruit");
-
-        File medtestDir = new File(TEST_DATA_DIR, "medtest");
-        File input = new File(medtestDir, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample100k");
-
-        FullBuild instance = new FullBuild();
-        instance.setCharset(DEFAULT_CHARSET);
-        instance.setInstancesFile(input);
-        instance.setOutputDir(TEST_OUTPUT_DIR);
-        instance.setTempBaseDir(TEST_OUTPUT_DIR);
-        instance.setMinSimilarity(0.1);
-        instance.setFilterEntryMinFreq(2);
-        instance.setFilterFeatureMinFreq(2);
-        instance.setFilterEventMinFreq(2);
-        instance.runCommand();
-
-
-    }
+//    @BeforeClass
+//    public static void setUpClass() throws Exception {
+//    }
+//
+//    @AfterClass
+//    public static void tearDownClass() throws Exception {
+//    }
+//
+//    @Before
+//    public void setUp() {
+//    }
+//
+//    @After
+//    public void tearDown() {
+//    }
+////
+//
+//    @Test
+//    @Ignore
+//    public void testRunCommand_Fruit() throws Exception {
+//        System.out.println("Test on fruit");
+//
+//
+//        FullBuild instance = new FullBuild();
+//        instance.setCharset(DEFAULT_CHARSET);
+//        instance.setInstancesFile(TEST_FRUIT_INPUT);
+//        instance.setOutputDir(TEST_OUTPUT_DIR);
+//        instance.setTempBaseDir(TEST_OUTPUT_DIR);
+//        instance.runCommand();
+//
+//
+//    }
+//
+//    @Test
+//    @Ignore
+//    public void testRunCommand_Medtest100k() throws Exception {
+//        System.out.println("Test on fruit");
+//
+//        File medtestDir = new File(TEST_DATA_DIR, "medtest");
+//        File input = new File(medtestDir, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample100k");
+//
+//        FullBuild instance = new FullBuild();
+//        instance.setCharset(DEFAULT_CHARSET);
+//        instance.setInstancesFile(input);
+//        instance.setOutputDir(TEST_OUTPUT_DIR);
+//        instance.setTempBaseDir(TEST_OUTPUT_DIR);
+//        instance.setMinSimilarity(0.1);
+//        instance.setFilterEntryMinFreq(2);
+//        instance.setFilterFeatureMinFreq(2);
+//        instance.setFilterEventMinFreq(2);
+//        instance.runCommand();
+//
+//
+//    }
 
 //
 //    @Test
@@ -149,31 +149,34 @@ public class FullBuildTest {
         instance.setFilterEventMinFreq(2);
         instance.setSkipIndex1(skip1);
         instance.setSkipIndex2(skip2);
+        instance.setNumThreads(2);
+
+        
         instance.runCommand();
 
 
     }
 
-    @Test
-    @Ignore
-    public void testRunCommand_Medtest10m() throws Exception {
-        System.out.println("Test on fruit");
-
-        File medtestDir = new File(TEST_DATA_DIR, "medtest");
-        File input = new File(medtestDir, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample10m");
-
-        FullBuild instance = new FullBuild();
-        instance.setCharset(DEFAULT_CHARSET);
-        instance.setInstancesFile(input);
-        instance.setOutputDir(TEST_OUTPUT_DIR);
-        instance.setTempBaseDir(TEST_OUTPUT_DIR);
-        instance.setMinSimilarity(0.1);
-        instance.setFilterEntryMinFreq(160);
-        instance.setFilterFeatureMinFreq(90);
-        instance.setFilterEventMinFreq(40);
-        instance.runCommand();
-
-
-    }
+//    @Test
+//    @Ignore
+//    public void testRunCommand_Medtest10m() throws Exception {
+//        System.out.println("Test on fruit");
+//
+//        File medtestDir = new File(TEST_DATA_DIR, "medtest");
+//        File input = new File(medtestDir, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample10m");
+//
+//        FullBuild instance = new FullBuild();
+//        instance.setCharset(DEFAULT_CHARSET);
+//        instance.setInstancesFile(input);
+//        instance.setOutputDir(TEST_OUTPUT_DIR);
+//        instance.setTempBaseDir(TEST_OUTPUT_DIR);
+//        instance.setMinSimilarity(0.1);
+//        instance.setFilterEntryMinFreq(160);
+//        instance.setFilterFeatureMinFreq(90);
+//        instance.setFilterEventMinFreq(40);
+//        instance.runCommand();
+//
+//
+//    }
 
 }

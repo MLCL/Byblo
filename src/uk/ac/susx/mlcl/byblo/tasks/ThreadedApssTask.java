@@ -158,6 +158,7 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 double complete = (!chunkerA.hasNext() && !chunkerB.hasNext()) ? 1
                         : nChunks == 0 ? 0
                         : (double) (i * nChunks + j) / (double) (nChunks * nChunks);
+                
                 if (LOG.isInfoEnabled()) {
                     LOG.info(MessageFormat.format(
                             "Creating APSS task on chunks {0,number} and {1,number} ({2,number,percent} complete)",

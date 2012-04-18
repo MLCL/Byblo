@@ -559,7 +559,7 @@ public class Lexer implements Seekable<Tell>, Closeable {
      */
     @Override
     public void position(final Tell offset) throws IOException {
-        this.pos = offset.value(Position.class);
+        this.pos = offset.value(Position.class).clone();
 
         channel.position(pos.channelOffset);
         channelRestartOffset = channel.position();

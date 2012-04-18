@@ -111,7 +111,7 @@ public class AllPairsCommand extends AbstractCommand {
 
     @Parameter(names = {"-t", "--threads"},
     description = "Number of conccurent processing threads.")
-    private int nThreads = Runtime.getRuntime().availableProcessors() + 1;
+    private int numThreads = Runtime.getRuntime().availableProcessors() + 1;
 
     @Parameter(names = {"-Smn", "--similarity-min"},
     description = "Minimum similarity threshold.",
@@ -164,7 +164,6 @@ public class AllPairsCommand extends AbstractCommand {
 
         private Algorithm(Class<? extends NaiveApssTask> imp) {
             this.implementation = imp;
-            Object o = InvertedApssTask.class;
         }
 
         public Class<? extends NaiveApssTask> getImplementation() {
@@ -357,12 +356,12 @@ public class AllPairsCommand extends AbstractCommand {
     private NaiveApssTask newAlgorithmInstance()
             throws InstantiationException, IllegalAccessException {
 
-        if (getnThreads() == 1) {
+        if (getNumThreads() == 1) {
             return getAlgorithm().newInstance();
         } else {
             ThreadedApssTask<Tell> tapss = new ThreadedApssTask<Tell>();
             tapss.setInnerAlgorithm(getAlgorithm().getImplementation());
-            tapss.setNumThreads(getnThreads());
+            tapss.setNumThreads(getNumThreads());
             tapss.setMaxChunkSize(getChunkSize());
             return tapss;
         }
@@ -467,7 +466,7 @@ public class AllPairsCommand extends AbstractCommand {
                 add("simsOut", getOutputFile()).
                 add("charset", getCharset()).
                 add("chunkSize", getChunkSize()).
-                add("threads", getnThreads()).
+                add("threads", getNumThreads()).
                 add("minSimilarity", getMinSimilarity()).
                 add("maxSimilarity", getMaxSimilarity()).
                 add("outputIdentityPairs", isOutputIdentityPairs()).
@@ -549,13 +548,13 @@ public class AllPairsCommand extends AbstractCommand {
         this.chunkSize = chunkSize;
     }
 
-    public final int getnThreads() {
-        return nThreads;
+    public final int getNumThreads() {
+        return numThreads;
     }
 
     public final void setNumThreads(int nThreads) {
         Checks.checkRangeIncl("nThreads", nThreads, 1, Integer.MAX_VALUE);
-        this.nThreads = nThreads;
+        this.numThreads = nThreads;
     }
 
     public final double getMinSimilarity() {
@@ -643,21 +642,6 @@ public class AllPairsCommand extends AbstractCommand {
         this.indexDeligate = indexDeligate;
     }
 
-//    public void setEnumeratorSkipIndexed2(boolean b) {
-//        indexDeligate.setEnumeratorSkipIndexed2(b);
-//    }
-//
-//    public void setEnumeratorSkipIndexed1(boolean b) {
-//        indexDeligate.setEnumeratorSkipIndexed1(b);
-//    }
-////
-//    public boolean isEnumeratorSkipIndexed2() {
-//        return indexDeligate.isEnumeratorSkipIndexed2();
-//    }
-//
-//    public boolean isEnumeratorSkipIndexed1() {
-//        return indexDeligate.isEnumeratorSkipIndexed1();
-//    }
     public void setEnumeratedFeatures(boolean enumeratedFeatures) {
         indexDeligate.setEnumeratedFeatures(enumeratedFeatures);
     }
