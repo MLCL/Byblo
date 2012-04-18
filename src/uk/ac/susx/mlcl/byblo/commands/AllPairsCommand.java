@@ -265,8 +265,8 @@ public class AllPairsCommand extends AbstractCommand {
         // combinations of vectors, so will be looking at two differnt points
         // in the file. Also this allows for the possibility of having differnt
         // files, e.g compare fruit words with cake words
-        final WeightedTokenPairVectorSource sourceA = openEventsSource();
-        final WeightedTokenPairVectorSource sourceB = openEventsSource();
+        final FastWeightedTokenPairVectorSource sourceA = openEventsSource();
+        final FastWeightedTokenPairVectorSource sourceB = openEventsSource();
 
 
         // Create a sink object that will act as a recipient for all pairs that
@@ -374,7 +374,7 @@ public class AllPairsCommand extends AbstractCommand {
                 EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
     }
 
-    private WeightedTokenPairVectorSource openEventsSource() throws IOException {
+    private FastWeightedTokenPairVectorSource openEventsSource() throws IOException {
         return BybloIO.openEventsVectorSource(
                 getEventsFile(), getCharset(),
                 getIndexDeligate());

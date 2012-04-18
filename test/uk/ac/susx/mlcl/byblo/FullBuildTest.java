@@ -110,10 +110,9 @@ public class FullBuildTest {
 //    public void testRunCommand_Medtest100k_skip2() throws Exception {
 //        testRunCommand_Medtest100k(false, true);
 //    }
-
     @Test
     public void testRunCommand_Medtest100k_skipboth() throws Exception {
-        testRunCommand_Medtest100k(true, true);
+        testRunCommand_Medtest100k("100k", true, true);
     }
 //
 //    @Test
@@ -121,13 +120,12 @@ public class FullBuildTest {
 //        testRunCommand_Medtest100k(false, false);
 //    }
 
-    public static void testRunCommand_Medtest100k(boolean skip1, boolean skip2) throws Exception {
-        System.out.println("Test on fruit");
+    public static void testRunCommand_Medtest100k(String sampleName, boolean skip1, boolean skip2) throws Exception {
 
         File medtestDir = new File(TEST_DATA_DIR, "medtest");
-        File input = new File(medtestDir, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample100k");
+        File input = new File(medtestDir, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample" + sampleName);
 
-        String name = "medtest-100k";
+        String name = "medtest-" + sampleName;
         if (skip1 && skip2)
             name += "-skipboth";
         else if (skip1)
@@ -149,9 +147,8 @@ public class FullBuildTest {
         instance.setFilterEventMinFreq(2);
         instance.setSkipIndex1(skip1);
         instance.setSkipIndex2(skip2);
-        instance.setNumThreads(2);
 
-        
+
         instance.runCommand();
 
 
@@ -178,5 +175,4 @@ public class FullBuildTest {
 //
 //
 //    }
-
 }

@@ -117,7 +117,7 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 nThreads, nThreads, 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>());
         futureQueue = new ArrayDeque<Future<? extends Task>>();
-        throttle = new Semaphore(nThreads * 2);
+        throttle = new Semaphore((int)(nThreads * 1.5) + 1);
     }
 
     @Override
