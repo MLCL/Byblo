@@ -28,6 +28,7 @@ ordered=(1 1 1 1 1 1 1 1 1 1)
 numeric=(0 1 1 1 1 1 1 1 0 0)
 tooctal=(0 1 1 1 1 1 0 0 0 0)
 floatp=(0 0 0 0 0 0 1 1 0 0)
+primitive=(1 1 1 1 1 1 1 1 0 0)
 
 
 perl -pe "s/__CLASS__/${class}/g;" << "---EOF---" >> ${outfile}
@@ -104,6 +105,47 @@ public final class __CLASS__ {
 
 for ((i=0; i<${#PRIMTYP[@]}; i++))
 do
+
+
+if (( ${primitive[i]} == 1 ))
+then
+cat << "---EOF---" \
+    | perl -pe "s/PRIMTYP/${PRIMTYP[i]}/g;" \
+    | perl -pe "s/BOXTYPE/${BOXTYPE[i]}/g;" 
+
+    public static BOXTYPE[] box(final PRIMTYP[] src) {
+        return box(src, 0, src.length);
+    }
+
+    public static BOXTYPE[] box(final PRIMTYP[] src, final int offset) {
+        return box(src, offset, src.length - offset);
+    }
+
+    public static BOXTYPE[] box(final PRIMTYP[] src, final int offset, final int len) {
+        BOXTYPE[] dst = new BOXTYPE[len];
+        for(int i = 0; i < len; i++) 
+            dst[i] = (BOXTYPE)src[offset + i];
+        return dst;
+    }
+
+    public static PRIMTYP[] unbox(final BOXTYPE[] src) {
+        return unbox(src, 0, src.length);
+    }
+
+    public static PRIMTYP[] unbox(final BOXTYPE[] src, final int offset) {
+        return unbox(src, offset, src.length - offset);
+    }
+
+    public static PRIMTYP[] unbox(final BOXTYPE[] src, final int offset, final int len) {
+        PRIMTYP[] dst = new PRIMTYP[len];
+        for(int i = 0; i < len; i++) 
+            dst[i] = (PRIMTYP)src[offset + i];
+        return dst;
+    }
+    
+---EOF---
+
+fi
 
 if (( ${symbolic[i]} == 1 ))
 then

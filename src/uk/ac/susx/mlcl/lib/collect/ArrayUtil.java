@@ -67,6 +67,37 @@ public final class ArrayUtil {
     }
 
 
+    public static Boolean[] box(final boolean[] src) {
+        return box(src, 0, src.length);
+    }
+
+    public static Boolean[] box(final boolean[] src, final int offset) {
+        return box(src, offset, src.length - offset);
+    }
+
+    public static Boolean[] box(final boolean[] src, final int offset, final int len) {
+        Boolean[] dst = new Boolean[len];
+        for(int i = 0; i < len; i++) 
+            dst[i] = (Boolean)src[offset + i];
+        return dst;
+    }
+
+    public static boolean[] unbox(final Boolean[] src) {
+        return unbox(src, 0, src.length);
+    }
+
+    public static boolean[] unbox(final Boolean[] src, final int offset) {
+        return unbox(src, offset, src.length - offset);
+    }
+
+    public static boolean[] unbox(final Boolean[] src, final int offset, final int len) {
+        boolean[] dst = new boolean[len];
+        for(int i = 0; i < len; i++) 
+            dst[i] = (boolean)src[offset + i];
+        return dst;
+    }
+    
+
 
     /* 
      * ==================
@@ -399,6 +430,37 @@ public final class ArrayUtil {
         return dst;
     }
 
+
+    public static Byte[] box(final byte[] src) {
+        return box(src, 0, src.length);
+    }
+
+    public static Byte[] box(final byte[] src, final int offset) {
+        return box(src, offset, src.length - offset);
+    }
+
+    public static Byte[] box(final byte[] src, final int offset, final int len) {
+        Byte[] dst = new Byte[len];
+        for(int i = 0; i < len; i++) 
+            dst[i] = (Byte)src[offset + i];
+        return dst;
+    }
+
+    public static byte[] unbox(final Byte[] src) {
+        return unbox(src, 0, src.length);
+    }
+
+    public static byte[] unbox(final Byte[] src, final int offset) {
+        return unbox(src, offset, src.length - offset);
+    }
+
+    public static byte[] unbox(final Byte[] src, final int offset, final int len) {
+        byte[] dst = new byte[len];
+        for(int i = 0; i < len; i++) 
+            dst[i] = (byte)src[offset + i];
+        return dst;
+    }
+    
 
 
     /* 
@@ -749,6 +811,37 @@ public final class ArrayUtil {
     }
 
 
+    public static Character[] box(final char[] src) {
+        return box(src, 0, src.length);
+    }
+
+    public static Character[] box(final char[] src, final int offset) {
+        return box(src, offset, src.length - offset);
+    }
+
+    public static Character[] box(final char[] src, final int offset, final int len) {
+        Character[] dst = new Character[len];
+        for(int i = 0; i < len; i++) 
+            dst[i] = (Character)src[offset + i];
+        return dst;
+    }
+
+    public static char[] unbox(final Character[] src) {
+        return unbox(src, 0, src.length);
+    }
+
+    public static char[] unbox(final Character[] src, final int offset) {
+        return unbox(src, offset, src.length - offset);
+    }
+
+    public static char[] unbox(final Character[] src, final int offset, final int len) {
+        char[] dst = new char[len];
+        for(int i = 0; i < len; i++) 
+            dst[i] = (char)src[offset + i];
+        return dst;
+    }
+    
+
 
     /* 
      * ==================
@@ -1097,6 +1190,37 @@ public final class ArrayUtil {
         return sbuf.toString();
     }
 
+
+    public static Short[] box(final short[] src) {
+        return box(src, 0, src.length);
+    }
+
+    public static Short[] box(final short[] src, final int offset) {
+        return box(src, offset, src.length - offset);
+    }
+
+    public static Short[] box(final short[] src, final int offset, final int len) {
+        Short[] dst = new Short[len];
+        for(int i = 0; i < len; i++) 
+            dst[i] = (Short)src[offset + i];
+        return dst;
+    }
+
+    public static short[] unbox(final Short[] src) {
+        return unbox(src, 0, src.length);
+    }
+
+    public static short[] unbox(final Short[] src, final int offset) {
+        return unbox(src, offset, src.length - offset);
+    }
+
+    public static short[] unbox(final Short[] src, final int offset, final int len) {
+        short[] dst = new short[len];
+        for(int i = 0; i < len; i++) 
+            dst[i] = (short)src[offset + i];
+        return dst;
+    }
+    
 
 
     /* 
@@ -1447,6 +1571,37 @@ public final class ArrayUtil {
     }
 
 
+    public static Integer[] box(final int[] src) {
+        return box(src, 0, src.length);
+    }
+
+    public static Integer[] box(final int[] src, final int offset) {
+        return box(src, offset, src.length - offset);
+    }
+
+    public static Integer[] box(final int[] src, final int offset, final int len) {
+        Integer[] dst = new Integer[len];
+        for(int i = 0; i < len; i++) 
+            dst[i] = (Integer)src[offset + i];
+        return dst;
+    }
+
+    public static int[] unbox(final Integer[] src) {
+        return unbox(src, 0, src.length);
+    }
+
+    public static int[] unbox(final Integer[] src, final int offset) {
+        return unbox(src, offset, src.length - offset);
+    }
+
+    public static int[] unbox(final Integer[] src, final int offset, final int len) {
+        int[] dst = new int[len];
+        for(int i = 0; i < len; i++) 
+            dst[i] = (int)src[offset + i];
+        return dst;
+    }
+    
+
 
     /* 
      * ==================
@@ -1796,6 +1951,37 @@ public final class ArrayUtil {
     }
 
 
+    public static Long[] box(final long[] src) {
+        return box(src, 0, src.length);
+    }
+
+    public static Long[] box(final long[] src, final int offset) {
+        return box(src, offset, src.length - offset);
+    }
+
+    public static Long[] box(final long[] src, final int offset, final int len) {
+        Long[] dst = new Long[len];
+        for(int i = 0; i < len; i++) 
+            dst[i] = (Long)src[offset + i];
+        return dst;
+    }
+
+    public static long[] unbox(final Long[] src) {
+        return unbox(src, 0, src.length);
+    }
+
+    public static long[] unbox(final Long[] src, final int offset) {
+        return unbox(src, offset, src.length - offset);
+    }
+
+    public static long[] unbox(final Long[] src, final int offset, final int len) {
+        long[] dst = new long[len];
+        for(int i = 0; i < len; i++) 
+            dst[i] = (long)src[offset + i];
+        return dst;
+    }
+    
+
 
     /* 
      * ==================
@@ -2144,6 +2330,37 @@ public final class ArrayUtil {
         return sbuf.toString();
     }
 
+
+    public static Float[] box(final float[] src) {
+        return box(src, 0, src.length);
+    }
+
+    public static Float[] box(final float[] src, final int offset) {
+        return box(src, offset, src.length - offset);
+    }
+
+    public static Float[] box(final float[] src, final int offset, final int len) {
+        Float[] dst = new Float[len];
+        for(int i = 0; i < len; i++) 
+            dst[i] = (Float)src[offset + i];
+        return dst;
+    }
+
+    public static float[] unbox(final Float[] src) {
+        return unbox(src, 0, src.length);
+    }
+
+    public static float[] unbox(final Float[] src, final int offset) {
+        return unbox(src, offset, src.length - offset);
+    }
+
+    public static float[] unbox(final Float[] src, final int offset, final int len) {
+        float[] dst = new float[len];
+        for(int i = 0; i < len; i++) 
+            dst[i] = (float)src[offset + i];
+        return dst;
+    }
+    
 
 
     /* 
@@ -2496,6 +2713,37 @@ public final class ArrayUtil {
         return sbuf.toString();
     }
 
+
+    public static Double[] box(final double[] src) {
+        return box(src, 0, src.length);
+    }
+
+    public static Double[] box(final double[] src, final int offset) {
+        return box(src, offset, src.length - offset);
+    }
+
+    public static Double[] box(final double[] src, final int offset, final int len) {
+        Double[] dst = new Double[len];
+        for(int i = 0; i < len; i++) 
+            dst[i] = (Double)src[offset + i];
+        return dst;
+    }
+
+    public static double[] unbox(final Double[] src) {
+        return unbox(src, 0, src.length);
+    }
+
+    public static double[] unbox(final Double[] src, final int offset) {
+        return unbox(src, offset, src.length - offset);
+    }
+
+    public static double[] unbox(final Double[] src, final int offset, final int len) {
+        double[] dst = new double[len];
+        for(int i = 0; i < len; i++) 
+            dst[i] = (double)src[offset + i];
+        return dst;
+    }
+    
 
 
     /* 
