@@ -22,6 +22,7 @@ import uk.ac.susx.mlcl.lib.io.IOUtil;
 import static org.junit.Assert.*;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.lib.Comparators;
+import uk.ac.susx.mlcl.lib.io.ObjectIO;
 
 /**
  *
@@ -135,8 +136,16 @@ public class SortWeightedTokenPairCommandTest {
 
         assertTrue("Randomised file does not exist", randomisedFile.exists());
         assertTrue("Randomised file is not a regular file", randomisedFile.isFile());
-        assertTrue("Randomised file length differs from input", randomisedFile.length() == inputFile.length());
 
+        {
+            WeightedTokenPairSource x = openSource(inputFile, idx);
+            WeightedTokenPairSource y = openSource(randomisedFile, idx);
+            assertTrue("Randomised file length differs from input",
+                       ObjectIO.flush(x) == ObjectIO.flush(y));
+            x.close();
+            y.close();
+
+        }
 
         // run the command
 
@@ -153,7 +162,16 @@ public class SortWeightedTokenPairCommandTest {
 
         assertTrue("Sorted file does not exist", sortedFile.exists());
         assertTrue("Sorted file is not a regular file", sortedFile.isFile());
-        assertTrue("Sorted file length differs from input", sortedFile.length() == inputFile.length());
+        
+        {
+            WeightedTokenPairSource x = openSource(inputFile, idx);
+            WeightedTokenPairSource y = openSource(sortedFile, idx);
+            assertTrue("Sorted file length differs from input",
+                       ObjectIO.flush(x) == ObjectIO.flush(y));
+            x.close();
+            y.close();
+
+        }
 
         // load the sorted output file and check it's sensible
 

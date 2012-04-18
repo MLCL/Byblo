@@ -5,20 +5,21 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import java.io.IOException;
+import uk.ac.susx.mlcl.lib.io.ForwardingObjectSink;
 import uk.ac.susx.mlcl.lib.io.Sink;
 
 /**
  *
  * @author hiam20
  */
-public class WeightSumReducerSink<T>
-        extends ForwardingSink<Sink<Weighted<T>>, Weighted<T>> {
+public class WeightSumReducerObjectSink<T>
+        extends ForwardingObjectSink<Sink<Weighted<T>>, Weighted<T>> {
 
     private T currentRecord = null;
 
     private double weightSum = 0;
 
-    public WeightSumReducerSink(Sink<Weighted<T>> inner) {
+    public WeightSumReducerObjectSink(Sink<Weighted<T>> inner) {
         super(inner);
     }
 

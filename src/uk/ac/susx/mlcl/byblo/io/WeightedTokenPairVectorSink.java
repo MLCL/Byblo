@@ -41,6 +41,7 @@ import uk.ac.susx.mlcl.lib.io.Sink;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@Deprecated
 public class WeightedTokenPairVectorSink
         implements Sink<Indexed<SparseDoubleVector>>, Flushable, Closeable {
 

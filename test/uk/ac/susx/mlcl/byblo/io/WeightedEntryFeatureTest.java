@@ -84,11 +84,11 @@ public class WeightedEntryFeatureTest {
         List<Indexed<SparseDoubleVector>> list = IOUtil.readAll(aSrc);
         Collections.sort(list);
 
-        WeightedTokenPairSink tmp = WeightedTokenPairSink.open(
+        FastWeightedTokenPairVectorSink bSink = FastWeightedTokenPairVectorSink.open(
                 b, DEFAULT_CHARSET, del, false, false, compact);
 
-        WeightedTokenPairVectorSink bSink = new WeightedTokenPairVectorSink(
-                tmp);
+//        WeightedTokenPairVectorSink bSink = new WeightedTokenPairVectorSink(
+//                tmp);
 
         IOUtil.copy(list, bSink);
 

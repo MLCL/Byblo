@@ -50,8 +50,6 @@ public class BybloIO {
 
     public static final boolean ENTRIES_SKIP_INDEXED_COLUMN_1 = true;
 
-    public static final boolean ENTRIES_SKIP_INDEXED_COLUMN_2 = true;
-
     public static final boolean FEATURES_SKIP_INDEXED_COLUMN_1 = true;
 
     public static final boolean EVENTS_SKIP_INDEXED_COLUMN_1 = true;
@@ -157,14 +155,17 @@ public class BybloIO {
         return new WeightedTokenPairVectorSource(openEventsSource(file, charset, idx));
     }
 
-    public static WeightedTokenPairVectorSink openEventsVectorSink(
+    public static FastWeightedTokenPairVectorSink openEventsVectorSink(
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
-        return new WeightedTokenPairVectorSink(
-                openEventsSink(file, charset, idx));
+        return FastWeightedTokenPairVectorSink.open(
+                file, charset, idx,
+                EVENTS_SKIP_INDEXED_COLUMN_1,
+                EVENTS_SKIP_INDEXED_COLUMN_2,
+                EVENTS_COMPACT);
+
     }
 
-    
     public static WeightedTokenPairSource openEventsSource(
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {

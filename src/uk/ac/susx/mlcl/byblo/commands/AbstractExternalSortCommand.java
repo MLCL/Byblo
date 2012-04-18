@@ -40,7 +40,7 @@ import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Comparator;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.tasks.Chunk;
@@ -168,8 +168,6 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
         if (getComparator() == null) {
             throw new NullPointerException();
         }
-
-
 
         nextFileToMerge = new File[64];
 
@@ -299,7 +297,7 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
     }
 
     @Override
-    protected <T extends Task> Future<T> submitTask(T task) {
+    protected <T extends Task> Future<T> submitTask(final T task) throws InterruptedException {
         return super.submitTask(task);
     }
 
@@ -366,18 +364,10 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
                 add("chunkSize", maxChunkSize).
                 add("temp", getTempFileFactory());
     }
-//
-//    public void setCompactFormatDisabled(boolean compactFormatDisabled) {
-//        fileDeligate.setCompactFormatDisabled(compactFormatDisabled);
-//    }
 
     public final void setCharset(Charset charset) {
         fileDeligate.setCharset(charset);
     }
-//
-//    public boolean isCompactFormatDisabled() {
-//        return fileDeligate.isCompactFormatDisabled();
-//    }
 
     public final Charset getCharset() {
         return fileDeligate.getCharset();

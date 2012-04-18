@@ -29,45 +29,30 @@
  * POSSIBILITY OF SUCH DAMAGE.To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.byblo.io;
+package uk.ac.susx.mlcl.lib.io;
 
-import java.io.Closeable;
 import java.io.IOException;
-import uk.ac.susx.mlcl.lib.io.Source;
 
 /**
  *
- * @param <S>
- * @param <T>
  * @author hiam20
  */
-public class ForwardingSource<S extends Source<T>, T>
-        implements Source<T>, Closeable {
+public class CountingObjectSink<S extends Sink<T>, T> extends ForwardingObjectSink<S, T> {
 
-    private final S inner;
+    private long count = 0;
 
-    public ForwardingSource(S inner) {
-        this.inner = inner;
+    public CountingObjectSink(S inner) {
+        super(inner);
     }
 
-    public S getInner() {
-        return inner;
-    }
-
-    @Override
-    public T read() throws IOException {
-        return inner.read();
+    public long getCount() {
+        return count;
     }
 
     @Override
-    public boolean hasNext() throws IOException {
-        return inner.hasNext();
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (inner instanceof Closeable)
-            ((Closeable) inner).close();
+    public void write(T record) throws IOException {
+        super.write(record);
+        ++count;
     }
 
 }

@@ -34,12 +34,7 @@ import com.beust.jcommander.Parameter;
 import com.google.common.base.Objects;
 import java.util.ArrayDeque;
 import java.util.Queue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.tasks.Task;
@@ -64,6 +59,8 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
     private ExecutorService executor = null;
 
     private Queue<Future<? extends Task>> futureQueue;
+
+    private Semaphore throttle;
 
     public AbstractParallelCommandTask() {
     }
@@ -107,6 +104,7 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
     @Override
     protected void initialiseTask() throws Exception {
         getExecutor();
+        throttle = new Semaphore(getNumThreads() * 2);
     }
 
     @Override
@@ -137,11 +135,33 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
         return futureQueue;
     }
 
-    protected <T extends Task> Future<T> submitTask(T task) {
+    protected <T extends Task> Future<T> submitTask(final T task) throws InterruptedException {
         Checks.checkNotNull("task", task);
-        Future<T> future = getExecutor().submit(task, task);
-        getFutureQueue().offer(future);
-        return future;
+        
+        throttle.acquire();
+        Runnable wrapper = new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    task.run();
+                } finally {
+                    throttle.release();
+                }
+            }
+
+        };
+        try {
+            Future<T> future = getExecutor().submit(wrapper, task);
+            getFutureQueue().offer(future);
+            return future;
+        } catch (RejectedExecutionException e) {
+            throttle.release();
+            throw e;
+        } catch (RuntimeException e) {
+            throttle.release();
+            throw e;
+        }
     }
 
     @Override

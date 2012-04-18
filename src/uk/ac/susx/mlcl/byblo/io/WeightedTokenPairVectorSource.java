@@ -52,14 +52,14 @@ import uk.ac.susx.mlcl.lib.io.Tell;
 public class WeightedTokenPairVectorSource
         implements SeekableSource<Indexed<SparseDoubleVector>, Tell> {
 
-    private final SeekableSource<Weighted<TokenPair>, Tell> inner;
+    private final WeightedTokenPairSource inner;
 
     private Weighted<TokenPair> next;
 
     private Tell tell;
 
     public WeightedTokenPairVectorSource(
-            SeekableSource<Weighted<TokenPair>, Tell> inner) throws IOException {
+            WeightedTokenPairSource inner) throws IOException {
         this.inner = inner;
         tell = inner.position();
         next = null;

@@ -39,6 +39,9 @@ import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects.ToStringHelper;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
+import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import java.io.Closeable;
 import java.io.File;
 import java.io.Flushable;
@@ -60,7 +63,9 @@ import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.commands.FileDeligate;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
+import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.Sink;
+import uk.ac.susx.mlcl.lib.io.Source;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
@@ -224,7 +229,7 @@ public class AllPairsCommand extends AbstractCommand {
                 WTStatsSource features = new WTStatsSource(openFeaturesSource());
 
                 AbstractMIProximity bmip = ((AbstractMIProximity) prox);
-                bmip.setFeatureFrequencies(WeightedTokenSource.readAllAsArray(features));
+                bmip.setFeatureFrequencies(readAllAsArray(features));
                 bmip.setFeatureFrequencySum(features.getWeightSum());
                 bmip.setOccuringFeatureCount(features.getMaxId() + 1);
 
@@ -239,9 +244,7 @@ public class AllPairsCommand extends AbstractCommand {
                 }
 
                 WTStatsSource features = new WTStatsSource(openFeaturesSource());
-                while (features.hasNext())
-                    features.read();
-
+                ObjectIO.copy(features, ObjectIO.<Weighted<Token>>nullSink());
                 ((KendallTau) prox).setNumFeatures(features.getMaxId() + 1);
 
             } catch (IOException e) {
@@ -304,6 +307,51 @@ public class AllPairsCommand extends AbstractCommand {
         if (LOG.isInfoEnabled()) {
             LOG.info("Completed all-pairs similarity search.");
         }
+    }
+
+    public static double[] readAllAsArray(Source<Weighted<Token>> src) throws IOException {
+
+        Int2DoubleMap entityFrequenciesMap = new Int2DoubleOpenHashMap();
+        while (src.hasNext()) {
+            Weighted<Token> entry = src.read();
+            if (entityFrequenciesMap.containsKey(entry.record().id())) {
+                // If we encounter the same Token more than once, it means
+                // the perl has decided two strings are not-equal, which java
+                // thinks are equal ... so we need to merge the records:
+
+                // TODO: Not true any more.. remove this code?
+
+                final int id = entry.record().id();
+                final double oldFreq = entityFrequenciesMap.get(id);
+                final double newFreq = oldFreq + entry.weight();
+
+                if (LOG.isWarnEnabled())
+                    LOG.warn("Found duplicate Entry \""
+                            //                            + (indexDeligate.getEnumerator().value(entry.record().id()))
+                            + (entry.record().id())
+                            + "\" (id=" + id
+                            + ") in entries file. Merging records. Old frequency = "
+                            + oldFreq + ", new frequency = " + newFreq + ".");
+
+                entityFrequenciesMap.put(id, newFreq);
+            } else {
+                entityFrequenciesMap.put(entry.record().id(), entry.weight());
+            }
+        }
+
+        int maxId = 0;
+        for (int k : entityFrequenciesMap.keySet()) {
+            if (k > maxId)
+                maxId = k;
+        }
+        double[] entryFreqs = new double[maxId + 1];
+        ObjectIterator<Int2DoubleMap.Entry> it = entityFrequenciesMap.int2DoubleEntrySet().
+                iterator();
+        while (it.hasNext()) {
+            Int2DoubleMap.Entry entry = it.next();
+            entryFreqs[entry.getIntKey()] = entry.getDoubleValue();
+        }
+        return entryFreqs;
     }
 
     private NaiveApssTask newAlgorithmInstance()
@@ -496,7 +544,6 @@ public class AllPairsCommand extends AbstractCommand {
 //    public boolean isCompactFormatDisabled() {
 //        return fileDeligate.isCompactFormatDisabled();
 //    }
-
     public final void setChunkSize(int chunkSize) {
         Checks.checkRangeIncl("chunkSize", chunkSize, 1, Integer.MAX_VALUE);
         this.chunkSize = chunkSize;
@@ -611,7 +658,6 @@ public class AllPairsCommand extends AbstractCommand {
 //    public boolean isEnumeratorSkipIndexed1() {
 //        return indexDeligate.isEnumeratorSkipIndexed1();
 //    }
-
     public void setEnumeratedFeatures(boolean enumeratedFeatures) {
         indexDeligate.setEnumeratedFeatures(enumeratedFeatures);
     }

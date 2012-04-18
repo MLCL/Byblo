@@ -31,18 +31,13 @@
 package uk.ac.susx.mlcl.lib.io;
 
 import com.google.common.base.CharMatcher;
-import java.io.Closeable;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.nio.BufferUnderflowException;
 import java.nio.CharBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.charset.CharacterCodingException;
-import java.util.NoSuchElementException;
-import java.io.File;
-import java.io.FileInputStream;
 import java.nio.charset.Charset;
-import java.util.RandomAccess;
+import java.util.NoSuchElementException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -172,12 +167,31 @@ public class Lexer implements Seekable<Tell>, Closeable {
      * Record the offset that can be used for seeking back to the currently
      * advanced position.
      */
-//    private Tell tell = new Tell(0, 0);
-    private long channelOffset = 0;
-    // the offset in the buffer of the first character in the lexeme
+    private final class Position {
 
-    private int bufferOffset = 0;
+        long channelOffset;
 
+        int bufferOffset;
+
+        public Position(long channelOffset, int bufferOffset) {
+            this.channelOffset = channelOffset;
+            this.bufferOffset = bufferOffset;
+        }
+
+        @Override
+        protected Position clone() {
+            return new Position(channelOffset, bufferOffset);
+        }
+
+    }
+
+    private Position pos = new Position(0, 0);
+
+////    private Tell tell = new Tell(0, 0);
+//    private long channelOffset = 0;
+//    // the offset in the buffer of the first character in the lexeme
+//
+//    private int bufferOffset = 0;
     /**
      * Store decoded characters
      */
@@ -258,7 +272,7 @@ public class Lexer implements Seekable<Tell>, Closeable {
     }
 
     /**
-     * Return true if the RaspLexer can produce more elements of any kind.
+     * Return true if the Lexer can produce more elements of any kind.
      *
      * @return true if there are more elements, false otherwise.
      * @throws CharacterCodingException When byte to char decoding fails
@@ -267,7 +281,7 @@ public class Lexer implements Seekable<Tell>, Closeable {
      */
     public final boolean hasNext() throws CharacterCodingException,
             ClosedChannelException, IOException {
-        return channel.hasBytesRemaining() || cbuf.hasRemaining();
+        return cbuf.hasRemaining() || channel.hasBytesRemaining();
     }
 
     /**
@@ -281,38 +295,50 @@ public class Lexer implements Seekable<Tell>, Closeable {
             ClosedChannelException, IOException {
         if (!hasNext())
             throw new NoSuchElementException("iteration has no more elements.");
+        advance0();
+    }
 
-        channelOffset = channelRestartOffset;
-        bufferOffset = cbuf.position() - charBufferRestartOffset;
+    public final void advanceIfPossible() throws CharacterCodingException,
+            ClosedChannelException, IOException {
+        if (hasNext())
+            advance0();
+    }
+
+    private void advance0() throws CharacterCodingException,
+            ClosedChannelException, IOException {
+        pos.channelOffset = channelRestartOffset;
+        pos.bufferOffset = cbuf.position() - charBufferRestartOffset;
 
         start = cbuf.position();
-        char c = read();
-
-        if (delimiterMatcher.matches(c)) { // isDelimiter(c)
-            type = Type.Delimiter;
-        } else if (whitespaceMatcher.matches(c)) { // Character.isWhitespace(c)
-            type = Type.Whitespace;
-        } else {
-            type = Type.Value;
-        }
+        insureRemaining(1);
+        char c = cbuf.get();
 
         try {
-            switch (type) {
-                case Whitespace:
-                    do {
-                        c = read();
-                    } while (whitespaceMatcher.matches(c)
-                            && !delimiterMatcher.matches(c));
-                    unread(1);
-                    break;
-                case Value:
-                    do {
-                        c = read();
-                    } while (!whitespaceMatcher.matches(c)
-                            && !delimiterMatcher.matches(c));
-                    unread(1);
-                    break;
+
+
+            if (delimiterMatcher.matches(c)) {
+                type = Type.Delimiter;
+            } else if (whitespaceMatcher.matches(c)) {
+                type = Type.Whitespace;
+
+                do {
+                    insureRemaining(1);
+                    c = cbuf.get();
+                } while (whitespaceMatcher.matches(c)
+                        && !delimiterMatcher.matches(c));
+                cbuf.position(cbuf.position() - 1);
+
+            } else {
+                type = Type.Value;
+
+                do {
+                    insureRemaining(1);
+                    c = cbuf.get();
+                } while (!whitespaceMatcher.matches(c)
+                        && !delimiterMatcher.matches(c));
+                cbuf.position(cbuf.position() - 1);
             }
+
         } catch (BufferUnderflowException e) {
             // perfectly acceptable as far as the lexer is concerned -
             // usually denoting EOF during a lexeme sequence
@@ -470,8 +496,7 @@ public class Lexer implements Seekable<Tell>, Closeable {
                                              cbuf.capacity() + required - available);
 
             if (LOG.isTraceEnabled()) {
-                LOG.trace("Growing character buffer from length " + cbuf.
-                        capacity() + " to " + newCapacity);
+                LOG.trace("Growing character buffer from length " + cbuf.capacity() + " to " + newCapacity);
             }
 
             final CharBuffer src = cbuf;
@@ -510,12 +535,7 @@ public class Lexer implements Seekable<Tell>, Closeable {
      */
     @Override
     public Tell position() {
-        return new Tell(Long.class, channelOffset).
-                push(Integer.class, bufferOffset);
-//        tell.push(Long.class, channelOffset);
-//        tell.push(Integer.class, bufferOffset);
-//        return tell;
-//        return tell.clone();
+        return new Tell(Position.class, pos.clone());
     }
 
     /**
@@ -539,13 +559,9 @@ public class Lexer implements Seekable<Tell>, Closeable {
      */
     @Override
     public void position(final Tell offset) throws IOException {
+        this.pos = offset.value(Position.class);
 
-//        this.bufferOffset = offset.pop(Integer.class);
-//        this.channelOffset = offset.pop(Long.class);
-        this.bufferOffset = offset.value(Integer.class);
-        this.channelOffset = offset.next().value(Long.class);
-
-        channel.position(channelOffset);
+        channel.position(pos.channelOffset);
         channelRestartOffset = channel.position();
         charBufferRestartOffset = 0;
 
@@ -553,114 +569,17 @@ public class Lexer implements Seekable<Tell>, Closeable {
         channel.read(cbuf);
         cbuf.flip();
 
-        cbuf.position(bufferOffset);
+        cbuf.position(pos.bufferOffset);
 
-        start = bufferOffset;
-        end = bufferOffset;
+        start = pos.bufferOffset;
+        end = pos.bufferOffset;
 
-        if (hasNext())
-            advance();
-
-//        
-
-
-//        channel.position(offset.channelOffset);
-//        channelRestartOffset = channel.position();
-//        charBufferRestartOffset = 0;
-//
-//        cbuf.clear();
-//        channel.read(cbuf);
-//        cbuf.flip();
-//
-//        cbuf.position(offset.bufferOffset);
-//
-//        start = offset.bufferOffset;
-//        end = offset.bufferOffset;
-//
-//        if (hasNext())
-//            advance();
-    }
-    
-    
-//    public static final class Tell {
-//        // the offset in the channel of the current buffered region
-//
-//        public static final Tell START = new Tell(0, 0);
-//
-//        private long channelOffset;
-//        // the offset in the buffer of the first character in the lexeme
-//
-//        private int bufferOffset;
-//
-//        private Tell(long channelOffset, int bufferOffset) {
-//            this.channelOffset = channelOffset;
-//            this.bufferOffset = bufferOffset;
-//        }
-//
-//        private Tell() {
-//            this(0, 0);
-//        }
-//
-//        @Override
-//        public boolean equals(Object obj) {
-//            if (obj == null)
-//                return false;
-//            if (getClass() != obj.getClass())
-//                return false;
-//            final Tell other = (Tell) obj;
-//            if (this.channelOffset != other.channelOffset)
-//                return false;
-//            if (this.bufferOffset != other.bufferOffset)
-//                return false;
-//            return true;
-//        }
-//
-//        @Override
-//        public int hashCode() {
-//            int hash = 7;
-//            hash = 83 * hash + (int) (this.channelOffset ^ (this.channelOffset >>> 32));
-//            hash = 83 * hash + this.bufferOffset;
-//            return hash;
-//        }
-//
-//        @Override
-//        public String toString() {
-//            return MessageFormat.format(
-//                    "{0,number,integer}/{1,number,integer}",
-//                    new Object[]{channelOffset, bufferOffset});
-//        }
-//
-//        @Override
-//        protected Tell clone() {
-//            return new Tell(this.channelOffset, this.bufferOffset);
-//        }
-//    }
-
-    /**
-     * Gets the next character from the buffer, refilling it if necessary.
-     *
-     * @return The next character in the buffer.
-     * @throws CharacterCodingException
-     */
-    private char read()
-            throws CharacterCodingException, IOException {
-        insureRemaining(1);
-        return cbuf.get();
-    }
-
-    /**
-     * Rather than keep a separate look-ahead character field, just push-back
-     * any character that isn't wanted. It doesn't actually change anything
-     * except the internal data pointers.
-     *
-     * @param num The number of characters to push-back.
-     */
-    private void unread(final int num) {
-        cbuf.position(cbuf.position() - num);
+        advanceIfPossible();
     }
 
     @Override
     public void close() throws IOException {
         channel.close();
     }
+
 }

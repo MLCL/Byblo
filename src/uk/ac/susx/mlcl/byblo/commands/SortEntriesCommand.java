@@ -54,7 +54,7 @@ public class SortEntriesCommand extends AbstractSortCommand<Weighted<Token>> {
 
     @Override
     protected Sink<Weighted<Token>> openSink(File file) throws FileNotFoundException, IOException {
-        return new WeightSumReducerSink<Token>(BybloIO.openEntriesSink(file, getCharset(), indexDeligate));
+        return new WeightSumReducerObjectSink<Token>(BybloIO.openEntriesSink(file, getCharset(), indexDeligate));
 
     }
 

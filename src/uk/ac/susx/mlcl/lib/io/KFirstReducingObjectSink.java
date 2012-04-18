@@ -29,30 +29,44 @@
  * POSSIBILITY OF SUCH DAMAGE.To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.byblo.enumerators;
+package uk.ac.susx.mlcl.lib.io;
 
 import java.io.IOException;
+import java.util.Comparator;
 
 /**
- * Denotes an object which while perform string enumeration on some or all of
- * the data it reads and writes.
  *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @author hiam20
  */
-public interface Enumerating {
+public class KFirstReducingObjectSink<T>
+        extends ForwardingObjectSink<Sink<T>, T> {
 
-    boolean DEFAULT_IS_ENUMERATED = false;
+    private Comparator<T> comparator = null;
 
-    EnumeratorType DEFAULT_TYPE = EnumeratorType.Memory;
+    private int limit = 100;
 
-    void closeEnumerator() throws IOException;
+    private T currentRecord = null;
 
-    void saveEnumerator() throws IOException;
+    private int count = -1;
 
-    void openEnumerator() throws IOException;
+    public KFirstReducingObjectSink(Sink<T> inner, Comparator<T> comparator, int limit) {
+        super(inner);
+        this.limit = limit;
+        this.comparator = comparator;
+    }
 
-    EnumeratorType getEnuemratorType();
+    @Override
+    public void write(T o) throws IOException {
+        if (currentRecord == null
+                || comparator.compare(currentRecord, o) != 0) {
+            currentRecord = o;
+            count = 0;
+        }
+        ++count;
 
-    void setEnumeratorType(EnumeratorType type);
+        if (count <= limit) {
+            super.write(o);
+        }
+    }
 
 }

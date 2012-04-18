@@ -38,7 +38,7 @@ import java.io.IOException;
  * @author hamish
  */
 public class SeekableDataSourceAdapter<S extends SeekableDataSource>
-        extends DataSourceAdapter<S>
+        extends ForwardingDataSource<S>
         implements SeekableDataSource {
 
     public SeekableDataSourceAdapter(S inner) {

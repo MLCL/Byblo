@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.lib.io.KFirstReducingObjectSink;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 import com.beust.jcommander.Parameter;
@@ -128,7 +129,7 @@ public class KnnSimsCommand extends SortEventsCommand {
 
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file) throws FileNotFoundException, IOException {
-        return new KFirstReducerSink<Weighted<TokenPair>>(
+        return new KFirstReducingObjectSink<Weighted<TokenPair>>(
                 super.openSink(file), classComparator, k);
     }
 

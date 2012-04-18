@@ -31,7 +31,6 @@
 package uk.ac.susx.mlcl.byblo.commands;
 
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
@@ -68,11 +67,6 @@ public class CountCommand extends AbstractCommand implements Serializable {
 
     private static final Log LOG = LogFactory.getLog(CountCommand.class);
 
-    /**
-     * Number of records to read or write between progress updates.
-     */
-    private static final int PROGRESS_INTERVAL = 1000000;
-
     @Parameter(names = {"-i", "--input"},
     required = true,
     description = "Source instances file",
@@ -83,7 +77,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
     required = true,
     description = "Entry-feature-pair frequencies destination file",
     validateWith = OutputFileValidator.class)
-    private File entryFeaturesFile = null;
+    private File eventsFile = null;
 
     @Parameter(names = {"-oe", "--output-entries"},
     required = true,
@@ -111,10 +105,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
      * @param entryFeaturesFile output file for entry/context/frequency triples
      * @param entriesFile output file for entry/frequency pairs
      * @param featuresFile output file for context/frequency pairs
-     * @param preindexedEntries
-     * @param preindexedFeatures
-     * @param entryIndexFile
-     * @param featureIndexFile
+     * @param indexDeligate
      * @param charset character set to use for all file I/O
      * @throws NullPointerException if any argument is null
      */
@@ -150,9 +141,17 @@ public class CountCommand extends AbstractCommand implements Serializable {
             final File entriesFile, final File featuresFile)
             throws NullPointerException {
         setInstancesFile(instancesFile);
-        setEntryFeaturesFile(entryFeaturesFile);
+        setEventsFile(entryFeaturesFile);
         setEntriesFile(entriesFile);
         setFeaturesFile(featuresFile);
+    }
+
+    /**
+     * Default constructor used by serialisation and JCommander instantiation.
+     * All files will initially be set to null. Character set will be set to
+     * software default from {@link IOUtil#DEFAULT_CHARSET}.
+     */
+    public CountCommand() {
     }
 
     public DoubleEnumerating getIndexDeligate() {
@@ -174,14 +173,14 @@ public class CountCommand extends AbstractCommand implements Serializable {
         this.featuresFile = featuresFile;
     }
 
-    public final File getEntryFeaturesFile() {
-        return entryFeaturesFile;
+    public final File getEventsFile() {
+        return eventsFile;
     }
 
-    public final void setEntryFeaturesFile(final File entryFeaturesFile)
+    public final void setEventsFile(final File entryFeaturesFile)
             throws NullPointerException {
         Checks.checkNotNull("entryFeaturesFile", entryFeaturesFile);
-        this.entryFeaturesFile = entryFeaturesFile;
+        this.eventsFile = entryFeaturesFile;
     }
 
     public final File getEntriesFile() {
@@ -213,18 +212,6 @@ public class CountCommand extends AbstractCommand implements Serializable {
         this.charset = charset;
     }
 
-    /**
-     * Default constructor used by serialisation and JCommander instantiation.
-     * All files will initially be set to null. Character set will be set to
-     * software default from {@link IOUtil#DEFAULT_CHARSET}.
-     */
-    public CountCommand() {
-    }
-
-//    @Override
-//    protected void initialiseTask() throws Exception {
-//        checkState();
-//    }
     private Comparator<Weighted<Token>> getEntryOrder() throws IOException {
         return indexDeligate.isEnumeratedEntries()
                ? Weighted.recordOrder(Token.indexOrder())
@@ -241,7 +228,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
         return (indexDeligate.isEnumeratedEntries() && indexDeligate.isEnumeratedFeatures())
                ? Weighted.recordOrder(TokenPair.indexOrder())
                : Weighted.recordOrder(TokenPair.stringOrder(
-               indexDeligate));
+                indexDeligate));
     }
 
     @Override
@@ -256,10 +243,10 @@ public class CountCommand extends AbstractCommand implements Serializable {
 
         WeightedTokenSink entrySink = BybloIO.openEntriesSink(entriesFile, charset, indexDeligate);
 
-        WeightedTokenSink featureSink =BybloIO.openEntriesSink(featuresFile, charset, indexDeligate);
+        WeightedTokenSink featureSink = BybloIO.openFeaturesSink(featuresFile, charset, indexDeligate);
 
 
-        WeightedTokenPairSink eventsSink = BybloIO.openEventsSink(entryFeaturesFile, charset, indexDeligate);
+        WeightedTokenPairSink eventsSink = BybloIO.openEventsSink(eventsFile, charset, indexDeligate);
 
         CountTask task = new CountTask(
                 instanceSource, eventsSink, entrySink, featureSink,
@@ -284,240 +271,11 @@ public class CountCommand extends AbstractCommand implements Serializable {
         indexDeligate.closeEnumerator();
 
 
-//        int i = 0;
-//        final Object2IntMap<TokenPair> entryFeatureFreq =
-//                new Object2IntOpenHashMap<TokenPair>();
-//        entryFeatureFreq.defaultReturnValue(0);
-//
-//        final Int2IntMap featureFreq = new Int2IntOpenHashMap();
-//        featureFreq.defaultReturnValue(0);
-//
-//        final Int2IntMap entryFreq = new Int2IntOpenHashMap();
-//        entryFreq.defaultReturnValue(0);
-//
-//        countEvents(entryFreq, featureFreq, entryFeatureFreq,
-//                    indexDeligate.getDecoder1(), indexDeligate.getDecoder2());
-//
-//        writeEntries(entryFreq, indexDeligate.getEncoder1());
-//        writeFeatures(featureFreq, indexDeligate.getEncoder2());
-//        writeEvents(entryFeatureFreq,
-//                    indexDeligate.getEncoder1(),
-//                    indexDeligate.getEncoder2());
-
         if (LOG.isInfoEnabled()) {
             LOG.info("Completed memory count.");
         }
     }
-//
-//    @Override
-//    protected void finaliseTask() throws Exception {
-//    }
-//
-//    private void countEvents(
-//            final Int2IntMap entryFreq,
-//            final Int2IntMap featureFreq,
-//            final Object2IntMap<? super TokenPair> entryFeatureFreq,
-//            final Function<String, Integer> entryDecoder,
-//            final Function<String, Integer> featureDecoder)
-//            throws IOException {
-//
-//        final TokenPairSource instanceSource = new TokenPairSource(
-//                new TSVSource(inputFile, charset),
-//                entryDecoder, featureDecoder);
-//
-//        if (!instanceSource.hasNext() && LOG.isWarnEnabled()) {
-//            LOG.warn("Events file is empty.");
-//        }
-//
-//        long i = 0;
-//        while (instanceSource.hasNext()) {
-//            final TokenPair instance;
-//            try {
-//                instance = instanceSource.read();
-//            } catch (SingletonRecordException ex) {
-//                LOG.warn("Badly formed input data: " + ex.getMessage());
-//                continue;
-//            }
-//
-//            final int entry_id = instance.id1();
-//            final int feature_id = instance.id2();
-//
-//            entryFreq.put(entry_id, entryFreq.get(entry_id) + 1);
-//            featureFreq.put(feature_id, featureFreq.get(feature_id) + 1);
-//            entryFeatureFreq.put(instance, entryFeatureFreq.getInt(instance) + 1);
-//
-//            if ((++i % PROGRESS_INTERVAL == 0 || !instanceSource.hasNext())
-//                    && LOG.isInfoEnabled()) {
-//                LOG.info("Read " + i + " events. Found "
-//                        + entryFreq.size() + " entries, " + featureFreq.size()
-//                        + " features, and " + entryFeatureFreq.size()
-//                        + " entry-features. (" + (int) instanceSource.percentRead()
-//                        + "% complete)");
-//                LOG.debug(MiscUtil.memoryInfoString());
-//            }
-//        }
-//    }
 
-//    private static final Comparator<Int2IntMap.Entry> TOKEN_ID_ORDER = new Comparator<Int2IntMap.Entry>() {
-//
-//        @Override
-//        public int compare(Int2IntMap.Entry o1, Int2IntMap.Entry o2) {
-//            return o1.getIntKey() - o2.getIntKey();
-//        }
-//
-//    };
-//
-//    private List<Weighted<Token>> mapToWeightedTokens(Int2IntMap map) {
-//        List<Weighted<Token>> out = new ArrayList<Weighted<Token>>(map.size());
-//        for (Int2IntMap.Entry e : map.int2IntEntrySet()) {
-//            out.add(new Weighted<Token>(
-//                    new Token(e.getIntKey()), e.getIntValue()));
-//        }
-//        return out;
-//    }
-//
-//    private List<Weighted<TokenPair>> mapToWeightedTokenPairs(
-//            Object2IntMap<TokenPair> map) {
-//        List<Weighted<TokenPair>> out = new ArrayList<Weighted<TokenPair>>(map.size());
-//        for (Object2IntMap.Entry<TokenPair> e : map.object2IntEntrySet()) {
-//            out.add(new Weighted<TokenPair>(
-//                    e.getKey(), e.getIntValue()));
-//        }
-//        return out;
-//    }
-//    private void writeEntries(
-//            final Int2IntMap entryFreq,
-//            final Function<Integer, String> entryEncoder)
-//            throws IOException {
-//
-//        if (LOG.isDebugEnabled())
-//            LOG.debug("Sorting entries frequency data.");
-//
-//
-//        List<Weighted<Token>> tokens = mapToWeightedTokens(entryFreq);
-//        Collections.sort(tokens, getEntryOrder());
-//
-//        if (LOG.isDebugEnabled())
-//            LOG.debug(
-//                    "Writing entries frequency data to file \"" + entriesFile + "\".");
-//
-//        if (entriesFile.exists() && LOG.isWarnEnabled())
-//            LOG.warn("The entries file already exists and will be overwritten.");
-//
-//        WeightedTokenSink entrySink = null;
-//        final int n = tokens.size();
-//        try {
-//            entrySink = new WeightedTokenSink(
-//                    new TSVSink(entriesFile, charset), entryEncoder);
-//            int i = 0;
-//            for (final Weighted<Token> tok : tokens) {
-//                entrySink.write(tok);
-//                if ((++i % PROGRESS_INTERVAL == 0 || i == n) && LOG.isInfoEnabled()) {
-//                    LOG.info("Wrote " + i + "/" + n + " entries. ("
-//                            + (int) (i * 100d / n) + "% complete)");
-//                }
-//            }
-//        } finally {
-//            if (entrySink != null) {
-//                entrySink.flush();
-//                entrySink.close();
-//            }
-//        }
-//    }
-//    private void writeFeatures(
-//            final Int2IntMap featureFreq,
-//            final Function<Integer, String> featureEncoder)
-//            throws IOException {
-//
-//        if (LOG.isDebugEnabled()) {
-//            LOG.debug("Sorting context frequency data.");
-//        }
-//
-//        List<Weighted<Token>> tokens = mapToWeightedTokens(featureFreq);
-//        Collections.sort(tokens, getFeatureOrder());
-//
-//        if (LOG.isDebugEnabled()) {
-//            LOG.debug("Writing context frequency data to " + featuresFile + ".");
-//        }
-//        if (featuresFile.exists() && LOG.isWarnEnabled()) {
-//            LOG.warn("The contexts file already exists and will be overwritten.");
-//        }
-//
-//        WeightedTokenSink featureSink = null;
-//        final int n = tokens.size();
-//        try {
-//            featureSink = new WeightedTokenSink(
-//                    new TSVSink(featuresFile, charset), featureEncoder);
-//            int i = 0;
-//            for (final Weighted<Token> tok : tokens) {
-//                featureSink.write(tok);
-//                if ((++i % PROGRESS_INTERVAL == 0 || i == n) && LOG.isInfoEnabled()) {
-//                    LOG.info("Wrote " + i + "/" + n + " contexts. ("
-//                            + (int) (i * 100d / n) + "% complete)");
-//                }
-//            }
-//        } finally {
-//            if (featureSink != null) {
-//                featureSink.flush();
-//                featureSink.close();
-//            }
-//        }
-//    }
-//    private static <T> Comparator<Object2IntMap.Entry<T>> keyOrder(
-//            final Comparator<T> inner) {
-//        return new Comparator<Object2IntMap.Entry<T>>() {
-//
-//            @Override
-//            public int compare(
-//                    Object2IntMap.Entry<T> o1,
-//                    Object2IntMap.Entry<T> o2) {
-//                return inner.compare(o1.getKey(), o2.getKey());
-//            }
-//
-//        };
-//    }
-//
-//    private void writeEvents(
-//            final Object2IntMap<TokenPair> entryFeatureFreq,
-//            final Function<Integer, String> entryEncoder,
-//            final Function<Integer, String> featureEncoder)
-//            throws FileNotFoundException, IOException {
-//
-//        LOG.debug("Sorting feature pairs frequency data.");
-//
-//        List<Weighted<TokenPair>> tokens = mapToWeightedTokenPairs(
-//                entryFeatureFreq);
-//        Collections.sort(tokens, getEventOrder());
-//
-//        if (LOG.isDebugEnabled()) {
-//            LOG.debug(
-//                    "Writing feature pairs frequency data to file  " + entryFeaturesFile + ".");
-//        }
-//        if (entryFeaturesFile.exists() && LOG.isWarnEnabled()) {
-//            LOG.warn("The features file already exists and will be overwritten.");
-//        }
-//
-//        WeightedTokenPairSink featureSink = null;
-//        final int n = tokens.size();
-//        try {
-//            featureSink = new WeightedTokenPairSink(
-//                    new TSVSink(entryFeaturesFile, charset),
-//                    entryEncoder, featureEncoder);
-//            int i = 0;
-//            for (final Weighted<TokenPair> tok : tokens) {
-//                featureSink.write(tok);
-//                if ((++i % PROGRESS_INTERVAL == 0 || i == n) && LOG.isInfoEnabled()) {
-//                    LOG.info("Wrote " + i + "/" + n + " features. ("
-//                            + (int) (i * 100d / n) + "% complete)");
-//                }
-//            }
-//        } finally {
-//            if (featureSink != null) {
-//                featureSink.flush();
-//                featureSink.close();
-//            }
-//        }
-//    }
     /**
      * Method that performance a number of sanity checks on the parameterisation
      * of this class. It is necessary to do this because the the class can be
@@ -529,7 +287,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
      */
     private void checkState() throws NullPointerException, IllegalStateException, FileNotFoundException {
         // Check non of the parameters are null
-        Checks.checkNotNull("entryFeaturesFile", entryFeaturesFile);
+        Checks.checkNotNull("entryFeaturesFile", eventsFile);
         Checks.checkNotNull("featuresFile", featuresFile);
         Checks.checkNotNull("entriesFile", entriesFile);
         Checks.checkNotNull("entriesFile", entriesFile);
@@ -537,7 +295,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
         Checks.checkNotNull("charset", charset);
 
         // Check that no two files are the same
-        if (inputFile.equals(entryFeaturesFile)) {
+        if (inputFile.equals(eventsFile)) {
             throw new IllegalStateException("inputFile == featuresFile");
         }
         if (inputFile.equals(featuresFile)) {
@@ -546,10 +304,10 @@ public class CountCommand extends AbstractCommand implements Serializable {
         if (inputFile.equals(entriesFile)) {
             throw new IllegalStateException("inputFile == entriesFile");
         }
-        if (entryFeaturesFile.equals(featuresFile)) {
+        if (eventsFile.equals(featuresFile)) {
             throw new IllegalStateException("entryFeaturesFile == featuresFile");
         }
-        if (entryFeaturesFile.equals(entriesFile)) {
+        if (eventsFile.equals(entriesFile)) {
             throw new IllegalStateException("entryFeaturesFile == entriesFile");
         }
         if (featuresFile.equals(entriesFile)) {
@@ -593,15 +351,15 @@ public class CountCommand extends AbstractCommand implements Serializable {
             throw new IllegalStateException(
                     "features file does not exists and can not be reated: " + featuresFile);
         }
-        if (entryFeaturesFile.exists() && (!entryFeaturesFile.isFile() || !entryFeaturesFile.canWrite())) {
+        if (eventsFile.exists() && (!eventsFile.isFile() || !eventsFile.canWrite())) {
             throw new IllegalStateException(
-                    "entry-features file exists but is not writable: " + entryFeaturesFile);
+                    "entry-features file exists but is not writable: " + eventsFile);
         }
-        if (!entryFeaturesFile.exists() && !entryFeaturesFile.getAbsoluteFile().
+        if (!eventsFile.exists() && !eventsFile.getAbsoluteFile().
                 getParentFile().
                 canWrite()) {
             throw new IllegalStateException(
-                    "entry-features file does not exists and can not be reated: " + entryFeaturesFile);
+                    "entry-features file does not exists and can not be reated: " + eventsFile);
         }
     }
 
@@ -611,7 +369,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
                 add("in", inputFile).
                 add("entriesOut", entriesFile).
                 add("featuresOut", featuresFile).
-                add("eventsOut", entryFeaturesFile).
+                add("eventsOut", eventsFile).
                 add("charset", charset);
     }
 

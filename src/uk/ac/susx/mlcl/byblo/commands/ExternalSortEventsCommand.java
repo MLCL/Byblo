@@ -44,7 +44,7 @@ public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weigh
 
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file) throws IOException {
-        return new WeightSumReducerSink<TokenPair>(BybloIO.openEventsSink(file, getCharset(), indexDeligate));
+        return new WeightSumReducerObjectSink<TokenPair>(BybloIO.openEventsSink(file, getCharset(), indexDeligate));
     }
 
     @Override

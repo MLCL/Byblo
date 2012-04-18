@@ -45,7 +45,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
-import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.tasks.CountTask;
@@ -481,7 +480,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     protected void submitCountTask(Source<TokenPair> instanceSource,
                                    File outEntries, File outFeatures,
-                                   File outEvents) throws IOException {
+                                   File outEvents) throws IOException, InterruptedException {
 
 
 //        Source<TokenPair> instanceSource = openInstancesSource(in);         
@@ -504,14 +503,14 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         submitTask(task);
     }
 
-    protected void submitDeleteTask(File file) {
+    protected void submitDeleteTask(File file) throws InterruptedException {
         final FileDeleteTask deleteTask = new FileDeleteTask(file);
         deleteTask.setProperty(KEY_TASK_TYPE,
                                VALUE_TASK_TYPE_DELETE);
         submitTask(deleteTask);
     }
 
-    private void submitSortEntriesTask(File file) throws IOException {
+    private void submitSortEntriesTask(File file) throws IOException, InterruptedException {
         File srcFile = file;
         File dstFile = tempFileFactory.createFile("mrg.ent.", "");
 
@@ -529,7 +528,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         submitTask(task);
     }
 
-    private void submitSortFeaturesTask(File file) throws IOException {
+    private void submitSortFeaturesTask(File file) throws IOException, InterruptedException {
         File srcFile = file;
         File dstFile = tempFileFactory.createFile("mrg.feat.", "");
 
@@ -547,7 +546,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         submitTask(task);
     }
 
-    private void submitSortEventsTask(File file) throws IOException {
+    private void submitSortEventsTask(File file) throws IOException, InterruptedException {
         File srcFile = file;
         File dstFile = tempFileFactory.createFile("mrg.feat.", "");
 
@@ -565,7 +564,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         submitTask(task);
     }
 
-    private void submitMergeEntriesTask(File dst) throws IOException {
+    private void submitMergeEntriesTask(File dst) throws IOException, InterruptedException {
         mergeEntryQueue.add(dst);
         if (mergeEntryQueue.size() >= 2) {
             File srcFileA = mergeEntryQueue.poll();
@@ -593,7 +592,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         }
     }
 
-    private void submitMergeFeaturesTask(File dst) throws IOException {
+    private void submitMergeFeaturesTask(File dst) throws IOException, InterruptedException {
         mergeFeaturesQueue.add(dst);
         if (mergeFeaturesQueue.size() >= 2) {
             File srcFileA = mergeFeaturesQueue.poll();
@@ -620,7 +619,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         }
     }
 
-    private void submitMergeEventsTask(File dst) throws IOException {
+    private void submitMergeEventsTask(File dst) throws IOException, InterruptedException {
         mergeEntryFeatureQueue.add(dst);
         if (mergeEntryFeatureQueue.size() >= 2) {
             File srcFileA = mergeEntryFeatureQueue.poll();
@@ -655,7 +654,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     }
 
     protected Sink<Weighted<Token>> openEntriesSink(File file) throws FileNotFoundException, IOException {
-        return new WeightSumReducerSink<Token>(BybloIO.openEntriesSink(file, getCharset(), indexDeligate));
+        return new WeightSumReducerObjectSink<Token>(
+                BybloIO.openEntriesSink(file, getCharset(), indexDeligate));
     }
 
     protected SeekableSource<Weighted<Token>, Tell> openFeaturesSource(File file)
@@ -664,7 +664,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     }
 
     protected Sink<Weighted<Token>> openFeaturesSink(File file) throws FileNotFoundException, IOException {
-        return new WeightSumReducerSink<Token>(BybloIO.openFeaturesSink(file, getCharset(), indexDeligate));
+        return new WeightSumReducerObjectSink<Token>(
+                BybloIO.openFeaturesSink(file, getCharset(), indexDeligate));
     }
 
     protected WeightedTokenPairSource openEventsSource(File file)
@@ -674,8 +675,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     protected Sink<Weighted<TokenPair>> openEventsSink(File file)
             throws FileNotFoundException, IOException {
-        return new WeightSumReducerSink<TokenPair>(BybloIO.openEventsSink(
-                file, getCharset(), indexDeligate));
+        return new WeightSumReducerObjectSink<TokenPair>(
+                BybloIO.openEventsSink(file, getCharset(), indexDeligate));
     }
 
     protected SeekableSource<TokenPair, Tell> openInstancesSource(File file) throws FileNotFoundException, IOException {
@@ -775,13 +776,6 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
                 add("id", getIndexDeligate());
     }
 
-//    public boolean isEnumeratorSkipIndexed2() {
-//        return indexDeligate.isEnumeratorSkipIndexed2();
-//    }
-//
-//    public boolean isEnumeratorSkipIndexed1() {
-//        return indexDeligate.isEnumeratorSkipIndexed1();
-//    }
     public void setEnumeratedFeatures(boolean enumeratedFeatures) {
         indexDeligate.setEnumeratedFeatures(enumeratedFeatures);
     }
@@ -797,18 +791,10 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     public boolean isEnumeratedEntries() {
         return indexDeligate.isEnumeratedEntries();
     }
-//
-//    public void setCompactFormatDisabled(boolean compactFormatDisabled) {
-//        fileDeligate.setCompactFormatDisabled(compactFormatDisabled);
-//    }
 
     public final void setCharset(Charset charset) {
         fileDeligate.setCharset(charset);
     }
-//
-//    public boolean isCompactFormatDisabled() {
-//        return fileDeligate.isCompactFormatDisabled();
-//    }
 
     public final Charset getCharset() {
         return fileDeligate.getCharset();

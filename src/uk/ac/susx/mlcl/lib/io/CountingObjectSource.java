@@ -29,35 +29,31 @@
  * POSSIBILITY OF SUCH DAMAGE.To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.byblo.io;
+package uk.ac.susx.mlcl.lib.io;
 
 import java.io.IOException;
-import uk.ac.susx.mlcl.lib.io.SeekableSource;
 
 /**
  *
- * @param <S>
- * @param <T>
  * @author hiam20
  */
-public class ForwardingSeekableSource<S extends SeekableSource<T, P>, T, P>
-        extends ForwardingSource<S, T>
-        implements SeekableSource<T, P> {
+public class CountingObjectSource<S extends Source<T>, T> extends ForwardingObjectSource<S, T> {
 
-    public ForwardingSeekableSource(S inner) {
+    private long count = 0;
+
+    public CountingObjectSource(S inner) {
         super(inner);
     }
 
-    @Override
-    public P position() throws IOException {
-        return getInner().position();
+    public long getCount() {
+        return count;
     }
 
     @Override
-    public void position(P offset) throws IOException {
-        position(offset);
+    public T read() throws IOException {
+        final T wt = super.read();
+        ++count;
+        return wt;
     }
-    
-    
 
 }

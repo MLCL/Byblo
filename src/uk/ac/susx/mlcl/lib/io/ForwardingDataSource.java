@@ -31,7 +31,6 @@
 package uk.ac.susx.mlcl.lib.io;
 
 import java.io.Closeable;
-import java.io.Flushable;
 import java.io.IOException;
 import uk.ac.susx.mlcl.lib.Checks;
 
@@ -40,12 +39,12 @@ import uk.ac.susx.mlcl.lib.Checks;
  * @param <T>
  * @author hamish
  */
-public abstract class DataSinkAdapter<T extends DataSink>
-        implements DataSink, Closeable, Flushable {
+public abstract class ForwardingDataSource<T extends DataSource>
+        implements DataSource, Closeable {
 
     private final T inner;
 
-    public DataSinkAdapter(T inner) {
+    public ForwardingDataSource(T inner) {
         Checks.checkNotNull("inner", inner);
         this.inner = inner;
     }
@@ -60,43 +59,53 @@ public abstract class DataSinkAdapter<T extends DataSink>
     }
 
     @Override
-    public void writeByte(byte val) throws IOException {
-        inner.writeByte(val);
+    public boolean isEndOfRecordNext() throws IOException {
+        return inner.isEndOfRecordNext();
     }
 
     @Override
-    public void writeChar(char val) throws IOException {
-        inner.writeChar(val);
+    public byte readByte() throws IOException {
+        return inner.readByte();
     }
 
     @Override
-    public void writeShort(short val) throws IOException {
-        inner.writeShort(val);
+    public char readChar() throws IOException {
+        return inner.readChar();
     }
 
     @Override
-    public void writeInt(int val) throws IOException {
-        inner.writeInt(val);
+    public short readShort() throws IOException {
+        return inner.readShort();
     }
 
     @Override
-    public void writeLong(long val) throws IOException {
-        inner.writeLong(val);
+    public int readInt() throws IOException {
+        return inner.readInt();
     }
 
     @Override
-    public void writeDouble(double val) throws IOException {
-        inner.writeDouble(val);
+    public long readLong() throws IOException {
+        return inner.readLong();
     }
 
     @Override
-    public void writeFloat(float val) throws IOException {
-        inner.writeFloat(val);
+    public float readFloat() throws IOException {
+        return inner.readFloat();
     }
 
     @Override
-    public void writeString(String str) throws IOException {
-        inner.writeString(str);
+    public double readDouble() throws IOException {
+        return inner.readDouble();
+    }
+
+    @Override
+    public String readString() throws IOException {
+        return inner.readString();
+    }
+
+    @Override
+    public boolean canRead() throws IOException {
+        return inner.canRead();
     }
 
     @Override
@@ -105,35 +114,25 @@ public abstract class DataSinkAdapter<T extends DataSink>
             ((Closeable) inner).close();
     }
 
-    @Override
-    public void flush() throws IOException {
-        if (inner instanceof Flushable)
-            ((Flushable) inner).flush();
-    }
-
-    public boolean equals(DataSinkAdapter<?> other) {
-        if (this.inner != other.inner && (this.inner == null || !this.inner.
-                                          equals(other.inner)))
-            return false;
-        return true;
+    public boolean equals(ForwardingDataSource<?> other) {
+        return this.inner == other.inner
+                || (this.inner != null && this.inner.equals(other.inner));
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        return equals((DataSinkAdapter) obj);
+        return this == obj || (obj != null
+                               && getClass() == obj.getClass()
+                               && equals((ForwardingDataSource) obj));
     }
 
     @Override
     public int hashCode() {
-        return 89 * 7 + (this.inner != null ? this.inner.hashCode() : 0);
+        return 67 * 3 + (this.inner != null ? this.inner.hashCode() : 0);
     }
 
     @Override
     public String toString() {
-        return "DataSinkAdapter{" + "inner=" + inner + '}';
+        return "DataSourceAdapter{" + "inner=" + inner + '}';
     }
 }

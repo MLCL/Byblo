@@ -76,13 +76,12 @@ public final class Tell implements Serializable {
 
     public boolean equals(Tell other) {
         if (this.type != other.type && (this.type == null || !this.type.equals(
-                                        other.type)))
+                other.type)))
             return false;
-        if (this.value != other.value && (this.value == null || !this.value.
-                                          equals(other.value)))
+        if (this.value != other.value && (this.value == null || !this.value.equals(other.value)))
             return false;
         if (this.next != other.next && (this.next == null || !this.next.equals(
-                                        other.next)))
+                other.next)))
             return false;
         return true;
     }
@@ -96,9 +95,9 @@ public final class Tell implements Serializable {
 
     @Override
     public int hashCode() {
-        return 97 * (97 * (97 * 7 
-                + (this.type != null ? this.type.hashCode() : 0)) 
-                + (this.value != null ? this.value.hashCode() : 0)) 
+        return 97 * (97 * (97 * 7
+                + (this.type != null ? this.type.hashCode() : 0))
+                + (this.value != null ? this.value.hashCode() : 0))
                 + (this.next != null ? this.next.hashCode() : 0);
     }
 
@@ -106,4 +105,5 @@ public final class Tell implements Serializable {
     public String toString() {
         return "Tell{" + "type=" + type.getSimpleName() + ", value=" + value + ", inner=" + next + '}';
     }
+
 }

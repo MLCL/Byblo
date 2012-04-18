@@ -61,7 +61,7 @@ public class MergeEntriesCommand extends AbstractMergeCommand<Weighted<Token>> {
 
     @Override
     protected Sink<Weighted<Token>> openSink(File file) throws FileNotFoundException, IOException {
-        return new WeightSumReducerSink<Token>(
+        return new WeightSumReducerObjectSink<Token>(
                 BybloIO.openEntriesSink(file, getFileDeligate().getCharset(), indexDeligate));
     }
 

@@ -68,7 +68,7 @@ public class SortEventsCommand extends AbstractSortCommand<Weighted<TokenPair>> 
     @Override
     protected Sink<Weighted<TokenPair>> openSink(File file)
             throws FileNotFoundException, IOException {
-        return new WeightSumReducerSink<TokenPair>(BybloIO.openEventsSink(file, getCharset(), indexDeligate));
+        return new WeightSumReducerObjectSink<TokenPair>(BybloIO.openEventsSink(file, getCharset(), indexDeligate));
     }
 
     public EnumeratorType getEnuemratorType() {

@@ -31,45 +31,53 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import java.io.Closeable;
-import java.io.Flushable;
 import java.io.IOException;
-import uk.ac.susx.mlcl.lib.io.Sink;
+import uk.ac.susx.mlcl.lib.io.CountingObjectSource;
+import uk.ac.susx.mlcl.lib.io.Source;
 
 /**
  *
- * @param <S>
- * @param <T>
  * @author hiam20
  */
-public class ForwardingSink<S extends Sink<T>, T>
-        implements Sink<T>, Closeable, Flushable {
+public class WeightStatsObjectSource<T> extends CountingObjectSource<Source<Weighted<T>>, Weighted<T>> {
 
-    private final S inner;
+    private double weightMin = Double.POSITIVE_INFINITY;
 
-    public ForwardingSink(S inner) {
-        this.inner = inner;
+    private double weightMax = Double.NEGATIVE_INFINITY;
+
+    private double weightSum = 0;
+
+    public WeightStatsObjectSource(Source<Weighted<T>> inner) {
+        super(inner);
     }
 
-    public S getInner() {
-        return inner;
+    public double getWeightSum() {
+        return weightSum;
+    }
+
+    public double getWeightMax() {
+        return weightMax;
+    }
+
+    public double getWeightMin() {
+        return weightMin;
+    }
+
+    public double getWeightRange() {
+        return getWeightMax() - getWeightMin();
+    }
+
+    public double getWeightMean() {
+        return getWeightSum() / getCount();
     }
 
     @Override
-    public void write(T record) throws IOException {
-        inner.write(record);
-    }
-
-    @Override
-    public void flush() throws IOException {
-        if (inner instanceof Flushable)
-            ((Flushable) inner).flush();
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (inner instanceof Closeable)
-            ((Closeable) inner).close();
+    public Weighted<T> read() throws IOException {
+        Weighted<T> wt = super.read();
+        weightSum += wt.weight();
+        weightMax = Math.max(weightMax, wt.weight());
+        weightMin = Math.min(weightMin, wt.weight());
+        return wt;
     }
 
 }

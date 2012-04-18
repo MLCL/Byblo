@@ -316,7 +316,7 @@ public class FullBuild extends AbstractCommand {
         File simsFile = new File(outputDir, instancesFile.getName() + ".sims");
 
         {
-            int allPairsChunksSize = 2500;
+            int allPairsChunksSize = 1000;
 
             checkValidInputFile("Filtered entries file", entriesFilteredFile);
             checkValidInputFile("Filtered features file", featuresFilteredFile);

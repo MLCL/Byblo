@@ -42,14 +42,12 @@ import uk.ac.susx.mlcl.lib.Checks;
  * @param <T>
  * @author hamish
  */
-public abstract class ObjectSinkAdapter<S extends Sink<T>, T>
-        implements Sink<T>, Closeable, Flushable, Serializable {
-
-    private static final long serialVersionUID = 1L;
+public abstract class ForwardingObjectSink<S extends Sink<T>, T>
+        implements Sink<T>, Closeable, Flushable {
 
     private final S inner;
 
-    public ObjectSinkAdapter(S inner) {
+    public ForwardingObjectSink(S inner) {
         Checks.checkNotNull("inner", inner);
         this.inner = inner;
     }
@@ -75,7 +73,7 @@ public abstract class ObjectSinkAdapter<S extends Sink<T>, T>
             ((Flushable) inner).flush();
     }
 
-    public boolean equals(ObjectSinkAdapter<?, ?> other) {
+    public boolean equals(ForwardingObjectSink<?, ?> other) {
         if (this.inner != other.inner && (this.inner == null || !this.inner.
                                           equals(other.inner)))
             return false;
@@ -88,7 +86,7 @@ public abstract class ObjectSinkAdapter<S extends Sink<T>, T>
             return false;
         if (getClass() != obj.getClass())
             return false;
-        return equals((ObjectSinkAdapter<?, ?>) obj);
+        return equals((ForwardingObjectSink<?, ?>) obj);
     }
 
     @Override

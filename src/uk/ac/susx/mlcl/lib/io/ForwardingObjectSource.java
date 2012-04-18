@@ -36,76 +36,32 @@ import uk.ac.susx.mlcl.lib.Checks;
 
 /**
  *
+ * @param <S>
  * @param <T>
  * @author hamish
  */
-public abstract class DataSourceAdapter<T extends DataSource>
-        implements DataSource, Closeable {
+public abstract class ForwardingObjectSource<S extends Source<T>, T>
+        implements Source<T>, Closeable {
 
-    private final T inner;
+    private final S inner;
 
-    public DataSourceAdapter(T inner) {
+    public ForwardingObjectSource(S inner) {
         Checks.checkNotNull("inner", inner);
         this.inner = inner;
     }
 
-    public final T getInner() {
+    public S getInner() {
         return inner;
     }
 
     @Override
-    public void endOfRecord() throws IOException {
-        inner.endOfRecord();
+    public T read() throws IOException {
+        return inner.read();
     }
 
     @Override
-    public boolean isEndOfRecordNext() throws IOException {
-        return inner.isEndOfRecordNext();
-    }
-
-    @Override
-    public byte readByte() throws IOException {
-        return inner.readByte();
-    }
-
-    @Override
-    public char readChar() throws IOException {
-        return inner.readChar();
-    }
-
-    @Override
-    public short readShort() throws IOException {
-        return inner.readShort();
-    }
-
-    @Override
-    public int readInt() throws IOException {
-        return inner.readInt();
-    }
-
-    @Override
-    public long readLong() throws IOException {
-        return inner.readLong();
-    }
-
-    @Override
-    public float readFloat() throws IOException {
-        return inner.readFloat();
-    }
-
-    @Override
-    public double readDouble() throws IOException {
-        return inner.readDouble();
-    }
-
-    @Override
-    public String readString() throws IOException {
-        return inner.readString();
-    }
-
-    @Override
-    public boolean canRead() throws IOException {
-        return inner.canRead();
+    public boolean hasNext() throws IOException {
+        return inner.hasNext();
     }
 
     @Override
@@ -114,25 +70,31 @@ public abstract class DataSourceAdapter<T extends DataSource>
             ((Closeable) inner).close();
     }
 
-    public boolean equals(DataSourceAdapter<?> other) {
-        return this.inner == other.inner
-                || (this.inner != null && this.inner.equals(other.inner));
+    public boolean equals(ForwardingObjectSource<?, ?> other) {
+        if (this.inner != other.inner && (this.inner == null || !this.inner.
+                                          equals(other.inner)))
+            return false;
+        return true;
     }
 
     @Override
     public boolean equals(Object obj) {
-        return this == obj || (obj != null
-                               && getClass() == obj.getClass()
-                               && equals((DataSourceAdapter) obj));
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        return equals((ForwardingObjectSource<?, ?>) obj);
     }
 
     @Override
     public int hashCode() {
-        return 67 * 3 + (this.inner != null ? this.inner.hashCode() : 0);
+        int hash = 3;
+        hash = 59 * hash + (this.inner != null ? this.inner.hashCode() : 0);
+        return hash;
     }
 
     @Override
     public String toString() {
-        return "DataSourceAdapter{" + "inner=" + inner + '}';
+        return "ObjectSourceAdapter{" + "inner=" + inner + '}';
     }
 }

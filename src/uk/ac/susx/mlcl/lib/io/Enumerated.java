@@ -134,7 +134,7 @@ public class Enumerated {
     }
 
     static class SimpleDSource
-            extends DataSourceAdapter<DataSource>
+            extends ForwardingDataSource<DataSource>
             implements DataSource, Closeable {
 
         final Enumerator<String> enumerator;
@@ -170,7 +170,7 @@ public class Enumerated {
     }
 
     static class SimpleDSink<S extends DataSink>
-            extends DataSinkAdapter<S> {
+            extends ForwardingDataSink<S> {
 
         final Enumerator<String> enumerator;
 
@@ -190,7 +190,7 @@ public class Enumerated {
     }
 
     static class ComplexDSource<T extends DataSource>
-            extends DataSourceAdapter<T>
+            extends ForwardingDataSource<T>
             implements DataSource, Closeable {
 
         final Enumerator<String>[] enumerators;
@@ -286,7 +286,7 @@ public class Enumerated {
     }
 
     static class ComplexDSink<S extends DataSink>
-            extends DataSinkAdapter<S> {
+            extends ForwardingDataSink<S> {
 
         final Enumerator<String>[] enumerators;
 
@@ -358,7 +358,7 @@ public class Enumerated {
     }
 
     static class ComplexDSource2<T extends DataSource>
-            extends DataSourceAdapter<T>
+            extends ForwardingDataSource<T>
             implements DataSource, Closeable {
 
         final Enumerator<String> enumerator;
@@ -459,7 +459,7 @@ public class Enumerated {
     }
 
     static class ComplexDSink2<S extends DataSink>
-            extends DataSinkAdapter<S> {
+            extends ForwardingDataSink<S> {
 
         final Enumerator<String> enumerator;
 

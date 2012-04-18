@@ -73,23 +73,25 @@ public class TokenPairSource
             throw new IOException("Error at position " + position(), ex);
         }
     }
-
-    public static boolean equal(File fileA, File fileB, Charset charset, boolean skip1, boolean skip2)
-            throws IOException {
-        DoubleEnumerating idx = EnumeratingDeligates.toPair(
-                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false,
-                                              null));
-        final TokenPairSource srcA = open(fileA, charset, idx, skip1, skip2);
-        final TokenPairSource srcB = open(fileB, charset, idx, skip1, skip2);
-
-
-        List<TokenPair> listA = IOUtil.readAll(srcA);
-        List<TokenPair> listB = IOUtil.readAll(srcB);
-        Comparator<TokenPair> c = TokenPair.indexOrder();
-        Collections.sort(listA, c);
-        Collections.sort(listB, c);
-        return listA.equals(listB);
-    }
+//
+//    public static boolean equal(File fileA, File fileB, Charset charset,
+//                                DoubleEnumerating aidx, DoubleEnumerating bidx,
+//                                boolean askip1, boolean askip2, boolean bskip1, boolean bskip2)
+//            throws IOException {
+////        DoubleEnumerating idx = EnumeratingDeligates.toPair(
+////                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false,
+////                                              null));
+//        final TokenPairSource srcA = open(fileA, charset, aidx, askip1, askip2);
+//        final TokenPairSource srcB = open(fileB, charset, bidx, bskip1, bskip2);
+//
+//
+//        List<TokenPair> listA = IOUtil.readAll(srcA);
+//        List<TokenPair> listB = IOUtil.readAll(srcB);
+//        Comparator<TokenPair> c = TokenPair.indexOrder();
+//        Collections.sort(listA, c);
+//        Collections.sort(listB, c);
+//        return listA.equals(listB);
+//    }
 
     @Override
     public boolean hasNext() throws IOException {

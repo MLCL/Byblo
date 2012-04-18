@@ -54,8 +54,7 @@ public abstract class TSV {
 
     protected final Charset charset;
 
-    protected long row;
-
+//    protected long row;
     protected long column;
 
     protected TSV(File file, Charset charset) throws FileNotFoundException, IOException {
@@ -63,7 +62,7 @@ public abstract class TSV {
         Checks.checkNotNull("charset", charset);
         this.file = file;
         this.charset = charset;
-        row = 0;
+//        row = 0;
         column = 0;
     }
 
@@ -78,10 +77,10 @@ public abstract class TSV {
     public File getFile() {
         return file;
     }
-
-    public long getRow() {
-        return row;
-    }
+//
+//    public long getRow() {
+//        return row;
+//    }
 
     /**
      * Class that holds functionality to read a Tab Separated Values file.
@@ -111,7 +110,6 @@ public abstract class TSV {
 
         private void writeRecordDelimiter() throws IOException {
             out.append(RECORD_DELIM);
-            ++row;
             column = 0;
         }
 
@@ -122,7 +120,7 @@ public abstract class TSV {
         @Override
         public void writeString(String str) throws IOException {
             Checks.checkNotNull("str", str);
-            
+
             assert str.indexOf(VALUE_DELIM) == -1;
             assert str.indexOf(RECORD_DELIM) == -1;
             if (column > 0)
@@ -184,6 +182,7 @@ public abstract class TSV {
             if (out instanceof Flushable)
                 ((Flushable) out).flush();
         }
+
     }
 
     /**
@@ -216,8 +215,6 @@ public abstract class TSV {
 
         @Override
         public void position(Tell offset) throws IOException {
-            row = offset.value(Long.class);
-            offset = offset.next();
             column = offset.value(Long.class);
             lexer.position(offset.next());
         }
@@ -232,9 +229,7 @@ public abstract class TSV {
 
         @Override
         public Tell position() {
-            return lexer.position().
-                    push(Long.class, column).
-                    push(Long.class, row);
+            return lexer.position().push(Long.class, column);
         }
 
         @Override
@@ -242,19 +237,9 @@ public abstract class TSV {
             return lexer.hasNext();
         }
 
-        private void skipWhitespace() throws IOException {
-            while (lexer.type() == Lexer.Type.Whitespace && lexer.hasNext()) {
-                lexer.advance();
-            }
-        }
-
         @Override
         public boolean isEndOfRecordNext() throws IOException {
             return isDelimiterNext() && lexer.charAt(0) == RECORD_DELIM;
-        }
-
-        private boolean isValueDelimiterNext() throws IOException {
-            return isDelimiterNext() && lexer.charAt(0) == VALUE_DELIM;
         }
 
         private boolean isDelimiterNext() throws IOException {
@@ -263,30 +248,19 @@ public abstract class TSV {
 
         @Override
         public void endOfRecord() throws IOException {
-            do {
-                parseDelimiter(RECORD_DELIM);
-                ++row;
-            } while (isEndOfRecordNext() && canRead());
+            parseDelimiter(RECORD_DELIM);
             column = 0;
-        }
-
-        private void parseValueDelimiter() throws IOException {
-            do {
-                parseDelimiter(VALUE_DELIM);
-            } while (isValueDelimiterNext() && canRead());
         }
 
         @Override
         public String readString() throws IOException {
             if (column > 0)
-                parseValueDelimiter();
+                parseDelimiter(VALUE_DELIM);
 
-            skipWhitespace();
+//            skipWhitespace();
             expectType(Lexer.Type.Value, lexer.type());
             final String str = lexer.value().toString();
-            if (lexer.hasNext())
-                lexer.advance();
-
+            lexer.advanceIfPossible();
             ++column;
             return str;
         }
@@ -316,11 +290,10 @@ public abstract class TSV {
         }
 
         private void parseDelimiter(char delim) throws IOException {
-            skipWhitespace();
+//            skipWhitespace();
             expectType(Lexer.Type.Delimiter, lexer.type());
             expectDelim(delim, lexer.charAt(0));
-            if (lexer.hasNext())
-                lexer.advance();
+            lexer.advanceIfPossible();
         }
 
         private void expectType(Lexer.Type expected, Lexer.Type actual) throws DataFormatException {
@@ -387,6 +360,7 @@ public abstract class TSV {
                         str), nfe);
             }
         }
+
     }
 
     /**
@@ -459,5 +433,6 @@ public abstract class TSV {
             in.close();
             return new String(bytes);
         }
+
     }
 }

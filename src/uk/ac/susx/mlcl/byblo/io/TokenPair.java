@@ -56,12 +56,12 @@ public class TokenPair implements
     /**
      * Indexed identifier of the first entry.
      */
-    private final int id1;
+      int id1;
 
     /**
      * Indexed identifier of the second entry.
      */
-    private final int id2;
+      int id2;
 
     /**
      * Constructor used during cloning. Sub-classes should implement a similar

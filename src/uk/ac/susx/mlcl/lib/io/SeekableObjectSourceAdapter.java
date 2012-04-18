@@ -39,7 +39,7 @@ import java.io.IOException;
  * @author hamish
  */
 public abstract class SeekableObjectSourceAdapter<S extends SeekableSource<T, Tell>, T>
-        extends ObjectSourceAdapter<S, T>
+        extends ForwardingObjectSource<S, T>
         implements SeekableSource<T, Tell> {
 
     public SeekableObjectSourceAdapter(S inner) {

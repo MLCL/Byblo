@@ -30,62 +30,46 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import com.google.common.base.Predicate;
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.lib.collect.Indexed;
+import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.*;
 
 /**
- * A <tt>WeightedTokenPairSource</tt> object is used to retrieve
- * {@link TokenPair} objects from a flat file.
  *
- * @param <P>
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
- * @see WeightedEntryPairSink
  */
-public class WeightedTokenPairSource
-        implements SeekableSource<Weighted<TokenPair>, Tell>, Closeable {
+public class FastWeightedTokenPairVectorSink
+        implements Sink<Indexed<SparseDoubleVector>>, Flushable, Closeable {
 
-    private final SeekableDataSource inner;
+    private final DataSink inner;
 
-    public WeightedTokenPairSource(
-            SeekableDataSource inner//, IndexDeligatePair indexDeligate
-            )
-            throws FileNotFoundException, IOException {
-
+    public FastWeightedTokenPairVectorSink(DataSink inner) {
         this.inner = inner;
     }
 
     @Override
-    public Weighted<TokenPair> read() throws IOException {
-        final int id1 = inner.readInt();
-        final int id2 = inner.readInt();
-        final double weight = inner.readDouble();
-        inner.endOfRecord();
-        return new Weighted<TokenPair>(new TokenPair(id1, id2), weight);
-    }
-
-    public WeightedTokenPairVectorSource getVectorSource() throws IOException {
-        return new WeightedTokenPairVectorSource(this);
-    }
-
-    @Override
-    public boolean hasNext() throws IOException {
-        return inner.canRead();
+    public void write(Indexed<SparseDoubleVector> record) throws IOException {
+        int entryId = record.key();
+        SparseDoubleVector vec = record.value();
+        for (int i = 0; i < vec.size; i++) {
+            inner.writeInt(entryId);
+            inner.writeInt(vec.keys[i]);
+            inner.writeDouble(vec.values[i]);
+            inner.endOfRecord();
+        }
     }
 
     @Override
-    public void position(Tell offset) throws IOException {
-        inner.position(offset);
-    }
-
-    @Override
-    public Tell position() throws IOException {
-        return inner.position();
+    public void flush() throws IOException {
+        if (inner instanceof Flushable)
+            ((Flushable) inner).flush();
     }
 
     @Override
@@ -93,29 +77,11 @@ public class WeightedTokenPairSource
         if (inner instanceof Closeable)
             ((Closeable) inner).close();
     }
-//
-//    public static boolean equal(File a, File b, Charset charset, boolean skip1, boolean skip2) throws IOException {
-//        DoubleEnumerating idx = new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false, false, null, null);
-//        final WeightedTokenPairSource srcA = WeightedTokenPairSource.open(
-//                a, charset, idx, skip1, skip2);
-//        final WeightedTokenPairSource srcB = WeightedTokenPairSource.open(
-//                b, charset, idx, skip1, skip2);
-//
-//        List<Weighted<TokenPair>> listA = IOUtil.readAll(srcA);
-//        List<Weighted<TokenPair>> listB = IOUtil.readAll(srcB);
-//        Comparator<Weighted<TokenPair>> c =
-//                Comparators.fallback(
-//                Weighted.recordOrder(TokenPair.indexOrder()),
-//                Weighted.<TokenPair>weightOrder());
-//        Collections.sort(listA, c);
-//        Collections.sort(listB, c);
-//        return listA.equals(listB);
-//    }
 
-    public static WeightedTokenPairSource open(
-            File file, Charset charset, DoubleEnumerating idx, boolean skip1, boolean skip2)
+    public static FastWeightedTokenPairVectorSink open(
+            File file, Charset charset, DoubleEnumerating idx, boolean skip1, boolean skip2, boolean compact)
             throws IOException {
-        SeekableDataSource tsv = new TSV.Source(file, charset);
+        DataSink tsv = new TSV.Sink(file, charset);
 
 
         if (skip1) {
@@ -128,6 +94,7 @@ public class WeightedTokenPairSource
 
             });
         }
+
         if (skip2) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
@@ -138,6 +105,7 @@ public class WeightedTokenPairSource
 
             });
         }
+
         if (!idx.isEnumeratedEntries()) {
             tsv = Enumerated.enumerated(tsv, idx.getEntryEnumerator(),
                                         new Predicate<Integer>() {
@@ -162,9 +130,10 @@ public class WeightedTokenPairSource
             });
         }
 
-        tsv = Compact.compact(tsv, 3);
+        if (compact)
+            tsv = Compact.compact(tsv, 3);
 
-        return new WeightedTokenPairSource(tsv);
+        return new FastWeightedTokenPairVectorSink(tsv);
     }
 
 }

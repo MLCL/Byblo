@@ -20,11 +20,10 @@ import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
 import static org.junit.Assert.*;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
-import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Comparators;
+import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 
 /**
@@ -67,9 +66,9 @@ public class ExternalSortWeightedTokenPairCommandTest {
         File featureIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".feature-index");
 
         final DoubleEnumerating idx = new DoubleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, 
+                Enumerating.DEFAULT_TYPE,
                 preindexedTokens1, preindexedTokens2,
-                entryIndex, featureIndex);
+                null, null);
 
         Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(
                 Weighted.recordOrder(TokenPair.firstStringOrder(idx.getEntriesEnumeratorCarriar())),
@@ -99,13 +98,13 @@ public class ExternalSortWeightedTokenPairCommandTest {
 
 
         final DoubleEnumerating idx = new DoubleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, 
+                Enumerating.DEFAULT_TYPE,
                 preindexedTokens1, preindexedTokens2,
-                entryIndex, featureIndex);
+                null, null);
 
 
         Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(
-                Weighted.recordOrder(TokenPair.firstIndexOrder()),
+                Weighted.recordOrder(TokenPair.secondIndexOrder()),
                 Comparators.reverse(Weighted.<TokenPair>weightOrder()));
 
         testSortWeightedTokenPairCommand(inputFile, randomisedFile, sortedFile,
@@ -128,59 +127,69 @@ public class ExternalSortWeightedTokenPairCommandTest {
 
 
         // load a weighted token pair file
-        WeightedTokenPairSource inputSource = openSource(inputFile, idx);
-        List<Weighted<TokenPair>> list = IOUtil.readAll(inputSource);
+        WeightedTokenPairSource inputSource = openSource(inputFile, idx, false, false);
+        List<Weighted<TokenPair>> inputList = ObjectIO.readAll(inputSource);
         inputSource.close();
 
-        assertTrue("Input list is empty", list.size() > 0);
+        assertTrue("Input list is empty", inputList.size() > 0);
 
         // scamble it up
-        shuffle(list);
+        shuffle(inputList);
 
 
         // write to a temporary file
 
-        WeightedTokenPairSink randomisedSink = openSink(randomisedFile, idx,
-                                                        false);
-//        randomisedSink.setCompactFormatEnabled(false);
-        IOUtil.copy(list, randomisedSink);
+        WeightedTokenPairSink randomisedSink =
+                openSink(randomisedFile, idx, false, false, false);
+        ObjectIO.copy(inputList, randomisedSink);
         randomisedSink.flush();
         randomisedSink.close();
 
         assertTrue("Randomised file does not exist", randomisedFile.exists());
         assertTrue("Randomised file is not a regular file", randomisedFile.isFile());
-        assertTrue("Randomised file length differs from input", randomisedFile.length() == inputFile.length());
+        {
+            WeightedTokenPairSource x = openSource(randomisedFile, idx, false, false);
+            WeightedTokenPairSource y = openSource(inputFile, idx, false, false);
+            assertTrue("Randomised file length differs from input",
+                       ObjectIO.flush(x) == ObjectIO.flush(y));
+            x.close();
+            y.close();
+        }
 
 
         // run the command
 
-        ExternalSortEventsCommand cmd =
-                new ExternalSortEventsCommand(
-                randomisedFile, sortedFile, DEFAULT_CHARSET,
-                idx);
+        ExternalSortEventsCommand cmd = new ExternalSortEventsCommand();
+        cmd.setSourceFile(randomisedFile);
+        cmd.setDestinationFile(sortedFile);
+        cmd.setCharset(DEFAULT_CHARSET);
         cmd.setMaxChunkSize(1000);
         cmd.setNumThreads(6);
         cmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
         cmd.setIndexDeligate(idx);
         cmd.setComparator(comparator);
 
-
         cmd.runCommand();
 
 
         assertTrue("Sorted file does not exist", sortedFile.exists());
         assertTrue("Sorted file is not a regular file", sortedFile.isFile());
-        assertTrue("Sorted file length differs from input",
-                   sortedFile.length() == inputFile.length());
 
+
+        {
+            WeightedTokenPairSource x = openSource(inputFile, idx, false, false);
+            WeightedTokenPairSource y = openSource(sortedFile, idx, false, false);
+            assertTrue("Sorted file length differs from input",
+                       ObjectIO.flush(x) == ObjectIO.flush(y));
+            x.close();
+            y.close();
+
+        }
         // load the sorted output file and check it's sensible
 
-        WeightedTokenPairSource sortedSource = openSource(sortedFile, idx);
-        List<Weighted<TokenPair>> actual = IOUtil.readAll(sortedSource);
+        WeightedTokenPairSource sortedSource = openSource(sortedFile, idx, false, false);
+        List<Weighted<TokenPair>> actual = ObjectIO.readAll(sortedSource);
         inputSource.close();
-
-        List<Weighted<TokenPair>> expected = new ArrayList<Weighted<TokenPair>>(list);
-        Collections.sort(expected, comparator);
 
         for (int i = 1; i < actual.size(); i++) {
             Weighted<TokenPair> a = actual.get(i - 1);
@@ -188,6 +197,10 @@ public class ExternalSortWeightedTokenPairCommandTest {
             assertTrue("Sorted data does not match comparator: "
                     + a + " > " + b, comparator.compare(a, b) <= 0);
         }
+
+        List<Weighted<TokenPair>> expected = new ArrayList<Weighted<TokenPair>>(inputList);
+        Collections.sort(expected, comparator);
+
 
         for (int i = 0; i < actual.size(); i++) {
             assertTrue(format("Mismatch on row {0}: expected {1} but found {2} ",
@@ -213,19 +226,19 @@ public class ExternalSortWeightedTokenPairCommandTest {
     }
 
     private static WeightedTokenPairSource openSource(
-            File file, DoubleEnumerating idx)
+            File file, DoubleEnumerating idx, boolean skip1, boolean skip2)
             throws IOException {
         return WeightedTokenPairSource.open(
                 file, DEFAULT_CHARSET,
-                idx, true, true);
+                idx, skip1, skip2);
     }
 
     private static WeightedTokenPairSink openSink(
-            File file, DoubleEnumerating idx, boolean compact)
+            File file, DoubleEnumerating idx, boolean compact, boolean skip1, boolean skip2)
             throws IOException {
         return WeightedTokenPairSink.open(
                 file, DEFAULT_CHARSET,
-                idx, compact, true, true);
+                idx, skip1, skip2, compact);
     }
 
 }

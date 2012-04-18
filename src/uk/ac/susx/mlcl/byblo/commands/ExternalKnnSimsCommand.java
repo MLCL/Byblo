@@ -42,7 +42,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
-import uk.ac.susx.mlcl.byblo.io.KFirstReducerSink;
+import uk.ac.susx.mlcl.lib.io.KFirstReducingObjectSink;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.Comparators;
@@ -161,7 +161,7 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
         ObjectMergeTask<Weighted<TokenPair>> task = super.createMergeTask(srcA,
                                                                           srcB,
                                                                           dst);
-        task.setSink(new KFirstReducerSink<Weighted<TokenPair>>(
+        task.setSink(new KFirstReducingObjectSink<Weighted<TokenPair>>(
                 task.getSink(), getClassComparator(), getK()));
         return task;
     }
@@ -171,7 +171,7 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
             Chunk<Weighted<TokenPair>> chunk, File dst) throws IOException {
         ObjectSortTask<Weighted<TokenPair>> task = super.createSortTask(chunk,
                                                                         dst);
-        task.setSink(new KFirstReducerSink<Weighted<TokenPair>>(
+        task.setSink(new KFirstReducingObjectSink<Weighted<TokenPair>>(
                 task.getSink(), getClassComparator(), getK()));
         return task;
     }

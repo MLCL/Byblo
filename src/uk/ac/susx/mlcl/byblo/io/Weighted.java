@@ -49,9 +49,9 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
 
     private static final long serialVersionUID = 1L;
 
-    private double weight;
+     double weight;
 
-    private T record;
+     T record;
 
     public Weighted(final T record, final double weight) {
         this.weight = weight;

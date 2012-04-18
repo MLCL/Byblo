@@ -169,7 +169,7 @@ public class TestConstants {
             File index = new File(file.getParentFile(), file.getName() + ".i.0");
             File trans = new File(file.getParentFile(), file.getName() + ".t");
 
-            assertValidInputFiles(data, index, trans);
+            assertValidInputFiles(data, index);
         }
     }
 
@@ -181,7 +181,7 @@ public class TestConstants {
             File index = new File(file.getParentFile(), file.getName() + ".i.0");
             File trans = new File(file.getParentFile(), file.getName() + ".t");
 
-            assertValidInputFiles(data, index, trans);
+            assertValidInputFiles(data, index);
         }
     }
 
