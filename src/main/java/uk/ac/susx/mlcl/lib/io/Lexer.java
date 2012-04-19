@@ -167,31 +167,8 @@ public class Lexer implements Seekable<Tell>, Closeable {
      * Record the offset that can be used for seeking back to the currently
      * advanced position.
      */
-    private final class Position {
+    private Position pos = new Position();
 
-        long channelOffset;
-
-        int bufferOffset;
-
-        public Position(long channelOffset, int bufferOffset) {
-            this.channelOffset = channelOffset;
-            this.bufferOffset = bufferOffset;
-        }
-
-        @Override
-        protected Position clone() {
-            return new Position(channelOffset, bufferOffset);
-        }
-
-    }
-
-    private Position pos = new Position(0, 0);
-
-////    private Tell tell = new Tell(0, 0);
-//    private long channelOffset = 0;
-//    // the offset in the buffer of the first character in the lexeme
-//
-//    private int bufferOffset = 0;
     /**
      * Store decoded characters
      */
@@ -559,7 +536,7 @@ public class Lexer implements Seekable<Tell>, Closeable {
      */
     @Override
     public void position(final Tell offset) throws IOException {
-        this.pos = offset.value(Position.class);
+        this.pos = offset.value(Position.class).clone();
 
         channel.position(pos.channelOffset);
         channelRestartOffset = channel.position();
@@ -582,4 +559,49 @@ public class Lexer implements Seekable<Tell>, Closeable {
         channel.close();
     }
 
+    /**
+     * Record the offset that can be used for seeking back to the currently
+     * advanced position.
+     */
+    private final class Position {
+
+        long channelOffset;
+
+        int bufferOffset;
+
+        private Position(long channelOffset, int bufferOffset) {
+            this.channelOffset = channelOffset;
+            this.bufferOffset = bufferOffset;
+        }
+
+        public Position() {
+            this(0, 0);
+        }
+
+        @Override
+        protected Position clone() {
+            return new Position(channelOffset, bufferOffset);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null || getClass() != obj.getClass())
+                return false;
+            final Position other = (Position) obj;
+            return this.channelOffset == other.channelOffset
+                    && this.bufferOffset == other.bufferOffset;
+        }
+
+        @Override
+        public int hashCode() {
+            return 43 * (43 * 3 + this.bufferOffset)
+                    + (int) (this.channelOffset ^ (this.channelOffset >>> 32));
+        }
+
+        @Override
+        public String toString() {
+            return "Position{" + "channelOffset=" + channelOffset + ", bufferOffset=" + bufferOffset + '}';
+        }
+
+    }
 }

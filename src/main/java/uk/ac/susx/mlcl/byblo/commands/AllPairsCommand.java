@@ -30,16 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.measure.ReversedProximity;
-import uk.ac.susx.mlcl.byblo.measure.Proximity;
-import uk.ac.susx.mlcl.byblo.measure.CrMi;
-import uk.ac.susx.mlcl.byblo.measure.Lee;
-import uk.ac.susx.mlcl.byblo.measure.KendallTau;
-import uk.ac.susx.mlcl.byblo.measure.Lp;
-import uk.ac.susx.mlcl.byblo.measure.AbstractMIProximity;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
@@ -57,9 +47,13 @@ import java.nio.charset.Charset;
 import java.util.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource.WTStatsSource;
+import uk.ac.susx.mlcl.byblo.measures.*;
 import uk.ac.susx.mlcl.byblo.tasks.InvertedApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.NaiveApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.ThreadedApssTask;
@@ -207,8 +201,8 @@ public class AllPairsCommand extends AbstractCommand {
     public void runCommand() throws Exception {
 
         if (LOG.isInfoEnabled()) {
-            LOG.info(
-                    "Running all-pairs similarity search from \"" + getEventsFile() + "\" to \"" + getOutputFile() + "\"");
+            LOG.info("Running all-pairs similarity search from \""
+                    + getEventsFile() + "\" to \"" + getOutputFile() + "\"");
         }
 
         // Instantiate the denote proxmity measure
@@ -333,7 +327,6 @@ public class AllPairsCommand extends AbstractCommand {
 
                 if (LOG.isWarnEnabled())
                     LOG.warn("Found duplicate Entry \""
-                            //                            + (indexDeligate.getEnumerator().value(entry.record().id()))
                             + (entry.record().id())
                             + "\" (id=" + id
                             + ") in entries file. Merging records. Old frequency = "
@@ -435,14 +428,15 @@ public class AllPairsCommand extends AbstractCommand {
         }
     }
 
-    private Map<String, Class<? extends Proximity>> buildMeasureClassLookupTable() throws ClassNotFoundException {
+    private Map<String, Class<? extends Proximity>> buildMeasureClassLookupTable()
+            throws ClassNotFoundException {
 
         // Map that will store measure aliases to class
         final Map<String, Class<? extends Proximity>> classLookup =
                 new HashMap<String, Class<? extends Proximity>>();
 
         final ResourceBundle res = ResourceBundle.getBundle(
-                "uk.ac.susx.mlcl.byblo.measure.measures");
+                uk.ac.susx.mlcl.byblo.measures.Lin.class.getPackage().getName() + ".measures");
         final String[] measures = res.getString("measures").split(",");
 
         for (int i = 0; i < measures.length; i++) {
@@ -543,13 +537,6 @@ public class AllPairsCommand extends AbstractCommand {
         return chunkSize;
     }
 
-//    public void setCompactFormatDisabled(boolean compactFormatDisabled) {
-//        fileDeligate.setCompactFormatDisabled(compactFormatDisabled);
-//    }
-//
-//    public boolean isCompactFormatDisabled() {
-//        return fileDeligate.isCompactFormatDisabled();
-//    }
     public final void setChunkSize(int chunkSize) {
         Checks.checkRangeIncl("chunkSize", chunkSize, 1, Integer.MAX_VALUE);
         this.chunkSize = chunkSize;
@@ -649,21 +636,6 @@ public class AllPairsCommand extends AbstractCommand {
         this.indexDeligate = indexDeligate;
     }
 
-//    public void setEnumeratorSkipIndexed2(boolean b) {
-//        indexDeligate.setEnumeratorSkipIndexed2(b);
-//    }
-//
-//    public void setEnumeratorSkipIndexed1(boolean b) {
-//        indexDeligate.setEnumeratorSkipIndexed1(b);
-//    }
-////
-//    public boolean isEnumeratorSkipIndexed2() {
-//        return indexDeligate.isEnumeratorSkipIndexed2();
-//    }
-//
-//    public boolean isEnumeratorSkipIndexed1() {
-//        return indexDeligate.isEnumeratorSkipIndexed1();
-//    }
     public void setEnumeratedFeatures(boolean enumeratedFeatures) {
         indexDeligate.setEnumeratedFeatures(enumeratedFeatures);
     }
