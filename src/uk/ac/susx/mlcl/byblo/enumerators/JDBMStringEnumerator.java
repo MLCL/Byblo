@@ -48,7 +48,7 @@ import uk.ac.susx.mlcl.lib.collect.ForwardingBiMap;
  *
  * @author hiam20
  */
-public class JDBCStringEnumerator extends BiMapEnumerator<String> {
+public class JDBMStringEnumerator extends BiMapEnumerator<String> {
 
     private static final long serialVersionUID = 1L;
 
@@ -68,12 +68,12 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
 
     private long modCount = 0;
 
-    public JDBCStringEnumerator(DB db, File file) {
+    public JDBMStringEnumerator(DB db, File file) {
         this.file = null;
         this.db = db;
     }
 
-    public JDBCStringEnumerator(DB db, File file, BiMap<Integer, String> map, AtomicInteger nextId) {
+    public JDBMStringEnumerator(DB db, File file, BiMap<Integer, String> map, AtomicInteger nextId) {
         super(map, nextId);
         this.file = file;
         this.db = db;
@@ -103,7 +103,7 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
             try {
                 file = File.createTempFile("jdbc-", ".tmp");
             } catch (IOException ex) {
-                Logger.getLogger(JDBCStringEnumerator.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(JDBMStringEnumerator.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
             anonymous = false;
@@ -117,7 +117,8 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
 //        maker.enableWeakCache();        
 //        maker.setMRUCacheSize(10000);
 //        maker.disableCacheAutoClear();
-//        maker.disableCache();
+//        maker.disableCache();  
+        maker.disableLocking();
 
         if (anonymous)
             maker.deleteFilesAfterClose();
@@ -174,7 +175,7 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
 
         ForwardingBiMap<Integer, String> map = ForwardingBiMap.<Integer, String>create(
                 forwards, backwards);
-        JDBCStringEnumerator instance = new JDBCStringEnumerator(
+        JDBMStringEnumerator instance = new JDBMStringEnumerator(
                 db, file, map, nextId);
 
         instance.indexOf(FilterCommand.FILTERED_STRING);
@@ -186,7 +187,7 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
 
     public void save() {
         if (file == null) {
-            Logger.getLogger(JDBCStringEnumerator.class.getName()).log(Level.WARNING,
+            Logger.getLogger(JDBMStringEnumerator.class.getName()).log(Level.WARNING,
                                                                        "Attempt made to save an enumerator with no attached file.");
             return;
         }
@@ -205,7 +206,7 @@ public class JDBCStringEnumerator extends BiMapEnumerator<String> {
 
     public void close() {
         if (db == null || db.isClosed()) {
-            Logger.getLogger(JDBCStringEnumerator.class.getName()).log(Level.WARNING,
+            Logger.getLogger(JDBMStringEnumerator.class.getName()).log(Level.WARNING,
                                                                        "Attempt made to close an enumerator that was not open.");
             return;
         }

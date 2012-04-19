@@ -49,7 +49,7 @@ import uk.ac.susx.mlcl.lib.MiscUtil;
  *
  * @author hiam20
  */
-public class JDBCTest {
+public class JDBMTest {
 
     @Test
     public void basicExample() throws IOException {
