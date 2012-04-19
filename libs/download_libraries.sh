@@ -1,7 +1,7 @@
 #!/bin/bash
 # Build Distribution Thresaurus, version 1
 #
-# Copyright (c) 2010-2011, University of Sussex
+# Copyright (c) 2010-2012, University of Sussex
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without 
@@ -54,7 +54,7 @@ function die {
 # Download and build JCommander
 function download_jcommander {
     jc=jcommander
-    jc_version=jcommander-1.19
+    jc_version=jcommander-1.23
 
     echo "[${jc}] Starting"
     which -s mvn || die "Can't find maven"
@@ -187,7 +187,8 @@ function download_junit {
 
 function download_mlcllib {
     ml=mlcllib
-    ml_version=mlcllib-0.1.0
+    #ml_version=mlcllib-0.1.0
+    ml_version=87aa4ed0e899a3bd467bd589f05c1bc61bf2cf29
 
     echo "[${ml}] Starting"
     which -s curl || die "Can't find curl"
@@ -219,18 +220,57 @@ function download_mlcllib {
 }
 
 
+
+# Download and build JDBM
+function download_jdbm {
+    jdbm=jdbm
+    jdbm_version=b90079b89d582e7c728ff6590bb02bf8b6ed3bfb
+
+    echo "[${jdbm}] Starting"
+    which -s mvn || die "Can't find maven"
+    which -s javac || die "Can't find javac"
+    which -s unzip || die "Can't find unzip"
+    which -s curl || die "Can't find curl"
+
+
+    jdbm_url="https://github.com/jankotek/JDBM3/zipball/${jdbm_version}"
+    jdbm_dl_file=`mktemp -t ${jdbm_version}-download`
+    echo "[${jdbm}] Downloading from ${jdbm_url} to $jdbm_dl_file"
+    curl -L "${jdbm_url}" > "${jdbm_dl_file}" || die
+
+    jdbm_ext_dir=`mktemp -dt ${jdbm_version}-extracted`
+    echo "[${jdbm}] Extracting to ${jdbm_ext_dir}"
+    unzip -q "${jdbm_dl_file}" -d "${jdbm_ext_dir}" || die
+
+    echo "[${jdbm}] Buildings"
+    cd ${jdbm_ext_dir}/`ls ${jdbm_ext_dir}`
+    mvn clean package || die
+    cp target/*.jar "$libs_dir" || die
+
+    echo "[${jdbm}] Cleaning temporary files"
+    rm -rf "$jdbm_ext_dir"
+    rm -f "$jdbm_dl_file"
+
+    cd "$libs_dir"
+
+    echo "[${jdbm}] Done"
+}
+
+
 function download_all {
     download_jcommander
-
+      
     download_fastutil
-
+      
     download_commons_logging
-
+      
     download_google_guava 
-
+      
     download_junit 
-
+      
     download_mlcllib
+ 
+	download_jdbm
 }
 
 

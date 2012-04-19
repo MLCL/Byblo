@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, University of Sussex
+ * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -43,7 +43,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
  */
 public class RecallTest {
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testMainMethodRun_RecallMI() throws Exception {
         System.out.println("Testing RecallMI from main method.");
 
@@ -75,7 +75,7 @@ public class RecallTest {
 
     }
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testMainMethodRun_PrecisionMI() throws Exception {
         System.out.println("Testing PrecisionMI from main method.");
 

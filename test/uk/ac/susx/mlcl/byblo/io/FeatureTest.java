@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, University of Sussex
+ * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import com.google.common.io.Files;
 import java.io.File;
@@ -38,6 +39,7 @@ import java.io.IOException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.byblo.enumerators.*;
 
 /**
  *
@@ -45,11 +47,15 @@ import static uk.ac.susx.mlcl.TestConstants.*;
  */
 public class FeatureTest {
 
-    private void copyF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        WeightedTokenSource aSrc = new WeightedTokenSource(a, DEFAULT_CHARSET);
-        WeightedTokenSink bSink = new WeightedTokenSink(b, DEFAULT_CHARSET,
-                aSrc.getStringIndex());
-        bSink.setCompactFormatEnabled(compact);
+    private void copyF(File a, File b) throws FileNotFoundException, IOException {
+        Enumerator<String> strEnum = MemoryBasedStringEnumerator.newInstance();
+
+        SingleEnumeratingDeligate del = new SingleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, null);
+        WeightedTokenSource aSrc = WeightedTokenSource.open(
+                a, DEFAULT_CHARSET, del, false);
+        WeightedTokenSink bSink = WeightedTokenSink.open(
+                b, DEFAULT_CHARSET, del, false);
 
         IOUtil.copy(aSrc, bSink);
         bSink.close();
@@ -59,21 +65,63 @@ public class FeatureTest {
     public void testFeaturesConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_FEATURES;
         File b = new File(TEST_OUTPUT_DIR,
-                TEST_FRUIT_FEATURES.getName() + ".compact");
+                          TEST_FRUIT_FEATURES.getName() + ".compact");
         File c = new File(TEST_OUTPUT_DIR,
-                TEST_FRUIT_FEATURES.getName() + ".verbose");
+                          TEST_FRUIT_FEATURES.getName() + ".verbose");
 
-        copyF(a, b, true);
+        copyF(a, b);
 
         assertTrue("Compact copy is smaller that verbose source.",
-                b.length() <= a.length());
+                   b.length() <= a.length());
 
-        copyF(b, c, false);
+        copyF(b, c);
 
 
         assertTrue("Verbose copy is smaller that compact source.",
-                c.length() >= b.length());
+                   c.length() >= b.length());
         assertTrue("Double converted file is not equal to origion.",
-                Files.equal(a, c));
+                   Files.equal(a, c));
     }
+
+    @Test
+    public void testFeaturesEnumeratorConversion() throws FileNotFoundException, IOException {
+        File a = TEST_FRUIT_FEATURES;
+        File b = new File(TEST_OUTPUT_DIR,
+                          TEST_FRUIT_FEATURES.getName() + ".enum");
+        File c = new File(TEST_OUTPUT_DIR,
+                          TEST_FRUIT_FEATURES.getName() + ".str");
+
+        SingleEnumeratingDeligate indel = new SingleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, null);
+        SingleEnumeratingDeligate outdel = new SingleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, true, null);
+
+
+        {
+            WeightedTokenSource aSrc = WeightedTokenSource.open(
+                    a, DEFAULT_CHARSET, indel, false);
+            WeightedTokenSink bSink = WeightedTokenSink.open(
+                    b, DEFAULT_CHARSET, outdel, false);
+            IOUtil.copy(aSrc, bSink);
+            bSink.close();
+        }
+
+        assertTrue("Compact copy is smaller that verbose source.",
+                   b.length() <= a.length());
+
+        {
+            WeightedTokenSource bSrc = WeightedTokenSource.open(
+                    b, DEFAULT_CHARSET, outdel, false);
+            WeightedTokenSink cSink = WeightedTokenSink.open(
+                    c, DEFAULT_CHARSET, indel, false);
+            IOUtil.copy(bSrc, cSink);
+            cSink.close();
+        }
+
+        assertTrue("Verbose copy is smaller that compact source.",
+                   c.length() >= b.length());
+        assertTrue("Double converted file is not equal to origion.",
+                   Files.equal(a, c));
+    }
+
 }

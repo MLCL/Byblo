@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, University of Sussex
+ * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -30,188 +30,150 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.lib.io.AbstractTSVSource;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
+import com.google.common.base.Predicate;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
+import uk.ac.susx.mlcl.lib.io.*;
 
 /**
- * An <tt>WeightedTokenSource</tt> object is used to retrieve {@link Token} 
- * objects from a flat file. 
- * 
+ * An <tt>WeightedTokenSource</tt> object is used to retrieve {@link Token}
+ * objects from a flat file.
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see EntrySink
  */
-public class WeightedTokenSource extends AbstractTSVSource<Weighted<Token>> {
+public class WeightedTokenSource
+        implements SeekableSource<Weighted<Token>, Tell>, Closeable {
 
     private static final Log LOG = LogFactory.getLog(WeightedTokenSource.class);
 
-    private final ObjectIndex<String> stringIndex;
+    private final SeekableDataSource inner;
 
-    private double weightSum = 0;
-
-    private double weightMax = 0;
-
-    private int widthSum = 0;
-
-    private int widthMax = 0;
-
-    private int cardinality = 0;
-
-    private int count = 0;
-
-    private Weighted<Token> previousRecord = null;
-
-    public WeightedTokenSource(File file, Charset charset,
-            ObjectIndex<String> stringIndex)
+    public WeightedTokenSource(SeekableDataSource inner)
             throws FileNotFoundException, IOException {
-        super(file, charset);
-        if (stringIndex == null)
-            throw new NullPointerException("stringIndex == null");
-        this.stringIndex = stringIndex;
-    }
-
-    public WeightedTokenSource(File file, Charset charset)
-            throws FileNotFoundException, IOException {
-        this(file, charset, new ObjectIndex<String>());
-    }
-
-    public ObjectIndex<String> getStringIndex() {
-        return stringIndex;
-    }
-
-    public double getWeightSum() {
-        return weightSum;
-    }
-
-    public double getWeightMax() {
-        return weightMax;
-    }
-
-    public int getWidthMax() {
-        return widthMax;
-    }
-
-    public int getWidthSum() {
-        return widthSum;
-    }
-
-    public int getCardinality() {
-        return cardinality;
-    }
-
-    public int getCount() {
-        return count;
+        this.inner = inner;
     }
 
     @Override
     public void position(Tell offset) throws IOException {
-        super.position(offset);
-        previousRecord = null;
+        inner.position(offset);
     }
 
     @Override
-    public Tell position() {
-        return super.position();
+    public Tell position() throws IOException {
+        return inner.position();
     }
 
     @Override
     public Weighted<Token> read() throws IOException {
-        final int entryId;
-        if (previousRecord == null) {
-            entryId = stringIndex.get(parseString());
-            parseValueDelimiter();
-        } else {
-            entryId = previousRecord.record().id();
-        }
+        final int tokenId = inner.readInt();
+        final double weight = inner.readDouble();
+        inner.endOfRecord();
 
-        if (!hasNext() || isDelimiterNext()) {
-            parseRecordDelimiter();
-            throw new SingletonRecordException(this,
-                    "Found entry record with no weights.");
-        }
+        return new Weighted<Token>(new Token(tokenId), weight);
 
-        final double weight = parseDouble();
-
-        cardinality = Math.max(cardinality, entryId + 1);
-        weightSum += weight;
-        weightMax = Math.max(weightMax, weight);
-        ++count;
-        final Weighted<Token> record = new Weighted<Token>(new Token(entryId), weight);
-
-        if (isValueDelimiterNext()) {
-            parseValueDelimiter();
-            previousRecord = record;
-        }
-
-        if (hasNext() && isRecordDelimiterNext()) {
-            parseRecordDelimiter();
-            previousRecord = null;
-        }
-
-        return record;
     }
 
-    public Int2DoubleMap readAll() throws IOException {
-        Int2DoubleMap entityFrequenciesMap = new Int2DoubleOpenHashMap();
-        while (this.hasNext()) {
-            Weighted<Token> entry = this.read();
-            if (entityFrequenciesMap.containsKey(entry.record().id())) {
-                // If we encounter the same Token more than once, it means
-                // the perl has decided two strings are not-equal, which java
-                // thinks are equal ... so we need to merge the records:
+    public static WeightedTokenSource open(
+            File f, Charset charset, SingleEnumerating idx, boolean skip1) throws IOException {
+        SeekableDataSource tsv = new TSV.Source(f, charset);
 
-                // TODO: Not true any more.. remove this code?
+        if (skip1) {
+            tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
-                final int id = entry.record().id();
-                final double oldFreq = entityFrequenciesMap.get(id);
-                final double newFreq = oldFreq + entry.weight();
+                @Override
+                public boolean apply(Integer column) {
+                    return column == 0;
+                }
 
-                if (LOG.isWarnEnabled())
-                    LOG.warn("Found duplicate Entry \"" + stringIndex.get(entry.record().
-                            id()) + "\" (id=" + id
-                            + ") in entries file. Merging records. Old frequency = "
-                            + oldFreq + ", new frequency = " + newFreq + ".");
-
-                entityFrequenciesMap.put(id, newFreq);
-            } else {
-                entityFrequenciesMap.put(entry.record().id(), entry.weight());
-            }
+            });
         }
-        return entityFrequenciesMap;
+
+        tsv = Compact.compact(tsv, 2);
+
+        if (!idx.isEnumerationEnabled())
+            tsv = Enumerated.enumerated(tsv, idx.getEnumerator());
+        return new WeightedTokenSource(tsv);
+    }
+//
+//    public static boolean equal(File a, File b, Charset charset,
+//                                boolean askip1, boolean bskip1) throws IOException {
+//        SingleEnumerating idx = new SingleEnumeratingDeligate(EnumeratorType.JDBC, true, null);
+//        final WeightedTokenSource srcA = open(a, charset, idx, askip1);
+//        final WeightedTokenSource srcB = open(b, charset, idx, bskip1);
+//
+//        List<Weighted<Token>> listA = IOUtil.readAll(srcA);
+//        List<Weighted<Token>> listB = IOUtil.readAll(srcB);
+//        Comparator<Weighted<Token>> c = Comparators.fallback(
+//                Weighted.recordOrder(Token.indexOrder()),
+//                Weighted.<Token>weightOrder());
+//        Collections.sort(listA, c);
+//        Collections.sort(listB, c);
+//        return listA.equals(listB);
+//    }
+//    
+//    public static boolean equal(File a, File b, Charset charset,
+//                                SingleEnumeratingDeligate aidx, SingleEnumeratingDeligate bidx,
+//                                boolean askip1, boolean bskip1) throws IOException {
+//        final WeightedTokenSource srcA = open(a, charset, aidx, askip1);
+//        final WeightedTokenSource srcB = open(b, charset, bidx, bskip1);
+//
+//        List<Weighted<Token>> listA = IOUtil.readAll(srcA);
+//        List<Weighted<Token>> listB = IOUtil.readAll(srcB);
+//        Comparator<Weighted<Token>> c = Comparators.fallback(
+//                Weighted.recordOrder(Token.indexOrder()),
+//                Weighted.<Token>weightOrder());
+//        Collections.sort(listA, c);
+//        Collections.sort(listB, c);
+//        return listA.equals(listB);
+//    }
+
+    @Override
+    public boolean hasNext() throws IOException {
+        return inner.canRead();
     }
 
-    public double[] readAllAsArray() throws IOException {
-        Int2DoubleMap tmp = readAll();
-        double[] entryFreqs = new double[getCardinality()];
-        ObjectIterator<Int2DoubleMap.Entry> it = tmp.int2DoubleEntrySet().
-                iterator();
-        while (it.hasNext()) {
-            Int2DoubleMap.Entry entry = it.next();
-            entryFreqs[entry.getIntKey()] = entry.getDoubleValue();
-        }
-        return entryFreqs;
+    @Override
+    public void close() throws IOException {
+        if (inner instanceof Closeable)
+            ((Closeable) inner).close();
     }
 
-    public static boolean equal(File a, File b, Charset charset) throws IOException {
-        final ObjectIndex<String> stringIndex = new ObjectIndex<String>();
-        final WeightedTokenSource srcA = new WeightedTokenSource(a, charset, stringIndex);
-        final WeightedTokenSource srcB = new WeightedTokenSource(b, charset, stringIndex);
-        boolean equal = true;
-        while (equal && srcA.hasNext() && srcB.hasNext()) {
-            final Weighted<Token> recA = srcA.read();
-            final Weighted<Token> recB = srcB.read();
-            equal = recA.record().id() == recB.record().id()
-                    && recA.weight() == recB.weight();
+    public static class WTStatsSource
+            extends WeightStatsObjectSource<Token> {
+
+        private int minId = 0;
+
+        private int maxId = 0;
+
+        public WTStatsSource(WeightedTokenSource inner) {
+            super(inner);
         }
-        return equal && srcA.hasNext() == srcB.hasNext();
+
+        public int getMaxId() {
+            return maxId;
+        }
+
+        public int getMinId() {
+            return minId;
+        }
+
+        @Override
+        public Weighted<Token> read() throws IOException {
+            final Weighted<Token> wt = super.read();
+            minId = Math.min(minId, wt.record().id());
+            maxId = Math.max(maxId, wt.record().id());
+            return wt;
+        }
+
     }
 }

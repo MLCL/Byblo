@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, University of Sussex
+ * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -30,16 +30,14 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.io.Serializable;
+import java.io.*;
 import java.util.Comparator;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.ObjectIndex;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 
 /**
  * TokenPair holds the unique ids of two indexed strings.
@@ -52,20 +50,26 @@ public class TokenPair implements
         Comparable<TokenPair>, Serializable, Cloneable {
 
     private static final long serialVersionUID = 3L;
+
+    private static final Comparator<TokenPair> NATURAL_ORDER = indexOrder();
+
     /**
      * Indexed identifier of the first entry.
      */
-    private final int id1;
+      int id1;
+
     /**
      * Indexed identifier of the second entry.
      */
-    private final int id2;
+      int id2;
 
     /**
      * Constructor used during cloning. Sub-classes should implement a similar
      * constructor and call this one.
      *
+     * @param that 
      * @throws NullPointerException if the argument is null
+     * @throws IllegalArgumentException  
      */
     protected TokenPair(final TokenPair that)
             throws NullPointerException, IllegalArgumentException {
@@ -106,10 +110,11 @@ public class TokenPair implements
                 toString();
     }
 
-    public String toString(ObjectIndex<String> stringIndex1,
-            ObjectIndex<String> stringIndex2) {
+    public String toString(Enumerator<String> stringIndex1,
+                           Enumerator<String> stringIndex2) {
         return Objects.toStringHelper(this).
-                add("1", stringIndex1.get(id1)).add("2", stringIndex2.get(id2)).
+                add("1", stringIndex1.valueOf(id1)).add("2", stringIndex2.valueOf(
+                id2)).
                 toString();
     }
 
@@ -126,7 +131,7 @@ public class TokenPair implements
     public int compareTo(final TokenPair that)
             throws NullPointerException {
         Checks.checkNotNull("that", that);
-        return ASYMMETRIC_KEY_COMPARATOR.compare(this, that);
+        return NATURAL_ORDER.compare(this, that);
     }
 
     @Override
@@ -154,6 +159,7 @@ public class TokenPair implements
             implements Externalizable {
 
         private static final long serialVersionUID = 1;
+
         private TokenPair pair;
 
         public Serializer() {
@@ -184,6 +190,7 @@ public class TokenPair implements
         protected final Object readResolve() {
             return pair;
         }
+
     }
 
     public static Predicate<TokenPair> identity() {
@@ -198,76 +205,96 @@ public class TokenPair implements
             public String toString() {
                 return "identity";
             }
+
         };
     }
-//
-//    public static Comparator<Weighted<EntryPair>> ASYMMETRIC_COMPARATOR =
-//            new Comparator<Weighted<EntryPair>>() {
-//
-//                @Override
-//                public int compare(Weighted<EntryPair> a,
-//                        Weighted<EntryPair> b) {
-//                    return a.get().entry1Id < b.get().entry1Id ? -1
-//                            : a.get().entry1Id > b.get().entry1Id ? 1
-//                            : a.get().entry2Id < b.get().entry2Id ? -1
-//                            : a.get().entry2Id > b.get().entry2Id ? 1
-//                            : Double.compare(a.getWeight(), b.getWeight());
-//                }
-//            };
-//
-//    public static Comparator<Weighted<EntryPair>> SYMMETRIC_COMPARATOR =
-//            new Comparator<Weighted<EntryPair>>() {
-//
-//                @Override
-//                public int compare(Weighted<EntryPair> a,
-//                        Weighted<EntryPair> b) {
-//                    final int x1 = Math.min(a.get().entry1Id, a.get().entry2Id);
-//                    final int x2 = Math.min(b.get().entry1Id, b.get().entry2Id);
-//                    final int y1 = Math.max(a.get().entry1Id, a.get().entry2Id);
-//                    final int y2 = Math.max(b.get().entry1Id, b.get().entry2Id);
-//                    return x1 < x2 ? -1
-//                            : x1 > x2 ? 1
-//                            : y1 < y2 ? -1
-//                            : y1 > y2 ? 1
-//                            : Double.compare(a.getWeight(), b.getWeight());
-//                }
-//            };
-    public static final Comparator<TokenPair> ASYMMETRIC_KEY_COMPARATOR =
-            new Comparator<TokenPair>() {
 
-                @Override
-                public final int compare(final TokenPair a, final TokenPair b) {
-                    return a.id1() < b.id1() ? -1
-                            : a.id1() > b.id1() ? 1
-                            : a.id2() < b.id2() ? -1
-                            : a.id2() > b.id2() ? 1
-                            : 0;
-                }
+    public static Comparator<TokenPair> indexOrder() {
+        return new Comparator<TokenPair>() {
 
-                @Override
-                public String toString() {
-                    return "ASYMMETRIC_KEY_COMPARATOR";
-                }
-            };
-    public static final Comparator<TokenPair> SYMMETRIC_KEY_COMPARATOR =
-            new Comparator<TokenPair>() {
+            @Override
+            public int compare(TokenPair a, TokenPair b) {
+                int c = a.id1() - b.id1();
+                return c != 0 ? c : a.id2() - b.id2();
+            }
 
-                @Override
-                public final int compare(final TokenPair a, final TokenPair b) {
-                    final int x1 = Math.min(a.id1(), a.id2());
-                    final int x2 = Math.min(b.id1(), b.id2());
-                    final int y1 = Math.max(a.id1(), a.id2());
-                    final int y2 = Math.max(b.id1(), b.id2());
-                    return x1 < x2 ? -1
-                            : x1 > x2 ? 1
-                            : y1 < y2 ? -1
-                            : y1 > y2 ? 1
-                            : 0;
-                }
+        };
+    }
 
-                @Override
-                public String toString() {
-                    return "SYMMETRIC_KEY_COMPARATOR";
+    public static Comparator<TokenPair> firstIndexOrder() {
+        return new Comparator<TokenPair>() {
+
+            @Override
+            public int compare(TokenPair a, TokenPair b) {
+                return a.id1() - b.id1();
+            }
+
+        };
+    }
+
+    public static Comparator<TokenPair> secondIndexOrder() {
+        return new Comparator<TokenPair>() {
+
+            @Override
+            public int compare(TokenPair a, TokenPair b) {
+                return a.id2() - b.id2();
+            }
+
+        };
+    }
+
+    public static Comparator<TokenPair> stringOrder(
+            final DoubleEnumerating idx) {
+        return new Comparator<TokenPair>() {
+
+            @Override
+            public int compare(final TokenPair a, final TokenPair b) {
+                try {
+                    final Enumerator<String> en1 = idx.getEntryEnumerator();
+                    int c = en1.valueOf(a.id1()).compareTo(en1.valueOf(b.id1()));
+                    final Enumerator<String> en2 = idx.getFeatureEnumerator();
+                    return c != 0 ? c 
+                           : en2.valueOf(a.id2()).compareTo(en2.valueOf(b.id2()));
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
                 }
-            };
+            }
+
+        };
+    }
+
+    public static Comparator<TokenPair> firstStringOrder(
+            final SingleEnumerating idx) {
+        return new Comparator<TokenPair>() {
+
+            @Override
+            public int compare(final TokenPair a, final TokenPair b) {
+                try {
+                    final Enumerator<String> en = idx.getEnumerator();
+                    return en.valueOf(a.id1()).compareTo(en.valueOf(b.id1()));
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+
+        };
+    }
+
+    public static Comparator<TokenPair> secondStringOrder(
+            final SingleEnumerating idx) {
+        return new Comparator<TokenPair>() {
+
+            @Override
+            public int compare(final TokenPair a, final TokenPair b) {
+                try {
+                    final Enumerator<String> en = idx.getEnumerator();
+                    return en.valueOf(a.id2()).compareTo(en.valueOf(b.id2()));
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+
+        };
+    }
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, University of Sussex
+ * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -33,7 +33,6 @@ package uk.ac.susx.mlcl.byblo.io;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
-import uk.ac.susx.mlcl.lib.ObjectIndex;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.Sink;
@@ -42,41 +41,23 @@ import uk.ac.susx.mlcl.lib.io.Sink;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@Deprecated
 public class WeightedTokenPairVectorSink
         implements Sink<Indexed<SparseDoubleVector>>, Flushable, Closeable {
 
     private final WeightedTokenPairSink inner;
-    private long count = 0;
 
     public WeightedTokenPairVectorSink(WeightedTokenPairSink inner) {
         this.inner = inner;
-    }
-
-    public ObjectIndex<String> getStringIndex1() {
-        return inner.getStringIndex1();
-    }
-
-    public ObjectIndex<String> getStringIndex2() {
-        return inner.getStringIndex2();
-    }
-
-    public boolean isIndexCombined() {
-        return inner.isIndexCombined();
     }
 
     @Override
     public void write(Indexed<SparseDoubleVector> record) throws IOException {
         int entryId = record.key();
         SparseDoubleVector vec = record.value();
-        for (int i = 0; i < vec.size; i++) {
+        for (int i = 0; i < vec.size; i++)
             inner.write(new Weighted<TokenPair>(
                     new TokenPair(entryId, vec.keys[i]), vec.values[i]));
-        }
-        ++count;
-    }
-
-    public long getCount() {
-        return count;
     }
 
     @Override
@@ -88,4 +69,5 @@ public class WeightedTokenPairVectorSink
     public void close() throws IOException {
         inner.close();
     }
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, University of Sussex
+ * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -43,7 +43,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
  */
 public class ConfusionTest {
 
-    @Test(timeout = 1000)
+    @Test(timeout = 2000)
     public void testConfusionCLI() throws Exception {
         System.out.println("Testing Confusion from main method.");
 

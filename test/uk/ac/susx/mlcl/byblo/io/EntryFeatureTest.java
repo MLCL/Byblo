@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, University of Sussex
+ * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -30,15 +30,21 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import uk.ac.susx.mlcl.lib.io.IOUtil;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.byblo.enumerators.*;
+import uk.ac.susx.mlcl.lib.io.IOUtil;
 
 /**
  *
@@ -47,53 +53,102 @@ import static uk.ac.susx.mlcl.TestConstants.*;
 public class EntryFeatureTest {
 
     @Test
-    public void testEndOfLineTab() throws FileNotFoundException, IOException {
+    public void testLMMedlineSample() throws FileNotFoundException, IOException {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-input-sample");
         Charset charset = Charset.forName("UTF-8");
-        TokenPairSource efSrc = new TokenPairSource(testSample, charset);
+        DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, false, null, null);
+
+        TokenPairSource efSrc = TokenPairSource.open(
+                testSample, charset, del, false, false);
         assertTrue("EntryFeatureSource is empty", efSrc.hasNext());
 
         while (efSrc.hasNext()) {
-            try {
-                TokenPair ef = efSrc.read();
-                assertNotNull("Found null EntryFeatureRecord", ef);
-            } catch (SingletonRecordException ex) {
-                // This is allowed to happen here, because the file explicitly
-                // contains this erroneous expression for test purposes
-                if (ex.getOffset() != 1671)
-                    throw ex;
-            }
+            TokenPair ef = efSrc.read();
+            assertNotNull("Found null EntryFeatureRecord", ef);
         }
     }
 
     private void copyEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        TokenPairSource aSrc = new TokenPairSource(a, DEFAULT_CHARSET);
-        TokenPairSink bSink = new TokenPairSink(b, DEFAULT_CHARSET,
-                aSrc.getStringIndex1(), aSrc.getStringIndex2());
-        bSink.setCompactFormatEnabled(compact);
-
-        IOUtil.copy(aSrc, bSink);
-        bSink.close();
+        DoubleEnumeratingDeligate idx = new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, false, null, null);
+        TokenPairSource src = TokenPairSource.open(
+                a, DEFAULT_CHARSET, idx, false, false);
+        TokenPairSink sink = TokenPairSink.open(
+                b, DEFAULT_CHARSET, idx, compact, false, false);
+        IOUtil.copy(src, sink);
+        sink.close();
     }
 
     @Test
-    public void testEntryFeaturesConversion() throws FileNotFoundException, IOException {
+    public void testEntryFeatures_CompactConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_INPUT;
         File b = new File(TEST_OUTPUT_DIR,
-                TEST_FRUIT_INPUT.getName() + ".compact");
+                          TEST_FRUIT_INPUT.getName() + ".compact");
         File c = new File(TEST_OUTPUT_DIR,
-                TEST_FRUIT_INPUT.getName() + ".verbose");
+                          TEST_FRUIT_INPUT.getName() + ".verbose");
 
         copyEF(a, b, true);
 
         assertTrue("Compact copy is smaller that verbose source.",
-                b.length() <= a.length());
+                   b.length() <= a.length());
 
         copyEF(b, c, false);
 
         assertTrue("Verbose copy is smaller that compact source.",
-                c.length() >= b.length());
+                   c.length() >= b.length());
         assertTrue("Double converted file is not equal to origion.",
-                Files.equal(a, c));
+                   Files.equal(a, c));
     }
+
+    @Test
+    public void testEntryPair_EnumeratorConversion() throws FileNotFoundException, IOException, ClassNotFoundException {
+        File a = TEST_FRUIT_INPUT;
+        File b = new File(TEST_OUTPUT_DIR,
+                          TEST_FRUIT_INPUT.getName() + ".enum");
+        File c = new File(TEST_OUTPUT_DIR,
+                          TEST_FRUIT_INPUT.getName() + ".str");
+        File idxFile = new File(TEST_OUTPUT_DIR,
+                                TEST_FRUIT_INPUT.getName() + ".index");
+
+
+        DoubleEnumerating indel = EnumeratingDeligates.toPair(
+                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false, idxFile));
+        DoubleEnumerating outdel = EnumeratingDeligates.toPair(
+                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, idxFile));
+
+        {
+
+
+            TokenPairSource aSrc = TokenPairSource.open(
+                    a, DEFAULT_CHARSET, indel, false, false);
+
+            TokenPairSink bSink = TokenPairSink.open(
+                    b, DEFAULT_CHARSET, outdel, true, true, true);
+            IOUtil.copy(aSrc, bSink);
+
+            indel.saveEntriesEnumerator();
+
+            bSink.close();
+        }
+
+        assertTrue("Compact copy is smaller that verbose source.",
+                   b.length() <= a.length());
+
+        {
+            TokenPairSource bSrc = TokenPairSource.open(
+                    b, DEFAULT_CHARSET, outdel, true, true);
+            TokenPairSink cSink = TokenPairSink.open(
+                    c, DEFAULT_CHARSET, indel,
+                    false, false, false);
+            IOUtil.copy(bSrc, cSink);
+            cSink.close();
+        }
+
+        assertTrue("Verbose copy is smaller that compact source.",
+                   c.length() >= b.length());
+        assertTrue("Double converted file is not equal to origion.",
+                   Files.equal(a, c));
+    }
+
 }

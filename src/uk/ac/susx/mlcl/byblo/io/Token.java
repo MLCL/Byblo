@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, University of Sussex
+ * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -31,23 +31,23 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import com.google.common.base.Objects;
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.io.Serializable;
-import uk.ac.susx.mlcl.lib.ObjectIndex;
+import java.io.*;
+import java.util.Comparator;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 
 /**
  * <tt>Token</tt> objects represent a single instance of an indexed string.
- * 
+ *
  * <p>Instances of <tt>Token</tt> are immutable.<p>
- * 
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class Token implements Serializable, Comparable<Token>, Cloneable {
 
     private static final long serialVersionUID = 2L;
+
+    private static final Comparator<Token> NATURAL_ORDER = indexOrder();
 
     private final int id;
 
@@ -59,21 +59,21 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
         this.id = other.id();
     }
 
-
     public int id() {
         return id;
     }
 
     /**
      * Indicates whether some other object is "equal to" this one.
-     * 
-     * <p>Note that only the <tt>entryId</tt> field is used for equality. I.e  
-     * two objects with the same <tt>entryId</tt>, but differing weights 
+     *
+     * <p>Note that only the <tt>entryId</tt> field is used for equality. I.e
+     * two objects with the same <tt>entryId</tt>, but differing weights
      * <em>will</em> be consider equal.</p>
-     * 
-     * @param   obj   the reference object with which to compare.
-     * @return  <code>true</code> if this object is the same as the obj
-     *          argument; <code>false</code> otherwise.
+     *
+     * @param obj the reference object with which to compare.
+     * @return
+     * <code>true</code> if this object is the same as the obj argument;
+     * <code>false</code> otherwise.
      */
     @Override
     public boolean equals(Object obj) {
@@ -100,24 +100,23 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
                 toString();
     }
 
-    public String toString(ObjectIndex<String> stringIndex) {
+    public String toString(Enumerator<String> stringIndex) {
         return Objects.toStringHelper(this).
                 add("id", id).
-                add("string", stringIndex.get(id)).
+                add("string", stringIndex.valueOf(id)).
                 toString();
     }
 
     @Override
     public int compareTo(Token that) {
-        return this.id() - that.id();
+        return NATURAL_ORDER.compare(this, that);
     }
 
     @Override
     protected Token clone() throws CloneNotSupportedException {
         return new Token(this);
     }
-    
-    
+
     protected final Object writeReplace() {
         return new Serializer(this);
     }
@@ -154,5 +153,39 @@ public class Token implements Serializable, Comparable<Token>, Cloneable {
         protected final Object readResolve() {
             return token;
         }
+
     }
+
+    public static Comparator<Token> indexOrder() {
+        return new Comparator<Token>() {
+
+            @Override
+            public int compare(final Token a, final Token b) {
+                return a.id() - b.id();
+            }
+
+        };
+    }
+
+    public static Comparator<Token> stringOrder(
+            final SingleEnumerating idx) {
+        return new Comparator<Token>() {
+
+            @Override
+            public int compare(final Token a, final Token b) {
+                try {
+                    String s1 = idx.getEnumerator().valueOf(a.id());
+                    String s2 = idx.getEnumerator().valueOf(b.id());
+
+                    assert s1 != null : "s1 ia null";
+                    assert s2 != null : "s2 ia null";
+                    return s1.compareTo(s2);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+
+        };
+    }
+
 }

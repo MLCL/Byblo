@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, University of Sussex
+ * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -30,13 +30,14 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import uk.ac.susx.mlcl.lib.io.Lexer.Tell;
 import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -44,6 +45,8 @@ import java.io.IOException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.byblo.enumerators.*;
+import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
  *
@@ -51,50 +54,110 @@ import static uk.ac.susx.mlcl.TestConstants.*;
  */
 public class EntryTest {
 
-    private void copyE(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        WeightedTokenSource aSrc = new WeightedTokenSource(a, DEFAULT_CHARSET);
-        WeightedTokenSink bSink = new WeightedTokenSink(b, DEFAULT_CHARSET,
-                aSrc.getStringIndex());
-        bSink.setCompactFormatEnabled(compact);
+    private void copyE(File a, File b, boolean enumIn,
+                       boolean enumOut)
+            throws FileNotFoundException, IOException {
+
+        SingleEnumeratingDeligate idx = new SingleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, null);
+
+        WeightedTokenSource aSrc;
+        WeightedTokenSink bSink;
+        if (enumIn)
+            aSrc = WeightedTokenSource.open(a, DEFAULT_CHARSET, idx, false);
+        else
+            aSrc = WeightedTokenSource.open(a, DEFAULT_CHARSET, idx, false);
+
+        if (enumOut)
+            bSink = WeightedTokenSink.open(b, DEFAULT_CHARSET, idx, false);
+        else
+            bSink = WeightedTokenSink.open(b, DEFAULT_CHARSET, idx, false);
 
         IOUtil.copy(aSrc, bSink);
         bSink.close();
     }
 
     @Test
-    public void testEntriesConversion() throws FileNotFoundException, IOException {
+    public void testEntriesCompactConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_ENTRIES;
         File b = new File(TEST_OUTPUT_DIR,
-                TEST_FRUIT_ENTRIES.getName() + ".compact");
+                          TEST_FRUIT_ENTRIES.getName() + ".compact");
         File c = new File(TEST_OUTPUT_DIR,
-                TEST_FRUIT_ENTRIES.getName() + ".verbose");
+                          TEST_FRUIT_ENTRIES.getName() + ".verbose");
 
-        copyE(a, b, true);
+        copyE(a, b, true, true);
 
         assertTrue("Compact copy is smaller that verbose source.",
-                b.length() <= a.length());
+                   b.length() <= a.length());
 
-        copyE(b, c, false);
+        copyE(b, c, false, true);
 
 
         assertTrue("Verbose copy is smaller that compact source.",
-                c.length() >= b.length());
+                   c.length() >= b.length());
         assertTrue("Double converted file is not equal to origion.",
-                Files.equal(a, c));
+                   Files.equal(a, c));
+    }
+
+    @Test
+    public void testEntriesEnumeratorConversion() throws FileNotFoundException, IOException {
+        File a = TEST_FRUIT_ENTRIES;
+        File b = new File(TEST_OUTPUT_DIR,
+                          TEST_FRUIT_ENTRIES.getName() + ".enum");
+        File c = new File(TEST_OUTPUT_DIR,
+                          TEST_FRUIT_ENTRIES.getName() + ".str");
+
+        SingleEnumeratingDeligate indel = new SingleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, null);
+        SingleEnumeratingDeligate outdel = new SingleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, true, null);
+
+
+
+        {
+            WeightedTokenSource aSrc = WeightedTokenSource.open(
+                    a, DEFAULT_CHARSET, indel, false);
+            WeightedTokenSink bSink = WeightedTokenSink.open(
+                    b, DEFAULT_CHARSET, outdel, false);
+            IOUtil.copy(aSrc, bSink);
+            bSink.close();
+        }
+
+        assertTrue("Compact copy is smaller that verbose source.",
+                   b.length() <= a.length());
+
+        {
+            WeightedTokenSource bSrc = WeightedTokenSource.open(
+                    b, DEFAULT_CHARSET, outdel, false);
+            WeightedTokenSink cSink = WeightedTokenSink.open(
+                    c, DEFAULT_CHARSET, indel, false);
+            IOUtil.copy(bSrc, cSink);
+            cSink.close();
+        }
+
+        assertTrue("Verbose copy is smaller that compact source.",
+                   c.length() >= b.length());
+        assertTrue("Double converted file is not equal to origion.",
+                   Files.equal(a, c));
     }
 
     public void testRandomAccess(File file) throws FileNotFoundException, IOException {
         final Map<Tell, Weighted<Token>> hist =
                 new HashMap<Tell, Weighted<Token>>();
 
-        WeightedTokenSource src = new WeightedTokenSource(file, DEFAULT_CHARSET);
+        SingleEnumeratingDeligate indel = new SingleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, null);
+
+        WeightedTokenSource src = WeightedTokenSource.open(
+                file, DEFAULT_CHARSET, indel, false);
         {
             while (src.hasNext()) {
+
                 final Tell pos = src.position();
                 final Weighted<Token> record = src.read();
 
-                System.out.println(pos.toString() + ": " + record.record().toString(src.
-                        getStringIndex()));
+                System.out.println(pos.toString() + ": " + record.record().
+                        toString(indel.getEnumerator()));
 
                 assertNotNull("Found null EntryRecord", record);
                 hist.put(pos, record);
@@ -110,8 +173,8 @@ public class EntryTest {
                 final Weighted<Token> expected = hist.get(pos);
 
                 System.out.println("expected tell: " + pos);
-                System.out.println("expected: " + expected.record().toString(src.
-                        getStringIndex()));
+                System.out.println(
+                        "expected: " + expected.record().toString(indel.getEnumerator()));
 
                 src.position(pos);
 
@@ -120,8 +183,7 @@ public class EntryTest {
 
                 Weighted<Token> actual = src.read();
                 System.out.println("actual tell: " + src.position());
-                System.out.println("actual: " + actual.record().toString(src.
-                        getStringIndex()));
+                System.out.println("actual: " + actual.record().toString(indel.getEnumerator()));
 
                 assertEquals(expected, actual);
             }
@@ -133,4 +195,5 @@ public class EntryTest {
             throws FileNotFoundException, IOException {
         testRandomAccess(TEST_FRUIT_ENTRIES);
     }
+
 }

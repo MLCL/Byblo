@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, University of Sussex
+ * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -30,15 +30,13 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
+import uk.ac.susx.mlcl.lib.PropertyCarrying;
+
 /**
- *
+ * Define a common interface for worker objects.
+ * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public interface Task extends Runnable {
-
-    Throwable getException();
-
-    boolean isExceptionThrown();
-
-    void throwException() throws Exception;
+public interface Task
+        extends Runnable, PropertyCarrying, ExceptionCarrying {
 }

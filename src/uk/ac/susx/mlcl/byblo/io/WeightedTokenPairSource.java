@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, University of Sussex
+ * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -30,141 +30,141 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.lib.io.AbstractTSVSource;
-import uk.ac.susx.mlcl.lib.io.Source;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import com.google.common.base.Predicate;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import uk.ac.susx.mlcl.lib.io.*;
 
 /**
  * A <tt>WeightedTokenPairSource</tt> object is used to retrieve
  * {@link TokenPair} objects from a flat file.
  *
+ * @param <P>
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see WeightedEntryPairSink
  */
 public class WeightedTokenPairSource
-        extends AbstractTSVSource<Weighted<TokenPair>>
-        implements Source<Weighted<TokenPair>> {
+        implements SeekableSource<Weighted<TokenPair>, Tell>, Closeable {
 
-    private final ObjectIndex<String> stringIndex1;
-
-    private final ObjectIndex<String> stringIndex2;
-
-    private Weighted<TokenPair> previousRecord = null;
-
-    private long count = 0;
+    private final SeekableDataSource inner;
 
     public WeightedTokenPairSource(
-            File file, Charset charset,
-            ObjectIndex<String> stringIndex1, ObjectIndex<String> stringIndex2)
+            SeekableDataSource inner//, IndexDeligatePair indexDeligate
+            )
             throws FileNotFoundException, IOException {
-        super(file, charset);
-        if (stringIndex1 == null)
-            throw new NullPointerException("entryIndex == null");
-        this.stringIndex1 = stringIndex1;
-        this.stringIndex2 = stringIndex2;
-    }
 
-    public WeightedTokenPairSource(
-            File file, Charset charset,
-            ObjectIndex<String> stringIndex)
-            throws FileNotFoundException, IOException {
-        this(file, charset, stringIndex, stringIndex);
-    }
-
-    public WeightedTokenPairSource(File file, Charset charset)
-            throws FileNotFoundException, IOException {
-        this(file, charset, new ObjectIndex<String>());
-    }
-
-    public final ObjectIndex<String> getStringIndex1() {
-        return stringIndex1;
-    }
-
-    public final ObjectIndex<String> getStringIndex2() {
-        return stringIndex2;
-    }
-
-    public boolean isIndexCombined() {
-        return stringIndex1 == stringIndex2;
-    }
-
-    public long getCount() {
-        return count;
+        this.inner = inner;
     }
 
     @Override
     public Weighted<TokenPair> read() throws IOException {
-        final int tokenId1;
-        if (previousRecord == null) {
-            tokenId1 = readEntry1();
-            parseValueDelimiter();
-        } else {
-            tokenId1 = previousRecord.record().id1();
-        }
-
-        if (!hasNext() || isDelimiterNext()) {
-            parseRecordDelimiter();
-            throw new SingletonRecordException(this,
-                    "Found weighte entry pair record with second entries.");
-        }
-
-        final int tokenId2 = readEntry2();
-        parseValueDelimiter();
-        final double weight = readWight();
-
-        final Weighted<TokenPair> record = new Weighted<TokenPair>(
-                new TokenPair(tokenId1, tokenId2), weight);
-        ++count;
-
-        if (isValueDelimiterNext()) {
-            parseValueDelimiter();
-            previousRecord = record;
-        }
-
-        if (hasNext() && isRecordDelimiterNext()) {
-            parseRecordDelimiter();
-            previousRecord = null;
-        }
-
-        return record;
+        final int id1 = inner.readInt();
+        final int id2 = inner.readInt();
+        final double weight = inner.readDouble();
+        inner.endOfRecord();
+        return new Weighted<TokenPair>(new TokenPair(id1, id2), weight);
     }
 
-    protected int readEntry1() throws IOException {
-        return stringIndex1.get(parseString());
-    }
-
-    protected int readEntry2() throws IOException {
-        return stringIndex2.get(parseString());
-    }
-
-    protected double readWight() throws IOException {
-        return parseDouble();
-    }
-
-    public WeightedTokenPairVectorSource getVectorSource() {
+    public WeightedTokenPairVectorSource getVectorSource() throws IOException {
         return new WeightedTokenPairVectorSource(this);
     }
 
-    public static boolean equal(File a, File b, Charset charset) throws IOException {
-        final ObjectIndex<String> stringIndex = new ObjectIndex<String>();
-        final WeightedTokenPairSource srcA = new WeightedTokenPairSource(a,
-                charset,
-                stringIndex);
-        final WeightedTokenPairSource srcB = new WeightedTokenPairSource(b,
-                charset,
-                stringIndex);
-        boolean equal = true;
-        while (equal && srcA.hasNext() && srcB.hasNext()) {
-            final Weighted<TokenPair> recA = srcA.read();
-            final Weighted<TokenPair> recB = srcB.read();
-            equal = recA.record().id1() == recB.record().id1()
-                    && recA.record().id2() == recB.record().id2()
-                    && recA.weight() == recB.weight();
-        }
-        return equal && srcA.hasNext() == srcB.hasNext();
+    @Override
+    public boolean hasNext() throws IOException {
+        return inner.canRead();
     }
+
+    @Override
+    public void position(Tell offset) throws IOException {
+        inner.position(offset);
+    }
+
+    @Override
+    public Tell position() throws IOException {
+        return inner.position();
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (inner instanceof Closeable)
+            ((Closeable) inner).close();
+    }
+//
+//    public static boolean equal(File a, File b, Charset charset, boolean skip1, boolean skip2) throws IOException {
+//        DoubleEnumerating idx = new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false, false, null, null);
+//        final WeightedTokenPairSource srcA = WeightedTokenPairSource.open(
+//                a, charset, idx, skip1, skip2);
+//        final WeightedTokenPairSource srcB = WeightedTokenPairSource.open(
+//                b, charset, idx, skip1, skip2);
+//
+//        List<Weighted<TokenPair>> listA = IOUtil.readAll(srcA);
+//        List<Weighted<TokenPair>> listB = IOUtil.readAll(srcB);
+//        Comparator<Weighted<TokenPair>> c =
+//                Comparators.fallback(
+//                Weighted.recordOrder(TokenPair.indexOrder()),
+//                Weighted.<TokenPair>weightOrder());
+//        Collections.sort(listA, c);
+//        Collections.sort(listB, c);
+//        return listA.equals(listB);
+//    }
+
+    public static WeightedTokenPairSource open(
+            File file, Charset charset, DoubleEnumerating idx, boolean skip1, boolean skip2)
+            throws IOException {
+        SeekableDataSource tsv = new TSV.Source(file, charset);
+
+
+        if (skip1) {
+            tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
+
+                @Override
+                public boolean apply(Integer column) {
+                    return column == 0;
+                }
+
+            });
+        }
+        if (skip2) {
+            tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
+
+                @Override
+                public boolean apply(Integer column) {
+                    return (column + 1) % 2 == 0;
+                }
+
+            });
+        }
+        if (!idx.isEnumeratedEntries()) {
+            tsv = Enumerated.enumerated(tsv, idx.getEntryEnumerator(),
+                                        new Predicate<Integer>() {
+
+                @Override
+                public boolean apply(Integer column) {
+                    return column == 0;
+                }
+
+            });
+        }
+
+        if (!idx.isEnumeratedFeatures()) {
+            tsv = Enumerated.enumerated(tsv, idx.getFeatureEnumerator(),
+                                        new Predicate<Integer>() {
+
+                @Override
+                public boolean apply(Integer column) {
+                    return (column + 1) % 2 == 0;
+                }
+
+            });
+        }
+
+        tsv = Compact.compact(tsv, 3);
+
+        return new WeightedTokenPairSource(tsv);
+    }
+
 }

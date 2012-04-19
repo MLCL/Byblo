@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, University of Sussex
+ * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.lib.io.IOUtil;
 import com.google.common.io.Files;
 import java.io.File;
@@ -38,6 +39,9 @@ import java.io.IOException;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
+import uk.ac.susx.mlcl.byblo.enumerators.MemoryBasedStringEnumerator;
 
 /**
  *
@@ -46,11 +50,16 @@ import static uk.ac.susx.mlcl.TestConstants.*;
 public class WeightedEntryPairTest {
 
     private void copyWEP(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        WeightedTokenPairSource aSrc = new WeightedTokenPairSource(a,
-                                                                   DEFAULT_CHARSET);
-        WeightedTokenPairSink bSink = new WeightedTokenPairSink(b,
-                                                                DEFAULT_CHARSET, aSrc.getStringIndex1(), aSrc.getStringIndex2());
-        bSink.setCompactFormatEnabled(compact);
+        Enumerator<String> idx = MemoryBasedStringEnumerator.newInstance();
+
+        DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, false, null, null);
+
+        WeightedTokenPairSource aSrc = WeightedTokenPairSource.open(
+                a, DEFAULT_CHARSET, del, false, false);
+        WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
+                b, DEFAULT_CHARSET, del, false, false, compact);
+//        bSink.setCompactFormatEnabled(compact);
 
         IOUtil.copy(aSrc, bSink);
         bSink.close();
@@ -71,6 +80,45 @@ public class WeightedEntryPairTest {
 
         copyWEP(b, c, false);
 
+
+        assertTrue("Verbose copy is smaller that compact source.",
+                   c.length() >= b.length());
+        assertTrue("Double converted file is not equal to origion.",
+                   Files.equal(a, c));
+    }
+
+    @Test
+    public void testEntryPairEnumeratorConversion() throws FileNotFoundException, IOException {
+        File a = TEST_FRUIT_SIMS;
+        File b = new File(TEST_OUTPUT_DIR,
+                          TEST_FRUIT_SIMS.getName() + ".enum");
+        File c = new File(TEST_OUTPUT_DIR,
+                          TEST_FRUIT_SIMS.getName() + ".str");
+
+        DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+                Enumerating.DEFAULT_TYPE, false, false, null, null);
+
+
+        {
+            WeightedTokenPairSource aSrc = WeightedTokenPairSource.open(
+                    a, DEFAULT_CHARSET, del, false, false);
+            WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
+                    b, DEFAULT_CHARSET, del, false, false, true);
+            IOUtil.copy(aSrc, bSink);
+            bSink.close();
+        }
+
+        assertTrue("Compact copy is smaller that verbose source.",
+                   b.length() <= a.length());
+
+        {
+            WeightedTokenPairSource bSrc = WeightedTokenPairSource.open(
+                    b, DEFAULT_CHARSET, del, false, false);
+            WeightedTokenPairSink cSink = WeightedTokenPairSink.open(
+                    c, DEFAULT_CHARSET, del, false, false, true);
+            IOUtil.copy(bSrc, cSink);
+            cSink.close();
+        }
 
         assertTrue("Verbose copy is smaller that compact source.",
                    c.length() >= b.length());

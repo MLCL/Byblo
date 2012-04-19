@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, University of Sussex
+ * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -30,11 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import uk.ac.susx.mlcl.lib.io.Lexer;
-import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.lib.collect.Indexed;
-import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.io.SeekableSource;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import java.io.IOException;
@@ -43,40 +38,31 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import uk.ac.susx.mlcl.lib.collect.Indexed;
+import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+import uk.ac.susx.mlcl.lib.io.SeekableSource;
+import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
- * Wraps a {@link WeightedEntryFeatureSource} to produce complete feature 
+ * Wraps a {@link WeightedEntryFeatureSource} to produce complete feature
  * vectors instead of just individual entry/feature records.
- * 
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class WeightedTokenPairVectorSource
-        implements SeekableSource<Indexed<SparseDoubleVector>, Lexer.Tell> {
+        implements SeekableSource<Indexed<SparseDoubleVector>, Tell> {
 
     private final WeightedTokenPairSource inner;
 
     private Weighted<TokenPair> next;
 
-    private Lexer.Tell tell;
+    private Tell tell;
 
-    private long count = 0;
-
-    public WeightedTokenPairVectorSource(WeightedTokenPairSource inner) {
+    public WeightedTokenPairVectorSource(
+            WeightedTokenPairSource inner) throws IOException {
         this.inner = inner;
-        tell = Lexer.Tell.START;
+        tell = inner.position();
         next = null;
-    }
-
-    public ObjectIndex<String> getStringIndex1() {
-        return inner.getStringIndex1();
-    }
-
-    public ObjectIndex<String> getStringIndex2() {
-        return inner.getStringIndex2();
-    }
-
-    public boolean isIndexCombined() {
-        return inner.isIndexCombined();
     }
 
     @Override
@@ -103,23 +89,18 @@ public class WeightedTokenPairVectorSource
 
         SparseDoubleVector v = toDoubleVector(features, cardinality);
 
-        ++count;
         return new Indexed<SparseDoubleVector>(start.record().id1(), v);
     }
 
-    public long getCount() {
-        return count;
-    }
-
     @Override
-    public void position(Lexer.Tell offset) throws IOException {
+    public void position(Tell offset) throws IOException {
         inner.position(offset);
         tell = offset;
         readNext();
     }
 
     @Override
-    public Lexer.Tell position() throws IOException {
+    public Tell position() throws IOException {
         return tell;
     }
 
@@ -132,7 +113,8 @@ public class WeightedTokenPairVectorSource
         }
     }
 
-    public static SparseDoubleVector toDoubleVector(Int2DoubleMap map, int cardinality) {
+    public static SparseDoubleVector toDoubleVector(Int2DoubleMap map,
+                                                    int cardinality) {
         if (map == null) {
             throw new NullPointerException();
         }
@@ -144,7 +126,8 @@ public class WeightedTokenPairVectorSource
         Collections.sort(entries, new Comparator<Int2DoubleMap.Entry>() {
 
             @Override
-            public final int compare(final Int2DoubleMap.Entry t, final Int2DoubleMap.Entry t1) {
+            public final int compare(final Int2DoubleMap.Entry t,
+                                     final Int2DoubleMap.Entry t1) {
                 return t.getIntKey() - t1.getIntKey();
             }
 
@@ -158,7 +141,8 @@ public class WeightedTokenPairVectorSource
             values[i] = entries.get(i).getDoubleValue();
         }
 
-        SparseDoubleVector vec = new SparseDoubleVector(keys, values, cardinality, keys.length);
+        SparseDoubleVector vec = new SparseDoubleVector(keys, values,
+                                                        cardinality, keys.length);
         vec.compact();
         return vec;
     }

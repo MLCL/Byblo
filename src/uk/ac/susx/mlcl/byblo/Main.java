@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, University of Sussex
+ * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -30,11 +30,15 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
+import uk.ac.susx.mlcl.byblo.commands.ExternalCountCommand;
+import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import uk.ac.susx.mlcl.lib.tasks.AbstractCommand;
-import uk.ac.susx.mlcl.lib.tasks.Command;
+import uk.ac.susx.mlcl.byblo.commands.*;
+import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
+import uk.ac.susx.mlcl.lib.commands.Command;
 
 /**
  *
@@ -46,13 +50,21 @@ public class Main extends AbstractCommand {
 
     static {
         final Map<String, Class<? extends Command>> tmp =
-            new HashMap<String, Class<? extends Command>>();
-        tmp.put("sort", ExternalSortTask.class);
-        tmp.put("merge", MergeTask.class);
-        tmp.put("knn", ExternalKnnTask.class);
-        tmp.put("allpairs", AllPairsTask.class);
-        tmp.put("count", ExternalCountTask.class);
-        tmp.put("filter", FilterTask.class);
+                new HashMap<String, Class<? extends Command>>();
+        tmp.put("sort-sims", ExternalSortEventsCommand.class);
+        tmp.put("sort-ents", ExternalSortEntriesCommand.class);
+        tmp.put("sort-feats", ExternalSortEntriesCommand.class);
+        tmp.put("sort-events", ExternalSortEventsCommand.class);
+        tmp.put("merge-sims", MergeInstancesCommand.class);
+        tmp.put("merge-ents", MergeEventsCommand.class);
+        tmp.put("merge-feats", MergeEntriesCommand.class);
+        tmp.put("merge-events", MergeEntriesCommand.class);
+        tmp.put("knn-sims", ExternalKnnSimsCommand.class);
+        tmp.put("allpairs", AllPairsCommand.class);
+        tmp.put("count", ExternalCountCommand.class);
+        tmp.put("filter", FilterCommand.class);
+        tmp.put("index", IndexInstancesCommand.class);
+        tmp.put("unindex-sims", UnindexSimsCommand.class);
         SUBCOMMANDS = Collections.unmodifiableMap(tmp);
     }
 
@@ -68,4 +80,5 @@ public class Main extends AbstractCommand {
     public static void main(final String[] args) throws Exception {
         new Main().runCommand(args);
     }
+
 }

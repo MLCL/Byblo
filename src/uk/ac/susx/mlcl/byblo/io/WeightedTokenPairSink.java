@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, University of Sussex
+ * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -30,26 +30,28 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import com.google.common.base.Predicate;
+import java.io.Closeable;
 import java.io.File;
+import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.text.DecimalFormat;
+import uk.ac.susx.mlcl.lib.io.*;
 
 /**
- * An <tt>WeightedTokenPairSink</tt> object is used to store 
- * {@link TokenPair} objects in a flat file. 
- * 
- * <p>The basic file format is Tab-Separated-Values (TSV) where records are 
+ * An <tt>WeightedTokenPairSink</tt> object is used to store
+ * {@link TokenPair} objects in a flat file.
+ *
+ * <p>The basic file format is Tab-Separated-Values (TSV) where records are
  * delimited by new-lines, and values are delimited by tabs. Two variants are
- * supported: verbose and compact. In verbose mode each 
- * {@link TokenPair} corresponds to a single TSV record; i.e one
- * line per object consisting of two entries, and their weight. In 
- * compact mode each TSV record consists of a single entry followed by the 
- * second-entry/weight pairs from all sequentially written 
+ * supported: verbose and compact. In verbose mode each
+ * {@link TokenPair} corresponds to a single TSV record; i.e one line per object
+ * consisting of two entries, and their weight. In compact mode each TSV record
+ * consists of a single entry followed by the second-entry/weight pairs from all
+ * sequentially written
  * {@link WeightedEntryFeatureSink} objects that share the same first entry.</p>
- * 
+ *
  * Verbose mode example:
  * <pre>
  *      entry1  entry1    weight1
@@ -59,116 +61,104 @@ import java.text.DecimalFormat;
  *      enrty3  entry4    weight5
  *      enrty3  entry1    weight6
  * </pre>
- * 
+ *
  * Equivalent compact mode example:
  * <pre>
  *      entry1  entry1    weight1 entry2    weight2
  *      entry2  entry3    weight3
  *      entry3  entry2    weight4 entry4    weight5 entry1    weight6
  * </pre>
- * 
- * <p>Compact mode is the default behavior, since it can reduce file sizes by 
+ *
+ * <p>Compact mode is the default behavior, since it can reduce file sizes by
  * approximately 50%, with corresponding reductions in I/O overhead.</p>
- * 
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightedTokenPairSink extends AbstractTSVSink<Weighted<TokenPair>> {
+public class WeightedTokenPairSink
+        implements Sink<Weighted<TokenPair>>, Closeable, Flushable {
 
-    private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
-    private final ObjectIndex<String> stringIndex1;
-    private final ObjectIndex<String> stringIndex2;
-    private boolean compactFormatEnabled = false;
-    private Weighted<TokenPair> previousRecord = null;
-    private long count = 0;
+    private DataSink inner;
 
-    public WeightedTokenPairSink(File file, Charset charset,
-            ObjectIndex<String> strIndex1,
-            ObjectIndex<String> strIndex2) throws IOException {
-        super(file, charset);
-        this.stringIndex1 = strIndex1;
-        this.stringIndex2 = strIndex2;
-    }
-
-    public ObjectIndex<String> getStringIndex1() {
-        return stringIndex1;
-    }
-
-    public ObjectIndex<String> getStringIndex2() {
-        return stringIndex2;
-    }
-
-    public boolean isIndexCombined() {
-        return stringIndex1 == stringIndex2;
-    }
-
-    public boolean isCompactFormatEnabled() {
-        return compactFormatEnabled;
-    }
-
-    public void setCompactFormatEnabled(boolean compactFormatEnabled) {
-        this.compactFormatEnabled = compactFormatEnabled;
-    }
-
-    public long getCount() {
-        return count;
+    public WeightedTokenPairSink(DataSink inner) {
+        this.inner = inner;
     }
 
     @Override
     public void write(Weighted<TokenPair> record) throws IOException {
-        if (isCompactFormatEnabled()) {
-            writeCompact(record);
-        } else {
-            writeVerbose(record);
-        }
-        ++count;
-    }
-
-    private void writeVerbose(Weighted<TokenPair> record) throws IOException {
-        writeToken1(record.record().id1());
-        writeValueDelimiter();
-        writeToken2(record.record().id2());
-        writeValueDelimiter();
-        writeWeight(record.weight());
-        writeRecordDelimiter();
-    }
-
-    private void writeCompact(final Weighted<TokenPair> record) throws IOException {
-        if (previousRecord == null) {
-            writeToken1(record.record().id1());
-        } else if (previousRecord.record().id1() != record.record().
-                id1()) {
-            writeRecordDelimiter();
-            writeToken1(record.record().id1());
-        }
-
-        writeValueDelimiter();
-        writeToken2(record.record().id2());
-        writeValueDelimiter();
-        writeWeight(record.weight());
-        previousRecord = record;
-    }
-
-    private void writeToken1(int id) throws IOException {
-        writeString(stringIndex1.get(id));
-    }
-
-    private void writeToken2(int id) throws IOException {
-        writeString(stringIndex2.get(id));
-    }
-
-    private void writeWeight(double weight) throws IOException {
-        if (Double.compare((int) weight, weight) == 0) {
-            writeInt((int) weight);
-        } else {
-            writeString(f.format(weight));
-        }
+        inner.writeInt(record.record().id1());
+        inner.writeInt(record.record().id2());
+        inner.writeDouble(record.weight());
+        inner.endOfRecord();
     }
 
     @Override
     public void close() throws IOException {
-        if (isCompactFormatEnabled() && previousRecord != null) {
-            writeRecordDelimiter();
-        }
-        super.close();
+        if (inner instanceof Closeable)
+            ((Closeable) inner).close();
     }
+
+    @Override
+    public void flush() throws IOException {
+        if (inner instanceof Flushable)
+            ((Flushable) inner).flush();
+    }
+
+    public static WeightedTokenPairSink open(
+            File file, Charset charset, DoubleEnumerating idx, boolean skip1, boolean skip2, boolean compact)
+            throws IOException {
+        DataSink tsv = new TSV.Sink(file, charset);
+
+
+        if (skip1) {
+            tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
+
+                @Override
+                public boolean apply(Integer column) {
+                    return column == 0;
+                }
+
+            });
+        }
+
+        if (skip2) {
+            tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
+
+                @Override
+                public boolean apply(Integer column) {
+                    return (column + 1) % 2 == 0;
+                }
+
+            });
+        }
+
+        if (!idx.isEnumeratedEntries()) {
+            tsv = Enumerated.enumerated(tsv, idx.getEntryEnumerator(),
+                                        new Predicate<Integer>() {
+
+                @Override
+                public boolean apply(Integer column) {
+                    return column == 0;
+                }
+
+            });
+        }
+
+        if (!idx.isEnumeratedFeatures()) {
+            tsv = Enumerated.enumerated(tsv, idx.getFeatureEnumerator(),
+                                        new Predicate<Integer>() {
+
+                @Override
+                public boolean apply(Integer column) {
+                    return (column + 1) % 2 == 0;
+                }
+
+            });
+        }
+
+        if (compact)
+            tsv = Compact.compact(tsv, 3);
+
+        return new WeightedTokenPairSink(tsv);
+    }
+
 }

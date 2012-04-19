@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, University of Sussex
+ * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -34,13 +34,14 @@ import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import java.io.Serializable;
+import java.util.Comparator;
 
 /**
  * <tt>Weighted</tt> objects represent a weighting or frequency applied to some
  * discrete record.
- * 
+ *
  * <p>Instances of <tt>Weighted</tt> are immutable.<p>
- * 
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T> Type of record being weighted
  */
@@ -48,9 +49,9 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
 
     private static final long serialVersionUID = 1L;
 
-    private double weight;
+     double weight;
 
-    private T record;
+     T record;
 
     public Weighted(final T record, final double weight) {
         this.weight = weight;
@@ -73,14 +74,15 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
 
     /**
      * Indicates whether some other object is "equal to" this one.
-     * 
-     * <p>Note that only the <tt>entryId</tt> field is used for equality. I.e  
-     * two objects with the same <tt>entryId</tt>, but differing weights 
+     *
+     * <p>Note that only the <tt>entryId</tt> field is used for equality. I.e
+     * two objects with the same <tt>entryId</tt>, but differing weights
      * <em>will</em> be consider equal.</p>
-     * 
-     * @param   obj   the reference object with which to compare.
-     * @return  <code>true</code> if this object is the same as the obj
-     *          argument; <code>false</code> otherwise.
+     *
+     * @param obj the reference object with which to compare.
+     * @return
+     * <code>true</code> if this object is the same as the obj argument;
+     * <code>false</code> otherwise.
      */
     @Override
     public boolean equals(Object obj) {
@@ -212,6 +214,28 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
             @Override
             public final String toString() {
                 return "Record";
+            }
+
+        };
+    }
+
+    public static <S> Comparator<Weighted<S>> weightOrder() {
+        return new Comparator<Weighted<S>>() {
+
+            @Override
+            public int compare(Weighted<S> t, Weighted<S> t1) {
+                return Double.compare(t.weight(), t1.weight());
+            }
+
+        };
+    }
+
+    public static <S> Comparator<Weighted<S>> recordOrder(final Comparator<S> inner) {
+        return new Comparator<Weighted<S>>() {
+
+            @Override
+            public int compare(Weighted<S> t, Weighted<S> t1) {
+                return inner.compare(t.record(), t1.record());
             }
 
         };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, University of Sussex
+ * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -30,26 +30,24 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.lib.io.AbstractTSVSink;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
+import com.google.common.base.Predicate;
+import java.io.*;
 import java.nio.charset.Charset;
-import java.text.DecimalFormat;
+import uk.ac.susx.mlcl.lib.io.*;
 
 /**
- * An <tt>WeightedTokenSink</tt> object is used to store {@link Token} objects in 
- * a flat file. 
- * 
- * <p>The basic file format is Tab-Separated-Values (TSV) where records are 
+ * An <tt>WeightedTokenSink</tt> object is used to store {@link Token} objects
+ * in a flat file.
+ *
+ * <p>The basic file format is Tab-Separated-Values (TSV) where records are
  * delimited by new-lines, and values are delimited by tabs. Two variants are
- * supported: verbose and compact. In verbose mode each {@link Token} 
+ * supported: verbose and compact. In verbose mode each {@link Token}
  * corresponds to a single TSV record; i.e one line per object consisting of an
  * entry and it's weight. In compact mode each TSV record consists of a single
  * entry followed by the weights of all sequentially written {@link Token}
  * objects that share the same entry.</p>
- * 
+ *
  * Verbose mode example:
  * <pre>
  *      entry1  weight1
@@ -59,91 +57,67 @@ import java.text.DecimalFormat;
  *      enrty3  weight5
  *      enrty3  weight6
  * </pre>
- * 
+ *
  * Equivalent compact mode example:
  * <pre>
  *      entry1  weight1 weight2
  *      entry2  weight3
  *      entry3  weight4 weight5 weight6
  * </pre>
- * 
- * <p>Compact mode is the default behavior, since it can reduce file sizes by 
+ *
+ * <p>Compact mode is the default behavior, since it can reduce file sizes by
  * approximately 50%, with corresponding reductions in I/O overhead.</p>
- * 
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightedTokenSink extends AbstractTSVSink<Weighted<Token>> {
+public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flushable {
 
-    private final DecimalFormat f = new DecimalFormat("###0.0#####;-###0.0#####");
-    private final ObjectIndex<String> stringIndex;
-    private boolean compactFormatEnabled = false;
-    private Weighted<Token> previousRecord = null;
-    private long count = 0;
+    private DataSink inner;
 
-    public WeightedTokenSink(File file, Charset charset, ObjectIndex<String> stringIndex)
+    public WeightedTokenSink(DataSink inner)
             throws FileNotFoundException, IOException {
-        super(file, charset);
-        this.stringIndex = stringIndex;
-    }
-
-    public boolean isCompactFormatEnabled() {
-        return compactFormatEnabled;
-    }
-
-    public void setCompactFormatEnabled(boolean compactFormatEnabled) {
-        this.compactFormatEnabled = compactFormatEnabled;
+        this.inner = inner;
     }
 
     @Override
     public void write(final Weighted<Token> record) throws IOException {
-        if (isCompactFormatEnabled()) {
-            writeCompact(record);
-        } else {
-            writeVerbose(record);
-        }
-        ++count;
+        inner.writeInt(record.record().id());
+        inner.writeDouble(record.weight());
+        inner.endOfRecord();
     }
 
-    public long getCount() {
-        return count;
+    @Override
+    public void flush() throws IOException {
+        if (inner instanceof Flushable)
+            ((Flushable) inner).flush();
     }
 
     @Override
     public void close() throws IOException {
-        if (isCompactFormatEnabled() && previousRecord != null) {
-            writeRecordDelimiter();
+        if (inner instanceof Closeable)
+            ((Closeable) inner).close();
+    }
+
+    public static WeightedTokenSink open(
+            File f, Charset charset, SingleEnumerating idx, boolean skip1) throws IOException {
+        DataSink tsv = new TSV.Sink(f, charset);
+
+        if (skip1) {
+            tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
+
+                @Override
+                public boolean apply(Integer column) {
+                    return column == 0;
+                }
+
+            });
         }
-        super.close();
-    }
 
-    private void writeVerbose(final Weighted<Token> record) throws IOException {
-        writeEntry(record.record().id());
-        writeValueDelimiter();
-        writeWeight(record.weight());
-        writeRecordDelimiter();
+        if (!idx.isEnumerationEnabled())
+            tsv = Enumerated.enumerated(tsv, idx.getEnumerator());
+        return new WeightedTokenSink(tsv);
     }
-
-    private void writeCompact(final Weighted<Token> record) throws IOException {
-        if (previousRecord == null) {
-            writeEntry(record.record().id());
-        } else if (previousRecord.record().id() != record.record().id()) {
-            writeRecordDelimiter();
-            writeEntry(record.record().id());
-        }
-        writeValueDelimiter();
-        writeWeight(record.weight());
-        previousRecord = record;
-    }
-
-    private void writeEntry(int id) throws IOException {
-        writeString(stringIndex.get(id));
-    }
-
-    private void writeWeight(double weight) throws IOException {
-        if (Double.compare((int) weight, weight) == 0) {
-            super.writeInt((int) weight);
-        } else {
-            super.writeString(f.format(weight));
-        }
-    }
+    
+    
+    
 }

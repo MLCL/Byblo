@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2011, University of Sussex
+ * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without 
@@ -30,141 +30,128 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import uk.ac.susx.mlcl.lib.ObjectIndex;
-import uk.ac.susx.mlcl.lib.io.AbstractTSVSource;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
+import com.google.common.base.Predicate;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import uk.ac.susx.mlcl.byblo.enumerators.*;
+import uk.ac.susx.mlcl.lib.io.*;
 
 /**
- * An <tt>TokenPairSource</tt> object is used to retrieve 
- * {@link EntryFeature} objects from a flat file. 
- * 
+ * An <tt>TokenPairSource</tt> object is used to retrieve
+ * {@link EntryFeature} objects from a flat file.
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see EntryFeatureSink
  */
-public class TokenPairSource extends AbstractTSVSource<TokenPair> {
+public class TokenPairSource
+        implements SeekableSource<TokenPair, Tell>, Closeable {
 
-    private static final Log LOG = LogFactory.getLog(TokenPairSource.class);
+    private final SeekableDataSource inner;
 
-    private final ObjectIndex<String> stringIndex1;
-
-    private final ObjectIndex<String> stringIndex2;
-
-    private TokenPair previousRecord = null;
-    
-    private long count = 0;
-
-    public TokenPairSource(
-            File file, Charset charset,
-            ObjectIndex<String> entryIndex,
-            ObjectIndex<String> featureIndex)
+    public TokenPairSource(SeekableDataSource inner)
             throws FileNotFoundException, IOException {
-        super(file, charset);
-        if (entryIndex == null)
-            throw new NullPointerException("stringIndex1 == null");
-        if (featureIndex == null)
-            throw new NullPointerException("stringIndex2 == null");
-        this.stringIndex1 = entryIndex;
-        this.stringIndex2 = featureIndex;
-    }
-
-    public TokenPairSource(File file, Charset charset,
-            ObjectIndex<String> combinedIndex)
-            throws FileNotFoundException, IOException {
-        this(file, charset, combinedIndex, combinedIndex);
-    }
-
-    public TokenPairSource(File file, Charset charset)
-            throws FileNotFoundException, IOException {
-        this(file, charset, new ObjectIndex<String>());
-    }
-
-    public ObjectIndex<String> getStringIndex1() {
-        return stringIndex1;
-    }
-
-    public ObjectIndex<String> getStringIndex2() {
-        return stringIndex2;
-    }
-
-    public boolean isIndexCombined() {
-        return getStringIndex1() == getStringIndex2();
-    }
-
-    public long getCount() {
-        return count;
+        this.inner = inner;
     }
 
     @Override
     public TokenPair read() throws IOException {
-        final int id1;
-        if (previousRecord == null) {
-            id1 = readHead();
-            parseValueDelimiter();
-        } else {
-            id1 = previousRecord.id1();
+        try {
+            final int id1 = inner.readInt();
+            final int id2 = inner.readInt();
+            inner.endOfRecord();
+            return new TokenPair(id1, id2);
+        } catch (Throwable ex) {
+            throw new IOException("Error at position " + position(), ex);
         }
+    }
+//
+//    public static boolean equal(File fileA, File fileB, Charset charset,
+//                                DoubleEnumerating aidx, DoubleEnumerating bidx,
+//                                boolean askip1, boolean askip2, boolean bskip1, boolean bskip2)
+//            throws IOException {
+////        DoubleEnumerating idx = EnumeratingDeligates.toPair(
+////                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false,
+////                                              null));
+//        final TokenPairSource srcA = open(fileA, charset, aidx, askip1, askip2);
+//        final TokenPairSource srcB = open(fileB, charset, bidx, bskip1, bskip2);
+//
+//
+//        List<TokenPair> listA = IOUtil.readAll(srcA);
+//        List<TokenPair> listB = IOUtil.readAll(srcB);
+//        Comparator<TokenPair> c = TokenPair.indexOrder();
+//        Collections.sort(listA, c);
+//        Collections.sort(listB, c);
+//        return listA.equals(listB);
+//    }
 
-        if (!hasNext() || isDelimiterNext()) {
-            // Encountered an entry without any features. This is incoherent wrt
-            // the task at hand, but quite a common scenario in general feature
-            // extraction. Throw an exception which is caught for end user input
-            parseRecordDelimiter();
-            throw new SingletonRecordException(this,
-                    "Found entry/feature record with no features.");
-        }
-
-        final int id2 = readTail();
-        final TokenPair record = new TokenPair(
-                id1, id2);
-
-        if (hasNext() && isValueDelimiterNext()) {
-            parseValueDelimiter();
-            previousRecord = record;
-        }
-
-        if (hasNext() && isRecordDelimiterNext()) {
-            parseRecordDelimiter();
-            previousRecord = null;
-        }
-
-        ++count;
-        return record;
+    @Override
+    public boolean hasNext() throws IOException {
+        return inner.canRead();
     }
 
-    protected final int readHead() throws IOException {
-        return stringIndex1.get(parseString());
+    @Override
+    public void position(Tell p) throws IOException {
+        inner.position(p);
     }
 
-    protected final int readTail() throws IOException {
-        return stringIndex2.get(parseString());
+    @Override
+    public Tell position() throws IOException {
+        return inner.position();
     }
 
-    public static boolean equal(File fileA, File fileB, Charset charset)
+    @Override
+    public void close() throws IOException {
+        if (inner instanceof Closeable)
+            ((Closeable) inner).close();
+    }
+
+    public static TokenPairSource open(
+            File file, Charset charset, DoubleEnumerating idx, boolean skip1, boolean skip2)
             throws IOException {
-        final ObjectIndex<String> stringIndex = new ObjectIndex<String>();
-        final TokenPairSource srcA = new TokenPairSource(
-                fileA, charset, stringIndex);
-        final TokenPairSource srcB = new TokenPairSource(
-                fileB, charset, stringIndex);
-        boolean equal = true;
-        while (equal && srcA.hasNext() && srcB.hasNext()) {
-            final TokenPair recA = srcA.read();
-            final TokenPair recB = srcB.read();
+        SeekableDataSource tsv = new TSV.Source(file, charset);
 
-            equal = equal
-                    && recA.id1() == recB.id1()
-                    && recA.id2() == recB.id2();
+        if (skip1) {
+            tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
 
-            if (!equal) {
-                LOG.info(recA + " | " + recB);
-            }
+                @Override
+                public boolean apply(Integer column) {
+                    return column == 0;
+                }
+
+            });
         }
-        equal = equal && srcA.hasNext() == srcB.hasNext();
-        return equal;
+        if (skip2) {
+            tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
+
+                @Override
+                public boolean apply(Integer column) {
+                    return column > 0;
+                }
+
+            });
+        }
+
+        tsv = Compact.compact(tsv, 2);
+
+        if (!idx.isEnumeratedEntries() || !idx.isEnumeratedFeatures()) {
+            @SuppressWarnings("unchecked")
+            Enumerator<String>[] enumerators = (Enumerator<String>[]) new Enumerator[2];
+            if (!idx.isEnumeratedEntries())
+                enumerators[0] = idx.getEntryEnumerator();
+            if (!idx.isEnumeratedFeatures())
+                enumerators[1] = idx.getFeatureEnumerator();
+            tsv = Enumerated.enumerated(tsv, enumerators);
+        }
+        return new TokenPairSource(tsv);
     }
+
 }
