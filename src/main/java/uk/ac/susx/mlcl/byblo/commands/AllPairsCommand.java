@@ -30,6 +30,13 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.measure.ReversedProximity;
+import uk.ac.susx.mlcl.byblo.measure.Proximity;
+import uk.ac.susx.mlcl.byblo.measure.CrMi;
+import uk.ac.susx.mlcl.byblo.measure.Lee;
+import uk.ac.susx.mlcl.byblo.measure.KendallTau;
+import uk.ac.susx.mlcl.byblo.measure.Lp;
+import uk.ac.susx.mlcl.byblo.measure.AbstractMIProximity;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
@@ -53,7 +60,6 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource.WTStatsSource;
-import uk.ac.susx.mlcl.byblo.measure.*;
 import uk.ac.susx.mlcl.byblo.tasks.InvertedApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.NaiveApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.ThreadedApssTask;

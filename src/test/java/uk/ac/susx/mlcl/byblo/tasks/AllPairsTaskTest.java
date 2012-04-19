@@ -39,6 +39,7 @@ import org.junit.Test;
 import uk.ac.susx.mlcl.byblo.Main;
 import uk.ac.susx.mlcl.lib.test.ExitTrapper;
 import static org.junit.Assert.*;
+import uk.ac.susx.mlcl.TestConstants;
 
 /**
  *
@@ -67,12 +68,12 @@ public class AllPairsTaskTest {
 
     @Test
     public void testMainRun() throws Exception {
-        new File("testdata","out").mkdir();
+        new File("testdata", "out").mkdir();
         try {
             ExitTrapper.enableExistTrapping();
             Main.main(new String[]{"allpairs",
-                        "-i", "testdata/fruit/bnc-gramrels-fruit.entryFeatures",
-                        "-o", "testdata/out/bnc-gramrels-fruit.out",
+                        "-i", TestConstants.TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "-o", new File(TestConstants.TEST_OUTPUT_DIR, "bnc-gramrels-fruit.out").toString(),
                         "-C", "500"});
         } finally {
             ExitTrapper.disableExitTrapping();
@@ -81,12 +82,12 @@ public class AllPairsTaskTest {
 
     @Test
     public void testMainRun_Indexed() throws Exception {
-        new File("testdata","out").mkdir();
+        new File("testdata", "out").mkdir();
         try {
             ExitTrapper.enableExistTrapping();
             Main.main(new String[]{"allpairs",
-                        "-i", "testdata/fruit/bnc-gramrels-fruit.indexed.entryFeatures",
-                        "-o", "testdata/out/bnc-gramrels-fruit.indexed.out",
+                        "-i", TestConstants.TEST_FRUIT_INDEXED_ENTRY_FEATURES.toString(),
+                        "-o", new File(TestConstants.TEST_OUTPUT_DIR, "bnc-gramrels-fruit.indexed.out").toString(),
                         "-C", "500",
                         "--enumerated-entries",
                         "--enumerated-features"});
@@ -94,6 +95,7 @@ public class AllPairsTaskTest {
             ExitTrapper.disableExitTrapping();
         }
     }
+
     @Test
     public void testExitStatus() throws Exception {
         try {
@@ -105,4 +107,5 @@ public class AllPairsTaskTest {
             ExitTrapper.disableExitTrapping();
         }
     }
+
 }

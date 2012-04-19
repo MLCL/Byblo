@@ -35,7 +35,6 @@ import uk.ac.susx.mlcl.lib.io.Files;
 import java.nio.charset.Charset;
 import static java.text.MessageFormat.*;
 import java.util.Random;
-import net.kotek.jdbm.DBMaker;
 import static org.junit.Assert.*;
 
 /**
@@ -44,10 +43,9 @@ import static org.junit.Assert.*;
  */
 public class TestConstants {
 
-    public static final File TEST_DATA_DIR = new File("testdata");
+    public static final File TEST_DATA_DIR = new File("src/test/resources/uk/ac/susx/mlcl/byblo");
 
-    public static final File TEST_FRUIT_DIR =
-            new File(TEST_DATA_DIR, "fruit");
+    public static final File TEST_FRUIT_DIR = TEST_DATA_DIR;
 
     public static final String FRUIT_NAME = "bnc-gramrels-fruit";
 
@@ -103,9 +101,9 @@ public class TestConstants {
     public static final File TEST_FRUIT_INDEXED_SIMS_100NN =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.sims.100nn");
 
-    public static final File TEST_OUTPUT_DIR = new File(TEST_DATA_DIR, "out");
+    public static final File TEST_OUTPUT_DIR = new File("target/test-out");
 
-    public static final File TEST_TMP_DIR = new File(TEST_OUTPUT_DIR, "tmp");
+    public static final File TEST_TMP_DIR = new File(TEST_OUTPUT_DIR, "temp");
 
     public static final Charset DEFAULT_CHARSET = Files.DEFAULT_CHARSET;
 

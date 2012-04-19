@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.measure;
 
+import uk.ac.susx.mlcl.byblo.measure.Jaccard;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import uk.ac.susx.mlcl.byblo.Main;
 import java.io.File;

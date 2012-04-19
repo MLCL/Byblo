@@ -83,8 +83,7 @@ public class FullBuildTest {
     public void testRunCommand_Medtest100k() throws Exception {
         System.out.println("Test on fruit");
 
-        File medtestDir = new File(TEST_DATA_DIR, "medtest");
-        File input = new File(medtestDir, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample100k");
+        File input = new File(TEST_DATA_DIR, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample100k");
 
         FullBuild instance = new FullBuild();
         instance.setCharset(DEFAULT_CHARSET);
@@ -124,8 +123,7 @@ public class FullBuildTest {
     public static void testRunCommand_Medtest100k(boolean skip1, boolean skip2) throws Exception {
         System.out.println("Test on fruit");
 
-        File medtestDir = new File(TEST_DATA_DIR, "medtest");
-        File input = new File(medtestDir, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample100k");
+        File input = new File(TEST_DATA_DIR, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample100k");
 
         String name = "medtest-100k";
         if (skip1 && skip2)
@@ -159,8 +157,7 @@ public class FullBuildTest {
     public void testRunCommand_Medtest10m() throws Exception {
         System.out.println("Test on fruit");
 
-        File medtestDir = new File(TEST_DATA_DIR, "medtest");
-        File input = new File(medtestDir, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample10m");
+        File input = new File(TEST_DATA_DIR, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample10m");
 
         FullBuild instance = new FullBuild();
         instance.setCharset(DEFAULT_CHARSET);
