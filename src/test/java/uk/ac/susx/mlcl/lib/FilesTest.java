@@ -47,7 +47,8 @@ import org.junit.Test;
  */
 public class FilesTest {
 
-    static final File TEST_CHARSETS_DIR = new File("test_data/charsets");
+    static final File TEST_CHARSETS_DIR =
+            new File("src/test/resources/uk/ac/susx/mlcl/lib/io");
 
     static final String[] CHARSET_SAMPLES = new String[]{
         "chinese-big5.meta.html",
