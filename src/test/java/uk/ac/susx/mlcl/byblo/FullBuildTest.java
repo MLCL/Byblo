@@ -44,22 +44,6 @@ public class FullBuildTest {
 
     public FullBuildTest() {
     }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
 //
 
     @Test
@@ -99,6 +83,7 @@ public class FullBuildTest {
 
     }
 
+
 //
 //    @Test
 //    public void testRunCommand_Medtest100k_skip1() throws Exception {
@@ -109,10 +94,9 @@ public class FullBuildTest {
 //    public void testRunCommand_Medtest100k_skip2() throws Exception {
 //        testRunCommand_Medtest100k(false, true);
 //    }
-
     @Test
     public void testRunCommand_Medtest100k_skipboth() throws Exception {
-        testRunCommand_Medtest100k(true, true);
+        testRunCommand_Medtest100k("100k", true, true);
     }
 //
 //    @Test
@@ -120,12 +104,11 @@ public class FullBuildTest {
 //        testRunCommand_Medtest100k(false, false);
 //    }
 
-    public static void testRunCommand_Medtest100k(boolean skip1, boolean skip2) throws Exception {
-        System.out.println("Test on fruit");
+    public static void testRunCommand_Medtest100k(String sampleName, boolean skip1, boolean skip2) throws Exception {
 
         File input = new File(TEST_DATA_DIR, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample100k");
 
-        String name = "medtest-100k";
+        String name = "medtest-" + sampleName;
         if (skip1 && skip2)
             name += "-skipboth";
         else if (skip1)
@@ -147,7 +130,6 @@ public class FullBuildTest {
         instance.setFilterEventMinFreq(2);
         instance.setSkipIndex1(skip1);
         instance.setSkipIndex2(skip2);
-        instance.runCommand();
 
 
     }
@@ -173,4 +155,25 @@ public class FullBuildTest {
 
     }
 
+//    @Test
+//    @Ignore
+//    public void testRunCommand_Medtest10m() throws Exception {
+//        System.out.println("Test on fruit");
+//
+//        File medtestDir = new File(TEST_DATA_DIR, "medtest");
+//        File input = new File(medtestDir, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample10m");
+//
+//        FullBuild instance = new FullBuild();
+//        instance.setCharset(DEFAULT_CHARSET);
+//        instance.setInstancesFile(input);
+//        instance.setOutputDir(TEST_OUTPUT_DIR);
+//        instance.setTempBaseDir(TEST_OUTPUT_DIR);
+//        instance.setMinSimilarity(0.1);
+//        instance.setFilterEntryMinFreq(160);
+//        instance.setFilterFeatureMinFreq(90);
+//        instance.setFilterEventMinFreq(40);
+//        instance.runCommand();
+//
+//
+//    }
 }

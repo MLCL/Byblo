@@ -111,7 +111,7 @@ public class AllPairsCommand extends AbstractCommand {
 
     @Parameter(names = {"-t", "--threads"},
     description = "Number of conccurent processing threads.")
-    private int nThreads = Runtime.getRuntime().availableProcessors() + 1;
+    private int numThreads = Runtime.getRuntime().availableProcessors() + 1;
 
     @Parameter(names = {"-Smn", "--similarity-min"},
     description = "Minimum similarity threshold.",
@@ -164,7 +164,6 @@ public class AllPairsCommand extends AbstractCommand {
 
         private Algorithm(Class<? extends NaiveApssTask> imp) {
             this.implementation = imp;
-            Object o = InvertedApssTask.class;
         }
 
         public Class<? extends NaiveApssTask> getImplementation() {
@@ -266,8 +265,8 @@ public class AllPairsCommand extends AbstractCommand {
         // combinations of vectors, so will be looking at two differnt points
         // in the file. Also this allows for the possibility of having differnt
         // files, e.g compare fruit words with cake words
-        final WeightedTokenPairVectorSource sourceA = openEventsSource();
-        final WeightedTokenPairVectorSource sourceB = openEventsSource();
+        final FastWeightedTokenPairVectorSource sourceA = openEventsSource();
+        final FastWeightedTokenPairVectorSource sourceB = openEventsSource();
 
 
         // Create a sink object that will act as a recipient for all pairs that
@@ -356,12 +355,12 @@ public class AllPairsCommand extends AbstractCommand {
     private NaiveApssTask newAlgorithmInstance()
             throws InstantiationException, IllegalAccessException {
 
-        if (getnThreads() == 1) {
+        if (getNumThreads() == 1) {
             return getAlgorithm().newInstance();
         } else {
             ThreadedApssTask<Tell> tapss = new ThreadedApssTask<Tell>();
             tapss.setInnerAlgorithm(getAlgorithm().getImplementation());
-            tapss.setNumThreads(getnThreads());
+            tapss.setNumThreads(getNumThreads());
             tapss.setMaxChunkSize(getChunkSize());
             return tapss;
         }
@@ -374,7 +373,7 @@ public class AllPairsCommand extends AbstractCommand {
                 EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
     }
 
-    private WeightedTokenPairVectorSource openEventsSource() throws IOException {
+    private FastWeightedTokenPairVectorSource openEventsSource() throws IOException {
         return BybloIO.openEventsVectorSource(
                 getEventsFile(), getCharset(),
                 getIndexDeligate());
@@ -467,7 +466,7 @@ public class AllPairsCommand extends AbstractCommand {
                 add("simsOut", getOutputFile()).
                 add("charset", getCharset()).
                 add("chunkSize", getChunkSize()).
-                add("threads", getnThreads()).
+                add("threads", getNumThreads()).
                 add("minSimilarity", getMinSimilarity()).
                 add("maxSimilarity", getMaxSimilarity()).
                 add("outputIdentityPairs", isOutputIdentityPairs()).
@@ -542,13 +541,13 @@ public class AllPairsCommand extends AbstractCommand {
         this.chunkSize = chunkSize;
     }
 
-    public final int getnThreads() {
-        return nThreads;
+    public final int getNumThreads() {
+        return numThreads;
     }
 
     public final void setNumThreads(int nThreads) {
         Checks.checkRangeIncl("nThreads", nThreads, 1, Integer.MAX_VALUE);
-        this.nThreads = nThreads;
+        this.numThreads = nThreads;
     }
 
     public final double getMinSimilarity() {
