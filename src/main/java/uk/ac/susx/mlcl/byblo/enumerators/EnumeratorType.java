@@ -60,22 +60,22 @@ public enum EnumeratorType {
         @Override
         public Enumerator<String> open(File file) {
             if (file == null) {
-                return JDBCStringEnumerator.newInstance(file);
+                return JDBMStringEnumerator.newInstance(file);
             } else if (!file.exists()) {
-                return JDBCStringEnumerator.newInstance(file);
+                return JDBMStringEnumerator.newInstance(file);
             } else {
-                return JDBCStringEnumerator.load(file);
+                return JDBMStringEnumerator.load(file);
             }
         }
 
         @Override
         public void save(Enumerator<String> enumerator) throws IOException {
-            ((JDBCStringEnumerator) enumerator).save();
+            ((JDBMStringEnumerator) enumerator).save();
         }
 
         @Override
         public void close(Enumerator<String> enumerator) throws IOException {
-            ((JDBCStringEnumerator) enumerator).close();
+            ((JDBMStringEnumerator) enumerator).close();
         }
     };
 

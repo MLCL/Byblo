@@ -49,7 +49,7 @@ import uk.ac.susx.mlcl.lib.MiscUtil;
  *
  * @author hiam20
  */
-public class JDBCTest {
+public class JDBMTest {
 
     @Test
     public void basicExample() throws IOException {
@@ -189,7 +189,6 @@ public class JDBCTest {
             map.put(i, x);
             bits += x.bitLength();
             if (i % 5000 == 0) {
-//                System.out.println("Fib(" + i + ") = " + map.get(i));
                 System.out.println(MiscUtil.memoryInfoString());
                 System.out.println("bits: " + bits);
                 db.commit();
