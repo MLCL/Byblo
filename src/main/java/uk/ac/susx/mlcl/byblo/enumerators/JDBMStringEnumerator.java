@@ -185,7 +185,7 @@ public class JDBMStringEnumerator extends BiMapEnumerator<String> {
         if (anonymous)
             maker.deleteFilesAfterClose();
         maker.closeOnExit();
-        DB db = maker.make();
+//        DB db = maker.make();
 
         return load(maker, file);
 

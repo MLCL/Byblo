@@ -316,7 +316,7 @@ public class FullBuild extends AbstractCommand {
         File simsFile = new File(outputDir, instancesFile.getName() + ".sims");
 
         {
-            int allPairsChunksSize = 1000;
+            int allPairsChunksSize = 2500;
 
             checkValidInputFile("Filtered entries file", entriesFilteredFile);
             checkValidInputFile("Filtered features file", featuresFilteredFile);
@@ -353,6 +353,7 @@ public class FullBuild extends AbstractCommand {
         File neighboursFile = suffixed(simsFile, ".neighbours");
 
         {
+            int maxChunkSize = 500000;
             checkValidInputFile("Sims file", simsFile);
             checkValidOutputFile("Neighbours file", neighboursFile);
 
@@ -370,6 +371,7 @@ public class FullBuild extends AbstractCommand {
 
             knnCmd.setTempFileFactory(knnTmpFact);
             knnCmd.setNumThreads(numThreads);
+            knnCmd.setMaxChunkSize(maxChunkSize);
 
             knnCmd.runCommand();
 

@@ -149,10 +149,14 @@ public class BybloIO {
         return openEntriesSink(file, charset, EnumeratingDeligates.toSingleEntries(idx));
     }
 
-    public static WeightedTokenPairVectorSource openEventsVectorSource(
+    public static FastWeightedTokenPairVectorSource openEventsVectorSource(
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
-        return new WeightedTokenPairVectorSource(openEventsSource(file, charset, idx));
+//        return new WeightedTokenPairVectorSource(openEventsSource(file, charset, idx));
+        return FastWeightedTokenPairVectorSource.open(
+                file, charset, idx,
+                EVENTS_SKIP_INDEXED_COLUMN_1,
+                EVENTS_SKIP_INDEXED_COLUMN_2);
     }
 
     public static FastWeightedTokenPairVectorSink openEventsVectorSink(
