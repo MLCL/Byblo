@@ -46,7 +46,7 @@ import uk.ac.susx.mlcl.lib.Checks;
  *
  * @author hamish
  */
-@Parameters
+@Parameters()
 public abstract class AbstractCommand implements Command {
 
     private static final Log LOG = LogFactory.getLog(AbstractCommand.class);

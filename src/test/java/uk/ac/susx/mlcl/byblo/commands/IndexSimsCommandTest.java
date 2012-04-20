@@ -151,6 +151,7 @@ public class IndexSimsCommandTest {
     }
 
     @Test
+    @Ignore
     public void testCompareSkipVsNoSkip() throws Exception {
         System.out.println("Testing " + IndexWTPCommandTest.class.getName()
                 + " on " + TEST_FRUIT_SIMS);

@@ -77,6 +77,7 @@ public class SortWeightedTokenPairCommandTest {
     }
 
     @Test
+    @Ignore
     public void testSortWeightedTokenPairCommand_Indexed() throws IOException, Exception {
         System.out.println("Testing SortWeightedTokenPairCommand (Indexed)");
 

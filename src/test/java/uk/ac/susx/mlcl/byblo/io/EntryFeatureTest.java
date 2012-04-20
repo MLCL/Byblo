@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import org.junit.Ignore;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.enumerators.*;
@@ -53,6 +54,7 @@ import uk.ac.susx.mlcl.lib.io.IOUtil;
 public class EntryFeatureTest {
 
     @Test
+    @Ignore
     public void testLMMedlineSample() throws FileNotFoundException, IOException {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-input-sample");
         Charset charset = Charset.forName("UTF-8");

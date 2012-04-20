@@ -33,7 +33,6 @@ package uk.ac.susx.mlcl.byblo;
 
 import java.io.File;
 import org.junit.*;
-import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 
 /**
@@ -47,7 +46,6 @@ public class FullBuildTest {
 //
 
     @Test
-    @Ignore
     public void testRunCommand_Fruit() throws Exception {
         System.out.println("Test on fruit");
 
@@ -83,30 +81,22 @@ public class FullBuildTest {
 
     }
 
-
-//
-//    @Test
-//    public void testRunCommand_Medtest100k_skip1() throws Exception {
-//        testRunCommand_Medtest100k(true, false);
-//    }
-//
-//    @Test
-//    public void testRunCommand_Medtest100k_skip2() throws Exception {
-//        testRunCommand_Medtest100k(false, true);
-//    }
     @Test
+    @Ignore
     public void testRunCommand_Medtest100k_skipboth() throws Exception {
         testRunCommand_Medtest100k("100k", true, true);
     }
-//
-//    @Test
-//    public void testRunCommand_Medtest100k_noskip() throws Exception {
-//        testRunCommand_Medtest100k(false, false);
-//    }
 
-    public static void testRunCommand_Medtest100k(String sampleName, boolean skip1, boolean skip2) throws Exception {
+    @Test
+    @Ignore
+    public void testRunCommand_Medtest1m_skipboth() throws Exception {
+        testRunCommand_Medtest100k("1m", true, true);
+    }
 
-        File input = new File(TEST_DATA_DIR, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample100k");
+    public static void testRunCommand_Medtest100k(
+            String sampleName, boolean skip1, boolean skip2) throws Exception {
+
+        File input = new File(TEST_DATA_DIR, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample" + sampleName);
 
         String name = "medtest-" + sampleName;
         if (skip1 && skip2)
@@ -131,6 +121,7 @@ public class FullBuildTest {
         instance.setSkipIndex1(skip1);
         instance.setSkipIndex2(skip2);
 
+        instance.runCommand();
 
     }
 
