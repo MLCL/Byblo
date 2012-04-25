@@ -30,10 +30,14 @@
  */
 package uk.ac.susx.mlcl.lib;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * <tt>MiscUtil</tt> is a static utility class for methods that don't fit 
+ * <tt>MiscUtil</tt> is a static utility class for methods that don't fit
  * anywhere else. In general if this class contains a large number of methods
  * that can be conceptually grouped, then they should be moved to their own
  * utility class.
@@ -50,8 +54,8 @@ public class MiscUtil {
         "", "k", "M", "G", "T", "P"};
 
     /**
-     * IEC unit multiples for Byte - increases by a factor of 2^10. Only required
-     * up to max long 2^61
+     * IEC unit multiples for Byte - increases by a factor of 2^10. Only
+     * required up to max long 2^61
      */
     private static final String[] BYTE_UNITS_SUFFIX_IEC = {
         "", "Ki", "Mi", "Gi", "Ti", "Pi"};
@@ -76,21 +80,19 @@ public class MiscUtil {
 
     /**
      * Format the provided integer parameter in units of bytes as a
-     * human-readable string. For example 2048 produces become "2KiB".
-     * <p>
-     * The output can be in either SI base units (multiples of 1000) or the
-     * more traditional multiples of 1024 (2<sup>10</sup>). In the case that
+     * human-readable string. For example 2048 produces become "2KiB". <p> The
+     * output can be in either SI base units (multiples of 1000) or the more
+     * traditional multiples of 1024 (2<sup>10</sup>). In the case that
      * multiples of 1024 are used, the correct IEC units infix an i character.
-     * For example using KiB for kilobyte instead of kB.
-     * </p>
+     * For example using KiB for kilobyte instead of kB. </p>
      *
      * @param bytes The number to make a human readable units string from.
-     * @param si    whether to not to use SI (1000) units, use 1024 otherwise
-     * @param iec   whether or not use IEC units (e.g KiB)
+     * @param si whether to not to use SI (1000) units, use 1024 otherwise
+     * @param iec whether or not use IEC units (e.g KiB)
      * @return human readable string representation of the number of bytes
      */
     public static String humanReadableBytes(long bytes, boolean si, boolean iec) {
-        
+
         // Record and strip the sign
         final int signum = Long.signum(bytes);
         final long posBytes = bytes * signum;
@@ -139,19 +141,19 @@ public class MiscUtil {
      * Java Virtual Machine will attempt to allocate.
      *
      * @return the maximum amount of memory that the virtual machine will
-     *      attempt to use, measured in bytes
+     * attempt to use, measured in bytes
      */
     public static long maxMemory() {
         return Runtime.getRuntime().maxMemory();
     }
 
     /**
-     * Returns the total amount of memory in the Java virtual machine. The
-     * value returned by this method may vary over time, depending on the host
+     * Returns the total amount of memory in the Java virtual machine. The value
+     * returned by this method may vary over time, depending on the host
      * environment.
      *
-     * @return total amount of memory currently available for current and
-     *      future objects, measured in bytes.
+     * @return total amount of memory currently available for current and future
+     * objects, measured in bytes.
      */
     public static long allocatedMemory() {
         return Runtime.getRuntime().totalMemory();
@@ -163,7 +165,7 @@ public class MiscUtil {
      * returned by freeMemory.
      *
      * @return an approximation to the total amount of memory currently
-     *      available for future allocated objects, measured in bytes.
+     * available for future allocated objects, measured in bytes.
      */
     public static long freeAllocatedMemory() {
         return Runtime.getRuntime().freeMemory();
@@ -176,7 +178,7 @@ public class MiscUtil {
      * by usedMemory.
      *
      * @return an approximation to the amount of memory currently used by
-     *      allocated objects, measured in bytes.
+     * allocated objects, measured in bytes.
      */
     public static long usedMemory() {
         return allocatedMemory() - freeAllocatedMemory();
@@ -185,11 +187,10 @@ public class MiscUtil {
     /**
      * Returns the amount of memory available for use by the Java program. This
      * includes memory that has not yet been allocated to the Java Virtual
-     * Machine.
-     * <p />
+     * Machine. <p />
      *
      * @return an approximation to the amount of memory that is available for
-     *      use by the Java program.
+     * use by the Java program.
      */
     public static long freeMaxMemory() {
         return maxMemory() - usedMemory();
@@ -212,10 +213,9 @@ public class MiscUtil {
                     humanReadableBytes(allocatedMemory()),
                     humanReadableBytes(maxMemory())});
     }
-    
-    
+
     /**
-     * Formals character names table for 0...32. Where a more recognizable 
+     * Formals character names table for 0...32. Where a more recognizable
      * pseudonym exists, the formal abbreviation has been replaced..
      */
     private static final String[] UTF8_CHAR_NAMES = {
@@ -231,15 +231,12 @@ public class MiscUtil {
 
     /**
      * Produces a string representation of <tt>ch</tt> that should be printable,
-     * and human readable.
-     * <p />
-     * For example, when <tt>ch</tt> is the horizontal-tab character (0x9), the
-     * function produces the String <tt>"Tab"</tt>.
-     * <p />
-     * The motivation for this function is a parser, where errors need to 
-     * display something sensible like <tt>"expecting Tab but found 
-     * New-line"</tt>.
-     * 
+     * and human readable. <p /> For example, when <tt>ch</tt> is the
+     * horizontal-tab character (0x9), the function produces the String
+     * <tt>"Tab"</tt>. <p /> The motivation for this function is a parser, where
+     * errors need to display something sensible like <tt>"expecting Tab but
+     * found New-line"</tt>.
+     *
      * @param ch character to print
      * @return printable representation
      */
@@ -253,4 +250,180 @@ public class MiscUtil {
         }
     }
 
+    private static final int FLOAT_BITS = Float.SIZE;
+
+    private static final int DOUBLE_BITS = Double.SIZE;
+
+    private static final int INT_BITS = Integer.SIZE;
+
+    private static final int LONG_BITS = Long.SIZE;
+
+    private static final int SHORT_BITS = Short.SIZE;
+
+    private static final int CHAR_BITS = Character.SIZE;
+
+    private static final int BYTE_BITS = Byte.SIZE;
+
+    private static final int BOOLEAN_BITS = Integer.SIZE;
+
+    private static final int VOID_BITS = 0;
+
+    private static final int REF_BITS = Integer.SIZE;
+
+    public static long sizeOf(Object instance) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException {
+        Map<Long, Long> cache = new HashMap<Long, Long>();
+        return sizeOf(instance, 0, cache);
+    }
+
+    private static long fingerprint(Object... objs) {
+        long fingerprint = 3;
+        for (Object o : objs) {
+            if (o != null) {
+                fingerprint = fingerprint * 37 + o.hashCode();
+                fingerprint = fingerprint * 37 + o.toString().hashCode();
+                fingerprint = fingerprint * 37 + o.getClass().hashCode();
+            }
+        }
+        return fingerprint;
+    }
+
+    private class MemoryProfile {
+
+        private long size = 0;
+        public MemoryProfile() {
+        }
+
+        private static long sizeOf(Object instance, int depth, Map<Long, Long> cache) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException {
+//        System.out.printf(format(depth, "sizeOf(instance)%n", instance));
+            if (cache.containsKey(fingerprint(instance)))
+                return 0;
+            cache.put(fingerprint(instance), 0L);
+
+
+            if (instance == null)
+                return 0;
+            Class<?> clazz = instance.getClass();
+            long size = 0;
+            if (clazz.isArray()) {
+                if (clazz.equals(float[].class)) {
+                    size += ((float[]) instance).length * FLOAT_BITS;
+                } else if (clazz.equals(double[].class)) {
+                    size += ((double[]) instance).length * DOUBLE_BITS;
+                } else if (clazz.equals(int[].class)) {
+                    size += ((int[]) instance).length * INT_BITS;
+                } else if (clazz.equals(long[].class)) {
+                    size += ((long[]) instance).length * LONG_BITS;
+                } else if (clazz.equals(short[].class)) {
+                    size += ((short[]) instance).length * SHORT_BITS;
+                } else if (clazz.equals(char[].class)) {
+                    size += ((char[]) instance).length * CHAR_BITS;
+                } else if (clazz.equals(byte[].class)) {
+                    size += ((byte[]) instance).length * BYTE_BITS;
+                } else if (clazz.equals(boolean[].class)) {
+                    size += ((boolean[]) instance).length * BOOLEAN_BITS;
+                } else {
+                    Object[] array = ((Object[]) instance);
+                    for (Object item : array) {
+                        size += REF_BITS;
+                        size += sizeOf(item, depth + 1, cache);
+                    }
+                }
+            } else if (clazz.isEnum()) {
+                size += REF_BITS;
+            } else {
+                size += sizeOfClassInstance(clazz, instance, depth, cache);
+            }
+
+            cache.put(fingerprint(instance), size);
+            return size;
+        }
+
+        private static long sizeOfClassInstance(Class<?> clazz, Object instance, int depth, Map<Long, Long> cache)
+                throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException {
+//        System.out.printf(format(depth, "sizeOfClassInstance(%s, instance)%n", clazz.getName(), instance));
+            if (cache.containsKey(fingerprint(clazz, instance)))
+                return 0;
+            cache.put(fingerprint(clazz, instance), 0L);
+
+            long size = 0;
+
+            Field[] fields = clazz.getDeclaredFields();
+            for (Field field : fields) {
+                size += sizeOfFieldInstance(field, instance, depth + 1, cache);
+            }
+
+            if (clazz.getSuperclass() != null)
+                size += sizeOfClassInstance(clazz.getSuperclass(), instance, depth + 1, cache);
+
+            cache.put(fingerprint(clazz, instance), size);
+            return size;
+        }
+
+        private static long sizeOfFieldInstance(Field field, Object instance, int depth, Map<Long, Long> cache)
+                throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException {
+
+            if (cache.containsKey(fingerprint(field, instance, field.get(instance))))
+                return 0;
+            cache.put(fingerprint(field, instance, field.get(instance)), 0L);
+            long size = 0;
+
+            boolean accessible = true;
+            if (!field.isAccessible()) {
+                field.setAccessible(true);
+                accessible = false;
+            }
+
+            final int fmods = field.getModifiers();
+            if (field.getType().isPrimitive()) {
+
+
+                Class<?> fc = field.getType();
+                if (fc.equals(float.class)) {
+                    size += FLOAT_BITS;
+                } else if (fc.equals(double.class)) {
+                    size += DOUBLE_BITS;
+                } else if (fc.equals(int.class)) {
+                    size += INT_BITS;
+                } else if (fc.equals(long.class)) {
+                    size += LONG_BITS;
+                } else if (fc.equals(short.class)) {
+                    size += SHORT_BITS;
+                } else if (fc.equals(char.class)) {
+                    size += CHAR_BITS;
+                } else if (fc.equals(byte.class)) {
+                    size += BYTE_BITS;
+                } else if (fc.equals(boolean.class)) {
+                    size += BOOLEAN_BITS;
+                } else if (fc.equals(void.class)) {
+                    size += VOID_BITS;
+                } else {
+                    throw new AssertionError(
+                            "Unknown primitive class: " + fc);
+                }
+            } else {
+
+
+
+                if (field.get(instance) != instance)
+                    size += sizeOf(field.get(instance), depth + 1, cache);
+
+
+
+            }
+            if (!accessible)
+                field.setAccessible(false);
+
+            cache.put(fingerprint(field, instance), size);
+            return size;
+        }
+
+        private static String format(int depth, String fmt, Object... args) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < depth * 4; i++)
+                sb.append(" ");
+            sb.append(String.format(fmt, args));
+            return sb.toString();
+        }
+
+    }
 }
