@@ -22,13 +22,14 @@ import java.util.*;
  */
 public class MemoryProfiler {
 
-    private static final boolean JAVA_64BIT = true;
+    private static final boolean JAVA_64BIT = false;
 
-    protected static final long OBJECT_REFERENCE_BITS = JAVA_64BIT ? 64 : 32;
+    protected static final long OBJECT_REFERENCE_BITS = 48; //JAVA_64BIT ? 64 : 32;
+    protected static final long OBJECT_REFERENCE_COMPRESSED_BITS = 32;
 
-    protected static final long OBJECT_OVERHEAD_BITS = OBJECT_REFERENCE_BITS * 2;
+    protected static final long OBJECT_OVERHEAD_BITS = 32 * 2;
 
-    protected static final long ARRAY_OVERHEAD_BITS = OBJECT_REFERENCE_BITS * 3;
+    protected static final long ARRAY_OVERHEAD_BITS = 32 * 3;
 
     protected static final long ALIGNEDMENT_BITS = 64;
 
@@ -93,19 +94,6 @@ public class MemoryProfiler {
         return bits + (bits % ALIGNEDMENT_BITS == 0 ? 0 : ALIGNEDMENT_BITS - (bits % ALIGNEDMENT_BITS));
     }
 
-    private Object fieldValue(Field field, Object obj) throws IllegalAccessException {
-        final boolean accessible = field.isAccessible();
-        if (!accessible)
-            field.setAccessible(true);
-
-        final Object instance = field.get(obj);
-
-        if (!accessible)
-            field.setAccessible(accessible);
-
-        return instance;
-    }
-
     private ClassInfo shallowClassInfo(Class<?> type) throws IllegalAccessException {
         assert type != null;
 
@@ -117,6 +105,17 @@ public class MemoryProfiler {
 
             info.fields = type.getDeclaredFields();
             for (Field field : info.fields) {
+                field.setAccessible(true);
+//                if(field.isSynthetic())
+//                    System.out.println("synthetic: " + field);
+//                Modifier.
+//                if(Modifier.isNative(field.getModifiers()) ){
+//                    System.out.println("native: " + field);
+//                }
+                
+            }
+            
+            for (Field field : info.fields) {
 
                 if (Modifier.isStatic(field.getModifiers())) {
 
@@ -127,7 +126,7 @@ public class MemoryProfiler {
                     } else {
 
                         size += OBJECT_REFERENCE_BITS;
-                        Object fieldInst = fieldValue(field, null);
+                        Object fieldInst = field.get(null);
                         sizeOf(fieldInst);
                     }
 
@@ -165,7 +164,7 @@ public class MemoryProfiler {
 
             } else {
 
-                size += OBJECT_REFERENCE_BITS
+                size += OBJECT_REFERENCE_COMPRESSED_BITS
                         * Array.getLength(instance);
                 for (Object value : ((Object[]) instance))
                     sizeOf(value);
@@ -187,7 +186,7 @@ public class MemoryProfiler {
                             || field.getType().isPrimitive())
                         continue;
 
-                    sizeOf(fieldValue(field, instance));
+                    sizeOf(field.get(instance));
                 }
 
             } while ((type = type.getSuperclass()) != null);
