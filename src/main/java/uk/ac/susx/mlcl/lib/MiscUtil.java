@@ -30,11 +30,7 @@
  */
 package uk.ac.susx.mlcl.lib;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * <tt>MiscUtil</tt> is a static utility class for methods that don't fit

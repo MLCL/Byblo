@@ -30,10 +30,8 @@
  */
 package uk.ac.susx.mlcl.lib;
 
-import java.util.Calendar;
 import static org.junit.Assert.*;
 import org.junit.Test;
-import uk.ac.susx.mlcl.lib.collect.ArrayUtil;
 
 /**
  *
@@ -58,14 +56,15 @@ public class MiscUtilTest {
             if (i > 32 && i != 127) {
                 // String should simply contain the character
                 assertTrue("String should have length 1", result.length() == 1);
-                assertEquals("Result should be the input character.", ch, result.charAt(0));
+                assertEquals("Result should be the input character.", ch,
+                             result.charAt(0));
             } else {
                 // String should contain some string name
-                assertTrue("String should have length at least 1", result.length() >= 1);
-                assertTrue("Result should not be the input character.", ch != result.charAt(0));
+                assertTrue("String should have length at least 1",
+                           result.length() >= 1);
+                assertTrue("Result should not be the input character.",
+                           ch != result.charAt(0));
             }
         }
     }
-
-
 }

@@ -4,18 +4,19 @@
  */
 package uk.ac.susx.mlcl.lib;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import org.junit.*;
 import static org.junit.Assert.*;
-import uk.ac.susx.mlcl.lib.collect.ArrayUtil;
 
 /**
  *
  * @author hamish
  */
-public class MemoryProfileTest {
+public class MemoryProfilerTest {
 
-    public MemoryProfileTest() {
+    public MemoryProfilerTest() {
     }
 
     @BeforeClass
@@ -34,6 +35,155 @@ public class MemoryProfileTest {
     public void tearDown() {
     }
 
+    @Test
+    public void testAddRuntimeObject() throws Exception {
+
+        MemoryProfiler mp = new MemoryProfiler();
+
+        mp.add(Runtime.getRuntime());
+        System.out.printf("Runtime size: %d bits, %d bytes.%n",
+                          mp.getSizeBits(), mp.getSizeBytes());
+
+    }
+
+    @Test
+    public void testAddThreadObject() throws Exception {
+
+        MemoryProfiler mp = new MemoryProfiler();
+
+        mp.add(Thread.currentThread());
+        System.out.printf("Thread size: %d bits, %d bytes.%n",
+                          mp.getSizeBits(), mp.getSizeBytes());
+    }
+
+    @Test
+    public void testAddClassLoaderObject() throws Exception {
+
+        MemoryProfiler mp = new MemoryProfiler();
+
+        mp.add(Thread.currentThread().getContextClassLoader());
+        System.out.printf("ClassLoader size: %d bits, %d bytes.%n",
+                          mp.getSizeBits(), mp.getSizeBytes());
+    }
+
+    @Test
+    public void testAddSelf() throws Exception {
+
+        MemoryProfiler mp = new MemoryProfiler();
+        mp.add(mp);
+        System.out.printf("Self size: %d bits, %d bytes.%n",
+                          mp.getSizeBits(), mp.getSizeBytes());
+    }
+
+    @Test
+    public void testAddStringFooBar() throws Exception {
+
+        MemoryProfiler mp = new MemoryProfiler();
+        mp.add("foobar");
+        mp.add(mp);
+        System.out.printf("String \"foobar\" size: %d bits, %d bytes.%n",
+                          mp.getSizeBits(), mp.getSizeBytes());
+    }
+
+    @Test
+    @Ignore
+    public void testAddDoubleObject() throws Exception {
+
+        MemoryProfiler mp = new MemoryProfiler();
+
+        mp.add(new Double(Math.PI));
+        System.out.printf("1 Double size: %d bits, %d bytes.%n",
+                          mp.getSizeBits(), mp.getSizeBytes());
+
+        mp.add(new Double(Math.E));
+        System.out.printf("2 Doubles size: %d bits, %d bytes.%n",
+                          mp.getSizeBits(), mp.getSizeBytes());
+
+        mp.add(new Double(0));
+        System.out.printf("3 Doubles size: %d bits, %d bytes.%n",
+                          mp.getSizeBits(), mp.getSizeBytes());
+    }
+
+    @Test
+    public void testStringObject() throws Exception {
+
+        MemoryProfiler mp = new MemoryProfiler();
+
+        String str = "foo";
+
+        long staticExpected = 0;
+
+        //  string object contains the following static fields:
+
+//    private static final long serialVersionUID = -6849794470754667710L;
+        staticExpected += MemoryProfiler.Primitives.LONG.getSizeBits();
+//    private static final ObjectStreamField[] serialPersistentFields =
+//        new ObjectStreamField[0];
+        staticExpected += MemoryProfiler.OBJECT_REFERENCE_BITS;
+        staticExpected += MemoryProfiler.ARRAY_OVERHEAD_BITS;
+
+//    public static final Comparator<String> CASE_INSENSITIVE_ORDER
+//                                         = new String.CaseInsensitiveComparator();
+//  private static class CaseInsensitiveComparator
+//                         implements Comparator<String>, java.io.Serializable {
+//	// use serialVersionUID from JDK 1.2.2 for interoperability
+//	private static final long serialVersionUID = 8575799808933029326L;
+//...
+//    }
+//  
+        staticExpected += MemoryProfiler.OBJECT_REFERENCE_BITS;
+        staticExpected += MemoryProfiler.OBJECT_OVERHEAD_BITS;
+        staticExpected += MemoryProfiler.Primitives.LONG.getSizeBits();
+
+        if (staticExpected % MemoryProfiler.ALIGNEDMENT_BITS != 0)
+            staticExpected += MemoryProfiler.ALIGNEDMENT_BITS
+                    - (staticExpected % MemoryProfiler.ALIGNEDMENT_BITS);
+
+        //  string object contains the following instance fields:
+
+
+        long instanceExpected = 0;
+        instanceExpected += MemoryProfiler.OBJECT_OVERHEAD_BITS;
+//    private final char value[];
+        instanceExpected += MemoryProfiler.OBJECT_REFERENCE_BITS;
+        instanceExpected += MemoryProfiler.ARRAY_OVERHEAD_BITS;
+        instanceExpected += MemoryProfiler.Primitives.CHAR.getSizeBits()
+                * str.length();
+//    private final int offset;
+        instanceExpected += MemoryProfiler.Primitives.INT.getSizeBits();
+//    private final int count;
+        instanceExpected += MemoryProfiler.Primitives.INT.getSizeBits();
+//    private int hash; // Default to 0
+        instanceExpected += MemoryProfiler.Primitives.INT.getSizeBits();
+
+        if (instanceExpected % MemoryProfiler.ALIGNEDMENT_BITS != 0)
+            instanceExpected += MemoryProfiler.ALIGNEDMENT_BITS
+                    - (instanceExpected % MemoryProfiler.ALIGNEDMENT_BITS);
+
+        mp.add(str);
+
+        System.out.printf(
+                "String \"%s\" size: static = %d, instanec = %d, actual = %d%n",
+                str, staticExpected, instanceExpected,
+                mp.getSizeBits());;
+        assertEquals(staticExpected + instanceExpected, mp.getSizeBits());
+
+
+        // Add another string of the same size
+        mp.add("bar");
+        instanceExpected *= 2;
+        assertEquals(staticExpected + instanceExpected, mp.getSizeBits());
+
+        // Add another string of the same size
+        mp.add("abc");
+        mp.add("xyz");
+        instanceExpected *= 2;
+        assertEquals(staticExpected + instanceExpected, mp.getSizeBits());
+
+
+
+    }
+
     /**
      * The Java Calendar object is famous for it's bloat. This test checks it
      * size in various ways.
@@ -45,48 +195,21 @@ public class MemoryProfileTest {
 
         Calendar cal = Calendar.getInstance();
 
-        {
-            MemoryProfile mp = new MemoryProfile();
-            mp.add(cal);
-            mp.build();
-            System.out.printf("Calendar size: %d bits, %d bytes.%n",
-                              mp.getSizeBits(), mp.getSizeBytes());
-        }
-        {
-            MemoryProfile mp = new MemoryProfile();
-            mp.setAccessableObeyed(true);
-            mp.add(cal);
-            mp.build();
-            System.out.printf("Calendar (accessable) size: %d bits, %d bytes.%n",
-                              mp.getSizeBits(), mp.getSizeBytes());
-        }
-        {
-            MemoryProfile mp = new MemoryProfile();
-            mp.setStaticFieldsIgnored(true);
-            mp.add(cal);
-            mp.build();
-            System.out.printf("Calendar (non-static) size: %d bits, %d bytes.%n",
-                              mp.getSizeBits(), mp.getSizeBytes());
-        }
-        {
-            MemoryProfile mp = new MemoryProfile();
-            mp.setAccessableObeyed(true);
-            mp.setStaticFieldsIgnored(true);
-            mp.add(cal);
-            mp.build();
-            System.out.printf(
-                    "Calendar (accessable, non-static) size: %d bits, %d bytes.%n",
-                    mp.getSizeBits(), mp.getSizeBytes());
-        }
+        MemoryProfiler mp = new MemoryProfiler();
+        mp.add(cal);
+        System.out.printf("Calendar size: %d bits, %d bytes.%n",
+                          mp.getSizeBits(), mp.getSizeBytes());
     }
 
     @Test
+    @Ignore
     public void testRepeatedAdds() throws Exception {
         Calendar cal = Calendar.getInstance();
 
-        MemoryProfile mp = new MemoryProfile();
+        MemoryProfiler mp = new MemoryProfiler();
         mp.add(cal);
-        mp.build();
+
+        System.out.println("\n");
 
         final long expectedSize = mp.getSizeBits();
         mp.add(cal);
@@ -95,22 +218,102 @@ public class MemoryProfileTest {
     }
 
     @Test
+    @Ignore
     public void testRepeatedAdds2() throws Exception {
         Calendar cal = Calendar.getInstance();
 
-        MemoryProfile mp = new MemoryProfile();
+        MemoryProfiler mp = new MemoryProfiler();
         mp.add(cal);
-        mp.build();
 
         final long expectedSize = mp.getSizeBits();
+
         for (int i = 0; i < 10000; i++) {
-            mp = new MemoryProfile();
+            mp = new MemoryProfiler();
             mp.add(cal);
-            mp.build();
             assertEquals(expectedSize, mp.getSizeBits());
         }
-
     }
+
+    @Test
+    public void compareMemoryGrowth() throws Exception {
+
+        System.gc();
+        final long startingMem = MiscUtil.usedMemory();
+
+        System.out.println("Starting memory: " + MiscUtil.humanReadableBytes(
+                startingMem));
+        List<Object> list = new ArrayList<Object>();
+
+        long expectedDiff = 0;
+        for (int i = 0; i < 40; i++) {
+            list.add(new long[1024 * 1024 / 8]);
+
+            System.gc();
+            long usedSize = MiscUtil.usedMemory();
+
+            MemoryProfiler mp = new MemoryProfiler();
+            mp.add(list);
+
+            long mpSize = mp.getSizeBytes() - expectedDiff;
+            long diff = mpSize - usedSize;
+            if (i == 0)
+                expectedDiff = diff;
+
+            double ratio = (double) usedSize / (double) mpSize;
+            System.out.printf("%d: used=%s, profiler=%s, diff=%s, radio=%f%n", i,
+                              MiscUtil.humanReadableBytes(usedSize),
+                              MiscUtil.humanReadableBytes(mpSize),
+                              MiscUtil.humanReadableBytes(diff),
+                              ratio);
+            
+            if(i != 0) {
+                assertEquals(ratio, 1.0, 0.001);
+            }
+        }
+    }
+//    
+//    interface ObjectInstantiater {
+//        
+//    }
+//    
+//    @Test
+//    public void compareMemoryGrowth() throws Exception {
+//
+//        System.gc();
+//        final long startingMem = MiscUtil.usedMemory();
+//
+//        System.out.println("Starting memory: " + MiscUtil.humanReadableBytes(
+//                startingMem));
+//        List<Object> list = new ArrayList<Object>();
+//
+//        long expectedDiff = 0;
+//        for (int i = 0; i < 40; i++) {
+//            list.add(new long[1024 * 1024 / 8]);
+//
+//            System.gc();
+//            long usedSize = MiscUtil.usedMemory();
+//
+//            MemoryProfiler mp = new MemoryProfiler();
+//            mp.add(list);
+//
+//            long mpSize = mp.getSizeBytes() - expectedDiff;
+//            long diff = mpSize - usedSize;
+//            if (i == 0)
+//                expectedDiff = diff;
+//
+//            double ratio = (double) usedSize / (double) mpSize;
+//            System.out.printf("%d: used=%s, profiler=%s, diff=%s, radio=%f%n", i,
+//                              MiscUtil.humanReadableBytes(usedSize),
+//                              MiscUtil.humanReadableBytes(mpSize),
+//                              MiscUtil.humanReadableBytes(diff),
+//                              ratio);
+//            
+//            if(i != 0) {
+//                assertEquals(ratio, 1.0, 0.001);
+//            }
+//        }
+//    }
+//    
 //    @Test
 //    public void testSizeof() throws Exception {
 //
