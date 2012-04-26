@@ -96,35 +96,34 @@ public class MiscUtil {
         // Calculate the power, for either base 1000 or 1024
         final double byteFrac;
         final String unit;
+        long order = 0;
         if (si) {
 
-            long i = 0;
             long lim = 1000L;
-            while (i < BYTE_UNITS_SUFFIX_SI.length
+            while (order < BYTE_UNITS_SUFFIX_SI.length
                     && posBytes >= lim) {
                 lim *= 1000L;
-                i++;
+                order++;
             }
             byteFrac = posBytes / (double) (lim / 1000L);
-            unit = BYTE_UNITS_SUFFIX_SI[(int) i];
+            unit = BYTE_UNITS_SUFFIX_SI[(int) order];
 
         } else {
 
-            long i = 0;
             final String[] units =
                     iec ? BYTE_UNITS_SUFFIX_IEC : BYTE_UNITS_SUFFIX_SI;
-            while (i < units.length
-                    && posBytes >= 1L << 10L * (i + 1L)) {
-                i++;
+            while (order < units.length
+                    && posBytes >= 1L << 10L * (order + 1L)) {
+                order++;
             }
-            byteFrac = posBytes / (double) (1L << (10L * i));
-            unit = units[(int) i];
+            byteFrac = posBytes / (double) (1L << (10L * order));
+            unit = units[(int) order];
         }
 
-        return String.format("%s%.1f%sB",
-                             signum == -1 ? "-" : "",
-                             byteFrac,
-                             unit);
+
+        return String.format(
+                Math.floor(byteFrac) == byteFrac ? "%s%.0f%sB" : "%s%.1f%sB",
+                signum == -1 ? "-" : "", byteFrac, unit);
     }
 
     /**
