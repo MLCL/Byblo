@@ -1,26 +1,49 @@
 /*
- * Copyright (c) 2010, Hamish Morgan.
- * All Rights Reserved.
+ * Copyright (c) 2010-2012, MLCL, University of Sussex
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without 
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *  * Redistributions of source code must retain the above copyright notice, 
+ *    this list of conditions and the following disclaimer.
+ * 
+ *  * Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ *  * Neither the name of the University of Sussex nor the names of its 
+ *    contributors may be used to endorse or promote products derived from this 
+ *    software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 package uk.ac.susx.mlcl.lib;
 
 import static java.lang.Thread.yield;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.EnumSet;
-import java.util.List;
+import java.util.*;
+import static org.junit.Assert.assertEquals;
 import org.junit.*;
-import static org.junit.Assert.*;
 
 /**
  *
  * @author hamish
  */
-public class MemoryProfilerTest {
+public class MemoryUsageTest {
 
     private static final int CHUNK_SIZE = 1024 * 1024 / 4;
 
-    public MemoryProfilerTest() {
+    public MemoryUsageTest() {
     }
 
     @BeforeClass
@@ -37,63 +60,74 @@ public class MemoryProfilerTest {
 
     @After
     public void tearDown() {
+        System.out.println();
     }
 
     @Test
     public void testAddRuntimeObject() throws Exception {
+        System.out.println("testAddRuntimeObject");
 
-        MemoryProfiler mp = new MemoryProfiler();
+        MemoryUsage mp = new MemoryUsage();
 
         mp.add(Runtime.getRuntime());
         System.out.printf("Runtime size: %d bits, %d bytes.%n",
                           mp.getSizeBits(), mp.getSizeBytes());
 
+        System.out.println(mp);
     }
 
     @Test
     public void testAddThreadObject() throws Exception {
+        System.out.println("testAddThreadObject");
 
-        MemoryProfiler mp = new MemoryProfiler();
+        MemoryUsage mp = new MemoryUsage();
 
         mp.add(Thread.currentThread());
         System.out.printf("Thread size: %d bits, %d bytes.%n",
                           mp.getSizeBits(), mp.getSizeBytes());
+        System.out.println(mp);
     }
 
     @Test
     public void testAddClassLoaderObject() throws Exception {
+        System.out.println("testAddClassLoaderObject");
 
-        MemoryProfiler mp = new MemoryProfiler();
+        MemoryUsage mp = new MemoryUsage();
 
         mp.add(Thread.currentThread().getContextClassLoader());
         System.out.printf("ClassLoader size: %d bits, %d bytes.%n",
                           mp.getSizeBits(), mp.getSizeBytes());
+        System.out.println(mp);
     }
 
     @Test
     public void testAddSelf() throws Exception {
+        System.out.println("testAddSelf");
 
-        MemoryProfiler mp = new MemoryProfiler();
+        MemoryUsage mp = new MemoryUsage();
         mp.add(mp);
         System.out.printf("Self size: %d bits, %d bytes.%n",
                           mp.getSizeBits(), mp.getSizeBytes());
+        System.out.println(mp);
     }
 
     @Test
     public void testAddStringFooBar() throws Exception {
+        System.out.println("testAddStringFooBar");
 
-        MemoryProfiler mp = new MemoryProfiler();
+        MemoryUsage mp = new MemoryUsage();
         mp.add("foobar");
         mp.add(mp);
         System.out.printf("String \"foobar\" size: %d bits, %d bytes.%n",
                           mp.getSizeBits(), mp.getSizeBytes());
+        System.out.println(mp);
     }
 
     @Test
-    @Ignore
     public void testAddDoubleObject() throws Exception {
+        System.out.println("testAddDoubleObject");
 
-        MemoryProfiler mp = new MemoryProfiler();
+        MemoryUsage mp = new MemoryUsage();
 
         mp.add(new Double(Math.PI));
         System.out.printf("1 Double size: %d bits, %d bytes.%n",
@@ -106,13 +140,15 @@ public class MemoryProfilerTest {
         mp.add(new Double(0));
         System.out.printf("3 Doubles size: %d bits, %d bytes.%n",
                           mp.getSizeBits(), mp.getSizeBytes());
+        System.out.println(mp);
     }
 
     @Test
     @Ignore
     public void testStringObject() throws Exception {
+        System.out.println("testStringObject");
 
-        MemoryProfiler mp = new MemoryProfiler();
+        MemoryUsage mp = new MemoryUsage();
 
         String str = "foo";
 
@@ -121,11 +157,11 @@ public class MemoryProfilerTest {
         //  string object contains the following static fields:
 
 //    private static final long serialVersionUID = -6849794470754667710L;
-        staticExpected += MemoryProfiler.Primitives.LONG.getSizeBits();
+        staticExpected += MemoryUsage.Primitive.LONG.getSizeBits();
 //    private static final ObjectStreamField[] serialPersistentFields =
 //        new ObjectStreamField[0];
-        staticExpected += MemoryProfiler.OBJECT_REFERENCE_BITS;
-        staticExpected += MemoryProfiler.ARRAY_OVERHEAD_BITS;
+        staticExpected += MemoryUsage.OBJECT_REFERENCE_BITS;
+        staticExpected += MemoryUsage.ARRAY_OVERHEAD_BITS;
 
 //    public static final Comparator<String> CASE_INSENSITIVE_ORDER
 //                                         = new String.CaseInsensitiveComparator();
@@ -136,34 +172,34 @@ public class MemoryProfilerTest {
 //...
 //    }
 //  
-        staticExpected += MemoryProfiler.OBJECT_REFERENCE_BITS;
-        staticExpected += MemoryProfiler.OBJECT_OVERHEAD_BITS;
-        staticExpected += MemoryProfiler.Primitives.LONG.getSizeBits();
+        staticExpected += MemoryUsage.OBJECT_REFERENCE_BITS;
+        staticExpected += MemoryUsage.OBJECT_OVERHEAD_BITS;
+        staticExpected += MemoryUsage.Primitive.LONG.getSizeBits();
 
-        if (staticExpected % MemoryProfiler.ALIGNEDMENT_BITS != 0)
-            staticExpected += MemoryProfiler.ALIGNEDMENT_BITS
-                    - (staticExpected % MemoryProfiler.ALIGNEDMENT_BITS);
+        if (staticExpected % MemoryUsage.ALIGNEDMENT_BITS != 0)
+            staticExpected += MemoryUsage.ALIGNEDMENT_BITS
+                    - (staticExpected % MemoryUsage.ALIGNEDMENT_BITS);
 
         //  string object contains the following instance fields:
 
 
         long instanceExpected = 0;
-        instanceExpected += MemoryProfiler.OBJECT_OVERHEAD_BITS;
+        instanceExpected += MemoryUsage.OBJECT_OVERHEAD_BITS;
 //    private final char value[];
-        instanceExpected += MemoryProfiler.OBJECT_REFERENCE_BITS;
-        instanceExpected += MemoryProfiler.ARRAY_OVERHEAD_BITS;
-        instanceExpected += MemoryProfiler.Primitives.CHAR.getSizeBits()
+        instanceExpected += MemoryUsage.OBJECT_REFERENCE_BITS;
+        instanceExpected += MemoryUsage.ARRAY_OVERHEAD_BITS;
+        instanceExpected += MemoryUsage.Primitive.CHAR.getSizeBits()
                 * str.length();
 //    private final int offset;
-        instanceExpected += MemoryProfiler.Primitives.INT.getSizeBits();
+        instanceExpected += MemoryUsage.Primitive.INT.getSizeBits();
 //    private final int count;
-        instanceExpected += MemoryProfiler.Primitives.INT.getSizeBits();
+        instanceExpected += MemoryUsage.Primitive.INT.getSizeBits();
 //    private int hash; // Default to 0
-        instanceExpected += MemoryProfiler.Primitives.INT.getSizeBits();
+        instanceExpected += MemoryUsage.Primitive.INT.getSizeBits();
 
-        if (instanceExpected % MemoryProfiler.ALIGNEDMENT_BITS != 0)
-            instanceExpected += MemoryProfiler.ALIGNEDMENT_BITS
-                    - (instanceExpected % MemoryProfiler.ALIGNEDMENT_BITS);
+        if (instanceExpected % MemoryUsage.ALIGNEDMENT_BITS != 0)
+            instanceExpected += MemoryUsage.ALIGNEDMENT_BITS
+                    - (instanceExpected % MemoryUsage.ALIGNEDMENT_BITS);
 
         mp.add(str);
 
@@ -185,6 +221,7 @@ public class MemoryProfilerTest {
         instanceExpected *= 2;
         assertEquals(staticExpected + instanceExpected, mp.getSizeBits());
 
+        System.out.println(mp);
 
 
     }
@@ -197,21 +234,23 @@ public class MemoryProfilerTest {
      */
     @Test
     public void testAddCalendarObject() throws Exception {
+        System.out.println("testAddCalendarObject");
 
         Calendar cal = Calendar.getInstance();
 
-        MemoryProfiler mp = new MemoryProfiler();
+        MemoryUsage mp = new MemoryUsage();
         mp.add(cal);
         System.out.printf("Calendar size: %d bits, %d bytes.%n",
                           mp.getSizeBits(), mp.getSizeBytes());
+        System.out.println(mp);
     }
 
     @Test
-    @Ignore
     public void testRepeatedAdds() throws Exception {
+        System.out.println("testRepeatedAdds");
         Calendar cal = Calendar.getInstance();
 
-        MemoryProfiler mp = new MemoryProfiler();
+        MemoryUsage mp = new MemoryUsage();
         mp.add(cal);
 
         System.out.println("\n");
@@ -219,24 +258,26 @@ public class MemoryProfilerTest {
         final long expectedSize = mp.getSizeBits();
         mp.add(cal);
         assertEquals(expectedSize, mp.getSizeBits());
+        System.out.println(mp);
 
     }
 
     @Test
-    @Ignore
     public void testRepeatedAdds2() throws Exception {
+        System.out.println("testRepeatedAdds2");
         Calendar cal = Calendar.getInstance();
 
-        MemoryProfiler mp = new MemoryProfiler();
+        MemoryUsage mp = new MemoryUsage();
         mp.add(cal);
 
         final long expectedSize = mp.getSizeBits();
 
         for (int i = 0; i < 10000; i++) {
-            mp = new MemoryProfiler();
+            mp = new MemoryUsage();
             mp.add(cal);
             assertEquals(expectedSize, mp.getSizeBits());
         }
+        System.out.println(mp);
     }
 
     interface Factory {
@@ -365,10 +406,8 @@ public class MemoryProfilerTest {
 
             byte h = (byte) 1;
 
-        
-
         }
-        final int size = (int) new MemoryProfiler().add(new Containder()).
+        final int size = (int) new MemoryUsage().add(new Containder()).
                 getSizeBytes();
         System.out.println(CHUNK_SIZE / size);
         compareMemoryGrowth(new Factory() {
@@ -381,16 +420,16 @@ public class MemoryProfilerTest {
             }
         });
     }
-    
+
     @Test
     public void compareMemoryGrowth_Container2() throws Exception {
         System.out.println("compareMemoryGrowth_Container2");
         class Containder {
 
-            Object j;
+            long j;
 
         }
-        final int size = (int) new MemoryProfiler().add(new Containder()).
+        final int size = (int) new MemoryUsage().add(new Containder()).
                 getSizeBytes();
         System.out.println(CHUNK_SIZE / size);
         compareMemoryGrowth(new Factory() {
@@ -399,6 +438,57 @@ public class MemoryProfilerTest {
                 Containder[] c = new Containder[CHUNK_SIZE / size];
                 for (int i = 0; i < c.length; i++)
                     c[i] = new Containder();
+                return c;
+            }
+        });
+    }
+
+    @Test
+    public void compareMemoryGrowth_Inheritance() throws Exception {
+        System.out.println("compareMemoryGrowth_Inheritance");
+
+        abstract class X {
+
+            int i;
+
+            void foo() {
+            }
+        
+        ;
+
+        }
+        abstract class Y extends X {
+
+            int j;
+
+            void bar() {
+            }
+        
+        ;
+
+        }
+        class Z extends Y {
+
+            int k;
+
+            void bum() {
+            }
+        
+        ;
+
+        }
+        
+        System.out.println(Arrays.toString(Z.class.getDeclaredFields()));
+
+        final int size = (int) new MemoryUsage().add(new Z()).
+                getSizeBytes();
+        System.out.println(CHUNK_SIZE / size);
+        compareMemoryGrowth(new Factory() {
+
+            public Object newInstance() {
+                Z[] c = new Z[CHUNK_SIZE / size];
+                for (int i = 0; i < c.length; i++)
+                    c[i] = new Z();
                 return c;
             }
         });
@@ -435,6 +525,7 @@ public class MemoryProfilerTest {
     @Test
     public void compareMemoryGrowth_String() throws Exception {
         System.out.println("compareMemoryGrowth_String");
+        String s = "";
         compareMemoryGrowth(new Factory() {
 
             public Object newInstance() {
@@ -533,6 +624,8 @@ public class MemoryProfilerTest {
         List<Object> list = new ArrayList<Object>();
 
         long expectedDiff = 0;
+        long nObjsDiff = 0;
+        long prevObjsSeen = 0;
         for (int i = 0; i < 10; i++) {
             list.add(factory.newInstance());
 
@@ -540,23 +633,29 @@ public class MemoryProfilerTest {
 
             long usedSize = MiscUtil.usedMemory();
 
-            MemoryProfiler mp = new MemoryProfiler();
+            MemoryUsage mp = new MemoryUsage();
             mp.add(list);
 
             long mpSize = mp.getSizeBytes() - expectedDiff;
             long diff = mpSize - usedSize;
-//            if (i == 0)
-//                expectedDiff = diff;
+
+            nObjsDiff = prevObjsSeen - mp.getNumObjectsSeen();
+            prevObjsSeen = mp.getNumObjectsSeen();
+            
+            double diffPerObj = (double)diff / (double)nObjsDiff;
 
             double ratio = (double) usedSize / (double) mpSize;
-            System.out.printf("%d: used=%s, profiler=%s, diff=%s, radio=%f%n", i,
+            
+            System.out.printf("%d: used=%s, profiler=%s, diff=%s (%f p/o), ratio=%f%n", i,
                               MiscUtil.humanReadableBytes(usedSize),
                               MiscUtil.humanReadableBytes(mpSize),
-                              MiscUtil.humanReadableBytes(diff),
+                              MiscUtil.humanReadableBytes(diff), 
+                              diffPerObj,
                               ratio);
+            System.out.println(mp.getInfoString());
 
-//            if (i != 0) {
-//                assertEquals(ratio, 1.0, 0.01);
+//            if (i > 2) {
+//                assertEquals(ratio, 1.0, 0.1);
 //            }
             expectedDiff += diff;
         }
