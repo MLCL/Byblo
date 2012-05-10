@@ -34,10 +34,22 @@ package uk.ac.susx.mlcl.lib;
 import java.util.Random;
 
 /**
+ * Class that provides methods to calculate the PMF, CDF, and Quantile functions
+ * of a Zipfian (power law) distribution.
+ *
+ * The Zipfian distribution relates to the frequency of words in a corpus of
+ * natural language text. It states that the frequency of any given word is
+ * inversely proportional to it's rank.
+ *
+ * The Zipfian distribution is discrete, so the quantile function is an
+ * approximation, without a closed form solution.
  *
  * @author hiam20
  */
 public class ZipfianDist {
+
+    private static final double Euler_Mascheroni_constant =
+            0.57721566490153286060651209008240243104215933593992;
 
     /**
      * The population size.
@@ -50,8 +62,6 @@ public class ZipfianDist {
     private final double exponent;
 
     private Random random = null;
-
-    private transient double[] H = null;
 
     /**
      * Construct a new instance of the ZipfianDist object, parameterized by the
@@ -133,9 +143,7 @@ public class ZipfianDist {
      */
     public double pmf(int k) {
         Checks.checkRangeIncl(k, 1, populationSize);
-        if (H == null)
-            H = generate_H_table(populationSize, exponent);
-        return (1.0 / Math.pow(k, exponent)) / H[populationSize];
+        return (1.0 / Math.pow(k, exponent)) / harm0_s1(populationSize);
     }
 
     /**
@@ -147,9 +155,7 @@ public class ZipfianDist {
      */
     public double cdf(int k) {
         Checks.checkRangeIncl(k, 1, populationSize);
-        if (H == null)
-            H = generate_H_table(populationSize, exponent);
-        return H[k] / H[populationSize];
+        return harm0_s1(k) / harm0_s1(populationSize);
     }
 
     /**
@@ -157,6 +163,11 @@ public class ZipfianDist {
      *
      * For a given value of uniformly distributed random variable u, calculate
      * the minimum rank that is at least a probable as u.
+     *
+     * Since the distribution is over discrete random variables, there is not
+     * closed for solution for the quantile function. Hence it is calculate by
+     * binary searching the cumulative distribution function for interval such
+     * that cdf(k) &lt; u &lt; cdf(k+1).
      *
      * @param u probability value
      * @return
@@ -192,31 +203,57 @@ public class ZipfianDist {
         }
     }
 
+    protected static double harm(long n, double s) {
+        if (s == 1) {
+            return harm0_s1(n);
+        } else {
+            return harm1(n, s);
+        }
+    }
+
     /**
-     * Pre-calculate the harmonic number table H for all ranks in the
-     * distribution.
+     * Approximation of the harmonic series. Get's closer as n tends to
+     * infinity, so the first 20 values are calculated with the iterative
+     * method.
      *
-     * The n-th generalized harmonic number is the sum of the reciprocals of the
-     * first n natural numbers to the power m:
-     *
-     * H[n] = 1/(1^2) + 1/(2^m) + 1/3 + ... + 1/n
-     *
-     * @param N
-     * @param s
+     * @param n
      * @return
      */
-    private static double[] generate_H_table(int N, double s) {
-        double[] H = new double[N + 1];
-        H[0] = 0;
-        H[1] = 1;
-        for (int k = 2; k <= N; k++)
-            H[k] = H[k - 1] + 1.0 / Math.pow(k, s);
-        return H;
+    protected static double harm0_s1(long n) {
+        Checks.checkRangeIncl(n, 1, Integer.MAX_VALUE);
+
+        if (n < 20)
+            return harm1(n, 1);
+        return Math.log(n) + Euler_Mascheroni_constant
+                + 1.0 / (2.0 * n)
+                - 1.0 / (12.0 * n * n)
+                + 1.0 / (120.0 * n * n * n * n)
+                - 1.0 / (252.0 * n * n * n * n * n * n)
+                + 1.0 / (240.0 * n * n * n * n * n * n * n * n);
+    }
+
+    protected static double harm1(long n, double s) {
+        Checks.checkRangeIncl(n, 1, Integer.MAX_VALUE);
+
+        double h = 1;
+        if (s == 1) {
+            for (long k = 2; k <= n; ++k)
+                h += 1.0 / k;
+        } else if (s == 2) {
+            for (long k = 2; k <= n; ++k)
+                h += 1.0 / (k * k);
+        } else {
+            for (long k = 2; k <= n; ++k)
+                h += Math.pow(1.0 / k, s);
+        }
+        return h;
     }
 
     @Override
     public String toString() {
-        return "ZipfianDist{" + "populationSize=" + populationSize + ", exponent=" + exponent + '}';
+        return "ZipfianDist{"
+                + "populationSize=" + populationSize
+                + ", exponent=" + exponent + '}';
     }
 
     @Override
@@ -228,7 +265,9 @@ public class ZipfianDist {
         final ZipfianDist other = (ZipfianDist) obj;
         if (this.populationSize != other.populationSize)
             return false;
-        if (Double.doubleToLongBits(this.exponent) != Double.doubleToLongBits(other.exponent))
+        // zero checks to support 0 == -0
+        if ((this.exponent != 0 && other.exponent != 0)
+                && Double.doubleToLongBits(this.exponent) != Double.doubleToLongBits(other.exponent))
             return false;
         return true;
     }
@@ -237,7 +276,10 @@ public class ZipfianDist {
     public int hashCode() {
         int hash = 5;
         hash = 17 * hash + this.populationSize;
-        hash = 17 * hash + (int) (Double.doubleToLongBits(this.exponent) ^ (Double.doubleToLongBits(this.exponent) >>> 32));
+        // zero check to support 0 == -0
+        final long exponentBits = exponent == 0 ? 0
+                                  : Double.doubleToLongBits(this.exponent);
+        hash = 17 * hash + (int) (exponentBits ^ (exponentBits >>> 32));
         return hash;
     }
 
