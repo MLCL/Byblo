@@ -34,12 +34,7 @@ import com.google.common.base.Objects;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -61,6 +56,8 @@ public abstract class AbstractParallelTask extends AbstractTask {
 
     private Queue<Future<? extends Task>> futureQueue;
 
+    private Semaphore throttle;
+
     public AbstractParallelTask() {
     }
 
@@ -69,8 +66,7 @@ public abstract class AbstractParallelTask extends AbstractTask {
 
         if (LOG.isWarnEnabled() && numThreads
                 > Runtime.getRuntime().availableProcessors()) {
-            LOG.warn("numThreads (" + numThreads + ") > availableProcessors (" + Runtime.
-                    getRuntime().
+            LOG.warn("numThreads (" + numThreads + ") > availableProcessors (" + Runtime.getRuntime().
                     availableProcessors() + ")");
         }
         if (numThreads != this.numThreads) {
@@ -82,7 +78,7 @@ public abstract class AbstractParallelTask extends AbstractTask {
         return numThreads;
     }
 
-    protected synchronized final ExecutorService getExecutor() {
+    private synchronized final ExecutorService getExecutor() {
         if (executor == null) {
             // Create a new thread pool using an unbounded queue - throttling will
             // be handled by a semaphore
@@ -102,6 +98,7 @@ public abstract class AbstractParallelTask extends AbstractTask {
     @Override
     protected void initialiseTask() throws Exception {
         getExecutor();
+        throttle = new Semaphore((int) (getNumThreads() * 1.5) + 1);
     }
 
     @Override
@@ -129,14 +126,33 @@ public abstract class AbstractParallelTask extends AbstractTask {
         return futureQueue;
     }
 
-    protected <T extends Task> Future<T> submitTask(T task) {
+    protected <T extends Task> Future<T> submitTask(final T task) throws InterruptedException {
         Checks.checkNotNull("task", task);
-        if (task == null) {
-            throw new NullPointerException("task is null");
+
+        throttle.acquire();
+        Runnable wrapper = new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    task.run();
+                } finally {
+                    throttle.release();
+                }
+            }
+
+        };
+        try {
+            Future<T> future = getExecutor().submit(wrapper, task);
+            getFutureQueue().offer(future);
+            return future;
+        } catch (RejectedExecutionException e) {
+            throttle.release();
+            throw e;
+        } catch (RuntimeException e) {
+            throttle.release();
+            throw e;
         }
-        Future<T> future = getExecutor().submit(task, task);
-        getFutureQueue().offer(future);
-        return future;
     }
 
     @Override
@@ -152,11 +168,9 @@ public abstract class AbstractParallelTask extends AbstractTask {
             return false;
         if (this.numThreads != other.numThreads)
             return false;
-        if (this.executor != other.executor && (this.executor == null || !this.executor.
-                                                equals(other.executor)))
+        if (this.executor != other.executor && (this.executor == null || !this.executor.equals(other.executor)))
             return false;
-        if (this.futureQueue != other.futureQueue && (this.futureQueue == null || !this.futureQueue.
-                                                      equals(other.futureQueue)))
+        if (this.futureQueue != other.futureQueue && (this.futureQueue == null || !this.futureQueue.equals(other.futureQueue)))
             return false;
         return true;
     }
@@ -178,4 +192,5 @@ public abstract class AbstractParallelTask extends AbstractTask {
         hash = 61 * hash + (this.futureQueue != null ? this.futureQueue.hashCode() : 0);
         return hash;
     }
+
 }
