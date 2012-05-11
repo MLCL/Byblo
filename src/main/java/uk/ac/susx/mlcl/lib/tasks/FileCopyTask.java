@@ -9,7 +9,6 @@ import java.io.*;
 import java.nio.channels.FileChannel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 import static java.text.MessageFormat.format;
 import uk.ac.susx.mlcl.lib.Checks;
 
@@ -98,4 +97,5 @@ public class FileCopyTask extends AbstractTask {
                 add("in", sourceFile).
                 add("out", destFile);
     }
+
 }

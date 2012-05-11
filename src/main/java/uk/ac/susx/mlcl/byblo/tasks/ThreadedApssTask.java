@@ -30,8 +30,8 @@
  */
 package uk.ac.susx.mlcl.byblo.tasks;
 
-import uk.ac.susx.mlcl.lib.tasks.Chunker;
-import uk.ac.susx.mlcl.lib.tasks.Chunk;
+import uk.ac.susx.mlcl.lib.io.Chunker;
+import uk.ac.susx.mlcl.lib.io.Chunk;
 import com.google.common.base.Objects.ToStringHelper;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -184,8 +184,8 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
                         isDone()) {
                     Future<? extends Task> completed = getFutureQueue().poll();
                     Task t = completed.get();
-                    while (t.isExceptionCaught()) {
-                        t.throwException();
+                    while (t.isExceptionTrapped()) {
+                        t.throwTrappedException();
                     }
                 }
             }
@@ -198,8 +198,8 @@ public class ThreadedApssTask<S> extends NaiveApssTask<S> {
         while (!getFutureQueue().isEmpty()) {
             Future<? extends Task> completed = getFutureQueue().poll();
             Task t = completed.get();
-            while (t.isExceptionCaught()) {
-                t.throwException();
+            while (t.isExceptionTrapped()) {
+                t.throwTrappedException();
             }
         }
 

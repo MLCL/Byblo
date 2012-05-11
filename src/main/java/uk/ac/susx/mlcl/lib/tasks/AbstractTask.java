@@ -37,6 +37,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
+ * Abstract super class to all task objects, implementing common functionality.
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -46,20 +47,18 @@ public abstract class AbstractTask implements Task {
 
     private final Properties properties = new Properties();
 
-    private final ExceptionDeligate exceptionDeligate =
-            new ExceptionDeligate();
+    private final ExceptionTrappingDelegate exceptionDeligate =
+            new ExceptionTrappingDelegate();
 
     public AbstractTask() {
     }
 
     protected void initialiseTask() throws Exception {
-        
     }
 
     protected abstract void runTask() throws Exception;
 
     protected void finaliseTask() throws Exception {
-        
     }
 
     @Override
@@ -76,9 +75,9 @@ public abstract class AbstractTask implements Task {
             runTask();
 
         } catch (Exception ex) {
-            exceptionDeligate.catchException(ex);
+            exceptionDeligate.trapException(ex);
         } catch (Throwable t) {
-            exceptionDeligate.catchException(new RuntimeException(t));
+            exceptionDeligate.trapException(new RuntimeException(t));
         } finally {
 
             try {
@@ -88,9 +87,9 @@ public abstract class AbstractTask implements Task {
                 finaliseTask();
 
             } catch (Exception ex) {
-                exceptionDeligate.catchException(ex);
+                exceptionDeligate.trapException(ex);
             } catch (Throwable t) {
-                exceptionDeligate.catchException(new RuntimeException(t));
+                exceptionDeligate.trapException(new RuntimeException(t));
             }
 
             if (LOG.isTraceEnabled())
@@ -112,11 +111,10 @@ public abstract class AbstractTask implements Task {
     protected boolean equals(AbstractTask other) {
         if (this.properties != other.properties
                 && (this.properties == null || !this.properties.equals(
-                    other.properties)))
+                other.properties)))
             return false;
         if (this.exceptionDeligate != other.exceptionDeligate
-                && (this.exceptionDeligate == null || !this.exceptionDeligate.
-                    equals(other.exceptionDeligate)))
+                && (this.exceptionDeligate == null || !this.exceptionDeligate.equals(other.exceptionDeligate)))
             return false;
         return true;
     }
@@ -134,13 +132,8 @@ public abstract class AbstractTask implements Task {
     public int hashCode() {
         int hash = 3;
         hash = 11 * hash + (this.properties != null ? this.properties.hashCode() : 0);
-        hash = 11 * hash + (this.exceptionDeligate != null ? this.exceptionDeligate.
-                            hashCode() : 0);
+        hash = 11 * hash + (this.exceptionDeligate != null ? this.exceptionDeligate.hashCode() : 0);
         return hash;
-    }
-
-    protected ExceptionDeligate getExceptionDeligate() {
-        return exceptionDeligate;
     }
 
     @Override
@@ -153,22 +146,27 @@ public abstract class AbstractTask implements Task {
         properties.setProperty(key, value);
     }
 
-    public final void catchException(Exception exception) {
-        exceptionDeligate.catchException(exception);
+    protected ExceptionTrappingDelegate getExceptionDeligate() {
+        return exceptionDeligate;
+    }
+
+    protected final void trapException(Exception exception) {
+        exceptionDeligate.trapException(exception);
     }
 
     @Override
-    public final synchronized void throwException() throws Exception {
-        exceptionDeligate.throwException();
+    public final synchronized void throwTrappedException() throws Exception {
+        exceptionDeligate.throwTrappedException();
     }
 
     @Override
-    public final synchronized boolean isExceptionCaught() {
-        return exceptionDeligate.isExceptionCaught();
+    public final synchronized boolean isExceptionTrapped() {
+        return exceptionDeligate.isExceptionTrapped();
     }
 
     @Override
-    public final synchronized Exception getException() {
-        return exceptionDeligate.getException();
+    public final synchronized Exception getTrappedException() {
+        return exceptionDeligate.getTrappedException();
     }
+
 }

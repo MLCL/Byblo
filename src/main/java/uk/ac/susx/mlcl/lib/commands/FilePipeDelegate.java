@@ -14,7 +14,7 @@ import java.nio.charset.Charset;
  *
  * @author hiam20
  */
-public class FilePipeDeligate extends FileDeligate implements Serializable {
+public class FilePipeDelegate extends FileDeligate implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -24,13 +24,13 @@ public class FilePipeDeligate extends FileDeligate implements Serializable {
     @Parameter(names = {"-o", "--output"}, description = "Destination file that will be writen to.", validateWith = OutputFileValidator.class, required = true)
     private File destFile;
 
-    public FilePipeDeligate(File sourceFile, File destinationFile, Charset charset) {
+    public FilePipeDelegate(File sourceFile, File destinationFile, Charset charset) {
         super(charset);
         setSourceFile(sourceFile);
         setDestinationFile(destinationFile);
     }
 
-    public FilePipeDeligate() {
+    public FilePipeDelegate() {
     }
 
     public final File getSourceFile() {

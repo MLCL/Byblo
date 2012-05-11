@@ -104,28 +104,12 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
     @Override
     protected void initialiseTask() throws Exception {
         getExecutor();
-        throttle = new Semaphore((int)(getNumThreads() * 1.5) + 1);
+        throttle = new Semaphore((int) (getNumThreads() * 1.5) + 1);
     }
 
     @Override
     protected void finaliseTask() throws Exception {
-//        List<Runnable> runnables = 
         executor.shutdownNow();
-//        
-//        try {
-////            executor.shutdown();
-////            executor.awaitTermination(1, TimeUnit.HOURS);
-//            if (!executor.isTerminated()) {
-//                List<Runnable> runnables = executor.shutdownNow();
-//            }
-//        } catch (InterruptedException ex) {
-//            if (LOG.isErrorEnabled()) {
-//                LOG.error("Finalization interupted", ex);
-//            }
-//            catchException(ex);
-//        } finally {
-//            executor.shutdownNow();
-//        }
     }
 
     protected synchronized final Queue<Future<? extends Task>> getFutureQueue() {
@@ -137,7 +121,7 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
 
     protected <T extends Task> Future<T> submitTask(final T task) throws InterruptedException {
         Checks.checkNotNull("task", task);
-        
+
         throttle.acquire();
         Runnable wrapper = new Runnable() {
 

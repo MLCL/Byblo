@@ -46,7 +46,7 @@ import java.util.Arrays;
 import uk.ac.susx.mlcl.byblo.commands.*;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.DoubleConverter;
+import uk.ac.susx.mlcl.lib.commands.DoubleConverter;
 import uk.ac.susx.mlcl.lib.commands.FileDeligate;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;

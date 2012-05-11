@@ -17,7 +17,7 @@ import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
  *
  * @author hiam20
  */
-public class FileMergeDeligate extends FileDeligate implements Serializable {
+public class FileMergeDelegate extends FileDeligate implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -39,14 +39,14 @@ public class FileMergeDeligate extends FileDeligate implements Serializable {
     validateWith = OutputFileValidator.class)
     private File destinationFile;
 
-    public FileMergeDeligate(File sourceFileA, File sourceFileB, File destination, Charset charset) {
+    public FileMergeDelegate(File sourceFileA, File sourceFileB, File destination, Charset charset) {
         super(charset);
         setSourceFileA(sourceFileA);
         setSourceFileB(sourceFileB);
         setDestinationFile(destination);
     }
 
-    public FileMergeDeligate() {
+    public FileMergeDelegate() {
     }
 
     public File getSourceFileA() {

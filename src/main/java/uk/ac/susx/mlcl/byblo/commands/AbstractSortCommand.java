@@ -115,8 +115,8 @@ public abstract class AbstractSortCommand<T> extends AbstractCopyCommand<T> {
         task.setSink(snk);
         task.run();
 
-        while (task.isExceptionCaught())
-            task.throwException();
+        while (task.isExceptionTrapped())
+            task.throwTrappedException();
 
         if (snk instanceof Flushable)
             ((Flushable) snk).flush();

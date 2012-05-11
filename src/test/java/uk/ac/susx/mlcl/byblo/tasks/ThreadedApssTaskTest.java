@@ -122,8 +122,8 @@ public class ThreadedApssTaskTest {
 
         instance.run();
 
-        while (instance.isExceptionCaught()) {
-            instance.throwException();
+        while (instance.isExceptionTrapped()) {
+            instance.throwTrappedException();
         }
 
         assertTrue(!result.isEmpty());
@@ -158,8 +158,8 @@ public class ThreadedApssTaskTest {
         instance.setProducatePair(PAIR_FILTER);
 
         instance.run();
-        while (instance.isExceptionCaught()) {
-            instance.throwException();
+        while (instance.isExceptionTrapped()) {
+            instance.throwTrappedException();
         }
 
         assertTrue(!result.isEmpty());
@@ -202,8 +202,8 @@ public class ThreadedApssTaskTest {
 
             instance.run();
 
-            while (instance.isExceptionCaught()) {
-                instance.throwException();
+            while (instance.isExceptionTrapped()) {
+                instance.throwTrappedException();
             }
         }
 
@@ -232,8 +232,8 @@ public class ThreadedApssTaskTest {
             instance.setProducatePair(PAIR_FILTER);
 
             instance.run();
-            while (instance.isExceptionCaught()) {
-                instance.throwException();
+            while (instance.isExceptionTrapped()) {
+                instance.throwTrappedException();
             }
         }
 
@@ -278,8 +278,8 @@ public class ThreadedApssTaskTest {
 
             instance.run();
 
-            while (instance.isExceptionCaught()) {
-                instance.throwException();
+            while (instance.isExceptionTrapped()) {
+                instance.throwTrappedException();
             }
         }
 
@@ -306,8 +306,8 @@ public class ThreadedApssTaskTest {
             instance.setProducatePair(PAIR_FILTER);
 
             instance.run();
-            while (instance.isExceptionCaught()) {
-                instance.throwException();
+            while (instance.isExceptionTrapped()) {
+                instance.throwTrappedException();
             }
         }
 
@@ -349,8 +349,8 @@ public class ThreadedApssTaskTest {
 
             instance.run();
 
-            while (instance.isExceptionCaught()) {
-                instance.throwException();
+            while (instance.isExceptionTrapped()) {
+                instance.throwTrappedException();
             }
         }
 
@@ -377,8 +377,8 @@ public class ThreadedApssTaskTest {
             instance.setProducatePair(PAIR_FILTER);
 
             instance.run();
-            while (instance.isExceptionCaught()) {
-                instance.throwException();
+            while (instance.isExceptionTrapped()) {
+                instance.throwTrappedException();
             }
         }
 

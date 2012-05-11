@@ -61,7 +61,7 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
     private static final Log LOG = LogFactory.getLog(AbstractMergeCommand.class);
 
     @ParametersDelegate
-    private final FileMergeDeligate fileDeligate = new FileMergeDeligate();
+    private final FileMergeDelegate fileDeligate = new FileMergeDelegate();
 
     @Parameter(names = {"-r", "--reverse"},
     description = "Reverse the result of comparisons.")
@@ -81,7 +81,7 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
     public AbstractMergeCommand() {
     }
 
-    public FileMergeDeligate getFileDeligate() {
+    public FileMergeDelegate getFileDeligate() {
         return fileDeligate;
     }
 
@@ -123,8 +123,8 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
         ObjectMergeTask<T> task = new ObjectMergeTask<T>(
                 srcA, srcB, snk, getComparator());
         task.run();
-        while (task.isExceptionCaught())
-            task.throwException();
+        while (task.isExceptionTrapped())
+            task.throwTrappedException();
 
         if (snk instanceof Flushable)
             ((Flushable) snk).flush();

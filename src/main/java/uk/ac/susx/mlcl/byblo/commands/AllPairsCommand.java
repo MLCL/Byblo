@@ -58,7 +58,7 @@ import uk.ac.susx.mlcl.byblo.tasks.InvertedApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.NaiveApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.ThreadedApssTask;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.DoubleConverter;
+import uk.ac.susx.mlcl.lib.commands.DoubleConverter;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.commands.FileDeligate;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
@@ -297,8 +297,8 @@ public class AllPairsCommand extends AbstractCommand {
         if (sourceB instanceof Closeable)
             ((Closeable) sourceB).close();
 
-        if (apss.isExceptionCaught())
-            apss.throwException();
+        if (apss.isExceptionTrapped())
+            apss.throwTrappedException();
 
         indexDeligate.saveEnumerator();
         indexDeligate.closeEnumerator();

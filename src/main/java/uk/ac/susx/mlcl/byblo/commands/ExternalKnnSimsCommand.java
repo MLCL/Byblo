@@ -46,7 +46,7 @@ import uk.ac.susx.mlcl.lib.io.KFirstReducingObjectSink;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.Comparators;
-import uk.ac.susx.mlcl.lib.tasks.Chunk;
+import uk.ac.susx.mlcl.lib.io.Chunk;
 import uk.ac.susx.mlcl.lib.tasks.ObjectMergeTask;
 import uk.ac.susx.mlcl.lib.tasks.ObjectSortTask;
 

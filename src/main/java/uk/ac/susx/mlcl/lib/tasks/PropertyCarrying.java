@@ -31,42 +31,35 @@
 package uk.ac.susx.mlcl.lib.tasks;
 
 /**
- * Defines an interface for an object when stores exceptions, rather than 
- * throwing them directly. This is useful for certain functionality, such as
- * when code executing inside another thread.
- * 
+ * Interface for objects that can carry arbitrary properties with them.
+ *
+ * This is primarily a hack, to allow object to store external information with
+ * them, rather than manage the data properly. Usage should probably be avoided
+ * but often the overhead of not using this interface is ridiculous, so it
+ * stands as an unhappy compromise,
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public interface ExceptionCarrying {
+public interface PropertyCarrying {
 
     /**
-     * Whether or not at leat 1 exception is currently caught by this object.
+     * Retrieve a property with the given key.
      *
-     * @return True if an exception has been caught, false otherwise
+     * @param key unique string identified of the property
+     * @return value associated with the key
+     * @throws NullPointerException if key is null
      */
-    boolean isExceptionCaught();
-
-    
-    /**
-     * Return the oldest exception that was previously caught, clearing it
-     * internally.
-     *
-     * Repeated calls to this method may return addition exceptions; in a
-     * first-in/first-out order. When no exception remain this method returns
-     * null.
-     *
-     * @return Exception the exception, or null if no exception is caught
-     */
-    Exception getException();
+    String getProperty(String key)
+            throws NullPointerException;
 
     /**
-     * Throws the oldest exception that was previously caught.
+     * Store a property value with the given key.
      *
-     * Repeated calls to this method may throw addition exceptions; in a 
-     * first-in/first-out order. When no exception remain this method does
-     * nothing.
-     *
-     * @throws Exception the exception
+     * @param key unique string identified of the property
+     * @param value object to associate with the key
+     * @throws NullPointerException if key is null
      */
-    void throwException() throws Exception;
+    void setProperty(String key, String value)
+            throws NullPointerException;
+
 }

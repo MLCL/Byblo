@@ -45,7 +45,7 @@ import uk.ac.susx.mlcl.lib.tasks.FileCopyTask;
 public class FileCopyCommand extends AbstractCommand {
 
     @ParametersDelegate
-    protected final FilePipeDeligate filesDeligate = new FilePipeDeligate();
+    protected final FilePipeDelegate filesDeligate = new FilePipeDelegate();
 
     public FileCopyCommand(File sourceFile, File destinationFile) {
         filesDeligate.setSourceFile(sourceFile);
@@ -80,8 +80,8 @@ public class FileCopyCommand extends AbstractCommand {
 
         task.run();
 
-        while (task.isExceptionCaught())
-            task.throwException();
+        while (task.isExceptionTrapped())
+            task.throwTrappedException();
     }
 
     @Override

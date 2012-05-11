@@ -43,13 +43,13 @@ import java.util.Comparator;
 import java.util.concurrent.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.tasks.Chunk;
-import uk.ac.susx.mlcl.lib.tasks.Chunker;
+import uk.ac.susx.mlcl.lib.io.Chunk;
+import uk.ac.susx.mlcl.lib.io.Chunker;
 import uk.ac.susx.mlcl.lib.tasks.FileDeleteTask;
 import uk.ac.susx.mlcl.lib.AbstractParallelCommandTask;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Comparators;
-import uk.ac.susx.mlcl.lib.commands.FilePipeDeligate;
+import uk.ac.susx.mlcl.lib.commands.FilePipeDelegate;
 import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
 import uk.ac.susx.mlcl.lib.io.*;
 import uk.ac.susx.mlcl.lib.tasks.*;
@@ -81,7 +81,7 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
     private int maxChunkSize = 1000000;
 
     @ParametersDelegate
-    private final FilePipeDeligate fileDeligate = new FilePipeDeligate();
+    private final FilePipeDelegate fileDeligate = new FilePipeDelegate();
 
     @Parameter(names = {"-T", "--temporary-directory"},
     description = "Directory which will be used for storing temporary files.",
@@ -114,7 +114,7 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
         super();
     }
 
-    public FilePipeDeligate getFileDeligate() {
+    public FilePipeDelegate getFileDeligate() {
         return fileDeligate;
     }
 
@@ -210,8 +210,8 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
 
                 mergeTask.run();
 
-                if (mergeTask.isExceptionCaught())
-                    mergeTask.throwException();
+                if (mergeTask.isExceptionTrapped())
+                    mergeTask.throwTrappedException();
                 if (mergeTask.getSink() instanceof Flushable)
                     ((Flushable) mergeTask.getSink()).flush();
                 if (mergeTask.getSink() instanceof Closeable)
@@ -235,8 +235,8 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
                 finalMerge, getFileDeligate().getDestinationFile());
         moveTask.run();
 
-        if (moveTask.isExceptionCaught())
-            moveTask.throwException();
+        if (moveTask.isExceptionTrapped())
+            moveTask.throwTrappedException();
 
 
         if (LOG.isInfoEnabled()) {
@@ -247,11 +247,11 @@ public abstract class AbstractExternalSortCommand<T> extends AbstractParallelCom
 
     protected void handleCompletedTask(Task task) throws Exception {
         Checks.checkNotNull("task", task);
-        task.throwException();
+        task.throwTrappedException();
 //        final Properties 2p = task.getProperties();
 
-        if (task.isExceptionCaught())
-            task.throwException();
+        if (task.isExceptionTrapped())
+            task.throwTrappedException();
 
         if (task instanceof ObjectSortTask) {
 

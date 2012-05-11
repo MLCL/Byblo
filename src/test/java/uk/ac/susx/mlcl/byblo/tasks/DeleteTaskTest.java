@@ -49,8 +49,8 @@ public class DeleteTaskTest {
         assertTrue(tmp.exists());
         FileDeleteTask instance = new FileDeleteTask(tmp);
         instance.run();
-        while (instance.isExceptionCaught())
-            instance.throwException();
+        while (instance.isExceptionTrapped())
+            instance.throwTrappedException();
         assertFalse(tmp.exists());
     }
 
@@ -62,7 +62,7 @@ public class DeleteTaskTest {
         assertFalse(tmp.exists());
         FileDeleteTask instance = new FileDeleteTask(tmp);
         instance.run();
-        instance.throwException();
+        instance.throwTrappedException();
     }
 
     @Test(expected = IOException.class, timeout = 1000)
@@ -73,7 +73,7 @@ public class DeleteTaskTest {
         assertFalse(tmp.exists());
         FileDeleteTask instance = new FileDeleteTask(tmp);
         instance.run();
-        instance.throwException();
+        instance.throwTrappedException();
     }
 
     @Test(timeout = 1000)

@@ -30,6 +30,8 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.lib.io.Chunker;
+import uk.ac.susx.mlcl.lib.io.Chunk;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
@@ -334,15 +336,15 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     }
 
     protected void handleCompletedTask(Task task) throws Exception {
-        while (task.isExceptionCaught())
-            task.throwException();
+        while (task.isExceptionTrapped())
+            task.throwTrappedException();
 
 //        final Properties p = task.getProperties();
         final String taskType = task.getProperty(KEY_TASK_TYPE);
         final String dataType = task.getProperty(KEY_DATA_TYPE);
 
-        if (task.isExceptionCaught())
-            task.throwException();
+        if (task.isExceptionTrapped())
+            task.throwTrappedException();
 
         if (taskType.equals(VALUE_TASK_TYPE_DELETE)) {
             // not a sausage

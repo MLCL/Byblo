@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.lib.tasks;
+package uk.ac.susx.mlcl.lib.io;
 
 import com.google.common.base.Objects;
 import uk.ac.susx.mlcl.lib.Checks;

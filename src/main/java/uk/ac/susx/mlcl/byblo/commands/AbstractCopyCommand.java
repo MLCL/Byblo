@@ -40,7 +40,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
-import uk.ac.susx.mlcl.lib.commands.FilePipeDeligate;
+import uk.ac.susx.mlcl.lib.commands.FilePipeDelegate;
 import uk.ac.susx.mlcl.lib.io.Files;
 import uk.ac.susx.mlcl.lib.io.Sink;
 import uk.ac.susx.mlcl.lib.io.Source;
@@ -57,10 +57,10 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand {
     private static final Log LOG = LogFactory.getLog(AbstractCopyCommand.class);
 
     @ParametersDelegate
-    private FilePipeDeligate filesDeligate = new FilePipeDeligate();
+    private FilePipeDelegate filesDeligate = new FilePipeDelegate();
 
     public AbstractCopyCommand(File sourceFile, File destinationFile, Charset charset) {
-        filesDeligate = new FilePipeDeligate(sourceFile, destinationFile, charset);
+        filesDeligate = new FilePipeDelegate(sourceFile, destinationFile, charset);
     }
 
     public AbstractCopyCommand(File sourceFile, File destinationFile) {
@@ -70,7 +70,7 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand {
     public AbstractCopyCommand() {
     }
 
-    public FilePipeDeligate getFilesDeligate() {
+    public FilePipeDelegate getFilesDeligate() {
         return filesDeligate;
     }
 
@@ -126,8 +126,8 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand {
         task.setSink(snk);
         task.run();
 
-        while (task.isExceptionCaught())
-            task.throwException();
+        while (task.isExceptionTrapped())
+            task.throwTrappedException();
 
         if (src instanceof Closeable)
             ((Closeable) src).close();

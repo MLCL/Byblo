@@ -72,8 +72,8 @@ public abstract class AbstractCommandTask extends AbstractTask implements Comman
     @Override
     public void runCommand() throws Exception {
         this.run();
-        while(this.isExceptionCaught())
-            this.throwException();
+        while(this.isExceptionTrapped())
+            this.throwTrappedException();
     }
     
     @Override

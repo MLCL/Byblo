@@ -48,7 +48,7 @@ import uk.ac.susx.mlcl.lib.tasks.FileMoveTask;
 public class FileMoveCommand extends AbstractCommand {
 
     @ParametersDelegate
-    protected final FilePipeDeligate filesDeligate = new FilePipeDeligate();
+    protected final FilePipeDelegate filesDeligate = new FilePipeDelegate();
 
     public FileMoveCommand(File sourceFile, File destinationFile) {
         filesDeligate.setSourceFile(sourceFile);
@@ -83,8 +83,8 @@ public class FileMoveCommand extends AbstractCommand {
 
         task.run();
 
-        while (task.isExceptionCaught())
-            task.throwException();
+        while (task.isExceptionTrapped())
+            task.throwTrappedException();
     }
 
     @Override

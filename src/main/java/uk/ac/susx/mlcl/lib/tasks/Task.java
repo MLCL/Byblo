@@ -30,13 +30,12 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
-import uk.ac.susx.mlcl.lib.PropertyCarrying;
-
 /**
- * Define a common interface for worker objects.
+ * Define a common interface for worker objects. Essentially this class is 
+ * Runnable which also supports exception trapping and the ability to set
+ * arbitrary properties on it.i
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public interface Task
-        extends Runnable, PropertyCarrying, ExceptionCarrying {
+public interface Task extends Runnable, PropertyCarrying, ExceptionTrapping {
 }
