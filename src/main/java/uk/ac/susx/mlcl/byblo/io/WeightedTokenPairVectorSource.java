@@ -47,7 +47,7 @@ import uk.ac.susx.mlcl.lib.io.Tell;
  * Wraps a {@link WeightedEntryFeatureSource} to produce complete feature
  * vectors instead of just individual entry/feature records.
  *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class WeightedTokenPairVectorSource
         implements SeekableSource<Indexed<SparseDoubleVector>, Tell> {

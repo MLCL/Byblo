@@ -1,31 +1,31 @@
 /*
  * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without 
+ *
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
- *  * Redistributions of source code must retain the above copyright notice, 
+ *
+ *  * Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  *  * Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
- *  * Neither the name of the University of Sussex nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ *
+ *  * Neither the name of the University of Sussex nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package uk.ac.susx.mlcl.byblo.measures;
@@ -35,10 +35,10 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 /**
  * AbstractMIProximity is a class that mutual information (MI) based proximity
  * measures can extend. Unlike more tradition measures (such as Jaccard) these
- * require global feature statistical information, which is held in
- * the class fields.
+ * require global feature statistical information, which is held in the class
+ * fields.
  *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class AbstractMIProximity extends AbstractProximity {
 
@@ -46,10 +46,10 @@ public abstract class AbstractMIProximity extends AbstractProximity {
      * For conversion to base 2 logs
      */
     private static final double LOG_2 = Math.log(2.0);
-    
+
     /**
-     * A mapping from feature id to frequency, stored as a double because it
-     * may have been waited in a pre-processing stage.
+     * A mapping from feature id to frequency, stored as a double because it may
+     * have been waited in a pre-processing stage.
      */
     private double[] featureFrequencies;
 
@@ -61,15 +61,15 @@ public abstract class AbstractMIProximity extends AbstractProximity {
     private double featureFrequencySum;
 
     /**
-     * The number of features that are actually occurring more than once.
-     * Due to pre-processing a feature may have been previously filtered,
-     * resulting in this value being less than the cardinality. This could
-     * be described as the non-zero cardinality.
+     * The number of features that are actually occurring more than once. Due to
+     * pre-processing a feature may have been previously filtered, resulting in
+     * this value being less than the cardinality. This could be described as
+     * the non-zero cardinality.
      */
     private long occuringFeatureCount;
 
     /**
-     * 
+     *
      */
     public AbstractMIProximity() {
     }
@@ -94,7 +94,7 @@ public abstract class AbstractMIProximity extends AbstractProximity {
 
     /**
      * The total number of features, not just the number of unique features.
-     * 
+     *
      * @return sum of all feature frequencies.
      */
     public final double getFeatureFrequencySum() {
@@ -103,6 +103,7 @@ public abstract class AbstractMIProximity extends AbstractProximity {
 
     /**
      * The number of unique features.
+     *
      * @return number of unique featuress.
      */
     public final int getFeatureCount() {
@@ -124,23 +125,27 @@ public abstract class AbstractMIProximity extends AbstractProximity {
     }
 
     /**
-     * Return the independent probability of a particular feature, calculated
-     * as the frequency of the feature divided by the total number of features
+     * Return the independent probability of a particular feature, calculated as
+     * the frequency of the feature divided by the total number of features
      * observed over the corpus.
      *
-     * @param k the  feature id (or dimension)
+     * @param k the feature id (or dimension)
      * @return independent probability of that feature occurring.
      */
     protected final double featurePrior(final int k) {
         return featureFreq(k) / featureFrequencySum;
     }
 
+    protected final double entryPrior(final SparseDoubleVector V) {
+        return V.sum / featureFrequencySum;
+    }
+
     /**
-     * <p>Calculate the information content of the vector V at dimension i
-     * with respect to the feature information held by this class.</p>
+     * <p>Calculate the information content of the vector V at dimension i with
+     * respect to the feature information held by this class.</p>
      *
-     * <p>If only the positive information is required then use
-     * posInf(null, featureCardinality) because it's faster.</p>
+     * <p>If only the positive information is required then use posInf(null,
+     * featureCardinality) because it's faster.</p>
      *
      * @param V vector
      * @param i dimension (aka feature id) to calculate
@@ -179,4 +184,5 @@ public abstract class AbstractMIProximity extends AbstractProximity {
     protected final double prob(final SparseDoubleVector V, final int k) {
         return V.values[k] / V.sum;
     }
+
 }

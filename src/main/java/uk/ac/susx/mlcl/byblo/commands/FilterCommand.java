@@ -1,39 +1,35 @@
 /*
  * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without 
+ *
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
- *  * Redistributions of source code must retain the above copyright notice, 
+ *
+ *  * Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  *  * Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
- *  * Neither the name of the University of Sussex nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ *
+ *  * Neither the name of the University of Sussex nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.lib.commands.DoubleConverter;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
@@ -54,16 +50,27 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
-import uk.ac.susx.mlcl.byblo.io.*;
-import static uk.ac.susx.mlcl.lib.Predicates2.*;
-import uk.ac.susx.mlcl.lib.*;
+import uk.ac.susx.mlcl.byblo.io.BybloIO;
+import uk.ac.susx.mlcl.byblo.io.Token;
+import uk.ac.susx.mlcl.byblo.io.TokenPair;
+import uk.ac.susx.mlcl.byblo.io.Weighted;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenSink;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
+import uk.ac.susx.mlcl.lib.MiscUtil;
+import uk.ac.susx.mlcl.lib.Predicates2;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
+import uk.ac.susx.mlcl.lib.commands.DoubleConverter;
 import uk.ac.susx.mlcl.lib.commands.FileDeligate;
-import uk.ac.susx.mlcl.lib.io.*;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
+import uk.ac.susx.mlcl.lib.io.FileFactory;
+import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 
 /**
  *
@@ -71,7 +78,7 @@ import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
  * intelligently. If, for e.g, one predicate was found to be implied by another
  * then only the stronger need be taken.
  *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Parameters(commandDescription = "Filter a set of frequency files")
 public class FilterCommand extends AbstractCommand implements Serializable {
@@ -181,11 +188,11 @@ public class FilterCommand extends AbstractCommand implements Serializable {
     /*
      * === INTERNAL ===
      */
-    private Predicate<Weighted<Token>> acceptEntry = alwaysTrue();
+    private Predicate<Weighted<Token>> acceptEntry = Predicates2.alwaysTrue();
 
-    private Predicate<Weighted<TokenPair>> acceptEntryFeature = alwaysTrue();
+    private Predicate<Weighted<TokenPair>> acceptEntryFeature = Predicates2.alwaysTrue();
 
-    private Predicate<Weighted<Token>> acceptFeature = alwaysTrue();
+    private Predicate<Weighted<Token>> acceptFeature = Predicates2.alwaysTrue();
 
     private boolean entryFilterRequired = false;
 
@@ -436,9 +443,9 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         // Update the feature acceptance predicate
         if (rejected.size() > 0) {
             entryFeatureFilterRequired = true;
-            acceptEntryFeature = and(acceptEntryFeature,
-                                     compose(not(in(rejected)),
-                                             entryFeatureEntryId()));
+            acceptEntryFeature = Predicates2.and(acceptEntryFeature,
+                                                 Predicates2.compose(Predicates2.not(Predicates2.in(rejected)),
+                                                                     entryFeatureEntryId()));
         }
 
 
@@ -571,14 +578,14 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         rejectedEntries.removeAll(acceptedEntries);
 
         if (rejectedEntries.size() > 0) {
-            acceptEntry = and(acceptEntry,
-                              compose(not(in(rejectedEntries)), id()));
+            acceptEntry = Predicates2.and(acceptEntry,
+                                          Predicates2.compose(Predicates2.not(Predicates2.in(rejectedEntries)), id()));
             entryFilterRequired = true;
         }
 
         if (rejectedFeatures.size() > 0) {
-            acceptFeature = and(acceptFeature,
-                                not(compose(in(rejectedFeatures), id())));
+            acceptFeature = Predicates2.and(acceptFeature,
+                                            Predicates2.not(Predicates2.compose(Predicates2.in(rejectedFeatures), id())));
             featureFilterRequired = true;
 
         }
@@ -657,9 +664,9 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         if (rejectedFeatures.size() > 0) {
 
             entryFeatureFilterRequired = true;
-            acceptEntryFeature = and(
+            acceptEntryFeature = Predicates2.and(
                     acceptEntryFeature,
-                    compose(not(in(rejectedFeatures)), entryFeatureFeatureId()));
+                    Predicates2.compose(Predicates2.not(Predicates2.in(rejectedFeatures)), entryFeatureFeatureId()));
 
         }
     }
@@ -726,25 +733,25 @@ public class FilterCommand extends AbstractCommand implements Serializable {
     public void addFeaturesMinimumFrequency(double threshold) {
         setAcceptFeatures(Predicates2.<Weighted<Token>>and(
                 getAcceptFeatures(),
-                compose(gte(threshold), this.<Token>weight())));
+                Predicates2.compose(Predicates2.gte(threshold), this.<Token>weight())));
     }
 
     public void addFeaturesMaximumFrequency(double threshold) {
         setAcceptFeatures(Predicates2.<Weighted<Token>>and(
                 getAcceptFeatures(),
-                compose(lte(threshold), this.<Token>weight())));
+                Predicates2.compose(Predicates2.lte(threshold), this.<Token>weight())));
     }
 
     public void addFeaturesFrequencyRange(double min, double max) {
         setAcceptFeatures(Predicates2.<Weighted<Token>>and(
                 getAcceptFeatures(),
-                compose(inRange(min, max), this.<Token>weight())));
+                Predicates2.compose(Predicates2.inRange(min, max), this.<Token>weight())));
     }
 
     public void addFeaturesPattern(String pattern) {
         setAcceptFeatures(Predicates2.<Weighted<Token>>and(
                 getAcceptFeatures(),
-                compose(containsPattern(pattern), featureString())));
+                Predicates2.compose(Predicates2.containsPattern(pattern), featureString())));
     }
 
     public void addFeaturesWhitelist(List<String> strings) throws IOException {
@@ -755,7 +762,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         }
         setAcceptFeatures(Predicates2.<Weighted<Token>>and(
                 getAcceptFeatures(),
-                compose(in(featureIdSet), id())));
+                Predicates2.compose(Predicates2.in(featureIdSet), id())));
     }
 
     public void addFeaturesBlacklist(List<String> strings) throws IOException {
@@ -766,7 +773,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         }
         setAcceptFeatures(Predicates2.<Weighted<Token>>and(
                 getAcceptFeatures(),
-                compose(not(in(featureIdSet)), id())));
+                Predicates2.compose(Predicates2.not(Predicates2.in(featureIdSet)), id())));
 
     }
 
@@ -785,19 +792,19 @@ public class FilterCommand extends AbstractCommand implements Serializable {
     public void addEntryFeatureMinimumFrequency(double threshold) {
         setAcceptEntryFeature(Predicates2.<Weighted<TokenPair>>and(
                 getAcceptEntryFeature(),
-                compose(gte(threshold), this.<TokenPair>weight())));
+                Predicates2.compose(Predicates2.gte(threshold), this.<TokenPair>weight())));
     }
 
     public void addEntryFeatureMaximumFrequency(double threshold) {
         setAcceptEntryFeature(Predicates2.<Weighted<TokenPair>>and(
                 getAcceptEntryFeature(),
-                compose(lte(threshold), this.<TokenPair>weight())));
+                Predicates2.compose(Predicates2.lte(threshold), this.<TokenPair>weight())));
     }
 
     public void addEntryFeatureFrequencyRange(double min, double max) {
         setAcceptEntryFeature(Predicates2.<Weighted<TokenPair>>and(
                 getAcceptEntryFeature(),
-                compose(inRange(min, max), this.<TokenPair>weight())));
+                Predicates2.compose(Predicates2.inRange(min, max), this.<TokenPair>weight())));
     }
 
     public Predicate<Weighted<Token>> getAcceptEntry() {
@@ -814,25 +821,25 @@ public class FilterCommand extends AbstractCommand implements Serializable {
     public void addEntryMinimumFrequency(double threshold) {
         setAcceptEntry(Predicates2.<Weighted<Token>>and(
                 getAcceptEntry(),
-                compose(gte(threshold), this.<Token>weight())));
+                Predicates2.compose(Predicates2.gte(threshold), this.<Token>weight())));
     }
 
     public void addEntryMaximumFrequency(double threshold) {
         setAcceptEntry(Predicates2.<Weighted<Token>>and(
                 getAcceptEntry(),
-                compose(lte(threshold), this.<Token>weight())));
+                Predicates2.compose(Predicates2.lte(threshold), this.<Token>weight())));
     }
 
     public void addEntryFrequencyRange(double min, double max) {
         setAcceptEntry(Predicates2.<Weighted<Token>>and(
                 getAcceptEntry(),
-                compose(inRange(min, max), this.<Token>weight())));
+                Predicates2.compose(Predicates2.inRange(min, max), this.<Token>weight())));
     }
 
     public void addEntryPattern(String pattern) {
         setAcceptEntry(Predicates2.<Weighted<Token>>and(
                 getAcceptEntry(),
-                compose(containsPattern(pattern), entryString())));
+                Predicates2.compose(Predicates2.containsPattern(pattern), entryString())));
     }
 
     public void addEntryWhitelist(List<String> strings) throws IOException {
@@ -843,7 +850,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         }
         setAcceptEntry(Predicates2.<Weighted<Token>>and(
                 getAcceptEntry(),
-                compose(in(entryIdSet), id())));
+                Predicates2.compose(Predicates2.in(entryIdSet), id())));
 
     }
 
@@ -855,7 +862,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         }
         setAcceptEntry(Predicates2.<Weighted<Token>>and(
                 getAcceptEntry(),
-                compose(not(in(entryIdSet)), id())));
+                Predicates2.compose(Predicates2.not(Predicates2.in(entryIdSet)), id())));
 
     }
 

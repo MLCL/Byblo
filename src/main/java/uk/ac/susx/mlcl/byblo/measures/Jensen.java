@@ -37,7 +37,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 /**
  * Jensen-Shannon divergence
  * 
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class Jensen extends AbstractProximity {
 

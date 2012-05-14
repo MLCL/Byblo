@@ -38,7 +38,7 @@ package uk.ac.susx.mlcl.lib.tasks;
  * but often the overhead of not using this interface is ridiculous, so it
  * stands as an unhappy compromise,
  *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public interface PropertyCarrying {
 

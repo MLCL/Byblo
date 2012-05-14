@@ -42,7 +42,7 @@ import java.util.Comparator;
  *
  * <p>Instances of <tt>Weighted</tt> are immutable.<p>
  *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T> Type of record being weighted
  */
 public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {

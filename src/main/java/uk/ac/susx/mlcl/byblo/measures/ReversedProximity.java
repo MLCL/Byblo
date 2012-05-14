@@ -36,7 +36,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * Decorator that reverses the features sets, for calculating asymmetric
  * measures with the inputs the other way around.
  *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class ReversedProximity implements Proximity {
 

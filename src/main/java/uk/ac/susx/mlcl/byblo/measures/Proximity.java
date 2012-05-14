@@ -37,7 +37,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * implement. It has been expanded from the usual single method interface, to
  * allow for pre-calculation of values that are independant to one vector. 
  *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public interface Proximity {
 

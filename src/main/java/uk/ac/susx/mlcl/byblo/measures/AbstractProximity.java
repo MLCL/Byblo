@@ -32,7 +32,7 @@ package uk.ac.susx.mlcl.byblo.measures;
 
 /**
  *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class AbstractProximity implements Proximity {
 

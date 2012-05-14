@@ -1,31 +1,31 @@
 /*
  * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without 
+ *
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- *  
- *  * Redistributions of source code must retain the above copyright notice, 
+ *
+ *  * Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  *  * Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
- *  * Neither the name of the University of Sussex nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ *
+ *  * Neither the name of the University of Sussex nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- *  
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -36,26 +36,32 @@ import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
-import uk.ac.susx.mlcl.lib.io.FileFactory;
-import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import static java.text.MessageFormat.format;
 import java.util.Arrays;
-import uk.ac.susx.mlcl.byblo.commands.*;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
+import uk.ac.susx.mlcl.byblo.commands.ExternalCountCommand;
+import uk.ac.susx.mlcl.byblo.commands.ExternalKnnSimsCommand;
+import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
+import uk.ac.susx.mlcl.byblo.commands.IndexInstancesCommand;
+import uk.ac.susx.mlcl.byblo.commands.UnindexSimsCommand;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.lib.Checks;
+import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.commands.DoubleConverter;
 import uk.ac.susx.mlcl.lib.commands.FileDeligate;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
+import uk.ac.susx.mlcl.lib.io.FileFactory;
+import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 
 /**
+ * Run complete build of Byblo, performing all stages in order.
  *
- * @author hiam20
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class FullBuild extends AbstractCommand {
+public final class FullBuild extends AbstractCommand {
 
     private static final Log LOG = LogFactory.getLog(FullBuild.class);
 
@@ -95,7 +101,8 @@ public class FullBuild extends AbstractCommand {
     private double filterEntryMinFreq;
 
     @Parameter(names = {"-few", "--filter-entry-whitelist"},
-    description = "Whitelist file containing entries of interest. (All others will be ignored)",
+    description = "Whitelist file containing entries of interest. "
+    + "(All others will be ignored)",
     validateWith = InputFileValidator.class)
     private File filterEntryWhitelist;
 
@@ -114,7 +121,8 @@ public class FullBuild extends AbstractCommand {
     private double filterFeatureMinFreq;
 
     @Parameter(names = {"-ffw", "--filter-feature-whitelist"},
-    description = "Whitelist file containing features of interest. (All others will be ignored)",
+    description = "Whitelist file containing features of interest. "
+    + "(All others will be ignored)",
     validateWith = InputFileValidator.class)
     private File filterFeatureWhitelist;
 
@@ -131,35 +139,20 @@ public class FullBuild extends AbstractCommand {
     description = "Similarity measure to use.")
     private String measureName = "Lin";
 
-    public FullBuild() {
+    private static final int COUNT_MAX_CHUNK_SIZE = 500000;
+
+    private static final int ALLPAIRS_MAX_CHUNK_SIZE = 2500;
+
+    private static final int KNN_MAX_CHUNK_SIZE = 500000;
+
+    /**
+     * Should only be instantiated through the main method.
+     */
+    protected FullBuild() {
     }
 
-    public void setInstancesFile(File instancesFile) {
-        this.instancesFile = instancesFile;
-    }
-
-    public final void setCharset(Charset charset) {
-        fileDeligate.setCharset(charset);
-    }
-
-    public final Charset getCharset() {
-        return fileDeligate.getCharset();
-    }
-
-    public File getOutputDir() {
-        return outputDir;
-    }
-
-    public void setOutputDir(File outputDir) {
-        this.outputDir = outputDir;
-    }
-
-    public File getTempBaseDir() {
-        return tempBaseDir;
-    }
-
-    public void setTempBaseDir(File tempBaseDir) {
-        this.tempBaseDir = tempBaseDir;
+    public static void main(String[] args) throws Exception {
+        new FullBuild().runCommand(args);
     }
 
     @Override
@@ -168,8 +161,9 @@ public class FullBuild extends AbstractCommand {
         checkValidInputFile("Instances file", instancesFile);
 
         // If the output dir isn't
-        if (outputDir == null)
+        if (outputDir == null) {
             outputDir = instancesFile.getParentFile();
+        }
         checkValidOutputDir("Output dir", outputDir);
 
         if (tempBaseDir == null)
@@ -182,234 +176,258 @@ public class FullBuild extends AbstractCommand {
         File instancesEnumeratedFile =
                 new File(outputDir, instancesFile.getName() + ".enumerated");
 
+        runIndex(instancesEnumeratedFile, featureEnumeratorFile, entryEnumeratorFile);
 
-        {
-            checkValidOutputFile("Enumerated instances file", instancesEnumeratedFile);
-            checkValidOutputFile("Feature index file", featureEnumeratorFile);
-            checkValidOutputFile("Entry index file", entryEnumeratorFile);
+        File entriesFile = new File(outputDir,
+                                    instancesFile.getName() + ".entries");
+        File featuresFile = new File(outputDir,
+                                     instancesFile.getName() + ".features");
+        File eventsFile = new File(outputDir,
+                                   instancesFile.getName() + ".events");
 
-            IndexInstancesCommand indexCmd = new IndexInstancesCommand();
-            indexCmd.setSourceFile(instancesFile);
-            indexCmd.setDestinationFile(instancesEnumeratedFile);
-            indexCmd.setCharset(getCharset());
-
-            indexCmd.setEntryEnumeratorFile(entryEnumeratorFile);
-            indexCmd.setFeatureEnumeratorFile(featureEnumeratorFile);
-            indexCmd.setEnumeratorType(enumeratorType);
-
-            indexCmd.runCommand();
-
-            checkValidInputFile("Enumerated instances file", instancesEnumeratedFile);
-        }
-
-
-        File entriesFile = new File(outputDir, instancesFile.getName() + ".entries");
-        File featuresFile = new File(outputDir, instancesFile.getName() + ".features");
-        File eventsFile = new File(outputDir, instancesFile.getName() + ".events");
-
-        {
-            int countMaxChunkSize = 500000;
-
-            checkValidInputFile("Enumerated instances file", instancesEnumeratedFile);
-            checkValidOutputFile("Entries file", entriesFile);
-            checkValidOutputFile("Features file", featuresFile);
-            checkValidOutputFile("Events file", eventsFile);
-
-            File countTempDir = createTempSubdirDir(tempBaseDir);
-            FileFactory countTmpFact = new TempFileFactory(countTempDir);
-
-            ExternalCountCommand countCmd = new ExternalCountCommand();
-            countCmd.setCharset(getCharset());
-            countCmd.setInstancesFile(instancesEnumeratedFile);
-            countCmd.setEntriesFile(entriesFile);
-            countCmd.setFeaturesFile(featuresFile);
-            countCmd.setEventsFile(eventsFile);
-            countCmd.setTempFileFactory(countTmpFact);
-
-            // Configure the enumeration
-            countCmd.setEnumeratedEntries(true);
-            countCmd.setEnumeratedFeatures(true);
-            countCmd.setEnumeratorType(enumeratorType);
-
-            countCmd.setNumThreads(numThreads);
-            countCmd.setMaxChunkSize(countMaxChunkSize);
-
-
-            countCmd.runCommand();
-
-            checkValidInputFile("Entries file", entriesFile);
-            checkValidInputFile("Features file", featuresFile);
-            checkValidInputFile("Events file", eventsFile);
-
-            if (countTempDir.list().length > 0)
-                throw new IllegalStateException(format("Count temporary directory is not empty: {0}", countTempDir));
-            if (!countTempDir.delete())
-                throw new IOException(format("Unable to delete count temporary directory is not empty: {0}", countTempDir));
-        }
-
-
-
-
-
-
+        runCount(instancesEnumeratedFile, entriesFile, featuresFile, eventsFile);
 
 
         File entriesFilteredFile = suffixed(entriesFile, ".filtered");
         File featuresFilteredFile = suffixed(featuresFile, ".filtered");
         File eventsFilteredFile = suffixed(eventsFile, ".filtered");
 
-
-        {
-            checkValidInputFile("Entries file", entriesFile);
-            checkValidInputFile("Features file", featuresFile);
-            checkValidInputFile("Events file", eventsFile);
-            checkValidOutputFile("Filtered entries file", entriesFilteredFile);
-            checkValidOutputFile("Filtered features file", featuresFilteredFile);
-            checkValidOutputFile("Filtered events file", eventsFilteredFile);
-
-            File filterTempDir = createTempSubdirDir(tempBaseDir);
-            FileFactory filterTmpFact = new TempFileFactory(filterTempDir);
-
-            FilterCommand filterCmd = new FilterCommand();
-            filterCmd.setCharset(getCharset());
-            filterCmd.setInputEntriesFile(entriesFile);
-            filterCmd.setInputFeaturesFile(featuresFile);
-            filterCmd.setInputEventsFile(eventsFile);
-            filterCmd.setOutputEntriesFile(entriesFilteredFile);
-            filterCmd.setOutputFeaturesFile(featuresFilteredFile);
-            filterCmd.setOutputEventsFile(eventsFilteredFile);
-            filterCmd.setTempFiles(filterTmpFact);
-
-            filterCmd.setFilterEventMinFreq(filterEventMinFreq);
-            filterCmd.setFilterEntryMinFreq(filterEntryMinFreq);
-            filterCmd.setFilterEntryPattern(filterEntryPattern);
-            filterCmd.setFilterEntryWhitelist(filterEntryWhitelist);
-            filterCmd.setFilterFeatureMinFreq(filterFeatureMinFreq);
-            filterCmd.setFilterFeaturePattern(filterFeaturePattern);
-            filterCmd.setFilterFeatureWhitelist(filterFeatureWhitelist);
-
-            filterCmd.setEnumeratedEntries(true);
-            filterCmd.setEnumeratedFeatures(true);
-            filterCmd.setEntryEnumeratorFile(entryEnumeratorFile);
-            filterCmd.setFeatureEnumeratorFile(featureEnumeratorFile);
-            filterCmd.setEnumeratorType(enumeratorType);
-
-            filterCmd.runCommand();
-
-            checkValidInputFile("Filtered entries file", entriesFilteredFile);
-            checkValidInputFile("Filtered features file", featuresFilteredFile);
-            checkValidInputFile("Filtered events file", eventsFilteredFile);
-
-            if (filterTempDir.list().length > 0)
-                throw new IllegalStateException(format(
-                        "Filter temporary directory is not empty: {0} --- countains {1}",
-                        filterTempDir, Arrays.toString(filterTempDir.list())));
-
-            if (!filterTempDir.delete())
-                throw new IOException(format("Unable to delete filter temporary directory is not empty: {0}", filterTempDir));
-        }
-
-
-
+        runFilter(entriesFile, featuresFile, eventsFile, entriesFilteredFile,
+                  featuresFilteredFile, eventsFilteredFile, entryEnumeratorFile,
+                  featureEnumeratorFile);
 
 
         File simsFile = new File(outputDir, instancesFile.getName() + ".sims");
-
-        {
-            int allPairsChunksSize = 2500;
-
-            checkValidInputFile("Filtered entries file", entriesFilteredFile);
-            checkValidInputFile("Filtered features file", featuresFilteredFile);
-            checkValidInputFile("Filtered events file", eventsFilteredFile);
-            checkValidOutputFile("Sims file", simsFile);
-
-
-            AllPairsCommand allpairsCmd = new AllPairsCommand();
-            allpairsCmd.setCharset(getCharset());
-
-            allpairsCmd.setEntriesFile(entriesFilteredFile);
-            allpairsCmd.setFeaturesFile(featuresFilteredFile);
-            allpairsCmd.setEventsFile(eventsFilteredFile);
-            allpairsCmd.setOutputFile(simsFile);
-
-            allpairsCmd.setNumThreads(numThreads);
-            allpairsCmd.setChunkSize(allPairsChunksSize);
-
-            allpairsCmd.setMeasureName(measureName);
-            allpairsCmd.setMinSimilarity(minSimilarity);
-
-            allpairsCmd.setEnumeratedEntries(true);
-            allpairsCmd.setEnumeratedFeatures(true);
-            allpairsCmd.setEnumeratorType(enumeratorType);
-
-            allpairsCmd.runCommand();
-            checkValidInputFile("Sims file", simsFile);
-        }
-
-
-
-
+        runAllpairs(entriesFilteredFile, featuresFilteredFile, eventsFilteredFile, simsFile);
 
         File neighboursFile = suffixed(simsFile, ".neighbours");
 
-        {
-            int maxChunkSize = 500000;
-            checkValidInputFile("Sims file", simsFile);
-            checkValidOutputFile("Neighbours file", neighboursFile);
-
-            File knnTempDir = createTempSubdirDir(tempBaseDir);
-            FileFactory knnTmpFact = new TempFileFactory(knnTempDir);
-
-            ExternalKnnSimsCommand knnCmd = new ExternalKnnSimsCommand();
-            knnCmd.setCharset(getCharset());
-            knnCmd.setSourceFile(simsFile);
-            knnCmd.setDestinationFile(neighboursFile);
-
-            knnCmd.setEnumeratedEntries(true);
-            knnCmd.setEnumeratedFeatures(true);
-            knnCmd.setEnumeratorType(enumeratorType);
-
-            knnCmd.setTempFileFactory(knnTmpFact);
-            knnCmd.setNumThreads(numThreads);
-            knnCmd.setMaxChunkSize(maxChunkSize);
-
-            knnCmd.runCommand();
-
-            checkValidInputFile("Neighbours file", neighboursFile);
-
-            if (knnTempDir.list().length > 0)
-                throw new IllegalStateException(format("Filter temporary directory is not empty: {0}", knnTempDir));
-            if (!knnTempDir.delete())
-                throw new IOException(format("Unable to delete filter temporary directory is not empty: {0}", knnTempDir));
-
-        }
-
-
-
+        runKNN(simsFile, neighboursFile);
 
         File neighboursStringsFile = suffixed(neighboursFile, ".strings");
+        runUnindexSim(neighboursFile, neighboursStringsFile, entryEnumeratorFile);
+    }
 
-        {
-            checkValidInputFile("Neighbours file", neighboursFile);
-            checkValidOutputFile("Neighbours strings file", neighboursStringsFile);
+    private void runIndex(File instancesEnumeratedFile,
+                          File featureEnumeratorFile, File entryEnumeratorFile)
+            throws Exception {
+        checkValidOutputFile("Enumerated instances file",
+                             instancesEnumeratedFile);
+        checkValidOutputFile("Feature index file", featureEnumeratorFile);
+        checkValidOutputFile("Entry index file", entryEnumeratorFile);
+
+        IndexInstancesCommand indexCmd = new IndexInstancesCommand();
+        indexCmd.setSourceFile(instancesFile);
+        indexCmd.setDestinationFile(instancesEnumeratedFile);
+        indexCmd.setCharset(getCharset());
+
+        indexCmd.setEntryEnumeratorFile(entryEnumeratorFile);
+        indexCmd.setFeatureEnumeratorFile(featureEnumeratorFile);
+        indexCmd.setEnumeratorType(enumeratorType);
+
+        indexCmd.runCommand();
+
+        checkValidInputFile("Enumerated instances file",
+                            instancesEnumeratedFile);
+    }
+
+    private void runCount(File instancesEnumeratedFile, File entriesFile,
+                          File featuresFile, File eventsFile) throws Exception {
+
+        checkValidInputFile("Enumerated instances file",
+                            instancesEnumeratedFile);
+        checkValidOutputFile("Entries file", entriesFile);
+        checkValidOutputFile("Features file", featuresFile);
+        checkValidOutputFile("Events file", eventsFile);
+
+        File countTempDir = createTempSubdirDir(tempBaseDir);
+        FileFactory countTmpFact = new TempFileFactory(countTempDir);
+
+        ExternalCountCommand countCmd = new ExternalCountCommand();
+        countCmd.setCharset(getCharset());
+        countCmd.setInstancesFile(instancesEnumeratedFile);
+        countCmd.setEntriesFile(entriesFile);
+        countCmd.setFeaturesFile(featuresFile);
+        countCmd.setEventsFile(eventsFile);
+        countCmd.setTempFileFactory(countTmpFact);
+
+        // Configure the enumeration
+        countCmd.setEnumeratedEntries(true);
+        countCmd.setEnumeratedFeatures(true);
+        countCmd.setEnumeratorType(enumeratorType);
+
+        countCmd.setNumThreads(numThreads);
+        countCmd.setMaxChunkSize(COUNT_MAX_CHUNK_SIZE);
 
 
-            UnindexSimsCommand unindexCmd = new UnindexSimsCommand();
-            unindexCmd.setSourceFile(neighboursFile);
-            unindexCmd.setDestinationFile(neighboursStringsFile);
-            unindexCmd.setCharset(getCharset());
+        countCmd.runCommand();
 
-            unindexCmd.getIndexDeligate().setEnumerationEnabled(true);
-            unindexCmd.getIndexDeligate().setEnumeratorFile(entryEnumeratorFile);
-            unindexCmd.getIndexDeligate().setEnumeratorType(enumeratorType);
+        checkValidInputFile("Entries file", entriesFile);
+        checkValidInputFile("Features file", featuresFile);
+        checkValidInputFile("Events file", eventsFile);
 
-            unindexCmd.runCommand();
-
-            checkValidInputFile("Neighbours strings file", neighboursStringsFile);
-
+        if (countTempDir.list().length > 0) {
+            throw new IllegalStateException(format(
+                    "Count temporary directory is not empty: {0}",
+                    countTempDir));
         }
+        if (!countTempDir.delete()) {
+            throw new IOException(format(
+                    "Unable to delete count temporary "
+                    + "directory is not empty: {0}",
+                    countTempDir));
+        }
+    }
+
+    private void runFilter(File entriesFile, File featuresFile, File eventsFile,
+                           File entriesFilteredFile, File featuresFilteredFile,
+                           File eventsFilteredFile,
+                           File entryEnumeratorFile, File featureEnumeratorFile)
+            throws Exception {
+        checkValidInputFile("Entries file", entriesFile);
+        checkValidInputFile("Features file", featuresFile);
+        checkValidInputFile("Events file", eventsFile);
+        checkValidOutputFile("Filtered entries file", entriesFilteredFile);
+        checkValidOutputFile("Filtered features file", featuresFilteredFile);
+        checkValidOutputFile("Filtered events file", eventsFilteredFile);
+
+        File filterTempDir = createTempSubdirDir(tempBaseDir);
+        FileFactory filterTmpFact = new TempFileFactory(filterTempDir);
+
+        FilterCommand filterCmd = new FilterCommand();
+        filterCmd.setCharset(getCharset());
+        filterCmd.setInputEntriesFile(entriesFile);
+        filterCmd.setInputFeaturesFile(featuresFile);
+        filterCmd.setInputEventsFile(eventsFile);
+        filterCmd.setOutputEntriesFile(entriesFilteredFile);
+        filterCmd.setOutputFeaturesFile(featuresFilteredFile);
+        filterCmd.setOutputEventsFile(eventsFilteredFile);
+        filterCmd.setTempFiles(filterTmpFact);
+
+        filterCmd.setFilterEventMinFreq(filterEventMinFreq);
+        filterCmd.setFilterEntryMinFreq(filterEntryMinFreq);
+        filterCmd.setFilterEntryPattern(filterEntryPattern);
+        filterCmd.setFilterEntryWhitelist(filterEntryWhitelist);
+        filterCmd.setFilterFeatureMinFreq(filterFeatureMinFreq);
+        filterCmd.setFilterFeaturePattern(filterFeaturePattern);
+        filterCmd.setFilterFeatureWhitelist(filterFeatureWhitelist);
+
+        filterCmd.setEnumeratedEntries(true);
+        filterCmd.setEnumeratedFeatures(true);
+        filterCmd.setEntryEnumeratorFile(entryEnumeratorFile);
+        filterCmd.setFeatureEnumeratorFile(featureEnumeratorFile);
+        filterCmd.setEnumeratorType(enumeratorType);
+
+        filterCmd.runCommand();
+
+        checkValidInputFile("Filtered entries file", entriesFilteredFile);
+        checkValidInputFile("Filtered features file", featuresFilteredFile);
+        checkValidInputFile("Filtered events file", eventsFilteredFile);
+
+        if (filterTempDir.list().length > 0) {
+            throw new IllegalStateException(format(
+                    "Filter temporary directory is not "
+                    + "empty: {0} --- countains {1}",
+                    filterTempDir, Arrays.toString(filterTempDir.list())));
+        }
+        if (!filterTempDir.delete()) {
+            throw new IOException(format(
+                    "Unable to delete filter temporary "
+                    + "directory is not empty: {0}",
+                    filterTempDir));
+        }
+    }
+
+    private void runAllpairs(File entriesFilteredFile, File featuresFilteredFile,
+                             File eventsFilteredFile, File simsFile)
+            throws Exception {
+        checkValidInputFile("Filtered entries file", entriesFilteredFile);
+        checkValidInputFile("Filtered features file", featuresFilteredFile);
+        checkValidInputFile("Filtered events file", eventsFilteredFile);
+        checkValidOutputFile("Sims file", simsFile);
 
 
+        AllPairsCommand allpairsCmd = new AllPairsCommand();
+        allpairsCmd.setCharset(getCharset());
+
+        allpairsCmd.setEntriesFile(entriesFilteredFile);
+        allpairsCmd.setFeaturesFile(featuresFilteredFile);
+        allpairsCmd.setEventsFile(eventsFilteredFile);
+        allpairsCmd.setOutputFile(simsFile);
+
+        allpairsCmd.setNumThreads(numThreads);
+        allpairsCmd.setChunkSize(ALLPAIRS_MAX_CHUNK_SIZE);
+
+        allpairsCmd.setMeasureName(measureName);
+        allpairsCmd.setMinSimilarity(minSimilarity);
+
+        allpairsCmd.setEnumeratedEntries(true);
+        allpairsCmd.setEnumeratedFeatures(true);
+        allpairsCmd.setEnumeratorType(enumeratorType);
+
+        allpairsCmd.runCommand();
+        checkValidInputFile("Sims file", simsFile);
+    }
+
+    private void runKNN(File simsFile, File neighboursFile) throws Exception {
+        checkValidInputFile("Sims file", simsFile);
+        checkValidOutputFile("Neighbours file", neighboursFile);
+
+        File knnTempDir = createTempSubdirDir(tempBaseDir);
+        FileFactory knnTmpFact = new TempFileFactory(knnTempDir);
+
+        ExternalKnnSimsCommand knnCmd = new ExternalKnnSimsCommand();
+        knnCmd.setCharset(getCharset());
+        knnCmd.setSourceFile(simsFile);
+        knnCmd.setDestinationFile(neighboursFile);
+
+        knnCmd.setEnumeratedEntries(true);
+        knnCmd.setEnumeratedFeatures(true);
+        knnCmd.setEnumeratorType(enumeratorType);
+
+        knnCmd.setTempFileFactory(knnTmpFact);
+        knnCmd.setNumThreads(numThreads);
+        knnCmd.setMaxChunkSize(KNN_MAX_CHUNK_SIZE);
+
+        knnCmd.runCommand();
+
+        checkValidInputFile("Neighbours file", neighboursFile);
+
+        if (knnTempDir.list().length > 0) {
+            throw new IllegalStateException(format(
+                    "Filter temporary directory is not empty: {0}",
+                    knnTempDir));
+        }
+        if (!knnTempDir.delete()) {
+            throw new IOException(format(
+                    "Unable to delete filter temporary"
+                    + " directory is not empty: {0}",
+                    knnTempDir));
+        }
+    }
+
+    private void runUnindexSim(File neighboursFile, File neighboursStringsFile,
+                               File entryEnumeratorFile)
+            throws Exception {
+
+        checkValidInputFile("Neighbours file", neighboursFile);
+        checkValidOutputFile("Neighbours strings file",
+                             neighboursStringsFile);
+
+
+        UnindexSimsCommand unindexCmd = new UnindexSimsCommand();
+        unindexCmd.setSourceFile(neighboursFile);
+        unindexCmd.setDestinationFile(neighboursStringsFile);
+        unindexCmd.setCharset(getCharset());
+
+        unindexCmd.getIndexDeligate().setEnumerationEnabled(true);
+        unindexCmd.getIndexDeligate().setEnumeratorFile(entryEnumeratorFile);
+        unindexCmd.getIndexDeligate().setEnumeratorType(enumeratorType);
+
+        unindexCmd.runCommand();
+
+        checkValidInputFile("Neighbours strings file",
+                            neighboursStringsFile);
 
     }
 
@@ -418,9 +436,10 @@ public class FullBuild extends AbstractCommand {
         FileFactory tmp = new TempFileFactory(base);
         File tempDir = tmp.createFile("tempdir", "");
         LOG.debug(format("Creating temporary directory {0}", tempDir));
-        if (!tempDir.delete() || !tempDir.mkdir())
+        if (!tempDir.delete() || !tempDir.mkdir()) {
             throw new IOException(format(
                     "Unable to create temporary directory {0}", tempDir));
+        }
         checkValidOutputDir("Temporary directory", tempDir);
         return tempDir;
     }
@@ -435,15 +454,18 @@ public class FullBuild extends AbstractCommand {
 
     public static void checkValidInputFile(String name, File file) {
         Checks.checkNotNull(name, file);
-        if (!file.exists())
+        if (!file.exists()) {
             throw new IllegalArgumentException(format(
                     "{0} does not exist: {1}", name, file));
-        if (!file.canRead())
+        }
+        if (!file.canRead()) {
             throw new IllegalArgumentException(format(
                     "{0} is not readable: {0}", name, file));
-        if (!file.isFile())
+        }
+        if (!file.isFile()) {
             throw new IllegalArgumentException(format(
                     "{0} is not a regular file: ", name, file));
+        }
 
     }
 
@@ -454,17 +476,22 @@ public class FullBuild extends AbstractCommand {
     public static void checkValidOutputFile(String name, File file) {
         Checks.checkNotNull(name, file);
         if (file.exists()) {
-            if (!file.isFile())
+            if (!file.isFile()) {
                 throw new IllegalArgumentException(format(
-                        "{0} already exists, but not regular: {1}", name, file));
-            if (!file.canWrite())
+                        "{0} already exists, but not regular: {1}",
+                        name, file));
+            }
+            if (!file.canWrite()) {
                 throw new IllegalArgumentException(format(
-                        "{0} already exists, but is not writeable: {1}", name, file));
+                        "{0} already exists, but is not writeable: {1}",
+                        name, file));
+            }
         } else {
-            if (!file.getParentFile().canWrite())
+            if (!file.getParentFile().canWrite()) {
                 throw new IllegalArgumentException(
                         format("{0} can not be created, because the parent "
                         + "directory is not writeable: {1}", name, file));
+            }
         }
     }
 
@@ -474,15 +501,18 @@ public class FullBuild extends AbstractCommand {
 
     public static void checkValidOutputDir(String name, File file) {
         Checks.checkNotNull(name, file);
-        if (!file.exists())
+        if (!file.exists()) {
             throw new IllegalArgumentException(format(
                     "{0} does not exist: {1}", name, file));
-        if (!file.canWrite())
+        }
+        if (!file.canWrite()) {
             throw new IllegalArgumentException(format(
                     "{0} is not writeable: {0}", name, file));
-        if (!file.isDirectory())
+        }
+        if (!file.isDirectory()) {
             throw new IllegalArgumentException(format(
                     "{0} is not a directory: ", name, file));
+        }
 
     }
 
@@ -590,8 +620,32 @@ public class FullBuild extends AbstractCommand {
         this.skipIndex2 = skipIndex2;
     }
 
-    public static void main(String[] args) throws Exception {
-        new FullBuild().runCommand(args);
+    public void setInstancesFile(File instancesFile) {
+        this.instancesFile = instancesFile;
+    }
+
+    public void setCharset(Charset charset) {
+        fileDeligate.setCharset(charset);
+    }
+
+    public Charset getCharset() {
+        return fileDeligate.getCharset();
+    }
+
+    public File getOutputDir() {
+        return outputDir;
+    }
+
+    public void setOutputDir(File outputDirectory) {
+        this.outputDir = outputDirectory;
+    }
+
+    public File getTempBaseDir() {
+        return tempBaseDir;
+    }
+
+    public void setTempBaseDir(File tempBaseDirectory) {
+        this.tempBaseDir = tempBaseDirectory;
     }
 
 }

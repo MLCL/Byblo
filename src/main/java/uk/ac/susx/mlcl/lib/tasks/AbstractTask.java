@@ -39,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Abstract super class to all task objects, implementing common functionality.
  *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class AbstractTask implements Task {
 

@@ -50,7 +50,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * Linguistics 31, no. 4: 439-475.</li>
  * </ul>
  *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class CrMi extends AbstractMIProximity {
 

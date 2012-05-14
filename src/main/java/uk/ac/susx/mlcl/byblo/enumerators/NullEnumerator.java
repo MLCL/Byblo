@@ -42,7 +42,7 @@ import java.util.Map.Entry;
  * UnsupportedOperationException.
  *
  * @param <T> type of object being indexed.
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class NullEnumerator<T> implements Enumerator<T> {
 

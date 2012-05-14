@@ -42,7 +42,7 @@ import java.util.Map.Entry;
  * been assigned a unique id it can be retrieved using the valueOf method.
  *
  * @param <T> type of object being indexed.
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public interface Enumerator<T> extends Iterable<Entry<Integer, T>> {
 

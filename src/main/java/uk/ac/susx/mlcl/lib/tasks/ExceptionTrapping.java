@@ -36,7 +36,7 @@ package uk.ac.susx.mlcl.lib.tasks;
  * when code is executing inside another thread: i.e implementing the Runnable
  * interface which does not support checked exceptions.
  *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public interface ExceptionTrapping {
 

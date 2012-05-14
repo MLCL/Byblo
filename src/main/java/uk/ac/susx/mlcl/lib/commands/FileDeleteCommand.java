@@ -41,7 +41,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Parameters(commandDescription = "Delete a file.")
 public class FileDeleteCommand extends AbstractCommand {

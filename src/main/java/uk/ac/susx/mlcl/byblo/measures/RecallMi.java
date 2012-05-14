@@ -58,7 +58,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * Note that recall(x,y) = precision(y,x) so the precision can be calculated
  * by wrapping an instance of RecallMi in the ReversedProximity decorator.
  *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class RecallMi extends AbstractMIProximity {
 

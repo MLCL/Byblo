@@ -1,40 +1,40 @@
 /*
  * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without 
+ *
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
- *  * Redistributions of source code must retain the above copyright notice, 
+ *
+ *  * Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  *  * Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
- *  * Neither the name of the University of Sussex nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ *
+ *  * Neither the name of the University of Sussex nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package uk.ac.susx.mlcl.lib;
 
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import static com.google.common.base.Preconditions.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +47,7 @@ import java.util.regex.Pattern;
 
 /**
  *
- * @author hamish
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class Predicates2 {
 
@@ -101,7 +101,7 @@ public final class Predicates2 {
             if (pred.equals(alwaysFalse()))
                 return alwaysFalse();
             else if (!pred.equals(alwaysTrue()))
-                result.add(checkNotNull(pred));
+                result.add(Preconditions.checkNotNull(pred));
         }
         if (result.isEmpty())
             return alwaysTrue();
@@ -128,7 +128,7 @@ public final class Predicates2 {
             if (pred.equals(alwaysTrue()))
                 return alwaysTrue();
             else if (!pred.equals(alwaysFalse()))
-                result.add(checkNotNull(pred));
+                result.add(Preconditions.checkNotNull(pred));
         }
         if (result.isEmpty())
             return alwaysFalse();
@@ -143,7 +143,7 @@ public final class Predicates2 {
     }
 
     public static <T> Predicate<T> or(Predicate<? super T> first,
-            Predicate<? super T> second) {
+                                      Predicate<? super T> second) {
         return or(Predicates2.<T>asList(first, second));
     }
 
@@ -151,8 +151,8 @@ public final class Predicates2 {
     private static <T> List<Predicate<? super T>> asList(
             Predicate<? super T> first, Predicate<? super T> second) {
         return Arrays.<Predicate<? super T>>asList(
-                checkNotNull(first),
-                checkNotNull(second));
+                Preconditions.checkNotNull(first),
+                Preconditions.checkNotNull(second));
     }
 
     public static <T> Predicate<T> equalTo(T target) {
@@ -231,7 +231,7 @@ public final class Predicates2 {
         private final Collection<?> target;
 
         private InPredicate(Collection<?> target) {
-            this.target = checkNotNull(target);
+            this.target = Preconditions.checkNotNull(target);
         }
 
         @Override
@@ -269,11 +269,12 @@ public final class Predicates2 {
                 int i = 0;
                 Iterator<?> it = target.iterator();
                 while (it.hasNext() && i++ < 20) {
-                    tmp.add((T)it.next());
+                    tmp.add((T) it.next());
                 }
                 return "In(" + tmp + ", ...)";
             }
         }
+
     }
 
     private static class InRange implements Predicate<Double>, Serializable {
@@ -313,11 +314,9 @@ public final class Predicates2 {
         @Override
         public int hashCode() {
             int hash = 5;
-            hash = 67 * hash + (int) (Double.doubleToLongBits(this.min) ^ (Double.
-                    doubleToLongBits(
+            hash = 67 * hash + (int) (Double.doubleToLongBits(this.min) ^ (Double.doubleToLongBits(
                     this.min) >>> 32));
-            hash = 67 * hash + (int) (Double.doubleToLongBits(this.max) ^ (Double.
-                    doubleToLongBits(
+            hash = 67 * hash + (int) (Double.doubleToLongBits(this.max) ^ (Double.doubleToLongBits(
                     this.max) >>> 32));
             return hash;
         }
@@ -328,6 +327,7 @@ public final class Predicates2 {
                     addValue(min + " to " + max).
                     toString();
         }
+
     }
 
     private static class GreaterThan implements Predicate<Double>, Serializable {
@@ -352,8 +352,7 @@ public final class Predicates2 {
             if (getClass() != obj.getClass())
                 return false;
             final GreaterThan other = (GreaterThan) obj;
-            if (Double.doubleToLongBits(this.threshold) != Double.
-                    doubleToLongBits(other.threshold))
+            if (Double.doubleToLongBits(this.threshold) != Double.doubleToLongBits(other.threshold))
                 return false;
             return true;
         }
@@ -361,8 +360,7 @@ public final class Predicates2 {
         @Override
         public int hashCode() {
             int hash = 7;
-            hash = 23 * hash + (int) (Double.doubleToLongBits(this.threshold) ^ (Double.
-                    doubleToLongBits(this.threshold) >>> 32));
+            hash = 23 * hash + (int) (Double.doubleToLongBits(this.threshold) ^ (Double.doubleToLongBits(this.threshold) >>> 32));
             return hash;
         }
 
@@ -372,6 +370,7 @@ public final class Predicates2 {
                     addValue(threshold).
                     toString();
         }
+
     }
 
     private static class LessThan implements Predicate<Double>, Serializable {
@@ -396,8 +395,7 @@ public final class Predicates2 {
             if (getClass() != obj.getClass())
                 return false;
             final GreaterThan other = (GreaterThan) obj;
-            if (Double.doubleToLongBits(this.threshold) != Double.
-                    doubleToLongBits(other.threshold))
+            if (Double.doubleToLongBits(this.threshold) != Double.doubleToLongBits(other.threshold))
                 return false;
             return true;
         }
@@ -405,8 +403,7 @@ public final class Predicates2 {
         @Override
         public int hashCode() {
             int hash = 7;
-            hash = 23 * hash + (int) (Double.doubleToLongBits(this.threshold) ^ (Double.
-                    doubleToLongBits(this.threshold) >>> 32));
+            hash = 23 * hash + (int) (Double.doubleToLongBits(this.threshold) ^ (Double.doubleToLongBits(this.threshold) >>> 32));
             return hash;
         }
 
@@ -416,8 +413,10 @@ public final class Predicates2 {
                     addValue(threshold).
                     toString();
         }
+
     }
 
     private Predicates2() {
     }
+
 }
