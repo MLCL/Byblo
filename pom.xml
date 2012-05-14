@@ -121,7 +121,18 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     </dependencies>
 
 
+
     <build>
+
+        <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -167,6 +178,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 <version>2.8.1</version>
                 <configuration>
                     <author>true</author>
+                    <quiet>true</quiet>
                 </configuration>
             </plugin>
 
@@ -216,17 +228,35 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
                     </reportPlugins>
+
                 </configuration>
+
+                <!-- Automatically execute the site goal during package phase -->
+<!--                <executions>
+                    <execution>
+                        <id>make-site</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>site</goal>
+                        </goals>
+                    </execution>
+                </executions>-->
             </plugin>
 
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.3</version>
+
                 <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>bin</descriptorRef>
-                    </descriptorRefs>
+                    <descriptorSourceDirectory>${project.basedir}/src/assemble</descriptorSourceDirectory>
+<!--                    <descriptors>
+                        <descriptor>src/assemble/src.xml</descriptor>
+                        <descriptor>src/assemble/bin.xml</descriptor>
+                        <descriptor>src/assemble/bin-with-deps.xml</descriptor>
+                    </descriptors>-->
                 </configuration>
+
+                <!-- Automatically execute the assembly goal during package phase -->
                 <executions>
                     <execution>
                         <id>make-assembly</id>
@@ -237,17 +267,14 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
 
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
+
 
 
     </build>
+
 
 <!--
 
