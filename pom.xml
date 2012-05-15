@@ -1,26 +1,121 @@
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>uk.ac.susx.mlcl</groupId>
-  <artifactId>lib</artifactId>
-  <version>0.2-SNAPSHOT</version>
-  <packaging>jar</packaging>
+    <groupId>uk.ac.susx.mlcl</groupId>
+    <artifactId>lib</artifactId>
+    <version>0.2-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
-  <name>mlcl-lib</name>
-  <url>http://maven.apache.org</url>
+    <scm>
+        <connection>scm:git:git://github.com/MLCL/Byblo.git</connection>
+        <tag>HEAD</tag>
+        <url>https://github.com/MLCL/Byblo</url>
+    </scm>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+    <name>mlcl-lib</name>
+    <url>https://github.com/MLCL/Byblo</url>
+    <description>
+        MLCL-Lib is a discombobulated collection of Java code, thought be of
+        sufficient quality and usefulness that it can be re-used across a
+        number of the MLCL Labs projects.
+    </description>
+    <inceptionYear>2011</inceptionYear>
 
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.10</version>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
-    <description>MLCL-Lib is a discombobulated collection of Java code, thought be of sufficient quality and usefulness that it can be re-used across a number of the MLCL Labs projects.</description>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <licenses>
+        <license>
+            <name>BSD 3-clause Licence</name>
+            <url>https://raw.github.com/MLCL/Byblo/develop/LICENSE.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+
+
+    <build>
+        <resources>
+            <resource>
+                <directory>${project.basedir}/src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.12</version>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <locales>en</locales>
+                    <reportPlugins>
+                        <plugin>
+                            <artifactId>maven-javadoc-plugin</artifactId>
+                            <version>2.8.1</version>
+                            <configuration>
+                                <author>true</author>
+                            </configuration>
+                        </plugin>
+                    </reportPlugins>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.3</version>
+
+                <configuration>
+                    <descriptorSourceDirectory>${project.basedir}/src/assemble</descriptorSourceDirectory>
+                </configuration>
+
+                <!-- Automatically execute the assembly goal during package phase -->
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+
+    </build>
 </project>
