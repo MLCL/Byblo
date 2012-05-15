@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>uk.ac.susx.mlcl</groupId>
-    <artifactId>lib</artifactId>
+    <artifactId>mlcl-lib</artifactId>
     <version>0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
