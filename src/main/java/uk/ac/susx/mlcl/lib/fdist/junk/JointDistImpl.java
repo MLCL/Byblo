@@ -8,42 +8,44 @@ import java.io.Serializable;
 /**
  * @author Hamish Morgan
  */
-public class JointDist implements Serializable, Dist2 {
+public class JointDistImpl implements Serializable, BivariateDistribution {
 
     private static final long serialVersionUID = 1L;
 
-    private final double[][] freqs;
+    private final double[][] frequencies;
 
-    private final EmpDist xTotals;
+    private final UniveriateDistributionImpl xTotals;
 
-    private final EmpDist yTotals;
+    private final UniveriateDistributionImpl yTotals;
 
     private final double totalFreq;
 
-    protected JointDist(double[][] classFeatureFreq) {
-        this.freqs = classFeatureFreq;
+    protected JointDistImpl(double[][] classFeatureFreq) {
+        this.frequencies = classFeatureFreq;
         xTotals = calcXDist(classFeatureFreq);
         yTotals = calcYDist(classFeatureFreq);
-        assert xTotals.getTotalFreq() == yTotals.getTotalFreq();
-        totalFreq = xTotals.getTotalFreq();
+        assert xTotals.getFrequencyTotal() == yTotals.getFrequencyTotal();
+        totalFreq = xTotals.getFrequencyTotal();
     }
 
     @Override
-    public EmpDist getXTotalsDist() {
+    public UniveriateDistributionImpl marginaliseOverY() {
         return xTotals;
     }
 
     @Override
-    public EmpDist getYTotalsDist() {
+    public UniveriateDistributionImpl marginaliseOverX() {
         return yTotals;
     }
 
-    public Dist1 getXWithYPresentDist(final int y) {
+
+
+    public DiscreteUnivariateDistribution getXWithYPresentDist(final int y) {
         return new AbstractDist1() {
 
             @Override
             public double getPresentFreq(int x) {
-                return freqs[x][y];
+                return frequencies[x][y];
             }
 
             @Override
@@ -54,12 +56,12 @@ public class JointDist implements Serializable, Dist2 {
         };
     }
 
-    public Dist1 getXWithYAbsentDist(final int y) {
+    public DiscreteUnivariateDistribution getXWithYAbsentDist(final int y) {
         return new AbstractDist1() {
 
             @Override
             public double getPresentFreq(int x) {
-                return xTotals.getPresentFreq(x) - freqs[x][y];
+                return xTotals.getPresentFreq(x) - frequencies[x][y];
             }
 
             @Override
@@ -70,12 +72,12 @@ public class JointDist implements Serializable, Dist2 {
         };
     }
 
-    public Dist1 getYWithXPresentDist(final int x) {
+    public DiscreteUnivariateDistribution getYWithXPresentDist(final int x) {
         return new AbstractDist1() {
 
             @Override
             public double getPresentFreq(int y) {
-                return freqs[x][y];
+                return frequencies[x][y];
             }
 
             @Override
@@ -87,12 +89,12 @@ public class JointDist implements Serializable, Dist2 {
     }
 
 
-    public Dist1 getYWithXAbsentDist(final int x) {
+    public DiscreteUnivariateDistribution getYWithXAbsentDist(final int x) {
         return new AbstractDist1() {
 
             @Override
             public double getPresentFreq(int y) {
-                return yTotals.getPresentFreq(y) - freqs[x][y];
+                return yTotals.getPresentFreq(y) - frequencies[x][y];
             }
 
             @Override
@@ -113,26 +115,26 @@ public class JointDist implements Serializable, Dist2 {
     }
 
     @Override
-    public double getXPresentWithYPresentFreq(int x, int y) {
-        return freqs[x][y];
+    public double getFrequency(int x, int y) {
+        return frequencies[x][y];
     }
 
     @Override
     public double getXPresentWithYAbsentFreq(int x, int y) {
-        return xTotals.getPresentFreq(x) - getXPresentWithYPresentFreq(x, y);
+        return xTotals.getPresentFreq(x) - getFrequency(x, y);
     }
 
     @Override
-    public double getXAbsentWithYPresentFreq(int x, int y) {
-        return yTotals.getPresentFreq(y) - getXPresentWithYPresentFreq(x, y);
+    public double getXAbsentAndYPresentFreq(int x, int y) {
+        return yTotals.getPresentFreq(y) - getFrequency(x, y);
     }
 
     @Override
-    public double getXAbsentWithYAbsentFreq(int x, int y) {
+    public double getFreqXAbsentAndYAbsent(int x, int y) {
         return getTotalFreq()
                 - xTotals.getPresentFreq(x)
                 - yTotals.getPresentFreq(y)
-                + getXPresentWithYPresentFreq(x, y);
+                + getFrequency(x, y);
     }
 
     /*
@@ -142,22 +144,22 @@ public class JointDist implements Serializable, Dist2 {
      */
     @Override
     public boolean isXPresentWithYPresent(int x, int y) {
-        return freqs[x][y] > 0;
+        return frequencies[x][y] > 0;
     }
 
     @Override
     public boolean isXPresentWithYAbsent(int x, int y) {
-        return xTotals.getPresentFreq(x) > getXPresentWithYPresentFreq(x, y);
+        return xTotals.getPresentFreq(x) > getFrequency(x, y);
     }
 
     @Override
     public boolean isXAbsentWithYPresent(int x, int y) {
-        return yTotals.getPresentFreq(y) > getXPresentWithYPresentFreq(x, y);
+        return yTotals.getPresentFreq(y) > getFrequency(x, y);
     }
 
     @Override
     public boolean isXAbsentWithYAbsent(int x, int y) {
-        return getTotalFreq() > getXPresentWithYPresentFreq(x, y);
+        return getTotalFreq() > getFrequency(x, y);
     }
 
     public boolean isEmpty() {
@@ -170,9 +172,9 @@ public class JointDist implements Serializable, Dist2 {
      * ========================================================================
      */
     @Override
-    public double getXPresentWithYPresentProb(int x, int y) {
+    public double getProbability(int x, int y) {
         return isEmpty() ? 0
-               : getXPresentWithYPresentFreq(x, y)
+               : getFrequency(x, y)
                 / getTotalFreq();
     }
 
@@ -186,14 +188,14 @@ public class JointDist implements Serializable, Dist2 {
     @Override
     public double getXAbsentWithYPresentProb(int x, int y) {
         return isEmpty() ? 0
-               : getXAbsentWithYPresentFreq(x, y)
+               : getXAbsentAndYPresentFreq(x, y)
                 / getTotalFreq();
     }
 
     @Override
     public double getXAbsentWithYAbsentProb(int x, int y) {
         return isEmpty() ? 0
-               : getXPresentWithYPresentFreq(x, y)
+               : getFrequency(x, y)
                 / getTotalFreq();
     }
     /*
@@ -202,23 +204,23 @@ public class JointDist implements Serializable, Dist2 {
      * ========================================================================
      */
 
-    public Dist1 getXGivenYPresentDist(final int y) {
+    public DiscreteUnivariateDistribution getXGivenYPresentDist(final int y) {
         return new AbstractDist1() {
 
             @Override
             public double getPresentFreq(int x) {
-                return getXPresentWithYPresentFreq(x, y);
+                return getFrequency(x, y);
             }
 
             @Override
             public double getTotalFreq() {
-                return getYTotalsDist().getPresentFreq(y);
+                return marginaliseOverX().getPresentFreq(y);
             }
 
         };
     }
 
-    public Dist1 getXGivenYAbsentDist(final int y) {
+    public DiscreteUnivariateDistribution getXGivenYAbsentDist(final int y) {
         return new AbstractDist1() {
 
             @Override
@@ -228,39 +230,39 @@ public class JointDist implements Serializable, Dist2 {
 
             @Override
             public double getTotalFreq() {
-                return getYTotalsDist().getAbsentFreq(y);
+                return marginaliseOverX().getAbsentFreq(y);
             }
 
         };
     }
 
-    public Dist1 getYGivenXPresentDist(final int x) {
+    public DiscreteUnivariateDistribution getYGivenXPresentDist(final int x) {
         return new AbstractDist1() {
 
             @Override
             public double getPresentFreq(int y) {
-                return getXPresentWithYPresentFreq(x, y);
+                return getFrequency(x, y);
             }
 
             @Override
             public double getTotalFreq() {
-                return getXTotalsDist().getPresentFreq(x);
+                return marginaliseOverY().getPresentFreq(x);
             }
 
         };
     }
 
-    public Dist1 getYGivenXAbsentDist(final int x) {
+    public DiscreteUnivariateDistribution getYGivenXAbsentDist(final int x) {
         return new AbstractDist1() {
 
             @Override
             public double getPresentFreq(int y) {
-                return getXAbsentWithYPresentFreq(x, y);
+                return getXAbsentAndYPresentFreq(x, y);
             }
 
             @Override
             public double getTotalFreq() {
-                return getXTotalsDist().getPresentFreq(x);
+                return marginaliseOverY().getPresentFreq(x);
             }
 
         };
@@ -312,7 +314,7 @@ public class JointDist implements Serializable, Dist2 {
 //               : getXAbsentWithYAbsentFreq(classId, featureId)
 //                / featureAbsantFreq(featureId);
 //    }
-//   
+//
     /*
      * ========================================================================
      * Entropy accessors and calculations
@@ -466,7 +468,7 @@ public class JointDist implements Serializable, Dist2 {
 //        return mi;
 //    }
 
-    private static EmpDist calcXDist(double[][] freqs) {
+    private static UniveriateDistributionImpl calcXDist(double[][] freqs) {
         final int N = freqs.length;
         final int M = freqs[0].length;
         final double[] xFreqs = new double[M];
@@ -475,10 +477,10 @@ public class JointDist implements Serializable, Dist2 {
                 xFreqs[i] += freqs[j][i];
             }
         }
-        return new EmpDist(xFreqs);
+        return new UniveriateDistributionImpl(xFreqs);
     }
 
-    private static EmpDist calcYDist(double[][] freqs) {
+    private static UniveriateDistributionImpl calcYDist(double[][] freqs) {
         final int N = freqs.length;
         final int M = freqs[0].length;
         final double[] yFreqs = new double[N];
@@ -487,7 +489,7 @@ public class JointDist implements Serializable, Dist2 {
                 yFreqs[j] += freqs[j][i];
             }
         }
-        return new EmpDist(yFreqs);
+        return new UniveriateDistributionImpl(yFreqs);
     }
 //
 //    private static double sum(double[] arr) {

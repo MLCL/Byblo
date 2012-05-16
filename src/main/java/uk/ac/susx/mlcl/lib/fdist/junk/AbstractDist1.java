@@ -8,7 +8,7 @@ package uk.ac.susx.mlcl.lib.fdist;
  *
  * @author hiam20
  */
-abstract class AbstractDist1 implements Dist1 {
+abstract class AbstractDist1 implements DiscreteUnivariateDistribution {
 
     @Override
     public double getPresentProb(int i) {
@@ -39,5 +39,5 @@ abstract class AbstractDist1 implements Dist1 {
     public double getAbsentFreq(int x) {
         return getTotalFreq() - getPresentFreq(x);
     }
-    
+
 }

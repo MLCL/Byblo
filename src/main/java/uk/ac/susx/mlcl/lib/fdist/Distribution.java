@@ -8,11 +8,13 @@ package uk.ac.susx.mlcl.lib.fdist;
  *
  * @author hiam20
  */
-public interface Dist0 {
+public interface Distribution {
 
-    double getTotalFreq();
+    /**
+     * Sum of the expected values across all valu
+     * @return
+     */
+    double getTotal();
 
-    boolean isEmpty();
 
-    
 }
