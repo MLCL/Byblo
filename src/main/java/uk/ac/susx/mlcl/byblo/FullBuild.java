@@ -47,6 +47,7 @@ import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
 import uk.ac.susx.mlcl.byblo.commands.IndexInstancesCommand;
 import uk.ac.susx.mlcl.byblo.commands.UnindexSimsCommand;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
+import uk.ac.susx.mlcl.byblo.measures.CrMi;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.commands.DoubleConverter;
@@ -138,6 +139,18 @@ public final class FullBuild extends AbstractCommand {
     @Parameter(names = {"-m", "--measure"},
     description = "Similarity measure to use.")
     private String measureName = "Lin";
+
+    @Parameter(names = {"--crmi-beta"},
+    description = "Beta paramter to Weed's CRMI measure.",
+    hidden = true,
+    converter = DoubleConverter.class)
+    private double crmiBeta = CrMi.DEFAULT_BETA;
+
+    @Parameter(names = {"--crmi-gamma"},
+    description = "Gamma paramter to Weed's CRMI measure.",
+    hidden = true,
+    converter = DoubleConverter.class)
+    private double crmiGamma = CrMi.DEFAULT_GAMMA;
 
     private static final int COUNT_MAX_CHUNK_SIZE = 500000;
 
@@ -360,6 +373,8 @@ public final class FullBuild extends AbstractCommand {
 
         allpairsCmd.setMeasureName(measureName);
         allpairsCmd.setMinSimilarity(minSimilarity);
+        allpairsCmd.setCrmiBeta(crmiBeta);
+        allpairsCmd.setCrmiGamma(crmiGamma);
 
         allpairsCmd.setEnumeratedEntries(true);
         allpairsCmd.setEnumeratedFeatures(true);
