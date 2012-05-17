@@ -40,8 +40,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     <packaging>jar</packaging>
 
     <scm>
-        <connection>scm:git://github.com/MLCL/Byblo.git</connection>
-        <developerConnection>scm:git@github.com:MLCL/Byblo.git</developerConnection>
+        <connection>scm:git:git://github.com/MLCL/Byblo.git</connection>
         <tag>HEAD</tag>
         <url>https://github.com/MLCL/Byblo</url>
     </scm>
@@ -111,14 +110,14 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
         <!-- The following dependancies aren't on the central repo. -->
         <dependency>
-            <groupId>uk.ac.susx.mlcl</groupId>
-            <artifactId>lib</artifactId>
-            <version>0.2-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>JDBM</groupId>
             <artifactId>JDBM</artifactId>
             <version>3.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mlcl-lib</artifactId>
+            <version>0.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

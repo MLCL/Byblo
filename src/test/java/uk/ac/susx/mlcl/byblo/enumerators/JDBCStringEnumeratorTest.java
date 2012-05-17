@@ -43,7 +43,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.lib.ZipfianDist;
+import uk.ac.susx.mlcl.lib.ZipfianDistribution;
 
 /**
  *
@@ -60,14 +60,14 @@ public class JDBCStringEnumeratorTest {
 
     static int repeats;
 
-    static ZipfianDist zipfDist;
+    static ZipfianDistribution zipfDist;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
         populationSize = 10000;
         zipfExponent = 1;
         repeats = 10000;
-        zipfDist = new ZipfianDist(populationSize, zipfExponent);
+        zipfDist = new ZipfianDistribution(populationSize, zipfExponent);
         new JDBCStringEnumeratorTest().performanceTest_JDBM_trans_mru100();
     }
 
