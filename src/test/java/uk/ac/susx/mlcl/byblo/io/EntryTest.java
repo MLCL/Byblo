@@ -44,7 +44,7 @@ import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
+import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
@@ -72,7 +72,7 @@ public class EntryTest {
         else
             bSink = WeightedTokenSink.open(b, DEFAULT_CHARSET, idx, false);
 
-        IOUtil.copy(aSrc, bSink);
+        ObjectIO.copy(aSrc, bSink);
         bSink.close();
     }
 
@@ -118,7 +118,7 @@ public class EntryTest {
                     a, DEFAULT_CHARSET, indel, false);
             WeightedTokenSink bSink = WeightedTokenSink.open(
                     b, DEFAULT_CHARSET, outdel, false);
-            IOUtil.copy(aSrc, bSink);
+            ObjectIO.copy(aSrc, bSink);
             bSink.close();
         }
 
@@ -130,7 +130,7 @@ public class EntryTest {
                     b, DEFAULT_CHARSET, outdel, false);
             WeightedTokenSink cSink = WeightedTokenSink.open(
                     c, DEFAULT_CHARSET, indel, false);
-            IOUtil.copy(bSrc, cSink);
+            ObjectIO.copy(bSrc, cSink);
             cSink.close();
         }
 

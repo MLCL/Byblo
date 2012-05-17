@@ -80,8 +80,8 @@ import uk.ac.susx.mlcl.lib.commands.FileDeligate;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
-import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.io.Source;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
@@ -288,7 +288,7 @@ public class AllPairsCommand extends AbstractCommand {
         // Create a sink object that will act as a recipient for all pairs that
         // are produced by the algorithm.
 
-        final Sink<Weighted<TokenPair>> sink = openSimsSink();
+        final ObjectSink<Weighted<TokenPair>> sink = openSimsSink();
 
         final NaiveApssTask apss = newAlgorithmInstance();
 
@@ -324,7 +324,7 @@ public class AllPairsCommand extends AbstractCommand {
         }
     }
 
-    public static double[] readAllAsArray(Source<Weighted<Token>> src) throws IOException {
+    public static double[] readAllAsArray(ObjectSource<Weighted<Token>> src) throws IOException {
 
         Int2DoubleMap entityFrequenciesMap = new Int2DoubleOpenHashMap();
         while (src.hasNext()) {

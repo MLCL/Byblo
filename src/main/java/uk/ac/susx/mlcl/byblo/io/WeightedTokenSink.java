@@ -41,7 +41,7 @@ import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 import uk.ac.susx.mlcl.lib.io.DataSink;
 import uk.ac.susx.mlcl.lib.io.Deltas;
 import uk.ac.susx.mlcl.lib.io.Enumerated;
-import uk.ac.susx.mlcl.lib.io.Sink;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.TSV;
 
 /**
@@ -78,7 +78,7 @@ import uk.ac.susx.mlcl.lib.io.TSV;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightedTokenSink implements Sink<Weighted<Token>>, Closeable, Flushable {
+public class WeightedTokenSink implements ObjectSink<Weighted<Token>>, Closeable, Flushable {
 
     private DataSink inner;
 

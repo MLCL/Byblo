@@ -33,14 +33,14 @@ package uk.ac.susx.mlcl.byblo.io;
 
 import java.io.IOException;
 import uk.ac.susx.mlcl.lib.io.CountingObjectSource;
-import uk.ac.susx.mlcl.lib.io.Source;
+import uk.ac.susx.mlcl.lib.io.ObjectSource;
 
 /**
  *
- * @param <T> 
+ * @param <T>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightStatsObjectSource<T> extends CountingObjectSource<Source<Weighted<T>>, Weighted<T>> {
+public class WeightStatsObjectSource<T> extends CountingObjectSource<ObjectSource<Weighted<T>>, Weighted<T>> {
 
     private double weightMin = Double.POSITIVE_INFINITY;
 
@@ -48,7 +48,7 @@ public class WeightStatsObjectSource<T> extends CountingObjectSource<Source<Weig
 
     private double weightSum = 0;
 
-    public WeightStatsObjectSource(Source<Weighted<T>> inner) {
+    public WeightStatsObjectSource(ObjectSource<Weighted<T>> inner) {
         super(inner);
     }
 

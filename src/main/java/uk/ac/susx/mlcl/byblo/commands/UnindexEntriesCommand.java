@@ -44,8 +44,8 @@ import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.io.Source;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.ObjectSource;
 
 /**
  *
@@ -76,13 +76,13 @@ public final class UnindexEntriesCommand extends AbstractCopyCommand<Weighted<To
     }
 
     @Override
-    protected Source<Weighted<Token>> openSource(File file)
+    protected ObjectSource<Weighted<Token>> openSource(File file)
             throws FileNotFoundException, IOException {
         return BybloIO.openEntriesSource(file, getCharset(), sourceIndexDeligate());
     }
 
     @Override
-    protected Sink<Weighted<Token>> openSink(File file)
+    protected ObjectSink<Weighted<Token>> openSink(File file)
             throws FileNotFoundException, IOException {
         return BybloIO.openEntriesSink(file, getCharset(), sinkIndexDeligate());
     }

@@ -36,8 +36,8 @@ import java.io.Flushable;
 import java.util.Comparator;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Comparators;
-import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.io.Source;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.ObjectSource;
 
 /**
  *
@@ -46,15 +46,15 @@ import uk.ac.susx.mlcl.lib.io.Source;
  */
 public final class ObjectMergeTask<T> extends AbstractTask {
 
-    private Source<T> sourceA;
+    private ObjectSource<T> sourceA;
 
-    private Source<T> sourceB;
+    private ObjectSource<T> sourceB;
 
-    private Sink<T> sink;
+    private ObjectSink<T> sink;
 
     private Comparator<T> comparator;
 
-    public ObjectMergeTask(Source<T> sourceA, Source<T> sourceB, Sink<T> sink,
+    public ObjectMergeTask(ObjectSource<T> sourceA, ObjectSource<T> sourceB, ObjectSink<T> sink,
                      Comparator<T> comparator) {
         setSourceA(sourceA);
         setSourceB(sourceB);
@@ -62,7 +62,7 @@ public final class ObjectMergeTask<T> extends AbstractTask {
         setComparator(comparator);
     }
 
-    public ObjectMergeTask(Source<T> sourceA, Source<T> sourceB, Sink<T> sink) {
+    public ObjectMergeTask(ObjectSource<T> sourceA, ObjectSource<T> sourceB, ObjectSink<T> sink) {
         setSourceA(sourceA);
         setSourceB(sourceB);
         setSink(sink);
@@ -82,29 +82,29 @@ public final class ObjectMergeTask<T> extends AbstractTask {
         this.comparator = comparator;
     }
 
-    public final Sink<T> getSink() {
+    public final ObjectSink<T> getSink() {
         return sink;
     }
 
-    public final void setSink(Sink<T> sink) {
+    public final void setSink(ObjectSink<T> sink) {
         Checks.checkNotNull(sink);
         this.sink = sink;
     }
 
-    public final Source<T> getSourceA() {
+    public final ObjectSource<T> getSourceA() {
         return sourceA;
     }
 
-    public final void setSourceA(Source<T> sourceA) {
+    public final void setSourceA(ObjectSource<T> sourceA) {
         Checks.checkNotNull(sourceA);
         this.sourceA = sourceA;
     }
 
-    public final Source<T> getSourceB() {
+    public final ObjectSource<T> getSourceB() {
         return sourceB;
     }
 
-    public final void setSourceB(Source<T> sourceB) {
+    public final void setSourceB(ObjectSource<T> sourceB) {
         Checks.checkNotNull(sourceB);
         this.sourceB = sourceB;
     }

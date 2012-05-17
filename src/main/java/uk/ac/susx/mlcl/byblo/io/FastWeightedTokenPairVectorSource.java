@@ -48,7 +48,7 @@ import uk.ac.susx.mlcl.lib.io.Compact;
 import uk.ac.susx.mlcl.lib.io.Deltas;
 import uk.ac.susx.mlcl.lib.io.Enumerated;
 import uk.ac.susx.mlcl.lib.io.SeekableDataSource;
-import uk.ac.susx.mlcl.lib.io.SeekableSource;
+import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.io.TSV;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
@@ -59,7 +59,7 @@ import uk.ac.susx.mlcl.lib.io.Tell;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class FastWeightedTokenPairVectorSource
-        implements SeekableSource<Indexed<SparseDoubleVector>, Tell> {
+        implements SeekableObjectSource<Indexed<SparseDoubleVector>, Tell> {
 
     private final SeekableDataSource inner;
 

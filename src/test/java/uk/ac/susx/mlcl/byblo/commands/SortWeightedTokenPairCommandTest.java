@@ -53,7 +53,6 @@ import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import uk.ac.susx.mlcl.lib.Comparators;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
 
 /**
@@ -151,7 +150,7 @@ public class SortWeightedTokenPairCommandTest {
 
         // load a weighted token pair file
         WeightedTokenPairSource inputSource = openSource(inputFile, idx);
-        List<Weighted<TokenPair>> list = IOUtil.readAll(inputSource);
+        List<Weighted<TokenPair>> list = ObjectIO.readAll(inputSource);
         inputSource.close();
 
         assertTrue("Input list is empty", list.size() > 0);
@@ -163,7 +162,7 @@ public class SortWeightedTokenPairCommandTest {
         // write to a temporary file
 
         WeightedTokenPairSink randomisedSink = openSink(randomisedFile, idx, false);
-        IOUtil.copy(list, randomisedSink);
+        ObjectIO.copy(list, randomisedSink);
         randomisedSink.flush();
         randomisedSink.close();
 
@@ -209,7 +208,7 @@ public class SortWeightedTokenPairCommandTest {
         // load the sorted output file and check it's sensible
 
         WeightedTokenPairSource sortedSource = openSource(sortedFile, idx);
-        List<Weighted<TokenPair>> sorted = IOUtil.readAll(sortedSource);
+        List<Weighted<TokenPair>> sorted = ObjectIO.readAll(sortedSource);
         inputSource.close();
 
 

@@ -46,14 +46,14 @@ import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.commands.FilePipeDelegate;
 import uk.ac.susx.mlcl.lib.io.Files;
-import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.io.Source;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.tasks.ObjectPipeTask;
 
 /**
  * Abstract super class for all tasks that require copying data from one file
  * to another.
- * 
+ *
  * @param <T>
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -114,8 +114,8 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand {
                     getFilesDeligate().getDestinationFile()));
         LOG.debug(MiscUtil.memoryInfoString());
 
-        Source<T> src = openSource(getFilesDeligate().getSourceFile());
-        Sink<T> snk = openSink(getFilesDeligate().getDestinationFile());
+        ObjectSource<T> src = openSource(getFilesDeligate().getSourceFile());
+        ObjectSink<T> snk = openSink(getFilesDeligate().getDestinationFile());
 
         ObjectPipeTask<T> task = new ObjectPipeTask<T>();
         task.setSource(src);
@@ -148,10 +148,10 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand {
                 add("files", getFilesDeligate());
     }
 
-    protected abstract Source<T> openSource(File file)
+    protected abstract ObjectSource<T> openSource(File file)
             throws FileNotFoundException, IOException;
 
-    protected abstract Sink<T> openSink(File file)
+    protected abstract ObjectSink<T> openSink(File file)
             throws FileNotFoundException, IOException;
 
 }

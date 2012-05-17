@@ -44,8 +44,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Comparators;
-import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.io.Source;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.tasks.ObjectSortTask;
 
 /**
@@ -111,8 +111,8 @@ public abstract class AbstractSortCommand<T> extends AbstractCopyCommand<T> {
             LOG.info("Running memory sort from \"" + getFilesDeligate().getSourceFile()
                     + "\" to \"" + getFilesDeligate().getDestinationFile() + "\".");
 
-        Source<T> src = openSource(getFilesDeligate().getSourceFile());
-        Sink<T> snk = openSink(getFilesDeligate().getDestinationFile());
+        ObjectSource<T> src = openSource(getFilesDeligate().getSourceFile());
+        ObjectSink<T> snk = openSink(getFilesDeligate().getDestinationFile());
 
         ObjectSortTask<T> task = new ObjectSortTask<T>();
         task.setComparator(getComparator());
@@ -146,11 +146,11 @@ public abstract class AbstractSortCommand<T> extends AbstractCopyCommand<T> {
     }
 
     @Override
-    protected abstract Source<T> openSource(File file)
+    protected abstract ObjectSource<T> openSource(File file)
             throws FileNotFoundException, IOException;
 
     @Override
-    protected abstract Sink<T> openSink(File file)
+    protected abstract ObjectSink<T> openSink(File file)
             throws FileNotFoundException, IOException;
 
 }

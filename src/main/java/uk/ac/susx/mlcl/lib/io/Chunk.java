@@ -42,7 +42,7 @@ import uk.ac.susx.mlcl.lib.Checks;
  * @param <T> The atomic type of items in this chunk
  */
 public final class Chunk<T> extends AbstractList<T>
-        implements SeekableSource<T, Integer>, Cloneable {
+        implements SeekableObjectSource<T, Integer>, Cloneable {
 
     private String name;
 

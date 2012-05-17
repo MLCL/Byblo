@@ -35,16 +35,16 @@ import java.io.Flushable;
 import java.io.IOException;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.io.Sink;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
 
 /**
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
- * @deprecated 
+ * @deprecated
  */
 @Deprecated
 public class WeightedTokenPairVectorSink
-        implements Sink<Indexed<SparseDoubleVector>>, Flushable, Closeable {
+        implements ObjectSink<Indexed<SparseDoubleVector>>, Flushable, Closeable {
 
     private final WeightedTokenPairSink inner;
 

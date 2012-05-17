@@ -44,8 +44,8 @@ import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.byblo.io.WeightSumReducerObjectSink;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.io.Source;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.ObjectSource;
 
 /**
  *
@@ -85,12 +85,12 @@ public final class MergeEntriesCommand extends AbstractMergeCommand<Weighted<Tok
     }
 
     @Override
-    protected Source<Weighted<Token>> openSource(File file) throws FileNotFoundException, IOException {
+    protected ObjectSource<Weighted<Token>> openSource(File file) throws FileNotFoundException, IOException {
         return BybloIO.openEntriesSource(file, getFileDeligate().getCharset(), indexDeligate);
     }
 
     @Override
-    protected Sink<Weighted<Token>> openSink(File file) throws FileNotFoundException, IOException {
+    protected ObjectSink<Weighted<Token>> openSink(File file) throws FileNotFoundException, IOException {
         return new WeightSumReducerObjectSink<Token>(
                 BybloIO.openEntriesSink(file, getFileDeligate().getCharset(), indexDeligate));
     }

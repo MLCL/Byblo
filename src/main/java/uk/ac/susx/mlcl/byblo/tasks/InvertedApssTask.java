@@ -45,8 +45,8 @@ import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
-import uk.ac.susx.mlcl.lib.io.SeekableSource;
+import uk.ac.susx.mlcl.lib.io.ObjectIO;
+import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 
 /**
  * An all-pairs similarity search implementation that improves efficiency by
@@ -107,7 +107,7 @@ public final class InvertedApssTask<S> extends NaiveApssTask<S> {
         }
         Collections.sort(pairs, Weighted.recordOrder(TokenPair.indexOrder()));
         synchronized (getSink()) {
-            IOUtil.copy(pairs, getSink());
+            ObjectIO.copy(pairs, getSink());
         }
         getSourceB().position(startB);
 
@@ -131,7 +131,7 @@ public final class InvertedApssTask<S> extends NaiveApssTask<S> {
 
     protected Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> buildIndex()
             throws IOException {
-        SeekableSource<? extends Indexed<SparseDoubleVector>, S> src = getSourceA();
+        SeekableObjectSource<? extends Indexed<SparseDoubleVector>, S> src = getSourceA();
         final Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> result =
                 new Int2ObjectOpenHashMap<Set<Indexed<SparseDoubleVector>>>();
         final S startA = src.position();

@@ -152,7 +152,7 @@ public final  class Enumerated {
     }
 
     static class SimpleSDSource<S extends SeekableDataSource>
-            extends SeekableDataSourceAdapter<S>
+            extends ForwardingSeekableDataSource<S>
             implements SeekableDataSource, Closeable {
 
         final Enumerator<String> enumerator;

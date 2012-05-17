@@ -43,8 +43,8 @@ import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.io.Source;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.ObjectSource;
 
 /**
  *
@@ -80,13 +80,13 @@ public class IndexInstancesCommand extends AbstractCopyCommand<TokenPair> {
     }
 
     @Override
-    protected Source<TokenPair> openSource(File file)
+    protected ObjectSource<TokenPair> openSource(File file)
             throws FileNotFoundException, IOException {
         return BybloIO.openInstancesSource(file, getCharset(), sourceIndexDeligate());
     }
 
     @Override
-    protected Sink<TokenPair> openSink(File file)
+    protected ObjectSink<TokenPair> openSink(File file)
             throws FileNotFoundException, IOException {
         return BybloIO.openInstancesSink(file, getCharset(), sinkIndexDeligate());
     }

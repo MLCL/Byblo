@@ -41,9 +41,9 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
-import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.io.Source;
+import uk.ac.susx.mlcl.lib.io.ObjectIO;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.ObjectSource;
 
 /**
  *
@@ -81,8 +81,8 @@ public class SortTaskTest {
 
         List<Integer> out = new ArrayList<Integer>();
 
-        Source<Integer> src = IOUtil.asSource(in);
-        Sink<Integer> sink = IOUtil.asSink(out);
+        ObjectSource<Integer> src = ObjectIO.asSource(in);
+        ObjectSink<Integer> sink = ObjectIO.asSink(out);
 
         Comparator<Integer> comparator = new Comparator<Integer>() {
 

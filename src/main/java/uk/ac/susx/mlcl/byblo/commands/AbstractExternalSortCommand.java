@@ -51,9 +51,9 @@ import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
 import uk.ac.susx.mlcl.lib.io.Chunk;
 import uk.ac.susx.mlcl.lib.io.Chunker;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
-import uk.ac.susx.mlcl.lib.io.SeekableSource;
-import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.io.Source;
+import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import uk.ac.susx.mlcl.lib.tasks.FileDeleteTask;
 import uk.ac.susx.mlcl.lib.tasks.FileMoveTask;
@@ -179,9 +179,9 @@ public abstract class AbstractExternalSortCommand<T>
 
         nextFileToMerge = new File[64];
 
-        final SeekableSource<T, ?> src = openSource(getFileDeligate().
+        final SeekableObjectSource<T, ?> src = openSource(getFileDeligate().
                 getSourceFile());
-        final Source<Chunk<T>> chunks = Chunker.newInstance(
+        final ObjectSource<Chunk<T>> chunks = Chunker.newInstance(
                 src, getMaxChunkSize());
 
         while (chunks.hasNext()) {
@@ -335,7 +335,7 @@ public abstract class AbstractExternalSortCommand<T>
     }
 
     protected ObjectSortTask<T> createSortTask(Chunk<T> chunk, File dst) throws IOException {
-        Sink<T> sink = openSink(dst);
+        ObjectSink<T> sink = openSink(dst);
         ObjectSortTask<T> task = new ObjectSortTask<T>();
         task.setSource(chunk);
         task.setSink(sink);
@@ -348,9 +348,9 @@ public abstract class AbstractExternalSortCommand<T>
     }
 
     protected ObjectMergeTask<T> createMergeTask(File srcA, File srcB, File dst) throws IOException {
-        Source<T> source1 = openSource(srcA);
-        Source<T> source2 = openSource(srcB);
-        Sink<T> sink = openSink(dst);
+        ObjectSource<T> source1 = openSource(srcA);
+        ObjectSource<T> source2 = openSource(srcB);
+        ObjectSink<T> sink = openSink(dst);
 
         ObjectMergeTask<T> mergeTask =
                 new ObjectMergeTask<T>(source1, source2, sink);
@@ -397,8 +397,8 @@ public abstract class AbstractExternalSortCommand<T>
         return fileDeligate.getDestinationFile();
     }
 
-    protected abstract SeekableSource<T, ?> openSource(File file) throws IOException;
+    protected abstract SeekableObjectSource<T, ?> openSource(File file) throws IOException;
 
-    protected abstract Sink<T> openSink(File file) throws IOException;
+    protected abstract ObjectSink<T> openSink(File file) throws IOException;
 
 }

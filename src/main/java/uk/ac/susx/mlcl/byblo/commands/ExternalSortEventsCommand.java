@@ -44,7 +44,7 @@ import uk.ac.susx.mlcl.byblo.io.WeightSumReducerObjectSink;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.io.Sink;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
 
 /**
  *
@@ -74,7 +74,7 @@ public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weigh
     }
 
     @Override
-    protected Sink<Weighted<TokenPair>> openSink(File file) throws IOException {
+    protected ObjectSink<Weighted<TokenPair>> openSink(File file) throws IOException {
         return new WeightSumReducerObjectSink<TokenPair>(BybloIO.openEventsSink(file, getCharset(), indexDeligate));
     }
 

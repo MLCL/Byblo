@@ -67,9 +67,9 @@ import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
 import uk.ac.susx.mlcl.lib.io.Chunk;
 import uk.ac.susx.mlcl.lib.io.Chunker;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
-import uk.ac.susx.mlcl.lib.io.SeekableSource;
-import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.io.Source;
+import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.io.Tell;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import uk.ac.susx.mlcl.lib.tasks.FileDeleteTask;
@@ -318,10 +318,10 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         BlockingQueue<File> chunkQueue = new ArrayBlockingQueue<File>(2);
 
 
-        final SeekableSource<TokenPair, Tell> src =
+        final SeekableObjectSource<TokenPair, Tell> src =
                 openInstancesSource(getInputFile());
 
-        final Source<Chunk<TokenPair>> chunks =
+        final ObjectSource<Chunk<TokenPair>> chunks =
                 Chunker.newInstance(src, getMaxChunkSize());
 
         while (chunks.hasNext()) {
@@ -497,15 +497,15 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
                : Weighted.recordOrder(TokenPair.stringOrder(indexDeligate));
     }
 
-    protected void submitCountTask(Source<TokenPair> instanceSource,
+    protected void submitCountTask(ObjectSource<TokenPair> instanceSource,
                                    File outEntries, File outFeatures,
                                    File outEvents) throws IOException, InterruptedException {
 
 
 //        Source<TokenPair> instanceSource = openInstancesSource(in);
-        Sink<Weighted<Token>> entrySink = openEntriesSink(outEntries);
-        Sink<Weighted<Token>> featureSink = openFeaturesSink(outFeatures);
-        Sink<Weighted<TokenPair>> eventsSink = openEventsSink(outEvents);
+        ObjectSink<Weighted<Token>> entrySink = openEntriesSink(outEntries);
+        ObjectSink<Weighted<Token>> featureSink = openFeaturesSink(outFeatures);
+        ObjectSink<Weighted<TokenPair>> eventsSink = openEventsSink(outEvents);
 
         CountTask task = new CountTask(
                 instanceSource, eventsSink, entrySink, featureSink,
@@ -533,8 +533,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         File srcFile = file;
         File dstFile = tempFileFactory.createFile("mrg.ent.", "");
 
-        Source<Weighted<Token>> src = openEntriesSource(srcFile);
-        Sink<Weighted<Token>> snk = openEntriesSink(dstFile);
+        ObjectSource<Weighted<Token>> src = openEntriesSource(srcFile);
+        ObjectSink<Weighted<Token>> snk = openEntriesSink(dstFile);
 
         ObjectSortTask<Weighted<Token>> task =
                 new ObjectSortTask<Weighted<Token>>(src, snk);
@@ -551,8 +551,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         File srcFile = file;
         File dstFile = tempFileFactory.createFile("mrg.feat.", "");
 
-        Source<Weighted<Token>> src = openFeaturesSource(srcFile);
-        Sink<Weighted<Token>> snk = openFeaturesSink(dstFile);
+        ObjectSource<Weighted<Token>> src = openFeaturesSource(srcFile);
+        ObjectSink<Weighted<Token>> snk = openFeaturesSink(dstFile);
 
         ObjectSortTask<Weighted<Token>> task =
                 new ObjectSortTask<Weighted<Token>>(src, snk);
@@ -569,8 +569,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         File srcFile = file;
         File dstFile = tempFileFactory.createFile("mrg.feat.", "");
 
-        Source<Weighted<TokenPair>> src = openEventsSource(srcFile);
-        Sink<Weighted<TokenPair>> snk = openEventsSink(dstFile);
+        ObjectSource<Weighted<TokenPair>> src = openEventsSource(srcFile);
+        ObjectSink<Weighted<TokenPair>> snk = openEventsSink(dstFile);
 
         ObjectSortTask<Weighted<TokenPair>> task =
                 new ObjectSortTask<Weighted<TokenPair>>(src, snk);
@@ -590,9 +590,9 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             File srcFileB = mergeEntryQueue.poll();
             File dstFile = tempFileFactory.createFile("mrg.ent.", "");
 
-            Source<Weighted<Token>> srcA = openEntriesSource(srcFileA);
-            Source<Weighted<Token>> srcB = openEntriesSource(srcFileB);
-            Sink<Weighted<Token>> snk = openEntriesSink(dstFile);
+            ObjectSource<Weighted<Token>> srcA = openEntriesSource(srcFileA);
+            ObjectSource<Weighted<Token>> srcB = openEntriesSource(srcFileB);
+            ObjectSink<Weighted<Token>> snk = openEntriesSink(dstFile);
 
             ObjectMergeTask<Weighted<Token>> task =
                     new ObjectMergeTask<Weighted<Token>>(srcA, srcB, snk);
@@ -618,9 +618,9 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             File srcFileB = mergeFeaturesQueue.poll();
             File dstFile = tempFileFactory.createFile("mrg.feat.", "");
 
-            Source<Weighted<Token>> srcA = openFeaturesSource(srcFileA);
-            Source<Weighted<Token>> srcB = openFeaturesSource(srcFileB);
-            Sink<Weighted<Token>> snk = openFeaturesSink(dstFile);
+            ObjectSource<Weighted<Token>> srcA = openFeaturesSource(srcFileA);
+            ObjectSource<Weighted<Token>> srcB = openFeaturesSource(srcFileB);
+            ObjectSink<Weighted<Token>> snk = openFeaturesSink(dstFile);
 
             ObjectMergeTask<Weighted<Token>> task =
                     new ObjectMergeTask<Weighted<Token>>(srcA, srcB, snk);
@@ -645,9 +645,9 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             File srcFileB = mergeEntryFeatureQueue.poll();
             File dstFile = tempFileFactory.createFile("mrg.evnt.", "");
 
-            Source<Weighted<TokenPair>> srcA = openEventsSource(srcFileA);
-            Source<Weighted<TokenPair>> srcB = openEventsSource(srcFileB);
-            Sink<Weighted<TokenPair>> snk = openEventsSink(dstFile);
+            ObjectSource<Weighted<TokenPair>> srcA = openEventsSource(srcFileA);
+            ObjectSource<Weighted<TokenPair>> srcB = openEventsSource(srcFileB);
+            ObjectSink<Weighted<TokenPair>> snk = openEventsSink(dstFile);
 
             ObjectMergeTask<Weighted<TokenPair>> task =
                     new ObjectMergeTask<Weighted<TokenPair>>(srcA, srcB, snk);
@@ -667,22 +667,22 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         }
     }
 
-    protected SeekableSource<Weighted<Token>, Tell> openEntriesSource(File file)
+    protected SeekableObjectSource<Weighted<Token>, Tell> openEntriesSource(File file)
             throws FileNotFoundException, IOException {
         return BybloIO.openEntriesSource(file, getCharset(), indexDeligate);
     }
 
-    protected Sink<Weighted<Token>> openEntriesSink(File file) throws FileNotFoundException, IOException {
+    protected ObjectSink<Weighted<Token>> openEntriesSink(File file) throws FileNotFoundException, IOException {
         return new WeightSumReducerObjectSink<Token>(
                 BybloIO.openEntriesSink(file, getCharset(), indexDeligate));
     }
 
-    protected SeekableSource<Weighted<Token>, Tell> openFeaturesSource(File file)
+    protected SeekableObjectSource<Weighted<Token>, Tell> openFeaturesSource(File file)
             throws FileNotFoundException, IOException {
         return BybloIO.openFeaturesSource(file, getCharset(), indexDeligate);
     }
 
-    protected Sink<Weighted<Token>> openFeaturesSink(File file) throws FileNotFoundException, IOException {
+    protected ObjectSink<Weighted<Token>> openFeaturesSink(File file) throws FileNotFoundException, IOException {
         return new WeightSumReducerObjectSink<Token>(
                 BybloIO.openFeaturesSink(file, getCharset(), indexDeligate));
     }
@@ -692,17 +692,17 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         return BybloIO.openEventsSource(file, getCharset(), indexDeligate);
     }
 
-    protected Sink<Weighted<TokenPair>> openEventsSink(File file)
+    protected ObjectSink<Weighted<TokenPair>> openEventsSink(File file)
             throws FileNotFoundException, IOException {
         return new WeightSumReducerObjectSink<TokenPair>(
                 BybloIO.openEventsSink(file, getCharset(), indexDeligate));
     }
 
-    protected SeekableSource<TokenPair, Tell> openInstancesSource(File file) throws FileNotFoundException, IOException {
+    protected SeekableObjectSource<TokenPair, Tell> openInstancesSource(File file) throws FileNotFoundException, IOException {
         return BybloIO.openInstancesSource(file, getCharset(), indexDeligate);
     }
 
-    protected Sink<TokenPair> openInstancesSink(File file) throws FileNotFoundException, IOException {
+    protected ObjectSink<TokenPair> openInstancesSink(File file) throws FileNotFoundException, IOException {
         return BybloIO.openInstancesSink(file, getCharset(), indexDeligate);
     }
 

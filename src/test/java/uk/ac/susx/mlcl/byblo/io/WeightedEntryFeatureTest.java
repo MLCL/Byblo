@@ -51,7 +51,7 @@ import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.byblo.enumerators.MemoryBasedStringEnumerator;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
+import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
@@ -69,7 +69,7 @@ public class WeightedEntryFeatureTest {
         WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
                 b, DEFAULT_CHARSET, del, false, false, compact);
 
-        IOUtil.copy(aSrc, bSink);
+        ObjectIO.copy(aSrc, bSink);
         bSink.close();
     }
 
@@ -81,7 +81,7 @@ public class WeightedEntryFeatureTest {
                 WeightedTokenPairSource.open(
                 a, DEFAULT_CHARSET, del, false, false));
 
-        List<Indexed<SparseDoubleVector>> list = IOUtil.readAll(aSrc);
+        List<Indexed<SparseDoubleVector>> list = ObjectIO.readAll(aSrc);
         Collections.sort(list);
 
         FastWeightedTokenPairVectorSink bSink = FastWeightedTokenPairVectorSink.open(
@@ -90,7 +90,7 @@ public class WeightedEntryFeatureTest {
 //        WeightedTokenPairVectorSink bSink = new WeightedTokenPairVectorSink(
 //                tmp);
 
-        IOUtil.copy(list, bSink);
+        ObjectIO.copy(list, bSink);
 
         bSink.close();
     }
@@ -234,7 +234,7 @@ public class WeightedEntryFeatureTest {
             WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
                     b, DEFAULT_CHARSET, outdel, false, false, false);
 //            bSink.setCompactFormatEnabled(false);
-            IOUtil.copy(aSrc, bSink);
+            ObjectIO.copy(aSrc, bSink);
             bSink.close();
         }
 
@@ -247,7 +247,7 @@ public class WeightedEntryFeatureTest {
             WeightedTokenPairSink cSink = WeightedTokenPairSink.open(
                     c, DEFAULT_CHARSET, indel, false, false, false);
 //            cSink.setCompactFormatEnabled(false);
-            IOUtil.copy(bSrc, cSink);
+            ObjectIO.copy(bSrc, cSink);
             cSink.close();
         }
 
@@ -281,7 +281,7 @@ public class WeightedEntryFeatureTest {
             WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
                     b, DEFAULT_CHARSET, outdel, false, false, true);
 //            bSink.setCompactFormatEnabled(true);
-            IOUtil.copy(aSrc, bSink);
+            ObjectIO.copy(aSrc, bSink);
             bSink.close();
         }
 
@@ -294,7 +294,7 @@ public class WeightedEntryFeatureTest {
             WeightedTokenPairSink cSink = WeightedTokenPairSink.open(
                     c, DEFAULT_CHARSET, indel, false, false, false);
 //            cSink.setCompactFormatEnabled(false);
-            IOUtil.copy(bSrc, cSink);
+            ObjectIO.copy(bSrc, cSink);
             cSink.close();
         }
 
@@ -325,7 +325,7 @@ public class WeightedEntryFeatureTest {
 
             WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
                     b, DEFAULT_CHARSET, outdel,true,true, true);
-            IOUtil.copy(aSrc, bSink);
+            ObjectIO.copy(aSrc, bSink);
             bSink.close();
         }
 
@@ -338,7 +338,7 @@ public class WeightedEntryFeatureTest {
             WeightedTokenPairSink cSink = WeightedTokenPairSink.open(
                     c, DEFAULT_CHARSET, indel, false, false,
                     false);
-            IOUtil.copy(bSrc, cSink);
+            ObjectIO.copy(bSrc, cSink);
             cSink.close();
         }
 

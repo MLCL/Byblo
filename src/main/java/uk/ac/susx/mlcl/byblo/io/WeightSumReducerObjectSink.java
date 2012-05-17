@@ -33,7 +33,7 @@ package uk.ac.susx.mlcl.byblo.io;
 
 import java.io.IOException;
 import uk.ac.susx.mlcl.lib.io.ForwardingObjectSink;
-import uk.ac.susx.mlcl.lib.io.Sink;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
 
 /**
  *
@@ -41,13 +41,13 @@ import uk.ac.susx.mlcl.lib.io.Sink;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class WeightSumReducerObjectSink<T>
-        extends ForwardingObjectSink<Sink<Weighted<T>>, Weighted<T>> {
+        extends ForwardingObjectSink<ObjectSink<Weighted<T>>, Weighted<T>> {
 
     private T currentRecord = null;
 
     private double weightSum = 0;
 
-    public WeightSumReducerObjectSink(Sink<Weighted<T>> inner) {
+    public WeightSumReducerObjectSink(ObjectSink<Weighted<T>> inner) {
         super(inner);
     }
 

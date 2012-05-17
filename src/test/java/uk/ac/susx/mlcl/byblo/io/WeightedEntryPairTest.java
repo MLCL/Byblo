@@ -41,7 +41,7 @@ import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.byblo.enumerators.MemoryBasedStringEnumerator;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
+import uk.ac.susx.mlcl.lib.io.ObjectIO;
 
 /**
  *
@@ -61,7 +61,7 @@ public class WeightedEntryPairTest {
                 b, DEFAULT_CHARSET, del, false, false, compact);
 //        bSink.setCompactFormatEnabled(compact);
 
-        IOUtil.copy(aSrc, bSink);
+        ObjectIO.copy(aSrc, bSink);
         bSink.close();
     }
 
@@ -104,7 +104,7 @@ public class WeightedEntryPairTest {
                     a, DEFAULT_CHARSET, del, false, false);
             WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
                     b, DEFAULT_CHARSET, del, false, false, true);
-            IOUtil.copy(aSrc, bSink);
+            ObjectIO.copy(aSrc, bSink);
             bSink.close();
         }
 
@@ -116,7 +116,7 @@ public class WeightedEntryPairTest {
                     b, DEFAULT_CHARSET, del, false, false);
             WeightedTokenPairSink cSink = WeightedTokenPairSink.open(
                     c, DEFAULT_CHARSET, del, false, false, true);
-            IOUtil.copy(bSrc, cSink);
+            ObjectIO.copy(bSrc, cSink);
             cSink.close();
         }
 

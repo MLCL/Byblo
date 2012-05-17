@@ -35,8 +35,8 @@ import java.io.Flushable;
 import java.io.IOException;
 import java.io.Serializable;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.io.Source;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.ObjectSource;
 
 /**
  * @param <T>
@@ -46,11 +46,11 @@ public class ObjectPipeTask<T> extends AbstractTask implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Source<T> source;
+    private ObjectSource<T> source;
 
-    private Sink<T> sink;
+    private ObjectSink<T> sink;
 
-    public ObjectPipeTask(Source<T> source, Sink<T> sink) {
+    public ObjectPipeTask(ObjectSource<T> source, ObjectSink<T> sink) {
         setSource(source);
         setSink(sink);
     }
@@ -58,20 +58,20 @@ public class ObjectPipeTask<T> extends AbstractTask implements Serializable {
     public ObjectPipeTask() {
     }
 
-    public final Sink<T> getSink() {
+    public final ObjectSink<T> getSink() {
         return sink;
     }
 
-    public final void setSink(Sink<T> sink) {
+    public final void setSink(ObjectSink<T> sink) {
         Checks.checkNotNull("sink", sink);
         this.sink = sink;
     }
 
-    public final Source<T> getSource() {
+    public final ObjectSource<T> getSource() {
         return source;
     }
 
-    public final void setSource(Source<T> source) {
+    public final void setSource(ObjectSource<T> source) {
         Checks.checkNotNull("source", source);
         this.source = source;
     }

@@ -51,8 +51,8 @@ import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.Chunk;
 import uk.ac.susx.mlcl.lib.io.Chunker;
-import uk.ac.susx.mlcl.lib.io.SeekableSource;
-import uk.ac.susx.mlcl.lib.io.Sink;
+import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.tasks.Task;
 
 /**
@@ -84,9 +84,9 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
     private Semaphore throttle;
 
     public ThreadedApssTask(
-            SeekableSource<Indexed<SparseDoubleVector>, S> A,
-            SeekableSource<Indexed<SparseDoubleVector>, S> B,
-            Sink<Weighted<TokenPair>> sink) {
+            SeekableObjectSource<Indexed<SparseDoubleVector>, S> A,
+            SeekableObjectSource<Indexed<SparseDoubleVector>, S> B,
+            ObjectSink<Weighted<TokenPair>> sink) {
         super(A, B, sink);
         setNumThreads(DEFAULT_NUM_THREADS);
     }
@@ -132,13 +132,13 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
         if (LOG.isTraceEnabled()) {
             LOG.trace("Initialising chunker A.");
         }
-        SeekableSource<Chunk<Indexed<SparseDoubleVector>>, S> chunkerA =
+        SeekableObjectSource<Chunk<Indexed<SparseDoubleVector>>, S> chunkerA =
                 Chunker.newSeekableInstance(getSourceA(), maxChunkSize);
 
         if (LOG.isTraceEnabled()) {
             LOG.trace("Initialising chunker B.");
         }
-        SeekableSource<Chunk<Indexed<SparseDoubleVector>>, S> chunkerB =
+        SeekableObjectSource<Chunk<Indexed<SparseDoubleVector>>, S> chunkerB =
                 Chunker.newSeekableInstance(getSourceB(), maxChunkSize);
 
         int nChunks = 0;

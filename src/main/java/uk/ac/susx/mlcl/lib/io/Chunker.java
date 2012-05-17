@@ -42,8 +42,8 @@ import uk.ac.susx.mlcl.lib.Checks;
  * @param <T> The atomic data type
  * @param <S>
  */
-public class Chunker<T, S extends Source<T>>
-        implements Source<Chunk<T>>, Closeable {
+public class Chunker<T, S extends ObjectSource<T>>
+        implements ObjectSource<Chunk<T>>, Closeable {
 
     private static final int DEFAULT_MAX_CHUNK_SIZE = 1000;
 
@@ -56,14 +56,14 @@ public class Chunker<T, S extends Source<T>>
         this.maxChunkSize = maxChunkSize;
     }
 
-    public static <T> Source<Chunk<T>> newInstance(
-            Source<T> source, int maxChunkSize) {
-        return new Chunker<T, Source<T>>(source, maxChunkSize);
+    public static <T> ObjectSource<Chunk<T>> newInstance(
+            ObjectSource<T> source, int maxChunkSize) {
+        return new Chunker<T, ObjectSource<T>>(source, maxChunkSize);
     }
 
-    public static <T, P> SeekableSource<Chunk<T>, P> newSeekableInstance(
-            SeekableSource<T, P> source, int maxChunkSize) {
-        return new SeekableChunker<T, P, SeekableSource<T, P>>(
+    public static <T, P> SeekableObjectSource<Chunk<T>, P> newSeekableInstance(
+            SeekableObjectSource<T, P> source, int maxChunkSize) {
+        return new SeekableChunker<T, P, SeekableObjectSource<T, P>>(
                 source, maxChunkSize);
     }
 
@@ -113,9 +113,9 @@ public class Chunker<T, S extends Source<T>>
                 add("inner", inner);
     }
 
-    public static class SeekableChunker<T, P, S extends SeekableSource<T, P>>
+    public static class SeekableChunker<T, P, S extends SeekableObjectSource<T, P>>
             extends Chunker<T, S>
-            implements SeekableSource<Chunk<T>, P> {
+            implements SeekableObjectSource<Chunk<T>, P> {
 
         public SeekableChunker(S inner, int maxChunkSize) {
             super(inner, maxChunkSize);

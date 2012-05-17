@@ -40,8 +40,8 @@ import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.io.SeekableSource;
-import uk.ac.susx.mlcl.lib.io.Sink;
+import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
@@ -74,12 +74,12 @@ public class ExternalSortInstancesCommand extends AbstractExternalSortCommand<To
     }
 
     @Override
-    protected Sink<TokenPair> openSink(File file) throws IOException {
+    protected ObjectSink<TokenPair> openSink(File file) throws IOException {
         return BybloIO.openInstancesSink(file, getCharset(), indexDeligate);
     }
 
     @Override
-    protected SeekableSource<TokenPair, Tell> openSource(File file) throws IOException {
+    protected SeekableObjectSource<TokenPair, Tell> openSource(File file) throws IOException {
         return BybloIO.openInstancesSource(file, getCharset(), indexDeligate);
     }
 

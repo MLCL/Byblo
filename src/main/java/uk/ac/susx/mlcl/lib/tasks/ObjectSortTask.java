@@ -40,9 +40,9 @@ import java.util.Comparator;
 import java.util.List;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Comparators;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
-import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.io.Source;
+import uk.ac.susx.mlcl.lib.io.ObjectIO;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.ObjectSource;
 
 /**
  *
@@ -55,12 +55,12 @@ public final class ObjectSortTask<T> extends ObjectPipeTask<T> {
 
     private Comparator<T> comparator;
 
-    public ObjectSortTask(Source<T> source, Sink<T> sink, Comparator<T> comparator) {
+    public ObjectSortTask(ObjectSource<T> source, ObjectSink<T> sink, Comparator<T> comparator) {
         super(source, sink);
         setComparator(comparator);
     }
 
-    public ObjectSortTask(Source<T> source, Sink<T> sink) {
+    public ObjectSortTask(ObjectSource<T> source, ObjectSink<T> sink) {
         super(source, sink);
         setComparator(Comparators.<T>naturalOrderIfPossible());
     }
@@ -114,14 +114,14 @@ public final class ObjectSortTask<T> extends ObjectPipeTask<T> {
     @Override
     protected void runTask() throws IOException {
 
-        final List<T> items = IOUtil.readAll(getSource());
+        final List<T> items = ObjectIO.readAll(getSource());
 
         if (getSource() instanceof Closeable)
             ((Closeable) getSource()).close();
 
         Collections.sort(items, getComparator());
 
-        int i = IOUtil.copy(items, getSink());
+        long i = ObjectIO.copy(items, getSink());
         assert i == items.size();
 
         if (getSink() instanceof Flushable)

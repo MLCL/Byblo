@@ -48,9 +48,9 @@ import uk.ac.susx.mlcl.byblo.measures.Proximity;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
-import uk.ac.susx.mlcl.lib.io.SeekableSource;
-import uk.ac.susx.mlcl.lib.io.Sink;
+import uk.ac.susx.mlcl.lib.io.ObjectIO;
+import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 
 /**
@@ -71,13 +71,13 @@ public class NaiveApssTask<P> extends AbstractTask {
      */
     public static final Proximity DEFAULT_MEASURE = new Jaccard();
 
-    private SeekableSource<Indexed<SparseDoubleVector>, P> sourceA;
+    private SeekableObjectSource<Indexed<SparseDoubleVector>, P> sourceA;
 
-    private SeekableSource<Indexed<SparseDoubleVector>, P> sourceB;
+    private SeekableObjectSource<Indexed<SparseDoubleVector>, P> sourceB;
 
     private Proximity measure = DEFAULT_MEASURE;
 
-    private Sink<Weighted<TokenPair>> sink;
+    private ObjectSink<Weighted<TokenPair>> sink;
 
     /**
      * Filters that determine which feature vectors are considered.
@@ -111,9 +111,9 @@ public class NaiveApssTask<P> extends AbstractTask {
      * @param sink
      */
     public NaiveApssTask(
-            SeekableSource<Indexed<SparseDoubleVector>, P> Q,
-            SeekableSource<Indexed<SparseDoubleVector>, P> R,
-            Sink<Weighted<TokenPair>> sink) {
+            SeekableObjectSource<Indexed<SparseDoubleVector>, P> Q,
+            SeekableObjectSource<Indexed<SparseDoubleVector>, P> R,
+            ObjectSink<Weighted<TokenPair>> sink) {
         setSourceA(Q);
         setSourceB(R);
         setSink(sink);
@@ -154,7 +154,7 @@ public class NaiveApssTask<P> extends AbstractTask {
     }
 
     public final void setSourceA(
-            SeekableSource<Indexed<SparseDoubleVector>, P> A) {
+            SeekableObjectSource<Indexed<SparseDoubleVector>, P> A) {
         if (A == null) {
             throw new NullPointerException("sourceA is null");
         }
@@ -165,7 +165,7 @@ public class NaiveApssTask<P> extends AbstractTask {
     }
 
     public final void setSourceB(
-            SeekableSource<Indexed<SparseDoubleVector>, P> B) {
+            SeekableObjectSource<Indexed<SparseDoubleVector>, P> B) {
         if (B == null) {
             throw new NullPointerException("sourceB is null");
         }
@@ -175,11 +175,11 @@ public class NaiveApssTask<P> extends AbstractTask {
         this.sourceB = B;
     }
 
-    protected final SeekableSource<Indexed<SparseDoubleVector>, P> getSourceA() {
+    protected final SeekableObjectSource<Indexed<SparseDoubleVector>, P> getSourceA() {
         return sourceA;
     }
 
-    protected final SeekableSource<Indexed<SparseDoubleVector>, P> getSourceB() {
+    protected final SeekableObjectSource<Indexed<SparseDoubleVector>, P> getSourceB() {
         return sourceB;
     }
 
@@ -194,11 +194,11 @@ public class NaiveApssTask<P> extends AbstractTask {
         this.measure = measure;
     }
 
-    public final Sink<Weighted<TokenPair>> getSink() {
+    public final ObjectSink<Weighted<TokenPair>> getSink() {
         return sink;
     }
 
-    public final void setSink(Sink<Weighted<TokenPair>> sink) {
+    public final void setSink(ObjectSink<Weighted<TokenPair>> sink) {
         if (sink == null) {
             throw new NullPointerException("handler == null");
         }
@@ -247,7 +247,7 @@ public class NaiveApssTask<P> extends AbstractTask {
         }
         Collections.sort(pairs, Weighted.recordOrder(TokenPair.indexOrder()));
         synchronized (getSink()) {
-            IOUtil.copy(pairs, getSink());
+            ObjectIO.copy(pairs, getSink());
         }
     }
 

@@ -44,7 +44,7 @@ import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairVectorSource;
 import uk.ac.susx.mlcl.byblo.measures.Jaccard;
 import uk.ac.susx.mlcl.byblo.measures.Proximity;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
+import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
@@ -81,7 +81,7 @@ public class NaiveApssTaskTest {
 
         instance.setSourceA(vsa);
         instance.setSourceB(vsb);
-        instance.setSink(IOUtil.asSink(result));
+        instance.setSink(ObjectIO.asSink(result));
         instance.setMeasure(MEASURE);
         instance.setProducatePair(PAIR_FILTER);
 

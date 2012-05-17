@@ -45,9 +45,9 @@ import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
-import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.io.Source;
+import uk.ac.susx.mlcl.lib.io.ObjectIO;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 
 /**
@@ -60,13 +60,13 @@ public final class CountTask extends AbstractTask implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Source<TokenPair> source;
+    private ObjectSource<TokenPair> source;
 
-    private Sink<Weighted<TokenPair>> eventSink;
+    private ObjectSink<Weighted<TokenPair>> eventSink;
 
-    private Sink<Weighted<Token>> entrySink;
+    private ObjectSink<Weighted<Token>> entrySink;
 
-    private Sink<Weighted<Token>> featureSink;
+    private ObjectSink<Weighted<Token>> featureSink;
 
     private Comparator<Weighted<TokenPair>> eventComparator;
 
@@ -75,10 +75,10 @@ public final class CountTask extends AbstractTask implements Serializable {
     private Comparator<Weighted<Token>> featureComparator;
 
     public CountTask(
-            Source<TokenPair> source,
-            Sink<Weighted<TokenPair>> eventSink,
-            Sink<Weighted<Token>> entrySink,
-            Sink<Weighted<Token>> featureSink,
+            ObjectSource<TokenPair> source,
+            ObjectSink<Weighted<TokenPair>> eventSink,
+            ObjectSink<Weighted<Token>> entrySink,
+            ObjectSink<Weighted<Token>> featureSink,
             Comparator<Weighted<TokenPair>> eventComparator,
             Comparator<Weighted<Token>> entryComparator,
             Comparator<Weighted<Token>> featureComparator) {
@@ -91,38 +91,38 @@ public final class CountTask extends AbstractTask implements Serializable {
         setFeatureComparator(featureComparator);
     }
 
-    public final Sink<Weighted<Token>> getEntrySink() {
+    public final ObjectSink<Weighted<Token>> getEntrySink() {
         return entrySink;
     }
 
-    public final void setEntrySink(Sink<Weighted<Token>> entrySink) {
+    public final void setEntrySink(ObjectSink<Weighted<Token>> entrySink) {
         Checks.checkNotNull("entrySink", entrySink);
         this.entrySink = entrySink;
     }
 
-    public final Sink<Weighted<TokenPair>> getEventSink() {
+    public final ObjectSink<Weighted<TokenPair>> getEventSink() {
         return eventSink;
     }
 
-    public final void setEventSink(Sink<Weighted<TokenPair>> eventSink) {
+    public final void setEventSink(ObjectSink<Weighted<TokenPair>> eventSink) {
         Checks.checkNotNull("eventSink", eventSink);
         this.eventSink = eventSink;
     }
 
-    public final Sink<Weighted<Token>> getFeatureSink() {
+    public final ObjectSink<Weighted<Token>> getFeatureSink() {
         return featureSink;
     }
 
-    public final void setFeatureSink(Sink<Weighted<Token>> featureSink) {
+    public final void setFeatureSink(ObjectSink<Weighted<Token>> featureSink) {
         Checks.checkNotNull("featureSink", featureSink);
         this.featureSink = featureSink;
     }
 
-    public final Source<TokenPair> getSource() {
+    public final ObjectSource<TokenPair> getSource() {
         return source;
     }
 
-    public final void setSource(Source<TokenPair> source) {
+    public final void setSource(ObjectSource<TokenPair> source) {
         Checks.checkNotNull("source", source);
         this.source = source;
     }
@@ -196,14 +196,14 @@ public final class CountTask extends AbstractTask implements Serializable {
 
         List<Weighted<Token>> entries = int2IntMapToWeightedTokens(entryFreq);
         Collections.sort(entries, getEntryComparator());
-        IOUtil.copy(entries, getEntrySink());
+        ObjectIO.copy(entries, getEntrySink());
         if (getEntrySink() instanceof Flushable)
             ((Flushable) getEntrySink()).flush();
 
 
         List<Weighted<Token>> features = int2IntMapToWeightedTokens(featureFreq);
         Collections.sort(features, getFeatureComparator());
-        IOUtil.copy(features, getFeatureSink());
+        ObjectIO.copy(features, getFeatureSink());
         if (getFeatureSink() instanceof Flushable)
             ((Flushable) getFeatureSink()).flush();
 
@@ -211,7 +211,7 @@ public final class CountTask extends AbstractTask implements Serializable {
 
         List<Weighted<TokenPair>> events = obj2intmapToWeightedObjList(entryFeatureFreq);
         Collections.sort(events, getEventComparator());
-        IOUtil.copy(events, getEventSink());
+        ObjectIO.copy(events, getEventSink());
         if (getEventSink() instanceof Flushable)
             ((Flushable) getEventSink()).flush();
 

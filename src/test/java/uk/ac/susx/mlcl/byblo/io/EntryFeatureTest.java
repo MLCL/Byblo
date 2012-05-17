@@ -45,7 +45,7 @@ import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
+import uk.ac.susx.mlcl.lib.io.ObjectIO;
 
 /**
  *
@@ -78,7 +78,7 @@ public class EntryFeatureTest {
                 a, DEFAULT_CHARSET, idx, false, false);
         TokenPairSink sink = TokenPairSink.open(
                 b, DEFAULT_CHARSET, idx, compact, false, false);
-        IOUtil.copy(src, sink);
+        ObjectIO.copy(src, sink);
         sink.close();
     }
 
@@ -127,7 +127,7 @@ public class EntryFeatureTest {
 
             TokenPairSink bSink = TokenPairSink.open(
                     b, DEFAULT_CHARSET, outdel, true, true, true);
-            IOUtil.copy(aSrc, bSink);
+            ObjectIO.copy(aSrc, bSink);
 
             indel.saveEntriesEnumerator();
 
@@ -143,7 +143,7 @@ public class EntryFeatureTest {
             TokenPairSink cSink = TokenPairSink.open(
                     c, DEFAULT_CHARSET, indel,
                     false, false, false);
-            IOUtil.copy(bSrc, cSink);
+            ObjectIO.copy(bSrc, cSink);
             cSink.close();
         }
 

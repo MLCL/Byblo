@@ -41,7 +41,7 @@ import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.byblo.enumerators.MemoryBasedStringEnumerator;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
+import uk.ac.susx.mlcl.lib.io.ObjectIO;
 
 /**
  *
@@ -59,7 +59,7 @@ public class FeatureTest {
         WeightedTokenSink bSink = WeightedTokenSink.open(
                 b, DEFAULT_CHARSET, del, false);
 
-        IOUtil.copy(aSrc, bSink);
+        ObjectIO.copy(aSrc, bSink);
         bSink.close();
     }
 
@@ -104,7 +104,7 @@ public class FeatureTest {
                     a, DEFAULT_CHARSET, indel, false);
             WeightedTokenSink bSink = WeightedTokenSink.open(
                     b, DEFAULT_CHARSET, outdel, false);
-            IOUtil.copy(aSrc, bSink);
+            ObjectIO.copy(aSrc, bSink);
             bSink.close();
         }
 
@@ -116,7 +116,7 @@ public class FeatureTest {
                     b, DEFAULT_CHARSET, outdel, false);
             WeightedTokenSink cSink = WeightedTokenSink.open(
                     c, DEFAULT_CHARSET, indel, false);
-            IOUtil.copy(bSrc, cSink);
+            ObjectIO.copy(bSrc, cSink);
             cSink.close();
         }
 

@@ -57,7 +57,7 @@ import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
 import uk.ac.susx.mlcl.lib.io.Files;
-import uk.ac.susx.mlcl.lib.io.IOUtil;
+import uk.ac.susx.mlcl.lib.io.ObjectIO;
 
 /**
  * <p>Read in a raw feature instances file, to produce three frequency files:

@@ -44,8 +44,8 @@ import java.util.Comparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
-import uk.ac.susx.mlcl.lib.io.Sink;
-import uk.ac.susx.mlcl.lib.io.Source;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.tasks.ObjectMergeTask;
 
 /**
@@ -121,9 +121,9 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
                     + "\" and \"" + getFileDeligate().getSourceFileB()
                     + "\" to \"" + getFileDeligate().getDestinationFile() + "\".");
 
-        Source<T> srcA = openSource(getFileDeligate().getSourceFileA());
-        Source<T> srcB = openSource(getFileDeligate().getSourceFileB());
-        Sink<T> snk = openSink(getFileDeligate().getDestinationFile());
+        ObjectSource<T> srcA = openSource(getFileDeligate().getSourceFileA());
+        ObjectSource<T> srcB = openSource(getFileDeligate().getSourceFileB());
+        ObjectSink<T> snk = openSink(getFileDeligate().getDestinationFile());
 
         ObjectMergeTask<T> task = new ObjectMergeTask<T>(
                 srcA, srcB, snk, getComparator());
@@ -145,8 +145,8 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
             LOG.info("Completed merge.");
     }
 
-    protected abstract Source<T> openSource(File file) throws FileNotFoundException, IOException;
+    protected abstract ObjectSource<T> openSource(File file) throws FileNotFoundException, IOException;
 
-    protected abstract Sink<T> openSink(File file) throws FileNotFoundException, IOException;
+    protected abstract ObjectSink<T> openSink(File file) throws FileNotFoundException, IOException;
 
 }

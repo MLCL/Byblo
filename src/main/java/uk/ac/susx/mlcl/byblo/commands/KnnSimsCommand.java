@@ -46,7 +46,7 @@ import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.io.KFirstReducingObjectSink;
-import uk.ac.susx.mlcl.lib.io.Sink;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
 
 /**
  * Task that read in a file and produces the k-nearest-neighbors for each base
@@ -129,7 +129,7 @@ public final class KnnSimsCommand extends SortEventsCommand {
     }
 
     @Override
-    protected Sink<Weighted<TokenPair>> openSink(File file) throws FileNotFoundException, IOException {
+    protected ObjectSink<Weighted<TokenPair>> openSink(File file) throws FileNotFoundException, IOException {
         return new KFirstReducingObjectSink<Weighted<TokenPair>>(
                 super.openSink(file), classComparator, k);
     }
