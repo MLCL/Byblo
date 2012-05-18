@@ -80,22 +80,11 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
     <repositories>
         <repository>
-            <id>mlcl-snapshots</id>
-            <name>MLCL Group Snapshots</name>
-            <url>http://kungf.eu:8081/nexus/content/repositories/snapshots/</url>
+            <id>mlcl-repository</id>
+            <name>MLCL Group Public Repository</name>
+            <url>http://kungf.eu:8081/nexus/content/groups/public/</url>
             <snapshots>
                 <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-        <repository>
-            <id>mlcl-releases</id>
-            <name>MLCL Group Releases</name>
-            <url>http://kungf.eu:8081/nexus/content/repositories/releases/</url>
-            <snapshots>
-                <enabled>false</enabled>
             </snapshots>
             <releases>
                 <enabled>true</enabled>
@@ -109,16 +98,11 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
-        </dependency>
+
         <dependency>
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
-            <version>1.23</version>
+            <version>1.25</version>
         </dependency>
         <dependency>
             <groupId>it.unimi.dsi</groupId>
@@ -128,7 +112,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>11.0.2</version>
+            <version>12.0</version>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
@@ -156,8 +140,19 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <groupId>${project.groupId}</groupId>
             <artifactId>mlcl-lib</artifactId>
             <version>0.2-SNAPSHOT</version>
-
+            <type>jar</type>
         </dependency>
+
+
+        <!-- Testing scope dependancies -->
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
     <build>
