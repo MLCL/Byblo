@@ -63,11 +63,46 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     </licenses>
 
     <distributionManagement>
-        <site>
-            <id>website</id>
-            <url>scp://napier.uscs.susx.ac.uk/home/h/hi/hiam20/public_html/byblo</url>
-        </site>
+
+        <snapshotRepository>
+            <id>mlcl-snapshots</id>
+            <name>MLCL Group Snapshots</name>
+            <url>http://kungf.eu:8081/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+
+        <repository>
+            <id>mlcl-releases</id>
+            <name>MLCL Group Releases</name>
+            <url>http://kungf.eu:8081/nexus/content/repositories/releases/</url>
+        </repository>
+
     </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>mlcl-snapshots</id>
+            <name>MLCL Group Snapshots</name>
+            <url>http://kungf.eu:8081/nexus/content/repositories/snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <id>mlcl-releases</id>
+            <name>MLCL Group Releases</name>
+            <url>http://kungf.eu:8081/nexus/content/repositories/releases/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
+
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -108,24 +143,25 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <optional>true</optional>
         </dependency>
 
-        <!-- The following dependancies aren't on the central repo. -->
+        <!-- The following dependancies aren't on the central repository, but
+            are available at http://kungf.eu:8081/nexus/ -->
+
         <dependency>
             <groupId>JDBM</groupId>
             <artifactId>JDBM</artifactId>
             <version>3.0-SNAPSHOT</version>
         </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>mlcl-lib</artifactId>
             <version>0.2-SNAPSHOT</version>
+
         </dependency>
     </dependencies>
 
-
-
     <build>
         <scriptSourceDirectory>${project.basedir}/src/main/scripts</scriptSourceDirectory>
-
 
         <resources>
             <resource>
