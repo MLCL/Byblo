@@ -49,7 +49,7 @@ The project requires [Java 6](http://www.oracle.com/technetwork/java/javase/down
 
  * [Commons Logging 1.1.1](http://commons.apache.org/logging/) -- A very light weight wrapper API that enables logging frameworks to be configured and "plugged in" at runtime. 
 
- * [MLCL Lib 0.1.0](https://github.com/MLCL/MLCLLib) -- A collection of generic Java utilities and classes developed by the authors of Byblo, for use in this and other projects.
+ * [MLCL Lib 0.2-SNAPSHOT](https://github.com/MLCL/MLCLLib) -- A collection of generic Java utilities and classes developed by the authors of Byblo, for use in this and other projects.
 
  * [JDBM3 3.0-SNAPTSHOT](https://github.com/jankotek/JDBM3) -- Embedded Key Value Java Database. Note that at time of writing there is no stable release,
 but the dependancy will be updated as soon as there is.
