@@ -25,17 +25,10 @@ Well almost simple... At time of writing the library is not available on the Mav
 ```xml
     <repositories>
         <repository>
-            <id>mlcl-snapshots</id>
-            <name>MLCL Group Snapshots</name>
-			<url>http://kungf.eu:8081/nexus/content/repositories/snapshots/</url>
+            <id>mlcl-repository</id>
+            <name>MLCL Group Public Repository</name>
+            <url>http://kungf.eu:8081/nexus/content/groups/public/</url>
             <snapshots><enabled>true</enabled></snapshots>
-            <releases><enabled>false</enabled></releases>
-        </repository>
-        <repository>
-            <id>mlcl-releases</id>
-            <name>MLCL Group Releases</name>
-            <url>http://kungf.eu:8081/nexus/content/repositories/releases/</url>
-            <snapshots><enabled>false</enabled></snapshots>
             <releases><enabled>true</enabled></releases>
         </repository>
     </repositories>
