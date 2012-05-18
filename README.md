@@ -5,33 +5,36 @@ MLCLLib is a discombobulated collection of Java code, thought be of sufficient q
 ## Distribution 
 
 The software is primarily distributed in source-code form. Binaries may be available sporadically, and on request. 
+
 The source code can be acquired from the [github repository](https://github.com/MLCL/MLCLLib), click the *Downloads* button, and select a version to download an archive of the source code.
+
+API javadocs can be browsed here: [http://mlcl.github.com/MLCLLib/apidocs/](http://mlcl.github.com/MLCLLib/apidocs/)
 
 ### Acquire the library as a Maven Dependancy
 
 To use this library as part of a Maven managed project, simply add the following snipped to the dependencies section of your ```pom.xml```.
 
 ```xml
-	<dependency>
-    	<groupId>${project.groupId}</groupId>
-		<artifactId>mlcl-lib</artifactId>
-		<version>0.2-SNAPSHOT</version>
-		<type>jar</type>
-	</dependency>
+<dependency>
+   	<groupId>${project.groupId}</groupId>
+	<artifactId>mlcl-lib</artifactId>
+	<version>0.2-SNAPSHOT</version>
+	<type>jar</type>
+</dependency>
 ```
 
 Well almost simple... At time of writing the library is not available on the Maven central repository, so you will also need to add our repositories to your ```pom.xml```:
 
 ```xml
-    <repositories>
-        <repository>
-            <id>mlcl-repository</id>
-            <name>MLCL Group Public Repository</name>
-            <url>http://kungf.eu:8081/nexus/content/groups/public/</url>
-            <snapshots><enabled>true</enabled></snapshots>
-            <releases><enabled>true</enabled></releases>
-        </repository>
-    </repositories>
+<repositories>
+    <repository>
+        <id>mlcl-repository</id>
+        <name>MLCL Group Public Repository</name>
+        <url>http://kungf.eu:8081/nexus/content/groups/public/</url>
+        <snapshots><enabled>true</enabled></snapshots>
+        <releases><enabled>true</enabled></releases>
+    </repository>
+</repositories>
 ```
 
 
@@ -72,11 +75,11 @@ All build output is stored in the newly created directory `/target/`. It will
 contain a number of sub-directories along with containing the compiled `jar` archive, and various assemblies:
 
 ```
-	...
- 	mlcl-lib-<version>.jar
-	mlcl-lib-<version>-bin.zip
- 	mlcl-lib-<version>-src.zip
-	...
+...
+mlcl-lib-<version>.jar
+mlcl-lib-<version>-bin.zip
+mlcl-lib-<version>-src.zip
+...
 ```
 
 The ```jar``` file is probability all you need, to use the library. The ```-bin.zip``` and ```-src.zip``` are binary and source distributions respectively. The binary distribution contains the ```jar``` archive, along with a copy of the README. The source distribution should be an exact replica of the distribution you just downloaded.
