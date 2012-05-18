@@ -1,31 +1,31 @@
 /*
  * Copyright (c) 2010-2012, MLCL, University of Sussex
  * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without 
+ *
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
- *  * Redistributions of source code must retain the above copyright notice, 
+ *
+ *  * Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  *  * Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
- *  * Neither the name of the University of Sussex nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ *
+ *  * Neither the name of the University of Sussex nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package uk.ac.susx.mlcl.lib;
@@ -171,7 +171,7 @@ public class MemoryUsageTest {
 //	private static final long serialVersionUID = 8575799808933029326L;
 //...
 //    }
-//  
+//
         staticExpected += MemoryUsage.OBJECT_REFERENCE_BITS;
         staticExpected += MemoryUsage.OBJECT_OVERHEAD_BITS;
         staticExpected += MemoryUsage.Primitive.LONG.getSizeBits();
@@ -453,7 +453,7 @@ public class MemoryUsageTest {
 
             void foo() {
             }
-        
+
         ;
 
         }
@@ -463,7 +463,7 @@ public class MemoryUsageTest {
 
             void bar() {
             }
-        
+
         ;
 
         }
@@ -473,11 +473,11 @@ public class MemoryUsageTest {
 
             void bum() {
             }
-        
+
         ;
 
         }
-        
+
         System.out.println(Arrays.toString(Z.class.getDeclaredFields()));
 
         final int size = (int) new MemoryUsage().add(new Z()).
@@ -619,8 +619,8 @@ public class MemoryUsageTest {
         gcUntilStable();
         final long startingMem = MiscUtil.usedMemory();
 
-        System.out.println("Starting memory: " + MiscUtil.humanReadableBytes(
-                startingMem));
+//        System.out.println("Starting memory: " + MiscUtil.humanReadableBytes(
+//                startingMem));
         List<Object> list = new ArrayList<Object>();
 
         long expectedDiff = 0;
@@ -641,18 +641,18 @@ public class MemoryUsageTest {
 
             nObjsDiff = prevObjsSeen - mp.getNumObjectsSeen();
             prevObjsSeen = mp.getNumObjectsSeen();
-            
+
             double diffPerObj = (double)diff / (double)nObjsDiff;
 
             double ratio = (double) usedSize / (double) mpSize;
-            
-            System.out.printf("%d: used=%s, profiler=%s, diff=%s (%f p/o), ratio=%f%n", i,
-                              MiscUtil.humanReadableBytes(usedSize),
-                              MiscUtil.humanReadableBytes(mpSize),
-                              MiscUtil.humanReadableBytes(diff), 
-                              diffPerObj,
-                              ratio);
-            System.out.println(mp.getInfoString());
+
+//            System.out.printf("%d: used=%s, profiler=%s, diff=%s (%f p/o), ratio=%f%n", i,
+//                              MiscUtil.humanReadableBytes(usedSize),
+//                              MiscUtil.humanReadableBytes(mpSize),
+//                              MiscUtil.humanReadableBytes(diff),
+//                              diffPerObj,
+//                              ratio);
+//            System.out.println(mp.getInfoString());
 
 //            if (i > 2) {
 //                assertEquals(ratio, 1.0, 0.1);
@@ -677,7 +677,7 @@ public class MemoryUsageTest {
 //        System.out.println(count);
 
     }
-//    
+//
 //    @Test
 //    public void testSizeof() throws Exception {
 //
@@ -733,8 +733,8 @@ public class MemoryUsageTest {
 ////        System.out.printf("Calendar %d %n", MiscUtil.sizeOf(calendar));
 //
 //    }
-//    
-//    
+//
+//
 //    /**
 //     * Test of getSizeBits method, of class MemoryProfile.
 //     */
