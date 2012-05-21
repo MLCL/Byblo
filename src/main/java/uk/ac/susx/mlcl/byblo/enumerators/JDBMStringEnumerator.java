@@ -174,6 +174,9 @@ public final class JDBMStringEnumerator extends BiMapEnumerator<String> {
 
         DBMaker maker = DBMaker.openFile(file.toString());
         maker.disableTransactions();
+        
+        maker.disableLocking();
+        
 //        maker.enableMRUCache();
 //        maker.enableHardCache();
 //        maker.enableSoftCache();
