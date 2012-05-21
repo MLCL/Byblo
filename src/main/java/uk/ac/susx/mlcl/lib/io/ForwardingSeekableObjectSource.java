@@ -29,73 +29,35 @@
  * POSSIBILITY OF SUCH DAMAGE.To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.lib.fdist;
+package uk.ac.susx.mlcl.lib.io;
+
+import java.io.IOException;
 
 /**
- * Bivariate joint distribution of two empirically estimated, dependent
- * random variables.
+ * A SeekableObjectSource adapter that forwards all method invocations to some
+ * encapsulated instance.
  *
- * @author hiam20
+ * @param <S> type of the encapsulated instance
+ * @param <T> type of object being produced
+ * @param <P> type of the tell used to random access input source.
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class BivariateDistributionImpl extends BivariateDistributionAdapter {
+public abstract class ForwardingSeekableObjectSource<S extends SeekableObjectSource<T, P>, T, P>
+        extends ForwardingObjectSource<S, T>
+        implements SeekableObjectSource<T, P> {
 
-    private long[][] frequency;
-
-    private DiscreteUnivariateDistribution xMarginals;
-
-    private DiscreteUnivariateDistribution yMarginals;
-
-    private long frequencyTotal;
-
-    private BivariateDistributionImpl(
-            long[][] frequency,
-            DiscreteUnivariateDistribution xMarginals,
-            DiscreteUnivariateDistribution yMarginals,
-            long frequencyTotal) {
-        this.frequency = frequency;
-        this.xMarginals = xMarginals;
-        this.yMarginals = yMarginals;
-        this.frequencyTotal = frequencyTotal;
+    public ForwardingSeekableObjectSource(S inner) {
+        super(inner);
     }
 
     @Override
-    public long getFrequency(int x, int y) {
-        assert x >= 0 && y >= 0;
-
-        return frequency.length > x && frequency[x].length > y
-               ? frequency[x][y]
-               : 0;
+    public P position() throws IOException {
+        return getInner().position();
     }
 
     @Override
-    public void setFrequency(int x, int y, long newFrequency) {
-        assert x >= 0 && y >= 0;
-        assert newFrequency >= 0;
-
-        xMarginals.setFrequency(y, xMarginals.getFrequency(y)
-                - frequency[x][y] + newFrequency);
-
-        yMarginals.setFrequency(x, yMarginals.getFrequency(x)
-                - frequency[x][y] + newFrequency);
-
-        frequencyTotal += -frequency[x][y] + newFrequency;
-
-        frequency[x][y] = newFrequency;
-    }
-
-    @Override
-    public DiscreteUnivariateDistribution marginaliseOverX() {
-        return xMarginals;
-    }
-
-    @Override
-    public DiscreteUnivariateDistribution marginaliseOverY() {
-        return yMarginals;
-    }
-
-    @Override
-    public long getFrequencyTotal() {
-        return frequencyTotal;
+    public void position(P offset) throws IOException {
+        position(offset);
     }
 
 }
