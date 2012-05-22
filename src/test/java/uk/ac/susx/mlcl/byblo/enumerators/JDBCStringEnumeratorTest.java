@@ -95,142 +95,142 @@ public class JDBCStringEnumeratorTest {
 
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_trans_mru100() throws IOException {
         performanceTest_JDBM(false, true, CacheType.MRU, 100, false, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_trans_weak() throws IOException {
         performanceTest_JDBM(false, true, CacheType.Weak, 0, false, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_trans_soft() throws IOException {
         performanceTest_JDBM(false, true, CacheType.Soft, 0, false, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_trans_hard() throws IOException {
         performanceTest_JDBM(false, true, CacheType.Hard, 0, false, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_trans_none() throws IOException {
         performanceTest_JDBM(false, true, CacheType.None, 0, false, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_notrans_mru1() throws IOException {
         performanceTest_JDBM(false, false, CacheType.MRU, 0, false, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_notrans_mru25() throws IOException {
         performanceTest_JDBM(false, false, CacheType.MRU, 25, false, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_notrans_mru50() throws IOException {
         performanceTest_JDBM(false, false, CacheType.MRU, 50, false, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_notrans_mru100() throws IOException {
         performanceTest_JDBM(false, false, CacheType.MRU, 100, false, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_notrans_mru200() throws IOException {
         performanceTest_JDBM(false, false, CacheType.MRU, 200, false, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_notrans_mru400() throws IOException {
         performanceTest_JDBM(false, false, CacheType.MRU, 400, false, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_notrans_mru800() throws IOException {
         performanceTest_JDBM(false, false, CacheType.MRU, 800, false, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_notrans_mru1600() throws IOException {
         performanceTest_JDBM(false, false, CacheType.MRU, 1600, false, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_notrans_mru3200() throws IOException {
         performanceTest_JDBM(false, false, CacheType.MRU, 3200, false, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_notrans_weak() throws IOException {
         performanceTest_JDBM(false, false, CacheType.Weak, 0, false, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_notrans_soft() throws IOException {
         performanceTest_JDBM(false, false, CacheType.Soft, 0, false, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_notrans_hard() throws IOException {
         performanceTest_JDBM(false, false, CacheType.Hard, 0, false, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_notrans_none() throws IOException {
         performanceTest_JDBM(false, false, CacheType.None, 0, false, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_notrans_mru3200_noautoclear() throws IOException {
         performanceTest_JDBM(false, false, CacheType.MRU, 3200, true, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_notrans_weak_noautoclear() throws IOException {
         performanceTest_JDBM(false, false, CacheType.Weak, 0, true, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_notrans_soft_noautoclear() throws IOException {
         performanceTest_JDBM(false, false, CacheType.Soft, 0, true, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_notrans_hard_noautoclear() throws IOException {
         performanceTest_JDBM(false, false, CacheType.Hard, 0, true, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_notrans_mru3200_nolock() throws IOException {
         performanceTest_JDBM(false, false, CacheType.MRU, 3200, true, true);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_notrans_weak_nolock() throws IOException {
         performanceTest_JDBM(false, false, CacheType.Weak, 0, true, true);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_notrans_soft_nolock() throws IOException {
         performanceTest_JDBM(false, false, CacheType.Soft, 0, true, true);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_notrans_hard_nolock() throws IOException {
         performanceTest_JDBM(false, false, CacheType.Hard, 0, true, true);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_mem_trans() throws IOException {
         performanceTest_JDBM(true, true, CacheType.None, 0, false, false);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void performanceTest_JDBM_mem_notrans() throws IOException {
         performanceTest_JDBM(true, false, CacheType.None, 0, false, false);
     }
