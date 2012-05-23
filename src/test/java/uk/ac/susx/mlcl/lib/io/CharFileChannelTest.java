@@ -86,7 +86,7 @@ public class CharFileChannelTest {
         SMALL_SAMPLE_FILE.deleteOnExit();
     }
 
-    @Test(timeout = 10000)
+    @Test
     public void testRead() throws Exception {
         System.out.println("Testing read(CharBuffer)");
 
@@ -111,7 +111,7 @@ public class CharFileChannelTest {
 //        assertEquals(charsRead, SMALL_SAMPLE_FILE.length());
     }
 
-    @Test(timeout = 10000)
+    @Test
     public void testReadSmallBuffer() throws Exception {
         System.out.println("Testing read(CharBuffer) with small buffer");
 
@@ -137,7 +137,7 @@ public class CharFileChannelTest {
 //        assertEquals(charsRead, SMALL_SAMPLE_FILE.length());
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void testSeekable() throws Exception {
 
         System.out.println("Testing position() and position(long)");
@@ -187,7 +187,7 @@ public class CharFileChannelTest {
         }
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void testIsOpen() throws FileNotFoundException, IOException {
         System.out.println("Testing isOpen() and close()");
 
@@ -209,7 +209,7 @@ public class CharFileChannelTest {
         }
     }
 
-    @Test(timeout = 100000)
+    @Test
     @Ignore(value = "Test creates a massive (over 2 GB) file to test address "
     + "outside of 32bits. Hense it is not suitable for all users to "
     + "run.")
