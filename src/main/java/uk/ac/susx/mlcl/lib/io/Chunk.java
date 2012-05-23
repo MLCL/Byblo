@@ -120,7 +120,7 @@ public final class Chunk<T> extends AbstractList<T>
 
     @Override
     public String toString() {
-        return "Chunk{" + "name=" + name + ", items=" + items + ", nextIndex=" + nextIndex + '}';
+        return "Chunk{" + "name=" + name + '}';
     }
 
 }
