@@ -61,7 +61,7 @@ public class NaiveApssTaskTest {
     /**
      * Test of runTask method, of class AbstractAPSS2.
      */
-    @Test(timeout = 10000)
+    @Test
     @SuppressWarnings("unchecked")
     public void testRunTask() throws Exception {
 

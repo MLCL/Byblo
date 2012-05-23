@@ -53,7 +53,7 @@ public class ExternalSimsKnnCommandTest {
 
     private static final String subject = ExternalKnnSimsCommand.class.getName();
 
-    @Test//(timeout = 2000)
+    @Test
     public void testRunOnFruit() throws Exception {
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_SIMS);
 

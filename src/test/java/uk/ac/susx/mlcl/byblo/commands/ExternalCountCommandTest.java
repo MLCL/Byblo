@@ -207,7 +207,7 @@ public class ExternalCountCommandTest {
 //                                         DEFAULT_CHARSET, true, true));
     }
 
-    @Test(timeout = 16000)
+    @Test
     public void testRunOnFruitAPITinyChunk() throws Exception {
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
 
@@ -237,7 +237,7 @@ public class ExternalCountCommandTest {
 //                                         DEFAULT_CHARSET, true, true));
     }
 
-    @Test(timeout = 2000)
+    @Test
     public void testRunOnFruitAPITinyChunk_Indexed() throws Exception {
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT_INDEXED);
 
@@ -267,7 +267,7 @@ public class ExternalCountCommandTest {
 //                                         DEFAULT_CHARSET, true, true));
     }
 
-    @Test(timeout = 2000)
+    @Test
     public void testRunOnFruitCLI() throws Exception {
 
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
@@ -297,7 +297,7 @@ public class ExternalCountCommandTest {
 //                                         DEFAULT_CHARSET, true, true));
     }
 
-    @Test(timeout = 2000)
+    @Test
     public void testRunOnFruitCLI_Indexed() throws Exception {
 
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT_INDEXED);
@@ -327,7 +327,7 @@ public class ExternalCountCommandTest {
 //                                         DEFAULT_CHARSET, true, true));
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void testMissingParameters() throws Exception {
         System.out.println("Testing " + subject + " for bad parameterisation.");
 

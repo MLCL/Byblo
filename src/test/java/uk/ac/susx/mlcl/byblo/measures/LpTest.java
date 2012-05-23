@@ -44,7 +44,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
  */
 public class LpTest {
 
-    @Test(timeout = 1000)
+    @Test
     @Ignore(value = "Fails due to not yet being implemented.")
     public void testMainMethodRun_L0() throws Exception {
         System.out.println("Testing L0 from main method.");
@@ -77,7 +77,7 @@ public class LpTest {
 
     }
 
-    @Test(timeout = 2000)
+    @Test
     public void testMainMethodRun_L1() throws Exception {
         System.out.println("Testing L1 from main method.");
 
@@ -109,7 +109,7 @@ public class LpTest {
 
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void testMainMethodRun_L2() throws Exception {
         System.out.println("Testing L2 from main method.");
 
@@ -139,7 +139,7 @@ public class LpTest {
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void testMainMethodRun_L3() throws Exception {
         System.out.println("Testing L3 from main method.");
 
@@ -169,7 +169,7 @@ public class LpTest {
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void testMainMethodRun_L_e() throws Exception {
         System.out.println("Testing L_e from main method.");
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Le");
@@ -198,7 +198,7 @@ public class LpTest {
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void testMainMethodRun_LInf() throws Exception {
         System.out.println("Testing LInf from main method.");
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".inf");
@@ -227,7 +227,7 @@ public class LpTest {
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void test_L1_Symmetry() throws Exception {
         System.out.println("Testing symmetry.");
 
@@ -268,7 +268,7 @@ public class LpTest {
 //                                                 DEFAULT_CHARSET, false, false));
     }
 
-    @Test(timeout = 2000)
+    @Test
     public void test_L2_Symmetry() throws Exception {
         System.out.println("Testing symmetry.");
 
@@ -310,7 +310,7 @@ public class LpTest {
 
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void test_L3_Symmetry() throws Exception {
         System.out.println("Testing symmetry.");
 
@@ -351,7 +351,7 @@ public class LpTest {
 //                                                 DEFAULT_CHARSET, false, false));
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void test_LInf_Symmetry() throws Exception {
         System.out.println("Testing symmetry.");
 

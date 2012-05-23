@@ -42,7 +42,7 @@ import uk.ac.susx.mlcl.lib.tasks.FileDeleteTask;
  */
 public class DeleteTaskTest {
 
-    @Test(timeout = 1000)
+    @Test
     public void testRun_success() throws Exception {
         System.out.println("Testing run() -- expecting success");
         File tmp = File.createTempFile(getClass().getName(), "");
@@ -54,7 +54,7 @@ public class DeleteTaskTest {
         assertFalse(tmp.exists());
     }
 
-    @Test(expected = IOException.class, timeout = 1000)
+    @Test(expected = IOException.class)
     public void testRunTask_failure() throws Exception {
         System.out.println("Testing runTask() -- expecting failure");
         File tmp = File.createTempFile(getClass().getName(), "");
@@ -65,7 +65,7 @@ public class DeleteTaskTest {
         instance.throwTrappedException();
     }
 
-    @Test(expected = IOException.class, timeout = 1000)
+    @Test(expected = IOException.class)
     public void testRun_failure() throws Exception {
         System.out.println("Testing runTask() -- expecting failure");
         File tmp = File.createTempFile(getClass().getName(), "");
@@ -76,7 +76,7 @@ public class DeleteTaskTest {
         instance.throwTrappedException();
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void testGetSetFile() throws IOException {
         System.out.println("Testing getFile() and setFile()");
         File tmp = File.createTempFile(getClass().getName(), "");

@@ -44,7 +44,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
  */
 public class KendallTauTest {
 
-    @Test(timeout = 10000)
+    @Test
     public void testKendallTauCLI() throws Exception {
         System.out.println("Testing KentalTau from main method.");
 
@@ -72,7 +72,7 @@ public class KendallTauTest {
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout = 10000)
+    @Test
     @Ignore(value = "Test ignored because it takes too long.")
     public void testKendalTau_Symmetry() throws Exception {
         System.out.println("Testing KendalTau symmetry.");

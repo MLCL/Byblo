@@ -44,7 +44,7 @@ public class LinTest {
 
     private static final Class<?> subject = Lin.class;
 
-    @Test(timeout = 2000)
+    @Test
     public void testMainMethodRun() throws Exception {
         System.out.println("Testing " + subject + " from main method.");
 
@@ -71,7 +71,7 @@ public class LinTest {
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void test_Symmetry() throws Exception {
         System.out.println("Testing " + subject + " symmetry.");
 

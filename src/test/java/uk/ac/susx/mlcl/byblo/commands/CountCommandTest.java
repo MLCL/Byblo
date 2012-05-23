@@ -296,7 +296,7 @@ public class CountCommandTest {
 //                                         false, false));
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void testMissingParameters() throws Exception {
         System.out.println("Testing " + subject + " for bad parameterisation.");
 

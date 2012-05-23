@@ -43,7 +43,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
  */
 public class JensenTest {
 
-    @Test(timeout = 2000)
+    @Test
     public void testJensenCLI() throws Exception {
         System.out.println("Testing Jensen from main method.");
 
@@ -70,7 +70,7 @@ public class JensenTest {
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout = 2000)
+    @Test
     public void testJensen_Symmetry() throws Exception {
         System.out.println("Testing Jensen symmetry.");
 

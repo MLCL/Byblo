@@ -71,7 +71,7 @@ public class CosineTest {
                    outputFile.length() > 0);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void testCosineMiCli() throws Exception {
         System.out.println("Testing CosineMi from main method.");
 
@@ -99,7 +99,7 @@ public class CosineTest {
                    outputFile.length() > 0);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void testCosineSymmetry() throws Exception {
         System.out.println("Testing Cosine symmetry.");
 
@@ -138,7 +138,7 @@ public class CosineTest {
 //                                                 DEFAULT_CHARSET, false, false));
     }
 
-    @Test(timeout = 2000)
+    @Test
     public void test_CosineMi_Symmetry() throws Exception {
         System.out.println("Testing CosineMi symmetry.");
 

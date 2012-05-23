@@ -45,7 +45,7 @@ import uk.ac.susx.mlcl.lib.io.Files;
  */
 public class CopyCommandTest {
 
-    @Test(timeout=1000)
+    @Test
     public void testGetSrcFile() {
         System.out.println("Testing getSrcFile() and setSrcFile()");
         File x = new File("x");
@@ -56,7 +56,7 @@ public class CopyCommandTest {
         assertEquals(expResult, result);
     }
 
-    @Test(timeout=1000)
+    @Test
     public void testGetDstFile() {
         System.out.println("Testing getDstFile() and setDstFile()");
         File x = new File("x");
@@ -67,7 +67,7 @@ public class CopyCommandTest {
         assertEquals(expResult, result);
     }
 
-    @Test(timeout=1000)
+    @Test
     public void testRun_success() throws Exception {
         System.out.println("Testing run() -- expecting success");
         File in = File.createTempFile(getClass().getName(), "in");
@@ -98,7 +98,7 @@ public class CopyCommandTest {
         out.delete();
     }
 
-    @Test(timeout=1000, expected=ParameterException.class)
+    @Test(expected=ParameterException.class)
     public void testCLI() throws IOException {
         System.out.println("Testing command line usage.");
         File x = new File("x"), y = new File("y");

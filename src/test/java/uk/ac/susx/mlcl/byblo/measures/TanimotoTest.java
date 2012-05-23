@@ -43,7 +43,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
  */
 public class TanimotoTest {
 
-    @Test(timeout = 2000)
+    @Test
     public void testMainMethodRun() throws Exception {
         System.out.println("Testing Tanimoto from main method.");
 

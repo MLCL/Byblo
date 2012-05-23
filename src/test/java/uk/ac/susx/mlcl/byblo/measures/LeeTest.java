@@ -43,7 +43,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
  */
 public class LeeTest {
 
-    @Test(timeout = 2000)
+    @Test
     public void testLee_alpha_0_00() throws Exception {
         System.out.println("Testing Lee (alpha=0.00) from main method.");
 
@@ -70,7 +70,7 @@ public class LeeTest {
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void testMainMethodRun_alpha_0_01() throws Exception {
         System.out.println("Testing Lee (alpha=0.01) from main method.");
 
@@ -99,7 +99,7 @@ public class LeeTest {
 
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void testMainMethodRun_alpha_0_50() throws Exception {
         System.out.println("Testing Lee (alpha=0.50) from main method.");
 
@@ -129,7 +129,7 @@ public class LeeTest {
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void testMainMethodRun_alpha_0_99() throws Exception {
         System.out.println("Testing Lee (alpha=0.99) from main method.");
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Lee-alpha-0_99");
@@ -157,7 +157,7 @@ public class LeeTest {
 
     }
 
-    @Test(timeout = 1000)
+    @Test
     @Ignore(value = "Fails - presumably due to the log(0) statement.")
     public void testLee_alpha_1_00() throws Exception {
         System.out.println("Testing Lee (alpha=1.00) from main method.");

@@ -48,7 +48,7 @@ public class SimsKnnCommandTest {
 
     private static final String subject = ExternalKnnSimsCommand.class.getName();
 
-    @Test //(timeout = 8000)
+    @Test
     public void testRunOnFruit() throws Exception {
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
 
@@ -73,7 +73,7 @@ public class SimsKnnCommandTest {
         assertTrue("Empty output file found.", out.length() > 0);
     }
 
-    @Test //(timeout = 8000)
+    @Test
     public void testRunOnFruit_Indexed() throws Exception {
         System.out.println(
                 "Testing " + subject + " on " + TEST_FRUIT_INPUT_INDEXED);

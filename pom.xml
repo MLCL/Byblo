@@ -178,9 +178,6 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.12</version>
-                <configuration>
-<!--                    <skipTests>true</skipTests>-->
-                </configuration>
             </plugin>
 
             <plugin>

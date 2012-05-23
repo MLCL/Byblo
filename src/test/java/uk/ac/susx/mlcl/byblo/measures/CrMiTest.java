@@ -80,47 +80,47 @@ public class CrMiTest {
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout = 2000)
+    @Test
     public void testCRMI_beta_0_gamma_0() throws Exception {
         testCrmiCli(0, 0);
     }
 
-    @Test(timeout = 2000)
+    @Test
     public void testCrmiCli_beta_0_5_gamma_0() throws Exception {
         testCrmiCli(0.5, 0);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void testCrmiCli_beta_1_gamma_0() throws Exception {
         testCrmiCli(1, 0);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void testCrmiCli_beta_NA_gamma_1() throws Exception {
         testCrmiCli(1, 1);
     }
 
-    @Test(timeout = 1000, expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testCrmiCli_fail1() throws Exception {
         testCrmiCli(-0.001, 1);
     }
 
-    @Test(timeout = 1000, expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testCrmiCli_fail2() throws Exception {
         testCrmiCli(1.001, 1);
     }
 
-    @Test(timeout = 1000, expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testCrmiCli_fail3() throws Exception {
         testCrmiCli(0, -0.001);
     }
 
-    @Test(timeout = 1000, expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testCrmiCli_fail4() throws Exception {
         testCrmiCli(0, 1.001);
     }
 
-    @Test(timeout = 2000)
+    @Test
     public void testCrmiCli_recallCheck() throws Exception {
         System.out.println(
                 "Testing CrMi(beta=0, gamma=0) equals RecallMi from main method.");
@@ -165,7 +165,7 @@ public class CrMiTest {
 
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void testCrmiCli_precisionCheck() throws Exception {
         System.out.println(
                 "Testing CrMi(beta=1, gamma=0) equals PrecisionMi from main method.");
@@ -212,7 +212,7 @@ public class CrMiTest {
 
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void testCrmiCli_diceCheck() throws Exception {
         System.out.println(
                 "Testing CrMi(beta=NA, gamma=1) \"harmonic mean\" equals DiceMi  from main method.");

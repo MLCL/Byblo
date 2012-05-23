@@ -43,7 +43,7 @@ import org.junit.Test;
  */
 public class DeleteCommandTest {
 
-    @Test(timeout = 1000)
+    @Test
     public void testCLI() throws IOException, Exception {
         System.out.println("Testing command line usage.");
         File tmp = File.createTempFile(getClass().getName(), "");

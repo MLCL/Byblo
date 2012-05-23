@@ -116,7 +116,7 @@ public class LexerTest {
         return tmp;
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void basicTest() throws FileNotFoundException, IOException {
         System.out.println("basicTest");
 
@@ -154,7 +154,7 @@ public class LexerTest {
         assertEquals("charAt0 length", i, CFB_charAt0.length);
     }
 
-    @Test(timeout = 10000)
+    @Test
     public void seekTest() throws FileNotFoundException, IOException {
         System.out.println("seekTest");
 
@@ -196,28 +196,28 @@ public class LexerTest {
 
     }
 
-    @Test(timeout = 10000)
+    @Test
     public void seekTestFruitEntries() throws FileNotFoundException, IOException {
         seekTest(TestConstants.TEST_FRUIT_ENTRIES);
     }
 
-    @Test(timeout = 10000)
+    @Test
     public void seekTestFruitFeatures() throws FileNotFoundException, IOException {
         seekTest(TestConstants.TEST_FRUIT_FEATURES);
 
     }
 
-    @Test(timeout = 10000)
+    @Test
     public void seekTestFruitEntryFeatures() throws FileNotFoundException, IOException {
         seekTest(TestConstants.TEST_FRUIT_ENTRY_FEATURES);
     }
 
-    @Test(timeout = 10000)
+    @Test
     public void seekTestFruitInput() throws FileNotFoundException, IOException {
         seekTest(TestConstants.TEST_FRUIT_INPUT);
     }
 
-    @Test(timeout = 10000)
+    @Test
     public void seekTestFruitSims() throws FileNotFoundException, IOException {
         seekTest(TestConstants.TEST_FRUIT_SIMS);
     }

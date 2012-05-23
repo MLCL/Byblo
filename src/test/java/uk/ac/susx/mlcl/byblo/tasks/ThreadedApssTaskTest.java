@@ -67,7 +67,7 @@ public class ThreadedApssTaskTest {
     private static final Predicate<Weighted<TokenPair>> PAIR_FILTER =
             Weighted.greaterThanOrEqualTo(0.1);
 
-    @Test(timeout = 2000)
+    @Test
     public void testCLI() throws Exception {
         String output = new File(TEST_OUTPUT_DIR,
                                  TEST_FRUIT_INPUT.getName() + ".sims").toString();
@@ -93,7 +93,7 @@ public class ThreadedApssTaskTest {
     /**
      * Test of runTask method, of class AbstractAPSS2.
      */
-    @Test(timeout = 1000)
+    @Test
     public void testNaive() throws Exception {
         System.out.println("Testing " + subject + " Naive");
 
@@ -132,7 +132,7 @@ public class ThreadedApssTaskTest {
     /**
      * Test of runTask method, of class AbstractAPSS2.
      */
-    @Test(timeout = 1000)
+    @Test
     public void testInverted() throws Exception {
         System.out.println("Testing " + subject + " Inverted");
         DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
@@ -165,7 +165,7 @@ public class ThreadedApssTaskTest {
         assertTrue(!result.isEmpty());
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void compareNaiveInverted() throws Exception {
         System.out.println(
                 "Testing " + subject + " comparing Naive and Inverted");
@@ -243,7 +243,7 @@ public class ThreadedApssTaskTest {
         assertEquals(naiveResults, invertedResults);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void compareNaive_Threaded_vs_NonThreaded() throws Exception {
         System.out.println(
                 "Testing " + subject + " compare Naive Threaded vs Non-Threaded");
@@ -317,7 +317,7 @@ public class ThreadedApssTaskTest {
         assertEquals(threadedResults, nonThreadedResults);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void compareInverted_Threaded_vs_NonThreaded() throws Exception {
         System.out.println(
                 "Testing " + subject + " compare Naive Threaded vs Non-Threaded");

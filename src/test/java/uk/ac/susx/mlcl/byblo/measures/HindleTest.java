@@ -43,7 +43,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
  */
 public class HindleTest {
 
-    @Test(timeout = 2000)
+    @Test
     public void testHindleCLI() throws Exception {
         System.out.println("Testing Hindel from main method.");
 
@@ -69,7 +69,7 @@ public class HindleTest {
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    @Test(timeout = 1000)
+    @Test
     public void testHindle_Symmetry() throws Exception {
         System.out.println("Testing symmetry.");
 
