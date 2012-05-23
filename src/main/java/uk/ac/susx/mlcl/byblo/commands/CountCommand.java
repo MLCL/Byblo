@@ -108,26 +108,26 @@ public class CountCommand extends AbstractCommand implements Serializable {
      * Dependency injection constructor with all fields parameterised.
      *
      * @param instancesFile input file containing entry/context instances
-     * @param entryFeaturesFile output file for entry/context/frequency triples
+     * @param eventsFile output file for entry/context/frequency triples
      * @param entriesFile output file for entry/frequency pairs
      * @param featuresFile output file for context/frequency pairs
      * @param indexDeligate
      * @param charset character set to use for all file I/O
      * @throws NullPointerException if any argument is null
      */
-    public CountCommand(final File instancesFile, final File entryFeaturesFile,
+    public CountCommand(final File instancesFile, final File eventsFile,
                         final File entriesFile, final File featuresFile,
                         DoubleEnumerating indexDeligate,
                         final Charset charset) throws NullPointerException {
-        this(instancesFile, entryFeaturesFile, entriesFile, featuresFile);
+        this(instancesFile, eventsFile, entriesFile, featuresFile);
         setCharset(charset);
         setIndexDeligate(indexDeligate);
     }
 
-    public CountCommand(final File instancesFile, final File entryFeaturesFile,
+    public CountCommand(final File instancesFile, final File eventsFile,
                         final File entriesFile, final File featuresFile,
                         final Charset charset) throws NullPointerException {
-        this(instancesFile, entryFeaturesFile, entriesFile, featuresFile);
+        this(instancesFile, eventsFile, entriesFile, featuresFile);
         setCharset(charset);
     }
 
@@ -137,17 +137,17 @@ public class CountCommand extends AbstractCommand implements Serializable {
      * default from {@link IOUtil#DEFAULT_CHARSET}.
      *
      * @param instancesFile input file containing entry/context instances
-     * @param entryFeaturesFile output file for entry/context/frequency triples
+     * @param eventsFile output file for entry/context/frequency triples
      * @param entriesFile output file for entry/frequency pairs
      * @param featuresFile output file for context/frequency pairs
      * @throws NullPointerException if any argument is null
      */
     public CountCommand(
-            final File instancesFile, final File entryFeaturesFile,
+            final File instancesFile, final File eventsFile,
             final File entriesFile, final File featuresFile)
             throws NullPointerException {
         setInstancesFile(instancesFile);
-        setEventsFile(entryFeaturesFile);
+        setEventsFile(eventsFile);
         setEntriesFile(entriesFile);
         setFeaturesFile(featuresFile);
     }
@@ -183,10 +183,10 @@ public class CountCommand extends AbstractCommand implements Serializable {
         return eventsFile;
     }
 
-    public final void setEventsFile(final File entryFeaturesFile)
+    public final void setEventsFile(final File eventsFile)
             throws NullPointerException {
-        Checks.checkNotNull("entryFeaturesFile", entryFeaturesFile);
-        this.eventsFile = entryFeaturesFile;
+        Checks.checkNotNull("eventsFile", eventsFile);
+        this.eventsFile = eventsFile;
     }
 
     public final File getEntriesFile() {
@@ -293,7 +293,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
      */
     private void checkState() throws NullPointerException, IllegalStateException, FileNotFoundException {
         // Check non of the parameters are null
-        Checks.checkNotNull("entryFeaturesFile", eventsFile);
+        Checks.checkNotNull("eventsFile", eventsFile);
         Checks.checkNotNull("featuresFile", featuresFile);
         Checks.checkNotNull("entriesFile", entriesFile);
         Checks.checkNotNull("entriesFile", entriesFile);
@@ -311,10 +311,10 @@ public class CountCommand extends AbstractCommand implements Serializable {
             throw new IllegalStateException("inputFile == entriesFile");
         }
         if (eventsFile.equals(featuresFile)) {
-            throw new IllegalStateException("entryFeaturesFile == featuresFile");
+            throw new IllegalStateException("eventsFile == featuresFile");
         }
         if (eventsFile.equals(entriesFile)) {
-            throw new IllegalStateException("entryFeaturesFile == entriesFile");
+            throw new IllegalStateException("eventsFile == entriesFile");
         }
         if (featuresFile.equals(entriesFile)) {
             throw new IllegalStateException("featuresFile == entriesFile");

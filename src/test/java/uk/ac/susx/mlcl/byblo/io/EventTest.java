@@ -51,7 +51,7 @@ import uk.ac.susx.mlcl.lib.io.ObjectIO;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class EntryFeatureTest {
+public class EventTest {
 
     @Test
     @Ignore
@@ -63,11 +63,11 @@ public class EntryFeatureTest {
 
         TokenPairSource efSrc = TokenPairSource.open(
                 testSample, charset, del, false, false);
-        assertTrue("EntryFeatureSource is empty", efSrc.hasNext());
+        assertTrue("EventSource is empty", efSrc.hasNext());
 
         while (efSrc.hasNext()) {
             TokenPair ef = efSrc.read();
-            assertNotNull("Found null EntryFeatureRecord", ef);
+            assertNotNull("Found null EventRecord", ef);
         }
     }
 
@@ -83,7 +83,7 @@ public class EntryFeatureTest {
     }
 
     @Test
-    public void testEntryFeatures_CompactConversion() throws FileNotFoundException, IOException {
+    public void testEvents_CompactConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_INPUT;
         File b = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_INPUT.getName() + ".compact");

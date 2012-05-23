@@ -58,7 +58,7 @@ import uk.ac.susx.mlcl.lib.io.Tell;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightedEntryFeatureTest {
+public class WeightedEventsTest {
 
     private void copyWEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
         DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
@@ -96,7 +96,7 @@ public class WeightedEntryFeatureTest {
     }
 
     @Test
-    public void testWeightedEntryFeaturesConversion() throws FileNotFoundException, IOException {
+    public void testWeightedEventsConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_ENTRY_FEATURES;
         File b = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_ENTRY_FEATURES.getName() + ".compact");
@@ -119,7 +119,7 @@ public class WeightedEntryFeatureTest {
 
     @Test
     @Ignore
-    public void testWeightedEntryFeatureVectorsConversion() throws FileNotFoundException, IOException {
+    public void testWeightedEventsVectorsConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_ENTRY_FEATURES;
         File b = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_ENTRY_FEATURES.getName() + ".vecs.compact");
@@ -153,11 +153,11 @@ public class WeightedEntryFeatureTest {
 
         WeightedTokenPairSource efSrc = WeightedTokenPairSource.open(
                 testSample, charset, del, false, false);
-        assertTrue("EntryFeatureSource is empty", efSrc.hasNext());
+        assertTrue("EventsSource is empty", efSrc.hasNext());
 
         while (efSrc.hasNext()) {
             Weighted<TokenPair> ef = efSrc.read();
-            assertNotNull("Found null EntryFeatureRecord", ef);
+            assertNotNull("Found null EventsRecord", ef);
         }
     }
 
@@ -175,7 +175,7 @@ public class WeightedEntryFeatureTest {
             while (src.hasNext()) {
                 final Tell pos = src.position();
                 final Weighted<TokenPair> record = src.read();
-                assertNotNull("Found null EntryFeatureRecord", record);
+                assertNotNull("Found null EventsRecord", record);
                 hist.put(pos, record);
             }
         }
@@ -215,7 +215,7 @@ public class WeightedEntryFeatureTest {
     }
 
     @Test
-    public void testEntryFeaturePairEnumeratorConversion() throws FileNotFoundException, IOException {
+    public void testEventsPairEnumeratorConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_ENTRY_FEATURES;
         File b = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_ENTRY_FEATURES.getName() + ".enum");
@@ -259,7 +259,7 @@ public class WeightedEntryFeatureTest {
     }
 
     @Test
-    public void testEntryFeaturePairCompactEnumeratorConversion() throws FileNotFoundException, IOException {
+    public void testEventsPairCompactEnumeratorConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_ENTRY_FEATURES;
         File b = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_ENTRY_FEATURES.getName() + ".enum.compact");
@@ -306,7 +306,7 @@ public class WeightedEntryFeatureTest {
     }
 
     @Test
-    public void testEntryFeaturePairCompactEnumeratorConversion_SkipIndex() throws FileNotFoundException, IOException {
+    public void testEventsPairCompactEnumeratorConversion_SkipIndex() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_ENTRY_FEATURES;
         File b = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_ENTRY_FEATURES.getName() + ".enum.skip.compact");

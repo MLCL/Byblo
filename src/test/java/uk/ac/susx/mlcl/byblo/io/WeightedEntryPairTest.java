@@ -66,7 +66,7 @@ public class WeightedEntryPairTest {
     }
 
     @Test
-    public void testWeightedEntryFeaturesConversion() throws FileNotFoundException, IOException {
+    public void testWeightedEventsConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_SIMS;
         File b = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_SIMS.getName() + ".compact");

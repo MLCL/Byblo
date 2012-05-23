@@ -107,7 +107,7 @@ public class FullBuildTest2 {
 //        FilterCommand filter = new FilterCommand(
 //                events, entries, features,
 //                eventsFiltered, entriesFiltered, featuresFiltered, charet);
-//        filter.addEntryFeatureMinimumFrequency(2);
+//        filter.addEventMinimumFrequency(2);
 //        filter.runCommand();
 //
 //        assertTrue("Filtered events file is no smaller that events file.",
@@ -196,7 +196,7 @@ public class FullBuildTest2 {
 //        FilterCommand filter = new FilterCommand(
 //                events, entries, features,
 //                eventsFiltered, entriesFiltered, featuresFiltered, charet);
-//        filter.addEntryFeatureMinimumFrequency(2);
+//        filter.addEventMinimumFrequency(2);
 //        filter.runCommand();
 //
 //        assertTrue("Filtered events file is no smaller that events file.",
@@ -414,7 +414,7 @@ public class FullBuildTest2 {
 //        count.setInstancesFile(instancesIndexed);
 //        count.setEntriesFile(entries);
 //        count.setFeaturesFile(features);
-//        count.setEntryFeaturesFile(events);
+//        count.setEventsFile(events);
 //        count.setIndexDeligate(new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
 //                                                             preindexedEntries, preindexedFeatures,
 //                                                             null, null, false, false));
@@ -673,7 +673,7 @@ public class FullBuildTest2 {
 //        count.setInstancesFile(instancesIndexed);
 //        count.setEntriesFile(entries);
 //        count.setFeaturesFile(features);
-//        count.setEntryFeaturesFile(events);
+//        count.setEventsFile(events);
 //        count.setIndexDeligate(new DoubleEnumeratingDeligate(
 //                Enumerating.DEFAULT_TYPE,
 //                preindexedEntries, preindexedFeatures,
@@ -1112,7 +1112,7 @@ public class FullBuildTest2 {
                 type,
                 preindexedEntries, preindexedFeatures,
                 entryIndex, featureIndex));
-        filter.addEntryFeatureMinimumFrequency(2);
+        filter.addEventMinimumFrequency(2);
 
         filter.runCommand();
 

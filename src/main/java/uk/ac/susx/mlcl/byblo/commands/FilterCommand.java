@@ -190,13 +190,13 @@ public class FilterCommand extends AbstractCommand implements Serializable {
      */
     private Predicate<Weighted<Token>> acceptEntry = Predicates2.alwaysTrue();
 
-    private Predicate<Weighted<TokenPair>> acceptEntryFeature = Predicates2.alwaysTrue();
+    private Predicate<Weighted<TokenPair>> acceptEvent = Predicates2.alwaysTrue();
 
     private Predicate<Weighted<Token>> acceptFeature = Predicates2.alwaysTrue();
 
     private boolean entryFilterRequired = false;
 
-    private boolean entryFeatureFilterRequired = false;
+    private boolean eventFilterRequired = false;
 
     private boolean featureFilterRequired = false;
 
@@ -265,7 +265,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         }
 
         if (filterEventMinFreq > 0) {
-            addEntryFeatureMinimumFrequency(filterEventMinFreq);
+            addEventMinimumFrequency(filterEventMinFreq);
         }
 
         checkState();
@@ -284,10 +284,10 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         int passCount = 0;
 
         while (entryFilterRequired
-                || entryFeatureFilterRequired
+                || eventFilterRequired
                 || featureFilterRequired) {
 
-            if (entryFilterRequired || entryFeatureFilterRequired) {
+            if (entryFilterRequired || eventFilterRequired) {
                 if (LOG.isInfoEnabled()) {
                     LOG.info(
                             "Running forwards filtering pass (#" + (++passCount) + ").");
@@ -297,8 +297,8 @@ public class FilterCommand extends AbstractCommand implements Serializable {
                     filterEntries();
                 }
 
-                if (entryFeatureFilterRequired) {
-                    filterEntryFeatures();
+                if (eventFilterRequired) {
+                    filterEvents();
                 }
 
                 if (featureFilterRequired) {
@@ -306,7 +306,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
                 }
             }
 
-            if (featureFilterRequired || entryFeatureFilterRequired) {
+            if (featureFilterRequired || eventFilterRequired) {
                 if (LOG.isInfoEnabled()) {
                     LOG.info(
                             "Running backwards filtering pass (#" + (++passCount) + ").");
@@ -316,8 +316,8 @@ public class FilterCommand extends AbstractCommand implements Serializable {
                     filterFeatures();
                 }
 
-                if (entryFeatureFilterRequired) {
-                    filterEntryFeatures();
+                if (eventFilterRequired) {
+                    filterEvents();
                 }
 
                 if (entryFilterRequired) {
@@ -442,10 +442,10 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
         // Update the feature acceptance predicate
         if (rejected.size() > 0) {
-            entryFeatureFilterRequired = true;
-            acceptEntryFeature = Predicates2.and(acceptEntryFeature,
+            eventFilterRequired = true;
+            acceptEvent = Predicates2.and(acceptEvent,
                                                  Predicates2.compose(Predicates2.not(Predicates2.in(rejected)),
-                                                                     entryFeatureEntryId()));
+                                                                     eventEntryId()));
         }
 
 
@@ -455,7 +455,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
     // Filter the AllPairsTask file, rejecting all entires that contain entries
     // dropped in the entries file filter pass. Store a list of featuress that
     // only appear in filtered entries to filter the featuress file.
-    private void filterEntryFeatures()
+    private void filterEvents()
             throws FileNotFoundException, IOException {
 
         IntSet acceptedEntries = new IntOpenHashSet();
@@ -484,7 +484,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
                 FILTERED_STRING);
 
         int currentEntryId = -1;
-        int currentEntryFeatureCount = 0;
+        int currentEventCount = 0;
         double currentEntryFilteredFeatureWeight = 0;
 
         double filteredEntryWeight = 0;
@@ -500,7 +500,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             if (record.record().id1() != currentEntryId) {
 
                 if (currentEntryId != -1 && currentEntryFilteredFeatureWeight != 0) {
-                    if (currentEntryFeatureCount == 0) {
+                    if (currentEventCount == 0) {
                         filteredEntryWeight += currentEntryFilteredFeatureWeight;
                     } else {
                         efSink.write(new Weighted<TokenPair>(
@@ -511,19 +511,19 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
                 currentEntryId = record.record().id1();
                 currentEntryFilteredFeatureWeight = 0;
-                currentEntryFeatureCount = 0;
+                currentEventCount = 0;
             }
 
             if (record.record().id2() == filteredFeature) {
 
                 currentEntryFilteredFeatureWeight += record.weight();
 
-            } else if (acceptEntryFeature.apply(record)) {
+            } else if (acceptEvent.apply(record)) {
 
                 efSink.write(record);
                 acceptedEntries.add(record.record().id1());
                 acceptedFeatures.add(record.record().id2());
-                ++currentEntryFeatureCount;
+                ++currentEventCount;
 
             } else {
                 rejectedEntries.add(record.record().id1());
@@ -544,7 +544,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
 
         if (currentEntryId != -1 && currentEntryFilteredFeatureWeight != 0) {
-            if (currentEntryFeatureCount == 0) {
+            if (currentEventCount == 0) {
                 filteredEntryWeight += currentEntryFilteredFeatureWeight;
             } else {
                 efSink.write(new Weighted<TokenPair>(
@@ -571,7 +571,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         }
 
 
-        entryFeatureFilterRequired = false;
+        eventFilterRequired = false;
         activeEventsFile = outputFile;
 
         rejectedFeatures.removeAll(acceptedFeatures);
@@ -663,10 +663,10 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         // Update the feature acceptance predicate
         if (rejectedFeatures.size() > 0) {
 
-            entryFeatureFilterRequired = true;
-            acceptEntryFeature = Predicates2.and(
-                    acceptEntryFeature,
-                    Predicates2.compose(Predicates2.not(Predicates2.in(rejectedFeatures)), entryFeatureFeatureId()));
+            eventFilterRequired = true;
+            acceptEvent = Predicates2.and(
+                    acceptEvent,
+                    Predicates2.compose(Predicates2.not(Predicates2.in(rejectedFeatures)), eventFeatureId()));
 
         }
     }
@@ -683,8 +683,8 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         return inputEventsFile;
     }
 
-    public final void setInputEventsFile(File inputEntryFeaturesFile) {
-        this.inputEventsFile = checkNotNull(inputEntryFeaturesFile);
+    public final void setInputEventsFile(File inputEventsFile) {
+        this.inputEventsFile = checkNotNull(inputEventsFile);
     }
 
     public final File getInputEntriesFile() {
@@ -777,33 +777,33 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
     }
 
-    public Predicate<Weighted<TokenPair>> getAcceptEntryFeature() {
-        return acceptEntryFeature;
+    public Predicate<Weighted<TokenPair>> getAcceptEvent() {
+        return acceptEvent;
     }
 
-    public void setAcceptEntryFeature(
+    public void setAcceptEvent(
             Predicate<Weighted<TokenPair>> acceptFeature) {
-        if (!acceptFeature.equals(this.acceptEntryFeature)) {
-            this.acceptEntryFeature = acceptFeature;
-            entryFeatureFilterRequired = true;
+        if (!acceptFeature.equals(this.acceptEvent)) {
+            this.acceptEvent = acceptFeature;
+            eventFilterRequired = true;
         }
     }
 
-    public void addEntryFeatureMinimumFrequency(double threshold) {
-        setAcceptEntryFeature(Predicates2.<Weighted<TokenPair>>and(
-                getAcceptEntryFeature(),
+    public void addEventMinimumFrequency(double threshold) {
+        setAcceptEvent(Predicates2.<Weighted<TokenPair>>and(
+                getAcceptEvent(),
                 Predicates2.compose(Predicates2.gte(threshold), this.<TokenPair>weight())));
     }
 
-    public void addEntryFeatureMaximumFrequency(double threshold) {
-        setAcceptEntryFeature(Predicates2.<Weighted<TokenPair>>and(
-                getAcceptEntryFeature(),
+    public void addEventMaximumFrequency(double threshold) {
+        setAcceptEvent(Predicates2.<Weighted<TokenPair>>and(
+                getAcceptEvent(),
                 Predicates2.compose(Predicates2.lte(threshold), this.<TokenPair>weight())));
     }
 
-    public void addEntryFeatureFrequencyRange(double min, double max) {
-        setAcceptEntryFeature(Predicates2.<Weighted<TokenPair>>and(
-                getAcceptEntryFeature(),
+    public void addEventFrequencyRange(double min, double max) {
+        setAcceptEvent(Predicates2.<Weighted<TokenPair>>and(
+                getAcceptEvent(),
                 Predicates2.compose(Predicates2.inRange(min, max), this.<TokenPair>weight())));
     }
 
@@ -881,12 +881,12 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         final Map<String, File> inputFiles = new HashMap<String, File>();
         inputFiles.put("inputEntries", inputEntriesFile);
         inputFiles.put("inputFeatures", inputFeaturesFile);
-        inputFiles.put("inputEntryFeatures", inputEventsFile);
+        inputFiles.put("inputEvents", inputEventsFile);
 
         final Map<String, File> outputFiles = new HashMap<String, File>();
         outputFiles.put("outputEntries", outputEntriesFile);
         outputFiles.put("outputFeatures", outputFeaturesFile);
-        outputFiles.put("outputEntryFeatures", outputEventsFile);
+        outputFiles.put("outputEvents", outputEventsFile);
 
         final Map<String, File> allFiles = new HashMap<String, File>();
         allFiles.putAll(inputFiles);
@@ -1020,7 +1020,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         };
     }
 
-    private Function<Weighted<TokenPair>, Integer> entryFeatureEntryId() {
+    private Function<Weighted<TokenPair>, Integer> eventEntryId() {
         return new Function<Weighted<TokenPair>, Integer>() {
 
             @Override
@@ -1036,7 +1036,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         };
     }
 
-    private Function<Weighted<TokenPair>, Integer> entryFeatureFeatureId() {
+    private Function<Weighted<TokenPair>, Integer> eventFeatureId() {
         return new Function<Weighted<TokenPair>, Integer>() {
 
             @Override
@@ -1046,13 +1046,13 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
             @Override
             public String toString() {
-                return "EntryFeatureID";
+                return "EventID";
             }
 
         };
     }
 
-    private Function<Weighted<TokenPair>, String> entryFeatureFeatureString() {
+    private Function<Weighted<TokenPair>, String> eventFeatureString() {
         return new Function<Weighted<TokenPair>, String>() {
 
             @Override
@@ -1066,13 +1066,13 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
             @Override
             public String toString() {
-                return "EntryFeatureFeatureString";
+                return "EventFeatureString";
             }
 
         };
     }
 
-    private Function<Weighted<TokenPair>, String> entryFeatureEntryString() {
+    private Function<Weighted<TokenPair>, String> eventEntryString() {
         return new Function<Weighted<TokenPair>, String>() {
 
             @Override
@@ -1086,7 +1086,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
             @Override
             public String toString() {
-                return "EntryFeatureEntryString";
+                return "EventEntryString";
             }
 
         };
@@ -1224,7 +1224,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
                 add("tmp", tempFiles).
                 add("acceptEntry", acceptEntry).
                 add("acceptFeature", acceptFeature).
-                add("acceptEvent", acceptEntryFeature);
+                add("acceptEvent", acceptEvent);
     }
 
 }

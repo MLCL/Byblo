@@ -208,7 +208,7 @@ public class LexerTest {
     }
 
     @Test
-    public void seekTestFruitEntryFeatures() throws FileNotFoundException, IOException {
+    public void seekTestFruitEvents() throws FileNotFoundException, IOException {
         seekTest(TestConstants.TEST_FRUIT_ENTRY_FEATURES);
     }
 

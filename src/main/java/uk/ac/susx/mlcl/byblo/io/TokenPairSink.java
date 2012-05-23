@@ -48,15 +48,15 @@ import uk.ac.susx.mlcl.lib.io.TSV;
 
 /**
  * An <tt>TokenPairSink</tt> object is used to store
- * {@link EntryFeature} objects in a flat file.
+ * {@link Event} objects in a flat file.
  *
  * <p>The basic file format is Tab-Separated-Values (TSV) where records are
  * delimited by new-lines, and values are delimited by tabs. Two variants are
- * supported: verbose and compact. In verbose mode each {@link EntryFeature}
+ * supported: verbose and compact. In verbose mode each {@link Event}
  * corresponds to a single TSV record; i.e one line per object consisting of an
  * entry and a feature. In compact mode each TSV record consists of a single
  * entry followed by the features from all sequentially written
- * {@link EntryFeature} objects that share the same entry.</p>
+ * {@link Event} objects that share the same entry.</p>
  *
  * Verbose mode example:
  * <pre>

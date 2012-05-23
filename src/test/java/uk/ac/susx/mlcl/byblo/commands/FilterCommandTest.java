@@ -119,7 +119,7 @@ public class FilterCommandTest {
     }
 
     @Test
-    public void testMainMethodRun_fruit_entryFeatureFreqFilter() throws Exception {
+    public void testMainMethodRun_fruit_eventFreqFilter() throws Exception {
         System.out.println(
                 "Testing FilterTask on fruit from main method, filter by feature freqency.");
 

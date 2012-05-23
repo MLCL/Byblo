@@ -73,7 +73,7 @@ public class TestConstants {
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".features");
 
     public static final File TEST_FRUIT_ENTRY_FEATURES =
-            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".entryFeatures");
+            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".events");
 
     public static final File TEST_FRUIT_ENTRIES_FILTERED =
             new File(TEST_FRUIT_ENTRIES.getParentFile(), TEST_FRUIT_ENTRIES.getName() + ".filtered");
@@ -98,7 +98,7 @@ public class TestConstants {
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.features");
 
     public static final File TEST_FRUIT_INDEXED_ENTRY_FEATURES =
-            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.entryFeatures");
+            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.events");
 
     public static final File TEST_FRUIT_INDEXED_SIMS =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.sims");

@@ -159,7 +159,7 @@ public class ExternalCountCommandTest {
         final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
         final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
         final File efActual = new File(TEST_OUTPUT_DIR,
-                                       fruitPrefix + ".entryFeatures");
+                                       fruitPrefix + ".events");
 
         eActual.delete();
         fActual.delete();
@@ -187,7 +187,7 @@ public class ExternalCountCommandTest {
         final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
         final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
         final File efActual = new File(TEST_OUTPUT_DIR,
-                                       fruitPrefix + ".entryFeatures");
+                                       fruitPrefix + ".events");
 
         eActual.delete();
         fActual.delete();
@@ -217,7 +217,7 @@ public class ExternalCountCommandTest {
         final File fActual = new File(TEST_OUTPUT_DIR,
                                       fruitPrefix + ".features" + ".tiny");
         final File efActual = new File(TEST_OUTPUT_DIR,
-                                       fruitPrefix + ".entryFeatures" + ".tiny");
+                                       fruitPrefix + ".events" + ".tiny");
 
         eActual.delete();
         fActual.delete();
@@ -247,7 +247,7 @@ public class ExternalCountCommandTest {
         final File fActual = new File(TEST_OUTPUT_DIR,
                                       fruitPrefix + ".features" + ".tiny");
         final File efActual = new File(TEST_OUTPUT_DIR,
-                                       fruitPrefix + ".entryFeatures" + ".tiny");
+                                       fruitPrefix + ".events" + ".tiny");
 
         eActual.delete();
         fActual.delete();
@@ -276,7 +276,7 @@ public class ExternalCountCommandTest {
         final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
         final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
         final File efActual = new File(TEST_OUTPUT_DIR,
-                                       fruitPrefix + ".entryFeatures");
+                                       fruitPrefix + ".events");
 
         eActual.delete();
         fActual.delete();
@@ -306,7 +306,7 @@ public class ExternalCountCommandTest {
         final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
         final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
         final File efActual = new File(TEST_OUTPUT_DIR,
-                                       fruitPrefix + ".entryFeatures");
+                                       fruitPrefix + ".events");
 
         eActual.delete();
         fActual.delete();
@@ -336,7 +336,7 @@ public class ExternalCountCommandTest {
         final File eOut = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
         final File fOut = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
         final File efOut = new File(TEST_OUTPUT_DIR,
-                                    fruitPrefix + ".entryFeatures");
+                                    fruitPrefix + ".events");
 
         runExpectingNullPointer(null, eOut, fOut, efOut, DEFAULT_CHARSET, false,
                                 false);

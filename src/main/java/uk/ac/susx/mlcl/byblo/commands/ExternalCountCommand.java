@@ -142,7 +142,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     required = true,
     description = "Output entry-feature frequencies file",
     validateWith = OutputFileValidator.class)
-    private File entryFeaturesFile = null;
+    private File eventsFile = null;
 
     @Parameter(names = {"-oe", "--output-entries"},
     required = true,
@@ -165,14 +165,14 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     private Queue<File> mergeFeaturesQueue;
 
-    private Queue<File> mergeEntryFeatureQueue;
+    private Queue<File> mergeEventQueue;
 
     public ExternalCountCommand(
-            final File instancesFile, final File entryFeaturesFile,
+            final File instancesFile, final File eventsFile,
             final File entriesFile, final File featuresFile, Charset charset,
             DoubleEnumerating indexDeligate,
             int maxChunkSize) {
-        this(instancesFile, entryFeaturesFile, entriesFile, featuresFile);
+        this(instancesFile, eventsFile, entriesFile, featuresFile);
         fileDeligate.setCharset(charset);
         setMaxChunkSize(maxChunkSize);
         setIndexDeligate(indexDeligate);
@@ -180,12 +180,12 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     }
 
     public ExternalCountCommand(
-            final File instancesFile, final File entryFeaturesFile,
+            final File instancesFile, final File eventsFile,
             final File entriesFile, final File featuresFile,
             final Charset charset,
             DoubleEnumerating indexDeligate) {
         setInstancesFile(instancesFile);
-        setEventsFile(entryFeaturesFile);
+        setEventsFile(eventsFile);
         setEntriesFile(entriesFile);
         setFeaturesFile(featuresFile);
         fileDeligate.setCharset(charset);
@@ -193,10 +193,10 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     }
 
     public ExternalCountCommand(
-            final File instancesFile, final File entryFeaturesFile,
+            final File instancesFile, final File eventsFile,
             final File entriesFile, final File featuresFile) {
         setInstancesFile(instancesFile);
-        setEventsFile(entryFeaturesFile);
+        setEventsFile(eventsFile);
         setEntriesFile(entriesFile);
         setFeaturesFile(featuresFile);
     }
@@ -253,14 +253,14 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     }
 
     public final File getEventsFile() {
-        return entryFeaturesFile;
+        return eventsFile;
     }
 
     public final void setEventsFile(final File featuresFile)
             throws NullPointerException {
         if (featuresFile == null)
             throw new NullPointerException("featuresFile is null");
-        this.entryFeaturesFile = featuresFile;
+        this.eventsFile = featuresFile;
     }
 
     public final File getEntriesFile() {
@@ -313,7 +313,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
         mergeEntryQueue = new ArrayDeque<File>();
         mergeFeaturesQueue = new ArrayDeque<File>();
-        mergeEntryFeatureQueue = new ArrayDeque<File>();
+        mergeEventQueue = new ArrayDeque<File>();
 
         BlockingQueue<File> chunkQueue = new ArrayBlockingQueue<File>(2);
 
@@ -330,7 +330,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             }
 
             Chunk<TokenPair> chunk = chunks.read();
-//            submitCountTask(chunk, inputFile, entryFeaturesFile, inputFile);
+//            submitCountTask(chunk, inputFile, eventsFile, inputFile);
 
             File chunk_entriesFile = tempFileFactory.createFile("cnt.ent.",
                                                                 "");
@@ -465,7 +465,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
                     "The entry merge queue is empty but final copy has not been completed.");
         new FileMoveCommand(finalMerge, getEntriesFile()).runCommand();
 
-        finalMerge = mergeEntryFeatureQueue.poll();
+        finalMerge = mergeEventQueue.poll();
         if (finalMerge == null)
             throw new AssertionError(
                     "The entry/feature merge queue is empty but final copy has not been completed.");
@@ -639,10 +639,10 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     }
 
     private void submitMergeEventsTask(File dst) throws IOException, InterruptedException {
-        mergeEntryFeatureQueue.add(dst);
-        if (mergeEntryFeatureQueue.size() >= 2) {
-            File srcFileA = mergeEntryFeatureQueue.poll();
-            File srcFileB = mergeEntryFeatureQueue.poll();
+        mergeEventQueue.add(dst);
+        if (mergeEventQueue.size() >= 2) {
+            File srcFileA = mergeEventQueue.poll();
+            File srcFileB = mergeEventQueue.poll();
             File dstFile = tempFileFactory.createFile("mrg.evnt.", "");
 
             ObjectSource<Weighted<TokenPair>> srcA = openEventsSource(srcFileA);
@@ -719,24 +719,24 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         // Check non of the parameters are null
         if (inputFile == null)
             throw new NullPointerException("inputFile is null");
-        if (entryFeaturesFile == null)
-            throw new NullPointerException("entryFeaturesFile is null");
+        if (eventsFile == null)
+            throw new NullPointerException("eventsFile is null");
         if (featuresFile == null)
             throw new NullPointerException("featuresFile is null");
         if (entriesFile == null)
             throw new NullPointerException("entriesFile is null");
 
         // Check that no two files are the same
-        if (inputFile.equals(entryFeaturesFile))
+        if (inputFile.equals(eventsFile))
             throw new IllegalStateException("inputFile == featuresFile");
         if (inputFile.equals(featuresFile))
             throw new IllegalStateException("inputFile == contextsFile");
         if (inputFile.equals(entriesFile))
             throw new IllegalStateException("inputFile == entriesFile");
-        if (entryFeaturesFile.equals(featuresFile))
-            throw new IllegalStateException("entryFeaturesFile == featuresFile");
-        if (entryFeaturesFile.equals(entriesFile))
-            throw new IllegalStateException("entryFeaturesFile == entriesFile");
+        if (eventsFile.equals(featuresFile))
+            throw new IllegalStateException("eventsFile == featuresFile");
+        if (eventsFile.equals(entriesFile))
+            throw new IllegalStateException("eventsFile == entriesFile");
         if (featuresFile.equals(entriesFile))
             throw new IllegalStateException("featuresFile == entriesFile");
 
@@ -772,14 +772,14 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             throw new IllegalStateException(
                     "features file does not exists and can not be reated: " + featuresFile);
         }
-        if (entryFeaturesFile.exists() && (!entryFeaturesFile.isFile() || !entryFeaturesFile.canWrite()))
+        if (eventsFile.exists() && (!eventsFile.isFile() || !eventsFile.canWrite()))
             throw new IllegalStateException(
-                    "entry-features file exists but is not writable: " + entryFeaturesFile);
-        if (!entryFeaturesFile.exists() && !entryFeaturesFile.getAbsoluteFile().
+                    "entry-features file exists but is not writable: " + eventsFile);
+        if (!eventsFile.exists() && !eventsFile.getAbsoluteFile().
                 getParentFile().
                 canWrite()) {
             throw new IllegalStateException(
-                    "entry-features file does not exists and can not be reated: " + entryFeaturesFile);
+                    "entry-features file does not exists and can not be reated: " + eventsFile);
         }
     }
 
@@ -789,7 +789,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
                 add("in", inputFile).
                 add("entriesOut", entriesFile).
                 add("featuresOut", featuresFile).
-                add("eventsOut", entryFeaturesFile).
+                add("eventsOut", eventsFile).
                 add("tempDir", tempFileFactory).
                 add("fd", getFileDeligate()).
                 add("id", getIndexDeligate());

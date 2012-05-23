@@ -198,9 +198,9 @@ public class AllPairsCommand extends AbstractCommand {
     private Algorithm algorithm = Algorithm.Inverted;
 
     public AllPairsCommand(File entriesFile, File featuresFile,
-                           File entryFeaturesFile, File outputFile,
+                           File eventsFile, File outputFile,
                            Charset charset, DoubleEnumerating indexDeligate) {
-        setEventsFile(entryFeaturesFile);
+        setEventsFile(eventsFile);
         setEntriesFile(entriesFile);
         setFeaturesFile(featuresFile);
         setOutputFile(outputFile);

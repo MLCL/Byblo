@@ -172,9 +172,9 @@ public final class CountTask extends AbstractTask implements Serializable {
     @Override
     public void runTask() throws Exception {
 
-        final Object2IntMap<TokenPair> entryFeatureFreq =
+        final Object2IntMap<TokenPair> eventFreq =
                 new Object2IntOpenHashMap<TokenPair>();
-        entryFeatureFreq.defaultReturnValue(0);
+        eventFreq.defaultReturnValue(0);
 
         final Int2IntMap featureFreq = new Int2IntOpenHashMap();
         featureFreq.defaultReturnValue(0);
@@ -191,7 +191,7 @@ public final class CountTask extends AbstractTask implements Serializable {
 
             entryFreq.put(entry_id, entryFreq.get(entry_id) + 1);
             featureFreq.put(feature_id, featureFreq.get(feature_id) + 1);
-            entryFeatureFreq.put(instance, entryFeatureFreq.getInt(instance) + 1);
+            eventFreq.put(instance, eventFreq.getInt(instance) + 1);
         }
 
         List<Weighted<Token>> entries = int2IntMapToWeightedTokens(entryFreq);
@@ -209,7 +209,7 @@ public final class CountTask extends AbstractTask implements Serializable {
 
 
 
-        List<Weighted<TokenPair>> events = obj2intmapToWeightedObjList(entryFeatureFreq);
+        List<Weighted<TokenPair>> events = obj2intmapToWeightedObjList(eventFreq);
         Collections.sort(events, getEventComparator());
         ObjectIO.copy(events, getEventSink());
         if (getEventSink() instanceof Flushable)

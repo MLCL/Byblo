@@ -48,10 +48,10 @@ import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
  * An <tt>TokenPairSource</tt> object is used to retrieve
- * {@link EntryFeature} objects from a flat file.
+ * {@link Event} objects from a flat file.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
- * @see EntryFeatureSink
+ * @see EventSink
  */
 public class TokenPairSource
         implements SeekableObjectSource<TokenPair, Tell>, Closeable {
