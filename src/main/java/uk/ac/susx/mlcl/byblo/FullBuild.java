@@ -45,6 +45,7 @@ import uk.ac.susx.mlcl.byblo.commands.ExternalCountCommand;
 import uk.ac.susx.mlcl.byblo.commands.ExternalKnnSimsCommand;
 import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
 import uk.ac.susx.mlcl.byblo.commands.IndexInstancesCommand;
+import uk.ac.susx.mlcl.byblo.commands.UnindexNeighboursCommand;
 import uk.ac.susx.mlcl.byblo.commands.UnindexSimsCommand;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.measures.CrMi;
@@ -152,6 +153,10 @@ public final class FullBuild extends AbstractCommand {
     converter = DoubleConverter.class)
     private double crmiGamma = CrMi.DEFAULT_GAMMA;
 
+    @Parameter(names = {"-k"},
+    description = "The maximum number of neighbours to produce per word.")
+    private int k = ExternalKnnSimsCommand.DEFAULT_K;
+
     private static final int COUNT_MAX_CHUNK_SIZE = 500000;
 
     private static final int ALLPAIRS_MAX_CHUNK_SIZE = 2500;
@@ -219,6 +224,10 @@ public final class FullBuild extends AbstractCommand {
 
         File neighboursStringsFile = suffixed(neighboursFile, ".strings");
         runUnindexSim(neighboursFile, neighboursStringsFile, entryEnumeratorFile);
+
+
+        if(tempBaseDir.list().length == 0)
+            tempBaseDir.delete();
     }
 
     private void runIndex(File instancesEnumeratedFile,
@@ -403,6 +412,7 @@ public final class FullBuild extends AbstractCommand {
         knnCmd.setTempFileFactory(knnTmpFact);
         knnCmd.setNumThreads(numThreads);
         knnCmd.setMaxChunkSize(KNN_MAX_CHUNK_SIZE);
+        knnCmd.setK(k);
 
         knnCmd.runCommand();
 
@@ -430,7 +440,7 @@ public final class FullBuild extends AbstractCommand {
                              neighboursStringsFile);
 
 
-        UnindexSimsCommand unindexCmd = new UnindexSimsCommand();
+        UnindexNeighboursCommand unindexCmd = new UnindexNeighboursCommand();
         unindexCmd.setSourceFile(neighboursFile);
         unindexCmd.setDestinationFile(neighboursStringsFile);
         unindexCmd.setCharset(getCharset());

@@ -34,6 +34,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects.ToStringHelper;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Comparator;
@@ -42,13 +43,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
+import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
+import uk.ac.susx.mlcl.byblo.io.WeightSumReducerObjectSink;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import uk.ac.susx.mlcl.lib.Comparators;
-import uk.ac.susx.mlcl.lib.io.Chunk;
 import uk.ac.susx.mlcl.lib.io.KFirstReducingObjectSink;
-import uk.ac.susx.mlcl.lib.tasks.ObjectMergeTask;
-import uk.ac.susx.mlcl.lib.tasks.ObjectSortTask;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
 
 /**
  *
@@ -65,7 +67,7 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
     private static final long serialVersionUID = 1L;
 
     @Parameter(names = {"-k"},
-               description = "The number of neighbours to produce for each base entry.")
+    description = "The number of neighbours to produce for each base entry.")
     private int k = DEFAULT_K;
 
     private Comparator<Weighted<TokenPair>> classComparator =
@@ -153,31 +155,46 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
     protected void finaliseTask() throws Exception {
         super.finaliseTask();
     }
-
-    @Override
-    protected ObjectMergeTask<Weighted<TokenPair>> createMergeTask(File srcA,
-                                                                   File srcB,
-                                                                   File dst) throws IOException {
-        ObjectMergeTask<Weighted<TokenPair>> task = super.createMergeTask(srcA,
-                                                                          srcB,
-                                                                          dst);
-        task.setSink(new KFirstReducingObjectSink<Weighted<TokenPair>>(
-                task.getSink(), getClassComparator(), getK()));
-        return task;
-    }
-
-    @Override
-    protected ObjectSortTask<Weighted<TokenPair>> createSortTask(
-            Chunk<Weighted<TokenPair>> chunk, File dst) throws IOException {
-        ObjectSortTask<Weighted<TokenPair>> task = super.createSortTask(chunk,
-                                                                        dst);
-        task.setSink(new KFirstReducingObjectSink<Weighted<TokenPair>>(
-                task.getSink(), getClassComparator(), getK()));
-        return task;
-    }
+//
+//    @Override
+//    protected ObjectMergeTask<Weighted<TokenPair>> createMergeTask(
+//            File srcA, File srcB, File dst) throws IOException {
+//        ObjectMergeTask<Weighted<TokenPair>> task = super.createMergeTask(
+//                srcA, srcB, dst);
+//        task.setSink(new KFirstReducingObjectSink<Weighted<TokenPair>>(
+//                task.getSink(), getClassComparator(), getK()));
+//        return task;
+//    }
+//
+//    @Override
+//    protected ObjectSortTask<Weighted<TokenPair>> createSortTask(
+//            Chunk<Weighted<TokenPair>> chunk, File dst) throws IOException {
+//        ObjectSortTask<Weighted<TokenPair>> task = super.createSortTask(chunk,
+//                                                                        dst);
+//        task.setSink(new KFirstReducingObjectSink<Weighted<TokenPair>>(
+//                task.getSink(), getClassComparator(), getK()));
+//        return task;
+//    }
 
     @Override
     protected ToStringHelper toStringHelper() {
         return super.toStringHelper().add("k", k);
     }
+
+    @Override
+    protected WeightedTokenPairSource openSource(File file)
+            throws FileNotFoundException, IOException {
+        return BybloIO.openSimsSource(file, getCharset(), getIndexDeligate());
+    }
+
+    @Override
+    protected ObjectSink<Weighted<TokenPair>> openSink(File file)
+            throws FileNotFoundException, IOException {
+        return new KFirstReducingObjectSink<Weighted<TokenPair>>(
+                new WeightSumReducerObjectSink<TokenPair>(
+                BybloIO.openNeighboursSink(file, getCharset(), getIndexDeligate())),
+                classComparator, k);
+
+    }
+
 }

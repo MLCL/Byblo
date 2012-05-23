@@ -34,51 +34,29 @@ package uk.ac.susx.mlcl.byblo.io;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import uk.ac.susx.mlcl.byblo.BybloSettings;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 
 /**
+ * Static utility class that provides functions for opening the various file
+ * types.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class BybloIO {
 
-    public static final boolean INSTANCES_SKIP_INDEXED_COLUMN_1 = false;
-
-    public static final boolean INSTANCES_SKIP_INDEXED_COLUMN_2 = false;
-
-    public static final boolean ENTRIES_SKIP_INDEXED_COLUMN_1 = true;
-
-    public static final boolean FEATURES_SKIP_INDEXED_COLUMN_1 = true;
-
-    public static final boolean EVENTS_SKIP_INDEXED_COLUMN_1 = true;
-
-    public static final boolean EVENTS_SKIP_INDEXED_COLUMN_2 = true;
-
-    public static final boolean SIMS_SKIP_INDEXED_COLUMN_1 = true;
-
-    public static final boolean SIMS_SKIP_INDEXED_COLUMN_2 = true;
-
-    public static final boolean NEIGHBOURS_SKIP_INDEXED_COLUMN_1 = true;
-
-    public static final boolean NEIGHBOURS_SKIP_INDEXED_COLUMN_2 = false;
-
-    public static final boolean INSTANCES_COMPACT = true;
-
-    public static final boolean EVENTS_COMPACT = true;
-
-    public static final boolean SIMS_COMPACT = true;
-
-    public static final boolean NEIGHBOURS_COMPACT = true;
+    private BybloIO() {
+    }
 
     public static TokenPairSource openInstancesSource(
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
         return TokenPairSource.open(
                 file, charset, idx,
-                INSTANCES_SKIP_INDEXED_COLUMN_1,
-                INSTANCES_SKIP_INDEXED_COLUMN_2);
+                BybloSettings.getInstance().isInstancesSkipIndexColumn1Enabled(),
+                BybloSettings.getInstance().isInstancesSkipIndexColumn2Enabled());
     }
 
     public static TokenPairSink openInstancesSink(
@@ -86,9 +64,9 @@ public final class BybloIO {
             throws IOException {
         return TokenPairSink.open(
                 file, charset, idx,
-                INSTANCES_SKIP_INDEXED_COLUMN_1,
-                INSTANCES_SKIP_INDEXED_COLUMN_2,
-                INSTANCES_COMPACT);
+                BybloSettings.getInstance().isInstancesSkipIndexColumn1Enabled(),
+                BybloSettings.getInstance().isInstancesSkipIndexColumn1Enabled(),
+                BybloSettings.getInstance().isInstancesCompactEnabled());
     }
 
     public static WeightedTokenSource openFeaturesSource(
@@ -96,7 +74,7 @@ public final class BybloIO {
             throws IOException {
         return WeightedTokenSource.open(
                 file, charset, idx,
-                FEATURES_SKIP_INDEXED_COLUMN_1);
+                BybloSettings.getInstance().isFeaturesSkipIndexColumn1Enabled());
 
     }
 
@@ -105,19 +83,21 @@ public final class BybloIO {
             throws IOException {
         return WeightedTokenSink.open(
                 file, charset, idx,
-                FEATURES_SKIP_INDEXED_COLUMN_1);
+                BybloSettings.getInstance().isFeaturesSkipIndexColumn1Enabled());
 
     }
 
     public static WeightedTokenSource openFeaturesSource(
             File file, Charset charset, DoubleEnumerating idx) throws IOException {
-        return openFeaturesSource(file, charset, EnumeratingDeligates.toSingleFeatures(idx));
+        return openFeaturesSource(file, charset,
+                                  EnumeratingDeligates.toSingleFeatures(idx));
     }
 
     public static WeightedTokenSink openFeaturesSink(
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
-        return openFeaturesSink(file, charset, EnumeratingDeligates.toSingleFeatures(idx));
+        return openFeaturesSink(file, charset,
+                                EnumeratingDeligates.toSingleFeatures(idx));
     }
 
     public static WeightedTokenSource openEntriesSource(
@@ -125,7 +105,7 @@ public final class BybloIO {
             throws IOException {
         return WeightedTokenSource.open(
                 file, charset, idx,
-                ENTRIES_SKIP_INDEXED_COLUMN_1);
+                BybloSettings.getInstance().isEntriesSkipIndexColumn1Enabled());
 
     }
 
@@ -134,7 +114,7 @@ public final class BybloIO {
             throws IOException {
         return WeightedTokenSink.open(
                 file, charset, idx,
-                ENTRIES_SKIP_INDEXED_COLUMN_1);
+                BybloSettings.getInstance().isEntriesSkipIndexColumn1Enabled());
 
     }
 
@@ -152,11 +132,10 @@ public final class BybloIO {
     public static FastWeightedTokenPairVectorSource openEventsVectorSource(
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
-//        return new WeightedTokenPairVectorSource(openEventsSource(file, charset, idx));
         return FastWeightedTokenPairVectorSource.open(
                 file, charset, idx,
-                EVENTS_SKIP_INDEXED_COLUMN_1,
-                EVENTS_SKIP_INDEXED_COLUMN_2);
+                BybloSettings.getInstance().isEventsSkipIndexColumn1Enabled(),
+                BybloSettings.getInstance().isEventsSkipIndexColumn2Enabled());
     }
 
     public static FastWeightedTokenPairVectorSink openEventsVectorSink(
@@ -164,9 +143,9 @@ public final class BybloIO {
             throws IOException {
         return FastWeightedTokenPairVectorSink.open(
                 file, charset, idx,
-                EVENTS_SKIP_INDEXED_COLUMN_1,
-                EVENTS_SKIP_INDEXED_COLUMN_2,
-                EVENTS_COMPACT);
+                BybloSettings.getInstance().isEventsSkipIndexColumn1Enabled(),
+                BybloSettings.getInstance().isEventsSkipIndexColumn2Enabled(),
+                BybloSettings.getInstance().isEventsCompactEnabled());
 
     }
 
@@ -175,8 +154,8 @@ public final class BybloIO {
             throws IOException {
         return WeightedTokenPairSource.open(
                 file, charset, idx,
-                EVENTS_SKIP_INDEXED_COLUMN_1,
-                EVENTS_SKIP_INDEXED_COLUMN_2);
+                BybloSettings.getInstance().isEventsSkipIndexColumn1Enabled(),
+                BybloSettings.getInstance().isEventsSkipIndexColumn2Enabled());
     }
 
     public static WeightedTokenPairSink openEventsSink(
@@ -184,9 +163,9 @@ public final class BybloIO {
             throws IOException {
         return WeightedTokenPairSink.open(
                 file, charset, idx,
-                EVENTS_SKIP_INDEXED_COLUMN_1,
-                EVENTS_SKIP_INDEXED_COLUMN_2,
-                EVENTS_COMPACT);
+                BybloSettings.getInstance().isEventsSkipIndexColumn1Enabled(),
+                BybloSettings.getInstance().isEventsSkipIndexColumn2Enabled(),
+                BybloSettings.getInstance().isEventsCompactEnabled());
     }
 
     public static WeightedTokenPairSource openSimsSource(
@@ -194,8 +173,8 @@ public final class BybloIO {
             throws IOException {
         return WeightedTokenPairSource.open(
                 file, charset, EnumeratingDeligates.toPair(idx),
-                SIMS_SKIP_INDEXED_COLUMN_1,
-                SIMS_SKIP_INDEXED_COLUMN_2);
+                BybloSettings.getInstance().isSimsSkipIndexColumn1Enabled(),
+                BybloSettings.getInstance().isSimsSkipIndexColumn2Enabled());
     }
 
     public static WeightedTokenPairSink openSimsSink(
@@ -203,9 +182,9 @@ public final class BybloIO {
             throws IOException {
         return WeightedTokenPairSink.open(
                 file, charset, EnumeratingDeligates.toPair(idx),
-                SIMS_SKIP_INDEXED_COLUMN_1,
-                SIMS_SKIP_INDEXED_COLUMN_2,
-                SIMS_COMPACT);
+                BybloSettings.getInstance().isSimsSkipIndexColumn1Enabled(),
+                BybloSettings.getInstance().isSimsSkipIndexColumn2Enabled(),
+                BybloSettings.getInstance().isSimsCompactEnabled());
     }
 
     public static WeightedTokenPairSource openSimsSource(
@@ -218,6 +197,37 @@ public final class BybloIO {
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
         return openSimsSink(file, charset, EnumeratingDeligates.toSingleEntries(idx));
+    }
+
+    public static WeightedTokenPairSource openNeighboursSource(
+            File file, Charset charset, SingleEnumerating idx)
+            throws IOException {
+        return WeightedTokenPairSource.open(
+                file, charset, EnumeratingDeligates.toPair(idx),
+                BybloSettings.getInstance().isNeighboursSkipIndexColumn1Enabled(),
+                BybloSettings.getInstance().isNeighboursSkipIndexColumn2Enabled());
+    }
+
+    public static WeightedTokenPairSink openNeighboursSink(
+            File file, Charset charset, SingleEnumerating idx)
+            throws IOException {
+        return WeightedTokenPairSink.open(
+                file, charset, EnumeratingDeligates.toPair(idx),
+                BybloSettings.getInstance().isNeighboursSkipIndexColumn1Enabled(),
+                BybloSettings.getInstance().isNeighboursSkipIndexColumn2Enabled(),
+                BybloSettings.getInstance().isNeighboursCompactEnabled());
+    }
+
+    public static WeightedTokenPairSource openNeighboursSource(
+            File file, Charset charset, DoubleEnumerating idx)
+            throws IOException {
+        return openNeighboursSource(file, charset, EnumeratingDeligates.toSingleEntries(idx));
+    }
+
+    public static WeightedTokenPairSink openNeighboursSink(
+            File file, Charset charset, DoubleEnumerating idx)
+            throws IOException {
+        return openNeighboursSink(file, charset, EnumeratingDeligates.toSingleEntries(idx));
     }
 
 }

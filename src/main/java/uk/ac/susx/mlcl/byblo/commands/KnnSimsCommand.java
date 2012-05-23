@@ -42,11 +42,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
+import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
+import uk.ac.susx.mlcl.byblo.io.WeightSumReducerObjectSink;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.io.KFirstReducingObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.ObjectSource;
 
 /**
  * Task that read in a file and produces the k-nearest-neighbors for each base
@@ -128,10 +131,27 @@ public final class KnnSimsCommand extends SortEventsCommand {
         this.k = k;
     }
 
+    private boolean first = false;
+
     @Override
-    protected ObjectSink<Weighted<TokenPair>> openSink(File file) throws FileNotFoundException, IOException {
+    protected ObjectSource<Weighted<TokenPair>> openSource(File file)
+            throws FileNotFoundException, IOException {
+        final ObjectSource<Weighted<TokenPair>> src =
+                first
+                ? BybloIO.openSimsSource(file, getCharset(), getIndexDeligate())
+                : BybloIO.openNeighboursSource(file, getCharset(), getIndexDeligate());
+        first = true;
+        return src;
+    }
+
+    @Override
+    protected ObjectSink<Weighted<TokenPair>> openSink(File file)
+            throws FileNotFoundException, IOException {
         return new KFirstReducingObjectSink<Weighted<TokenPair>>(
-                super.openSink(file), classComparator, k);
+                new WeightSumReducerObjectSink<TokenPair>(
+                BybloIO.openNeighboursSink(file, getCharset(), getIndexDeligate())),
+                classComparator, k);
+
     }
 
     @Override

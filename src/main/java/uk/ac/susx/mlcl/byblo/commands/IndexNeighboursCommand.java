@@ -36,14 +36,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
-import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
-import uk.ac.susx.mlcl.byblo.io.WeightSumReducerObjectSink;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
@@ -53,77 +52,62 @@ import uk.ac.susx.mlcl.lib.io.ObjectSource;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class SortEventsCommand extends AbstractSortCommand<Weighted<TokenPair>> {
-
-    private static final Log LOG = LogFactory.getLog(
-            SortEntriesCommand.class);
+public class IndexNeighboursCommand extends AbstractCopyCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
-    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
+    private SingleEnumerating indexDeligate = new SingleEnumeratingDeligate(
+            Enumerating.DEFAULT_TYPE, false, null);
 
-    public SortEventsCommand(
+    public IndexNeighboursCommand(
             File sourceFile, File destinationFile, Charset charset,
-            DoubleEnumerating indexDeligate) {
-        super(sourceFile, destinationFile, charset,
-              Weighted.recordOrder(TokenPair.indexOrder()));
-        setIndexDeligate(indexDeligate);
+            SingleEnumerating indexDeligate) {
+        super(sourceFile, destinationFile, charset);
+        this.indexDeligate = indexDeligate;
     }
 
-    public SortEventsCommand() {
+    public IndexNeighboursCommand() {
+        super();
     }
 
     @Override
     public void runCommand() throws Exception {
+        Checks.checkNotNull("indexFile", indexDeligate.getEnumeratorFile());
+
         super.runCommand();
+
         indexDeligate.saveEnumerator();
         indexDeligate.closeEnumerator();
 
     }
 
-    public final DoubleEnumerating getIndexDeligate() {
-        return indexDeligate;
-    }
-
-    public final void setIndexDeligate(DoubleEnumerating indexDeligate) {
-        Checks.checkNotNull("indexDeligate", indexDeligate);
-        this.indexDeligate = indexDeligate;
-    }
-
     @Override
     protected ObjectSource<Weighted<TokenPair>> openSource(File file)
             throws FileNotFoundException, IOException {
-        return BybloIO.openEventsSource(file, getCharset(), indexDeligate);
+        return BybloIO.openNeighboursSource(file, getCharset(), sourceIndexDeligate());
     }
 
     @Override
     protected ObjectSink<Weighted<TokenPair>> openSink(File file)
             throws FileNotFoundException, IOException {
-        return new WeightSumReducerObjectSink<TokenPair>(
-               BybloIO.openEventsSink(file, getCharset(), indexDeligate));
+        return BybloIO.openNeighboursSink(file, getCharset(), sinkIndexDeligate());
     }
 
-    public EnumeratorType getEnuemratorType() {
-        return indexDeligate.getEnuemratorType();
+    public SingleEnumerating getIndexDeligate() {
+        return indexDeligate;
     }
 
-    public void setEnumeratedFeatures(boolean enumeratedFeatures) {
-        indexDeligate.setEnumeratedFeatures(enumeratedFeatures);
+    public void setIndexDeligate(SingleEnumerating indexDeligate) {
+        this.indexDeligate = indexDeligate;
     }
 
-    public void setEnumeratedEntries(boolean enumeratedEntries) {
-        indexDeligate.setEnumeratedEntries(enumeratedEntries);
+    protected DoubleEnumerating sourceIndexDeligate() {
+        return new EnumeratingDeligates.SingleToPairAdapter(
+                EnumeratingDeligates.decorateEnumerated(indexDeligate, false));
     }
 
-    public boolean isEnumeratedFeatures() {
-        return indexDeligate.isEnumeratedFeatures();
-    }
-
-    public boolean isEnumeratedEntries() {
-        return indexDeligate.isEnumeratedEntries();
-    }
-
-    public void setEnumeratorType(EnumeratorType type) {
-        indexDeligate.setEnumeratorType(type);
+    protected DoubleEnumerating sinkIndexDeligate() {
+        return new EnumeratingDeligates.SingleToPairAdapter(
+                EnumeratingDeligates.decorateEnumerated(indexDeligate, true));
     }
 
 }
