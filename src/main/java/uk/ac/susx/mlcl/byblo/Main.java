@@ -39,11 +39,10 @@ import uk.ac.susx.mlcl.byblo.commands.ExternalKnnSimsCommand;
 import uk.ac.susx.mlcl.byblo.commands.ExternalSortEntriesCommand;
 import uk.ac.susx.mlcl.byblo.commands.ExternalSortEventsCommand;
 import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
-import uk.ac.susx.mlcl.byblo.commands.IndexInstancesCommand;
+import uk.ac.susx.mlcl.byblo.commands.IndexingCommands;
 import uk.ac.susx.mlcl.byblo.commands.MergeEntriesCommand;
 import uk.ac.susx.mlcl.byblo.commands.MergeEventsCommand;
 import uk.ac.susx.mlcl.byblo.commands.MergeInstancesCommand;
-import uk.ac.susx.mlcl.byblo.commands.UnindexSimsCommand;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.commands.Command;
 
@@ -74,8 +73,19 @@ public final class Main extends AbstractCommand {
         tmp.put("allpairs", AllPairsCommand.class);
         tmp.put("count", ExternalCountCommand.class);
         tmp.put("filter", FilterCommand.class);
-        tmp.put("index", IndexInstancesCommand.class);
-        tmp.put("unindex-sims", UnindexSimsCommand.class);
+        tmp.put("index", IndexingCommands.IndexInstances.class);
+        tmp.put("index-instances", IndexingCommands.IndexInstances.class);
+        tmp.put("index-entries", IndexingCommands.IndexEntries.class);
+        tmp.put("index-features", IndexingCommands.IndexFeatures.class);
+        tmp.put("index-events", IndexingCommands.IndexEvents.class);
+        tmp.put("index-sims", IndexingCommands.IndexSims.class);
+        tmp.put("index-neighbours", IndexingCommands.IndexNeighbours.class);
+        tmp.put("unindex-instances", IndexingCommands.UnindexInstances.class);
+        tmp.put("unindex-entries", IndexingCommands.UnindexEntries.class);
+        tmp.put("unindex-features", IndexingCommands.UnindexFeatures.class);
+        tmp.put("unindex-events", IndexingCommands.UnindexEvents.class);
+        tmp.put("unindex-sims", IndexingCommands.UnindexSims.class);
+        tmp.put("unindex-neighbours", IndexingCommands.UnindexNeighbours.class);
         SUBCOMMANDS = Collections.unmodifiableMap(tmp);
     }
 

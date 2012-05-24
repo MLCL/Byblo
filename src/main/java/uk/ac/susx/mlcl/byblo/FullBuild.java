@@ -44,9 +44,7 @@ import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
 import uk.ac.susx.mlcl.byblo.commands.ExternalCountCommand;
 import uk.ac.susx.mlcl.byblo.commands.ExternalKnnSimsCommand;
 import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
-import uk.ac.susx.mlcl.byblo.commands.IndexInstancesCommand;
-import uk.ac.susx.mlcl.byblo.commands.UnindexNeighboursCommand;
-import uk.ac.susx.mlcl.byblo.commands.UnindexSimsCommand;
+import uk.ac.susx.mlcl.byblo.commands.IndexingCommands;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.measures.CrMi;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -226,7 +224,7 @@ public final class FullBuild extends AbstractCommand {
         runUnindexSim(neighboursFile, neighboursStringsFile, entryEnumeratorFile);
 
 
-        if(tempBaseDir.list().length == 0)
+        if (tempBaseDir.list().length == 0)
             tempBaseDir.delete();
     }
 
@@ -238,14 +236,14 @@ public final class FullBuild extends AbstractCommand {
         checkValidOutputFile("Feature index file", featureEnumeratorFile);
         checkValidOutputFile("Entry index file", entryEnumeratorFile);
 
-        IndexInstancesCommand indexCmd = new IndexInstancesCommand();
+        IndexingCommands.IndexInstances indexCmd = new IndexingCommands.IndexInstances();
         indexCmd.setSourceFile(instancesFile);
         indexCmd.setDestinationFile(instancesEnumeratedFile);
         indexCmd.setCharset(getCharset());
 
-        indexCmd.setEntryEnumeratorFile(entryEnumeratorFile);
-        indexCmd.setFeatureEnumeratorFile(featureEnumeratorFile);
-        indexCmd.setEnumeratorType(enumeratorType);
+        indexCmd.getIndexDeligate().setEntryEnumeratorFile(entryEnumeratorFile);
+        indexCmd.getIndexDeligate().setFeatureEnumeratorFile(featureEnumeratorFile);
+        indexCmd.getIndexDeligate().setEnumeratorType(enumeratorType);
 
         indexCmd.runCommand();
 
@@ -440,13 +438,13 @@ public final class FullBuild extends AbstractCommand {
                              neighboursStringsFile);
 
 
-        UnindexNeighboursCommand unindexCmd = new UnindexNeighboursCommand();
+        IndexingCommands.UnindexNeighbours unindexCmd = new IndexingCommands.UnindexNeighbours();
         unindexCmd.setSourceFile(neighboursFile);
         unindexCmd.setDestinationFile(neighboursStringsFile);
         unindexCmd.setCharset(getCharset());
 
-        unindexCmd.getIndexDeligate().setEnumerationEnabled(true);
-        unindexCmd.getIndexDeligate().setEnumeratorFile(entryEnumeratorFile);
+        unindexCmd.getIndexDeligate().setEnumeratedEntries(true);
+        unindexCmd.getIndexDeligate().setEntryEnumeratorFile(entryEnumeratorFile);
         unindexCmd.getIndexDeligate().setEnumeratorType(enumeratorType);
 
         unindexCmd.runCommand();

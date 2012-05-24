@@ -317,7 +317,7 @@ public class IndexWTPCommandTest {
         else
             assertValidOutputFiles(index1, index2);
 
-        IndexEventsCommand unindex = new IndexEventsCommand();
+        IndexingCommands.IndexEvents unindex = new IndexingCommands.IndexEvents();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
@@ -345,7 +345,7 @@ public class IndexWTPCommandTest {
             assertValidInputFiles(index1, index2);
         assertValidOutputFiles(to);
 
-        UnindexEventsCommand unindex = new UnindexEventsCommand();
+        IndexingCommands.UnindexEvents unindex = new IndexingCommands.UnindexEvents();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);

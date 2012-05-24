@@ -40,13 +40,12 @@ import uk.ac.susx.mlcl.byblo.commands.CountCommand;
 import uk.ac.susx.mlcl.byblo.commands.ExternalCountCommand;
 import uk.ac.susx.mlcl.byblo.commands.ExternalKnnSimsCommand;
 import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
+import uk.ac.susx.mlcl.byblo.commands.IndexingCommands;
 import static uk.ac.susx.mlcl.byblo.commands.IndexSimsCommandTest.*;
 import static uk.ac.susx.mlcl.byblo.commands.IndexTPCommandTest.*;
 import uk.ac.susx.mlcl.byblo.commands.KnnSimsCommand;
-import uk.ac.susx.mlcl.byblo.commands.UnindexEntriesCommand;
-import uk.ac.susx.mlcl.byblo.commands.UnindexEventsCommand;
-import uk.ac.susx.mlcl.byblo.commands.UnindexInstancesCommand;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
 
@@ -1195,11 +1194,11 @@ public class FullBuildTest2 {
             throws Exception {
         assertValidPlaintextInputFiles(from);
 
-        UnindexEntriesCommand unindex = new UnindexEntriesCommand();
+        IndexingCommands.UnindexEntries unindex = new IndexingCommands.UnindexEntries();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
-        unindex.setIndexDeligate(new SingleEnumeratingDeligate(type, true, index));
+        unindex.setIndexDeligate(EnumeratingDeligates.toPair(new SingleEnumeratingDeligate(type, true, index)));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);
@@ -1212,7 +1211,7 @@ public class FullBuildTest2 {
             throws Exception {
         assertValidPlaintextInputFiles(from);
 
-        UnindexEventsCommand unindex = new UnindexEventsCommand();
+        IndexingCommands.IndexEvents unindex = new IndexingCommands.IndexEvents();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
@@ -1230,7 +1229,7 @@ public class FullBuildTest2 {
             throws Exception {
         assertValidPlaintextInputFiles(from);
 
-        UnindexInstancesCommand unindex = new UnindexInstancesCommand();
+        IndexingCommands.IndexInstances unindex = new IndexingCommands.IndexInstances();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
