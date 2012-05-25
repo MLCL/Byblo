@@ -1,31 +1,31 @@
 /*
  * Copyright (c) 2010-2012, University of Sussex
  * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without 
+ *
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
- *  * Redistributions of source code must retain the above copyright notice, 
+ *
+ *  * Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  *  * Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
- *  * Neither the name of the University of Sussex nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ *
+ *  * Neither the name of the University of Sussex nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package uk.ac.susx.mlcl.byblo.measures;
@@ -33,14 +33,14 @@ package uk.ac.susx.mlcl.byblo.measures;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- * 
+ *
  * <h4>Notes</h4>
  * <ul>
- * <li>All results are inverted to produce proximities rather than distances. 
- * I.e Values are between 0 and 1 (inclusive) where 0 indicates infinite 
+ * <li>All results are inverted to produce proximities rather than distances.
+ * I.e Values are between 0 and 1 (inclusive) where 0 indicates infinite
  * distance, and 1 indicates no distance at all.</li>
  * <li>L0 is defined as the L0 "norm" (with quotes) by David Donoho. This is
- * effectively the non-zero cardinality of the absolute difference between 
+ * effectively the non-zero cardinality of the absolute difference between
  * vectors.</li>
  * </ul>
  *
@@ -48,7 +48,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  */
 public class Lp extends AbstractProximity {
 
-    public static final double DEFAULT_P = 1;
+    public static final double DEFAULT_P = 2;
 
     private double p;
 
@@ -210,7 +210,7 @@ public class Lp extends AbstractProximity {
 
     @Override
     public double combine(double shared, double left, double right) {
-        // results are inverted: High values indicate similarity 
+        // results are inverted: High values indicate similarity
         if (p == 0) {
             return 1d / (shared + left + right);
         } else if (p == 1) {

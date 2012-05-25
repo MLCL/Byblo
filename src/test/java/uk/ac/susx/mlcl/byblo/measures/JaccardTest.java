@@ -37,7 +37,7 @@ import java.util.Set;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.Main;
+import uk.ac.susx.mlcl.byblo.Tools;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
@@ -56,7 +56,7 @@ public class JaccardTest {
 
         try {
             enableExistTrapping();
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "Jaccard",
@@ -93,7 +93,7 @@ public class JaccardTest {
 
         try {
             enableExistTrapping();
-            Main.main(args);
+            Tools.main(args);
         } finally {
             disableExitTrapping();
         }
@@ -252,7 +252,7 @@ public class JaccardTest {
 
         try {
             enableExistTrapping();
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "Jaccard",
@@ -261,7 +261,7 @@ public class JaccardTest {
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output1.toString()
                     });
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "Jaccard",
@@ -294,7 +294,7 @@ public class JaccardTest {
 
         try {
             enableExistTrapping();
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "JaccardMi",
@@ -303,7 +303,7 @@ public class JaccardTest {
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output1.toString()
                     });
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "JaccardMi",

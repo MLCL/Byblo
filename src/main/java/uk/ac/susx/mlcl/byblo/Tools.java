@@ -51,7 +51,7 @@ import uk.ac.susx.mlcl.lib.commands.Command;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class Main extends AbstractCommand {
+public final class Tools extends AbstractCommand {
 
     /**
      * Store mapping from names to Command objects.
@@ -92,13 +92,13 @@ public final class Main extends AbstractCommand {
     /**
      * Can only be instantiated from main.
      */
-    private Main() {
+    private Tools() {
         super(SUBCOMMANDS);
     }
 
     @Override
     public void runCommand() throws Exception {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported.");
     }
 
     /**
@@ -108,7 +108,7 @@ public final class Main extends AbstractCommand {
      * @throws Exception when something goes awry.
      */
     public static void main(final String[] args) throws Exception {
-        new Main().runCommand(args);
+        new Tools().runCommand(args);
     }
 
 }

@@ -34,7 +34,7 @@ import java.io.File;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.Main;
+import uk.ac.susx.mlcl.byblo.Tools;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
@@ -64,7 +64,7 @@ public class RecallTest {
 
         try {
             enableExistTrapping();
-            Main.main(args);
+            Tools.main(args);
         } finally {
             disableExitTrapping();
         }
@@ -97,7 +97,7 @@ public class RecallTest {
 
         try {
             enableExistTrapping();
-            Main.main(args);
+            Tools.main(args);
         } finally {
             disableExitTrapping();
         }

@@ -34,7 +34,7 @@ import java.io.File;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.Main;
+import uk.ac.susx.mlcl.byblo.Tools;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
@@ -60,7 +60,7 @@ public class CrMiTest {
 
         try {
             enableExistTrapping();
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "CrMi",
@@ -135,7 +135,7 @@ public class CrMiTest {
 
         try {
             enableExistTrapping();
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "RecallMi",
@@ -144,7 +144,7 @@ public class CrMiTest {
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", expectedOutput.toString()
                     });
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "CrMi",
@@ -180,7 +180,7 @@ public class CrMiTest {
 
         try {
             enableExistTrapping();
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "RecallMi",
@@ -190,7 +190,7 @@ public class CrMiTest {
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", expectedOutput.toString()
                     });
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "CrMi",
@@ -227,7 +227,7 @@ public class CrMiTest {
 
         try {
             enableExistTrapping();
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "DiceMi",
@@ -236,7 +236,7 @@ public class CrMiTest {
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", expectedOutput.toString()
                     });
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "CrMi",

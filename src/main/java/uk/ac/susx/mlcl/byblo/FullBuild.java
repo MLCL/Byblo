@@ -32,6 +32,7 @@
 package uk.ac.susx.mlcl.byblo;
 
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +41,7 @@ import static java.text.MessageFormat.format;
 import java.util.Arrays;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.commands.AbstractExternalSortCommand;
 import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
 import uk.ac.susx.mlcl.byblo.commands.ExternalCountCommand;
 import uk.ac.susx.mlcl.byblo.commands.ExternalKnnSimsCommand;
@@ -47,6 +49,8 @@ import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
 import uk.ac.susx.mlcl.byblo.commands.IndexingCommands;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.measures.CrMi;
+import uk.ac.susx.mlcl.byblo.measures.Lee;
+import uk.ac.susx.mlcl.byblo.measures.Lp;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.commands.DoubleConverter;
@@ -61,9 +65,16 @@ import uk.ac.susx.mlcl.lib.io.TempFileFactory;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@Parameters(commandDescription = "Run the full thesaurus building pipeline.")
 public final class FullBuild extends AbstractCommand {
 
     private static final Log LOG = LogFactory.getLog(FullBuild.class);
+
+    /**
+     * Whether or not some of the rarely used parameters should be hidden from
+     * the help usage page.
+     */
+    public static final boolean HIDE_UNCOMMON_PARAMTERS = true;
 
     @ParametersDelegate
     private FileDeligate fileDeligate = new FileDeligate();
@@ -74,12 +85,13 @@ public final class FullBuild extends AbstractCommand {
     private File instancesFile;
 
     @Parameter(names = {"-o", "--output"},
-    description = "Output directory")
-    private File outputDir;
+    description = "Output directory. Default: current working directory.")
+    private File outputDir = null;
 
     @Parameter(names = {"-T", "--temp-dir"},
-    description = "Temorary directory which will be used during filtering.",
-    converter = TempFileFactoryConverter.class, hidden = true)
+    description = "Temorary directory, used during processing. Default: A subdirectory will be created inside the output directory.",
+    converter = TempFileFactoryConverter.class,
+    hidden = HIDE_UNCOMMON_PARAMTERS)
     private File tempBaseDir;
 
     private boolean skipIndex1 = false;
@@ -93,10 +105,18 @@ public final class FullBuild extends AbstractCommand {
     private int numThreads = Runtime.getRuntime().availableProcessors() + 1;
 
     /*
+     * === COUNTING PARAMATERISATION ===
+     */
+    @Parameter(names = {"--count-chunk-size"},
+    description = "Number of lines per work unit. Larger values increase performance and memory usage.",
+    hidden = true)
+    private int countMaxChunkSize = ExternalCountCommand.DEFAULT_MAX_CHUNK_SIE;
+
+    /*
      * === FILTER PARAMATERISATION ===
      */
     @Parameter(names = {"-fef", "--filter-entry-freq"},
-    description = "Minimum entry pair frequency threshold.",
+    description = "Minimum entry frequency threshold.",
     converter = DoubleConverter.class)
     private double filterEntryMinFreq;
 
@@ -129,37 +149,75 @@ public final class FullBuild extends AbstractCommand {
     @Parameter(names = {"-ffp", "--filter-feature-pattern"},
     description = "Regular expresion that accepted features must match.")
     private String filterFeaturePattern;
+    /*
+     * === ALL-PAIRS PARAMATERISATION ===
+     */
+
+    @Parameter(names = {"-m", "--measure"},
+    description = "Similarity measure to use.")
+    private String measureName = AllPairsCommand.DEFAULT_MEASURE;
 
     @Parameter(names = {"-Smn", "--similarity-min"},
     description = "Minimum similarity threshold.",
     converter = DoubleConverter.class)
-    private double minSimilarity = Double.NEGATIVE_INFINITY;
+    private double minSimilarity = AllPairsCommand.DEFAULT_MIN_SIMILARITY;
 
-    @Parameter(names = {"-m", "--measure"},
-    description = "Similarity measure to use.")
-    private String measureName = "Lin";
+    @Parameter(names = {"-Smx", "--similarity-max"},
+    description = "Maximyum similarity threshold.",
+    hidden = HIDE_UNCOMMON_PARAMTERS,
+    converter = DoubleConverter.class)
+    private double maxSimilarity = AllPairsCommand.DEFAULT_MAX_SIMILARITY;
 
     @Parameter(names = {"--crmi-beta"},
-    description = "Beta paramter to Weed's CRMI measure.",
-    hidden = true,
+    description = "Beta paramter to CRMI measure.",
+    hidden = HIDE_UNCOMMON_PARAMTERS,
     converter = DoubleConverter.class)
     private double crmiBeta = CrMi.DEFAULT_BETA;
 
     @Parameter(names = {"--crmi-gamma"},
-    description = "Gamma paramter to Weed's CRMI measure.",
-    hidden = true,
+    description = "Gamma paramter to CRMI measure.",
+    hidden = HIDE_UNCOMMON_PARAMTERS,
     converter = DoubleConverter.class)
     private double crmiGamma = CrMi.DEFAULT_GAMMA;
+
+    @Parameter(names = {"--mink-p"},
+    description = "P parameter to Minkowski distance measure.",
+    hidden = HIDE_UNCOMMON_PARAMTERS,
+    converter = DoubleConverter.class)
+    private double minkP = Lp.DEFAULT_P;
+
+    @Parameter(names = {"--measure-reversed"},
+    description = "Swap similarity measure inputs.",
+    hidden = HIDE_UNCOMMON_PARAMTERS)
+    private boolean measureReversed = false;
+
+    @Parameter(names = {"--lee-alpha"},
+    description = "Alpha parameter to Lee alpha-skew divergence measure.",
+    hidden = HIDE_UNCOMMON_PARAMTERS,
+    converter = DoubleConverter.class)
+    private double leeAlpha = Lee.DEFAULT_ALPHA;
+
+    @Parameter(names = {"-ip", "--identity-pairs"},
+    description = "Produce similarity between pair of identical entries.",
+    hidden = HIDE_UNCOMMON_PARAMTERS)
+    private boolean outputIdentityPairs = false;
+
+    @Parameter(names = {"--allpairs-chunk-size"},
+    description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.",
+    hidden = HIDE_UNCOMMON_PARAMTERS)
+    private int chunkSize = AllPairsCommand.DEFAULT_MAX_CHUNK_SIZE;
+    /*
+     * === K-NEAREST-NEIGHBOURS PARAMATERISATION ===
+     */
 
     @Parameter(names = {"-k"},
     description = "The maximum number of neighbours to produce per word.")
     private int k = ExternalKnnSimsCommand.DEFAULT_K;
 
-    private static final int COUNT_MAX_CHUNK_SIZE = 500000;
-
-    private static final int ALLPAIRS_MAX_CHUNK_SIZE = 2500;
-
-    private static final int KNN_MAX_CHUNK_SIZE = 500000;
+    @Parameter(names = {"--knn-chunk-size"},
+    description = "Number of lines per KNN work unit. Larger values increase memory usage and performace.",
+    hidden = HIDE_UNCOMMON_PARAMTERS)
+    private int knnMaxChunkSize = AbstractExternalSortCommand.DEFAULT_MAX_CHUNK_SIZE;
 
     /**
      * Should only be instantiated through the main method.
@@ -176,10 +234,8 @@ public final class FullBuild extends AbstractCommand {
 
         checkValidInputFile("Instances file", instancesFile);
 
-        // If the output dir isn't
-        if (outputDir == null) {
-            outputDir = instancesFile.getParentFile();
-        }
+        if (outputDir == null)
+            outputDir = new File(System.getProperty("user.dir"));
         checkValidOutputDir("Output dir", outputDir);
 
         if (tempBaseDir == null)
@@ -277,7 +333,7 @@ public final class FullBuild extends AbstractCommand {
         countCmd.setEnumeratorType(enumeratorType);
 
         countCmd.setNumThreads(numThreads);
-        countCmd.setMaxChunkSize(COUNT_MAX_CHUNK_SIZE);
+        countCmd.setMaxChunkSize(countMaxChunkSize);
 
 
         countCmd.runCommand();
@@ -376,16 +432,23 @@ public final class FullBuild extends AbstractCommand {
         allpairsCmd.setOutputFile(simsFile);
 
         allpairsCmd.setNumThreads(numThreads);
-        allpairsCmd.setChunkSize(ALLPAIRS_MAX_CHUNK_SIZE);
+        allpairsCmd.setChunkSize(chunkSize);
+
+        allpairsCmd.setMinSimilarity(minSimilarity);
+        allpairsCmd.setMaxSimilarity(maxSimilarity);
+        allpairsCmd.setOutputIdentityPairs(outputIdentityPairs);
 
         allpairsCmd.setMeasureName(measureName);
-        allpairsCmd.setMinSimilarity(minSimilarity);
         allpairsCmd.setCrmiBeta(crmiBeta);
         allpairsCmd.setCrmiGamma(crmiGamma);
+        allpairsCmd.setLeeAlpha(leeAlpha);
+        allpairsCmd.setMinkP(minkP);
+        allpairsCmd.setMeasureReversed(measureReversed);
 
         allpairsCmd.setEnumeratedEntries(true);
         allpairsCmd.setEnumeratedFeatures(true);
         allpairsCmd.setEnumeratorType(enumeratorType);
+
 
         allpairsCmd.runCommand();
         checkValidInputFile("Sims file", simsFile);
@@ -409,7 +472,7 @@ public final class FullBuild extends AbstractCommand {
 
         knnCmd.setTempFileFactory(knnTmpFact);
         knnCmd.setNumThreads(numThreads);
-        knnCmd.setMaxChunkSize(KNN_MAX_CHUNK_SIZE);
+        knnCmd.setMaxChunkSize(knnMaxChunkSize);
         knnCmd.setK(k);
 
         knnCmd.runCommand();

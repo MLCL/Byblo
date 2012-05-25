@@ -38,7 +38,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import uk.ac.susx.mlcl.TestConstants;
-import uk.ac.susx.mlcl.byblo.Main;
+import uk.ac.susx.mlcl.byblo.Tools;
 import uk.ac.susx.mlcl.lib.test.ExitTrapper;
 
 /**
@@ -71,7 +71,7 @@ public class AllPairsTaskTest {
         new File("testdata", "out").mkdir();
         try {
             ExitTrapper.enableExistTrapping();
-            Main.main(new String[]{"allpairs",
+            Tools.main(new String[]{"allpairs",
                         "-i", TestConstants.TEST_FRUIT_ENTRY_FEATURES.toString(),
                         "-o", new File(TestConstants.TEST_OUTPUT_DIR, "bnc-gramrels-fruit.out").toString(),
                         "-C", "500"});
@@ -85,7 +85,7 @@ public class AllPairsTaskTest {
         new File("testdata", "out").mkdir();
         try {
             ExitTrapper.enableExistTrapping();
-            Main.main(new String[]{"allpairs",
+            Tools.main(new String[]{"allpairs",
                         "-i", TestConstants.TEST_FRUIT_INDEXED_ENTRY_FEATURES.toString(),
                         "-o", new File(TestConstants.TEST_OUTPUT_DIR, "bnc-gramrels-fruit.indexed.out").toString(),
                         "-C", "500",
@@ -100,7 +100,7 @@ public class AllPairsTaskTest {
     public void testExitStatus() throws Exception {
         try {
             ExitTrapper.enableExistTrapping();
-            Main.main(new String[]{"allpairs"});
+            Tools.main(new String[]{"allpairs"});
         } catch (ExitTrapper.ExitException ex) {
             assertTrue("Expecting non-zero exit status.", ex.getStatus() != 0);
         } finally {

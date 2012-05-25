@@ -36,7 +36,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import uk.ac.susx.mlcl.TestConstants;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.Main;
+import uk.ac.susx.mlcl.byblo.Tools;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
@@ -91,7 +91,7 @@ public class ExternalSimsKnnCommandTest {
     public void testExitStatus() throws Exception {
         try {
             ExitTrapper.enableExistTrapping();
-            Main.main(new String[]{"knn"});
+            Tools.main(new String[]{"knn"});
         } catch (ExitTrapper.ExitException ex) {
             assertTrue("Expecting non-zero exit status.", ex.getStatus() != 0);
         } finally {
@@ -108,7 +108,7 @@ public class ExternalSimsKnnCommandTest {
             File out = new File(TestConstants.TEST_OUTPUT_DIR, "extknn-test-empty.out");
 
             ExitTrapper.enableExistTrapping();
-            Main.main(new String[]{"knn", "-i", in.toString(),
+            Tools.main(new String[]{"knn", "-i", in.toString(),
                         "-o", out.toString()});
         } catch (ExitTrapper.ExitException ex) {
             assertTrue("Expecting non-zero exit status.", ex.getStatus() == 0);

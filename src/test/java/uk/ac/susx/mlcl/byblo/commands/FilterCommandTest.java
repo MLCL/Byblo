@@ -38,7 +38,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.Main;
+import uk.ac.susx.mlcl.byblo.Tools;
 import uk.ac.susx.mlcl.lib.test.ExitTrapper;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
@@ -89,7 +89,7 @@ public class FilterCommandTest {
 
         try {
             enableExistTrapping();
-            Main.main(args);
+            Tools.main(args);
         } finally {
             disableExitTrapping();
         }
@@ -203,7 +203,7 @@ public class FilterCommandTest {
     public void testExitStatus() throws Exception {
         try {
             ExitTrapper.enableExistTrapping();
-            Main.main(new String[]{"filter"});
+            Tools.main(new String[]{"filter"});
         } catch (ExitTrapper.ExitException ex) {
             assertTrue("Expecting non-zero exit status.", ex.getStatus() != 0);
         } finally {

@@ -38,7 +38,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.Main;
+import uk.ac.susx.mlcl.byblo.Tools;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
@@ -110,7 +110,7 @@ public class ExternalCountCommandTest {
 
         try {
             enableExistTrapping();
-            Main.main(args);
+            Tools.main(args);
         } finally {
             disableExitTrapping();
         }
@@ -363,7 +363,7 @@ public class ExternalCountCommandTest {
     public void testExitStatus() throws Exception {
         try {
             ExitTrapper.enableExistTrapping();
-            Main.main(new String[]{"count"});
+            Tools.main(new String[]{"count"});
         } catch (ExitTrapper.ExitException ex) {
             assertTrue("Expecting non-zero exit status.", ex.getStatus() != 0);
         } finally {

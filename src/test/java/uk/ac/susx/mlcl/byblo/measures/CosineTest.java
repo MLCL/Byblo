@@ -34,7 +34,7 @@ import java.io.File;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.Main;
+import uk.ac.susx.mlcl.byblo.Tools;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
@@ -52,7 +52,7 @@ public class CosineTest {
 
         try {
             enableExistTrapping();
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "Cosine",
@@ -80,7 +80,7 @@ public class CosineTest {
 
         try {
             enableExistTrapping();
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "CosineMi",
@@ -111,7 +111,7 @@ public class CosineTest {
 
         try {
             enableExistTrapping();
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "Cosine",
@@ -120,7 +120,7 @@ public class CosineTest {
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output1.toString()
                     });
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "Cosine",
@@ -149,7 +149,7 @@ public class CosineTest {
 
         try {
             enableExistTrapping();
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "CosineMi",
@@ -158,7 +158,7 @@ public class CosineTest {
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output1.toString()
                     });
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "CosineMi",

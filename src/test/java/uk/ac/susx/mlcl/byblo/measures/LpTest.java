@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 import org.junit.Ignore;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.Main;
+import uk.ac.susx.mlcl.byblo.Tools;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
@@ -65,7 +65,7 @@ public class LpTest {
 
         try {
             enableExistTrapping();
-            Main.main(args);
+            Tools.main(args);
         } finally {
             disableExitTrapping();
         }
@@ -97,7 +97,7 @@ public class LpTest {
 
         try {
             enableExistTrapping();
-            Main.main(args);
+            Tools.main(args);
         } finally {
             disableExitTrapping();
         }
@@ -129,7 +129,7 @@ public class LpTest {
 
         try {
             enableExistTrapping();
-            Main.main(args);
+            Tools.main(args);
         } finally {
             disableExitTrapping();
         }
@@ -159,7 +159,7 @@ public class LpTest {
 
         try {
             enableExistTrapping();
-            Main.main(args);
+            Tools.main(args);
         } finally {
             disableExitTrapping();
         }
@@ -188,7 +188,7 @@ public class LpTest {
 
         try {
             enableExistTrapping();
-            Main.main(args);
+            Tools.main(args);
         } finally {
             disableExitTrapping();
         }
@@ -217,7 +217,7 @@ public class LpTest {
 
         try {
             enableExistTrapping();
-            Main.main(args);
+            Tools.main(args);
         } finally {
             disableExitTrapping();
         }
@@ -241,7 +241,7 @@ public class LpTest {
         try {
             enableExistTrapping();
 
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8", "--mink-p", "1",
                         "--measure", "Lp",
@@ -250,7 +250,7 @@ public class LpTest {
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output1.toString()
                     });
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8", "--mink-p", "1",
                         "--measure", "Lp", "--measure-reversed",
@@ -282,7 +282,7 @@ public class LpTest {
         try {
             enableExistTrapping();
 
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8", "--mink-p", "2",
                         "--measure", "Lp",
@@ -291,7 +291,7 @@ public class LpTest {
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output1.toString()
                     });
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8", "--mink-p", "2",
                         "--measure", "Lp", "--measure-reversed",
@@ -324,7 +324,7 @@ public class LpTest {
         try {
             enableExistTrapping();
 
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8", "--mink-p", "3",
                         "--measure", "Lp",
@@ -333,7 +333,7 @@ public class LpTest {
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output1.toString()
                     });
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8", "--mink-p", "3",
                         "--measure", "Lp", "--measure-reversed",
@@ -366,7 +366,7 @@ public class LpTest {
         try {
             enableExistTrapping();
 
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8", "--mink-p", "inf",
                         "--measure", "Lp",
@@ -375,7 +375,7 @@ public class LpTest {
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output1.toString()
                     });
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8", "--mink-p", "+INFIN",
                         "--measure", "Lp", "--measure-reversed",

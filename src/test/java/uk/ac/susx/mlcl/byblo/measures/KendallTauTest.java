@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
 import org.junit.Ignore;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.Main;
+import uk.ac.susx.mlcl.byblo.Tools;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
@@ -53,7 +53,7 @@ public class KendallTauTest {
 
         try {
             enableExistTrapping();
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "KendalTau",
@@ -84,7 +84,7 @@ public class KendallTauTest {
 
         try {
             enableExistTrapping();
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "KendalTau",
@@ -92,7 +92,7 @@ public class KendallTauTest {
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output1.toString(),});
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "KendalTau",

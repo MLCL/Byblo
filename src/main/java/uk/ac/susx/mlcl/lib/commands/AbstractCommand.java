@@ -84,7 +84,6 @@ public abstract class AbstractCommand implements Command {
         jc.addConverterFactory(new ConverterFactory());
         jc.addObject(this);
 
-
         // If sub-commands have been set then instantiate all the objects
         // and pass them to JCommander
         final Map<String, Command> subCommandInstances;

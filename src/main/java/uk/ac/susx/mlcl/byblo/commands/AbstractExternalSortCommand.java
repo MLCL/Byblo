@@ -83,10 +83,12 @@ public abstract class AbstractExternalSortCommand<T>
 
     private static final boolean DEBUG = false;
 
+    public static final int DEFAULT_MAX_CHUNK_SIZE = 50000;
+
     @Parameter(names = {"-C", "--chunk-size"},
     description = "Number of lines that will be read and sorted in RAM at one "
     + "time (per thread). Larger values increase memory usage and performace.")
-    private int maxChunkSize = 1000000;
+    private int maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
 
     @ParametersDelegate
     private final FilePipeDelegate fileDeligate = new FilePipeDelegate();

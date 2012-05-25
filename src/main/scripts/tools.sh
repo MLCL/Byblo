@@ -35,7 +35,7 @@
 # ============================================
 
 # Name of job
-#$ -N Byblo
+#$ -N BybloTools
 
 # Shell to use
 #$ -S /bin/bash
@@ -50,7 +50,7 @@
 #$ -pe openmp 12-
 
 # Send mail to. (Comma separated list)
-# #$ -M example@example.com
+# #$ -M example@exmaple.com
 
 # When: [b]eginning, [e]nd, [a]borted and reschedules, [s]uspended, [n]one
 #$ -m beas
@@ -65,6 +65,6 @@
 readonly JAVA_ARGS="-Xmx2g"
 
 
-java $JAVA_ARGS -cp ./*:lib/* uk.ac.susx.mlcl.byblo.FullBuild $@
+java $JAVA_ARGS -cp ./*:lib/* uk.ac.susx.mlcl.byblo.Tools $@
 
 

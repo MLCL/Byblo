@@ -128,9 +128,11 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
     @ParametersDelegate
     private FileDeligate fileDeligate = new FileDeligate();
 
+    public static final int DEFAULT_MAX_CHUNK_SIE = 500000;
+
     @Parameter(names = {"-C", "--chunk-size"},
     description = "Number of lines per work unit. Larger value increase performance and memory usage.")
-    private int maxChunkSize = 500000;
+    private int maxChunkSize = DEFAULT_MAX_CHUNK_SIE;
 
     @Parameter(names = {"-i", "--input"},
     required = true,

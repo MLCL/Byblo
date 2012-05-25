@@ -99,6 +99,10 @@ public class AllPairsCommand extends AbstractCommand {
     @ParametersDelegate
     private FileDeligate fileDeligate = new FileDeligate();
 
+    public static final int DEFAULT_MAX_CHUNK_SIZE = 2500;
+
+    public static final int DEFAULT_MINK_P = 2;
+
     @Parameter(names = {"-i", "--input"},
     description = "Event frequency vectors files.",
     required = true,
@@ -123,29 +127,35 @@ public class AllPairsCommand extends AbstractCommand {
 
     @Parameter(names = {"-C", "--chunk-size"},
     description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
-    private int chunkSize = 2500;
+    private int chunkSize = DEFAULT_MAX_CHUNK_SIZE;
 
     @Parameter(names = {"-t", "--threads"},
     description = "Number of conccurent processing threads.")
     private int numThreads = Runtime.getRuntime().availableProcessors() + 1;
 
+    public static final double DEFAULT_MIN_SIMILARITY = Double.NEGATIVE_INFINITY;
+
+    public static final double DEFAULT_MAX_SIMILARITY = Double.POSITIVE_INFINITY;
+
     @Parameter(names = {"-Smn", "--similarity-min"},
     description = "Minimum similarity threshold.",
     converter = DoubleConverter.class)
-    private double minSimilarity = Double.NEGATIVE_INFINITY;
+    private double minSimilarity = DEFAULT_MIN_SIMILARITY;
 
     @Parameter(names = {"-Smx", "--similarity-max"},
     description = "Maximyum similarity threshold.",
     converter = DoubleConverter.class)
-    private double maxSimilarity = Double.POSITIVE_INFINITY;
+    private double maxSimilarity = DEFAULT_MAX_SIMILARITY;
 
     @Parameter(names = {"-ip", "--identity-pairs"},
     description = "Produce similarity between pair of identical entries.")
     private boolean outputIdentityPairs = false;
 
+    public static final String DEFAULT_MEASURE = "Lin";
+
     @Parameter(names = {"-m", "--measure"},
     description = "Similarity measure to use.")
-    private String measureName = "Jaccard";
+    private String measureName = DEFAULT_MEASURE;
 
     @Parameter(names = {"--measure-reversed"},
     description = "Swap similarity measure inputs.")
@@ -169,7 +179,7 @@ public class AllPairsCommand extends AbstractCommand {
     @Parameter(names = {"--mink-p"},
     description = "P parameter to Minkowski/Lp space measure.",
     converter = DoubleConverter.class)
-    private double minkP = 2;
+    private double minkP = Lp.DEFAULT_P;
 
     public enum Algorithm {
 

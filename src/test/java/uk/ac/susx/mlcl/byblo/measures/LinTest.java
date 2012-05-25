@@ -34,7 +34,7 @@ import java.io.File;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.Main;
+import uk.ac.susx.mlcl.byblo.Tools;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
@@ -53,7 +53,7 @@ public class LinTest {
 
         try {
             enableExistTrapping();
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "Lin",
@@ -82,7 +82,7 @@ public class LinTest {
 
         try {
             enableExistTrapping();
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "Overlap",
@@ -91,7 +91,7 @@ public class LinTest {
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output1.toString()
                     });
-            Main.main(new String[]{
+            Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "Overlap", "--measure-reversed",
