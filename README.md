@@ -35,7 +35,7 @@ The resultant thesaurus will have a highly semantic notion of similarity. The ne
 ## Distribution 
 
 The software is primarily distributed in source-code form. Binaries may be available sporadically, and on request. 
-The source code can be acquired from the [github repository](https://github.com/hamishmorgan/Byblo), click the *Downloads* button, and select a version to download an archive of the source code.
+The source code can be acquired from the [github repository](https://github.com/MLCL/Byblo), click the *Downloads* button, and select a version to download an archive of the source code.
 
 ## Dependencies
 
@@ -124,7 +124,7 @@ Where the arguments are:
 
  * `<options>` Any number of the option switches
 
-There are a large number of options. To view a complete list enter ```./byblo.sh --help``` or view the wiki page on [Running the Sotware](https://github.com/hamishmorgan/Byblo/wiki/Running-the-Software)
+There are a large number of options. To view a complete list enter ```./byblo.sh --help``` or view the wiki page on [Running the Sotware](https://github.com/MLCL/Byblo/wiki/Running-the-Software)
 
 ## Attribution 
 
@@ -139,7 +139,7 @@ To contribute to the project you should fork the git repository. First click the
 ```sh
 $ git clone git@github.com:[your-user-name]/Byblo.git
 $ cd Byblo
-$ git remote add upsteam git@github.com:hamishmorgan/Byblo.git
+$ git remote add upsteam git@github.com:MLCL/Byblo.git
 $ git fetch upstream
 ```
 
@@ -147,4 +147,4 @@ If you have changes to contribute back to the main project, send me a pull reque
 
 ## Licence
 
-This software is distributed under the 3-clause [BSD Licence](https://github.com/hamishmorgan/Byblo/wiki/Licence).
+This software is distributed under the 3-clause [BSD Licence](https://github.com/MLCL/Byblo/wiki/Licence).
