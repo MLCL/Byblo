@@ -38,6 +38,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.FullBuild;
 import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
 
 /**
@@ -46,6 +49,8 @@ import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
  */
 public abstract class EnumeratingDeligate
         implements Serializable, Enumerating {
+
+    private static final Log LOG = LogFactory.getLog(FullBuild.class);
 
     private static final long serialVersionUID = 1L;
 //
@@ -107,9 +112,7 @@ public abstract class EnumeratingDeligate
 
     protected void save(Enumerator<String> enumerator) throws IOException {
         if (enumerator == null) {
-            Logger.getLogger(EnumeratingDeligate.class.getName()).log(
-                    Level.WARNING,
-                    "Attempt made to save an enumerator that was not open.");
+            LOG.warn("Attempt made to save an enumerator that was not open.");
             return;
         }
         type.save(enumerator);
@@ -119,9 +122,7 @@ public abstract class EnumeratingDeligate
 
     protected void close(Enumerator<String> enumerator) throws IOException {
         if (enumerator == null) {
-            Logger.getLogger(EnumeratingDeligate.class.getName()).log(
-                    Level.WARNING,
-                    "Attempt made to close an enumerator that was not open.");
+            LOG.warn("Attempt made to close an enumerator that was not open.");
             return;
         }
         if (enumerator.indexOf(FilterCommand.FILTERED_STRING) != FilterCommand.FILTERED_ID)

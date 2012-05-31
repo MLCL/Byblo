@@ -74,6 +74,7 @@ import uk.ac.susx.mlcl.byblo.tasks.InvertedApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.NaiveApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.ThreadedApssTask;
 import uk.ac.susx.mlcl.lib.Checks;
+import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.commands.DoubleConverter;
 import uk.ac.susx.mlcl.lib.commands.FileDeligate;
@@ -83,6 +84,8 @@ import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.io.Tell;
+import uk.ac.susx.mlcl.lib.tasks.ProgressEvent;
+import uk.ac.susx.mlcl.lib.tasks.ProgressListener;
 
 /**
  *
@@ -226,8 +229,7 @@ public class AllPairsCommand extends AbstractCommand {
     public void runCommand() throws Exception {
 
         if (LOG.isInfoEnabled()) {
-            LOG.info("Running all-pairs similarity search from \""
-                    + getEventsFile() + "\" to \"" + getOutputFile() + "\"");
+            LOG.info("Running all-pairs similarity.");
         }
 
         // Instantiate the denote proxmity measure
@@ -310,6 +312,17 @@ public class AllPairsCommand extends AbstractCommand {
         apss.setMeasure(prox);
         apss.setProducatePair(getProductionFilter());
 
+
+        apss.addProgressListener(new ProgressListener() {
+
+            @Override
+            public void progressChanged(ProgressEvent progressEvent) {
+                LOG.info(progressEvent.getSource().getProgressReport());
+//                LOG.info(MiscUtil.memoryInfoString());
+            }
+
+        });
+
         apss.run();
 
         if (sink instanceof Flushable)
@@ -326,8 +339,10 @@ public class AllPairsCommand extends AbstractCommand {
         if (apss.isExceptionTrapped())
             apss.throwTrappedException();
 
-        indexDeligate.saveEnumerator();
-        indexDeligate.closeEnumerator();
+        if (indexDeligate.isEnumeratorOpen()) {
+            indexDeligate.saveEnumerator();
+            indexDeligate.closeEnumerator();
+        }
 
         if (LOG.isInfoEnabled()) {
             LOG.info("Completed all-pairs similarity search.");

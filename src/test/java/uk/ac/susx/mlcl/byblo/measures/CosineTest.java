@@ -56,7 +56,7 @@ public class CosineTest {
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "Cosine",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", outputFile.toString()
@@ -84,7 +84,7 @@ public class CosineTest {
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "CosineMi",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", outputFile.toString()
@@ -115,7 +115,7 @@ public class CosineTest {
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "Cosine",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output1.toString()
@@ -125,7 +125,7 @@ public class CosineTest {
                         "--charset", "UTF-8",
                         "--measure", "Cosine",
                         "--measure-reversed",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output2.toString()
@@ -153,7 +153,7 @@ public class CosineTest {
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "CosineMi",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output1.toString()
@@ -163,7 +163,7 @@ public class CosineTest {
                         "--charset", "UTF-8",
                         "--measure", "CosineMi",
                         "--measure-reversed",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output2.toString()

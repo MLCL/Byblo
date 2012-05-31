@@ -33,6 +33,7 @@ package uk.ac.susx.mlcl.lib.tasks;
 
 import com.google.common.base.Objects;
 import java.io.Flushable;
+import java.text.MessageFormat;
 import java.util.Comparator;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Comparators;
@@ -44,7 +45,9 @@ import uk.ac.susx.mlcl.lib.io.ObjectSource;
  * @param <T>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class ObjectMergeTask<T> extends AbstractTask {
+public final class ObjectMergeTask<T> extends AbstractTask implements ProgressReporting {
+
+    private ProgressDeligate progress = new ProgressDeligate(this, false);
 
     private ObjectSource<T> sourceA;
 
@@ -55,7 +58,7 @@ public final class ObjectMergeTask<T> extends AbstractTask {
     private Comparator<T> comparator;
 
     public ObjectMergeTask(ObjectSource<T> sourceA, ObjectSource<T> sourceB, ObjectSink<T> sink,
-                     Comparator<T> comparator) {
+                           Comparator<T> comparator) {
         setSourceA(sourceA);
         setSourceB(sourceB);
         setSink(sink);
@@ -113,20 +116,16 @@ public final class ObjectMergeTask<T> extends AbstractTask {
         if (!super.equals(other))
             return false;
         if (this.getSourceA() != other.getSourceA()
-                && (this.getSourceA() == null || !this.getSourceA().equals(other.
-                    getSourceA())))
+                && (this.getSourceA() == null || !this.getSourceA().equals(other.getSourceA())))
             return false;
         if (this.getSourceB() != other.getSourceB()
-                && (this.getSourceB() == null || !this.getSourceB().equals(other.
-                    getSourceB())))
+                && (this.getSourceB() == null || !this.getSourceB().equals(other.getSourceB())))
             return false;
-        if (this.getSink() != other.getSink() && (this.getSink() == null || !this.
-                                                  getSink().equals(
-                                                  other.getSink())))
+        if (this.getSink() != other.getSink() && (this.getSink() == null || !this.getSink().equals(
+                other.getSink())))
             return false;
         if (this.getComparator() != other.getComparator()
-                && (this.getComparator() == null || !this.getComparator().equals(other.
-                    getComparator())))
+                && (this.getComparator() == null || !this.getComparator().equals(other.getComparator())))
             return false;
         return true;
     }
@@ -146,7 +145,8 @@ public final class ObjectMergeTask<T> extends AbstractTask {
         hash = 71 * hash + (this.sourceA != null ? this.sourceA.hashCode() : 0);
         hash = 71 * hash + (this.sourceB != null ? this.sourceB.hashCode() : 0);
         hash = 71 * hash + (this.sink != null ? this.sink.hashCode() : 0);
-        hash = 71 * hash + (this.comparator != null ? this.comparator.hashCode() : 0);
+        hash = 71 * hash + (this.comparator != null ? this.comparator.hashCode()
+                            : 0);
         return hash;
     }
 
@@ -166,6 +166,13 @@ public final class ObjectMergeTask<T> extends AbstractTask {
 
     @Override
     protected void runTask() throws Exception {
+        progress.startAdjusting();
+        progress.setStarted();
+//        progress.setProgressPercent(0);
+        progress.endAdjusting();
+
+        int mergeCount = 0;
+
         T a = sourceA.hasNext() ? sourceA.read() : null;
         T b = sourceB.hasNext() ? sourceB.read() : null;
         while (a != null && b != null) {
@@ -182,16 +189,36 @@ public final class ObjectMergeTask<T> extends AbstractTask {
                 a = sourceA.hasNext() ? sourceA.read() : null;
                 b = sourceB.hasNext() ? sourceB.read() : null;
             }
+            ++mergeCount;
+
+            if (mergeCount % 1000000 == 0) {
+                progress.setMessage(MessageFormat.format("Merged {0} unique items.", mergeCount));
+            }
         }
         while (a != null) {
             sink.write(a);
             a = sourceA.hasNext() ? sourceA.read() : null;
+            ++mergeCount;
+
+            if (mergeCount % 1000000 == 0) {
+                progress.setMessage(MessageFormat.format("Merged {0} unique items.", mergeCount));
+            }
         }
         while (b != null) {
             sink.write(b);
             b = sourceB.hasNext() ? sourceB.read() : null;
+            ++mergeCount;
+
+            if (mergeCount % 1000000 == 0) {
+                progress.setMessage(MessageFormat.format("Merged {0} unique items.", mergeCount));
+            }
         }
 
+        progress.startAdjusting();
+        progress.setMessage(MessageFormat.format("Merged {0} unique items.", mergeCount));
+        progress.setCompleted();
+//        progress.setProgressPercent(100);
+        progress.endAdjusting();
 
         if (sink instanceof Flushable)
             ((Flushable) sink).flush();
@@ -201,7 +228,44 @@ public final class ObjectMergeTask<T> extends AbstractTask {
     protected void finaliseTask() throws Exception {
     }
 
-     @Override
+    @Override
+    public String getName() {
+        return "merge";
+    }
+
+    public void removeProgressListener(ProgressListener progressListener) {
+        progress.removeProgressListener(progressListener);
+    }
+
+    public boolean isStarted() {
+        return progress.isStarted();
+    }
+
+    public boolean isProgressPercentageSupported() {
+        return progress.isProgressPercentageSupported();
+    }
+
+    public boolean isCompleted() {
+        return progress.isCompleted();
+    }
+
+    public String getProgressReport() {
+        return progress.getProgressReport();
+    }
+
+    public int getProgressPercent() {
+        return progress.getProgressPercent();
+    }
+
+    public ProgressListener[] getProgressListeners() {
+        return progress.getProgressListeners();
+    }
+
+    public void addProgressListener(ProgressListener progressListener) {
+        progress.addProgressListener(progressListener);
+    }
+
+    @Override
     protected Objects.ToStringHelper toStringHelper() {
         return super.toStringHelper().
                 add("sourceA", getSourceA()).

@@ -123,7 +123,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.16</version>
-            <type>zip</type>
+<!--            <type>zip</type>-->
             <optional>true</optional>
         </dependency>
 
@@ -178,6 +178,17 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.12</version>
+                <configuration>
+                    <parallel>methods</parallel>
+                    <threadCount>10</threadCount>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.surefire</groupId>
+                        <artifactId>surefire-junit47</artifactId>
+                        <version>2.12</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <plugin>

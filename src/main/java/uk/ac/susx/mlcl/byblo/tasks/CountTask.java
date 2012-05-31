@@ -37,6 +37,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import java.io.Flushable;
 import java.io.Serializable;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -49,6 +50,9 @@ import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
+import uk.ac.susx.mlcl.lib.tasks.ProgressDeligate;
+import uk.ac.susx.mlcl.lib.tasks.ProgressListener;
+import uk.ac.susx.mlcl.lib.tasks.ProgressReporting;
 
 /**
  * <p>Read in a raw feature instances, to produce three frequency cuonts:
@@ -56,9 +60,12 @@ import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class CountTask extends AbstractTask implements Serializable {
+public final class CountTask extends AbstractTask
+        implements Serializable, ProgressReporting {
 
     private static final long serialVersionUID = 1L;
+
+    private final ProgressDeligate progress = new ProgressDeligate(this, true);
 
     private ObjectSource<TokenPair> source;
 
@@ -172,6 +179,8 @@ public final class CountTask extends AbstractTask implements Serializable {
     @Override
     public void runTask() throws Exception {
 
+        progress.setStarted();
+
         final Object2IntMap<TokenPair> eventFreq =
                 new Object2IntOpenHashMap<TokenPair>();
         eventFreq.defaultReturnValue(0);
@@ -182,6 +191,7 @@ public final class CountTask extends AbstractTask implements Serializable {
         final Int2IntMap entryFreq = new Int2IntOpenHashMap();
         entryFreq.defaultReturnValue(0);
 
+        int instanceCount = 0;
         while (getSource().hasNext()) {
             final TokenPair instance;
             instance = getSource().read();
@@ -192,13 +202,32 @@ public final class CountTask extends AbstractTask implements Serializable {
             entryFreq.put(entry_id, entryFreq.get(entry_id) + 1);
             featureFreq.put(feature_id, featureFreq.get(feature_id) + 1);
             eventFreq.put(instance, eventFreq.getInt(instance) + 1);
+
+            ++instanceCount;
+            if (instanceCount % 1000000 == 0 || !getSource().hasNext()) {
+                progress.setMessage(MessageFormat.format("Read {0} instances", instanceCount));
+            }
         }
+
+        progress.startAdjusting();
+        progress.setProgressPercent(
+                100 * (instanceCount)
+                / (instanceCount + entryFreq.size() + featureFreq.size() + eventFreq.size()));
+        progress.setMessage("Writing entries.");
+        progress.endAdjusting();
 
         List<Weighted<Token>> entries = int2IntMapToWeightedTokens(entryFreq);
         Collections.sort(entries, getEntryComparator());
         ObjectIO.copy(entries, getEntrySink());
         if (getEntrySink() instanceof Flushable)
             ((Flushable) getEntrySink()).flush();
+
+        progress.startAdjusting();
+        progress.setProgressPercent(
+                100 * (instanceCount + entryFreq.size())
+                / (instanceCount + entryFreq.size() + featureFreq.size() + eventFreq.size()));
+        progress.setMessage("Writing features.");
+        progress.endAdjusting();
 
 
         List<Weighted<Token>> features = int2IntMapToWeightedTokens(featureFreq);
@@ -207,6 +236,12 @@ public final class CountTask extends AbstractTask implements Serializable {
         if (getFeatureSink() instanceof Flushable)
             ((Flushable) getFeatureSink()).flush();
 
+        progress.startAdjusting();
+        progress.setProgressPercent(
+                100 * (instanceCount + entryFreq.size() + featureFreq.size())
+                / (instanceCount + entryFreq.size() + featureFreq.size() + eventFreq.size()));
+        progress.setMessage("Writing events.");
+        progress.endAdjusting();
 
 
         List<Weighted<TokenPair>> events = obj2intmapToWeightedObjList(eventFreq);
@@ -214,6 +249,11 @@ public final class CountTask extends AbstractTask implements Serializable {
         ObjectIO.copy(events, getEventSink());
         if (getEventSink() instanceof Flushable)
             ((Flushable) getEventSink()).flush();
+
+        progress.startAdjusting();
+        progress.setProgressPercent(100);
+        progress.setCompleted();
+        progress.endAdjusting();
 
 
     }
@@ -239,6 +279,43 @@ public final class CountTask extends AbstractTask implements Serializable {
                     e.getKey(), e.getIntValue()));
         }
         return out;
+    }
+
+    @Override
+    public String getName() {
+        return "count";
+    }
+
+    public void removeProgressListener(ProgressListener progressListener) {
+        progress.removeProgressListener(progressListener);
+    }
+
+    public boolean isStarted() {
+        return progress.isStarted();
+    }
+
+    public boolean isProgressPercentageSupported() {
+        return progress.isProgressPercentageSupported();
+    }
+
+    public boolean isCompleted() {
+        return progress.isCompleted();
+    }
+
+    public String getProgressReport() {
+        return progress.getProgressReport();
+    }
+
+    public int getProgressPercent() {
+        return progress.getProgressPercent();
+    }
+
+    public ProgressListener[] getProgressListeners() {
+        return progress.getProgressListeners();
+    }
+
+    public void addProgressListener(ProgressListener progressListener) {
+        progress.addProgressListener(progressListener);
     }
 
     @Override

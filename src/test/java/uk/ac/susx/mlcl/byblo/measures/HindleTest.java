@@ -56,7 +56,7 @@ public class HindleTest {
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "Hindle",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output.toString()
@@ -84,7 +84,7 @@ public class HindleTest {
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "Hindle",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output1.toString()
@@ -94,7 +94,7 @@ public class HindleTest {
                         "--charset", "UTF-8",
                         "--measure", "Hindle",
                         "--measure-reversed",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output2.toString()

@@ -71,6 +71,10 @@ import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
+import uk.ac.susx.mlcl.lib.tasks.ProgressDeligate;
+import uk.ac.susx.mlcl.lib.tasks.ProgressEvent;
+import uk.ac.susx.mlcl.lib.tasks.ProgressListener;
+import uk.ac.susx.mlcl.lib.tasks.ProgressReporting;
 
 /**
  *
@@ -81,7 +85,8 @@ import uk.ac.susx.mlcl.lib.io.TempFileFactory;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Parameters(commandDescription = "Filter a set of frequency files")
-public class FilterCommand extends AbstractCommand implements Serializable {
+public class FilterCommand extends AbstractCommand
+        implements Serializable, ProgressReporting {
 
     private static final long serialVersionUID = 1L;
 
@@ -99,9 +104,11 @@ public class FilterCommand extends AbstractCommand implements Serializable {
     @ParametersDelegate
     private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
 
+    private final ProgressDeligate progress = new ProgressDeligate(this, true);
     /*
      * === INPUT FILES ===
      */
+
     @Parameter(names = {"-iv", "--input-events"},
     required = true,
     description = "Input event frequencies file.",
@@ -273,7 +280,17 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         activeEntriesFile = inputEntriesFile;
         activeFeaturesFile = inputFeaturesFile;
 
+        progress.addProgressListener(new ProgressListener() {
 
+            @Override
+            public void progressChanged(ProgressEvent progressEvent) {
+                LOG.info(progressEvent.getSource().getProgressReport());
+            }
+
+        });
+
+        progress.setStarted();
+        progress.setProgressPercent(0);
 
 
         // Run the filters forwards then backwards. Each filtering step may
@@ -282,56 +299,81 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         // very unlikely to take more than 3 passes
 
         int passCount = 0;
+        int opCount = 0;
 
         while (entryFilterRequired
                 || eventFilterRequired
                 || featureFilterRequired) {
 
-            if (entryFilterRequired || eventFilterRequired) {
-                if (LOG.isInfoEnabled()) {
-                    LOG.info(
-                            "Running forwards filtering pass (#" + (++passCount) + ").");
-                }
+//            if (entryFilterRequired || eventFilterRequired) {
 
-                if (entryFilterRequired) {
-                    filterEntries();
-                }
+            progress.setMessage("Running filtering pass (#" + (++passCount) + ").");
 
-                if (eventFilterRequired) {
-                    filterEvents();
-                }
-
-                if (featureFilterRequired) {
-                    filterFeatures();
-                }
+            if (entryFilterRequired) {
+                filterEntries();
+                ++opCount;
+                progress.setProgressPercent(100 * opCount / (opCount + 3
+                        + (entryFilterRequired ? 1 : 0)
+                        + (eventFilterRequired ? 1 : 0)
+                        + (featureFilterRequired ? 1 : 0)));
             }
 
-            if (featureFilterRequired || eventFilterRequired) {
-                if (LOG.isInfoEnabled()) {
-                    LOG.info(
-                            "Running backwards filtering pass (#" + (++passCount) + ").");
-                }
-
-                if (featureFilterRequired) {
-                    filterFeatures();
-                }
-
-                if (eventFilterRequired) {
-                    filterEvents();
-                }
-
-                if (entryFilterRequired) {
-                    filterEntries();
-                }
+            if (eventFilterRequired) {
+                filterEvents();
+                ++opCount;
+                progress.setProgressPercent(100 * opCount / (opCount + 3
+                        + (entryFilterRequired ? 1 : 0)
+                        + (eventFilterRequired ? 1 : 0)
+                        + (featureFilterRequired ? 1 : 0)));
             }
+
+            if (featureFilterRequired) {
+                filterFeatures();
+                ++opCount;
+                progress.setProgressPercent(100 * opCount / (opCount + 3
+                        + (entryFilterRequired ? 1 : 0)
+                        + (eventFilterRequired ? 1 : 0)
+                        + (featureFilterRequired ? 1 : 0)));
+            }
+//            }
+//
+//            if (featureFilterRequired || eventFilterRequired) {
+//
+//                progress.setMessage("Running backwards filtering pass (#" + (++passCount) + ").");
+//
+//                if (featureFilterRequired) {
+//                    filterFeatures();
+//                    ++opCount;
+//                    progress.setProgressPercent(100 * opCount / (opCount
+//                            + (entryFilterRequired ? 1 : 0)
+//                            + (eventFilterRequired ? 1 : 0)
+//                            + (featureFilterRequired ? 1 : 0)));
+//                }
+
+            if (eventFilterRequired) {
+                filterEvents();
+                ++opCount;
+                progress.setProgressPercent(100 * opCount / (opCount + 3
+                        + (entryFilterRequired ? 1 : 0)
+                        + (eventFilterRequired ? 1 : 0)
+                        + (featureFilterRequired ? 1 : 0)));
+            }
+
+            if (entryFilterRequired) {
+                filterEntries();
+                ++opCount;
+                progress.setProgressPercent(100 * opCount / (opCount + 3
+                        + (entryFilterRequired ? 1 : 0)
+                        + (eventFilterRequired ? 1 : 0)
+                        + (featureFilterRequired ? 1 : 0)));
+            }
+//            }
         }
 
         // Finished filtering so copy the results files to the outputs.
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Copying entries from " + activeEntriesFile
-                    + " to " + outputEntriesFile + ".");
-        }
+        progress.setMessage("Copying final entries file.");
+
 
         outputEntriesFile.delete();
         if (!activeEntriesFile.renameTo(outputEntriesFile)) {
@@ -339,11 +381,15 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             if (!activeEntriesFile.equals(inputEntriesFile))
                 activeEntriesFile.delete();
         }
+        ++opCount;
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Copying features from " + activeEventsFile
-                    + " to " + outputEventsFile + ".");
-        }
+        progress.startAdjusting();
+        progress.setProgressPercent(100 * opCount / (opCount + 2
+                + (entryFilterRequired ? 1 : 0)
+                + (eventFilterRequired ? 1 : 0)
+                + (featureFilterRequired ? 1 : 0)));
+        progress.setMessage("Copying finaly events file.");
+        progress.endAdjusting();
 
         outputEventsFile.delete();
         if (!activeEventsFile.renameTo(outputEventsFile)) {
@@ -352,11 +398,15 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             if (!activeEventsFile.equals(inputEventsFile))
                 activeEventsFile.delete();
         }
+        ++opCount;
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Copying features from " + activeFeaturesFile
-                    + " to " + outputFeaturesFile + ".");
-        }
+        progress.startAdjusting();
+        progress.setProgressPercent(100 * opCount / (opCount + 1
+                + (entryFilterRequired ? 1 : 0)
+                + (eventFilterRequired ? 1 : 0)
+                + (featureFilterRequired ? 1 : 0)));
+        progress.setMessage("Copying final features file.");
+        progress.endAdjusting();
 
         outputFeaturesFile.delete();
         if (!activeFeaturesFile.renameTo(outputFeaturesFile)) {
@@ -364,14 +414,20 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             if (!activeFeaturesFile.equals(inputFeaturesFile))
                 activeFeaturesFile.delete();
         }
+        ++opCount;
+        progress.setProgressPercent(100 * opCount / (opCount + 0
+                + (entryFilterRequired ? 1 : 0)
+                + (eventFilterRequired ? 1 : 0)
+                + (featureFilterRequired ? 1 : 0)));
 
-        indexDeligate.saveEnumerator();
-        indexDeligate.closeEnumerator();
 
-
-        if (LOG.isInfoEnabled()) {
-            LOG.info("Completed filtering.");
+        if (indexDeligate.isEnumeratorOpen()) {
+            indexDeligate.saveEnumerator();
+            indexDeligate.closeEnumerator();
         }
+
+
+        progress.setCompleted();
     }
     // Read the entries file, passing it thought the filter. accepted entries
     // are written out to the output file while rejected entries are stored
@@ -390,10 +446,8 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         WeightedTokenSink entriesSink = BybloIO.openEntriesSink(
                 outputFile, getCharset(), getIndexDeligate());
 
-        if (LOG.isInfoEnabled()) {
-            LOG.info(
-                    "Filtering entries from " + activeEntriesFile + " to " + outputFile + ".");
-        }
+        progress.setMessage("Filtering entries.");
+
 
         final int filteredEntry = getIndexDeligate().getEntryEnumerator().indexOf(
                 FILTERED_STRING);
@@ -418,7 +472,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
             if ((inCount % PROGRESS_INTERVAL == 0 || !entriesSource.hasNext())
                     && LOG.isInfoEnabled()) {
-                LOG.info(format("Accepted {0} of {1} entries.", outCount, inCount));
+                progress.setMessage(format("Accepted {0} of {1} entries.", outCount, inCount));
                 LOG.debug(MiscUtil.memoryInfoString());
             }
         }
@@ -444,8 +498,8 @@ public class FilterCommand extends AbstractCommand implements Serializable {
         if (rejected.size() > 0) {
             eventFilterRequired = true;
             acceptEvent = Predicates2.and(acceptEvent,
-                                                 Predicates2.compose(Predicates2.not(Predicates2.in(rejected)),
-                                                                     eventEntryId()));
+                                          Predicates2.compose(Predicates2.not(Predicates2.in(rejected)),
+                                                              eventEntryId()));
         }
 
 
@@ -471,10 +525,8 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
         WeightedTokenPairSink efSink = BybloIO.openEventsSink(outputFile, getCharset(), indexDeligate);
 
-        if (LOG.isInfoEnabled()) {
-            LOG.info("Filtering entry/features pairs from "
-                    + activeEventsFile + " to " + outputFile + ".");
-        }
+        progress.setMessage("Filtering events from.");
+
 
         // Store the id of the special filtered feature and entry
         // TODO This can probably be removed now but need to check
@@ -489,8 +541,12 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
         double filteredEntryWeight = 0;
 
+        int readCount = 0;
+        int writeCount = 0;
+
         while (efSrc.hasNext()) {
             Weighted<TokenPair> record = efSrc.read();
+            ++readCount;
 
             if (record.record().id1() == filteredEntry) {
                 filteredEntryWeight += record.weight();
@@ -506,6 +562,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
                         efSink.write(new Weighted<TokenPair>(
                                 new TokenPair(currentEntryId, filteredFeature),
                                 currentEntryFilteredFeatureWeight));
+                        ++writeCount;
                     }
                 }
 
@@ -521,6 +578,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             } else if (acceptEvent.apply(record)) {
 
                 efSink.write(record);
+                ++writeCount;
                 acceptedEntries.add(record.record().id1());
                 acceptedFeatures.add(record.record().id2());
                 ++currentEventCount;
@@ -532,14 +590,11 @@ public class FilterCommand extends AbstractCommand implements Serializable {
                 currentEntryFilteredFeatureWeight += record.weight();
             }
 
-
-//            if ((efSrc.getCount() % PROGRESS_INTERVAL == 0
-//                 || !efSrc.hasNext()) && LOG.isInfoEnabled()) {
-//                LOG.info(
-//                        "Accepted " + efSink.getCount() + " of " + efSrc.
-//                        getCount() + " feature entries.");
-//                LOG.debug(MiscUtil.memoryInfoString());
-//            }
+            if ((readCount % PROGRESS_INTERVAL == 0
+                    || !efSrc.hasNext()) && LOG.isInfoEnabled()) {
+                progress.setMessage("Accepted " + writeCount + " of " + readCount + " events.");
+                LOG.debug(MiscUtil.memoryInfoString());
+            }
         }
 
 
@@ -607,10 +662,8 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
         WeightedTokenSink featureSink = BybloIO.openFeaturesSink(outputFile, getCharset(), indexDeligate);
 
-        if (LOG.isInfoEnabled()) {
-            LOG.info(
-                    "Filtering features from " + activeFeaturesFile + " to " + outputFile + ".");
-        }
+        progress.setMessage("Filtering features.");
+
 
         // Store an filtered wieght here and record it so as to maintain
         // accurate priors for those features that remain
@@ -637,7 +690,7 @@ public class FilterCommand extends AbstractCommand implements Serializable {
             if ((inCount % PROGRESS_INTERVAL == 0
                     || !featureSource.hasNext())
                     && LOG.isInfoEnabled()) {
-                LOG.info(format("Accepted {0} of {1} features.", outCount, inCount));
+                progress.setMessage(format("Accepted {0} of {1} features.", outCount, inCount));
                 LOG.debug(MiscUtil.memoryInfoString());
             }
         }
@@ -1202,6 +1255,46 @@ public class FilterCommand extends AbstractCommand implements Serializable {
 
     public EnumeratorType getEnuemratorType() {
         return indexDeligate.getEnuemratorType();
+    }
+
+    public void removeProgressListener(ProgressListener progressListener) {
+        progress.removeProgressListener(progressListener);
+    }
+
+    public boolean isStarted() {
+        return progress.isStarted();
+    }
+
+    public boolean isRunning() {
+        return progress.isRunning();
+    }
+
+    public boolean isProgressPercentageSupported() {
+        return progress.isProgressPercentageSupported();
+    }
+
+    public boolean isCompleted() {
+        return progress.isCompleted();
+    }
+
+    public String getProgressReport() {
+        return progress.getProgressReport();
+    }
+
+    public int getProgressPercent() {
+        return progress.getProgressPercent();
+    }
+
+    public ProgressListener[] getProgressListeners() {
+        return progress.getProgressListeners();
+    }
+
+    public String getName() {
+        return "filter";
+    }
+
+    public void addProgressListener(ProgressListener progressListener) {
+        progress.addProgressListener(progressListener);
     }
 
     @Override

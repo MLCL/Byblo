@@ -35,6 +35,8 @@ import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
@@ -45,12 +47,17 @@ import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.tasks.ProgressEvent;
+import uk.ac.susx.mlcl.lib.tasks.ProgressListener;
 
 /**
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weighted<TokenPair>> {
+
+    private static final Log LOG = LogFactory.getLog(
+            ExternalSortEventsCommand.class);
 
     @ParametersDelegate
     private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
@@ -67,9 +74,21 @@ public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weigh
 
     @Override
     public void runCommand() throws Exception {
+        this.addProgressListener(new ProgressListener() {
+
+            @Override
+            public void progressChanged(ProgressEvent progressEvent) {
+                LOG.info(getProgressReport());
+            }
+
+        });
+
         super.runCommand();
-        indexDeligate.saveEnumerator();
-        indexDeligate.closeEnumerator();
+
+        if (indexDeligate.isEnumeratorOpen()) {
+            indexDeligate.saveEnumerator();
+            indexDeligate.closeEnumerator();
+        }
 
     }
 

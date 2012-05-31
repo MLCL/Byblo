@@ -59,6 +59,10 @@ import uk.ac.susx.mlcl.lib.tasks.FileDeleteTask;
 import uk.ac.susx.mlcl.lib.tasks.FileMoveTask;
 import uk.ac.susx.mlcl.lib.tasks.ObjectMergeTask;
 import uk.ac.susx.mlcl.lib.tasks.ObjectSortTask;
+import uk.ac.susx.mlcl.lib.tasks.ProgressAggregate;
+import uk.ac.susx.mlcl.lib.tasks.ProgressEvent;
+import uk.ac.susx.mlcl.lib.tasks.ProgressListener;
+import uk.ac.susx.mlcl.lib.tasks.ProgressReporting;
 import uk.ac.susx.mlcl.lib.tasks.Task;
 
 /**
@@ -68,7 +72,8 @@ import uk.ac.susx.mlcl.lib.tasks.Task;
  */
 @Parameters(commandDescription = "Sort a file.")
 public abstract class AbstractExternalSortCommand<T>
-        extends AbstractParallelCommandTask {
+        extends AbstractParallelCommandTask
+        implements ProgressReporting {
 
     private static final Log LOG = LogFactory.getLog(
             AbstractExternalSortCommand.class);
@@ -105,6 +110,8 @@ public abstract class AbstractExternalSortCommand<T>
     private Comparator<T> comparator;
 
     private File[] nextFileToMerge;
+
+    private final ProgressAggregate progress = new ProgressAggregate(this);
 
     public AbstractExternalSortCommand(File src, File dst, Charset charset,
                                        Comparator<T> comparator,
@@ -165,15 +172,18 @@ public abstract class AbstractExternalSortCommand<T>
         this.maxChunkSize = maxChunkSize;
     }
 
+
     @Override
     protected void runTask() throws Exception {
 
-        if (LOG.isInfoEnabled()) {
-            LOG.info(
-                    "Sorting file externally: from \""
-                    + getFileDeligate().getSourceFile() + "\" to \""
-                    + getFileDeligate().getDestinationFile() + "\".");
-        }
+
+
+//
+//        if (LOG.isInfoEnabled()) {
+//            LOG.info("Sorting file externally: from \""
+//                    + getFileDeligate().getSourceFile() + "\" to \""
+//                    + getFileDeligate().getDestinationFile() + "\".");
+//        }
 
         if (getComparator() == null) {
             throw new NullPointerException();
@@ -185,6 +195,10 @@ public abstract class AbstractExternalSortCommand<T>
                 getSourceFile());
         final ObjectSource<Chunk<T>> chunks = Chunker.newInstance(
                 src, getMaxChunkSize());
+
+        progress.startAdjusting();
+        progress.setStarted();
+        progress.endAdjusting();
 
         while (chunks.hasNext()) {
             while (!getFutureQueue().isEmpty() && getFutureQueue().peek().isDone()) {
@@ -218,6 +232,8 @@ public abstract class AbstractExternalSortCommand<T>
                 ObjectMergeTask<T> mergeTask = createMergeTask(
                         nextFileToMerge[i], nextFileToMerge[i + 1], tmp);
 
+                progress.addChildProgressReporter(mergeTask);
+
                 mergeTask.run();
 
                 if (mergeTask.isExceptionTrapped())
@@ -243,15 +259,17 @@ public abstract class AbstractExternalSortCommand<T>
 
         FileMoveTask moveTask = new FileMoveTask(
                 finalMerge, getFileDeligate().getDestinationFile());
+        progress.addChildProgressReporter(moveTask);
         moveTask.run();
 
         if (moveTask.isExceptionTrapped())
             moveTask.throwTrappedException();
 
 
-        if (LOG.isInfoEnabled()) {
-            LOG.info("Completed " + this + ".");
-        }
+        progress.startAdjusting();
+        progress.setCompleted();
+        progress.endAdjusting();
+
 
     }
 
@@ -333,7 +351,9 @@ public abstract class AbstractExternalSortCommand<T>
     }
 
     protected FileDeleteTask createDeleteTask(File file) {
-        return new FileDeleteTask(file);
+        FileDeleteTask task = new FileDeleteTask(file);
+        progress.addChildProgressReporter(task);
+        return task;
     }
 
     protected ObjectSortTask<T> createSortTask(Chunk<T> chunk, File dst) throws IOException {
@@ -346,6 +366,9 @@ public abstract class AbstractExternalSortCommand<T>
         task.setProperty(KEY_SRC_FILE, getFileDeligate().
                 getSourceFile().toString());
         task.setProperty(KEY_DST_FILE, dst.toString());
+
+        progress.addChildProgressReporter(task);
+
         return task;
     }
 
@@ -361,6 +384,8 @@ public abstract class AbstractExternalSortCommand<T>
         mergeTask.setProperty(KEY_SRC_FILE_A, srcA.toString());
         mergeTask.setProperty(KEY_SRC_FILE_B, srcB.toString());
         mergeTask.setProperty(KEY_DST_FILE, dst.toString());
+
+        progress.addChildProgressReporter(mergeTask);
 
         return mergeTask;
 
@@ -402,5 +427,47 @@ public abstract class AbstractExternalSortCommand<T>
     protected abstract SeekableObjectSource<T, ?> openSource(File file) throws IOException;
 
     protected abstract ObjectSink<T> openSink(File file) throws IOException;
+
+    public void removeProgressListener(ProgressListener progressListener) {
+        progress.removeProgressListener(progressListener);
+    }
+
+    public boolean isStarted() {
+        return progress.isStarted();
+    }
+
+    public boolean isRunning() {
+        return progress.isRunning();
+    }
+
+    public boolean isProgressPercentageSupported() {
+        return progress.isProgressPercentageSupported();
+    }
+
+    public boolean isCompleted() {
+        return progress.isCompleted();
+    }
+
+    public int getProgressPercent() {
+        return progress.getProgressPercent();
+    }
+
+    public ProgressListener[] getProgressListeners() {
+        return progress.getProgressListeners();
+    }
+
+    public void addProgressListener(ProgressListener progressListener) {
+        progress.addProgressListener(progressListener);
+    }
+
+    @Override
+    public String getProgressReport() {
+        return progress.getProgressReport();
+    }
+
+    @Override
+    public String getName() {
+        return "xsort";
+    }
 
 }

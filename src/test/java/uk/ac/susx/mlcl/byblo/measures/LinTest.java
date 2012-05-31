@@ -57,7 +57,7 @@ public class LinTest {
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "Lin",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output.toString()
@@ -86,7 +86,7 @@ public class LinTest {
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "Overlap",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output1.toString()
@@ -95,7 +95,7 @@ public class LinTest {
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "Overlap", "--measure-reversed",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output2.toString()

@@ -52,6 +52,9 @@ import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
+import uk.ac.susx.mlcl.lib.tasks.ProgressDeligate;
+import uk.ac.susx.mlcl.lib.tasks.ProgressListener;
+import uk.ac.susx.mlcl.lib.tasks.ProgressReporting;
 
 /**
  * The most basic implementation of all-pairs similarity search. Will only
@@ -61,7 +64,8 @@ import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <P> The generic-type for offset positions.
  */
-public class NaiveApssTask<P> extends AbstractTask {
+public class NaiveApssTask<P> extends AbstractTask
+        implements ProgressReporting {
 
     private static final Log LOG = LogFactory.getLog(NaiveApssTask.class);
 
@@ -70,6 +74,8 @@ public class NaiveApssTask<P> extends AbstractTask {
      * instantiated quickly and easily.
      */
     public static final Proximity DEFAULT_MEASURE = new Jaccard();
+
+    protected final ProgressDeligate progress = new ProgressDeligate(this, true);
 
     private SeekableObjectSource<Indexed<SparseDoubleVector>, P> sourceA;
 
@@ -216,6 +222,12 @@ public class NaiveApssTask<P> extends AbstractTask {
         List<Weighted<TokenPair>> pairs = new ArrayList<Weighted<TokenPair>>();
         final P restartB = getSourceB().position();
 
+        progress.startAdjusting();
+        progress.setStarted();
+        progress.setMessage("Reading feature vectors.");
+        progress.setProgressPercent(0);
+        progress.endAdjusting();
+
         // for every vector (a) in source A
         while (getSourceA().hasNext()) {
             Indexed<SparseDoubleVector> a = getSourceA().read();
@@ -245,10 +257,30 @@ public class NaiveApssTask<P> extends AbstractTask {
                 }
             }
         }
+
+        progress.startAdjusting();
+        progress.setMessage("Sorting pairs.");
+        progress.setProgressPercent(80);
+        progress.endAdjusting();
+
+
         Collections.sort(pairs, Weighted.recordOrder(TokenPair.indexOrder()));
+
+        progress.startAdjusting();
+        progress.setMessage("Writing pairs.");
+        progress.setProgressPercent(90);
+        progress.endAdjusting();
+
         synchronized (getSink()) {
             ObjectIO.copy(pairs, getSink());
         }
+
+
+        progress.startAdjusting();
+        progress.setProgressPercent(100);
+        progress.setCompleted();
+        progress.endAdjusting();
+
     }
 
     @Override
@@ -341,6 +373,46 @@ public class NaiveApssTask<P> extends AbstractTask {
                 measure.shared(a.value(), b.value()),
                 precalcA.get(a.key()),
                 precalcB.get(b.key()));
+    }
+
+    public void removeProgressListener(ProgressListener progressListener) {
+        progress.removeProgressListener(progressListener);
+    }
+
+    public boolean isStarted() {
+        return progress.isStarted();
+    }
+
+    public boolean isRunning() {
+        return progress.isRunning();
+    }
+
+    public boolean isProgressPercentageSupported() {
+        return progress.isProgressPercentageSupported();
+    }
+
+    public boolean isCompleted() {
+        return progress.isCompleted();
+    }
+
+    public String getProgressReport() {
+        return progress.getProgressReport();
+    }
+
+    public int getProgressPercent() {
+        return progress.getProgressPercent();
+    }
+
+    public ProgressListener[] getProgressListeners() {
+        return progress.getProgressListeners();
+    }
+
+    public String getName() {
+        return "naive-allpairs";
+    }
+
+    public void addProgressListener(ProgressListener progressListener) {
+        progress.addProgressListener(progressListener);
     }
 
     @Override

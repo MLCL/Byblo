@@ -84,8 +84,8 @@ public final class ObjectSortTask<T> extends ObjectPipeTask<T> {
             return false;
         if (this.getComparator() != other.getComparator()
                 && (this.getComparator() == null
-                    || !this.getComparator().
-                    equals(other.getComparator())))
+                || !this.getComparator().
+                equals(other.getComparator())))
             return false;
         return true;
 
@@ -101,7 +101,8 @@ public final class ObjectSortTask<T> extends ObjectPipeTask<T> {
     @Override
     public int hashCode() {
         int hash = super.hashCode();
-        hash = 71 * hash + (this.comparator != null ? this.comparator.hashCode() : 0);
+        hash = 71 * hash + (this.comparator != null ? this.comparator.hashCode()
+                            : 0);
         return hash;
     }
 
@@ -113,6 +114,8 @@ public final class ObjectSortTask<T> extends ObjectPipeTask<T> {
 
     @Override
     protected void runTask() throws IOException {
+
+        progress.setStarted();
 
         final List<T> items = ObjectIO.readAll(getSource());
 
@@ -126,6 +129,14 @@ public final class ObjectSortTask<T> extends ObjectPipeTask<T> {
 
         if (getSink() instanceof Flushable)
             ((Flushable) getSink()).flush();
+
+
+        progress.setCompleted();
+    }
+
+    @Override
+    public String getName() {
+        return "sort";
     }
 
     @Override
@@ -133,6 +144,5 @@ public final class ObjectSortTask<T> extends ObjectPipeTask<T> {
         return super.toStringHelper().
                 add("comparator", getComparator());
     }
-
 
 }

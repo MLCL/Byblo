@@ -73,7 +73,7 @@ public class ThreadedApssTaskTest {
                                  TEST_FRUIT_INPUT.getName() + ".sims").toString();
         String[] args = {
             "allpairs",
-            "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+            "--input", TEST_FRUIT_EVENTS.toString(),
             "--input-entries", TEST_FRUIT_ENTRIES.toString(),
             "--input-features", TEST_FRUIT_FEATURES.toString(),
             "--output", output,
@@ -104,12 +104,12 @@ public class ThreadedApssTaskTest {
         WeightedTokenPairVectorSource vsa =
                 new WeightedTokenPairVectorSource(
                 WeightedTokenPairSource.open(
-                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, del, false, false));
+                TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
         WeightedTokenPairVectorSource vsb =
                 new WeightedTokenPairVectorSource(
                 WeightedTokenPairSource.open(
-                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, del, false, false));
+                TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
         List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
         ObjectSink<Weighted<TokenPair>> sink = ObjectIO.asSink(result);
@@ -142,12 +142,12 @@ public class ThreadedApssTaskTest {
         WeightedTokenPairVectorSource vsa =
                 new WeightedTokenPairVectorSource(
                 WeightedTokenPairSource.open(
-                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, del, false, false));
+                TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
         WeightedTokenPairVectorSource vsb =
                 new WeightedTokenPairVectorSource(
                 WeightedTokenPairSource.open(
-                TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, del, false, false));
+                TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
         List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
         ObjectSink<Weighted<TokenPair>> sink = ObjectIO.asSink(result);
         ThreadedApssTask<Tell> instance = new ThreadedApssTask<Tell>(
@@ -183,12 +183,12 @@ public class ThreadedApssTaskTest {
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, del, false, false));
+                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, del, false, false));
+                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
 
             List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
@@ -214,12 +214,12 @@ public class ThreadedApssTaskTest {
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, del, false, false));
+                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, del, false, false));
+                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
 
             List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
@@ -260,12 +260,12 @@ public class ThreadedApssTaskTest {
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, del, false, false));
+                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, del, false, false));
+                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
 
             ObjectSink<Weighted<TokenPair>> sink = ObjectIO.asSink(threadedResults);
@@ -292,12 +292,12 @@ public class ThreadedApssTaskTest {
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, del, false, false));
+                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, del, false, false));
+                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
             instance.setSourceA(vsa);
             instance.setSourceB(vsb);
@@ -332,12 +332,12 @@ public class ThreadedApssTaskTest {
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, del, false, false));
+                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, del, false, false));
+                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
             ObjectSink<Weighted<TokenPair>> sink = ObjectIO.asSink(threadedResults);
             ThreadedApssTask<Tell> instance = new ThreadedApssTask<Tell>(
@@ -363,12 +363,12 @@ public class ThreadedApssTaskTest {
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, del, false, false));
+                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(
                     WeightedTokenPairSource.open(
-                    TEST_FRUIT_ENTRY_FEATURES, DEFAULT_CHARSET, del, false, false));
+                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
             instance.setSourceA(vsa);
             instance.setSourceB(vsb);

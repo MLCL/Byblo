@@ -54,7 +54,8 @@ import uk.ac.susx.mlcl.lib.io.ObjectSource;
  * @param <T>
  * @author hiam20
  */
-public abstract class IndexingCommands<T> extends AbstractCopyCommand<T> {
+public abstract class IndexingCommands<T>
+    extends AbstractCopyCommand<T> {
 
     @ParametersDelegate
     private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate(
@@ -65,7 +66,7 @@ public abstract class IndexingCommands<T> extends AbstractCopyCommand<T> {
     }
 
     public IndexingCommands(File sourceFile, File destinationFile,
-                        Charset charset, DoubleEnumerating indexDeligate) {
+                            Charset charset, DoubleEnumerating indexDeligate) {
         super(sourceFile, destinationFile, charset);
         this.indexDeligate = indexDeligate;
     }
@@ -74,8 +75,14 @@ public abstract class IndexingCommands<T> extends AbstractCopyCommand<T> {
     public void runCommand() throws Exception {
         checkState();
         super.runCommand();
+
         indexDeligate.saveEnumerator();
         indexDeligate.closeEnumerator();
+    }
+
+    @Override
+    public String getName() {
+        return "enumeration";
     }
 
     protected abstract void checkState() throws Exception;
@@ -109,6 +116,11 @@ public abstract class IndexingCommands<T> extends AbstractCopyCommand<T> {
         }
 
         @Override
+        public String getName() {
+            return "entry enumeration";
+        }
+
+        @Override
         protected void checkState() throws Exception {
             Checks.checkNotNull("indexFile", EnumeratingDeligates.toSingleEntries(getIndexDeligate()).getEnumeratorFile());
         }
@@ -133,6 +145,11 @@ public abstract class IndexingCommands<T> extends AbstractCopyCommand<T> {
                 File sourceFile, File destinationFile, Charset charset,
                 SingleEnumerating indexDeligate) {
             super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(indexDeligate));
+        }
+
+        @Override
+        public String getName() {
+            return "feature enumeration";
         }
 
         public IndexFeatures() {
@@ -171,6 +188,11 @@ public abstract class IndexingCommands<T> extends AbstractCopyCommand<T> {
         }
 
         @Override
+        public String getName() {
+            return "event enumeration";
+        }
+
+        @Override
         public void checkState() throws Exception {
             Checks.checkNotNull("indexFile1", getIndexDeligate().getEntryEnumeratorFile());
             Checks.checkNotNull("indexFile2", getIndexDeligate().getFeatureEnumeratorFile());
@@ -200,6 +222,11 @@ public abstract class IndexingCommands<T> extends AbstractCopyCommand<T> {
 
         public IndexInstances() {
             super();
+        }
+
+        @Override
+        public String getName() {
+            return "instance enumeration";
         }
 
         @Override
@@ -235,6 +262,11 @@ public abstract class IndexingCommands<T> extends AbstractCopyCommand<T> {
         }
 
         @Override
+        public String getName() {
+            return "neighbours enumeration";
+        }
+
+        @Override
         public void checkState() throws Exception {
             Checks.checkNotNull("indexFile", EnumeratingDeligates.toSingleEntries(getIndexDeligate()).getEnumeratorFile());
         }
@@ -266,6 +298,11 @@ public abstract class IndexingCommands<T> extends AbstractCopyCommand<T> {
         }
 
         @Override
+        public String getName() {
+            return "sims enumeration";
+        }
+
+        @Override
         public void checkState() throws Exception {
             Checks.checkNotNull("indexFile", EnumeratingDeligates.toSingleEntries(getIndexDeligate()).getEnumeratorFile());
         }
@@ -294,6 +331,11 @@ public abstract class IndexingCommands<T> extends AbstractCopyCommand<T> {
         }
 
         @Override
+        public String getName() {
+            return "entries unenumeration";
+        }
+
+        @Override
         protected DoubleEnumerating getSinkIndexDeligate() {
             return super.getSourceIndexDeligate();
         }
@@ -312,6 +354,11 @@ public abstract class IndexingCommands<T> extends AbstractCopyCommand<T> {
 
         public UnindexFeatures(File sourceFile, File destinationFile, Charset charset, SingleEnumerating indexDeligate) {
             super(sourceFile, destinationFile, charset, indexDeligate);
+        }
+
+        @Override
+        public String getName() {
+            return "features unenumeration";
         }
 
         @Override
@@ -336,6 +383,11 @@ public abstract class IndexingCommands<T> extends AbstractCopyCommand<T> {
         }
 
         @Override
+        public String getName() {
+            return "instnaces unenumeration";
+        }
+
+        @Override
         protected DoubleEnumerating getSinkIndexDeligate() {
             return super.getSourceIndexDeligate();
         }
@@ -354,6 +406,11 @@ public abstract class IndexingCommands<T> extends AbstractCopyCommand<T> {
 
         public UnindexEvents(File sourceFile, File destinationFile, Charset charset, DoubleEnumerating indexDeligate) {
             super(sourceFile, destinationFile, charset, indexDeligate);
+        }
+
+        @Override
+        public String getName() {
+            return "events unenumeration";
         }
 
         @Override
@@ -378,6 +435,11 @@ public abstract class IndexingCommands<T> extends AbstractCopyCommand<T> {
         }
 
         @Override
+        public String getName() {
+            return "neighbours unenumeration";
+        }
+
+        @Override
         protected DoubleEnumerating getSinkIndexDeligate() {
             return super.getSourceIndexDeligate();
         }
@@ -396,6 +458,11 @@ public abstract class IndexingCommands<T> extends AbstractCopyCommand<T> {
 
         public UnindexSims(File sourceFile, File destinationFile, Charset charset, SingleEnumerating indexDeligate) {
             super(sourceFile, destinationFile, charset, indexDeligate);
+        }
+
+        @Override
+        public String getName() {
+            return "sims unenumeration";
         }
 
         @Override

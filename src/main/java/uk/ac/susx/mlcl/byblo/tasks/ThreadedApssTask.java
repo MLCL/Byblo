@@ -129,6 +129,11 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
     @Override
     protected void runTask() throws Exception {
 
+        progress.startAdjusting();
+        progress.setStarted();
+        progress.setMessage("Reading threaded all-pairs.");
+        progress.endAdjusting();
+
         if (LOG.isTraceEnabled()) {
             LOG.trace("Initialising chunker A.");
         }
@@ -161,18 +166,28 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 j++;
                 chunkB.setName(Integer.toString(j));
 
-                double complete = (!chunkerA.hasNext() && !chunkerB.hasNext()) ? 1
+                double complete = (!chunkerA.hasNext() && !chunkerB.hasNext())
+                                  ? 1
                                   : nChunks == 0 ? 0
                                     : (double) (i * nChunks + j) / (double) (nChunks * nChunks);
 
-                if (LOG.isInfoEnabled()) {
-                    LOG.info(MessageFormat.format(
-                            "Creating APSS task on chunks {0,number} and {1,number} ({2,number,percent} complete)",
-                            new Object[]{i, j, complete}));
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug(MiscUtil.memoryInfoString());
-                    }
-                }
+                progress.startAdjusting();
+                progress.setMessage(MessageFormat.format(
+                        "Queueing chunk pair {0,number} and {1,number}",
+                        new Object[]{i, j, complete}));
+                progress.setProgressPercent((int) (100 * complete));
+                progress.endAdjusting();
+
+//
+//
+//                if (LOG.isInfoEnabled()) {
+//                    LOG.info(MessageFormat.format(
+//                            "Creating APSS task on chunks {0,number} and {1,number} ({2,number,percent} complete)",
+//                            new Object[]{i, j, complete}));
+//                    if (LOG.isDebugEnabled()) {
+//                        LOG.debug(MiscUtil.memoryInfoString());
+//                    }
+//                }
 
                 @SuppressWarnings("unchecked")
                 NaiveApssTask<Integer> task = innerAlgorithm.newInstance();
@@ -184,6 +199,7 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 task.setSink(getSink());
                 task.setStats(getStats());
                 queueTask(task);
+
 
                 // retrieve the results
                 while (!getFutureQueue().isEmpty() && getFutureQueue().peek().
@@ -209,8 +225,12 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
             }
         }
 
-        getExecutor().awaitTermination(Integer.MIN_VALUE, TimeUnit.DAYS);
+        getExecutor().awaitTermination(Integer.MAX_VALUE, TimeUnit.DAYS);
 
+        progress.startAdjusting();
+        progress.setCompleted();
+        progress.setProgressPercent(90);
+        progress.endAdjusting();
     }
 
     @Override
@@ -270,6 +290,10 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
             throw new IllegalArgumentException("nThreads < 1");
         }
         this.nThreads = nThreads;
+    }
+
+    public String getName() {
+        return "threaded-allpairs";
     }
 
     @Override

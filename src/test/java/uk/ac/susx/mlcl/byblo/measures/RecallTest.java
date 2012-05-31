@@ -56,7 +56,7 @@ public class RecallTest {
             "allpairs",
             "--charset", "UTF-8",
             "--measure", "RecallMi",
-            "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+            "--input", TEST_FRUIT_EVENTS.toString(),
             "--input-features", TEST_FRUIT_FEATURES.toString(),
             "--input-entries", TEST_FRUIT_ENTRIES.toString(),
             "--output", output.toString()
@@ -88,7 +88,7 @@ public class RecallTest {
             "--charset", "UTF-8",
             "--measure", "RecallMi",
             "--measure-reversed",
-            "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+            "--input", TEST_FRUIT_EVENTS.toString(),
             "--input-features", TEST_FRUIT_FEATURES.toString(),
             "--input-entries", TEST_FRUIT_ENTRIES.toString(),
             "--output", output.toString()

@@ -56,7 +56,7 @@ public class DiceTest {
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "Dice",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output.toString()
@@ -83,7 +83,7 @@ public class DiceTest {
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "DiceMi",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output.toString()
@@ -112,7 +112,7 @@ public class DiceTest {
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "Dice",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output1.toString()
@@ -122,7 +122,7 @@ public class DiceTest {
                         "--charset", "UTF-8",
                         "--measure", "Dice",
                         "--measure-reversed",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output2.toString()
@@ -150,7 +150,7 @@ public class DiceTest {
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "DiceMi",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output1.toString()
@@ -160,7 +160,7 @@ public class DiceTest {
                         "--charset", "UTF-8",
                         "--measure", "DiceMi",
                         "--measure-reversed",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output2.toString()

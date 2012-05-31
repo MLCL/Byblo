@@ -72,7 +72,7 @@ public class TestConstants {
     public static final File TEST_FRUIT_FEATURES =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".features");
 
-    public static final File TEST_FRUIT_ENTRY_FEATURES =
+    public static final File TEST_FRUIT_EVENTS =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".events");
 
     public static final File TEST_FRUIT_ENTRIES_FILTERED =
@@ -81,9 +81,9 @@ public class TestConstants {
     public static final File TEST_FRUIT_FEATURES_FILTERED =
             new File(TEST_FRUIT_FEATURES.getParentFile(), TEST_FRUIT_FEATURES.getName() + ".filtered");
 
-    public static final File TEST_FRUIT_ENTRY_FEATURES_FILTERED =
-            new File(TEST_FRUIT_ENTRY_FEATURES.getParentFile(),
-                     TEST_FRUIT_ENTRY_FEATURES.getName() + ".filtered");
+    public static final File TEST_FRUIT_EVENTS_FILTERED =
+            new File(TEST_FRUIT_EVENTS.getParentFile(),
+                     TEST_FRUIT_EVENTS.getName() + ".filtered");
 
     public static final File TEST_FRUIT_SIMS =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".sims");
@@ -94,11 +94,20 @@ public class TestConstants {
     public static final File TEST_FRUIT_INDEXED_ENTRIES =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.entries");
 
+    public static final File TEST_FRUIT_SKIPINDEXED_ENTRIES =
+            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".skipindexed.entries");
+
     public static final File TEST_FRUIT_INDEXED_FEATURES =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.features");
 
-    public static final File TEST_FRUIT_INDEXED_ENTRY_FEATURES =
+    public static final File TEST_FRUIT_SKIPINDEXED_FEATURES =
+            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".skipindexed.features");
+
+    public static final File TEST_FRUIT_INDEXED_EVENTS =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.events");
+
+    public static final File TEST_FRUIT_SKIPINDEXED_EVENTS =
+            new File(TEST_FRUIT_DIR, FRUIT_NAME + ".skipindexed.events");
 
     public static final File TEST_FRUIT_INDEXED_SIMS =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.sims");

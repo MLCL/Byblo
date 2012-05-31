@@ -57,7 +57,7 @@ public class LeeTest {
                         "--charset", "UTF-8",
                         "--measure", "Lee",
                         "--lee-alpha", "0.00",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output.toString()
@@ -84,7 +84,7 @@ public class LeeTest {
                         "--charset", "UTF-8",
                         "--measure", "Lee",
                         "--lee-alpha", "0.01",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output.toString()
@@ -115,7 +115,7 @@ public class LeeTest {
                         "--charset", "UTF-8",
                         "--measure", "Lee",
                         "--lee-alpha", "0.50",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output.toString()
@@ -142,7 +142,7 @@ public class LeeTest {
                         "--charset", "UTF-8",
                         "--measure", "Lee",
                         "--lee-alpha", "0.99",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output.toString()
@@ -174,7 +174,7 @@ public class LeeTest {
                         "--charset", "UTF-8",
                         "--measure", "Lee",
                         "--lee-alpha", "1.00",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output.toString()

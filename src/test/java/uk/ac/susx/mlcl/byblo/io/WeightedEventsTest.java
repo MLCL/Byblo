@@ -97,11 +97,11 @@ public class WeightedEventsTest {
 
     @Test
     public void testWeightedEventsConversion() throws FileNotFoundException, IOException {
-        File a = TEST_FRUIT_ENTRY_FEATURES;
+        File a = TEST_FRUIT_EVENTS;
         File b = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_ENTRY_FEATURES.getName() + ".compact");
+                          TEST_FRUIT_EVENTS.getName() + ".compact");
         File c = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_ENTRY_FEATURES.getName() + ".verbose");
+                          TEST_FRUIT_EVENTS.getName() + ".verbose");
 
         copyWEF(a, b, true);
 
@@ -120,11 +120,11 @@ public class WeightedEventsTest {
     @Test
     @Ignore
     public void testWeightedEventsVectorsConversion() throws FileNotFoundException, IOException {
-        File a = TEST_FRUIT_ENTRY_FEATURES;
+        File a = TEST_FRUIT_EVENTS;
         File b = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_ENTRY_FEATURES.getName() + ".vecs.compact");
+                          TEST_FRUIT_EVENTS.getName() + ".vecs.compact");
         File c = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_ENTRY_FEATURES.getName() + ".vecs.verbose");
+                          TEST_FRUIT_EVENTS.getName() + ".vecs.verbose");
 
         copyWEFV(a, b, true);
 
@@ -211,16 +211,16 @@ public class WeightedEventsTest {
 
     @Test
     public void testRandomAccess() throws FileNotFoundException, IOException {
-        testRandomAccess(TEST_FRUIT_ENTRY_FEATURES);
+        testRandomAccess(TEST_FRUIT_EVENTS);
     }
 
     @Test
     public void testEventsPairEnumeratorConversion() throws FileNotFoundException, IOException {
-        File a = TEST_FRUIT_ENTRY_FEATURES;
+        File a = TEST_FRUIT_EVENTS;
         File b = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_ENTRY_FEATURES.getName() + ".enum");
+                          TEST_FRUIT_EVENTS.getName() + ".enum");
         File c = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_ENTRY_FEATURES.getName() + ".str");
+                          TEST_FRUIT_EVENTS.getName() + ".str");
 
         DoubleEnumeratingDeligate indel = new DoubleEnumeratingDeligate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
@@ -260,11 +260,11 @@ public class WeightedEventsTest {
 
     @Test
     public void testEventsPairCompactEnumeratorConversion() throws FileNotFoundException, IOException {
-        File a = TEST_FRUIT_ENTRY_FEATURES;
+        File a = TEST_FRUIT_EVENTS;
         File b = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_ENTRY_FEATURES.getName() + ".enum.compact");
+                          TEST_FRUIT_EVENTS.getName() + ".enum.compact");
         File c = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_ENTRY_FEATURES.getName() + ".enum.compact.str");
+                          TEST_FRUIT_EVENTS.getName() + ".enum.compact.str");
 
         DoubleEnumeratingDeligate indel = new DoubleEnumeratingDeligate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
@@ -307,11 +307,11 @@ public class WeightedEventsTest {
 
     @Test
     public void testEventsPairCompactEnumeratorConversion_SkipIndex() throws FileNotFoundException, IOException {
-        File a = TEST_FRUIT_ENTRY_FEATURES;
+        File a = TEST_FRUIT_EVENTS;
         File b = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_ENTRY_FEATURES.getName() + ".enum.skip.compact");
+                          TEST_FRUIT_EVENTS.getName() + ".enum.skip.compact");
         File c = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_ENTRY_FEATURES.getName() + ".enum.skip.compact.str");
+                          TEST_FRUIT_EVENTS.getName() + ".enum.skip.compact.str");
 
         DoubleEnumeratingDeligate indel = new DoubleEnumeratingDeligate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);

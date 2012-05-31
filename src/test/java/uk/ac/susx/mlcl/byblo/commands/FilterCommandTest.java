@@ -57,7 +57,7 @@ public class FilterCommandTest {
                                                          TEST_FRUIT_FEATURES_FILTERED.getName());
 
     private final static File OUTPUT_ENTRY_FEATURES = new File(TEST_OUTPUT_DIR,
-                                                               TEST_FRUIT_ENTRY_FEATURES_FILTERED.getName());
+                                                               TEST_FRUIT_EVENTS_FILTERED.getName());
 
     @Before
     public void setUp() {
@@ -77,7 +77,7 @@ public class FilterCommandTest {
             "--charset", "UTF-8",
             "--input-entries", TEST_FRUIT_ENTRIES.toString(),
             "--input-features", TEST_FRUIT_FEATURES.toString(),
-            "--input-events", TEST_FRUIT_ENTRY_FEATURES.toString(),
+            "--input-events", TEST_FRUIT_EVENTS.toString(),
             "--output-entries", OUTPUT_ENTRIES.toString(),
             "--output-features", OUTPUT_FEATURES.toString(),
             "--output-events", OUTPUT_ENTRY_FEATURES.toString(),};

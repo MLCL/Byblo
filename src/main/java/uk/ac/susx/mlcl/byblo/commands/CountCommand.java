@@ -58,6 +58,8 @@ import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
 import uk.ac.susx.mlcl.lib.io.Files;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
+import uk.ac.susx.mlcl.lib.tasks.ProgressEvent;
+import uk.ac.susx.mlcl.lib.tasks.ProgressListener;
 
 /**
  * <p>Read in a raw feature instances file, to produce three frequency files:
@@ -258,6 +260,16 @@ public class CountCommand extends AbstractCommand implements Serializable {
                 instanceSource, eventsSink, entrySink, featureSink,
                 getEventOrder(), getEntryOrder(), getFeatureOrder());
 
+
+        task.addProgressListener(new ProgressListener() {
+
+            @Override
+            public void progressChanged(ProgressEvent progressEvent) {
+                System.out.println(progressEvent.getSource().getProgressReport());
+            }
+
+        });
+
         task.run();
 
 
@@ -273,8 +285,10 @@ public class CountCommand extends AbstractCommand implements Serializable {
         eventsSink.flush();
         eventsSink.close();
 
-        indexDeligate.saveEnumerator();
-        indexDeligate.closeEnumerator();
+        if (indexDeligate.isEnumeratorOpen()) {
+            indexDeligate.saveEnumerator();
+            indexDeligate.closeEnumerator();
+        }
 
 
         if (LOG.isInfoEnabled()) {

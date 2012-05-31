@@ -221,13 +221,15 @@ public final class BybloIO {
     public static WeightedTokenPairSource openNeighboursSource(
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
-        return openNeighboursSource(file, charset, EnumeratingDeligates.toSingleEntries(idx));
+        return openNeighboursSource(file, charset,
+                                    EnumeratingDeligates.toSingleEntries(idx));
     }
 
     public static WeightedTokenPairSink openNeighboursSink(
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
-        return openNeighboursSink(file, charset, EnumeratingDeligates.toSingleEntries(idx));
+        return openNeighboursSink(file, charset,
+                                  EnumeratingDeligates.toSingleEntries(idx));
     }
 
 }

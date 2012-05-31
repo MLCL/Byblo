@@ -78,8 +78,11 @@ public final class InvertedApssTask<S> extends NaiveApssTask<S> {
     protected void runTask()
             throws IOException {
 
-
-        LOG.info("Running inverted all-pairs on " + getSourceA() + " and " + getSourceB());
+        progress.startAdjusting();
+        progress.setStarted();
+        progress.setMessage("Running inverted all-pairs.");
+        progress.setProgressPercent(0);
+        progress.endAdjusting();
 
         final S startB = getSourceB().position();
         List<Weighted<TokenPair>> pairs = new ArrayList<Weighted<TokenPair>>();
@@ -105,13 +108,28 @@ public final class InvertedApssTask<S> extends NaiveApssTask<S> {
                 }
             }
         }
+
+        progress.startAdjusting();
+        progress.setMessage("Sorting similarity pairs");
+        progress.setProgressPercent(80);
+        progress.endAdjusting();
+
         Collections.sort(pairs, Weighted.recordOrder(TokenPair.indexOrder()));
+
+        progress.startAdjusting();
+        progress.setMessage("Writing similarity pairs");
+        progress.setProgressPercent(90);
+        progress.endAdjusting();
+
         synchronized (getSink()) {
             ObjectIO.copy(pairs, getSink());
         }
         getSourceB().position(startB);
 
-        LOG.info("Completed inverted all-pairs on " + getSourceA() + " and " + getSourceB());
+        progress.startAdjusting();
+        progress.setCompleted();
+        progress.setProgressPercent(100);
+        progress.endAdjusting();
 
     }
 
@@ -156,6 +174,10 @@ public final class InvertedApssTask<S> extends NaiveApssTask<S> {
 
     protected Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> getIndex() {
         return index;
+    }
+
+    public String getName() {
+        return "inverted-allpairs";
     }
 
 }

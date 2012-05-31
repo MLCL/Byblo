@@ -39,7 +39,6 @@ import java.io.FileNotFoundException;
 import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.text.MessageFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.MiscUtil;
@@ -49,6 +48,8 @@ import uk.ac.susx.mlcl.lib.io.Files;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.tasks.ObjectPipeTask;
+import uk.ac.susx.mlcl.lib.tasks.ProgressEvent;
+import uk.ac.susx.mlcl.lib.tasks.ProgressListener;
 
 /**
  * Abstract super class for all tasks that require copying data from one file
@@ -106,12 +107,12 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand {
 
     @Override
     public void runCommand() throws Exception {
-        if (LOG.isInfoEnabled())
-            LOG.info(MessageFormat.format(
-                    "Running command {0} from \"{1}\" to \"{2}\".",
-                    getName(),
-                    getFilesDeligate().getSourceFile(),
-                    getFilesDeligate().getDestinationFile()));
+//        if (LOG.isInfoEnabled())
+//            LOG.info(MessageFormat.format(
+//                    "Running {0} from \"{1}\" to \"{2}\".",
+//                    getName(),
+//                    getFilesDeligate().getSourceFile(),
+//                    getFilesDeligate().getDestinationFile()));
         LOG.debug(MiscUtil.memoryInfoString());
 
         ObjectSource<T> src = openSource(getFilesDeligate().getSourceFile());
@@ -120,6 +121,16 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand {
         ObjectPipeTask<T> task = new ObjectPipeTask<T>();
         task.setSource(src);
         task.setSink(snk);
+
+        task.addProgressListener(new ProgressListener() {
+
+            @Override
+            public void progressChanged(ProgressEvent progressEvent) {
+
+                LOG.info(progressEvent.getSource().getProgressReport());
+            }
+        });
+
         task.run();
 
         while (task.isExceptionTrapped())
@@ -133,8 +144,8 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand {
             ((Closeable) snk).close();
 
         LOG.debug(MiscUtil.memoryInfoString());
-        if (LOG.isInfoEnabled())
-            LOG.info(MessageFormat.format("Completed command {0}.", getName()));
+//        if (LOG.isInfoEnabled())
+//            LOG.info(MessageFormat.format("Completed {0}.", getName()));
     }
 
     public String getName() {

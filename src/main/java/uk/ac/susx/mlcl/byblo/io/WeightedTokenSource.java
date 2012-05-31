@@ -87,8 +87,8 @@ public class WeightedTokenSource
     }
 
     public static WeightedTokenSource open(
-            File f, Charset charset, SingleEnumerating idx, boolean skip1) throws IOException {
-        SeekableDataSource tsv = new TSV.Source(f, charset);
+            File file, Charset charset, SingleEnumerating idx, boolean skip1) throws IOException {
+        SeekableDataSource tsv = new TSV.Source(file, charset);
 
         if (skip1) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {

@@ -37,8 +37,13 @@ import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import static java.text.MessageFormat.format;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.commands.AbstractExternalSortCommand;
@@ -52,6 +57,7 @@ import uk.ac.susx.mlcl.byblo.measures.CrMi;
 import uk.ac.susx.mlcl.byblo.measures.Lee;
 import uk.ac.susx.mlcl.byblo.measures.Lp;
 import uk.ac.susx.mlcl.lib.Checks;
+import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.commands.DoubleConverter;
 import uk.ac.susx.mlcl.lib.commands.FileDeligate;
@@ -74,14 +80,15 @@ public final class FullBuild extends AbstractCommand {
      * Whether or not some of the rarely used parameters should be hidden from
      * the help usage page.
      */
-    public static final boolean HIDE_UNCOMMON_PARAMTERS = true;
+    public static final boolean HIDE_UNCOMMON_PARAMTERS = false;
 
     @ParametersDelegate
     private FileDeligate fileDeligate = new FileDeligate();
 
     @Parameter(names = {"-i", "--input"},
     description = "Input instances file",
-    validateWith = InputFileValidator.class, required = true)
+    validateWith = InputFileValidator.class,
+    required = true)
     private File instancesFile;
 
     @Parameter(names = {"-o", "--output"},
@@ -102,14 +109,14 @@ public final class FullBuild extends AbstractCommand {
 
     @Parameter(names = {"-t", "--threads"},
     description = "Number of concurrent processing threads.")
-    private int numThreads = Runtime.getRuntime().availableProcessors() + 1;
+    private int numThreads = Runtime.getRuntime().availableProcessors();
 
     /*
      * === COUNTING PARAMATERISATION ===
      */
     @Parameter(names = {"--count-chunk-size"},
     description = "Number of lines per work unit. Larger values increase performance and memory usage.",
-    hidden = true)
+    hidden = HIDE_UNCOMMON_PARAMTERS)
     private int countMaxChunkSize = ExternalCountCommand.DEFAULT_MAX_CHUNK_SIE;
 
     /*
@@ -231,6 +238,7 @@ public final class FullBuild extends AbstractCommand {
 
     @Override
     public void runCommand() throws Exception {
+        LOG.info("\n=== Running full thesaurus build === \n");
 
         checkValidInputFile("Instances file", instancesFile);
 
@@ -241,6 +249,38 @@ public final class FullBuild extends AbstractCommand {
         if (tempBaseDir == null)
             tempBaseDir = createTempSubdirDir(outputDir);
 
+
+        LOG.info(MessageFormat.format(" * Input instances file: {0}", instancesFile));
+        LOG.info(MessageFormat.format(" * Output directory: {0} ({1} free)", outputDir,
+                                      MiscUtil.humanReadableBytes(outputDir.getFreeSpace())));
+        LOG.info(MessageFormat.format(" * Temporary directory: {0} ({1} free)",
+                                      tempBaseDir,
+                                      MiscUtil.humanReadableBytes(tempBaseDir.getFreeSpace())));
+        LOG.info(MessageFormat.format(" * Character encoding: {0}", getCharset()));
+        LOG.info(MessageFormat.format(" * Num. Threads: {0}", numThreads));
+        LOG.info(MessageFormat.format(" * {0}", MiscUtil.memoryInfoString()));
+        LOG.info(MessageFormat.format(" * Java Spec: {0} {1}, {2}",
+                                      System.getProperty("java.specification.name"),
+                                      System.getProperty("java.specification.version"),
+                                      System.getProperty("java.specification.vendor")));
+        LOG.info(MessageFormat.format(" * Java VM: {0} {1}, {2}",
+                                      System.getProperty("java.vm.name"),
+                                      System.getProperty("java.vm.version"),
+                                      System.getProperty("java.vm.vendor")));
+        LOG.info(MessageFormat.format(" * Java Runtime: {0} {1}",
+                                      System.getProperty("java.runtime.name"),
+                                      System.getProperty("java.runtime.version")));
+        LOG.info(MessageFormat.format(" * OS: {0} {1} {2}",
+                                      System.getProperty("os.name"),
+                                      System.getProperty("os.version"),
+                                      System.getProperty("os.arch")));
+
+//        List keys =  new ArrayList(System.getProperties().keySet());
+//        Collections.sort(keys);
+//        for(Object key : keys) {
+//            System.out.println(key + "  = " + System.getProperty((String)key));
+//        }
+
         File entryEnumeratorFile =
                 new File(outputDir, instancesFile.getName() + ".entry-index");
         File featureEnumeratorFile =
@@ -248,6 +288,9 @@ public final class FullBuild extends AbstractCommand {
         File instancesEnumeratedFile =
                 new File(outputDir, instancesFile.getName() + ".enumerated");
 
+
+
+        LOG.info("\n=== Stage 1 of 6: Enumerating Strings ===\n");
         runIndex(instancesEnumeratedFile, featureEnumeratorFile, entryEnumeratorFile);
 
         File entriesFile = new File(outputDir,
@@ -257,31 +300,39 @@ public final class FullBuild extends AbstractCommand {
         File eventsFile = new File(outputDir,
                                    instancesFile.getName() + ".events");
 
-        runCount(instancesEnumeratedFile, entriesFile, featuresFile, eventsFile);
 
+        LOG.info("\n=== Stage 2 of 6: Counting ===\n");
+        runCount(instancesEnumeratedFile, entriesFile, featuresFile, eventsFile);
 
         File entriesFilteredFile = suffixed(entriesFile, ".filtered");
         File featuresFilteredFile = suffixed(featuresFile, ".filtered");
         File eventsFilteredFile = suffixed(eventsFile, ".filtered");
 
+        LOG.info("\n=== Stage 3 of 6: Filtering ===\n");
         runFilter(entriesFile, featuresFile, eventsFile, entriesFilteredFile,
                   featuresFilteredFile, eventsFilteredFile, entryEnumeratorFile,
                   featureEnumeratorFile);
 
 
+        LOG.info("\n=== Stage 4 of 6: All-Pairs ===\n");
         File simsFile = new File(outputDir, instancesFile.getName() + ".sims");
         runAllpairs(entriesFilteredFile, featuresFilteredFile, eventsFilteredFile, simsFile);
 
         File neighboursFile = suffixed(simsFile, ".neighbours");
 
+        LOG.info("\n=== Stage 5 of 6: K-Nearest-Neighbours ===\n");
         runKNN(simsFile, neighboursFile);
 
         File neighboursStringsFile = suffixed(neighboursFile, ".strings");
+
+        LOG.info("\n=== Stage 6 of 6: Un-Enumerating ===\n");
         runUnindexSim(neighboursFile, neighboursStringsFile, entryEnumeratorFile);
 
 
         if (tempBaseDir.list().length == 0)
             tempBaseDir.delete();
+
+        LOG.info("\nCompleted full thesaurus build.\n");
     }
 
     private void runIndex(File instancesEnumeratedFile,
@@ -291,6 +342,12 @@ public final class FullBuild extends AbstractCommand {
                              instancesEnumeratedFile);
         checkValidOutputFile("Feature index file", featureEnumeratorFile);
         checkValidOutputFile("Entry index file", entryEnumeratorFile);
+
+        LOG.info(MessageFormat.format(" * Input instances file: {0}", instancesFile));
+        LOG.info(MessageFormat.format(" * Output enumerated instances file: {0}", instancesEnumeratedFile));
+        LOG.info(MessageFormat.format(" * Output entry index: {0}", entryEnumeratorFile));
+        LOG.info(MessageFormat.format(" * Output feature index: {0}", featureEnumeratorFile));
+        LOG.info("");
 
         IndexingCommands.IndexInstances indexCmd = new IndexingCommands.IndexInstances();
         indexCmd.setSourceFile(instancesFile);
@@ -318,6 +375,13 @@ public final class FullBuild extends AbstractCommand {
 
         File countTempDir = createTempSubdirDir(tempBaseDir);
         FileFactory countTmpFact = new TempFileFactory(countTempDir);
+
+        LOG.info(MessageFormat.format(" * Input instances file: {0}", instancesEnumeratedFile));
+        LOG.info(MessageFormat.format(" * Output entries file: {0}", entriesFile));
+        LOG.info(MessageFormat.format(" * Output features file: {0}", featuresFile));
+        LOG.info(MessageFormat.format(" * Output events file: {0}", eventsFile));
+        LOG.info(MessageFormat.format(" * Chunk size: {0} instances", countMaxChunkSize));
+        LOG.info("");
 
         ExternalCountCommand countCmd = new ExternalCountCommand();
         countCmd.setCharset(getCharset());
@@ -369,6 +433,23 @@ public final class FullBuild extends AbstractCommand {
 
         File filterTempDir = createTempSubdirDir(tempBaseDir);
         FileFactory filterTmpFact = new TempFileFactory(filterTempDir);
+
+
+        LOG.info(MessageFormat.format(" * Input entries file: {0}", entriesFile));
+        LOG.info(MessageFormat.format(" * Input features file: {0}", featuresFile));
+        LOG.info(MessageFormat.format(" * Input events file: {0}", eventsFile));
+        LOG.info(MessageFormat.format(" * Output entries file: {0}", entriesFilteredFile));
+        LOG.info(MessageFormat.format(" * Output features file: {0}", featuresFilteredFile));
+        LOG.info(MessageFormat.format(" * Output events file: {0}", eventsFilteredFile));
+        LOG.info(MessageFormat.format(" * Chunk size: {0} instances", countMaxChunkSize));
+        LOG.info(MessageFormat.format(" * Min. Entry Freq: {0}", filterEntryMinFreq));
+        LOG.info(MessageFormat.format(" * Min. Feature Freq: {0}", filterFeatureMinFreq));
+        LOG.info(MessageFormat.format(" * Min. Event Freq: {0}", filterEventMinFreq));
+        LOG.info(MessageFormat.format(" * Entry Pattern: {0}", filterEntryPattern));
+        LOG.info(MessageFormat.format(" * Feature Pattern: {0}", filterFeaturePattern));
+        LOG.info(MessageFormat.format(" * Entry Whitelist: {0}", filterEntryWhitelist));
+        LOG.info(MessageFormat.format(" * Feature Whitelist: {0}", filterFeatureWhitelist));
+        LOG.info("");
 
         FilterCommand filterCmd = new FilterCommand();
         filterCmd.setCharset(getCharset());
@@ -422,6 +503,17 @@ public final class FullBuild extends AbstractCommand {
         checkValidInputFile("Filtered events file", eventsFilteredFile);
         checkValidOutputFile("Sims file", simsFile);
 
+        LOG.info(MessageFormat.format(" * Input entries file: {0}", entriesFilteredFile));
+        LOG.info(MessageFormat.format(" * Input features file: {0}", featuresFilteredFile));
+        LOG.info(MessageFormat.format(" * Input events file: {0}", eventsFilteredFile));
+        LOG.info(MessageFormat.format(" * Ouput sims file: {0}", simsFile));
+        LOG.info(MessageFormat.format(" * Measure: {0}{1} {2}",
+                                      measureName,
+                                      measureReversed ? "(reversed)" : ""));
+        LOG.info(MessageFormat.format(" * Accept sims range: {0} to {1}",
+                                      minSimilarity, maxSimilarity));
+        LOG.info("");
+
 
         AllPairsCommand allpairsCmd = new AllPairsCommand();
         allpairsCmd.setCharset(getCharset());
@@ -461,6 +553,11 @@ public final class FullBuild extends AbstractCommand {
         File knnTempDir = createTempSubdirDir(tempBaseDir);
         FileFactory knnTmpFact = new TempFileFactory(knnTempDir);
 
+        LOG.info(MessageFormat.format(" * Input sims file: {0}", simsFile));
+        LOG.info(MessageFormat.format(" * Ouput neighbours file: {0}", neighboursFile));
+        LOG.info(MessageFormat.format(" * K: {0}", k));
+        LOG.info("");
+
         ExternalKnnSimsCommand knnCmd = new ExternalKnnSimsCommand();
         knnCmd.setCharset(getCharset());
         knnCmd.setSourceFile(simsFile);
@@ -499,6 +596,10 @@ public final class FullBuild extends AbstractCommand {
         checkValidInputFile("Neighbours file", neighboursFile);
         checkValidOutputFile("Neighbours strings file",
                              neighboursStringsFile);
+
+        LOG.info(MessageFormat.format(" * Input enuemrated neighbours neighboursFile: {0}", neighboursFile));
+        LOG.info(MessageFormat.format(" * Ouput neighbours file: {0}", neighboursStringsFile));
+        LOG.info("");
 
 
         IndexingCommands.UnindexNeighbours unindexCmd = new IndexingCommands.UnindexNeighbours();

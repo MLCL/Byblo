@@ -54,6 +54,8 @@ public class FileMoveTask extends FileCopyTask {
     }
 
     protected static void move(File from, File to) throws IOException {
+
+
         if (!from.renameTo(to)) {
             if (LOG.isDebugEnabled())
                 LOG.debug("Cannot performan fast rename; falling back to copy");
@@ -67,9 +69,16 @@ public class FileMoveTask extends FileCopyTask {
 
     @Override
     protected void runTask() throws Exception {
-        if (LOG.isInfoEnabled())
-            LOG.info(format("Moving file from \"{0}\" to \"{1}\".",
-                            getSrcFile(), getDstFile()));
+        progress.startAdjusting();
+        progress.setStarted();
+        progress.setMessage(format("Copying file from \"{0}\" to \"{1}\".",
+                                   getSrcFile(), getDstFile()));
+        progress.endAdjusting();
+
+
+//        if (LOG.isInfoEnabled())
+//            LOG.info(format("Moving file from \"{0}\" to \"{1}\".",
+//                            getSrcFile(), getDstFile()));
 
         // Check the configuration state
         if (getSrcFile().equals(getDstFile()))
@@ -77,7 +86,10 @@ public class FileMoveTask extends FileCopyTask {
 
         move(getSrcFile(), getDstFile());
 
-        if (LOG.isInfoEnabled())
-            LOG.info("Completed move.");
+
+        progress.setCompleted();
+//        if (LOG.isInfoEnabled())
+//            LOG.info("Completed move.");
     }
+
 }

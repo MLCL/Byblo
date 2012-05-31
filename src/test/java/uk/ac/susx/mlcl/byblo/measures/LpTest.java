@@ -57,7 +57,7 @@ public class LpTest {
             "allpairs",
             "--charset", "UTF-8", "--mink-p", "0",
             "--measure", "Lp",
-            "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+            "--input", TEST_FRUIT_EVENTS.toString(),
             "--input-features", TEST_FRUIT_FEATURES.toString(),
             "--input-entries", TEST_FRUIT_ENTRIES.toString(),
             "--output", output.toString()
@@ -89,7 +89,7 @@ public class LpTest {
             "allpairs",
             "--charset", "UTF-8", "--mink-p", "1",
             "--measure", "Lp",
-            "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+            "--input", TEST_FRUIT_EVENTS.toString(),
             "--input-features", TEST_FRUIT_FEATURES.toString(),
             "--input-entries", TEST_FRUIT_ENTRIES.toString(),
             "--output", output.toString()
@@ -121,7 +121,7 @@ public class LpTest {
             "allpairs",
             "--charset", "UTF-8", "--mink-p", "2",
             "--measure", "Lp",
-            "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+            "--input", TEST_FRUIT_EVENTS.toString(),
             "--input-features", TEST_FRUIT_FEATURES.toString(),
             "--input-entries", TEST_FRUIT_ENTRIES.toString(),
             "--output", output.toString()
@@ -151,7 +151,7 @@ public class LpTest {
             "allpairs",
             "--charset", "UTF-8", "--mink-p", "3",
             "--measure", "Lp",
-            "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+            "--input", TEST_FRUIT_EVENTS.toString(),
             "--input-features", TEST_FRUIT_FEATURES.toString(),
             "--input-entries", TEST_FRUIT_ENTRIES.toString(),
             "--output", output.toString()
@@ -180,7 +180,7 @@ public class LpTest {
             "allpairs",
             "--charset", "UTF-8", "--mink-p", Double.toString(Math.E),
             "--measure", "Lp",
-            "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+            "--input", TEST_FRUIT_EVENTS.toString(),
             "--input-features", TEST_FRUIT_FEATURES.toString(),
             "--input-entries", TEST_FRUIT_ENTRIES.toString(),
             "--output", output.toString()
@@ -209,7 +209,7 @@ public class LpTest {
             "allpairs",
             "--charset", "UTF-8", "--mink-p", "Infinity",
             "--measure", "Lp",
-            "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+            "--input", TEST_FRUIT_EVENTS.toString(),
             "--input-features", TEST_FRUIT_FEATURES.toString(),
             "--input-entries", TEST_FRUIT_ENTRIES.toString(),
             "--output", output.toString()
@@ -245,7 +245,7 @@ public class LpTest {
                         "allpairs",
                         "--charset", "UTF-8", "--mink-p", "1",
                         "--measure", "Lp",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output1.toString()
@@ -254,7 +254,7 @@ public class LpTest {
                         "allpairs",
                         "--charset", "UTF-8", "--mink-p", "1",
                         "--measure", "Lp", "--measure-reversed",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output2.toString()
@@ -286,7 +286,7 @@ public class LpTest {
                         "allpairs",
                         "--charset", "UTF-8", "--mink-p", "2",
                         "--measure", "Lp",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output1.toString()
@@ -295,7 +295,7 @@ public class LpTest {
                         "allpairs",
                         "--charset", "UTF-8", "--mink-p", "2",
                         "--measure", "Lp", "--measure-reversed",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output2.toString()
@@ -328,7 +328,7 @@ public class LpTest {
                         "allpairs",
                         "--charset", "UTF-8", "--mink-p", "3",
                         "--measure", "Lp",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output1.toString()
@@ -337,7 +337,7 @@ public class LpTest {
                         "allpairs",
                         "--charset", "UTF-8", "--mink-p", "3",
                         "--measure", "Lp", "--measure-reversed",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output2.toString()
@@ -370,7 +370,7 @@ public class LpTest {
                         "allpairs",
                         "--charset", "UTF-8", "--mink-p", "inf",
                         "--measure", "Lp",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output1.toString()
@@ -379,7 +379,7 @@ public class LpTest {
                         "allpairs",
                         "--charset", "UTF-8", "--mink-p", "+INFIN",
                         "--measure", "Lp", "--measure-reversed",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output2.toString()

@@ -108,6 +108,11 @@ public final class SingleEnumeratingDeligate
     }
 
     @Override
+    public boolean isEnumeratorOpen() {
+        return enumerator != null;
+    }
+
+    @Override
     public void closeEnumerator() throws IOException {
         close(enumerator);
         enumerator = null;

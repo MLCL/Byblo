@@ -43,8 +43,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayDeque;
 import java.util.Comparator;
 import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
@@ -75,6 +73,10 @@ import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import uk.ac.susx.mlcl.lib.tasks.FileDeleteTask;
 import uk.ac.susx.mlcl.lib.tasks.ObjectMergeTask;
 import uk.ac.susx.mlcl.lib.tasks.ObjectSortTask;
+import uk.ac.susx.mlcl.lib.tasks.ProgressAggregate;
+import uk.ac.susx.mlcl.lib.tasks.ProgressEvent;
+import uk.ac.susx.mlcl.lib.tasks.ProgressListener;
+import uk.ac.susx.mlcl.lib.tasks.ProgressReporting;
 import uk.ac.susx.mlcl.lib.tasks.Task;
 
 /**
@@ -82,7 +84,8 @@ import uk.ac.susx.mlcl.lib.tasks.Task;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Parameters(commandDescription = "Freqency count a structured input instance file.")
-public class ExternalCountCommand extends AbstractParallelCommandTask {
+public class ExternalCountCommand extends AbstractParallelCommandTask
+        implements ProgressReporting {
 
     private static final Log LOG = LogFactory.getLog(ExternalCountCommand.class);
 
@@ -122,13 +125,15 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     private static final boolean DEBUG = false;
 
+    private final ProgressAggregate progress = new ProgressAggregate(this);
+
     @ParametersDelegate
     private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
 
     @ParametersDelegate
     private FileDeligate fileDeligate = new FileDeligate();
 
-    public static final int DEFAULT_MAX_CHUNK_SIE = 500000;
+    public static final int DEFAULT_MAX_CHUNK_SIE = 5000000;
 
     @Parameter(names = {"-C", "--chunk-size"},
     description = "Number of lines per work unit. Larger value increase performance and memory usage.")
@@ -295,19 +300,43 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     @Override
     protected void runTask() throws Exception {
-        if (LOG.isInfoEnabled())
-            LOG.info("Running external count on \"" + inputFile + "\".");
+//        if (LOG.isInfoEnabled())
+//            LOG.info("Running external count on \"" + inputFile + "\".");
 
+        progress.addProgressListener(new ProgressListener() {
+
+            @Override
+            public void progressChanged(ProgressEvent progressEvent) {
+                LOG.info(progressEvent.getSource().getProgressReport());
+            }
+
+        });
+
+//        progress.setStarted();
+
+        progress.setStarted();
+        progress.setMessage("Mapping to small count tasks");
         map();
+        progress.setMessage("Merging and aggregating results");
         reduce();
         finish();
 
-        indexDeligate.saveEnumerator();
-        indexDeligate.closeEnumerator();
+        if (indexDeligate.isEnumeratorOpen()) {
+            indexDeligate.saveEnumerator();
+            indexDeligate.closeEnumerator();
+        }
 
+        progress.setCompleted();
 
-        if (LOG.isInfoEnabled())
-            LOG.info("Completed external count");
+//
+//        progress.startAdjusting();
+//        progress.setProgressPercent(100);
+//        progress.setCompleted();
+//        progress.endAdjusting();
+
+//
+//        if (LOG.isInfoEnabled())
+//            LOG.info("Completed external count");
 
     }
 
@@ -317,7 +346,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         mergeFeaturesQueue = new ArrayDeque<File>();
         mergeEventQueue = new ArrayDeque<File>();
 
-        BlockingQueue<File> chunkQueue = new ArrayBlockingQueue<File>(2);
+//        BlockingQueue<File> chunkQueue = new ArrayBlockingQueue<File>(2);
 
 
         final SeekableObjectSource<TokenPair, Tell> src =
@@ -326,6 +355,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         final ObjectSource<Chunk<TokenPair>> chunks =
                 Chunker.newInstance(src, getMaxChunkSize());
 
+        int chunkCount = 0;
         while (chunks.hasNext()) {
             while (!getFutureQueue().isEmpty() && getFutureQueue().peek().isDone()) {
                 handleCompletedTask(getFutureQueue().poll().get());
@@ -340,6 +370,10 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
                                                                  "");
             File chunk_eventsFile = tempFileFactory.createFile(
                     "cnt.evnt.", "");
+
+            ++chunkCount;
+
+
 
             submitCountTask(chunk, chunk_entriesFile, chunk_featuresFile,
                             chunk_eventsFile);
@@ -521,6 +555,11 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         task.setProperty(KEY_DST_ENTRIES_FILE, outEntries.toString());
         task.setProperty(KEY_DST_FEATURES_FILE, outFeatures.toString());
 
+//        progress.startAdjusting();
+        progress.addChildProgressReporter(task);
+//        progress.setMessage("Counting chunk");
+//        progress.endAdjusting();
+
         submitTask(task);
     }
 
@@ -546,6 +585,12 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         task.setProperty(KEY_DATA_TYPE, VALUE_DATA_TYPE_ENTRIES);
         task.setProperty(KEY_SRC_FILE, srcFile.toString());
         task.setProperty(KEY_DST_FILE, dstFile.toString());
+
+//        progress.startAdjusting();
+        progress.addChildProgressReporter(task);
+//        progress.setMessage("Sorting entries");
+//        progress.endAdjusting();
+
         submitTask(task);
     }
 
@@ -564,6 +609,12 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         task.setProperty(KEY_DATA_TYPE, VALUE_DATA_TYPE_FEATURES);
         task.setProperty(KEY_SRC_FILE, srcFile.toString());
         task.setProperty(KEY_DST_FILE, dstFile.toString());
+
+//        progress.startAdjusting();
+        progress.addChildProgressReporter(task);
+//        progress.setMessage("Sorting features");
+//        progress.endAdjusting();
+
         submitTask(task);
     }
 
@@ -582,6 +633,12 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
         task.setProperty(KEY_DATA_TYPE, VALUE_DATA_TYPE_EVENTS);
         task.setProperty(KEY_SRC_FILE, srcFile.toString());
         task.setProperty(KEY_DST_FILE, dstFile.toString());
+
+//        progress.startAdjusting();
+        progress.addChildProgressReporter(task);
+//        progress.setMessage("Sorting events");
+//        progress.endAdjusting();
+
         submitTask(task);
     }
 
@@ -608,6 +665,10 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             task.setProperty(KEY_SRC_FILE_B, srcFileB.toString());
             task.setProperty(KEY_DST_FILE, dstFile.toString());
 
+//            progress.startAdjusting();
+            progress.addChildProgressReporter(task);
+//            progress.setMessage("Merge entries");
+//            progress.endAdjusting();
 
             submitTask(task);
         }
@@ -635,6 +696,11 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             task.setProperty(KEY_SRC_FILE_A, srcFileA.toString());
             task.setProperty(KEY_SRC_FILE_B, srcFileB.toString());
             task.setProperty(KEY_DST_FILE, dstFile.toString());
+
+//            progress.startAdjusting();
+            progress.addChildProgressReporter(task);
+//            progress.setMessage("Merge features");
+//            progress.endAdjusting();
 
             submitTask(task);
         }
@@ -664,6 +730,10 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
             task.setProperty(KEY_SRC_FILE_B, srcFileB.toString());
             task.setProperty(KEY_DST_FILE, dstFile.toString());
 
+//            progress.startAdjusting();
+            progress.addChildProgressReporter(task);
+//            progress.setMessage("Merge events");
+//            progress.endAdjusting();
 
             submitTask(task);
         }
@@ -823,6 +893,44 @@ public class ExternalCountCommand extends AbstractParallelCommandTask {
 
     public void setEnumeratorType(EnumeratorType type) {
         indexDeligate.setEnumeratorType(type);
+    }
+
+    @Override
+    public String getName() {
+        return "xcount";
+    }
+
+    public void removeProgressListener(ProgressListener progressListener) {
+        progress.removeProgressListener(progressListener);
+    }
+
+    public boolean isStarted() {
+        return progress.isStarted();
+    }
+
+    public boolean isProgressPercentageSupported() {
+        return progress.isProgressPercentageSupported();
+    }
+
+    public boolean isCompleted() {
+        return progress.isCompleted();
+    }
+
+    public int getProgressPercent() {
+        return progress.getProgressPercent();
+    }
+
+    public ProgressListener[] getProgressListeners() {
+        return progress.getProgressListeners();
+    }
+
+    public void addProgressListener(ProgressListener progressListener) {
+        progress.addProgressListener(progressListener);
+    }
+
+    @Override
+    public String getProgressReport() {
+        return progress.getProgressReport();
     }
 
 }

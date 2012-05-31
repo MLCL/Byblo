@@ -29,55 +29,30 @@
  * POSSIBILITY OF SUCH DAMAGE.To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.byblo.enumerators;
 
-import java.io.File;
-import java.io.IOException;
+package uk.ac.susx.mlcl.lib.tasks;
+
+import java.util.EventObject;
 
 /**
  *
- * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public interface DoubleEnumerating extends Enumerating {
+public class ProgressEvent extends EventObject {
 
-    Enumerator<String> getEntryEnumerator() throws IOException;
+    private static final long serialVersionUID = 1L;
 
-    Enumerator<String> getFeatureEnumerator() throws IOException;
+    public ProgressEvent(ProgressReporting source) {
+        super(source);
+    }
 
-    File getEntryEnumeratorFile();
+    @Override
+    public ProgressReporting getSource() {
+        return (ProgressReporting) super.getSource();
+    }
 
-    File getFeatureEnumeratorFile();
-
-    void setEntryEnumeratorFile(File entryEnumeratorFile);
-
-    void setFeatureEnumeratorFile(File featureEnumeratorFile);
-
-    void openEntriesEnumerator() throws IOException;
-
-    void saveEntriesEnumerator() throws IOException;
-
-    void closeEntriesEnumerator() throws IOException;
-
-    boolean isEntriesEnumeratorOpen();
-
-    boolean isFeaturesEnumeratorOpen();
-
-    void openFeaturesEnumerator() throws IOException;
-
-    void saveFeaturesEnumerator() throws IOException;
-
-    void closeFeaturesEnumerator() throws IOException;
-
-    SingleEnumerating getEntriesEnumeratorCarriar();
-
-    SingleEnumerating getFeaturesEnumeratorCarriar();
-
-    boolean isEnumeratedEntries();
-
-    void setEnumeratedEntries(boolean enumeratedEntries);
-
-    boolean isEnumeratedFeatures();
-
-    void setEnumeratedFeatures(boolean enumeratedFeatures);
+    public void setSource(ProgressReporting source) {
+        this.source = source;
+    }
 
 }

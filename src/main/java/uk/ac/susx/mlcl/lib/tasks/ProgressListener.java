@@ -29,55 +29,22 @@
  * POSSIBILITY OF SUCH DAMAGE.To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.byblo.enumerators;
+package uk.ac.susx.mlcl.lib.tasks;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.EventListener;
 
 /**
  *
- * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public interface DoubleEnumerating extends Enumerating {
+public interface ProgressListener extends EventListener {
 
-    Enumerator<String> getEntryEnumerator() throws IOException;
-
-    Enumerator<String> getFeatureEnumerator() throws IOException;
-
-    File getEntryEnumeratorFile();
-
-    File getFeatureEnumeratorFile();
-
-    void setEntryEnumeratorFile(File entryEnumeratorFile);
-
-    void setFeatureEnumeratorFile(File featureEnumeratorFile);
-
-    void openEntriesEnumerator() throws IOException;
-
-    void saveEntriesEnumerator() throws IOException;
-
-    void closeEntriesEnumerator() throws IOException;
-
-    boolean isEntriesEnumeratorOpen();
-
-    boolean isFeaturesEnumeratorOpen();
-
-    void openFeaturesEnumerator() throws IOException;
-
-    void saveFeaturesEnumerator() throws IOException;
-
-    void closeFeaturesEnumerator() throws IOException;
-
-    SingleEnumerating getEntriesEnumeratorCarriar();
-
-    SingleEnumerating getFeaturesEnumeratorCarriar();
-
-    boolean isEnumeratedEntries();
-
-    void setEnumeratedEntries(boolean enumeratedEntries);
-
-    boolean isEnumeratedFeatures();
-
-    void setEnumeratedFeatures(boolean enumeratedFeatures);
+    /**
+     * Method will be called by progress event dispatchers (probably
+     * implementing {@link ProgressReporting}), whenever the progress changes.
+     *
+     * @param progressEvent
+     */
+    void progressChanged(ProgressEvent progressEvent);
 
 }

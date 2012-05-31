@@ -161,15 +161,29 @@ public final class DoubleEnumeratingDeligate
     }
 
     @Override
+    public boolean isEntriesEnumeratorOpen() {
+        return entryEnumerator != null;
+    }
+
+    @Override
+    public boolean isFeaturesEnumeratorOpen() {
+        return featureEnumerator != null;
+    }
+
+    @Override
     public void closeEnumerator() throws IOException {
-        closeFeaturesEnumerator();
-        closeEntriesEnumerator();
+        if (isFeaturesEnumeratorOpen())
+            closeFeaturesEnumerator();
+        if (isEntriesEnumeratorOpen())
+            closeEntriesEnumerator();
     }
 
     @Override
     public void saveEnumerator() throws IOException {
-        saveEntriesEnumerator();
-        saveFeaturesEnumerator();
+        if (isEntriesEnumeratorOpen())
+            saveEntriesEnumerator();
+        if (isFeaturesEnumeratorOpen())
+            saveFeaturesEnumerator();
     }
 
     @Override
@@ -215,6 +229,11 @@ public final class DoubleEnumeratingDeligate
     @Override
     public SingleEnumerating getFeaturesEnumeratorCarriar() {
         return EnumeratingDeligates.toSingleFeatures(this);
+    }
+
+    @Override
+    public boolean isEnumeratorOpen() {
+        return isEntriesEnumeratorOpen() || isFeaturesEnumeratorOpen();
     }
 
 }

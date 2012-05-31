@@ -132,7 +132,6 @@ public final class EnumeratingDeligates {
 //        public boolean isEnumeratorSkipIndexed2() {
 //            return getInner().isEnumeratorSkipIndexed2();
 //        }
-
         @Override
         public void closeEnumerator() throws IOException {
             getInner().closeEnumerator();
@@ -148,6 +147,11 @@ public final class EnumeratingDeligates {
             getInner().openEnumerator();
         }
 
+        @Override
+        public boolean isEnumeratorOpen() {
+            return getInner().isEnumeratorOpen();
+        }
+
 //        @Override
 //        public void setEnumeratorSkipIndexed1(boolean b) {
 //            getInner().setEnumeratorSkipIndexed1(b);
@@ -157,7 +161,6 @@ public final class EnumeratingDeligates {
 //        public void setEnumeratorSkipIndexed2(boolean b) {
 //            getInner().setEnumeratorSkipIndexed2(b);
 //        }
-
         @Override
         public int hashCode() {
             return 59 * 5 + (this.inner != null ? this.inner.hashCode() : 0);
@@ -268,6 +271,21 @@ public final class EnumeratingDeligates {
             return getInner();
         }
 
+        @Override
+        public boolean isEnumeratorOpen() {
+            return getInner().isEnumeratorOpen();
+        }
+
+        @Override
+        public boolean isEntriesEnumeratorOpen() {
+            return getInner().isEnumeratorOpen();
+        }
+
+        @Override
+        public boolean isFeaturesEnumeratorOpen() {
+            return getInner().isEnumeratorOpen();
+        }
+
     }
 
     public static class PairToFeaturesSingleAdapter
@@ -321,6 +339,11 @@ public final class EnumeratingDeligates {
         @Override
         public DoubleEnumerating getEnumeratorPairCarriar() {
             return getInner();
+        }
+
+        @Override
+        public boolean isEnumeratorOpen() {
+            return getInner().isEnumeratorOpen();
         }
 
     }
@@ -378,6 +401,11 @@ public final class EnumeratingDeligates {
             return getInner();
         }
 
+        @Override
+        public boolean isEnumeratorOpen() {
+            return getInner().isEnumeratorOpen();
+        }
+
     }
 
     public abstract static class SingleToSingleAdapter
@@ -431,6 +459,11 @@ public final class EnumeratingDeligates {
         @Override
         public DoubleEnumerating getEnumeratorPairCarriar() {
             return toPair(this);
+        }
+
+        @Override
+        public boolean isEnumeratorOpen() {
+            return getInner().isEnumeratorOpen();
         }
 
     }
@@ -531,6 +564,21 @@ public final class EnumeratingDeligates {
         @Override
         public void setFeatureEnumeratorFile(File featureEnumeratorFile) {
             throw new UnsupportedOperationException("Not supported yet.");
+        }
+
+        @Override
+        public boolean isEnumeratorOpen() {
+            return getInner().isEnumeratorOpen();
+        }
+
+        @Override
+        public boolean isEntriesEnumeratorOpen() {
+            return getInner().isEntriesEnumeratorOpen();
+        }
+
+        @Override
+        public boolean isFeaturesEnumeratorOpen() {
+            return getInner().isFeaturesEnumeratorOpen();
         }
 
     }

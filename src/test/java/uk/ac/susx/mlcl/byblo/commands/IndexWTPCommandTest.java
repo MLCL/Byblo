@@ -162,9 +162,9 @@ public class IndexWTPCommandTest {
     public void testRunOnFruitAPI(
             String prefix, EnumeratorType type, boolean skip1, boolean skip2, boolean compact) throws Exception {
         System.out.println("Testing " + IndexWTPCommandTest.class.getName()
-                + " on " + TEST_FRUIT_ENTRY_FEATURES);
+                + " on " + TEST_FRUIT_EVENTS);
 
-        final String name = TEST_FRUIT_ENTRY_FEATURES.getName();
+        final String name = TEST_FRUIT_EVENTS.getName();
         final File out = new File(TEST_OUTPUT_DIR, prefix + name + ".indexed");
         File out2 = suffix(out, ".unindexed");
         final File idx1 = new File(TEST_OUTPUT_DIR, name + ".entry-index");
@@ -173,7 +173,7 @@ public class IndexWTPCommandTest {
         deleteIfExist(out);
         deleteJDBCIfExist(idx1, idx2);
 
-        indexWTP(TEST_FRUIT_ENTRY_FEATURES, out, idx1, idx2, type, skip1, skip2,
+        indexWTP(TEST_FRUIT_EVENTS, out, idx1, idx2, type, skip1, skip2,
                  compact);
 
         unindexWTP(out, out2, idx1, idx2, type, skip1, skip2, compact);
@@ -186,10 +186,10 @@ public class IndexWTPCommandTest {
     @Ignore
     public void testCompareSkipVsNoSkip() throws Exception {
         System.out.println("Testing " + IndexWTPCommandTest.class.getName()
-                + " on " + TEST_FRUIT_ENTRY_FEATURES);
+                + " on " + TEST_FRUIT_EVENTS);
 
 
-        final String name = TEST_FRUIT_ENTRY_FEATURES.getName();
+        final String name = TEST_FRUIT_EVENTS.getName();
         String prefixa = "wtp-noskip-";
         String prefixb = "wtp-skip-";
 
@@ -212,9 +212,9 @@ public class IndexWTPCommandTest {
 
         deleteIfExist(outa, idx1a, idx2a, outb, idx1b, idx2b);
 
-        indexWTP(TEST_FRUIT_ENTRY_FEATURES, outa, idx1a, idx2a, EnumeratorType.Memory, skip1a, skip2a,
+        indexWTP(TEST_FRUIT_EVENTS, outa, idx1a, idx2a, EnumeratorType.Memory, skip1a, skip2a,
                  true);
-        indexWTP(TEST_FRUIT_ENTRY_FEATURES, outb, idx1b, idx2b, EnumeratorType.Memory, skip1b, skip2b, true);
+        indexWTP(TEST_FRUIT_EVENTS, outb, idx1b, idx2b, EnumeratorType.Memory, skip1b, skip2b, true);
 
         // Read back the data checking it's identical
         {

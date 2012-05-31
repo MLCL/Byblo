@@ -34,6 +34,7 @@ import com.google.common.base.Objects;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.MessageFormat;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
@@ -42,9 +43,12 @@ import uk.ac.susx.mlcl.lib.io.ObjectSource;
  * @param <T>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class ObjectPipeTask<T> extends AbstractTask implements Serializable {
+public class ObjectPipeTask<T> extends AbstractTask
+        implements Serializable, ProgressReporting {
 
     private static final long serialVersionUID = 1L;
+
+    protected ProgressDeligate progress = new ProgressDeligate(this, false);
 
     private ObjectSource<T> source;
 
@@ -87,12 +91,23 @@ public class ObjectPipeTask<T> extends AbstractTask implements Serializable {
     @Override
     protected void runTask() throws IOException {
 
+        progress.setStarted();
+
+        int count = 0;
         while (getSource().hasNext()) {
             getSink().write(getSource().read());
+            ++count;
+
+            if (count % 1000000 == 0 || !getSource().hasNext()) {
+                progress.setMessage(MessageFormat.format("Processed {0} items.", count));
+            }
+
         }
 
         if (getSink() instanceof Flushable)
             ((Flushable) getSink()).flush();
+
+        progress.setCompleted();
 
     }
 
@@ -112,12 +127,10 @@ public class ObjectPipeTask<T> extends AbstractTask implements Serializable {
         if (!super.equals((AbstractTask) that))
             return false;
         if (this.getSource() != that.getSource()
-                && (this.getSource() == null || !this.getSource().equals(that.
-                    getSource())))
+                && (this.getSource() == null || !this.getSource().equals(that.getSource())))
             return false;
         if (this.getSink() != that.getSink()
-                && (this.getSink() == null || !this.getSink().equals(that.
-                    getSink())))
+                && (this.getSink() == null || !this.getSink().equals(that.getSink())))
             return false;
         return true;
     }
@@ -134,8 +147,48 @@ public class ObjectPipeTask<T> extends AbstractTask implements Serializable {
     @Override
     public int hashCode() {
         int hash = super.hashCode();
-        hash = 37 * hash + (this.getSource() != null ? this.getSource().hashCode() : 0);
-        hash = 37 * hash + (this.getSink() != null ? this.getSink().hashCode() : 0);
+        hash = 37 * hash + (this.getSource() != null
+                            ? this.getSource().hashCode() : 0);
+        hash = 37 * hash + (this.getSink() != null ? this.getSink().hashCode()
+                            : 0);
         return hash;
     }
+
+    @Override
+    public String getName() {
+        return "pipe";
+    }
+
+    public void removeProgressListener(ProgressListener progressListener) {
+        progress.removeProgressListener(progressListener);
+    }
+
+    public boolean isStarted() {
+        return progress.isStarted();
+    }
+
+    public boolean isProgressPercentageSupported() {
+        return progress.isProgressPercentageSupported();
+    }
+
+    public boolean isCompleted() {
+        return progress.isCompleted();
+    }
+
+    public String getProgressReport() {
+        return progress.getProgressReport();
+    }
+
+    public int getProgressPercent() {
+        return progress.getProgressPercent();
+    }
+
+    public ProgressListener[] getProgressListeners() {
+        return progress.getProgressListeners();
+    }
+
+    public void addProgressListener(ProgressListener progressListener) {
+        progress.addProgressListener(progressListener);
+    }
+
 }

@@ -66,7 +66,7 @@ public class CrMiTest {
                         "--measure", "CrMi",
                         "--crmi-beta", "" + beta,
                         "--crmi-gamma", "" + gamma,
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output.toString()
@@ -139,7 +139,7 @@ public class CrMiTest {
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "RecallMi",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", expectedOutput.toString()
@@ -150,7 +150,7 @@ public class CrMiTest {
                         "--measure", "CrMi",
                         "--crmi-beta", "0.00",
                         "--crmi-gamma", "0.00",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", crmiOutput.toString()
@@ -185,7 +185,7 @@ public class CrMiTest {
                         "--charset", "UTF-8",
                         "--measure", "RecallMi",
                         "--measure-reversed",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", expectedOutput.toString()
@@ -196,7 +196,7 @@ public class CrMiTest {
                         "--measure", "CrMi",
                         "--crmi-beta", "1.00",
                         "--crmi-gamma", "0.00",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", crmiOutput.toString()
@@ -231,7 +231,7 @@ public class CrMiTest {
                         "allpairs",
                         "--charset", "UTF-8",
                         "--measure", "DiceMi",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", expectedOutput.toString()
@@ -242,7 +242,7 @@ public class CrMiTest {
                         "--measure", "CrMi",
                         "--crmi-beta", "0.00",
                         "--crmi-gamma", "1.00",
-                        "--input", TEST_FRUIT_ENTRY_FEATURES.toString(),
+                        "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", crmiOutput.toString()

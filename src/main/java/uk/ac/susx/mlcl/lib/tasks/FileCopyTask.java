@@ -46,9 +46,9 @@ import uk.ac.susx.mlcl.lib.Checks;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class FileCopyTask extends AbstractTask {
+public class FileCopyTask extends AbstractTask implements ProgressReporting {
 
-    private static final Log LOG = LogFactory.getLog(FileCopyTask.class);
+    protected final ProgressDeligate progress = new ProgressDeligate(this, false);
 
     private File sourceFile;
 
@@ -90,8 +90,12 @@ public class FileCopyTask extends AbstractTask {
 
     @Override
     protected void runTask() throws Exception {
-        LOG.info(format("Copying file from \"{0}\" to \"{1}\".",
+
+        progress.startAdjusting();
+        progress.setStarted();
+        progress.setMessage(format("Copying file from \"{0}\" to \"{1}\".",
                         getSrcFile(), getDstFile()));
+        progress.endAdjusting();
 
         // Check the configuration state
         if (sourceFile.equals(destFile))
@@ -99,8 +103,7 @@ public class FileCopyTask extends AbstractTask {
 
         copy(sourceFile, destFile);
 
-        if (LOG.isInfoEnabled())
-            LOG.info("Completed copy.");
+        progress.setCompleted();
     }
 
     public final File getSrcFile() {
@@ -126,6 +129,46 @@ public class FileCopyTask extends AbstractTask {
         return super.toStringHelper().
                 add("in", sourceFile).
                 add("out", destFile);
+    }
+
+    public void removeProgressListener(ProgressListener progressListener) {
+        progress.removeProgressListener(progressListener);
+    }
+
+    public boolean isStarted() {
+        return progress.isStarted();
+    }
+
+    public boolean isRunning() {
+        return progress.isRunning();
+    }
+
+    public boolean isProgressPercentageSupported() {
+        return progress.isProgressPercentageSupported();
+    }
+
+    public boolean isCompleted() {
+        return progress.isCompleted();
+    }
+
+    public String getProgressReport() {
+        return progress.getProgressReport();
+    }
+
+    public int getProgressPercent() {
+        return progress.getProgressPercent();
+    }
+
+    public ProgressListener[] getProgressListeners() {
+        return progress.getProgressListeners();
+    }
+
+    public String getName() {
+        return "copy";
+    }
+
+    public void addProgressListener(ProgressListener progressListener) {
+        progress.addProgressListener(progressListener);
     }
 
 }
