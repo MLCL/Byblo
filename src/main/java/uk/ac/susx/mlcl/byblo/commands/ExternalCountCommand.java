@@ -73,10 +73,10 @@ import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import uk.ac.susx.mlcl.lib.tasks.FileDeleteTask;
 import uk.ac.susx.mlcl.lib.tasks.ObjectMergeTask;
 import uk.ac.susx.mlcl.lib.tasks.ObjectSortTask;
-import uk.ac.susx.mlcl.lib.tasks.ProgressAggregate;
-import uk.ac.susx.mlcl.lib.tasks.ProgressEvent;
-import uk.ac.susx.mlcl.lib.tasks.ProgressListener;
-import uk.ac.susx.mlcl.lib.tasks.ProgressReporting;
+import uk.ac.susx.mlcl.lib.events.ProgressAggregate;
+import uk.ac.susx.mlcl.lib.events.ProgressEvent;
+import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import uk.ac.susx.mlcl.lib.tasks.Task;
 
 /**
@@ -300,8 +300,6 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
 
     @Override
     protected void runTask() throws Exception {
-//        if (LOG.isInfoEnabled())
-//            LOG.info("Running external count on \"" + inputFile + "\".");
 
         progress.addProgressListener(new ProgressListener() {
 
@@ -312,12 +310,16 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
 
         });
 
-//        progress.setStarted();
 
-        progress.setStarted();
+        progress.startAdjusting();
+        progress.setState(State.RUNNING);
         progress.setMessage("Mapping to small count tasks");
+        progress.endAdjusting();
+
         map();
+
         progress.setMessage("Merging and aggregating results");
+
         reduce();
         finish();
 
@@ -326,17 +328,9 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
             indexDeligate.closeEnumerator();
         }
 
-        progress.setCompleted();
+        progress.setState(State.COMPLETED);
 
-//
-//        progress.startAdjusting();
-//        progress.setProgressPercent(100);
-//        progress.setCompleted();
-//        progress.endAdjusting();
 
-//
-//        if (LOG.isInfoEnabled())
-//            LOG.info("Completed external count");
 
     }
 
@@ -900,30 +894,27 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
         return "xcount";
     }
 
+    @Override
     public void removeProgressListener(ProgressListener progressListener) {
         progress.removeProgressListener(progressListener);
     }
 
-    public boolean isStarted() {
-        return progress.isStarted();
-    }
-
+    @Override
     public boolean isProgressPercentageSupported() {
         return progress.isProgressPercentageSupported();
     }
 
-    public boolean isCompleted() {
-        return progress.isCompleted();
-    }
-
+    @Override
     public int getProgressPercent() {
         return progress.getProgressPercent();
     }
 
+    @Override
     public ProgressListener[] getProgressListeners() {
         return progress.getProgressListeners();
     }
 
+    @Override
     public void addProgressListener(ProgressListener progressListener) {
         progress.addProgressListener(progressListener);
     }
@@ -931,6 +922,11 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
     @Override
     public String getProgressReport() {
         return progress.getProgressReport();
+    }
+
+    @Override
+    public State getState() {
+        return progress.getState();
     }
 
 }

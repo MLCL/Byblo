@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.lib.tasks;
+package uk.ac.susx.mlcl.lib.events;
 
 /**
  * Defines a common interface for tasks which can report their progress as a
@@ -39,15 +39,21 @@ package uk.ac.susx.mlcl.lib.tasks;
  */
 public interface ProgressReporting {
 
+    /**
+     * States that this progress reported can be in.
+     */
     enum State {
 
-        PENDING,
-        RUNNING,
-        COMPLETED,
-        ERROR
+        PENDING, RUNNING, COMPLETED, ERROR;
 
     }
 
+    /**
+     * A string identifier for this progress reporter, that can be used by
+     * progress reports.
+     *
+     * @return human readable identifier
+     */
     String getName();
 
     /**
@@ -71,22 +77,12 @@ public interface ProgressReporting {
     boolean isProgressPercentageSupported();
 
     /**
-     * Accessor to whether or not operation has started. By definition when this {@link #isStarted()
-     * } = <tt>true</tt>, {@link #getProgressPercent()
-     * } > 0.
+     * Accessor to the state of this progress reporter. (As defined in
+     * {@link State}.)
      *
-     * @return whether the operation has started
+     * @return the state
      */
-    boolean isStarted();
-
-    /**
-     * Accessor to whether or not operation has completed. By definition when
-     * this {@link #isCompleted() } = <tt>true</tt>, {@link #getProgressPercent()
-     * } = 100.
-     *
-     * @return whether the operation has completed
-     */
-    boolean isCompleted();
+    State getState();
 
     /**
      *

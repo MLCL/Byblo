@@ -79,7 +79,7 @@ public final class InvertedApssTask<S> extends NaiveApssTask<S> {
             throws IOException {
 
         progress.startAdjusting();
-        progress.setStarted();
+        progress.setState(State.RUNNING);
         progress.setMessage("Running inverted all-pairs.");
         progress.setProgressPercent(0);
         progress.endAdjusting();
@@ -127,7 +127,7 @@ public final class InvertedApssTask<S> extends NaiveApssTask<S> {
         getSourceB().position(startB);
 
         progress.startAdjusting();
-        progress.setCompleted();
+        progress.setState(State.COMPLETED);
         progress.setProgressPercent(100);
         progress.endAdjusting();
 
@@ -176,6 +176,7 @@ public final class InvertedApssTask<S> extends NaiveApssTask<S> {
         return index;
     }
 
+    @Override
     public String getName() {
         return "inverted-allpairs";
     }

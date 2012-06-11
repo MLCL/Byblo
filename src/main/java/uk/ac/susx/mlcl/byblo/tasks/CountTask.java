@@ -50,9 +50,9 @@ import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
-import uk.ac.susx.mlcl.lib.tasks.ProgressDeligate;
-import uk.ac.susx.mlcl.lib.tasks.ProgressListener;
-import uk.ac.susx.mlcl.lib.tasks.ProgressReporting;
+import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
+import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 
 /**
  * <p>Read in a raw feature instances, to produce three frequency cuonts:
@@ -179,7 +179,7 @@ public final class CountTask extends AbstractTask
     @Override
     public void runTask() throws Exception {
 
-        progress.setStarted();
+        progress.setState(State.RUNNING);
 
         final Object2IntMap<TokenPair> eventFreq =
                 new Object2IntOpenHashMap<TokenPair>();
@@ -252,7 +252,7 @@ public final class CountTask extends AbstractTask
 
         progress.startAdjusting();
         progress.setProgressPercent(100);
-        progress.setCompleted();
+        progress.setState(State.RUNNING);
         progress.endAdjusting();
 
 
@@ -286,36 +286,39 @@ public final class CountTask extends AbstractTask
         return "count";
     }
 
+    @Override
     public void removeProgressListener(ProgressListener progressListener) {
         progress.removeProgressListener(progressListener);
     }
 
-    public boolean isStarted() {
-        return progress.isStarted();
-    }
-
+    @Override
     public boolean isProgressPercentageSupported() {
         return progress.isProgressPercentageSupported();
     }
 
-    public boolean isCompleted() {
-        return progress.isCompleted();
-    }
-
+    @Override
     public String getProgressReport() {
         return progress.getProgressReport();
     }
 
+    @Override
     public int getProgressPercent() {
         return progress.getProgressPercent();
     }
 
+    @Override
     public ProgressListener[] getProgressListeners() {
         return progress.getProgressListeners();
     }
 
+    @Override
     public void addProgressListener(ProgressListener progressListener) {
         progress.addProgressListener(progressListener);
+    }
+
+    @Override
+    public State getState() {
+        return progress.getState();
     }
 
     @Override

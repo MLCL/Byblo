@@ -30,6 +30,9 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
+import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
+import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import com.google.common.base.Objects;
 import java.io.Flushable;
 import java.io.IOException;
@@ -48,7 +51,7 @@ public class ObjectPipeTask<T> extends AbstractTask
 
     private static final long serialVersionUID = 1L;
 
-    protected ProgressDeligate progress = new ProgressDeligate(this, false);
+    protected final ProgressDeligate progress = new ProgressDeligate(this, false);
 
     private ObjectSource<T> source;
 
@@ -91,7 +94,7 @@ public class ObjectPipeTask<T> extends AbstractTask
     @Override
     protected void runTask() throws IOException {
 
-        progress.setStarted();
+        progress.setState(State.RUNNING);
 
         int count = 0;
         while (getSource().hasNext()) {
@@ -107,7 +110,7 @@ public class ObjectPipeTask<T> extends AbstractTask
         if (getSink() instanceof Flushable)
             ((Flushable) getSink()).flush();
 
-        progress.setCompleted();
+        progress.setState(State.COMPLETED);
 
     }
 
@@ -159,36 +162,39 @@ public class ObjectPipeTask<T> extends AbstractTask
         return "pipe";
     }
 
+    @Override
     public void removeProgressListener(ProgressListener progressListener) {
         progress.removeProgressListener(progressListener);
     }
 
-    public boolean isStarted() {
-        return progress.isStarted();
-    }
-
+    @Override
     public boolean isProgressPercentageSupported() {
         return progress.isProgressPercentageSupported();
     }
 
-    public boolean isCompleted() {
-        return progress.isCompleted();
-    }
-
+    @Override
     public String getProgressReport() {
         return progress.getProgressReport();
     }
 
+    @Override
     public int getProgressPercent() {
         return progress.getProgressPercent();
     }
 
+    @Override
     public ProgressListener[] getProgressListeners() {
         return progress.getProgressListeners();
     }
 
+    @Override
     public void addProgressListener(ProgressListener progressListener) {
         progress.addProgressListener(progressListener);
+    }
+
+    @Override
+    public State getState() {
+        return progress.getState();
     }
 
 }

@@ -226,7 +226,7 @@ public abstract class IndexingCommands<T>
 
         @Override
         public String getName() {
-            return "instance enumeration";
+            return "instance-enumeration";
         }
 
         @Override

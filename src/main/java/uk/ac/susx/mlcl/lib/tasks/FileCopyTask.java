@@ -31,6 +31,9 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
+import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
+import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import com.google.common.base.Objects;
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,8 +41,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import static java.text.MessageFormat.format;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Checks;
 
 /**
@@ -92,9 +93,9 @@ public class FileCopyTask extends AbstractTask implements ProgressReporting {
     protected void runTask() throws Exception {
 
         progress.startAdjusting();
-        progress.setStarted();
+        progress.setState(State.RUNNING);
         progress.setMessage(format("Copying file from \"{0}\" to \"{1}\".",
-                        getSrcFile(), getDstFile()));
+                                   getSrcFile(), getDstFile()));
         progress.endAdjusting();
 
         // Check the configuration state
@@ -103,7 +104,7 @@ public class FileCopyTask extends AbstractTask implements ProgressReporting {
 
         copy(sourceFile, destFile);
 
-        progress.setCompleted();
+        progress.setState(State.COMPLETED);
     }
 
     public final File getSrcFile() {
@@ -131,42 +132,42 @@ public class FileCopyTask extends AbstractTask implements ProgressReporting {
                 add("out", destFile);
     }
 
+    @Override
     public void removeProgressListener(ProgressListener progressListener) {
         progress.removeProgressListener(progressListener);
     }
 
-    public boolean isStarted() {
-        return progress.isStarted();
-    }
-
-    public boolean isRunning() {
-        return progress.isRunning();
-    }
-
+    @Override
     public boolean isProgressPercentageSupported() {
         return progress.isProgressPercentageSupported();
     }
 
-    public boolean isCompleted() {
-        return progress.isCompleted();
-    }
-
+    @Override
     public String getProgressReport() {
         return progress.getProgressReport();
     }
 
+    @Override
     public int getProgressPercent() {
         return progress.getProgressPercent();
     }
 
+    @Override
     public ProgressListener[] getProgressListeners() {
         return progress.getProgressListeners();
     }
 
+    @Override
     public String getName() {
         return "copy";
     }
 
+    @Override
+    public State getState() {
+        return progress.getState();
+    }
+
+    @Override
     public void addProgressListener(ProgressListener progressListener) {
         progress.addProgressListener(progressListener);
     }

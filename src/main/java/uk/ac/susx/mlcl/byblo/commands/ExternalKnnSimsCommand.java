@@ -197,4 +197,11 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
 
     }
 
+    @Override
+    public String getName() {
+        return "knn-sims";
+    }
+
+
+
 }

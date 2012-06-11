@@ -71,10 +71,10 @@ import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
-import uk.ac.susx.mlcl.lib.tasks.ProgressDeligate;
-import uk.ac.susx.mlcl.lib.tasks.ProgressEvent;
-import uk.ac.susx.mlcl.lib.tasks.ProgressListener;
-import uk.ac.susx.mlcl.lib.tasks.ProgressReporting;
+import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
+import uk.ac.susx.mlcl.lib.events.ProgressEvent;
+import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 
 /**
  *
@@ -289,7 +289,7 @@ public class FilterCommand extends AbstractCommand
 
         });
 
-        progress.setStarted();
+        progress.setState(State.RUNNING);
         progress.setProgressPercent(0);
 
 
@@ -427,7 +427,7 @@ public class FilterCommand extends AbstractCommand
         }
 
 
-        progress.setCompleted();
+        progress.setState(State.COMPLETED);
     }
     // Read the entries file, passing it thought the filter. accepted entries
     // are written out to the output file while rejected entries are stored
@@ -1257,42 +1257,42 @@ public class FilterCommand extends AbstractCommand
         return indexDeligate.getEnuemratorType();
     }
 
+    @Override
     public void removeProgressListener(ProgressListener progressListener) {
         progress.removeProgressListener(progressListener);
     }
 
-    public boolean isStarted() {
-        return progress.isStarted();
-    }
-
-    public boolean isRunning() {
-        return progress.isRunning();
-    }
-
+    @Override
     public boolean isProgressPercentageSupported() {
         return progress.isProgressPercentageSupported();
     }
 
-    public boolean isCompleted() {
-        return progress.isCompleted();
+    @Override
+    public State getState() {
+        return progress.getState();
     }
 
+    @Override
     public String getProgressReport() {
         return progress.getProgressReport();
     }
 
+    @Override
     public int getProgressPercent() {
         return progress.getProgressPercent();
     }
 
+    @Override
     public ProgressListener[] getProgressListeners() {
         return progress.getProgressListeners();
     }
 
+    @Override
     public String getName() {
         return "filter";
     }
 
+    @Override
     public void addProgressListener(ProgressListener progressListener) {
         progress.addProgressListener(progressListener);
     }

@@ -30,7 +30,7 @@
  * and open the template in the editor.
  */
 
-package uk.ac.susx.mlcl.lib.tasks;
+package uk.ac.susx.mlcl.lib.events;
 
 import java.util.EventObject;
 

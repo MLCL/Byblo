@@ -115,7 +115,7 @@ public final class ObjectSortTask<T> extends ObjectPipeTask<T> {
     @Override
     protected void runTask() throws IOException {
 
-        progress.setStarted();
+        progress.setState(State.RUNNING);
 
         final List<T> items = ObjectIO.readAll(getSource());
 
@@ -131,7 +131,7 @@ public final class ObjectSortTask<T> extends ObjectPipeTask<T> {
             ((Flushable) getSink()).flush();
 
 
-        progress.setCompleted();
+        progress.setState(State.COMPLETED);
     }
 
     @Override

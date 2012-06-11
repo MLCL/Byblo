@@ -58,8 +58,8 @@ import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
 import uk.ac.susx.mlcl.lib.io.Files;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
-import uk.ac.susx.mlcl.lib.tasks.ProgressEvent;
-import uk.ac.susx.mlcl.lib.tasks.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ProgressEvent;
+import uk.ac.susx.mlcl.lib.events.ProgressListener;
 
 /**
  * <p>Read in a raw feature instances file, to produce three frequency files:

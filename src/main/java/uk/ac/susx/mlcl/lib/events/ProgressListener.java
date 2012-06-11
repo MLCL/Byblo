@@ -29,11 +29,13 @@
  * POSSIBILITY OF SUCH DAMAGE.To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.lib.tasks;
+package uk.ac.susx.mlcl.lib.events;
 
 import java.util.EventListener;
 
 /**
+ * Interface that should be implemented by objects that can receive progress
+ * events.
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */

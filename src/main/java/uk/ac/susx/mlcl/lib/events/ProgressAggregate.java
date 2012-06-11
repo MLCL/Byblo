@@ -29,11 +29,14 @@
  * POSSIBILITY OF SUCH DAMAGE.To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.lib.tasks;
+package uk.ac.susx.mlcl.lib.events;
 
 import java.util.concurrent.CopyOnWriteArrayList;
+import uk.ac.susx.mlcl.lib.Checks;
 
 /**
+ * Implementation of ProgressReporting that reports progress based on the totals
+ * of sum number of child ProgressReporting objects.
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -41,18 +44,31 @@ public class ProgressAggregate extends ProgressDeligate {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Thread safe list of child progress reporters.
+     */
     private CopyOnWriteArrayList<ProgressReporting> children =
             new CopyOnWriteArrayList<ProgressReporting>();
 
+    /**
+     * Once a child has completed it will be removed from the listener list to
+     * save memory, and this count of completed children is incremented.
+     */
+    private int completedChildren = 0;
+
+    /**
+     * Listener that will be attached to every child progress reporter.
+     */
     private final ProgressListener childProgressListener =
             new ProgressListener() {
 
                 @Override
                 public void progressChanged(ProgressEvent progressEvent) {
+                    Checks.checkNotNull(progressEvent);
                     assert children.contains(progressEvent.getSource());
                     startAdjusting();
                     updateProgress();
-                    stateChangedSinceLastEvent = true;
+                    setStateChangedSinceLastEvent();
                     endAdjusting();
                 }
 
@@ -79,38 +95,50 @@ public class ProgressAggregate extends ProgressDeligate {
      */
     protected void updateProgress() {
         startAdjusting();
+
         if (!hasChildProgressReporters())
             setProgressPercent(0);
-        int sum = 0, count = 0;
-        boolean anyStarted = false;
-        boolean allCompleted = true;
+
+        int childProgressSum = 0;
+        boolean anyChildRunning = false;
+        boolean allChildrenCompleted = true;
         for (ProgressReporting child : children) {
+            // Add the progress percentage for the child, if it supported.
+            // Otherwise just assume 0, 50, or 100 for pending, running, and
+            // completed respectively.
             if (child.isProgressPercentageSupported()) {
-                sum += child.getProgressPercent();
-            } else if (child.isCompleted()) {
-                sum += 100;
-            } else if (child.isStarted()) {
-                sum += 50;
-            }
-            ++count;
+                childProgressSum += child.getProgressPercent();
+            } else if (child.getState() == State.COMPLETED) {
+                children.remove(child);
+                ++completedChildren;
+            } // otherwise progress is 0
 
-            anyStarted = anyStarted || child.isStarted();
-            allCompleted = allCompleted && child.isCompleted();
+            anyChildRunning = anyChildRunning || child.getState() == State.RUNNING;
+            allChildrenCompleted = allChildrenCompleted && child.getState() == State.COMPLETED;
         }
 
-        if (anyStarted && !isStarted()) {
-            super.setStarted();
+        // The aggregate is considered running if when any child is running
+        if (anyChildRunning && super.getState() != State.RUNNING) {
+            super.setState(State.RUNNING);
+        } else if (allChildrenCompleted && super.getState() != State.COMPLETED) {
+            super.setState(State.COMPLETED);
         }
-//        if (allCompleted && !isCompleted())
-//            setCompleted();
 
-        super.setProgressPercent(sum / count);
+        childProgressSum += 100 * completedChildren;
+        int childrenCount = children.size() + completedChildren;
+        super.setProgressPercent(childProgressSum / childrenCount);
+
         endAdjusting();
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getProgressReport() {
         return getDeepProgressReport(0);
+//        return super.getProgressReport();
     }
 
     public String getDeepProgressReport() {
@@ -118,19 +146,22 @@ public class ProgressAggregate extends ProgressDeligate {
     }
 
     private String getDeepProgressReport(int depth) {
+        assert depth >= 0;
         StringBuilder sb = new StringBuilder();
         sb.append(super.getProgressReport());
         for (ProgressReporting child : children) {
-            if (!child.isCompleted()) {
-                sb.append('\n');
-                for (int i = 0; i < depth + 1; i++)
-                    sb.append('\t');
-                if (child instanceof ProgressAggregate)
-                    sb.append(((ProgressAggregate) child).getDeepProgressReport(depth + 1));
-                else {
-                    sb.append(child.getProgressReport());
-                }
+            if (child.getState() == State.COMPLETED)
+                continue;
+
+            sb.append('\n');
+            for (int i = 0; i < depth + 1; i++)
+                sb.append('\t');
+            if (child instanceof ProgressAggregate)
+                sb.append(((ProgressAggregate) child).getDeepProgressReport(depth + 1));
+            else {
+                sb.append(child.getProgressReport());
             }
+
         }
         return sb.toString();
     }
@@ -142,11 +173,13 @@ public class ProgressAggregate extends ProgressDeligate {
     }
 
     public void addChildProgressReporter(ProgressReporting child) {
+        Checks.checkNotNull(child);
         children.add(child);
         child.addProgressListener(childProgressListener);
     }
 
     public void removeChildProgressReporter(ProgressReporting child) {
+        Checks.checkNotNull(child);
         children.remove(child);
         child.removeProgressListener(childProgressListener);
     }

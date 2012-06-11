@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.susx.mlcl.lib.tasks;
+package uk.ac.susx.mlcl.lib.events;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
@@ -40,7 +40,8 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Checks;
 
 /**
- *
+ * Implementation of ProgressReporting that can be used as a deligate by
+ * containing objects.
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -63,24 +64,22 @@ public class ProgressDeligate implements ProgressReporting, Serializable {
 
     private String message = null;
 
-    private enum State {
-
-        PENDING, RUNNING, COMPLETED
-
-    }
-
     private State state = State.PENDING;
 
-    protected boolean stateChangedSinceLastEvent = false;
+    private boolean stateChangedSinceLastEvent = false;
 
     private AtomicInteger adjustingCount = new AtomicInteger(0);
 
     public ProgressDeligate(ProgressReporting outer, boolean progressPercentageSupported) {
+        if (outer == this)
+            throw new IllegalArgumentException("outer == this");
         this.outer = outer;
         this.progressPercentageSupported = progressPercentageSupported;
     }
 
     public ProgressDeligate(ProgressReporting outer) {
+        if (outer == this)
+            throw new IllegalArgumentException("outer == this");
         this.outer = outer;
         this.progressPercentageSupported = true;
     }
@@ -95,26 +94,55 @@ public class ProgressDeligate implements ProgressReporting, Serializable {
         this.progressPercentageSupported = true;
     }
 
+    protected boolean isStateChangedSinceLastEvent() {
+        return stateChangedSinceLastEvent;
+    }
+
+    public void setStateChangedSinceLastEvent() {
+        this.stateChangedSinceLastEvent = true;
+    }
+
     public ProgressReporting getOuter() {
         return outer;
     }
 
     @Override
     public String getName() {
-        if (outer == this || outer == null)
+        if (outer == null)
             return "<unamed deligate>";
         else
             return outer.getName();
     }
 
-    public void startAdjusting() {
-        assert adjustingCount.get() >= 0;
+    /**
+     * Indicate the start of series of updates that should be considered a
+     * single atomic transaction.
+     *
+     * This method is used (in conjuction with {@link #endAdjusting() } to avoid
+     * multiple events being fired during a sequence of state changes.
+     *
+     * @throws IllegalStateException if adjustingCount is negative
+     */
+    public void startAdjusting() throws IllegalStateException {
+        if (adjustingCount.get() < 0)
+            throw new IllegalStateException("adjustingCount is negative");
 
         adjustingCount.incrementAndGet();
     }
 
+    /**
+     * Indicate the end of series of updates that should be considered a single
+     * atomic transaction.
+     *
+     * This method is used (in conjuction with {@link #startAdjusting() } to
+     * avoid multiple events being fired during a sequence of state changes.
+     *
+     * @throws IllegalStateException if no transaction has been started
+     */
     public void endAdjusting() {
-        assert adjustingCount.get() >= 1;
+        if (adjustingCount.get() < 1)
+            throw new IllegalStateException(
+                    "attempting to end a transaction that has not been started");
 
         if (adjustingCount.decrementAndGet() == 0) {
             fireProgressChangedEvent();
@@ -136,8 +164,6 @@ public class ProgressDeligate implements ProgressReporting, Serializable {
         Checks.checkRangeIncl(progressPercent, 0, 100);
         if (progressPercent != this.progressPercent) {
             startAdjusting();
-//            if (state != State.STARTED)
-//                setStarted();
             this.progressPercent = progressPercent;
             stateChangedSinceLastEvent = true;
             endAdjusting();
@@ -150,51 +176,25 @@ public class ProgressDeligate implements ProgressReporting, Serializable {
     }
 
     @Override
-    public boolean isStarted() {
-        return state == State.RUNNING || state == State.COMPLETED;
+    public State getState() {
+        return state;
     }
 
-    public boolean isRunning() {
-        return state == State.RUNNING;
-    }
-
-    public void setStarted() {
-        if (state == State.RUNNING)
+    public void setState(State newState) {
+        Checks.checkNotNull(newState);
+        if (state == newState)
             return;
-        if (state != State.PENDING)
-            throw new IllegalStateException(MessageFormat.format(
-                    "Unable to transision from state {0} to state {1}",
-                    state, State.RUNNING));
         startAdjusting();
-        state = State.RUNNING;
+        this.state = newState;
         stateChangedSinceLastEvent = true;
-        setMessage("Running");
         endAdjusting();
     }
 
-    @Override
-    public boolean isCompleted() {
-        return state == State.COMPLETED;
-    }
-
-    public void setCompleted() {
-        if (state == State.COMPLETED)
-            return;
-        if (state != State.RUNNING)
-            throw new IllegalStateException(MessageFormat.format(
-                    "Unable to transision from state {0} to state {1}",
-                    state, State.COMPLETED));
-        startAdjusting();
-        state = State.COMPLETED;
-        stateChangedSinceLastEvent = true;
-        setMessage("Completed");
-        endAdjusting();
-    }
-
-    public void setMessage(String message) {
-        if (this.message != message && (this.message == null || !this.message.equals(message))) {
+    public void setMessage(String newMessage) {
+        Checks.checkNotNull(newMessage);
+        if (this.message != newMessage && (this.message == null || !this.message.equals(newMessage))) {
             startAdjusting();
-            this.message = message;
+            this.message = newMessage;
             stateChangedSinceLastEvent = true;
             endAdjusting();
         }
@@ -218,6 +218,7 @@ public class ProgressDeligate implements ProgressReporting, Serializable {
 
     @Override
     public void addProgressListener(ProgressListener progressListener) {
+        Checks.checkNotNull(progressListener);
         if (!progressListeners.contains(progressListener)) {
             progressListeners.add(progressListener);
         }
@@ -225,6 +226,7 @@ public class ProgressDeligate implements ProgressReporting, Serializable {
 
     @Override
     public void removeProgressListener(ProgressListener progressListener) {
+        Checks.checkNotNull(progressListener);
         progressListeners.remove(progressListener);
     }
 

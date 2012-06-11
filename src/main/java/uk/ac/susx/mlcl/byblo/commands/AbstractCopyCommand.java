@@ -44,24 +44,29 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.commands.FilePipeDelegate;
+import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
 import uk.ac.susx.mlcl.lib.io.Files;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.tasks.ObjectPipeTask;
-import uk.ac.susx.mlcl.lib.tasks.ProgressEvent;
-import uk.ac.susx.mlcl.lib.tasks.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ProgressEvent;
+import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 
 /**
- * Abstract super class for all tasks that require copying data from one file
- * to another.
+ * Abstract super class for all tasks that require copying data from one file to
+ * another.
  *
  * @param <T>
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Parameters(commandDescription = "Sort a file.")
-public abstract class AbstractCopyCommand<T> extends AbstractCommand {
+public abstract class AbstractCopyCommand<T> extends AbstractCommand
+        implements ProgressReporting {
 
     private static final Log LOG = LogFactory.getLog(AbstractCopyCommand.class);
+
+    protected final ProgressDeligate progress = new ProgressDeligate(this, true);
 
     @ParametersDelegate
     private FilePipeDelegate filesDeligate = new FilePipeDelegate();
@@ -107,6 +112,11 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand {
 
     @Override
     public void runCommand() throws Exception {
+
+
+        progress.setState(State.PENDING);
+
+
 //        if (LOG.isInfoEnabled())
 //            LOG.info(MessageFormat.format(
 //                    "Running {0} from \"{1}\" to \"{2}\".",
@@ -126,9 +136,9 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand {
 
             @Override
             public void progressChanged(ProgressEvent progressEvent) {
-
                 LOG.info(progressEvent.getSource().getProgressReport());
             }
+
         });
 
         task.run();
@@ -143,6 +153,10 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand {
         if (snk instanceof Closeable)
             ((Closeable) snk).close();
 
+
+
+        progress.setState(State.COMPLETED);
+
         LOG.debug(MiscUtil.memoryInfoString());
 //        if (LOG.isInfoEnabled())
 //            LOG.info(MessageFormat.format("Completed {0}.", getName()));
@@ -151,6 +165,35 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand {
     public String getName() {
         return "copy";
     }
+
+    public void removeProgressListener(ProgressListener progressListener) {
+        progress.removeProgressListener(progressListener);
+    }
+
+    public boolean isProgressPercentageSupported() {
+        return progress.isProgressPercentageSupported();
+    }
+
+    public State getState() {
+        return progress.getState();
+    }
+
+    public String getProgressReport() {
+        return progress.getProgressReport();
+    }
+
+    public int getProgressPercent() {
+        return progress.getProgressPercent();
+    }
+
+    public ProgressListener[] getProgressListeners() {
+        return progress.getProgressListeners();
+    }
+
+    public void addProgressListener(ProgressListener progressListener) {
+        progress.addProgressListener(progressListener);
+    }
+
 
     @Override
     protected Objects.ToStringHelper toStringHelper() {

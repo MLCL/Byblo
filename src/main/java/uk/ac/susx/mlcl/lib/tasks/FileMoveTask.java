@@ -70,26 +70,21 @@ public class FileMoveTask extends FileCopyTask {
     @Override
     protected void runTask() throws Exception {
         progress.startAdjusting();
-        progress.setStarted();
+        progress.setState(State.RUNNING);
         progress.setMessage(format("Copying file from \"{0}\" to \"{1}\".",
                                    getSrcFile(), getDstFile()));
         progress.endAdjusting();
 
 
-//        if (LOG.isInfoEnabled())
-//            LOG.info(format("Moving file from \"{0}\" to \"{1}\".",
-//                            getSrcFile(), getDstFile()));
-
         // Check the configuration state
-        if (getSrcFile().equals(getDstFile()))
+        if (getSrcFile().equals(getDstFile())) 
             throw new IllegalStateException("sourceFile equals destinationFile");
 
         move(getSrcFile(), getDstFile());
 
 
-        progress.setCompleted();
-//        if (LOG.isInfoEnabled())
-//            LOG.info("Completed move.");
+        progress.setState(State.COMPLETED);
+
     }
 
 }

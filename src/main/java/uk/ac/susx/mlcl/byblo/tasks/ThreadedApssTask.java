@@ -34,7 +34,10 @@ import com.google.common.base.Objects.ToStringHelper;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -46,7 +49,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
-import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.Chunk;
@@ -123,14 +125,20 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 nThreads, nThreads, 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>());
         futureQueue = new ArrayDeque<Future<? extends Task>>();
-        throttle = new Semaphore((int) (nThreads * 1.5) + 1);
+        throttle = new Semaphore(nThreads + 1);
     }
+
+    int nChunks = 0;
+
+    int queuedCount = 0;
+
+    int completedCount = 0;
 
     @Override
     protected void runTask() throws Exception {
 
         progress.startAdjusting();
-        progress.setStarted();
+        progress.setState(State.RUNNING);
         progress.setMessage("Reading threaded all-pairs.");
         progress.endAdjusting();
 
@@ -146,7 +154,6 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
         SeekableObjectSource<Chunk<Indexed<SparseDoubleVector>>, S> chunkerB =
                 Chunker.newSeekableInstance(getSourceB(), maxChunkSize);
 
-        int nChunks = 0;
         int i = 0;
         while (chunkerA.hasNext()) {
             if (LOG.isTraceEnabled()) {
@@ -166,28 +173,11 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 j++;
                 chunkB.setName(Integer.toString(j));
 
-                double complete = (!chunkerA.hasNext() && !chunkerB.hasNext())
-                                  ? 1
-                                  : nChunks == 0 ? 0
-                                    : (double) (i * nChunks + j) / (double) (nChunks * nChunks);
-
                 progress.startAdjusting();
                 progress.setMessage(MessageFormat.format(
-                        "Queueing chunk pair {0,number} and {1,number}",
-                        new Object[]{i, j, complete}));
-                progress.setProgressPercent((int) (100 * complete));
+                        "Queueing chunk pair {0,number} and {1,number}", i, j));
+                updateProgress();
                 progress.endAdjusting();
-
-//
-//
-//                if (LOG.isInfoEnabled()) {
-//                    LOG.info(MessageFormat.format(
-//                            "Creating APSS task on chunks {0,number} and {1,number} ({2,number,percent} complete)",
-//                            new Object[]{i, j, complete}));
-//                    if (LOG.isDebugEnabled()) {
-//                        LOG.debug(MiscUtil.memoryInfoString());
-//                    }
-//                }
 
                 @SuppressWarnings("unchecked")
                 NaiveApssTask<Integer> task = innerAlgorithm.newInstance();
@@ -198,39 +188,85 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 task.setProcessRecord(getProcessRecord());
                 task.setSink(getSink());
                 task.setStats(getStats());
+                task.setProperty("chunkPair", MessageFormat.format("{0,number} and {1,number}", i, j));
                 queueTask(task);
+                ++queuedCount;
 
 
                 // retrieve the results
-                while (!getFutureQueue().isEmpty() && getFutureQueue().peek().
-                        isDone()) {
-                    Future<? extends Task> completed = getFutureQueue().poll();
-                    Task t = completed.get();
-                    while (t.isExceptionTrapped()) {
-                        t.throwTrappedException();
-                    }
-                }
+                clearCompleted(false);
+
             }
 
-            nChunks = j + 1;
+            nChunks = j;
             chunkerB.position(restartPos);
         }
         getExecutor().shutdown();
 
-        while (!getFutureQueue().isEmpty()) {
-            Future<? extends Task> completed = getFutureQueue().poll();
-            Task t = completed.get();
-            while (t.isExceptionTrapped()) {
-                t.throwTrappedException();
-            }
-        }
+        clearCompleted(true);
 
         getExecutor().awaitTermination(Integer.MAX_VALUE, TimeUnit.DAYS);
 
         progress.startAdjusting();
-        progress.setCompleted();
+        progress.setState(State.COMPLETED);
         progress.setProgressPercent(90);
+        progress.setMessage("Finished");
         progress.endAdjusting();
+    }
+
+    void updateProgress() {
+        if (nChunks != 0) {
+            double prog = (completedCount + queuedCount) / (double) (nChunks * nChunks * 2);
+            progress.setProgressPercent((int) (100 * prog));
+        }
+    }
+
+    void clearCompleted(boolean block) throws InterruptedException, ExecutionException, Exception {
+
+        if (!block) {
+
+            List<Future<? extends Task>> completed = null;
+            for (Future<? extends Task> future : getFutureQueue()) {
+                if (future.isDone()) {
+                    Task t = future.get();
+                    while (t.isExceptionTrapped()) {
+                        t.throwTrappedException();
+                    }
+                    ++completedCount;
+
+                    if (completed == null)
+                        completed = new ArrayList<Future<? extends Task>>();
+                    completed.add(future);
+
+                    progress.startAdjusting();
+                    progress.setMessage("Completed chunk pair " + t.getProperty("chunkPair"));
+                    updateProgress();
+                    progress.endAdjusting();
+                }
+            }
+            if (completed != null && !completed.isEmpty())
+                getFutureQueue().removeAll(completed);
+
+        } else {
+
+            while (!getFutureQueue().isEmpty()) {
+
+                Future<? extends Task> completed = getFutureQueue().poll();
+                Task t = completed.get();
+                while (t.isExceptionTrapped()) {
+                    t.throwTrappedException();
+                }
+                ++completedCount;
+
+                progress.startAdjusting();
+                progress.setMessage("Completed chunk pair " + t.getProperty("chunkPair"));
+                updateProgress();
+                progress.endAdjusting();
+            }
+
+        }
+
+
     }
 
     @Override
@@ -252,6 +288,11 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
             @Override
             public void run() {
                 try {
+                    progress.startAdjusting();
+                    progress.setMessage("Starting chunk pair " + task.getProperty("chunkPair"));
+                    updateProgress();
+                    progress.endAdjusting();
+
                     task.run();
                 } finally {
                     throttle.release();

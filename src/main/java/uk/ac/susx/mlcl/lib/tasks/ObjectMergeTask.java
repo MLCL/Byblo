@@ -31,6 +31,9 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
+import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
+import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import com.google.common.base.Objects;
 import java.io.Flushable;
 import java.text.MessageFormat;
@@ -47,7 +50,7 @@ import uk.ac.susx.mlcl.lib.io.ObjectSource;
  */
 public final class ObjectMergeTask<T> extends AbstractTask implements ProgressReporting {
 
-    private ProgressDeligate progress = new ProgressDeligate(this, false);
+    private final ProgressDeligate progress = new ProgressDeligate(this, false);
 
     private ObjectSource<T> sourceA;
 
@@ -166,10 +169,8 @@ public final class ObjectMergeTask<T> extends AbstractTask implements ProgressRe
 
     @Override
     protected void runTask() throws Exception {
-        progress.startAdjusting();
-        progress.setStarted();
-//        progress.setProgressPercent(0);
-        progress.endAdjusting();
+
+        progress.setState(State.RUNNING);
 
         int mergeCount = 0;
 
@@ -216,8 +217,7 @@ public final class ObjectMergeTask<T> extends AbstractTask implements ProgressRe
 
         progress.startAdjusting();
         progress.setMessage(MessageFormat.format("Merged {0} unique items.", mergeCount));
-        progress.setCompleted();
-//        progress.setProgressPercent(100);
+        progress.setState(State.COMPLETED);
         progress.endAdjusting();
 
         if (sink instanceof Flushable)
@@ -233,34 +233,37 @@ public final class ObjectMergeTask<T> extends AbstractTask implements ProgressRe
         return "merge";
     }
 
+    @Override
     public void removeProgressListener(ProgressListener progressListener) {
         progress.removeProgressListener(progressListener);
     }
 
-    public boolean isStarted() {
-        return progress.isStarted();
-    }
-
+    @Override
     public boolean isProgressPercentageSupported() {
         return progress.isProgressPercentageSupported();
     }
 
-    public boolean isCompleted() {
-        return progress.isCompleted();
+    @Override
+    public State getState() {
+        return progress.getState();
     }
 
+    @Override
     public String getProgressReport() {
         return progress.getProgressReport();
     }
 
+    @Override
     public int getProgressPercent() {
         return progress.getProgressPercent();
     }
 
+    @Override
     public ProgressListener[] getProgressListeners() {
         return progress.getProgressListeners();
     }
 
+    @Override
     public void addProgressListener(ProgressListener progressListener) {
         progress.addProgressListener(progressListener);
     }

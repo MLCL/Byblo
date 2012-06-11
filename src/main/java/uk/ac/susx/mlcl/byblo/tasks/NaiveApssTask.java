@@ -52,9 +52,9 @@ import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
-import uk.ac.susx.mlcl.lib.tasks.ProgressDeligate;
-import uk.ac.susx.mlcl.lib.tasks.ProgressListener;
-import uk.ac.susx.mlcl.lib.tasks.ProgressReporting;
+import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
+import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 
 /**
  * The most basic implementation of all-pairs similarity search. Will only
@@ -223,7 +223,7 @@ public class NaiveApssTask<P> extends AbstractTask
         final P restartB = getSourceB().position();
 
         progress.startAdjusting();
-        progress.setStarted();
+        progress.setState(State.RUNNING);
         progress.setMessage("Reading feature vectors.");
         progress.setProgressPercent(0);
         progress.endAdjusting();
@@ -278,7 +278,7 @@ public class NaiveApssTask<P> extends AbstractTask
 
         progress.startAdjusting();
         progress.setProgressPercent(100);
-        progress.setCompleted();
+        progress.setState(State.COMPLETED);
         progress.endAdjusting();
 
     }
@@ -375,44 +375,44 @@ public class NaiveApssTask<P> extends AbstractTask
                 precalcB.get(b.key()));
     }
 
+    @Override
     public void removeProgressListener(ProgressListener progressListener) {
         progress.removeProgressListener(progressListener);
     }
 
-    public boolean isStarted() {
-        return progress.isStarted();
-    }
-
-    public boolean isRunning() {
-        return progress.isRunning();
-    }
-
+    @Override
     public boolean isProgressPercentageSupported() {
         return progress.isProgressPercentageSupported();
     }
 
-    public boolean isCompleted() {
-        return progress.isCompleted();
-    }
-
+    @Override
     public String getProgressReport() {
         return progress.getProgressReport();
     }
 
+    @Override
     public int getProgressPercent() {
         return progress.getProgressPercent();
     }
 
+    @Override
     public ProgressListener[] getProgressListeners() {
         return progress.getProgressListeners();
     }
 
+    @Override
     public String getName() {
         return "naive-allpairs";
     }
 
+    @Override
     public void addProgressListener(ProgressListener progressListener) {
         progress.addProgressListener(progressListener);
+    }
+
+    @Override
+    public State getState() {
+        return progress.getState();
     }
 
     @Override

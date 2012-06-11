@@ -30,6 +30,9 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
+import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
+import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
 import java.io.File;
@@ -60,14 +63,12 @@ public class FileDeleteTask extends AbstractTask
     @Override
     public void runTask() throws Exception {
 
-        progress.startAdjusting();
-        progress.setMessage("Deleting file \"" + getFile() + "\".");
-        progress.endAdjusting();
+//        progress.setMessage("Deleting file \"" + getFile() + "\".");
 
         Checks.checkNotNull("file", getFile());
 
         progress.startAdjusting();
-        progress.setStarted();
+        progress.setState(State.RUNNING);
         progress.setProgressPercent(0);
         progress.endAdjusting();
 
@@ -81,7 +82,7 @@ public class FileDeleteTask extends AbstractTask
                     "Unnable to delete file: \"" + getFile() + "\"");
 
         progress.startAdjusting();
-        progress.setCompleted();
+        progress.setState(State.COMPLETED);
         progress.setProgressPercent(100);
         progress.endAdjusting();
 
@@ -97,44 +98,44 @@ public class FileDeleteTask extends AbstractTask
         this.file = file;
     }
 
+    @Override
     public void removeProgressListener(ProgressListener progressListener) {
         progress.removeProgressListener(progressListener);
     }
 
-    public boolean isStarted() {
-        return progress.isStarted();
-    }
-
-    public boolean isRunning() {
-        return progress.isRunning();
-    }
-
+    @Override
     public boolean isProgressPercentageSupported() {
         return progress.isProgressPercentageSupported();
     }
 
-    public boolean isCompleted() {
-        return progress.isCompleted();
-    }
-
+    @Override
     public String getProgressReport() {
         return progress.getProgressReport();
     }
 
+    @Override
     public int getProgressPercent() {
         return progress.getProgressPercent();
     }
 
+    @Override
     public ProgressListener[] getProgressListeners() {
         return progress.getProgressListeners();
     }
 
+    @Override
     public String getName() {
         return "delete";
     }
 
+    @Override
     public void addProgressListener(ProgressListener progressListener) {
         progress.addProgressListener(progressListener);
+    }
+
+    @Override
+    public State getState() {
+        return progress.getState();
     }
 
     @Override

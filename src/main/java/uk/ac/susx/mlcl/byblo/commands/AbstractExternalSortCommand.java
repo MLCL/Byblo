@@ -59,10 +59,10 @@ import uk.ac.susx.mlcl.lib.tasks.FileDeleteTask;
 import uk.ac.susx.mlcl.lib.tasks.FileMoveTask;
 import uk.ac.susx.mlcl.lib.tasks.ObjectMergeTask;
 import uk.ac.susx.mlcl.lib.tasks.ObjectSortTask;
-import uk.ac.susx.mlcl.lib.tasks.ProgressAggregate;
-import uk.ac.susx.mlcl.lib.tasks.ProgressEvent;
-import uk.ac.susx.mlcl.lib.tasks.ProgressListener;
-import uk.ac.susx.mlcl.lib.tasks.ProgressReporting;
+import uk.ac.susx.mlcl.lib.events.ProgressAggregate;
+import uk.ac.susx.mlcl.lib.events.ProgressEvent;
+import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import uk.ac.susx.mlcl.lib.tasks.Task;
 
 /**
@@ -88,7 +88,7 @@ public abstract class AbstractExternalSortCommand<T>
 
     private static final boolean DEBUG = false;
 
-    public static final int DEFAULT_MAX_CHUNK_SIZE = 50000;
+    public static final int DEFAULT_MAX_CHUNK_SIZE = 500000;
 
     @Parameter(names = {"-C", "--chunk-size"},
     description = "Number of lines that will be read and sorted in RAM at one "
@@ -172,18 +172,9 @@ public abstract class AbstractExternalSortCommand<T>
         this.maxChunkSize = maxChunkSize;
     }
 
-
     @Override
     protected void runTask() throws Exception {
 
-
-
-//
-//        if (LOG.isInfoEnabled()) {
-//            LOG.info("Sorting file externally: from \""
-//                    + getFileDeligate().getSourceFile() + "\" to \""
-//                    + getFileDeligate().getDestinationFile() + "\".");
-//        }
 
         if (getComparator() == null) {
             throw new NullPointerException();
@@ -197,9 +188,13 @@ public abstract class AbstractExternalSortCommand<T>
                 src, getMaxChunkSize());
 
         progress.startAdjusting();
-        progress.setStarted();
+        progress.setState(State.RUNNING);
+        FileMoveTask finalMoveTask = new FileMoveTask();
+        finalMoveTask.setDstFile(getFileDeligate().getDestinationFile());
+        progress.addChildProgressReporter(finalMoveTask);
         progress.endAdjusting();
 
+        progress.startAdjusting();
         while (chunks.hasNext()) {
             while (!getFutureQueue().isEmpty() && getFutureQueue().peek().isDone()) {
                 handleCompletedTask(getFutureQueue().poll().get());
@@ -207,13 +202,17 @@ public abstract class AbstractExternalSortCommand<T>
 
             Chunk<T> chunk = chunks.read();
             submitTask(createSortTask(chunk, getTempFileFactory().createFile()));
+            progress.endAdjusting();
+            progress.startAdjusting();
         }
-
 
         while (!getFutureQueue().isEmpty()) {
             Task task = getFutureQueue().poll().get();
             handleCompletedTask(task);
+            progress.endAdjusting();
+            progress.startAdjusting();
         }
+
 
         // Finally merge any remaining files up the stack
         // XXX ideal this should happen automatically.
@@ -229,10 +228,9 @@ public abstract class AbstractExternalSortCommand<T>
 
             } else {
                 File tmp = getTempFileFactory().createFile();
+
                 ObjectMergeTask<T> mergeTask = createMergeTask(
                         nextFileToMerge[i], nextFileToMerge[i + 1], tmp);
-
-                progress.addChildProgressReporter(mergeTask);
 
                 mergeTask.run();
 
@@ -251,25 +249,19 @@ public abstract class AbstractExternalSortCommand<T>
                 nextFileToMerge[i + 1].delete();
                 nextFileToMerge[i] = null;
                 nextFileToMerge[i + 1] = tmp;
+                progress.endAdjusting();
+                progress.startAdjusting();
             }
 
         }
 
-        File finalMerge = nextFileToMerge[nextFileToMerge.length - 1];
+        finalMoveTask.setSrcFile(nextFileToMerge[nextFileToMerge.length - 1]);
+        finalMoveTask.run();
+        if (finalMoveTask.isExceptionTrapped())
+            finalMoveTask.throwTrappedException();
 
-        FileMoveTask moveTask = new FileMoveTask(
-                finalMerge, getFileDeligate().getDestinationFile());
-        progress.addChildProgressReporter(moveTask);
-        moveTask.run();
-
-        if (moveTask.isExceptionTrapped())
-            moveTask.throwTrappedException();
-
-
-        progress.startAdjusting();
-        progress.setCompleted();
         progress.endAdjusting();
-
+        progress.setState(State.COMPLETED);
 
     }
 
@@ -428,34 +420,32 @@ public abstract class AbstractExternalSortCommand<T>
 
     protected abstract ObjectSink<T> openSink(File file) throws IOException;
 
+    @Override
     public void removeProgressListener(ProgressListener progressListener) {
         progress.removeProgressListener(progressListener);
     }
 
-    public boolean isStarted() {
-        return progress.isStarted();
-    }
-
-    public boolean isRunning() {
-        return progress.isRunning();
-    }
-
+    @Override
     public boolean isProgressPercentageSupported() {
         return progress.isProgressPercentageSupported();
     }
 
-    public boolean isCompleted() {
-        return progress.isCompleted();
+    @Override
+    public State getState() {
+        return progress.getState();
     }
 
+    @Override
     public int getProgressPercent() {
         return progress.getProgressPercent();
     }
 
+    @Override
     public ProgressListener[] getProgressListeners() {
         return progress.getProgressListeners();
     }
 
+    @Override
     public void addProgressListener(ProgressListener progressListener) {
         progress.addProgressListener(progressListener);
     }
