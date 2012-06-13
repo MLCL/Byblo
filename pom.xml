@@ -131,12 +131,6 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             are available at http://kungf.eu:8081/nexus/ -->
 
         <dependency>
-            <groupId>JDBM</groupId>
-            <artifactId>JDBM</artifactId>
-            <version>3.0-SNAPSHOT</version>
-        </dependency>
-
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>mlcl-lib</artifactId>
             <version>0.2-SNAPSHOT</version>
@@ -144,6 +138,12 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </dependency>
 
 
+        <dependency>
+            <groupId>org.apache.jdbm</groupId>
+            <artifactId>jdbm</artifactId>
+            <version>3.0-SNAPSHOT</version>
+        </dependency>
+        
         <!-- Testing scope dependancies -->
 
         <dependency>
@@ -152,6 +152,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <version>4.10</version>
             <scope>test</scope>
         </dependency>
+
 
     </dependencies>
 

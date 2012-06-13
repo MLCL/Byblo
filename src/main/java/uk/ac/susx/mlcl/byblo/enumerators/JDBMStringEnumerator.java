@@ -39,8 +39,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.kotek.jdbm.DB;
-import net.kotek.jdbm.DBMaker;
+import org.apache.jdbm.DB;
+import org.apache.jdbm.DBMaker;
 import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
 import uk.ac.susx.mlcl.lib.collect.ForwardingBiMap;
 

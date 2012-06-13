@@ -36,7 +36,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.Format;
 import java.util.Random;
-import net.kotek.jdbm.DBMaker;
+import org.apache.jdbm.DBMaker;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

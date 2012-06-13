@@ -13,7 +13,7 @@
  *    and/or other materials provided with the distribution.
  *
  *  * Neither the name of the University of Sussex nor the names of its
- *    contributors may be used to endorse or promote products derived from this
+ *    contributors may be used to endorse or promote products deri5ved from this
  *    software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -290,7 +290,10 @@ public final class FullBuild extends AbstractCommand {
 
         if (LOG.isInfoEnabled())
             LOG.info("\n=== Stage 1 of 6: Enumerating Strings ===\n");
+
+        System.gc();
         runIndex(instancesEnumeratedFile, featureEnumeratorFile, entryEnumeratorFile);
+        System.gc();
 
         File entriesFile = new File(outputDir,
                                     instancesFile.getName() + ".entries");
@@ -301,32 +304,46 @@ public final class FullBuild extends AbstractCommand {
 
         if (LOG.isInfoEnabled())
             LOG.info("\n=== Stage 2 of 6: Counting ===\n");
+        System.gc();
         runCount(instancesEnumeratedFile, entriesFile, featuresFile, eventsFile);
+        System.gc();
 
         File entriesFilteredFile = suffixed(entriesFile, ".filtered");
         File featuresFilteredFile = suffixed(featuresFile, ".filtered");
         File eventsFilteredFile = suffixed(eventsFile, ".filtered");
         if (LOG.isInfoEnabled())
             LOG.info("\n=== Stage 3 of 6: Filtering ===\n");
+
+        System.gc();
         runFilter(entriesFile, featuresFile, eventsFile, entriesFilteredFile,
                   featuresFilteredFile, eventsFilteredFile, entryEnumeratorFile,
                   featureEnumeratorFile);
+        System.gc();
 
         if (LOG.isInfoEnabled())
             LOG.info("\n=== Stage 4 of 6: All-Pairs ===\n");
         File simsFile = new File(outputDir, instancesFile.getName() + ".sims");
+
+        System.gc();
         runAllpairs(entriesFilteredFile, featuresFilteredFile, eventsFilteredFile, simsFile);
+        System.gc();
 
         File neighboursFile = suffixed(simsFile, ".neighbours");
         if (LOG.isInfoEnabled())
             LOG.info("\n=== Stage 5 of 6: K-Nearest-Neighbours ===\n");
+
+        System.gc();
         runKNN(simsFile, neighboursFile);
+        System.gc();
 
         File neighboursStringsFile = suffixed(neighboursFile, ".strings");
 
         if (LOG.isInfoEnabled())
             LOG.info("\n=== Stage 6 of 6: Un-Enumerating ===\n");
+
+        System.gc();
         runUnindexSim(neighboursFile, neighboursStringsFile, entryEnumeratorFile);
+        System.gc();
 
 
         if (tempBaseDir.list().length == 0)
@@ -473,6 +490,7 @@ public final class FullBuild extends AbstractCommand {
             sb.append("\nStats:\n");
             sb.append(MessageFormat.format(" * End time: {0,time,full} {0,date,full}\n", endTime));
             sb.append(MessageFormat.format(" * Ellapsed time: {0}\n", formatElapsedTime(endTime - startTime)));
+
             sb.append(MessageFormat.format(" * {0}\n", MiscUtil.memoryInfoString()));
             sb.append("\n");
             LOG.info(sb.toString());
