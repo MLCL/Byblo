@@ -35,7 +35,7 @@
 # ============================================
 
 # Name of job
-#$ -N Byblo
+#$ -N BybloBuild
 
 # Shell to use
 #$ -S /bin/bash
@@ -62,7 +62,7 @@
 #$ -j yes
 
 
-readonly JAVA_ARGS="-Xmx2g"
+readonly JAVA_ARGS="-Xmx2g -Xms1g"
 
 
 java $JAVA_ARGS -cp ./*:lib/* uk.ac.susx.mlcl.byblo.FullBuild $@
