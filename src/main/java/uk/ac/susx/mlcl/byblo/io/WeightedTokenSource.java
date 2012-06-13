@@ -39,6 +39,7 @@ import java.nio.charset.Charset;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
+import uk.ac.susx.mlcl.lib.C14nCache;
 import uk.ac.susx.mlcl.lib.io.Compact;
 import uk.ac.susx.mlcl.lib.io.Deltas;
 import uk.ac.susx.mlcl.lib.io.Enumerated;
@@ -76,13 +77,21 @@ public class WeightedTokenSource
         return inner.position();
     }
 
+//    private  final C14nCache<Token> cache1 = new C14nCache<Token>();
+//    private static final  C14nCache<Weighted<Token>> cache2 = new C14nCache<Weighted<Token>>();
+
     @Override
     public Weighted<Token> read() throws IOException {
         final int tokenId = inner.readInt();
         final double weight = inner.readDouble();
         inner.endOfRecord();
 
-        return new Weighted<Token>(new Token(tokenId), weight);
+//        synchronized (cache1) {
+            return new Weighted<Token>(
+//                    cache1.cached(new Token(tokenId))
+                                    new Token(tokenId)
+                    , weight);
+//        }
 
     }
 

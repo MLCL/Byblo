@@ -41,8 +41,11 @@ import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
@@ -133,7 +136,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
     @ParametersDelegate
     private FileDeligate fileDeligate = new FileDeligate();
 
-    public static final int DEFAULT_MAX_CHUNK_SIE = 5000000;
+    public static final int DEFAULT_MAX_CHUNK_SIE = 1000000;
 
     @Parameter(names = {"-C", "--chunk-size"},
     description = "Number of lines per work unit. Larger value increase performance and memory usage.")
@@ -320,7 +323,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
 
         progress.setMessage("Merging and aggregating results");
 
-        reduce();
+        clearCompleted(true);
         finish();
 
         if (indexDeligate.isEnumeratorOpen()) {
@@ -331,6 +334,34 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
         progress.setState(State.COMPLETED);
 
 
+
+    }
+
+    void clearCompleted(boolean block) throws Exception {
+
+        if (block) {
+            while (!getFutureQueue().isEmpty()) {
+                Task task = getFutureQueue().poll().get();
+                handleCompletedTask(task);
+            }
+        } else {
+
+            List<Future<? extends Task>> completed = null;
+            for(Future<? extends Task> future : getFutureQueue()) {
+                if(future.isDone()) {
+                    if(completed == null)
+                        completed = new ArrayList<Future<? extends Task>>();
+                    completed.add(future);
+                }
+            }
+
+            if(completed != null && !completed.isEmpty()) {
+                getFutureQueue().removeAll(completed);
+                for(Future<? extends Task> future : completed) {
+                    handleCompletedTask(future.get());
+                }
+            }
+        }
 
     }
 
@@ -351,9 +382,9 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
 
         int chunkCount = 0;
         while (chunks.hasNext()) {
-            while (!getFutureQueue().isEmpty() && getFutureQueue().peek().isDone()) {
-                handleCompletedTask(getFutureQueue().poll().get());
-            }
+
+
+            clearCompleted(false);
 
             Chunk<TokenPair> chunk = chunks.read();
 //            submitCountTask(chunk, inputFile, eventsFile, inputFile);
@@ -373,13 +404,6 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
                             chunk_eventsFile);
         }
 
-    }
-
-    protected void reduce() throws Exception {
-        while (!getFutureQueue().isEmpty()) {
-            Task task = getFutureQueue().poll().get();
-            handleCompletedTask(task);
-        }
     }
 
     protected void handleCompletedTask(Task task) throws Exception {

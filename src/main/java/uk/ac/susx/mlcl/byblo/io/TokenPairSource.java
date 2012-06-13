@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
+import uk.ac.susx.mlcl.lib.C14nCache;
 import uk.ac.susx.mlcl.lib.io.Compact;
 import uk.ac.susx.mlcl.lib.io.Deltas;
 import uk.ac.susx.mlcl.lib.io.Enumerated;
@@ -63,13 +64,19 @@ public class TokenPairSource
         this.inner = inner;
     }
 
+//    private  final C14nCache<TokenPair> cache = new C14nCache<TokenPair>();
+
     @Override
     public TokenPair read() throws IOException {
         try {
             final int id1 = inner.readInt();
             final int id2 = inner.readInt();
             inner.endOfRecord();
-            return new TokenPair(id1, id2);
+//            synchronized (cache) {
+                return
+//                        cache.cached(new TokenPair(id1, id2));
+                        new TokenPair(id1, id2);
+//            }
         } catch (Throwable ex) {
             throw new IOException("Error at position " + position(), ex);
         }

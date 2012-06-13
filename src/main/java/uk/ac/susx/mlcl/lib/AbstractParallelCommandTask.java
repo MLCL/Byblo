@@ -111,7 +111,8 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
     @Override
     protected void initialiseTask() throws Exception {
         getExecutor();
-        throttle = new Semaphore((int) (getNumThreads() * 1.5) + 1);
+//        throttle = new Semaphore((int)(getNumThreads() * 1.5) + 1);
+        throttle = new Semaphore(getNumThreads() + 1);
     }
 
     @Override

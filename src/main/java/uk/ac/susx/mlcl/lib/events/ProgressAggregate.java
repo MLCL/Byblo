@@ -106,12 +106,13 @@ public class ProgressAggregate extends ProgressDeligate {
             // Add the progress percentage for the child, if it supported.
             // Otherwise just assume 0, 50, or 100 for pending, running, and
             // completed respectively.
-            if (child.isProgressPercentageSupported()) {
-                childProgressSum += child.getProgressPercent();
-            } else if (child.getState() == State.COMPLETED) {
+            if (child.getState() == State.COMPLETED) {
+                child.removeProgressListener(childProgressListener);
                 children.remove(child);
                 ++completedChildren;
-            } // otherwise progress is 0
+            } else if (child.isProgressPercentageSupported()) {
+                childProgressSum += child.getProgressPercent();
+            }  // otherwise progress is 0
 
             anyChildRunning = anyChildRunning || child.getState() == State.RUNNING;
             allChildrenCompleted = allChildrenCompleted && child.getState() == State.COMPLETED;
@@ -150,20 +151,34 @@ public class ProgressAggregate extends ProgressDeligate {
         StringBuilder sb = new StringBuilder();
         sb.append(super.getProgressReport());
         for (ProgressReporting child : children) {
-            if (child.getState() == State.COMPLETED)
-                continue;
-
-            sb.append('\n');
-            for (int i = 0; i < depth + 1; i++)
-                sb.append('\t');
-            if (child instanceof ProgressAggregate)
-                sb.append(((ProgressAggregate) child).getDeepProgressReport(depth + 1));
-            else {
-                sb.append(child.getProgressReport());
+            if (child.getState() == State.RUNNING) {
+                sb.append('\n');
+                for (int i = 0; i < depth + 1; i++)
+                    sb.append('\t');
+                if (child instanceof ProgressAggregate)
+                    sb.append(((ProgressAggregate) child).getDeepProgressReport(depth + 1));
+                else {
+                    sb.append(child.getProgressReport());
+                }
             }
 
         }
         return sb.toString();
+    }
+
+    @Override
+    protected void fireProgressChangedEvent() {
+        int completed = 0;
+        for (ProgressReporting child : children) {
+            if (child.getState() == State.COMPLETED) {
+//                System.out.println(child);
+                ++completed;
+            }
+        }
+//        System.out.println(completed + " / " + children.size());
+
+
+        super.fireProgressChangedEvent();
     }
 
     @Override

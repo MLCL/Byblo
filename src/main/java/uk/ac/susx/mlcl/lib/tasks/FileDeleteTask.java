@@ -82,8 +82,8 @@ public class FileDeleteTask extends AbstractTask
                     "Unnable to delete file: \"" + getFile() + "\"");
 
         progress.startAdjusting();
-        progress.setState(State.COMPLETED);
         progress.setProgressPercent(100);
+        progress.setState(State.COMPLETED);
         progress.endAdjusting();
 
     }

@@ -31,6 +31,7 @@
 package uk.ac.susx.mlcl.byblo.tasks;
 
 import com.google.common.base.Objects;
+import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -181,20 +182,22 @@ public final class CountTask extends AbstractTask
 
         progress.setState(State.RUNNING);
 
+        float loadf = Hash.DEFAULT_LOAD_FACTOR;// * 0.5f;
+        int init = Hash.DEFAULT_INITIAL_SIZE;// * 100;
+
         final Object2IntMap<TokenPair> eventFreq =
-                new Object2IntOpenHashMap<TokenPair>();
+                new Object2IntOpenHashMap<TokenPair>(init, loadf);
         eventFreq.defaultReturnValue(0);
 
-        final Int2IntMap featureFreq = new Int2IntOpenHashMap();
+        final Int2IntMap featureFreq = new Int2IntOpenHashMap(init, loadf);
         featureFreq.defaultReturnValue(0);
 
-        final Int2IntMap entryFreq = new Int2IntOpenHashMap();
+        final Int2IntMap entryFreq = new Int2IntOpenHashMap(init, loadf);
         entryFreq.defaultReturnValue(0);
 
         int instanceCount = 0;
         while (getSource().hasNext()) {
-            final TokenPair instance;
-            instance = getSource().read();
+            final TokenPair instance = getSource().read();
 
             final int entry_id = instance.id1();
             final int feature_id = instance.id2();
@@ -252,7 +255,7 @@ public final class CountTask extends AbstractTask
 
         progress.startAdjusting();
         progress.setProgressPercent(100);
-        progress.setState(State.RUNNING);
+        progress.setState(State.COMPLETED);
         progress.endAdjusting();
 
 

@@ -217,9 +217,23 @@ public class NaiveApssTask<P> extends AbstractTask
         buildPrecalcs();
     }
 
+    protected final int PAIR_OUTPUT_BUFFER_SIZE = 100000;
+
+    protected void writeOutPairs(List<Weighted<TokenPair>> pairs) throws IOException {
+        if (pairs.isEmpty())
+            return;
+        // Sorting the pairs reduces disk space usage due to compact format and
+        // skip indexing.
+        Collections.sort(pairs, Weighted.recordOrder(TokenPair.indexOrder()));
+        synchronized (getSink()) {
+            ObjectIO.copy(pairs, getSink());
+        }
+        pairs.clear();
+    }
+
     @Override
     protected void runTask() throws Exception {
-        List<Weighted<TokenPair>> pairs = new ArrayList<Weighted<TokenPair>>();
+        List<Weighted<TokenPair>> pairBuffer = new ArrayList<Weighted<TokenPair>>();
         final P restartB = getSourceB().position();
 
         progress.startAdjusting();
@@ -252,28 +266,34 @@ public class NaiveApssTask<P> extends AbstractTask
                 Weighted<TokenPair> pair = new Weighted<TokenPair>(
                         new TokenPair(b.key(), a.key()), sim);
                 if (pruducePair.apply(pair)) {
-                    pairs.add(pair);
+                    pairBuffer.add(pair);
                     stats.incrementProductionCount();
+
+                    if (pairBuffer.size() > PAIR_OUTPUT_BUFFER_SIZE) {
+                        writeOutPairs(pairBuffer);
+                    }
                 }
             }
         }
 
-        progress.startAdjusting();
-        progress.setMessage("Sorting pairs.");
-        progress.setProgressPercent(80);
-        progress.endAdjusting();
+        writeOutPairs(pairBuffer);
+
+//        progress.startAdjusting();
+//        progress.setMessage("Sorting pairs.");
+//        progress.setProgressPercent(80);
+//        progress.endAdjusting();
 
 
-        Collections.sort(pairs, Weighted.recordOrder(TokenPair.indexOrder()));
-
-        progress.startAdjusting();
-        progress.setMessage("Writing pairs.");
-        progress.setProgressPercent(90);
-        progress.endAdjusting();
-
-        synchronized (getSink()) {
-            ObjectIO.copy(pairs, getSink());
-        }
+//        Collections.sort(pairs, Weighted.recordOrder(TokenPair.indexOrder()));
+//
+//        progress.startAdjusting();
+//        progress.setMessage("Writing pairs.");
+//        progress.setProgressPercent(90);
+//        progress.endAdjusting();
+//
+//        synchronized (getSink()) {
+//            ObjectIO.copy(pairs, getSink());
+//        }
 
 
         progress.startAdjusting();

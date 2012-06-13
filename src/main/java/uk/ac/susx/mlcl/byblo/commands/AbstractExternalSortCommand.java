@@ -39,7 +39,9 @@ import java.io.File;
 import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,21 +50,20 @@ import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.commands.FilePipeDelegate;
 import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
+import uk.ac.susx.mlcl.lib.events.ProgressAggregate;
+import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import uk.ac.susx.mlcl.lib.io.Chunk;
 import uk.ac.susx.mlcl.lib.io.Chunker;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
-import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
+import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import uk.ac.susx.mlcl.lib.tasks.FileDeleteTask;
 import uk.ac.susx.mlcl.lib.tasks.FileMoveTask;
 import uk.ac.susx.mlcl.lib.tasks.ObjectMergeTask;
 import uk.ac.susx.mlcl.lib.tasks.ObjectSortTask;
-import uk.ac.susx.mlcl.lib.events.ProgressAggregate;
-import uk.ac.susx.mlcl.lib.events.ProgressEvent;
-import uk.ac.susx.mlcl.lib.events.ProgressListener;
-import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import uk.ac.susx.mlcl.lib.tasks.Task;
 
 /**
@@ -172,6 +173,36 @@ public abstract class AbstractExternalSortCommand<T>
         this.maxChunkSize = maxChunkSize;
     }
 
+    void clearCompleted(boolean block) throws Exception {
+
+        if (block) {
+
+            while (!getFutureQueue().isEmpty()) {
+                Task task = getFutureQueue().poll().get();
+                handleCompletedTask(task);
+            }
+
+        } else {
+
+            List<Future<? extends Task>> completed = null;
+            for (Future<? extends Task> future : getFutureQueue()) {
+                if (future.isDone()) {
+                    if (completed == null)
+                        completed = new ArrayList<Future<? extends Task>>();
+                    completed.add(future);
+                }
+            }
+
+            if (completed != null && !completed.isEmpty()) {
+                getFutureQueue().removeAll(completed);
+                for (Future<? extends Task> future : completed) {
+                    handleCompletedTask(future.get());
+                }
+            }
+        }
+
+    }
+
     @Override
     protected void runTask() throws Exception {
 
@@ -196,9 +227,11 @@ public abstract class AbstractExternalSortCommand<T>
 
         progress.startAdjusting();
         while (chunks.hasNext()) {
-            while (!getFutureQueue().isEmpty() && getFutureQueue().peek().isDone()) {
-                handleCompletedTask(getFutureQueue().poll().get());
-            }
+            clearCompleted(false);
+
+//            while (!getFutureQueue().isEmpty() && getFutureQueue().peek().isDone()) {
+//                handleCompletedTask(getFutureQueue().poll().get());
+//            }
 
             Chunk<T> chunk = chunks.read();
             submitTask(createSortTask(chunk, getTempFileFactory().createFile()));
@@ -206,12 +239,16 @@ public abstract class AbstractExternalSortCommand<T>
             progress.startAdjusting();
         }
 
-        while (!getFutureQueue().isEmpty()) {
-            Task task = getFutureQueue().poll().get();
-            handleCompletedTask(task);
-            progress.endAdjusting();
-            progress.startAdjusting();
-        }
+        clearCompleted(true);
+        progress.endAdjusting();
+        progress.startAdjusting();
+
+//        while (!getFutureQueue().isEmpty()) {
+//            Task task = getFutureQueue().poll().get();
+//            handleCompletedTask(task);
+//            progress.endAdjusting();
+//            progress.startAdjusting();
+//        }
 
 
         // Finally merge any remaining files up the stack

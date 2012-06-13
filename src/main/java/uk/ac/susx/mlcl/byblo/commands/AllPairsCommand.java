@@ -102,8 +102,6 @@ public class AllPairsCommand extends AbstractCommand {
     @ParametersDelegate
     private FileDeligate fileDeligate = new FileDeligate();
 
-    public static final int DEFAULT_MAX_CHUNK_SIZE = 2500;
-
     public static final int DEFAULT_MINK_P = 2;
 
     @Parameter(names = {"-i", "--input"},
@@ -130,7 +128,7 @@ public class AllPairsCommand extends AbstractCommand {
 
     @Parameter(names = {"-C", "--chunk-size"},
     description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
-    private int chunkSize = DEFAULT_MAX_CHUNK_SIZE;
+    private int chunkSize = ThreadedApssTask.DEFAULT_MAX_CHUNK_SIZE;
 
     @Parameter(names = {"-t", "--threads"},
     description = "Number of conccurent processing threads.")

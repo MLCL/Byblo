@@ -52,6 +52,7 @@ import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.measures.CrMi;
 import uk.ac.susx.mlcl.byblo.measures.Lee;
 import uk.ac.susx.mlcl.byblo.measures.Lp;
+import uk.ac.susx.mlcl.byblo.tasks.ThreadedApssTask;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
@@ -208,7 +209,7 @@ public final class FullBuild extends AbstractCommand {
     @Parameter(names = {"--allpairs-chunk-size"},
     description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.",
     hidden = HIDE_UNCOMMON_PARAMTERS)
-    private int chunkSize = AllPairsCommand.DEFAULT_MAX_CHUNK_SIZE;
+    private int chunkSize = ThreadedApssTask.DEFAULT_MAX_CHUNK_SIZE;
     /*
      * === K-NEAREST-NEIGHBOURS PARAMATERISATION ===
      */

@@ -53,8 +53,8 @@ import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.Chunk;
 import uk.ac.susx.mlcl.lib.io.Chunker;
-import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.tasks.Task;
 
 /**
@@ -81,7 +81,9 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
     private Queue<Future<? extends Task>> futureQueue =
             new ArrayDeque<Future<? extends Task>>();
 
-    private int maxChunkSize = 5000;
+    public static final int DEFAULT_MAX_CHUNK_SIZE = 1000;
+
+    private int maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
 
     private Semaphore throttle;
 

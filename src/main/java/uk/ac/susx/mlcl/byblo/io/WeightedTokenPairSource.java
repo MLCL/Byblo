@@ -37,6 +37,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.lib.C14nCache;
 import uk.ac.susx.mlcl.lib.io.Compact;
 import uk.ac.susx.mlcl.lib.io.Deltas;
 import uk.ac.susx.mlcl.lib.io.Enumerated;
@@ -65,13 +66,22 @@ public class WeightedTokenPairSource
         this.inner = inner;
     }
 
+//    private  static final C14nCache<Weighted<TokenPair>> cache2 = new C14nCache<Weighted<TokenPair>>();
+
+//    private   final C14nCache<TokenPair> cache1 = new C14nCache<TokenPair>();
+
     @Override
     public Weighted<TokenPair> read() throws IOException {
         final int id1 = inner.readInt();
         final int id2 = inner.readInt();
         final double weight = inner.readDouble();
         inner.endOfRecord();
-        return new Weighted<TokenPair>(new TokenPair(id1, id2), weight);
+//        synchronized(cache1) {
+        return new Weighted<TokenPair>(
+//                cache1.cached(new TokenPair(id1, id2))
+                new TokenPair(id1, id2)
+                , weight);
+//        }
     }
 
     public WeightedTokenPairVectorSource getVectorSource() throws IOException {

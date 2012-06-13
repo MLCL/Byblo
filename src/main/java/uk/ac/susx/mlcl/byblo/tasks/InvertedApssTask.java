@@ -105,25 +105,23 @@ public final class InvertedApssTask<S> extends NaiveApssTask<S> {
                 if (getProducatePair().apply(pair)) {
                     pairs.add(pair);
                     getStats().incrementProductionCount();
+
+
+
+
+
+                    if (pairs.size() > PAIR_OUTPUT_BUFFER_SIZE) {
+                        writeOutPairs(pairs);
+                    }
+
+
                 }
             }
         }
 
-        progress.startAdjusting();
-        progress.setMessage("Sorting similarity pairs");
-        progress.setProgressPercent(80);
-        progress.endAdjusting();
+        writeOutPairs(pairs);
 
-        Collections.sort(pairs, Weighted.recordOrder(TokenPair.indexOrder()));
 
-        progress.startAdjusting();
-        progress.setMessage("Writing similarity pairs");
-        progress.setProgressPercent(90);
-        progress.endAdjusting();
-
-        synchronized (getSink()) {
-            ObjectIO.copy(pairs, getSink());
-        }
         getSourceB().position(startB);
 
         progress.startAdjusting();

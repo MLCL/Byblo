@@ -30,15 +30,15 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
-import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
-import uk.ac.susx.mlcl.lib.events.ProgressListener;
-import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import com.google.common.base.Objects;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import uk.ac.susx.mlcl.lib.Checks;
+import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
+import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 
@@ -102,7 +102,8 @@ public class ObjectPipeTask<T> extends AbstractTask
             ++count;
 
             if (count % 1000000 == 0 || !getSource().hasNext()) {
-                progress.setMessage(MessageFormat.format("Processed {0} items.", count));
+                progress.setMessage(
+                        MessageFormat.format("Processed {0} items.", count));
             }
 
         }
