@@ -53,7 +53,7 @@
     </properties>
 
     <scm>
-        <connection>scm:git:git://github.com/MLCL/Byblo.git</connection>
+        <connection>scm:git:git://github.com/MLCL/MLCLLib.git</connection>
         <tag>HEAD</tag>
         <url>https://github.com/MLCL/Byblo</url>
     </scm>
