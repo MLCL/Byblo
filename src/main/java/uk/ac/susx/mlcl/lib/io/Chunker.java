@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2012, University of Sussex
+ * Copyright (c) 2011-2012, University of Sussex
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -84,7 +84,7 @@ public class Chunker<T, S extends ObjectSource<T>>
 
     @Override
     public Chunk<T> read() throws IOException {
-        final List<T> items = new ArrayList<T>();
+        final List<T> items = new ArrayList<T>(maxChunkSize);
         int k = 0;
         while (k < maxChunkSize && inner.hasNext()) {
             items.add(inner.read());
@@ -109,11 +109,11 @@ public class Chunker<T, S extends ObjectSource<T>>
         return "Chunker{" + "maxChunkSize=" + maxChunkSize + ", inner=" + inner + '}';
     }
 
-    public static class SeekableChunker<T, P, S extends SeekableObjectSource<T, P>>
+    private static class SeekableChunker<T, P, S extends SeekableObjectSource<T, P>>
             extends Chunker<T, S>
             implements SeekableObjectSource<Chunk<T>, P> {
 
-        public SeekableChunker(S inner, int maxChunkSize) {
+        private SeekableChunker(S inner, int maxChunkSize) {
             super(inner, maxChunkSize);
         }
 

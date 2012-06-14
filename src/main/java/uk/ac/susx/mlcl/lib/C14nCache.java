@@ -1,31 +1,31 @@
 /*
- * Copyright (c) 2010-2012, MLCL Lab, University of Sussex
+ * Copyright (c) 2011-2012, University of Sussex
  * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without 
+ *
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
- *  * Redistributions of source code must retain the above copyright notice, 
+ *
+ *  * Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  *  * Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
- *  * Neither the name of the University of Sussex nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ *
+ *  * Neither the name of the University of Sussex nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package uk.ac.susx.mlcl.lib;
@@ -34,6 +34,7 @@ import java.lang.ref.WeakReference;
 import java.util.AbstractSet;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
@@ -65,7 +66,7 @@ import java.util.WeakHashMap;
  * functionality is fail-fast and will result in a
  * {@link ConcurrentModificationException}.
  * </p>
- * 
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T> The type of object that will be held here.
  */
@@ -75,7 +76,7 @@ public class C14nCache<T> extends AbstractSet<T> {
      * The storage where a WeakReference to objects are held for both the key
      * and value. This allows retrieval functionality as well as searching.
      */
-    private final WeakHashMap<T, WeakReference<T>> inner;
+    private final Map<T, WeakReference<T>> inner;
     /**
      * The number of times an object has been requested and an identical copy
      * was found to already be held.
@@ -99,7 +100,7 @@ public class C14nCache<T> extends AbstractSet<T> {
     /**
      * Return the cached copy of argument obj if it has been seen before, or
      * store and return obj if it is new.
-     * 
+     *
      * @param obj object to store and return a unique instance of
      * @return an equal but not necessarily identical instance of obj
      * @throws NullPointerException if argument obj is null
@@ -107,7 +108,7 @@ public class C14nCache<T> extends AbstractSet<T> {
     public T cached(T obj) throws NullPointerException {
         if (obj == null)
             throw new NullPointerException("obj == null");
-        
+
         final WeakReference<T> cached = inner.get(obj);
         if (cached == null) {
             inner.put(obj, new WeakReference<T>(obj));
@@ -159,4 +160,5 @@ public class C14nCache<T> extends AbstractSet<T> {
     public String toString() {
         return inner.keySet().toString();
     }
+
 }
