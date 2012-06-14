@@ -30,13 +30,12 @@
     POSSIBILITY OF SUCH DAMAGE.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>uk.ac.susx.mlcl</groupId>
     <artifactId>mlcl-lib</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.2</version>
     <packaging>jar</packaging>
 
     <name>mlcl-lib</name>
@@ -54,7 +53,7 @@
 
     <scm>
         <connection>scm:git:git://github.com/MLCL/MLCLLib.git</connection>
-        <tag>HEAD</tag>
+        <tag>mlcl-lib-0.2</tag>
         <url>https://github.com/MLCL/Byblo</url>
     </scm>
 
