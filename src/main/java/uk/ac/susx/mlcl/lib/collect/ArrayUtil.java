@@ -1,31 +1,31 @@
 /*
- * Copyright (c) 2010-2012, MLCL, University of Sussex
+ * Copyright (c) 2011-2012, University of Sussex
  * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without 
+ *
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
- *  * Redistributions of source code must retain the above copyright notice, 
+ *
+ *  * Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  *  * Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
- *  * Neither the name of the University of Sussex nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ *
+ *  * Neither the name of the University of Sussex nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package uk.ac.susx.mlcl.lib.collect;
@@ -77,7 +77,7 @@ public final class ArrayUtil {
 
     public static Boolean[] box(final boolean[] src, final int offset, final int len) {
         Boolean[] dst = new Boolean[len];
-        for(int i = 0; i < len; i++) 
+        for(int i = 0; i < len; i++)
             dst[i] = (Boolean)src[offset + i];
         return dst;
     }
@@ -92,14 +92,14 @@ public final class ArrayUtil {
 
     public static boolean[] unbox(final Boolean[] src, final int offset, final int len) {
         boolean[] dst = new boolean[len];
-        for(int i = 0; i < len; i++) 
+        for(int i = 0; i < len; i++)
             dst[i] = (boolean)src[offset + i];
         return dst;
     }
-    
 
 
-    /* 
+
+    /*
      * ==================
      *  Type: boolean
      * ==================
@@ -175,7 +175,7 @@ public final class ArrayUtil {
     }
 
     public static boolean[] unique(final boolean... arr) {
-        // This is way to slow O(n^2) - can be done in 
+        // This is way to slow O(n^2) - can be done in
         // O(n log n) by sorting in input first.
         boolean[] result = new boolean[arr.length];
         int j = 0;
@@ -218,7 +218,7 @@ public final class ArrayUtil {
     public static boolean[] elementsOf(boolean[] arr, boolean[] logical) {
         return elementsOf(arr, find(logical));
     }
-    
+
     public static boolean[] valuesEq(boolean[] arr, boolean val) {
         boolean[] result = new boolean[arr.length];
         for (int i = 0; i < arr.length; i++)
@@ -244,7 +244,7 @@ public final class ArrayUtil {
             return arr;
         }
     }
- 
+
     public static boolean mode(boolean[] arr) {
         Map<Boolean, Integer> map = new HashMap<Boolean, Integer>();
         for (int i = 0; i < arr.length; i++) {
@@ -264,7 +264,7 @@ public final class ArrayUtil {
         }
         return maxValue;
     }
-    
+
 
 
     public static void permute(final boolean[] a) {
@@ -276,13 +276,13 @@ public final class ArrayUtil {
     }
 
     /**
-     * Takes an array a and rearranges it into the next permutation in 
+     * Takes an array a and rearranges it into the next permutation in
      * lexicographic order.
-     * 
+     *
      * Use an algorithm defined in
      * http://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
      * which probably isnt the most efficient solution.
-     * 
+     *
      * @param a the array to be permuted
      * @param toIndex index of the first element (inclusive) to be permuted
      * @param fromIndex index of the last element (exclusive) to be permuted
@@ -291,7 +291,7 @@ public final class ArrayUtil {
         if (toIndex - fromIndex < 2)
             return;
 
-        // Find the largest index k such that a[k] < a[k + 1]. If no such index 
+        // Find the largest index k such that a[k] < a[k + 1]. If no such index
         // exists, the permutation is the last permutation.
         int k = toIndex - 2;
         while (k >= fromIndex && (a[k]==a[k + 1]?1:0)>=0)
@@ -304,7 +304,7 @@ public final class ArrayUtil {
 
         } else {
 
-            // Find the largest index l such that a[k] < a[l]. Since k + 1 is 
+            // Find the largest index l such that a[k] < a[l]. Since k + 1 is
             // such an index, l is well defined and satisfies k < l.
             int l = toIndex - 1;
             while (l >= fromIndex && (a[k]==a[l]?1:0)>=0)
@@ -313,8 +313,8 @@ public final class ArrayUtil {
             // Swap a[k] with a[l].
             swap(a, k, l);
 
-            // Reverse the sequence from a[k + 1] up to and including the final 
-            // element a[n].   
+            // Reverse the sequence from a[k + 1] up to and including the final
+            // element a[n].
             reverse(a, k + 1, toIndex);
         }
     }
@@ -441,7 +441,7 @@ public final class ArrayUtil {
 
     public static Byte[] box(final byte[] src, final int offset, final int len) {
         Byte[] dst = new Byte[len];
-        for(int i = 0; i < len; i++) 
+        for(int i = 0; i < len; i++)
             dst[i] = (Byte)src[offset + i];
         return dst;
     }
@@ -456,14 +456,14 @@ public final class ArrayUtil {
 
     public static byte[] unbox(final Byte[] src, final int offset, final int len) {
         byte[] dst = new byte[len];
-        for(int i = 0; i < len; i++) 
+        for(int i = 0; i < len; i++)
             dst[i] = (byte)src[offset + i];
         return dst;
     }
-    
 
 
-    /* 
+
+    /*
      * ==================
      *  Type: byte
      * ==================
@@ -539,7 +539,7 @@ public final class ArrayUtil {
     }
 
     public static byte[] unique(final byte... arr) {
-        // This is way to slow O(n^2) - can be done in 
+        // This is way to slow O(n^2) - can be done in
         // O(n log n) by sorting in input first.
         byte[] result = new byte[arr.length];
         int j = 0;
@@ -582,7 +582,7 @@ public final class ArrayUtil {
     public static byte[] elementsOf(byte[] arr, boolean[] logical) {
         return elementsOf(arr, find(logical));
     }
-    
+
     public static boolean[] valuesEq(byte[] arr, byte val) {
         boolean[] result = new boolean[arr.length];
         for (int i = 0; i < arr.length; i++)
@@ -608,7 +608,7 @@ public final class ArrayUtil {
             return arr;
         }
     }
- 
+
     public static byte mode(byte[] arr) {
         Map<Byte, Integer> map = new HashMap<Byte, Integer>();
         for (int i = 0; i < arr.length; i++) {
@@ -628,7 +628,7 @@ public final class ArrayUtil {
         }
         return maxValue;
     }
-    
+
 
 
     public static void permute(final byte[] a) {
@@ -640,13 +640,13 @@ public final class ArrayUtil {
     }
 
     /**
-     * Takes an array a and rearranges it into the next permutation in 
+     * Takes an array a and rearranges it into the next permutation in
      * lexicographic order.
-     * 
+     *
      * Use an algorithm defined in
      * http://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
      * which probably isnt the most efficient solution.
-     * 
+     *
      * @param a the array to be permuted
      * @param toIndex index of the first element (inclusive) to be permuted
      * @param fromIndex index of the last element (exclusive) to be permuted
@@ -655,7 +655,7 @@ public final class ArrayUtil {
         if (toIndex - fromIndex < 2)
             return;
 
-        // Find the largest index k such that a[k] < a[k + 1]. If no such index 
+        // Find the largest index k such that a[k] < a[k + 1]. If no such index
         // exists, the permutation is the last permutation.
         int k = toIndex - 2;
         while (k >= fromIndex && (byte)(a[k]-a[k + 1])>=0)
@@ -668,7 +668,7 @@ public final class ArrayUtil {
 
         } else {
 
-            // Find the largest index l such that a[k] < a[l]. Since k + 1 is 
+            // Find the largest index l such that a[k] < a[l]. Since k + 1 is
             // such an index, l is well defined and satisfies k < l.
             int l = toIndex - 1;
             while (l >= fromIndex && (byte)(a[k]-a[l])>=0)
@@ -677,8 +677,8 @@ public final class ArrayUtil {
             // Swap a[k] with a[l].
             swap(a, k, l);
 
-            // Reverse the sequence from a[k + 1] up to and including the final 
-            // element a[n].   
+            // Reverse the sequence from a[k + 1] up to and including the final
+            // element a[n].
             reverse(a, k + 1, toIndex);
         }
     }
@@ -821,7 +821,7 @@ public final class ArrayUtil {
 
     public static Character[] box(final char[] src, final int offset, final int len) {
         Character[] dst = new Character[len];
-        for(int i = 0; i < len; i++) 
+        for(int i = 0; i < len; i++)
             dst[i] = (Character)src[offset + i];
         return dst;
     }
@@ -836,14 +836,14 @@ public final class ArrayUtil {
 
     public static char[] unbox(final Character[] src, final int offset, final int len) {
         char[] dst = new char[len];
-        for(int i = 0; i < len; i++) 
+        for(int i = 0; i < len; i++)
             dst[i] = (char)src[offset + i];
         return dst;
     }
-    
 
 
-    /* 
+
+    /*
      * ==================
      *  Type: char
      * ==================
@@ -919,7 +919,7 @@ public final class ArrayUtil {
     }
 
     public static char[] unique(final char... arr) {
-        // This is way to slow O(n^2) - can be done in 
+        // This is way to slow O(n^2) - can be done in
         // O(n log n) by sorting in input first.
         char[] result = new char[arr.length];
         int j = 0;
@@ -962,7 +962,7 @@ public final class ArrayUtil {
     public static char[] elementsOf(char[] arr, boolean[] logical) {
         return elementsOf(arr, find(logical));
     }
-    
+
     public static boolean[] valuesEq(char[] arr, char val) {
         boolean[] result = new boolean[arr.length];
         for (int i = 0; i < arr.length; i++)
@@ -988,7 +988,7 @@ public final class ArrayUtil {
             return arr;
         }
     }
- 
+
     public static char mode(char[] arr) {
         Map<Character, Integer> map = new HashMap<Character, Integer>();
         for (int i = 0; i < arr.length; i++) {
@@ -1008,7 +1008,7 @@ public final class ArrayUtil {
         }
         return maxValue;
     }
-    
+
 
 
     public static void permute(final char[] a) {
@@ -1020,13 +1020,13 @@ public final class ArrayUtil {
     }
 
     /**
-     * Takes an array a and rearranges it into the next permutation in 
+     * Takes an array a and rearranges it into the next permutation in
      * lexicographic order.
-     * 
+     *
      * Use an algorithm defined in
      * http://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
      * which probably isnt the most efficient solution.
-     * 
+     *
      * @param a the array to be permuted
      * @param toIndex index of the first element (inclusive) to be permuted
      * @param fromIndex index of the last element (exclusive) to be permuted
@@ -1035,7 +1035,7 @@ public final class ArrayUtil {
         if (toIndex - fromIndex < 2)
             return;
 
-        // Find the largest index k such that a[k] < a[k + 1]. If no such index 
+        // Find the largest index k such that a[k] < a[k + 1]. If no such index
         // exists, the permutation is the last permutation.
         int k = toIndex - 2;
         while (k >= fromIndex && (char)(a[k]-a[k + 1])>=0)
@@ -1048,7 +1048,7 @@ public final class ArrayUtil {
 
         } else {
 
-            // Find the largest index l such that a[k] < a[l]. Since k + 1 is 
+            // Find the largest index l such that a[k] < a[l]. Since k + 1 is
             // such an index, l is well defined and satisfies k < l.
             int l = toIndex - 1;
             while (l >= fromIndex && (char)(a[k]-a[l])>=0)
@@ -1057,8 +1057,8 @@ public final class ArrayUtil {
             // Swap a[k] with a[l].
             swap(a, k, l);
 
-            // Reverse the sequence from a[k + 1] up to and including the final 
-            // element a[n].   
+            // Reverse the sequence from a[k + 1] up to and including the final
+            // element a[n].
             reverse(a, k + 1, toIndex);
         }
     }
@@ -1201,7 +1201,7 @@ public final class ArrayUtil {
 
     public static Short[] box(final short[] src, final int offset, final int len) {
         Short[] dst = new Short[len];
-        for(int i = 0; i < len; i++) 
+        for(int i = 0; i < len; i++)
             dst[i] = (Short)src[offset + i];
         return dst;
     }
@@ -1216,14 +1216,14 @@ public final class ArrayUtil {
 
     public static short[] unbox(final Short[] src, final int offset, final int len) {
         short[] dst = new short[len];
-        for(int i = 0; i < len; i++) 
+        for(int i = 0; i < len; i++)
             dst[i] = (short)src[offset + i];
         return dst;
     }
-    
 
 
-    /* 
+
+    /*
      * ==================
      *  Type: short
      * ==================
@@ -1299,7 +1299,7 @@ public final class ArrayUtil {
     }
 
     public static short[] unique(final short... arr) {
-        // This is way to slow O(n^2) - can be done in 
+        // This is way to slow O(n^2) - can be done in
         // O(n log n) by sorting in input first.
         short[] result = new short[arr.length];
         int j = 0;
@@ -1342,7 +1342,7 @@ public final class ArrayUtil {
     public static short[] elementsOf(short[] arr, boolean[] logical) {
         return elementsOf(arr, find(logical));
     }
-    
+
     public static boolean[] valuesEq(short[] arr, short val) {
         boolean[] result = new boolean[arr.length];
         for (int i = 0; i < arr.length; i++)
@@ -1368,7 +1368,7 @@ public final class ArrayUtil {
             return arr;
         }
     }
- 
+
     public static short mode(short[] arr) {
         Map<Short, Integer> map = new HashMap<Short, Integer>();
         for (int i = 0; i < arr.length; i++) {
@@ -1388,7 +1388,7 @@ public final class ArrayUtil {
         }
         return maxValue;
     }
-    
+
 
 
     public static void permute(final short[] a) {
@@ -1400,13 +1400,13 @@ public final class ArrayUtil {
     }
 
     /**
-     * Takes an array a and rearranges it into the next permutation in 
+     * Takes an array a and rearranges it into the next permutation in
      * lexicographic order.
-     * 
+     *
      * Use an algorithm defined in
      * http://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
      * which probably isnt the most efficient solution.
-     * 
+     *
      * @param a the array to be permuted
      * @param toIndex index of the first element (inclusive) to be permuted
      * @param fromIndex index of the last element (exclusive) to be permuted
@@ -1415,7 +1415,7 @@ public final class ArrayUtil {
         if (toIndex - fromIndex < 2)
             return;
 
-        // Find the largest index k such that a[k] < a[k + 1]. If no such index 
+        // Find the largest index k such that a[k] < a[k + 1]. If no such index
         // exists, the permutation is the last permutation.
         int k = toIndex - 2;
         while (k >= fromIndex && (short)(a[k]-a[k + 1])>=0)
@@ -1428,7 +1428,7 @@ public final class ArrayUtil {
 
         } else {
 
-            // Find the largest index l such that a[k] < a[l]. Since k + 1 is 
+            // Find the largest index l such that a[k] < a[l]. Since k + 1 is
             // such an index, l is well defined and satisfies k < l.
             int l = toIndex - 1;
             while (l >= fromIndex && (short)(a[k]-a[l])>=0)
@@ -1437,8 +1437,8 @@ public final class ArrayUtil {
             // Swap a[k] with a[l].
             swap(a, k, l);
 
-            // Reverse the sequence from a[k + 1] up to and including the final 
-            // element a[n].   
+            // Reverse the sequence from a[k + 1] up to and including the final
+            // element a[n].
             reverse(a, k + 1, toIndex);
         }
     }
@@ -1581,7 +1581,7 @@ public final class ArrayUtil {
 
     public static Integer[] box(final int[] src, final int offset, final int len) {
         Integer[] dst = new Integer[len];
-        for(int i = 0; i < len; i++) 
+        for(int i = 0; i < len; i++)
             dst[i] = (Integer)src[offset + i];
         return dst;
     }
@@ -1596,14 +1596,14 @@ public final class ArrayUtil {
 
     public static int[] unbox(final Integer[] src, final int offset, final int len) {
         int[] dst = new int[len];
-        for(int i = 0; i < len; i++) 
+        for(int i = 0; i < len; i++)
             dst[i] = (int)src[offset + i];
         return dst;
     }
-    
 
 
-    /* 
+
+    /*
      * ==================
      *  Type: int
      * ==================
@@ -1679,7 +1679,7 @@ public final class ArrayUtil {
     }
 
     public static int[] unique(final int... arr) {
-        // This is way to slow O(n^2) - can be done in 
+        // This is way to slow O(n^2) - can be done in
         // O(n log n) by sorting in input first.
         int[] result = new int[arr.length];
         int j = 0;
@@ -1722,7 +1722,7 @@ public final class ArrayUtil {
     public static int[] elementsOf(int[] arr, boolean[] logical) {
         return elementsOf(arr, find(logical));
     }
-    
+
     public static boolean[] valuesEq(int[] arr, int val) {
         boolean[] result = new boolean[arr.length];
         for (int i = 0; i < arr.length; i++)
@@ -1748,7 +1748,7 @@ public final class ArrayUtil {
             return arr;
         }
     }
- 
+
     public static int mode(int[] arr) {
         Map<Integer, Integer> map = new HashMap<Integer, Integer>();
         for (int i = 0; i < arr.length; i++) {
@@ -1768,7 +1768,7 @@ public final class ArrayUtil {
         }
         return maxValue;
     }
-    
+
 
 
     public static void permute(final int[] a) {
@@ -1780,13 +1780,13 @@ public final class ArrayUtil {
     }
 
     /**
-     * Takes an array a and rearranges it into the next permutation in 
+     * Takes an array a and rearranges it into the next permutation in
      * lexicographic order.
-     * 
+     *
      * Use an algorithm defined in
      * http://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
      * which probably isnt the most efficient solution.
-     * 
+     *
      * @param a the array to be permuted
      * @param toIndex index of the first element (inclusive) to be permuted
      * @param fromIndex index of the last element (exclusive) to be permuted
@@ -1795,7 +1795,7 @@ public final class ArrayUtil {
         if (toIndex - fromIndex < 2)
             return;
 
-        // Find the largest index k such that a[k] < a[k + 1]. If no such index 
+        // Find the largest index k such that a[k] < a[k + 1]. If no such index
         // exists, the permutation is the last permutation.
         int k = toIndex - 2;
         while (k >= fromIndex && a[k]-a[k + 1]>=0)
@@ -1808,7 +1808,7 @@ public final class ArrayUtil {
 
         } else {
 
-            // Find the largest index l such that a[k] < a[l]. Since k + 1 is 
+            // Find the largest index l such that a[k] < a[l]. Since k + 1 is
             // such an index, l is well defined and satisfies k < l.
             int l = toIndex - 1;
             while (l >= fromIndex && a[k]-a[l]>=0)
@@ -1817,8 +1817,8 @@ public final class ArrayUtil {
             // Swap a[k] with a[l].
             swap(a, k, l);
 
-            // Reverse the sequence from a[k + 1] up to and including the final 
-            // element a[n].   
+            // Reverse the sequence from a[k + 1] up to and including the final
+            // element a[n].
             reverse(a, k + 1, toIndex);
         }
     }
@@ -1961,7 +1961,7 @@ public final class ArrayUtil {
 
     public static Long[] box(final long[] src, final int offset, final int len) {
         Long[] dst = new Long[len];
-        for(int i = 0; i < len; i++) 
+        for(int i = 0; i < len; i++)
             dst[i] = (Long)src[offset + i];
         return dst;
     }
@@ -1976,14 +1976,14 @@ public final class ArrayUtil {
 
     public static long[] unbox(final Long[] src, final int offset, final int len) {
         long[] dst = new long[len];
-        for(int i = 0; i < len; i++) 
+        for(int i = 0; i < len; i++)
             dst[i] = (long)src[offset + i];
         return dst;
     }
-    
 
 
-    /* 
+
+    /*
      * ==================
      *  Type: long
      * ==================
@@ -2059,7 +2059,7 @@ public final class ArrayUtil {
     }
 
     public static long[] unique(final long... arr) {
-        // This is way to slow O(n^2) - can be done in 
+        // This is way to slow O(n^2) - can be done in
         // O(n log n) by sorting in input first.
         long[] result = new long[arr.length];
         int j = 0;
@@ -2102,7 +2102,7 @@ public final class ArrayUtil {
     public static long[] elementsOf(long[] arr, boolean[] logical) {
         return elementsOf(arr, find(logical));
     }
-    
+
     public static boolean[] valuesEq(long[] arr, long val) {
         boolean[] result = new boolean[arr.length];
         for (int i = 0; i < arr.length; i++)
@@ -2128,7 +2128,7 @@ public final class ArrayUtil {
             return arr;
         }
     }
- 
+
     public static long mode(long[] arr) {
         Map<Long, Integer> map = new HashMap<Long, Integer>();
         for (int i = 0; i < arr.length; i++) {
@@ -2148,7 +2148,7 @@ public final class ArrayUtil {
         }
         return maxValue;
     }
-    
+
 
 
     public static void permute(final long[] a) {
@@ -2160,13 +2160,13 @@ public final class ArrayUtil {
     }
 
     /**
-     * Takes an array a and rearranges it into the next permutation in 
+     * Takes an array a and rearranges it into the next permutation in
      * lexicographic order.
-     * 
+     *
      * Use an algorithm defined in
      * http://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
      * which probably isnt the most efficient solution.
-     * 
+     *
      * @param a the array to be permuted
      * @param toIndex index of the first element (inclusive) to be permuted
      * @param fromIndex index of the last element (exclusive) to be permuted
@@ -2175,7 +2175,7 @@ public final class ArrayUtil {
         if (toIndex - fromIndex < 2)
             return;
 
-        // Find the largest index k such that a[k] < a[k + 1]. If no such index 
+        // Find the largest index k such that a[k] < a[k + 1]. If no such index
         // exists, the permutation is the last permutation.
         int k = toIndex - 2;
         while (k >= fromIndex && a[k]-a[k + 1]>=0)
@@ -2188,7 +2188,7 @@ public final class ArrayUtil {
 
         } else {
 
-            // Find the largest index l such that a[k] < a[l]. Since k + 1 is 
+            // Find the largest index l such that a[k] < a[l]. Since k + 1 is
             // such an index, l is well defined and satisfies k < l.
             int l = toIndex - 1;
             while (l >= fromIndex && a[k]-a[l]>=0)
@@ -2197,8 +2197,8 @@ public final class ArrayUtil {
             // Swap a[k] with a[l].
             swap(a, k, l);
 
-            // Reverse the sequence from a[k + 1] up to and including the final 
-            // element a[n].   
+            // Reverse the sequence from a[k + 1] up to and including the final
+            // element a[n].
             reverse(a, k + 1, toIndex);
         }
     }
@@ -2341,7 +2341,7 @@ public final class ArrayUtil {
 
     public static Float[] box(final float[] src, final int offset, final int len) {
         Float[] dst = new Float[len];
-        for(int i = 0; i < len; i++) 
+        for(int i = 0; i < len; i++)
             dst[i] = (Float)src[offset + i];
         return dst;
     }
@@ -2356,14 +2356,14 @@ public final class ArrayUtil {
 
     public static float[] unbox(final Float[] src, final int offset, final int len) {
         float[] dst = new float[len];
-        for(int i = 0; i < len; i++) 
+        for(int i = 0; i < len; i++)
             dst[i] = (float)src[offset + i];
         return dst;
     }
-    
 
 
-    /* 
+
+    /*
      * ==================
      *  Type: float
      * ==================
@@ -2439,7 +2439,7 @@ public final class ArrayUtil {
     }
 
     public static float[] unique(final float... arr) {
-        // This is way to slow O(n^2) - can be done in 
+        // This is way to slow O(n^2) - can be done in
         // O(n log n) by sorting in input first.
         float[] result = new float[arr.length];
         int j = 0;
@@ -2482,7 +2482,7 @@ public final class ArrayUtil {
     public static float[] elementsOf(float[] arr, boolean[] logical) {
         return elementsOf(arr, find(logical));
     }
-    
+
     public static boolean[] valuesEq(float[] arr, float val) {
         boolean[] result = new boolean[arr.length];
         for (int i = 0; i < arr.length; i++)
@@ -2508,7 +2508,7 @@ public final class ArrayUtil {
             return arr;
         }
     }
- 
+
     public static float mode(float[] arr) {
         Map<Float, Integer> map = new HashMap<Float, Integer>();
         for (int i = 0; i < arr.length; i++) {
@@ -2528,7 +2528,7 @@ public final class ArrayUtil {
         }
         return maxValue;
     }
-    
+
 
 
     public static void permute(final float[] a) {
@@ -2540,13 +2540,13 @@ public final class ArrayUtil {
     }
 
     /**
-     * Takes an array a and rearranges it into the next permutation in 
+     * Takes an array a and rearranges it into the next permutation in
      * lexicographic order.
-     * 
+     *
      * Use an algorithm defined in
      * http://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
      * which probably isnt the most efficient solution.
-     * 
+     *
      * @param a the array to be permuted
      * @param toIndex index of the first element (inclusive) to be permuted
      * @param fromIndex index of the last element (exclusive) to be permuted
@@ -2555,7 +2555,7 @@ public final class ArrayUtil {
         if (toIndex - fromIndex < 2)
             return;
 
-        // Find the largest index k such that a[k] < a[k + 1]. If no such index 
+        // Find the largest index k such that a[k] < a[k + 1]. If no such index
         // exists, the permutation is the last permutation.
         int k = toIndex - 2;
         while (k >= fromIndex && a[k]-a[k + 1]>=0)
@@ -2568,7 +2568,7 @@ public final class ArrayUtil {
 
         } else {
 
-            // Find the largest index l such that a[k] < a[l]. Since k + 1 is 
+            // Find the largest index l such that a[k] < a[l]. Since k + 1 is
             // such an index, l is well defined and satisfies k < l.
             int l = toIndex - 1;
             while (l >= fromIndex && a[k]-a[l]>=0)
@@ -2577,8 +2577,8 @@ public final class ArrayUtil {
             // Swap a[k] with a[l].
             swap(a, k, l);
 
-            // Reverse the sequence from a[k + 1] up to and including the final 
-            // element a[n].   
+            // Reverse the sequence from a[k + 1] up to and including the final
+            // element a[n].
             reverse(a, k + 1, toIndex);
         }
     }
@@ -2724,7 +2724,7 @@ public final class ArrayUtil {
 
     public static Double[] box(final double[] src, final int offset, final int len) {
         Double[] dst = new Double[len];
-        for(int i = 0; i < len; i++) 
+        for(int i = 0; i < len; i++)
             dst[i] = (Double)src[offset + i];
         return dst;
     }
@@ -2739,14 +2739,14 @@ public final class ArrayUtil {
 
     public static double[] unbox(final Double[] src, final int offset, final int len) {
         double[] dst = new double[len];
-        for(int i = 0; i < len; i++) 
+        for(int i = 0; i < len; i++)
             dst[i] = (double)src[offset + i];
         return dst;
     }
-    
 
 
-    /* 
+
+    /*
      * ==================
      *  Type: double
      * ==================
@@ -2822,7 +2822,7 @@ public final class ArrayUtil {
     }
 
     public static double[] unique(final double... arr) {
-        // This is way to slow O(n^2) - can be done in 
+        // This is way to slow O(n^2) - can be done in
         // O(n log n) by sorting in input first.
         double[] result = new double[arr.length];
         int j = 0;
@@ -2865,7 +2865,7 @@ public final class ArrayUtil {
     public static double[] elementsOf(double[] arr, boolean[] logical) {
         return elementsOf(arr, find(logical));
     }
-    
+
     public static boolean[] valuesEq(double[] arr, double val) {
         boolean[] result = new boolean[arr.length];
         for (int i = 0; i < arr.length; i++)
@@ -2891,7 +2891,7 @@ public final class ArrayUtil {
             return arr;
         }
     }
- 
+
     public static double mode(double[] arr) {
         Map<Double, Integer> map = new HashMap<Double, Integer>();
         for (int i = 0; i < arr.length; i++) {
@@ -2911,7 +2911,7 @@ public final class ArrayUtil {
         }
         return maxValue;
     }
-    
+
 
 
     public static void permute(final double[] a) {
@@ -2923,13 +2923,13 @@ public final class ArrayUtil {
     }
 
     /**
-     * Takes an array a and rearranges it into the next permutation in 
+     * Takes an array a and rearranges it into the next permutation in
      * lexicographic order.
-     * 
+     *
      * Use an algorithm defined in
      * http://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
      * which probably isnt the most efficient solution.
-     * 
+     *
      * @param a the array to be permuted
      * @param toIndex index of the first element (inclusive) to be permuted
      * @param fromIndex index of the last element (exclusive) to be permuted
@@ -2938,7 +2938,7 @@ public final class ArrayUtil {
         if (toIndex - fromIndex < 2)
             return;
 
-        // Find the largest index k such that a[k] < a[k + 1]. If no such index 
+        // Find the largest index k such that a[k] < a[k + 1]. If no such index
         // exists, the permutation is the last permutation.
         int k = toIndex - 2;
         while (k >= fromIndex && a[k]-a[k + 1]>=0)
@@ -2951,7 +2951,7 @@ public final class ArrayUtil {
 
         } else {
 
-            // Find the largest index l such that a[k] < a[l]. Since k + 1 is 
+            // Find the largest index l such that a[k] < a[l]. Since k + 1 is
             // such an index, l is well defined and satisfies k < l.
             int l = toIndex - 1;
             while (l >= fromIndex && a[k]-a[l]>=0)
@@ -2960,8 +2960,8 @@ public final class ArrayUtil {
             // Swap a[k] with a[l].
             swap(a, k, l);
 
-            // Reverse the sequence from a[k + 1] up to and including the final 
-            // element a[n].   
+            // Reverse the sequence from a[k + 1] up to and including the final
+            // element a[n].
             reverse(a, k + 1, toIndex);
         }
     }
@@ -3098,7 +3098,7 @@ public final class ArrayUtil {
 
 
 
-    /* 
+    /*
      * ==================
      *  Type: Object
      * ==================
@@ -3174,7 +3174,7 @@ public final class ArrayUtil {
     }
 
     public static Object[] unique(final Object... arr) {
-        // This is way to slow O(n^2) - can be done in 
+        // This is way to slow O(n^2) - can be done in
         // O(n log n) by sorting in input first.
         Object[] result = new Object[arr.length];
         int j = 0;
@@ -3217,7 +3217,7 @@ public final class ArrayUtil {
     public static Object[] elementsOf(Object[] arr, boolean[] logical) {
         return elementsOf(arr, find(logical));
     }
-    
+
     public static boolean[] valuesEq(Object[] arr, Object val) {
         boolean[] result = new boolean[arr.length];
         for (int i = 0; i < arr.length; i++)
@@ -3243,7 +3243,7 @@ public final class ArrayUtil {
             return arr;
         }
     }
- 
+
     public static Object mode(Object[] arr) {
         Map<Object, Integer> map = new HashMap<Object, Integer>();
         for (int i = 0; i < arr.length; i++) {
@@ -3263,7 +3263,7 @@ public final class ArrayUtil {
         }
         return maxValue;
     }
-    
+
 
 
     public static void permute(final Object[] a) {
@@ -3275,13 +3275,13 @@ public final class ArrayUtil {
     }
 
     /**
-     * Takes an array a and rearranges it into the next permutation in 
+     * Takes an array a and rearranges it into the next permutation in
      * lexicographic order.
-     * 
+     *
      * Use an algorithm defined in
      * http://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
      * which probably isnt the most efficient solution.
-     * 
+     *
      * @param a the array to be permuted
      * @param toIndex index of the first element (inclusive) to be permuted
      * @param fromIndex index of the last element (exclusive) to be permuted
@@ -3290,7 +3290,7 @@ public final class ArrayUtil {
         if (toIndex - fromIndex < 2)
             return;
 
-        // Find the largest index k such that a[k] < a[k + 1]. If no such index 
+        // Find the largest index k such that a[k] < a[k + 1]. If no such index
         // exists, the permutation is the last permutation.
         int k = toIndex - 2;
         while (k >= fromIndex && ((Comparable)a[k]).compareTo(a[k + 1])>=0)
@@ -3303,7 +3303,7 @@ public final class ArrayUtil {
 
         } else {
 
-            // Find the largest index l such that a[k] < a[l]. Since k + 1 is 
+            // Find the largest index l such that a[k] < a[l]. Since k + 1 is
             // such an index, l is well defined and satisfies k < l.
             int l = toIndex - 1;
             while (l >= fromIndex && ((Comparable)a[k]).compareTo(a[l])>=0)
@@ -3312,8 +3312,8 @@ public final class ArrayUtil {
             // Swap a[k] with a[l].
             swap(a, k, l);
 
-            // Reverse the sequence from a[k + 1] up to and including the final 
-            // element a[n].   
+            // Reverse the sequence from a[k + 1] up to and including the final
+            // element a[n].
             reverse(a, k + 1, toIndex);
         }
     }
@@ -3440,13 +3440,13 @@ public final class ArrayUtil {
     }
 
     /**
-     * Takes an array a and rearranges it into the next permutation in 
+     * Takes an array a and rearranges it into the next permutation in
      * lexicographic order.
-     * 
+     *
      * Use an algorithm defined in
      * http://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
      * which probably isnt the most efficient solution.
-     * 
+     *
      * @param a the array to be permuted
      * @param toIndex index of the first element (inclusive) to be permuted
      * @param fromIndex index of the last element (exclusive) to be permuted
@@ -3455,7 +3455,7 @@ public final class ArrayUtil {
         if (toIndex - fromIndex < 2)
             return;
 
-        // Find the largest index k such that a[k] < a[k + 1]. If no such index 
+        // Find the largest index k such that a[k] < a[k + 1]. If no such index
         // exists, the permutation is the last permutation.
         int k = toIndex - 2;
         while (k >= fromIndex && comp.compare(a[k],a[k + 1])>=0)
@@ -3468,7 +3468,7 @@ public final class ArrayUtil {
 
         } else {
 
-            // Find the largest index l such that a[k] < a[l]. Since k + 1 is 
+            // Find the largest index l such that a[k] < a[l]. Since k + 1 is
             // such an index, l is well defined and satisfies k < l.
             int l = toIndex - 1;
             while (l >= fromIndex && comp.compare(a[k],a[l])>=0)
@@ -3477,8 +3477,8 @@ public final class ArrayUtil {
             // Swap a[k] with a[l].
             swap(a, k, l);
 
-            // Reverse the sequence from a[k + 1] up to and including the final 
-            // element a[n].   
+            // Reverse the sequence from a[k + 1] up to and including the final
+            // element a[n].
             reverse(a, k + 1, toIndex);
         }
     }
