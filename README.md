@@ -51,8 +51,8 @@ The project requires [Java 6](http://www.oracle.com/technetwork/java/javase/down
 
  * [MLCL Lib 0.2-SNAPSHOT](https://github.com/MLCL/MLCLLib) -- A collection of generic Java utilities and classes developed by the authors of Byblo, for use in this and other projects.
 
- * [JDBM3 3.0-SNAPTSHOT](https://github.com/jankotek/JDBM3) -- Embedded Key Value Java Database. Note that at time of writing there is no stable release,
-but the dependancy will be updated as soon as there is.
+ * [JDBM3 3.0-alpha3](https://github.com/jankotek/JDBM3) -- Embedded Key Value Java Database. Note that at time of writing there is no stable release,
+but the dependancy will be updated as soon as there is. The jar can be downloaded from [http://kungf.eu:8081/nexus/service/local/repositories/releases/content/uk/ac/susx/mlcl/jdbm/3.0-alpha3/jdbm-3.0-alpha3.jar](http://kungf.eu:8081/nexus/service/local/repositories/releases/content/uk/ac/susx/mlcl/jdbm/3.0-alpha3/jdbm-3.0-alpha3.jar)
 
 The following additional dependancies are optional:
 
@@ -71,10 +71,10 @@ First source distribution. To compile the software from the command line:
 
 ```sh
 $ cd path/to/byblo/source/distribution
-$ mvn package
+$ mvn -P release install
 ```
 
-This will download all dependencies, compile the source code, and create a new directory `/target/` containing the project `jar` archive, and the various assemblies. (See Build Output bellow)
+This will download all dependencies, compile the source code, and create a new directory `/target/` containing the project `jar` archive, and the various assemblies. (See Build Output bellow) The command will also install the generated artefacts in your local maven repository.
 
 ### Building with Netbeans IDE.
 
@@ -133,6 +133,8 @@ This project is supported a TSB (Technology Strategy Board) grant reference GCL-
 Special thanks to all members of the Machine Learning and Computational Linguistics Lab, Department of Informatics, University of Sussex, for all the helpful input.
 
 ## Contributing
+
+In the event that you discover a bug whiles using Byblo, please submit a detailed report on our issue tracker: [https://github.com/MLCL/Byblo/issues](https://github.com/MLCL/Byblo/issues)
 
 To contribute to the project you should fork the git repository. First click the "Fork" button on github. Then open a console and type the following:
 
