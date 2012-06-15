@@ -93,7 +93,7 @@ public class MemoryUsage {
 
             arrayOverheadBits = theUnsafe.arrayBaseOffset(int[].class) * 8;
             arrayReferenceBits = theUnsafe.arrayIndexScale(Object[].class) * 8;
-            
+
             alignmentBits = 64; //java64bit ? 64 : 32;
 
         } catch (Exception ex) {
@@ -252,7 +252,7 @@ public class MemoryUsage {
      * Produce an information string detailing the number of classes and objects
      * seen, with their estimated memory consumption.
      *
-     * @return
+     * @return string representation of this object
      */
     public String getInfoString() {
         return MessageFormat.format(
@@ -266,7 +266,7 @@ public class MemoryUsage {
 
     /**
      *
-     * @return
+     * @return string representation of this object
      */
     @Override
     public String toString() {
@@ -297,7 +297,7 @@ public class MemoryUsage {
      * Reset the MemoryProfiler object, clearing the caches and setting all size
      * counters back to 0.
      *
-     * @return self
+     * @return self (for method chaining)
      */
     public MemoryUsage clear() {
         assert queue.isEmpty();
@@ -442,7 +442,7 @@ public class MemoryUsage {
     /**
      *
      * @param bits
-     * @return
+     * @return aligned bits required to store the given unaligned bits
      */
     private long align(long bits) {
         return bits + (bits % ALIGNEDMENT_BITS == 0 ? 0

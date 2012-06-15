@@ -127,7 +127,7 @@ public final class ZipfianDistribution {
     /**
      * Generate a random value in the distribution
      *
-     * @return
+     * @return a random value from the distribution
      */
     public int random() {
         return quantile(random == null ? Math.random() : random.nextDouble());
@@ -169,7 +169,7 @@ public final class ZipfianDistribution {
      * that cdf(k) &lt; u &lt; cdf(k+1).
      *
      * @param u probability value
-     * @return
+     * @return minimum rank that is at least a probable as u
      */
     private int quantile(double u) {
         Checks.checkRangeIncl(u, 0, 1);
@@ -183,7 +183,7 @@ public final class ZipfianDistribution {
      * @param u
      * @param min
      * @param max
-     * @return
+     * @return that is at least a probable as u in the rank interval [min,max]
      */
     private int quantile0(double u, int min, int max) {
         assert u >= 0.0 && u <= 1.0;
@@ -202,6 +202,12 @@ public final class ZipfianDistribution {
         }
     }
 
+    /**
+     *
+     * @param n
+     * @param s
+     * @return nth harmonic number of power s
+     */
     protected static double harm(long n, double s) {
         if (s == 1) {
             return harm0_s1(n);
@@ -216,7 +222,7 @@ public final class ZipfianDistribution {
      * method.
      *
      * @param n
-     * @return
+     * @return nth harmonic number of power 1
      */
     protected static double harm0_s1(long n) {
         Checks.checkRangeIncl(n, 1, Integer.MAX_VALUE);
@@ -231,6 +237,12 @@ public final class ZipfianDistribution {
                 + 1.0 / (240.0 * n * n * n * n * n * n * n * n);
     }
 
+    /**
+     *
+     * @param n
+     * @param s
+     * @return  nth harmonic number of power 1
+     */
     protected static double harm1(long n, double s) {
         Checks.checkRangeIncl(n, 1, Integer.MAX_VALUE);
 

@@ -36,29 +36,29 @@ import java.security.Permission;
 import java.text.MessageFormat;
 
 /**
- * Static utility class that allows calls to {@link java.lang.System#exit(int)}
- * to be intercepted.  This makes direct testing of <tt>main</tt> methods 
- * possible, since all calls to {@link System#exit(int) } result in a runtime 
+ * Static utility class that allows calls to {@link java.lang.System#exit(int) }
+ * to be intercepted.  This makes direct testing of <tt>main</tt> methods
+ * possible, since all calls to {@link java.lang.System#exit(int) } result in a runtime
  * {@link ExitException}, rather than simply terminating the forked VM (passing
  * the test).
- * 
- * <p>When exit trapping is enabled, the previously installed 
- * {@link java.lang.SecurityManager} will be temporarily encapsulate, 
- * over-riding {@link java.lang.SecurityManager#checkExit(int)}. It will pass 
- * all other security related checks to the encapsulated security manager (if 
- * there was one). When trapping is disabled the previously installed manager 
+ *
+ * <p>When exit trapping is enabled, the previously installed
+ * {@link java.lang.SecurityManager} will be temporarily encapsulate,
+ * over-riding {@link java.lang.SecurityManager#checkExit(int)}. It will pass
+ * all other security related checks to the encapsulated security manager (if
+ * there was one). When trapping is disabled the previously installed manager
  * will be re-instated.</p>
- * 
- * <p>Take care that there are guarantees in place to insure ExitTrapper is 
+ *
+ * <p>Take care that there are guarantees in place to insure ExitTrapper is
  * disabled when not required, otherwise it's functionality will bleed into
  * other area of VM. To insure ExitTrapper is disabled enclosed it in a
  * <tt>try/finally</tt> block:</p>
  * <pre>
  *  try {
  *      ExitTrapper.enableExistTrapping();
- * 
+ *
  *      // Do trapped stuff here...
- * 
+ *
  *  } catch(ExitException ex) {
  *      // System.exit() was called
  *      int status = ex.getStatus();
@@ -67,7 +67,7 @@ import java.text.MessageFormat;
  *      ExitTrapper.disableExitTrapping();
  *  }
  * </pre>
- * 
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class ExitTrapper {
@@ -111,7 +111,7 @@ public class ExitTrapper {
 
     /**
      * Return whether or not exit trapping is enabled.
-     * 
+     *
      * @return true if exit trapping is enabled, false otherwise
      */
     public static synchronized boolean isExitTrappingEnabled() {
@@ -120,8 +120,8 @@ public class ExitTrapper {
     }
 
     /**
-     * <tt>ExitException</tt> is a {@link hava.lang.SecurityException } that 
-     * will be thrown when {@link java.lang.System#exit(int)} is called and 
+     * <tt>ExitException</tt> is a {@link java.lang.SecurityException } that
+     * will be thrown when {@link java.lang.System#exit(int)} is called and
      * trapping is enabled.
      */
     public static final class ExitException extends SecurityException {
@@ -138,7 +138,7 @@ public class ExitTrapper {
 
         /**
          * Construct a new ExitException with the given exit status code.
-         * 
+         *
          * @param status Code passed to {@link java.lang.System#exit(int)}
          */
         public ExitException(int status) {
@@ -148,7 +148,7 @@ public class ExitTrapper {
 
         /**
          * The status code that was passed to {@link java.lang.System#exit(int)}
-         * 
+         *
          * @return The status code of trapped exit.
          */
         public final int getStatus() {
@@ -191,7 +191,7 @@ public class ExitTrapper {
     }
 
     /**
-     * SecurityManagerDecoratorAdapter wraps a given security manager, 
+     * SecurityManagerDecoratorAdapter wraps a given security manager,
      * delegating all calls to the inner class. This class is intended to be
      * extended, with only a subset of the method overridden.
      */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2012, University of Sussex
+ * Copyright (c) 2010-2012, MLCL, University of Sussex
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -380,7 +380,7 @@ public final class ArrayMath {
     public static byte variance(byte[] values, int fromIndex, int toIndex) {
 		byte u = mean(values, fromIndex, toIndex);
 		byte s2 = 0;
-		for(int i = fromIndex; i < toIndex; i++) 
+		for(int i = fromIndex; i < toIndex; i++)
 			s2 += (values[i] - u) * (values[i] - u);
 		return (byte)(s2 / (toIndex - fromIndex));
     }
@@ -388,11 +388,11 @@ public final class ArrayMath {
     public static byte variance(byte[] values, int fromIndex) {
 		return (byte)variance(values, fromIndex, values.length);
 	}
-    
+
     public static byte variance(byte[] values) {
 		return (byte)variance(values, 0, values.length);
 	}
-	
+
     public static byte stddev(byte[] values, int fromIndex, int toIndex) {
 		return (byte)Math.sqrt(variance(values, fromIndex, toIndex));
     }
@@ -400,16 +400,16 @@ public final class ArrayMath {
     public static byte stddev(byte[] values, int fromIndex) {
 		return (byte)Math.sqrt(variance(values, fromIndex));
 	}
-    
+
     public static byte stddev(byte[] values) {
 		return (byte)Math.sqrt(variance(values));
 	}
-	
+
 
     public static byte sampleVariance(byte[] values, int fromIndex, int toIndex) {
 		byte u = mean(values, fromIndex, toIndex);
 		byte s2 = 0;
-		for(int i = fromIndex; i < toIndex; i++) 
+		for(int i = fromIndex; i < toIndex; i++)
 			s2 += (values[i] - u) * (values[i] - u);
 		return (byte)(s2 / ((toIndex - fromIndex) - 1));
     }
@@ -417,11 +417,11 @@ public final class ArrayMath {
     public static byte sampleVariance(byte[] values, int fromIndex) {
 		return (byte)sampleVariance(values, fromIndex, values.length);
 	}
-    
+
     public static byte sampleVariance(byte[] values) {
 		return (byte)sampleVariance(values, 0, values.length);
 	}
-	
+
     public static byte sampleStddev(byte[] values, int fromIndex, int toIndex) {
 		return (byte)Math.sqrt(sampleVariance(values, fromIndex, toIndex));
     }
@@ -429,17 +429,17 @@ public final class ArrayMath {
     public static byte sampleStddev(byte[] values, int fromIndex) {
 		return (byte)Math.sqrt(sampleVariance(values, fromIndex));
 	}
-    
+
     public static byte sampleStddev(byte[] values) {
 		return (byte)Math.sqrt(sampleVariance(values));
 	}
-	
-		
-    
+
+
+
     /**
      * Return the median average of the values passed as argument.
      *
-     * @param vals 1 or more values
+     * @param values 1 or more values
      * @return the media value of the values
      * @throws IllegalArgumentException if no values are passed
      * @throws NullPointerException if a null object of type {@code double[]}
@@ -780,7 +780,7 @@ public final class ArrayMath {
     public static char variance(char[] values, int fromIndex, int toIndex) {
 		char u = mean(values, fromIndex, toIndex);
 		char s2 = 0;
-		for(int i = fromIndex; i < toIndex; i++) 
+		for(int i = fromIndex; i < toIndex; i++)
 			s2 += (values[i] - u) * (values[i] - u);
 		return (char)(s2 / (toIndex - fromIndex));
     }
@@ -788,11 +788,11 @@ public final class ArrayMath {
     public static char variance(char[] values, int fromIndex) {
 		return (char)variance(values, fromIndex, values.length);
 	}
-    
+
     public static char variance(char[] values) {
 		return (char)variance(values, 0, values.length);
 	}
-	
+
     public static char stddev(char[] values, int fromIndex, int toIndex) {
 		return (char)Math.sqrt(variance(values, fromIndex, toIndex));
     }
@@ -800,16 +800,16 @@ public final class ArrayMath {
     public static char stddev(char[] values, int fromIndex) {
 		return (char)Math.sqrt(variance(values, fromIndex));
 	}
-    
+
     public static char stddev(char[] values) {
 		return (char)Math.sqrt(variance(values));
 	}
-	
+
 
     public static char sampleVariance(char[] values, int fromIndex, int toIndex) {
 		char u = mean(values, fromIndex, toIndex);
 		char s2 = 0;
-		for(int i = fromIndex; i < toIndex; i++) 
+		for(int i = fromIndex; i < toIndex; i++)
 			s2 += (values[i] - u) * (values[i] - u);
 		return (char)(s2 / ((toIndex - fromIndex) - 1));
     }
@@ -817,11 +817,11 @@ public final class ArrayMath {
     public static char sampleVariance(char[] values, int fromIndex) {
 		return (char)sampleVariance(values, fromIndex, values.length);
 	}
-    
+
     public static char sampleVariance(char[] values) {
 		return (char)sampleVariance(values, 0, values.length);
 	}
-	
+
     public static char sampleStddev(char[] values, int fromIndex, int toIndex) {
 		return (char)Math.sqrt(sampleVariance(values, fromIndex, toIndex));
     }
@@ -829,17 +829,17 @@ public final class ArrayMath {
     public static char sampleStddev(char[] values, int fromIndex) {
 		return (char)Math.sqrt(sampleVariance(values, fromIndex));
 	}
-    
+
     public static char sampleStddev(char[] values) {
 		return (char)Math.sqrt(sampleVariance(values));
 	}
-	
-		
-    
+
+
+
     /**
      * Return the median average of the values passed as argument.
      *
-     * @param vals 1 or more values
+     * @param values 1 or more values
      * @return the media value of the values
      * @throws IllegalArgumentException if no values are passed
      * @throws NullPointerException if a null object of type {@code double[]}
@@ -1180,7 +1180,7 @@ public final class ArrayMath {
     public static short variance(short[] values, int fromIndex, int toIndex) {
 		short u = mean(values, fromIndex, toIndex);
 		short s2 = 0;
-		for(int i = fromIndex; i < toIndex; i++) 
+		for(int i = fromIndex; i < toIndex; i++)
 			s2 += (values[i] - u) * (values[i] - u);
 		return (short)(s2 / (toIndex - fromIndex));
     }
@@ -1188,11 +1188,11 @@ public final class ArrayMath {
     public static short variance(short[] values, int fromIndex) {
 		return (short)variance(values, fromIndex, values.length);
 	}
-    
+
     public static short variance(short[] values) {
 		return (short)variance(values, 0, values.length);
 	}
-	
+
     public static short stddev(short[] values, int fromIndex, int toIndex) {
 		return (short)Math.sqrt(variance(values, fromIndex, toIndex));
     }
@@ -1200,16 +1200,16 @@ public final class ArrayMath {
     public static short stddev(short[] values, int fromIndex) {
 		return (short)Math.sqrt(variance(values, fromIndex));
 	}
-    
+
     public static short stddev(short[] values) {
 		return (short)Math.sqrt(variance(values));
 	}
-	
+
 
     public static short sampleVariance(short[] values, int fromIndex, int toIndex) {
 		short u = mean(values, fromIndex, toIndex);
 		short s2 = 0;
-		for(int i = fromIndex; i < toIndex; i++) 
+		for(int i = fromIndex; i < toIndex; i++)
 			s2 += (values[i] - u) * (values[i] - u);
 		return (short)(s2 / ((toIndex - fromIndex) - 1));
     }
@@ -1217,11 +1217,11 @@ public final class ArrayMath {
     public static short sampleVariance(short[] values, int fromIndex) {
 		return (short)sampleVariance(values, fromIndex, values.length);
 	}
-    
+
     public static short sampleVariance(short[] values) {
 		return (short)sampleVariance(values, 0, values.length);
 	}
-	
+
     public static short sampleStddev(short[] values, int fromIndex, int toIndex) {
 		return (short)Math.sqrt(sampleVariance(values, fromIndex, toIndex));
     }
@@ -1229,17 +1229,17 @@ public final class ArrayMath {
     public static short sampleStddev(short[] values, int fromIndex) {
 		return (short)Math.sqrt(sampleVariance(values, fromIndex));
 	}
-    
+
     public static short sampleStddev(short[] values) {
 		return (short)Math.sqrt(sampleVariance(values));
 	}
-	
-		
-    
+
+
+
     /**
      * Return the median average of the values passed as argument.
      *
-     * @param vals 1 or more values
+     * @param values 1 or more values
      * @return the media value of the values
      * @throws IllegalArgumentException if no values are passed
      * @throws NullPointerException if a null object of type {@code double[]}
@@ -1580,7 +1580,7 @@ public final class ArrayMath {
     public static int variance(int[] values, int fromIndex, int toIndex) {
 		int u = mean(values, fromIndex, toIndex);
 		int s2 = 0;
-		for(int i = fromIndex; i < toIndex; i++) 
+		for(int i = fromIndex; i < toIndex; i++)
 			s2 += (values[i] - u) * (values[i] - u);
 		return (int)(s2 / (toIndex - fromIndex));
     }
@@ -1588,11 +1588,11 @@ public final class ArrayMath {
     public static int variance(int[] values, int fromIndex) {
 		return (int)variance(values, fromIndex, values.length);
 	}
-    
+
     public static int variance(int[] values) {
 		return (int)variance(values, 0, values.length);
 	}
-	
+
     public static int stddev(int[] values, int fromIndex, int toIndex) {
 		return (int)Math.sqrt(variance(values, fromIndex, toIndex));
     }
@@ -1600,16 +1600,16 @@ public final class ArrayMath {
     public static int stddev(int[] values, int fromIndex) {
 		return (int)Math.sqrt(variance(values, fromIndex));
 	}
-    
+
     public static int stddev(int[] values) {
 		return (int)Math.sqrt(variance(values));
 	}
-	
+
 
     public static int sampleVariance(int[] values, int fromIndex, int toIndex) {
 		int u = mean(values, fromIndex, toIndex);
 		int s2 = 0;
-		for(int i = fromIndex; i < toIndex; i++) 
+		for(int i = fromIndex; i < toIndex; i++)
 			s2 += (values[i] - u) * (values[i] - u);
 		return (int)(s2 / ((toIndex - fromIndex) - 1));
     }
@@ -1617,11 +1617,11 @@ public final class ArrayMath {
     public static int sampleVariance(int[] values, int fromIndex) {
 		return (int)sampleVariance(values, fromIndex, values.length);
 	}
-    
+
     public static int sampleVariance(int[] values) {
 		return (int)sampleVariance(values, 0, values.length);
 	}
-	
+
     public static int sampleStddev(int[] values, int fromIndex, int toIndex) {
 		return (int)Math.sqrt(sampleVariance(values, fromIndex, toIndex));
     }
@@ -1629,17 +1629,17 @@ public final class ArrayMath {
     public static int sampleStddev(int[] values, int fromIndex) {
 		return (int)Math.sqrt(sampleVariance(values, fromIndex));
 	}
-    
+
     public static int sampleStddev(int[] values) {
 		return (int)Math.sqrt(sampleVariance(values));
 	}
-	
-		
-    
+
+
+
     /**
      * Return the median average of the values passed as argument.
      *
-     * @param vals 1 or more values
+     * @param values 1 or more values
      * @return the media value of the values
      * @throws IllegalArgumentException if no values are passed
      * @throws NullPointerException if a null object of type {@code double[]}
@@ -1980,7 +1980,7 @@ public final class ArrayMath {
     public static long variance(long[] values, int fromIndex, int toIndex) {
 		long u = mean(values, fromIndex, toIndex);
 		long s2 = 0;
-		for(int i = fromIndex; i < toIndex; i++) 
+		for(int i = fromIndex; i < toIndex; i++)
 			s2 += (values[i] - u) * (values[i] - u);
 		return (long)(s2 / (toIndex - fromIndex));
     }
@@ -1988,11 +1988,11 @@ public final class ArrayMath {
     public static long variance(long[] values, int fromIndex) {
 		return (long)variance(values, fromIndex, values.length);
 	}
-    
+
     public static long variance(long[] values) {
 		return (long)variance(values, 0, values.length);
 	}
-	
+
     public static long stddev(long[] values, int fromIndex, int toIndex) {
 		return (long)Math.sqrt(variance(values, fromIndex, toIndex));
     }
@@ -2000,16 +2000,16 @@ public final class ArrayMath {
     public static long stddev(long[] values, int fromIndex) {
 		return (long)Math.sqrt(variance(values, fromIndex));
 	}
-    
+
     public static long stddev(long[] values) {
 		return (long)Math.sqrt(variance(values));
 	}
-	
+
 
     public static long sampleVariance(long[] values, int fromIndex, int toIndex) {
 		long u = mean(values, fromIndex, toIndex);
 		long s2 = 0;
-		for(int i = fromIndex; i < toIndex; i++) 
+		for(int i = fromIndex; i < toIndex; i++)
 			s2 += (values[i] - u) * (values[i] - u);
 		return (long)(s2 / ((toIndex - fromIndex) - 1));
     }
@@ -2017,11 +2017,11 @@ public final class ArrayMath {
     public static long sampleVariance(long[] values, int fromIndex) {
 		return (long)sampleVariance(values, fromIndex, values.length);
 	}
-    
+
     public static long sampleVariance(long[] values) {
 		return (long)sampleVariance(values, 0, values.length);
 	}
-	
+
     public static long sampleStddev(long[] values, int fromIndex, int toIndex) {
 		return (long)Math.sqrt(sampleVariance(values, fromIndex, toIndex));
     }
@@ -2029,17 +2029,17 @@ public final class ArrayMath {
     public static long sampleStddev(long[] values, int fromIndex) {
 		return (long)Math.sqrt(sampleVariance(values, fromIndex));
 	}
-    
+
     public static long sampleStddev(long[] values) {
 		return (long)Math.sqrt(sampleVariance(values));
 	}
-	
-		
-    
+
+
+
     /**
      * Return the median average of the values passed as argument.
      *
-     * @param vals 1 or more values
+     * @param values 1 or more values
      * @return the media value of the values
      * @throws IllegalArgumentException if no values are passed
      * @throws NullPointerException if a null object of type {@code double[]}
@@ -2380,7 +2380,7 @@ public final class ArrayMath {
     public static float variance(float[] values, int fromIndex, int toIndex) {
 		float u = mean(values, fromIndex, toIndex);
 		float s2 = 0;
-		for(int i = fromIndex; i < toIndex; i++) 
+		for(int i = fromIndex; i < toIndex; i++)
 			s2 += (values[i] - u) * (values[i] - u);
 		return (float)(s2 / (toIndex - fromIndex));
     }
@@ -2388,11 +2388,11 @@ public final class ArrayMath {
     public static float variance(float[] values, int fromIndex) {
 		return (float)variance(values, fromIndex, values.length);
 	}
-    
+
     public static float variance(float[] values) {
 		return (float)variance(values, 0, values.length);
 	}
-	
+
     public static float stddev(float[] values, int fromIndex, int toIndex) {
 		return (float)Math.sqrt(variance(values, fromIndex, toIndex));
     }
@@ -2400,16 +2400,16 @@ public final class ArrayMath {
     public static float stddev(float[] values, int fromIndex) {
 		return (float)Math.sqrt(variance(values, fromIndex));
 	}
-    
+
     public static float stddev(float[] values) {
 		return (float)Math.sqrt(variance(values));
 	}
-	
+
 
     public static float sampleVariance(float[] values, int fromIndex, int toIndex) {
 		float u = mean(values, fromIndex, toIndex);
 		float s2 = 0;
-		for(int i = fromIndex; i < toIndex; i++) 
+		for(int i = fromIndex; i < toIndex; i++)
 			s2 += (values[i] - u) * (values[i] - u);
 		return (float)(s2 / ((toIndex - fromIndex) - 1));
     }
@@ -2417,11 +2417,11 @@ public final class ArrayMath {
     public static float sampleVariance(float[] values, int fromIndex) {
 		return (float)sampleVariance(values, fromIndex, values.length);
 	}
-    
+
     public static float sampleVariance(float[] values) {
 		return (float)sampleVariance(values, 0, values.length);
 	}
-	
+
     public static float sampleStddev(float[] values, int fromIndex, int toIndex) {
 		return (float)Math.sqrt(sampleVariance(values, fromIndex, toIndex));
     }
@@ -2429,17 +2429,17 @@ public final class ArrayMath {
     public static float sampleStddev(float[] values, int fromIndex) {
 		return (float)Math.sqrt(sampleVariance(values, fromIndex));
 	}
-    
+
     public static float sampleStddev(float[] values) {
 		return (float)Math.sqrt(sampleVariance(values));
 	}
-	
-		
-    
+
+
+
     /**
      * Return the median average of the values passed as argument.
      *
-     * @param vals 1 or more values
+     * @param values 1 or more values
      * @return the media value of the values
      * @throws IllegalArgumentException if no values are passed
      * @throws NullPointerException if a null object of type {@code double[]}
@@ -2485,21 +2485,21 @@ public final class ArrayMath {
 
     public static float[] round(final float[] arr) {
         final float[] result = new float[arr.length];
-        for (int i = 0; i < arr.length; i++) 
+        for (int i = 0; i < arr.length; i++)
             result[i] = (float)Math.round(arr[i]);
         return result;
     }
 
     public static float[] floor(final float[] arr) {
         final float[] result = new float[arr.length];
-        for (int i = 0; i < arr.length; i++) 
+        for (int i = 0; i < arr.length; i++)
             result[i] = (float)Math.floor(arr[i]);
         return result;
     }
 
     public static float[] ceil(final float[] arr) {
         final float[] result = new float[arr.length];
-        for (int i = 0; i < arr.length; i++) 
+        for (int i = 0; i < arr.length; i++)
             result[i] = (float)Math.ceil(arr[i]);
         return result;
     }
@@ -2803,7 +2803,7 @@ public final class ArrayMath {
     public static double variance(double[] values, int fromIndex, int toIndex) {
 		double u = mean(values, fromIndex, toIndex);
 		double s2 = 0;
-		for(int i = fromIndex; i < toIndex; i++) 
+		for(int i = fromIndex; i < toIndex; i++)
 			s2 += (values[i] - u) * (values[i] - u);
 		return (double)(s2 / (toIndex - fromIndex));
     }
@@ -2811,11 +2811,11 @@ public final class ArrayMath {
     public static double variance(double[] values, int fromIndex) {
 		return (double)variance(values, fromIndex, values.length);
 	}
-    
+
     public static double variance(double[] values) {
 		return (double)variance(values, 0, values.length);
 	}
-	
+
     public static double stddev(double[] values, int fromIndex, int toIndex) {
 		return (double)Math.sqrt(variance(values, fromIndex, toIndex));
     }
@@ -2823,16 +2823,16 @@ public final class ArrayMath {
     public static double stddev(double[] values, int fromIndex) {
 		return (double)Math.sqrt(variance(values, fromIndex));
 	}
-    
+
     public static double stddev(double[] values) {
 		return (double)Math.sqrt(variance(values));
 	}
-	
+
 
     public static double sampleVariance(double[] values, int fromIndex, int toIndex) {
 		double u = mean(values, fromIndex, toIndex);
 		double s2 = 0;
-		for(int i = fromIndex; i < toIndex; i++) 
+		for(int i = fromIndex; i < toIndex; i++)
 			s2 += (values[i] - u) * (values[i] - u);
 		return (double)(s2 / ((toIndex - fromIndex) - 1));
     }
@@ -2840,11 +2840,11 @@ public final class ArrayMath {
     public static double sampleVariance(double[] values, int fromIndex) {
 		return (double)sampleVariance(values, fromIndex, values.length);
 	}
-    
+
     public static double sampleVariance(double[] values) {
 		return (double)sampleVariance(values, 0, values.length);
 	}
-	
+
     public static double sampleStddev(double[] values, int fromIndex, int toIndex) {
 		return (double)Math.sqrt(sampleVariance(values, fromIndex, toIndex));
     }
@@ -2852,17 +2852,17 @@ public final class ArrayMath {
     public static double sampleStddev(double[] values, int fromIndex) {
 		return (double)Math.sqrt(sampleVariance(values, fromIndex));
 	}
-    
+
     public static double sampleStddev(double[] values) {
 		return (double)Math.sqrt(sampleVariance(values));
 	}
-	
-		
-    
+
+
+
     /**
      * Return the median average of the values passed as argument.
      *
-     * @param vals 1 or more values
+     * @param values 1 or more values
      * @return the media value of the values
      * @throws IllegalArgumentException if no values are passed
      * @throws NullPointerException if a null object of type {@code double[]}
@@ -2908,21 +2908,21 @@ public final class ArrayMath {
 
     public static double[] round(final double[] arr) {
         final double[] result = new double[arr.length];
-        for (int i = 0; i < arr.length; i++) 
+        for (int i = 0; i < arr.length; i++)
             result[i] = (double)Math.round(arr[i]);
         return result;
     }
 
     public static double[] floor(final double[] arr) {
         final double[] result = new double[arr.length];
-        for (int i = 0; i < arr.length; i++) 
+        for (int i = 0; i < arr.length; i++)
             result[i] = (double)Math.floor(arr[i]);
         return result;
     }
 
     public static double[] ceil(final double[] arr) {
         final double[] result = new double[arr.length];
-        for (int i = 0; i < arr.length; i++) 
+        for (int i = 0; i < arr.length; i++)
             result[i] = (double)Math.ceil(arr[i]);
         return result;
     }

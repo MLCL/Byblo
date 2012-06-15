@@ -33,11 +33,11 @@ package uk.ac.susx.mlcl.lib.io;
 import java.io.IOException;
 
 /**
- * <p>Interface defining a data-store that can be random-accessed to some 
+ * <p>Interface defining a data-store that can be random-accessed to some
  * extent.</p>
- * 
- * <p>Generally this is combined with an enumeration interface such as 
- * {@link Source} to allow positions to re-visited.</p>
+ *
+ * <p>Generally this is combined with an enumeration interface such as
+ * {@link ObjectSource} to allow positions to re-visited.</p>
  *
  * <p>Random access is used by some AllPairs implementations so they can record
  * read-offsets at certain times, then return to those offsets later. It allows

@@ -134,7 +134,7 @@ public final class Comparators {
      *
      * @param <T>
      * @param comparators
-     * @return
+     * @return produce a comparator that backsoff to each listed comparator
      */
     public static <T> Comparator<T> fallback(
             final Comparator<T>... comparators) {
@@ -150,7 +150,7 @@ public final class Comparators {
      *
      * @param <T>
      * @param comparators
-     * @return
+     * @return produce a comparator that backsoff to each listed comparator
      */
     public static <T> Comparator<T> fallback(
             final List<Comparator<T>> comparators) {
@@ -162,7 +162,7 @@ public final class Comparators {
     }
 
     /**
-     * 
+     *
      * @param <T>
      */
     private static class FallbackComparator<T>
@@ -234,7 +234,7 @@ public final class Comparators {
      * objects.
      *
      * @param <T> Type of object being compared
-     * @return comparator
+     * @return comparator object that uses it's operand's natural order
      */
     public static <T extends Comparable<T>> Comparator<T> naturalOrder() {
         return new Comparator<T>() {
@@ -255,7 +255,7 @@ public final class Comparators {
      * better way to hand this.
      *
      * @param <T> type of object being compared
-     * @return comparator
+     * @return comparator object that uses it's operand's natural order
      */
     public static <T> Comparator<T> naturalOrderIfPossible() {
         return new Comparator<T>() {
@@ -281,7 +281,7 @@ public final class Comparators {
      * before comparison, and uses less memory.
      *
      * @param <T>
-     * @return
+     * @return a string comparator that ignores alphabetical case
      */
     public <T extends CharSequence> Comparator<T> caseInsensitiveStringComparator() {
         return new CaseInsensitiveStringComparator<T>();
