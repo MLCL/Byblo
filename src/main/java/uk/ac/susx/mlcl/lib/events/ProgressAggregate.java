@@ -133,12 +133,11 @@ public class ProgressAggregate extends ProgressDeligate {
 
     /**
      *
-     * @return
+     * @return string representation of the progress
      */
     @Override
     public String getProgressReport() {
         return getDeepProgressReport(0);
-//        return super.getProgressReport();
     }
 
     public String getDeepProgressReport() {
@@ -170,13 +169,9 @@ public class ProgressAggregate extends ProgressDeligate {
         int completed = 0;
         for (ProgressReporting child : children) {
             if (child.getState() == State.COMPLETED) {
-//                System.out.println(child);
                 ++completed;
             }
         }
-//        System.out.println(completed + " / " + children.size());
-
-
         super.fireProgressChangedEvent();
     }
 

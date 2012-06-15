@@ -55,7 +55,7 @@ import uk.ac.susx.mlcl.lib.io.TSV;
  * consisting of two entries, and their weight. In compact mode each TSV record
  * consists of a single entry followed by the second-entry/weight pairs from all
  * sequentially written
- * {@link WeightedEventsSink} objects that share the same first entry.</p>
+ * {@link WeightedTokenPairSink} objects that share the same first entry.</p>
  *
  * Verbose mode example:
  * <pre>

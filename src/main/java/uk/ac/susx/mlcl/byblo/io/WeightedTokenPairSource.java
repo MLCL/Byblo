@@ -37,7 +37,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.lib.C14nCache;
 import uk.ac.susx.mlcl.lib.io.Compact;
 import uk.ac.susx.mlcl.lib.io.Deltas;
 import uk.ac.susx.mlcl.lib.io.Enumerated;
@@ -51,24 +50,18 @@ import uk.ac.susx.mlcl.lib.io.Tell;
  * {@link TokenPair} objects from a flat file.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
- * @see WeightedEntryPairSink
+ * @see WeightedTokenPairSink
  */
 public class WeightedTokenPairSource
         implements SeekableObjectSource<Weighted<TokenPair>, Tell>, Closeable {
 
     private final SeekableDataSource inner;
 
-    public WeightedTokenPairSource(
-            SeekableDataSource inner//, IndexDeligatePair indexDeligate
-            )
+    public WeightedTokenPairSource(SeekableDataSource inner)
             throws FileNotFoundException, IOException {
 
         this.inner = inner;
     }
-
-//    private  static final C14nCache<Weighted<TokenPair>> cache2 = new C14nCache<Weighted<TokenPair>>();
-
-//    private   final C14nCache<TokenPair> cache1 = new C14nCache<TokenPair>();
 
     @Override
     public Weighted<TokenPair> read() throws IOException {
@@ -76,12 +69,7 @@ public class WeightedTokenPairSource
         final int id2 = inner.readInt();
         final double weight = inner.readDouble();
         inner.endOfRecord();
-//        synchronized(cache1) {
-        return new Weighted<TokenPair>(
-//                cache1.cached(new TokenPair(id1, id2))
-                new TokenPair(id1, id2)
-                , weight);
-//        }
+        return new Weighted<TokenPair>(new TokenPair(id1, id2), weight);
     }
 
     public WeightedTokenPairVectorSource getVectorSource() throws IOException {
@@ -108,24 +96,6 @@ public class WeightedTokenPairSource
         if (inner instanceof Closeable)
             ((Closeable) inner).close();
     }
-//
-//    public static boolean equal(File a, File b, Charset charset, boolean skip1, boolean skip2) throws IOException {
-//        DoubleEnumerating idx = new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false, false, null, null);
-//        final WeightedTokenPairSource srcA = WeightedTokenPairSource.open(
-//                a, charset, idx, skip1, skip2);
-//        final WeightedTokenPairSource srcB = WeightedTokenPairSource.open(
-//                b, charset, idx, skip1, skip2);
-//
-//        List<Weighted<TokenPair>> listA = IOUtil.readAll(srcA);
-//        List<Weighted<TokenPair>> listB = IOUtil.readAll(srcB);
-//        Comparator<Weighted<TokenPair>> c =
-//                Comparators.fallback(
-//                Weighted.recordOrder(TokenPair.indexOrder()),
-//                Weighted.<TokenPair>weightOrder());
-//        Collections.sort(listA, c);
-//        Collections.sort(listB, c);
-//        return listA.equals(listB);
-//    }
 
     public static WeightedTokenPairSource open(
             File file, Charset charset, DoubleEnumerating idx, boolean skip1, boolean skip2)

@@ -44,7 +44,7 @@ import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
- * Wraps a {@link WeightedEventsSource} to produce complete feature
+ * Wraps a {@link WeightedTokenPairVectorSource} to produce complete feature
  * vectors instead of just individual entry/feature records.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;

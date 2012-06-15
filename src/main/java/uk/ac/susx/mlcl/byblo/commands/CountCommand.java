@@ -56,10 +56,9 @@ import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
-import uk.ac.susx.mlcl.lib.io.Files;
-import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.events.ProgressEvent;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.io.Files;
 
 /**
  * <p>Read in a raw feature instances file, to produce three frequency files:
@@ -136,7 +135,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
     /**
      * Minimal parameterisation constructor, with all fields that must be set
      * for the task to be functional. Character set will be set to software
-     * default from {@link IOUtil#DEFAULT_CHARSET}.
+     * default from {@link Files#DEFAULT_CHARSET}.
      *
      * @param instancesFile input file containing entry/context instances
      * @param eventsFile output file for entry/context/frequency triples
@@ -157,7 +156,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
     /**
      * Default constructor used by serialisation and JCommander instantiation.
      * All files will initially be set to null. Character set will be set to
-     * software default from {@link IOUtil#DEFAULT_CHARSET}.
+     * software default from {@link Files#DEFAULT_CHARSET}.
      */
     public CountCommand() {
     }

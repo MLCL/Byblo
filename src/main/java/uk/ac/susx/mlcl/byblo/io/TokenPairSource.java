@@ -38,7 +38,6 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
-import uk.ac.susx.mlcl.lib.C14nCache;
 import uk.ac.susx.mlcl.lib.io.Compact;
 import uk.ac.susx.mlcl.lib.io.Deltas;
 import uk.ac.susx.mlcl.lib.io.Enumerated;
@@ -49,10 +48,10 @@ import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
  * An <tt>TokenPairSource</tt> object is used to retrieve
- * {@link Event} objects from a flat file.
+ * {@link TokenPair} objects from a flat file.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
- * @see EventSink
+ * @see TokenPairSink
  */
 public class TokenPairSource
         implements SeekableObjectSource<TokenPair, Tell>, Closeable {
@@ -64,42 +63,17 @@ public class TokenPairSource
         this.inner = inner;
     }
 
-//    private  final C14nCache<TokenPair> cache = new C14nCache<TokenPair>();
-
     @Override
     public TokenPair read() throws IOException {
         try {
             final int id1 = inner.readInt();
             final int id2 = inner.readInt();
             inner.endOfRecord();
-//            synchronized (cache) {
-                return
-//                        cache.cached(new TokenPair(id1, id2));
-                        new TokenPair(id1, id2);
-//            }
+            return new TokenPair(id1, id2);
         } catch (Throwable ex) {
             throw new IOException("Error at position " + position(), ex);
         }
     }
-//
-//    public static boolean equal(File fileA, File fileB, Charset charset,
-//                                DoubleEnumerating aidx, DoubleEnumerating bidx,
-//                                boolean askip1, boolean askip2, boolean bskip1, boolean bskip2)
-//            throws IOException {
-////        DoubleEnumerating idx = EnumeratingDeligates.toPair(
-////                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false,
-////                                              null));
-//        final TokenPairSource srcA = open(fileA, charset, aidx, askip1, askip2);
-//        final TokenPairSource srcB = open(fileB, charset, bidx, bskip1, bskip2);
-//
-//
-//        List<TokenPair> listA = IOUtil.readAll(srcA);
-//        List<TokenPair> listB = IOUtil.readAll(srcB);
-//        Comparator<TokenPair> c = TokenPair.indexOrder();
-//        Collections.sort(listA, c);
-//        Collections.sort(listB, c);
-//        return listA.equals(listB);
-//    }
 
     @Override
     public boolean hasNext() throws IOException {

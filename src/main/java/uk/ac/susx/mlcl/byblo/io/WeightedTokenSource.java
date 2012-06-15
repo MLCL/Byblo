@@ -39,7 +39,6 @@ import java.nio.charset.Charset;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
-import uk.ac.susx.mlcl.lib.C14nCache;
 import uk.ac.susx.mlcl.lib.io.Compact;
 import uk.ac.susx.mlcl.lib.io.Deltas;
 import uk.ac.susx.mlcl.lib.io.Enumerated;
@@ -53,7 +52,7 @@ import uk.ac.susx.mlcl.lib.io.Tell;
  * objects from a flat file.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
- * @see EntrySink
+ * @see WeightedTokenSink
  */
 public class WeightedTokenSource
         implements SeekableObjectSource<Weighted<Token>, Tell>, Closeable {
@@ -77,22 +76,13 @@ public class WeightedTokenSource
         return inner.position();
     }
 
-//    private  final C14nCache<Token> cache1 = new C14nCache<Token>();
-//    private static final  C14nCache<Weighted<Token>> cache2 = new C14nCache<Weighted<Token>>();
-
     @Override
     public Weighted<Token> read() throws IOException {
         final int tokenId = inner.readInt();
         final double weight = inner.readDouble();
         inner.endOfRecord();
 
-//        synchronized (cache1) {
-            return new Weighted<Token>(
-//                    cache1.cached(new Token(tokenId))
-                                    new Token(tokenId)
-                    , weight);
-//        }
-
+        return new Weighted<Token>(new Token(tokenId), weight);
     }
 
     public static WeightedTokenSource open(
@@ -116,38 +106,6 @@ public class WeightedTokenSource
             tsv = Enumerated.enumerated(tsv, idx.getEnumerator());
         return new WeightedTokenSource(tsv);
     }
-//
-//    public static boolean equal(File a, File b, Charset charset,
-//                                boolean askip1, boolean bskip1) throws IOException {
-//        SingleEnumerating idx = new SingleEnumeratingDeligate(EnumeratorType.JDBC, true, null);
-//        final WeightedTokenSource srcA = open(a, charset, idx, askip1);
-//        final WeightedTokenSource srcB = open(b, charset, idx, bskip1);
-//
-//        List<Weighted<Token>> listA = IOUtil.readAll(srcA);
-//        List<Weighted<Token>> listB = IOUtil.readAll(srcB);
-//        Comparator<Weighted<Token>> c = Comparators.fallback(
-//                Weighted.recordOrder(Token.indexOrder()),
-//                Weighted.<Token>weightOrder());
-//        Collections.sort(listA, c);
-//        Collections.sort(listB, c);
-//        return listA.equals(listB);
-//    }
-//
-//    public static boolean equal(File a, File b, Charset charset,
-//                                SingleEnumeratingDeligate aidx, SingleEnumeratingDeligate bidx,
-//                                boolean askip1, boolean bskip1) throws IOException {
-//        final WeightedTokenSource srcA = open(a, charset, aidx, askip1);
-//        final WeightedTokenSource srcB = open(b, charset, bidx, bskip1);
-//
-//        List<Weighted<Token>> listA = IOUtil.readAll(srcA);
-//        List<Weighted<Token>> listB = IOUtil.readAll(srcB);
-//        Comparator<Weighted<Token>> c = Comparators.fallback(
-//                Weighted.recordOrder(Token.indexOrder()),
-//                Weighted.<Token>weightOrder());
-//        Collections.sort(listA, c);
-//        Collections.sort(listB, c);
-//        return listA.equals(listB);
-//    }
 
     @Override
     public boolean hasNext() throws IOException {

@@ -524,9 +524,9 @@ public final class Lexer implements Seekable<Tell>, Closeable {
      * <code>offset</code>. If the
      * <code>offset</code> is not at a valid lexical boundary, behavior will be
      * undefined. Correct behavior is only guaranteed when the given
-     * <code>offset</code> is a value previously return by a call to {@link #tell()}.</p>
+     * <code>offset</code> is a value previously return by a call to {@link #position()}.</p>
      *
-     * <p>Note: After performing a {@link #seek(Tell)}, the line and column
+     * <p>Note: After performing a {@link #position(uk.ac.susx.mlcl.lib.io.Tell)}, the line and column
      * number may be incorrect. The column number will correct itself after the
      * next new-line, but the line number will always be wrong, unless a seek(0)
      * is performed. After a call to seek the following fields may be
