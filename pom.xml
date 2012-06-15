@@ -36,7 +36,7 @@
 
     <groupId>uk.ac.susx.mlcl</groupId>
     <artifactId>mlcl-lib</artifactId>
-    <version>0.2</version>
+    <version>0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>mlcl-lib</name>
@@ -54,7 +54,7 @@
 
     <scm>
         <connection>scm:git:git://github.com/MLCL/MLCLLib.git</connection>
-        <tag>mlcl-lib-0.2</tag>
+        <tag>HEAD</tag>
         <url>https://github.com/MLCL/MLCLLib</url>
     </scm>
 
