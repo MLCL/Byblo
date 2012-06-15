@@ -137,6 +137,11 @@
                         </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <instructions>
+                        <Export-Package>uk.ac.susx.mlcl.lib.*</Export-Package>
+                    </instructions>
+                </configuration>
             </plugin>
 
             <plugin>
@@ -192,7 +197,7 @@
                             <strictCheck>true</strictCheck>
                             <quiet>false</quiet>
                             <header>src/license/license-header.txt</header>
-                         <includes>
+                            <includes>
                                 <include>src/**</include>
                                 <include>pom.xml</include>
                             </includes>
