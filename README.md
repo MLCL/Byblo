@@ -35,11 +35,11 @@ The resultant thesaurus will have a highly semantic notion of similarity. The ne
 ## Distribution 
 
 The software is primarily distributed in source-code form. Binaries may be available sporadically, and on request. 
-The source code can be acquired from the [github repository](https://github.com/hamishmorgan/Byblo), click the *Downloads* button, and select a version to download an archive of the source code.
+The source code can be acquired from the [github repository](https://github.com/MLCL/Byblo), click the *Downloads* button, and select a version to download an archive of the source code.
 
 ## Dependencies
 
-The project requires [Java 6](http://www.oracle.com/technetwork/java/javase/downloads/index.html) installed on the system. It also requires a unix command-line such as Linux or Mac OS X. Windows users may get it to work through [Cygwin](http://www.cygwin.com). The software is compiled using an [Apache Ant](http://ant.apache.org) script. In addition the following Java libraries are required:
+The project requires [Java 6](http://www.oracle.com/technetwork/java/javase/downloads/index.html) installed on the system. It also requires a unix command-line such as Linux or Mac OS X. Windows users may get it to work through [Cygwin](http://www.cygwin.com). The software is compiled using an [Apache Maven](http://maven.apache.org) script. In addition the following Java libraries are required:
 
  * [Google Guava 10.0.1](http://code.google.com/p/guava-libraries/) -- A library containing numerous useful features and tools; mostly the kind of things that should have been included with Java in the first place.
 
@@ -49,22 +49,17 @@ The project requires [Java 6](http://www.oracle.com/technetwork/java/javase/down
 
  * [Commons Logging 1.1.1](http://commons.apache.org/logging/) -- A very light weight wrapper API that enables logging frameworks to be configured and "plugged in" at runtime. 
 
- * [MLCL Lib 0.1.0](https://github.com/MLCL/MLCLLib) -- A collection of generic Java utilities and classes developed by the authors of Byblo, for use in this and other projects.
+ * [MLCL Lib 0.2-SNAPSHOT](https://github.com/MLCL/MLCLLib) -- A collection of generic Java utilities and classes developed by the authors of Byblo, for use in this and other projects.
+
+ * [JDBM3 3.0-alpha3](https://github.com/jankotek/JDBM3) -- Embedded Key Value Java Database. Note that at time of writing there is no stable release,
+but the dependancy will be updated as soon as there is. The jar can be downloaded from [http://kungf.eu:8081/nexus/service/local/repositories/releases/content/uk/ac/susx/mlcl/jdbm/3.0-alpha3/jdbm-3.0-alpha3.jar](http://kungf.eu:8081/nexus/service/local/repositories/releases/content/uk/ac/susx/mlcl/jdbm/3.0-alpha3/jdbm-3.0-alpha3.jar)
 
 The following additional dependancies are optional:
 
  * [JUnit 4.10](http://www.junit.org/) -- Required for unit testing the project.
 
- * [Log4J 1.2](http://logging.apache.org/log4j/1.2/) -- Can be used as a replacement for JDK 1.4 Logging, at the users discretion. Simply place the log4j jar files in the ```libs``` directory before building, or in ```dist/libs``` at run-time.
+ * [Log4J 1.2](http://logging.apache.org/log4j/1.2/) -- Can be used as a replacement for JDK 1.4 Logging, at the users discretion. 
 
-All except JCommander are available in pre-compiled binary form. Simply place the `.jar` files in the `/libs/` directory. In the case JCommander you must compile it first using [maven](http://maven.apache.org/).
-
-For convenience a script has been provided to automatically download and compile the dependancies. Simply run:
-
-```sh
-$ cd libs
-$ ./download_libraries.sh
-```
 
 ## Building
 
@@ -72,29 +67,45 @@ Compiling the software from a source distribution
 
 ### From the command line
 
-First download the dependancies as described above. Then, to compile the software from the command line:
+First source distribution. To compile the software from the command line:
 
 ```sh
-$ ant dist
+$ cd path/to/byblo/source/distribution
+$ mvn -P release install
 ```
 
-This will compile the source code, and create a new directory `/dist/` containing the project `jar` file, and a copy of the various required libraries.
+This will download all dependencies, compile the source code, and create a new directory `/target/` containing the project `jar` archive, and the various assemblies. (See Build Output bellow) The command will also install the generated artefacts in your local maven repository.
 
-### Creating a Netbeans project.
+### Building with Netbeans IDE.
 
-This section how build the project from with Netbeans 7. First acquire the source code as described above. 
+This section details how build the project from with Netbeans 7. First acquire the source code as described above. 
 
-1. Download all and compile all the library dependancies (see above), placing the jar file in the `libs/` directory.
+1. Start Netbeans and select "File -> Open Project" from the menu bar.
 
-2. Start Netbeans and select "File -> New Project" from the menu bar. Select *Java / Java Project with Existing Sources* and click *Next*.
+2. Browse the directory to which you downloaded mlcl-lib. Select the directory and click "Open Project".
 
-4. Enter the *Project Name* as "Byblo", and select the *Project Folder* a the location of the project source code. Click *Next*.
+3. From the Run menu select "Clean and Build Main Project".
 
-5. To *Source Package Folders* click *Add Folder* and select `src`. To *Test Package Folders* click *Add Folder* and select `test`. Click *Next* then *Finish*.
+This will compile the source code, and create a new directory `/target/` containing the project `jar` file, and various assemblies. (See Build Output bellow)
 
-6. Right click on *Libraries* in the *Projects* view, and select *Add JAR/Folder*. Select all `.jar` files in the `libs` directory and click *Choose*.
 
-From here you can run the project by clicking *Run -> Run Main Project* from the menu bar, and selecting `uk.ac.susx.mlcl.byblo.Byblo` as the main class.
+### Build Output:
+
+All build output is stored in the newly created directory `/target/`. It will
+contain a number of sub-directories along with containing the compiled `jar` archive, and various assemblies:
+
+```
+...
+Byblo-<version>.jar
+Byblo-<version>-src.zip
+Byblo-<version>-bin.zip
+Byblo-<version>-bin-with-deps.zip
+...
+```
+
+The ```jar``` file is just the compiled source code. The ```-bin.zip``` and ```-src.zip``` are binary and source distributions respectively. The binary distribution contains the ```jar``` archive, along with a copy of the README. The source distribution should be an exact replica of the distribution you just downloaded. The ```-bin-with-deps.zip``` is probably the file you want; it contains the jar, with all dependancies, and associated scripts. 
+
+Extract ```Byblo-<version>-bin-with-deps.zip``` somewhere are run from there.
 
 ## Usage 
 
@@ -113,7 +124,7 @@ Where the arguments are:
 
  * `<options>` Any number of the option switches
 
-There are a large number of options. To view a complete list enter ```./byblo.sh --help``` or view the wiki page on [Running the Sotware](https://github.com/hamishmorgan/Byblo/wiki/Running-the-Software)
+There are a large number of options. To view a complete list enter ```./byblo.sh --help``` or view the wiki page on [Running the Sotware](https://github.com/MLCL/Byblo/wiki/Running-the-Software)
 
 ## Attribution 
 
@@ -123,12 +134,14 @@ Special thanks to all members of the Machine Learning and Computational Linguist
 
 ## Contributing
 
+In the event that you discover a bug whiles using Byblo, please submit a detailed report on our issue tracker: [https://github.com/MLCL/Byblo/issues](https://github.com/MLCL/Byblo/issues)
+
 To contribute to the project you should fork the git repository. First click the "Fork" button on github. Then open a console and type the following:
 
 ```sh
 $ git clone git@github.com:[your-user-name]/Byblo.git
 $ cd Byblo
-$ git remote add upsteam git@github.com:hamishmorgan/Byblo.git
+$ git remote add upsteam git@github.com:MLCL/Byblo.git
 $ git fetch upstream
 ```
 
@@ -136,4 +149,4 @@ If you have changes to contribute back to the main project, send me a pull reque
 
 ## Licence
 
-This software is distributed under the 3-clause [BSD Licence](https://github.com/hamishmorgan/Byblo/wiki/Licence).
+This software is distributed under the 3-clause [BSD Licence](https://github.com/MLCL/Byblo/wiki/Licence).
