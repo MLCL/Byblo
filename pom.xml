@@ -166,16 +166,6 @@
                 </configuration>
             </plugin>
 
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.3.1</version>
-<!--                    <configuration>
-                        <tagBase>https://svn.apache.org/repos/asf/maven/components/releases</tagBase>
-                    </configuration>-->
-            </plugin>
-
         </plugins>
 
     </build>
@@ -202,13 +192,15 @@
                             <strictCheck>true</strictCheck>
                             <quiet>false</quiet>
                             <header>src/license/license-header.txt</header>
-                            <includes>
-                                <include>src/**/*.java</include>
-                                <include>src/**/*.xml</include>
-                                <include>src/**/*.properties</include>
+                         <includes>
+                                <include>src/**</include>
                                 <include>pom.xml</include>
                             </includes>
                             <useDefaultExcludes>false</useDefaultExcludes>
+                            <excludes>
+                                <exclude>src/test/resources/**</exclude>
+                                <exclude>**/.**</exclude>
+                            </excludes>
                             <mapping>
                                 <java>SLASHSTAR_STYLE</java>
                             </mapping>
@@ -225,12 +217,17 @@
                 </plugins>
             </build>
         </profile>
-<!--
+
         <profile>
             <id>release</id>
             <build>
                 <plugins>
-
+<!--
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-release-plugin</artifactId>
+                        <version>2.3.1</version>
+                    </plugin>-->
 
                     <plugin>
                         <artifactId>maven-assembly-plugin</artifactId>
@@ -240,7 +237,7 @@
                             <descriptorSourceDirectory>${project.basedir}/src/assemble</descriptorSourceDirectory>
                         </configuration>
 
-                 Automatically execute the assembly goal during package phase
+<!--                        Automatically execute the assembly goal during package phase-->
                         <executions>
                             <execution>
                                 <id>make-assembly</id>
@@ -300,7 +297,7 @@
                 </plugins>
             </build>
         </profile>
--->
+
     </profiles>
 
 
