@@ -87,7 +87,7 @@ we must create a new clone of the repository, because we must simultaneously pro
 	```
 		$ git clone https://github.com/MLCL/MLCLLib.git target/siterepo
 		$ cd target/siterepo
-		$ git pull origin gh-pages
+		$ git checkout gh-pages
 	```
 	
  3. Update the site by deleting everything then copying the new site
@@ -104,7 +104,7 @@ we must create a new clone of the repository, because we must simultaneously pro
  1. Merge the `master` branch back into `develop`.
 	```
 		$ git checkout develop
-		$ git merge --no-ff develop
+		$ git merge --no-ff master
 	```
 
  2. Bump the version in the POM to a new value y-SNAPSHOT
