@@ -16,9 +16,9 @@ To use this library as part of a Maven managed project, simply add the following
 
 ```xml
 <dependency>
-   	<groupId>${project.groupId}</groupId>
+   	<groupId>uk.ac.susx.mlcl</groupId>
 	<artifactId>mlcl-lib</artifactId>
-	<version>0.2-SNAPSHOT</version>
+	<version>0.2</version>
 	<type>jar</type>
 </dependency>
 ```
@@ -49,17 +49,17 @@ Compiling the software from a source distribution
 
 ### Building from the command line
 
-To compile the software from the command line:
+To compile the software from the command line, run:
 
 ```sh
-$ mvn package
+$ mvn -P release install -Dgpg.skip=true
 ```
 
-This will compile the source code, and create a new directory `/target/` containing the project `jar` file, and various assemblies. (See Build Output bellow)
+This will compile the source code, and create a new directory `/target/` containing the project `jar` file, and various assemblies. (See Build Output bellow). It will also install the artefacts to your local Maven repository.
 
 ### Building as a Netbeans project.
 
-This section details how build the project from with Netbeans 7. First acquire the source code as described above. 
+This section details how to build the project from with Netbeans 7. First acquire the source code as described above. 
 
 1. Start Netbeans and select "File -> Open Project" from the menu bar.
 
@@ -77,24 +77,25 @@ contain a number of sub-directories along with containing the compiled `jar` arc
 ```
 ...
 mlcl-lib-<version>.jar
+mlcl-lib-<version>-sources.jar
+mlcl-lib-<version>-javadoc.jar
 mlcl-lib-<version>-bin.zip
 mlcl-lib-<version>-src.zip
 ...
 ```
 
-The ```jar``` file is probability all you need, to use the library. The ```-bin.zip``` and ```-src.zip``` are binary and source distributions respectively. The binary distribution contains the ```jar``` archive, along with a copy of the README. The source distribution should be an exact replica of the distribution you just downloaded.
-
+The `mlcl-lib-<version>.jar` file is all you really need to use the library. The `-sources.jar` and `-javadoc.jar` can be used by most IDEs to assist developers, but don't worry about them if you don't know how. The `-bin.zip` and `-src.zip` are binary and source distributions respectively. The binary distribution contains the ```jar``` archives, along with a copy of the README. The source distribution should be an exact replica of the distribution you just downloaded. In addition to the `.zip` distribution artefacts, there will be `.tar.gz` and `.tar.bz2` files, which contain the same data but use different compression algorithms.
 
 ## Attribution 
 
-This project is partially supported a TSB (Technology Strategy Board) grant reference GCL-100934, and by the [EPSRC Doctoral Training Account Scheme](http://www.epsrc.ac.uk/funding/students/dta).
+This project is partially supported by a TSB (Technology Strategy Board) grant reference GCL-100934, and by the [EPSRC Doctoral Training Account Scheme](http://www.epsrc.ac.uk/funding/students/dta).
 
 Special thanks to all members of the Machine Learning and Computational Linguistics Lab, School of Informatics, University of Sussex, for all the helpful input.
 
 
 ## Contributing
 
-To contributed to the project you should fork the git repository. First click the "Fork" button on github. Then open a console and type the following:
+To contributed to the project you should fork the git repository. First click the "Fork" button on GitHub. Then open a console to run the following:
 
 ```sh
 $ git clone git@github.com:[your-user-name]/MLCLLib.git
@@ -103,7 +104,7 @@ $ git remote add upsteam git@github.com:MLCL/MLCLLib.git
 $ git fetch upstream
 ```
 
-If you have changes to contribute back to the main project, send us a pull request by clicking the "Pull Request" button on my fork of the repository.
+If you have changes to contribute back to the main project, push changes to your fork of the repository, then send us a pull request by clicking the "Pull Request" button on MLCL fork of the repository.
 
 
 ## Licence

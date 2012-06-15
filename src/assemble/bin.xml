@@ -58,6 +58,8 @@
             <outputDirectory></outputDirectory>
             <includes>
                 <include>${project.build.finalName}.jar</include>
+                <include>${project.build.finalName}-sources.jar</include>
+                <include>${project.build.finalName}-javadoc.jar</include>
             </includes>
         </fileSet>
 
