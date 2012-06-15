@@ -229,7 +229,7 @@ public class NaiveApssTask<P> extends AbstractTask
             ObjectIO.copy(pairs, getSink());
         }
         pairs.clear();
-        System.out.println(".");
+//        System.out.println(".");
     }
 
     @Override

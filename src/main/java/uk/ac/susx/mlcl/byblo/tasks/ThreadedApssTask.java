@@ -81,7 +81,7 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
     private Queue<Future<? extends Task>> futureQueue =
             new ArrayDeque<Future<? extends Task>>();
 
-    public static final int DEFAULT_MAX_CHUNK_SIZE = 1000;
+    public static final int DEFAULT_MAX_CHUNK_SIZE = 2000;
 
     private int maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
 

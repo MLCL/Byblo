@@ -47,13 +47,13 @@ import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.Checks;
+import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
+import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
-import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
-import uk.ac.susx.mlcl.lib.events.ProgressListener;
-import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 
 /**
  * <p>Read in a raw feature instances, to produce three frequency cuonts:
@@ -182,29 +182,26 @@ public final class CountTask extends AbstractTask
 
         progress.setState(State.RUNNING);
 
-        float loadf = Hash.DEFAULT_LOAD_FACTOR;// * 0.5f;
-        int init = Hash.DEFAULT_INITIAL_SIZE;// * 100;
+        float loadFactor = Hash.FAST_LOAD_FACTOR;
+        int initSize = Hash.DEFAULT_INITIAL_SIZE;// * 100;
 
-        final Object2IntMap<TokenPair> eventFreq =
-                new Object2IntOpenHashMap<TokenPair>(init, loadf);
+        final Object2IntOpenHashMap<TokenPair> eventFreq =
+                new Object2IntOpenHashMap<TokenPair>(initSize, loadFactor);
         eventFreq.defaultReturnValue(0);
 
-        final Int2IntMap featureFreq = new Int2IntOpenHashMap(init, loadf);
+        final Int2IntOpenHashMap featureFreq = new Int2IntOpenHashMap(initSize, loadFactor);
         featureFreq.defaultReturnValue(0);
 
-        final Int2IntMap entryFreq = new Int2IntOpenHashMap(init, loadf);
+        final Int2IntOpenHashMap entryFreq = new Int2IntOpenHashMap(initSize, loadFactor);
         entryFreq.defaultReturnValue(0);
 
-        int instanceCount = 0;
+        long instanceCount = 0;
         while (getSource().hasNext()) {
             final TokenPair instance = getSource().read();
 
-            final int entry_id = instance.id1();
-            final int feature_id = instance.id2();
-
-            entryFreq.put(entry_id, entryFreq.get(entry_id) + 1);
-            featureFreq.put(feature_id, featureFreq.get(feature_id) + 1);
-            eventFreq.put(instance, eventFreq.getInt(instance) + 1);
+            entryFreq.add(instance.id1(), 1);
+            featureFreq.add(instance.id2(), 1);
+            eventFreq.add(instance, 1);
 
             ++instanceCount;
             if (instanceCount % 1000000 == 0 || !getSource().hasNext()) {
@@ -213,43 +210,48 @@ public final class CountTask extends AbstractTask
         }
 
         progress.startAdjusting();
-        progress.setProgressPercent(
-                100 * (instanceCount)
-                / (instanceCount + entryFreq.size() + featureFreq.size() + eventFreq.size()));
+        progress.setProgressPercent((int)(
+                100 * instanceCount
+                / (instanceCount + entryFreq.size() + featureFreq.size() + eventFreq.size())));
         progress.setMessage("Writing entries.");
         progress.endAdjusting();
 
-        List<Weighted<Token>> entries = int2IntMapToWeightedTokens(entryFreq);
-        Collections.sort(entries, getEntryComparator());
-        ObjectIO.copy(entries, getEntrySink());
+
+        {
+            List<Weighted<Token>> entries = int2IntMapToWeightedTokens(entryFreq);
+            Collections.sort(entries, getEntryComparator());
+            ObjectIO.copy(entries, getEntrySink());
+        }
         if (getEntrySink() instanceof Flushable)
             ((Flushable) getEntrySink()).flush();
-
         progress.startAdjusting();
-        progress.setProgressPercent(
+        progress.setProgressPercent((int)(
                 100 * (instanceCount + entryFreq.size())
-                / (instanceCount + entryFreq.size() + featureFreq.size() + eventFreq.size()));
+                / (instanceCount + entryFreq.size() + featureFreq.size() + eventFreq.size())));
         progress.setMessage("Writing features.");
         progress.endAdjusting();
 
 
-        List<Weighted<Token>> features = int2IntMapToWeightedTokens(featureFreq);
-        Collections.sort(features, getFeatureComparator());
-        ObjectIO.copy(features, getFeatureSink());
+        {
+            List<Weighted<Token>> features = int2IntMapToWeightedTokens(featureFreq);
+            Collections.sort(features, getFeatureComparator());
+            ObjectIO.copy(features, getFeatureSink());
+        }
         if (getFeatureSink() instanceof Flushable)
             ((Flushable) getFeatureSink()).flush();
 
         progress.startAdjusting();
-        progress.setProgressPercent(
+        progress.setProgressPercent((int)(
                 100 * (instanceCount + entryFreq.size() + featureFreq.size())
-                / (instanceCount + entryFreq.size() + featureFreq.size() + eventFreq.size()));
+                / (instanceCount + entryFreq.size() + featureFreq.size() + eventFreq.size())));
         progress.setMessage("Writing events.");
         progress.endAdjusting();
 
-
-        List<Weighted<TokenPair>> events = obj2intmapToWeightedObjList(eventFreq);
-        Collections.sort(events, getEventComparator());
-        ObjectIO.copy(events, getEventSink());
+        {
+            List<Weighted<TokenPair>> events = obj2intmapToWeightedObjList(eventFreq);
+            Collections.sort(events, getEventComparator());
+            ObjectIO.copy(events, getEventSink());
+        }
         if (getEventSink() instanceof Flushable)
             ((Flushable) getEventSink()).flush();
 
@@ -265,8 +267,9 @@ public final class CountTask extends AbstractTask
     protected void finaliseTask() throws Exception {
     }
 
-    private static List<Weighted<Token>> int2IntMapToWeightedTokens(Int2IntMap map) {
-        List<Weighted<Token>> out = new ArrayList<Weighted<Token>>(map.size());
+    private static List<Weighted<Token>> int2IntMapToWeightedTokens(
+            final Int2IntMap map) {
+        final List<Weighted<Token>> out = new ArrayList<Weighted<Token>>(map.size());
         for (Int2IntMap.Entry e : map.int2IntEntrySet()) {
             out.add(new Weighted<Token>(
                     new Token(e.getIntKey()), e.getIntValue()));
@@ -275,8 +278,8 @@ public final class CountTask extends AbstractTask
     }
 
     private static <T> List<Weighted<T>> obj2intmapToWeightedObjList(
-            Object2IntMap<T> map) {
-        List<Weighted<T>> out = new ArrayList<Weighted<T>>(map.size());
+            final Object2IntMap<T> map) {
+        final List<Weighted<T>> out = new ArrayList<Weighted<T>>(map.size());
         for (Object2IntMap.Entry<T> e : map.object2IntEntrySet()) {
             out.add(new Weighted<T>(
                     e.getKey(), e.getIntValue()));
