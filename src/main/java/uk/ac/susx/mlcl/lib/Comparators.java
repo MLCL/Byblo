@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2012, University of Sussex
+ * Copyright (c) 2011-2012, University of Sussex
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,8 +26,7 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 package uk.ac.susx.mlcl.lib;
 
@@ -135,7 +134,7 @@ public final class Comparators {
      *
      * @param <T>
      * @param comparators
-     * @return
+     * @return produce a comparator that backsoff to each listed comparator
      */
     public static <T> Comparator<T> fallback(
             final Comparator<T>... comparators) {
@@ -151,7 +150,7 @@ public final class Comparators {
      *
      * @param <T>
      * @param comparators
-     * @return
+     * @return produce a comparator that backsoff to each listed comparator
      */
     public static <T> Comparator<T> fallback(
             final List<Comparator<T>> comparators) {
@@ -163,7 +162,7 @@ public final class Comparators {
     }
 
     /**
-     * 
+     *
      * @param <T>
      */
     private static class FallbackComparator<T>
@@ -235,7 +234,7 @@ public final class Comparators {
      * objects.
      *
      * @param <T> Type of object being compared
-     * @return comparator
+     * @return comparator object that uses it's operand's natural order
      */
     public static <T extends Comparable<T>> Comparator<T> naturalOrder() {
         return new Comparator<T>() {
@@ -256,7 +255,7 @@ public final class Comparators {
      * better way to hand this.
      *
      * @param <T> type of object being compared
-     * @return comparator
+     * @return comparator object that uses it's operand's natural order
      */
     public static <T> Comparator<T> naturalOrderIfPossible() {
         return new Comparator<T>() {
@@ -282,7 +281,7 @@ public final class Comparators {
      * before comparison, and uses less memory.
      *
      * @param <T>
-     * @return
+     * @return a string comparator that ignores alphabetical case
      */
     public <T extends CharSequence> Comparator<T> caseInsensitiveStringComparator() {
         return new CaseInsensitiveStringComparator<T>();

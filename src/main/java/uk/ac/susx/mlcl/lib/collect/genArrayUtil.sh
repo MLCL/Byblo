@@ -1,4 +1,35 @@
 #!/bin/sh
+#
+# Copyright (c) 2011-2012, University of Sussex
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#  * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#
+#  * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#  * Neither the name of the University of Sussex nor the names of its
+#    contributors may be used to endorse or promote products derived from this
+#    software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+
 
 
 class=ArrayUtil
@@ -10,7 +41,7 @@ fi
 
 PRIMTYP=("boolean" "byte" "char" "short" "int" "long" "float" "double" "Object" "T")
 GENTYPE[9]=" <T>"
-NEWINSTANCE=("new boolean" "new byte" "new char" "new short" "new int" "new long" 
+NEWINSTANCE=("new boolean" "new byte" "new char" "new short" "new int" "new long"
     "new float" "new double" "new Object" "(T[])new Object")
 BOXTYPE=("Boolean" "Byte" "Character" "Short" "Integer" "Long" "Float" "Double" "Object")
 
@@ -33,33 +64,33 @@ primitive=(1 1 1 1 1 1 1 1 0 0)
 
 perl -pe "s/__CLASS__/${class}/g;" << "---EOF---" >> ${outfile}
 /*
- * Copyright (c) 2010-2012, MLCL, University of Sussex
+ * Copyright (c) 2011-2012, University of Sussex
  * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without 
+ *
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
- *  * Redistributions of source code must retain the above copyright notice, 
+ *
+ *  * Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  *  * Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
- *  * Neither the name of the University of Sussex nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ *
+ *  * Neither the name of the University of Sussex nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package uk.ac.susx.mlcl.lib.collect;
@@ -111,7 +142,7 @@ if (( ${primitive[i]} == 1 ))
 then
 cat << "---EOF---" \
     | perl -pe "s/PRIMTYP/${PRIMTYP[i]}/g;" \
-    | perl -pe "s/BOXTYPE/${BOXTYPE[i]}/g;" 
+    | perl -pe "s/BOXTYPE/${BOXTYPE[i]}/g;"
 
     public static BOXTYPE[] box(final PRIMTYP[] src) {
         return box(src, 0, src.length);
@@ -123,7 +154,7 @@ cat << "---EOF---" \
 
     public static BOXTYPE[] box(final PRIMTYP[] src, final int offset, final int len) {
         BOXTYPE[] dst = new BOXTYPE[len];
-        for(int i = 0; i < len; i++) 
+        for(int i = 0; i < len; i++)
             dst[i] = (BOXTYPE)src[offset + i];
         return dst;
     }
@@ -138,11 +169,11 @@ cat << "---EOF---" \
 
     public static PRIMTYP[] unbox(final BOXTYPE[] src, final int offset, final int len) {
         PRIMTYP[] dst = new PRIMTYP[len];
-        for(int i = 0; i < len; i++) 
+        for(int i = 0; i < len; i++)
             dst[i] = (PRIMTYP)src[offset + i];
         return dst;
     }
-    
+
 ---EOF---
 
 fi
@@ -153,10 +184,10 @@ cat << "---EOF---" \
     | perl -pe "s/PRIMTYP/${PRIMTYP[i]}/g;" \
     | perl -pe "s/BOXTYPE/${BOXTYPE[i]}/g;" \
     | perl -pe "s/NEWINSTANCE/${NEWINSTANCE[i]}/g;" \
-    | perl -pe "s/(public static)/\$1${GENTYPE[i]}/g;" 
+    | perl -pe "s/(public static)/\$1${GENTYPE[i]}/g;"
 
 
-    /* 
+    /*
      * ==================
      *  Type: PRIMTYP
      * ==================
@@ -232,7 +263,7 @@ cat << "---EOF---" \
     }
 
     public static PRIMTYP[] unique(final PRIMTYP... arr) {
-        // This is way to slow O(n^2) - can be done in 
+        // This is way to slow O(n^2) - can be done in
         // O(n log n) by sorting in input first.
         PRIMTYP[] result = NEWINSTANCE[arr.length];
         int j = 0;
@@ -275,7 +306,7 @@ cat << "---EOF---" \
     public static PRIMTYP[] elementsOf(PRIMTYP[] arr, boolean[] logical) {
         return elementsOf(arr, find(logical));
     }
-    
+
     public static boolean[] valuesEq(PRIMTYP[] arr, PRIMTYP val) {
         boolean[] result = new boolean[arr.length];
         for (int i = 0; i < arr.length; i++)
@@ -301,7 +332,7 @@ cat << "---EOF---" \
             return arr;
         }
     }
- 
+
     public static PRIMTYP mode(PRIMTYP[] arr) {
         Map<BOXTYPE, Integer> map = new HashMap<BOXTYPE, Integer>();
         for (int i = 0; i < arr.length; i++) {
@@ -321,7 +352,7 @@ cat << "---EOF---" \
         }
         return maxValue;
     }
-    
+
 ---EOF---
 
 fi
@@ -346,13 +377,13 @@ cat << "---EOF---" \
     }
 
     /**
-     * Takes an array a and rearranges it into the next permutation in 
+     * Takes an array a and rearranges it into the next permutation in
      * lexicographic order.
-     * 
+     *
      * Use an algorithm defined in
      * http://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
      * which probably isnt the most efficient solution.
-     * 
+     *
      * @param a the array to be permuted
      * @param toIndex index of the first element (inclusive) to be permuted
      * @param fromIndex index of the last element (exclusive) to be permuted
@@ -361,7 +392,7 @@ cat << "---EOF---" \
         if (toIndex - fromIndex < 2)
             return;
 
-        // Find the largest index k such that a[k] < a[k + 1]. If no such index 
+        // Find the largest index k such that a[k] < a[k + 1]. If no such index
         // exists, the permutation is the last permutation.
         int k = toIndex - 2;
         while (k >= fromIndex && COMP(a[k],a[k + 1])>=0)
@@ -374,7 +405,7 @@ cat << "---EOF---" \
 
         } else {
 
-            // Find the largest index l such that a[k] < a[l]. Since k + 1 is 
+            // Find the largest index l such that a[k] < a[l]. Since k + 1 is
             // such an index, l is well defined and satisfies k < l.
             int l = toIndex - 1;
             while (l >= fromIndex && COMP(a[k],a[l])>=0)
@@ -383,8 +414,8 @@ cat << "---EOF---" \
             // Swap a[k] with a[l].
             swap(a, k, l);
 
-            // Reverse the sequence from a[k + 1] up to and including the final 
-            // element a[n].   
+            // Reverse the sequence from a[k + 1] up to and including the final
+            // element a[n].
             reverse(a, k + 1, toIndex);
         }
     }
@@ -573,7 +604,7 @@ perl -pe "s/PRIMTYP/${PRIMTYP[i]}/g; s/PrimToStringClass/${PrimToStringClass[i]}
     }
 
 ---EOF---
-fi 
+fi
 
 
 fi

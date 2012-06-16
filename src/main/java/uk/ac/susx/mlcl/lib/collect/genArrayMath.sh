@@ -1,4 +1,35 @@
 #!/bin/sh
+#
+# Copyright (c) 2011-2012, University of Sussex
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#  * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#
+#  * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#  * Neither the name of the University of Sussex nor the names of its
+#    contributors may be used to endorse or promote products derived from this
+#    software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+
 
 
 class=ArrayMath
@@ -10,7 +41,7 @@ fi
 
 PRIMTYP=("boolean" "byte" "char" "short" "int" "long" "float" "double" "Object" "T")
 GENTYPE[9]=" <T>"
-NEWINSTANCE=("new boolean" "new byte" "new char" "new short" "new int" "new long" 
+NEWINSTANCE=("new boolean" "new byte" "new char" "new short" "new int" "new long"
     "new float" "new double" "new Object" "(T[])new Object")
 BOXTYPE=("Boolean" "Byte" "Character" "Short" "Integer" "Long" "Float" "Double" "Object")
 
@@ -32,33 +63,33 @@ floatp=(0 0 0 0 0 0 1 1 0 0)
 
 perl -pe "s/__CLASS__/${class}/g;" << "---EOF---" >> ${outfile}
 /*
- * Copyright (c) 2010-2012, MLCL, University of Sussex
+ * Copyright (c) 2011-2012, University of Sussex
  * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without 
+ *
+ * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
- *  * Redistributions of source code must retain the above copyright notice, 
+ *
+ *  * Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  *  * Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
- *  * Neither the name of the University of Sussex nor the names of its 
- *    contributors may be used to endorse or promote products derived from this 
+ *
+ *  * Neither the name of the University of Sussex nor the names of its
+ *    contributors may be used to endorse or promote products derived from this
  *    software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE 
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
 package uk.ac.susx.mlcl.lib.collect;
@@ -424,7 +455,7 @@ cat << "---EOF---" \
     public static PRIMTYP variance(PRIMTYP[] values, int fromIndex, int toIndex) {
 		PRIMTYP u = mean(values, fromIndex, toIndex);
 		PRIMTYP s2 = 0;
-		for(int i = fromIndex; i < toIndex; i++) 
+		for(int i = fromIndex; i < toIndex; i++)
 			s2 += (values[i] - u) * (values[i] - u);
 		return (PRIMTYP)(s2 / (toIndex - fromIndex));
     }
@@ -432,11 +463,11 @@ cat << "---EOF---" \
     public static PRIMTYP variance(PRIMTYP[] values, int fromIndex) {
 		return (PRIMTYP)variance(values, fromIndex, values.length);
 	}
-    
+
     public static PRIMTYP variance(PRIMTYP[] values) {
 		return (PRIMTYP)variance(values, 0, values.length);
 	}
-	
+
     public static PRIMTYP stddev(PRIMTYP[] values, int fromIndex, int toIndex) {
 		return (PRIMTYP)Math.sqrt(variance(values, fromIndex, toIndex));
     }
@@ -444,16 +475,16 @@ cat << "---EOF---" \
     public static PRIMTYP stddev(PRIMTYP[] values, int fromIndex) {
 		return (PRIMTYP)Math.sqrt(variance(values, fromIndex));
 	}
-    
+
     public static PRIMTYP stddev(PRIMTYP[] values) {
 		return (PRIMTYP)Math.sqrt(variance(values));
 	}
-	
+
 
     public static PRIMTYP sampleVariance(PRIMTYP[] values, int fromIndex, int toIndex) {
 		PRIMTYP u = mean(values, fromIndex, toIndex);
 		PRIMTYP s2 = 0;
-		for(int i = fromIndex; i < toIndex; i++) 
+		for(int i = fromIndex; i < toIndex; i++)
 			s2 += (values[i] - u) * (values[i] - u);
 		return (PRIMTYP)(s2 / ((toIndex - fromIndex) - 1));
     }
@@ -461,11 +492,11 @@ cat << "---EOF---" \
     public static PRIMTYP sampleVariance(PRIMTYP[] values, int fromIndex) {
 		return (PRIMTYP)sampleVariance(values, fromIndex, values.length);
 	}
-    
+
     public static PRIMTYP sampleVariance(PRIMTYP[] values) {
 		return (PRIMTYP)sampleVariance(values, 0, values.length);
 	}
-	
+
     public static PRIMTYP sampleStddev(PRIMTYP[] values, int fromIndex, int toIndex) {
 		return (PRIMTYP)Math.sqrt(sampleVariance(values, fromIndex, toIndex));
     }
@@ -473,17 +504,17 @@ cat << "---EOF---" \
     public static PRIMTYP sampleStddev(PRIMTYP[] values, int fromIndex) {
 		return (PRIMTYP)Math.sqrt(sampleVariance(values, fromIndex));
 	}
-    
+
     public static PRIMTYP sampleStddev(PRIMTYP[] values) {
 		return (PRIMTYP)Math.sqrt(sampleVariance(values));
 	}
-	
-		
-    
+
+
+
     /**
      * Return the median average of the values passed as argument.
      *
-     * @param vals 1 or more values
+     * @param values 1 or more values
      * @return the media value of the values
      * @throws IllegalArgumentException if no values are passed
      * @throws NullPointerException if a null object of type {@code double[]}
@@ -536,21 +567,21 @@ cat << "---EOF---" \
 
     public static PRIMTYP[] round(final PRIMTYP[] arr) {
         final PRIMTYP[] result = new PRIMTYP[arr.length];
-        for (int i = 0; i < arr.length; i++) 
+        for (int i = 0; i < arr.length; i++)
             result[i] = (PRIMTYP)Math.round(arr[i]);
         return result;
     }
 
     public static PRIMTYP[] floor(final PRIMTYP[] arr) {
         final PRIMTYP[] result = new PRIMTYP[arr.length];
-        for (int i = 0; i < arr.length; i++) 
+        for (int i = 0; i < arr.length; i++)
             result[i] = (PRIMTYP)Math.floor(arr[i]);
         return result;
     }
 
     public static PRIMTYP[] ceil(final PRIMTYP[] arr) {
         final PRIMTYP[] result = new PRIMTYP[arr.length];
-        for (int i = 0; i < arr.length; i++) 
+        for (int i = 0; i < arr.length; i++)
             result[i] = (PRIMTYP)Math.ceil(arr[i]);
         return result;
     }
