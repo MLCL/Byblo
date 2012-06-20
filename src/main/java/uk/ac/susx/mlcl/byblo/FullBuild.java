@@ -345,8 +345,7 @@ public final class FullBuild extends AbstractCommand {
         System.gc();
 
 
-        if (tempBaseDir.list().length == 0)
-            tempBaseDir.delete();
+        deleteTempDir(tempBaseDir, "FullBuild");
 
         final long endTime = System.currentTimeMillis();
         LOG.info("\n=== Completed full thesaurus build ===\n");
@@ -471,7 +470,7 @@ public final class FullBuild extends AbstractCommand {
         checkValidInputFile("Features file", featuresFile);
         checkValidInputFile("Events file", eventsFile);
 
-        deleteTempDir(tempBaseDir, "Count");
+        deleteTempDir(countTempDir, "Count");
 
         final long endTime = System.currentTimeMillis();
         if (LOG.isInfoEnabled()) {
@@ -569,7 +568,7 @@ public final class FullBuild extends AbstractCommand {
         checkValidInputFile("Filtered features file", featuresFilteredFile);
         checkValidInputFile("Filtered events file", eventsFilteredFile);
 
-        deleteTempDir(tempBaseDir, "Filter");
+        deleteTempDir(filterTempDir, "Filter");
 
         final long endTime = System.currentTimeMillis();
         if (LOG.isInfoEnabled()) {
@@ -691,7 +690,7 @@ public final class FullBuild extends AbstractCommand {
 
         checkValidInputFile("Neighbours file", neighboursFile);
 
-        deleteTempDir(tempBaseDir, "K-Nearest-Neighbours");
+        deleteTempDir(knnTempDir, "K-Nearest-Neighbours");
 
         final long endTime = System.currentTimeMillis();
         if (LOG.isInfoEnabled()) {
