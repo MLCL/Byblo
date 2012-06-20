@@ -39,7 +39,7 @@
 
     <groupId>uk.ac.susx.mlcl</groupId>
     <artifactId>Byblo</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <version>2.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Byblo</name>

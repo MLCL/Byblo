@@ -471,17 +471,7 @@ public final class FullBuild extends AbstractCommand {
         checkValidInputFile("Features file", featuresFile);
         checkValidInputFile("Events file", eventsFile);
 
-        if (countTempDir.list().length > 0) {
-            throw new IllegalStateException(format(
-                    "Count temporary directory is not empty: {0}",
-                    countTempDir));
-        }
-        if (!countTempDir.delete()) {
-            throw new IOException(format(
-                    "Unable to delete count temporary "
-                    + "directory is not empty: {0}",
-                    countTempDir));
-        }
+        deleteTempDir(tempBaseDir, "Count");
 
         final long endTime = System.currentTimeMillis();
         if (LOG.isInfoEnabled()) {
@@ -493,6 +483,20 @@ public final class FullBuild extends AbstractCommand {
             sb.append(MessageFormat.format(" * {0}\n", MiscUtil.memoryInfoString()));
             sb.append("\n");
             LOG.info(sb.toString());
+        }
+    }
+
+    static void deleteTempDir(File tempDir, String taskName) {
+        if (!tempDir.delete()) {
+            LOG.warn(format("Unable to delete temporary directory for task {1}: {0}",
+                            tempDir, taskName));
+            if (tempDir.list().length > 0)
+                LOG.warn(format(
+                        "Directory is not empty: {0}; countains {1}",
+                        tempDir, Arrays.toString(tempDir.list())));
+            if (tempDir.getParentFile() != null && !tempDir.getParentFile().canWrite())
+                LOG.warn(format("Insufficient permissions to delete {0}",
+                                tempDir));
         }
     }
 
@@ -565,18 +569,7 @@ public final class FullBuild extends AbstractCommand {
         checkValidInputFile("Filtered features file", featuresFilteredFile);
         checkValidInputFile("Filtered events file", eventsFilteredFile);
 
-        if (filterTempDir.list().length > 0) {
-            throw new IllegalStateException(format(
-                    "Filter temporary directory is not "
-                    + "empty: {0} --- countains {1}",
-                    filterTempDir, Arrays.toString(filterTempDir.list())));
-        }
-        if (!filterTempDir.delete()) {
-            throw new IOException(format(
-                    "Unable to delete filter temporary "
-                    + "directory is not empty: {0}",
-                    filterTempDir));
-        }
+        deleteTempDir(tempBaseDir, "Filter");
 
         final long endTime = System.currentTimeMillis();
         if (LOG.isInfoEnabled()) {
@@ -698,17 +691,7 @@ public final class FullBuild extends AbstractCommand {
 
         checkValidInputFile("Neighbours file", neighboursFile);
 
-        if (knnTempDir.list().length > 0) {
-            throw new IllegalStateException(format(
-                    "Filter temporary directory is not empty: {0}",
-                    knnTempDir));
-        }
-        if (!knnTempDir.delete()) {
-            throw new IOException(format(
-                    "Unable to delete filter temporary"
-                    + " directory is not empty: {0}",
-                    knnTempDir));
-        }
+        deleteTempDir(tempBaseDir, "K-Nearest-Neighbours");
 
         final long endTime = System.currentTimeMillis();
         if (LOG.isInfoEnabled()) {
