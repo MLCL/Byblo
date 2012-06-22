@@ -113,12 +113,12 @@ This `byblo.sh` script is designed to be the primary point of usage for the thes
 most commonly used functionality of the underlying software.
 
 ```sh
-$ ./byblo.sh [<options>] [@<config>] <file>
+$ ./byblo.sh [<options>] [@<config>] -i <file>
 ```
 
 Where the arguments are:
 
- * `<file>` Input instances file containing entry/feature pairs.
+ * -i `<file>` Input instances file containing entry/feature pairs.
 
  * `@<config>` Options and input files can be read from a <config> file specified directly after an '$\mathtt{@}$' character. Options in this file should be specified exactly as they would be at the command line, and may contain additional `@` references to other config files. 
 
