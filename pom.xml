@@ -39,7 +39,7 @@
 
     <groupId>uk.ac.susx.mlcl</groupId>
     <artifactId>Byblo</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Byblo</name>
@@ -53,7 +53,7 @@
 
     <scm>
         <connection>scm:git:git://github.com/MLCL/Byblo.git</connection>
-        <tag>byblo-2.0.1</tag>
+        <tag>HEAD</tag>
         <url>https://github.com/MLCL/Byblo</url>
     </scm>
 
