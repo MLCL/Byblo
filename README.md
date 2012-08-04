@@ -71,7 +71,7 @@ First source distribution. To compile the software from the command line:
 
 ```sh
 $ cd path/to/byblo/source/distribution
-$ mvn -P release install
+$ mvn -P release install -Dgpg.skip=true
 ```
 
 This will download all dependencies, compile the source code, and create a new directory `/target/` containing the project `jar` archive, and the various assemblies. (See Build Output bellow) The command will also install the generated artefacts in your local maven repository.
