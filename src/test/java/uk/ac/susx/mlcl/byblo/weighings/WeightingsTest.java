@@ -75,6 +75,7 @@ public class WeightingsTest {
 
     static Class<? extends Weighting>[] WEIGHT_CLASSES =
             (Class<? extends Weighting>[]) new Class<?>[]{
+                NullWeighting.class,
                 Constant.class,
                 Power.class,
                 Likelyhood.class,
@@ -173,19 +174,20 @@ public class WeightingsTest {
         for (int vecIdx = 0; vecIdx < vecs.size(); vecIdx++) {
 
             final int entryId = vecs.get(vecIdx).key();
-            final SparseDoubleVector vec = vecs.get(vecIdx).value();
+            final SparseDoubleVector vector = vecs.get(vecIdx).value();
 
 //            System.out.println(" > testing entry id " + entryId);
 
             SparseDoubleVector[] reweighted = new SparseDoubleVector[WEIGHT_CLASSES.length];
             for (int wgtIdx = 0; wgtIdx < WEIGHT_CLASSES.length; wgtIdx++) {
-                Weighting wgt = wgts[wgtIdx];
+                Weighting weighting = wgts[wgtIdx];
 //                System.out.println("weighting: " + wgt);
 
-                SparseDoubleVector rew = wgt.apply(vec);
+                SparseDoubleVector rew = weighting.apply(vector);
                 reweighted[wgtIdx] = rew;
 
-                assertNotSame(rew, vec);
+                if (!weighting.getClass().equals(NullWeighting.class))
+                    assertNotSame(rew, vector);
                 assertNotNull(rew);
 
                 // Check there are no zero valued elements
@@ -193,18 +195,18 @@ public class WeightingsTest {
                     if (rew.values[i] == 0.0)
                         fail(String.format(
                                 "Found zero value in sparse vector %d at id %d with weighting scheme %s",
-                                entryId, rew.keys[i], wgt.getClass()));
+                                entryId, rew.keys[i], weighting.getClass()));
                     if (Double.isNaN(rew.values[i])) {
                         fail(String.format(
                                 "Found NaN value in sparse vector %d at id %d with weighting scheme %s",
-                                entryId, rew.keys[i], wgt.getClass()));
+                                entryId, rew.keys[i], weighting.getClass()));
                     }
 
-                    if (rew.values[i] < wgt.getLowerBound() || rew.values[i] > wgt.
+                    if (rew.values[i] < weighting.getLowerBound() || rew.values[i] > weighting.
                             getUpperBound()) {
                         fail(String.format(
                                 "sparse vector %d at id %d has value %f outside range with weighting scheme %s",
-                                entryId, rew.keys[i], rew.values[i], wgt.
+                                entryId, rew.keys[i], rew.values[i], weighting.
                                 getClass()));
                     }
                 }

@@ -32,7 +32,6 @@ package uk.ac.susx.mlcl.byblo.weighings.impl;
 
 import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.weighings.AbstractContextualWeighting;
-import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
@@ -47,9 +46,9 @@ public final class PositivePMI extends AbstractContextualWeighting implements Se
     public double apply(SparseDoubleVector vector, int key, double value) {
         double likelihood = value / vector.sum;
         double prior = getFeaturePrior(key);
-        
+
         if (likelihood > prior)
-            return (Weightings.log2(likelihood) - Weightings.log2(prior));
+            return (LogProduct.log2(likelihood) - LogProduct.log2(prior));
         else
             return 0;
     }
