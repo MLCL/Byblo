@@ -30,8 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.v2;
 
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.KLDivergence;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.LpSpace;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 
 /**

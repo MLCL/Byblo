@@ -31,96 +31,74 @@
 package uk.ac.susx.mlcl.byblo.measures.v2.impl;
 
 import java.io.Serializable;
-import java.text.MessageFormat;
 import uk.ac.susx.mlcl.byblo.measures.v2.Distance;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
-import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- * {@link Distance} measure that computes similarity using Lee's alpha-Skew
- * divergence.
- *
- * Skew divergence is a variant of Kullback–Leibler (KL) divergence. KL
- * divergence is undefined for zero probabilities in the empirical distribution.
- * To resolve this problem divergence is measured from a mixed distribution;
- * computed as the weighted average of the two distributions. The alpha
- * parameter controls this weighting.
- *
- * Alpha takes a value in the range [0,1] exclusive, where 0 is entirely the
- * first distribution, 1 is entirely the second distribution, and 0.5 is the
- * average distribution. Note that alpha <em>must<em> not be exactly 0 or 1, or
- * it becomes undefined for zero estimates just like KL divergence.
- *
- * Not a true metric, but effectively a distance measure.
- *
- * Lillian Lee (2001) "On the Effectiveness of the Skew Divergence for
- * Statistical Language Analysis" Artificial Intelligence and Statistics 2001,
- * pp. 65--72, 2001
+ * {@link Distance} measure that computes similarity as the Kullback–Leibler
+ * divergence, with Laplace smoothing.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class LeeSkewDivergence implements Distance, Serializable {
+public final class KullbackLeiblerDivergence implements Distance, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public static final double DEFAULT_ALPHA = 0.99;
-
-    private double alpha;
-
-    public LeeSkewDivergence() {
-        setAlpha(DEFAULT_ALPHA);
-    }
-
-    public LeeSkewDivergence(double alpha) {
-        setAlpha(alpha);
-    }
-
-    public final double getAlpha() {
-        return alpha;
-    }
-
-    public final void setAlpha(double alpha) {
-        Checks.checkNotNaN("alpha", alpha);
-        Checks.checkFinite("alpha", alpha);
-        Checks.checkRangeExcl("alpha", alpha, 0.0, 1.0);
-        this.alpha = alpha;
-    }
-
     @Override
     public double distance(SparseDoubleVector A, SparseDoubleVector B) {
+        assert A.cardinality == B.cardinality;
+        final int N = A.cardinality;
+
+        final double sumA = A.sum + N;
+        final double sumB = B.sum + N;
+
+        // The smoothed likelyhoods for zero frequency features
+        final double q0 = 1.0 / (A.sum + N);
+        final double r0 = 1.0 / (B.sum + N);
+        final double log_q0 = log2(q0);
+        final double log_r0 = log2(r0);
+
         double divergence = 0.0;
 
         int i = 0;
         int j = 0;
+        int intersectionSize = 0;
         while (i < A.size && j < B.size) {
             if (A.keys[i] < B.keys[j]) {
+                final double q = (A.values[i] + 1) / sumA;
+                divergence += q * (log2(q) - log_r0);
                 ++i;
             } else if (A.keys[i] > B.keys[j]) {
-                final double r = B.values[j] / B.sum;
-                final double logAvg = log2((1 - alpha) * r);
-                divergence += r * (log2(r) - logAvg);
+                final double r = (B.values[j] + 1) / sumB;
+                divergence += q0 * (log_q0 - log2(r));
                 ++j;
             } else {
-                final double q = A.values[i] / A.sum;
-                final double r = B.values[j] / B.sum;
-                final double logAvg = log2(alpha * q + (1 - alpha) * r);
-                divergence += r * (log2(r) - logAvg);
+                final double q = (A.values[i] + 1) / sumA;
+                final double r = (B.values[j] + 1) / sumB;
+                divergence += q * (log2(q) - log2(r));
                 ++i;
                 ++j;
+                ++intersectionSize;
             }
         }
-//        while (i < A.size) {
-//            i++;
-//        }
+        while (i < A.size) {
+            final double q = (A.values[i] + 1) / sumA;
+            divergence += q * (log2(q) - log_r0);
+            i++;
+        }
         while (j < B.size) {
-            final double r = B.values[j] / B.sum;
-            final double logAvg = log2((1 - alpha) * r);
-            divergence += r * (log2(r) - logAvg);
+            final double r = (B.values[j] + 1) / sumB;
+            divergence += q0 * (log_q0 - log2(r));
             j++;
         }
+
+        // Finally add all the divergence components for features that did not
+        // appear in either distribution
+        final int unionSize = A.size + B.size - intersectionSize;
+        divergence += (N - unionSize) * q0 * (log_q0 - log_r0);
 
         return divergence;
     }
@@ -147,6 +125,6 @@ public final class LeeSkewDivergence implements Distance, Serializable {
 
     @Override
     public String toString() {
-        return MessageFormat.format("LeeSkewDivergence{alpha={0}}", alpha);
+        return "KL-Divergence";
     }
 }

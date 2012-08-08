@@ -35,77 +35,96 @@ import uk.ac.susx.mlcl.byblo.measures.v2.Distance;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
+import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- * {@link Distance} measure that computes similarity as the Kullback–Leibler
- * divergence, with Laplace smoothing.
+ * {@link Distance} measure that computes similarity as the lambda divergence.
+ *
+ * The lambda weighted average of KL divergences of two distribution Q and R:
+ *
+ * lambdaD(Q||R) = lambda * D(Q||M) + (1 - lambda) * D(R||M)
+ *
+ * where M is the the mixed distribution:
+ *
+ * M = lambda * Q + (1 - lambda) * R:
+ *
+ * For lambda = 0.5 we have the Jensen-Shannon Divergence.
+ *
+ * For lambda = 0 and lambda = 1 the divergence is always 0, which is
+ * meaningless. Hence, lambda must be in the range 0 &lt; lambda &lt; 1.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class KLDivergence implements Distance, Serializable {
+public final class LambdaDivergence implements Distance, Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private static final double DEFAULT_LAMBDA = 0.5;
+
+    private double lambda;
+
+    public LambdaDivergence() {
+        setLambda(DEFAULT_LAMBDA);
+    }
+
+    public LambdaDivergence(double lambda) {
+        setLambda(lambda);
+    }
+
+    public final double getLambda() {
+        return lambda;
+    }
+
+    public final void setLambda(double lambda) {
+        Checks.checkRangeExcl("lambda", lambda, 0.0, 1.0);
+        this.lambda = lambda;
+    }
+
     @Override
     public double distance(SparseDoubleVector A, SparseDoubleVector B) {
-        assert A.cardinality == B.cardinality;
-        final int N = A.cardinality;
-
-        final double sumA = A.sum + N;
-        final double sumB = B.sum + N;
-
-        // The smoothed likelyhoods for zero frequency features
-        final double q0 = 1.0 / (A.sum + N);
-        final double r0 = 1.0 / (B.sum + N);
-        final double log_q0 = log2(q0);
-        final double log_r0 = log2(r0);
-
         double divergence = 0.0;
 
         int i = 0;
         int j = 0;
-        int intersectionSize = 0;
         while (i < A.size && j < B.size) {
             if (A.keys[i] < B.keys[j]) {
-                final double q = (A.values[i] + 1) / sumA;
-                divergence += q * (log2(q) - log_r0);
+                final double q = A.values[i] / A.sum;
+                divergence += lambda * q * (log2(q) - log2(lambda * q));
                 ++i;
             } else if (A.keys[i] > B.keys[j]) {
-                final double r = (B.values[j] + 1) / sumB;
-                divergence += q0 * (log_q0 - log2(r));
+                final double r = B.values[j] / B.sum;
+                divergence += (1.0 - lambda) * r
+                        * (log2(r) - log2((1.0 - lambda) * r));
                 ++j;
             } else {
-                final double q = (A.values[i] + 1) / sumA;
-                final double r = (B.values[j] + 1) / sumB;
-                divergence += q * (log2(q) - log2(r));
+                final double q = A.values[i] / A.sum;
+                final double r = B.values[j] / B.sum;
+                final double logAvg = log2(lambda * q + (1.0 - lambda) * r);
+                divergence += lambda * q * (log2(q) - logAvg)
+                        + (1.0 - lambda) * r * (log2(r) - logAvg);
                 ++i;
                 ++j;
-                ++intersectionSize;
             }
         }
         while (i < A.size) {
-            final double q = (A.values[i] + 1) / sumA;
-            divergence += q * (log2(q) - log_r0);
+            final double q = A.values[i] / A.sum;
+            divergence += lambda * q * (log2(q) - log2(lambda * q));
             i++;
         }
         while (j < B.size) {
-            final double r = (B.values[j] + 1) / sumB;
-            divergence += q0 * (log_q0 - log2(r));
+            final double r = B.values[j] / B.sum;
+            divergence += (1.0 - lambda) * r * (log2(r) - log2(
+                                                (1.0 - lambda) * r));
             j++;
         }
-
-        // Finally add all the divergence components for features that did not
-        // appear in either distribution
-        final int unionSize = A.size + B.size - intersectionSize;
-        divergence += (N - unionSize) * q0 * (log_q0 - log_r0);
 
         return divergence;
     }
 
     @Override
     public boolean isCommutative() {
-        return false;
+        return lambda == 0.5;
     }
 
     @Override
@@ -125,6 +144,6 @@ public final class KLDivergence implements Distance, Serializable {
 
     @Override
     public String toString() {
-        return "KL-Divergence";
+        return "Lambda-Divergence";
     }
 }
