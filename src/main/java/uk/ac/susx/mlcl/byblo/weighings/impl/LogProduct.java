@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo.weighings.impl;
 
 import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.weighings.AbstractSimpleWeighting;
+import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 
 /**
  *
@@ -43,7 +44,7 @@ public final class LogProduct extends AbstractSimpleWeighting implements Seriali
 
     @Override
     public double apply(double value) {
-        return log2(1 + value) * value;
+        return Weightings.log2(1 + value) * value;
     }
 
     @Override
@@ -61,25 +62,5 @@ public final class LogProduct extends AbstractSimpleWeighting implements Seriali
         return this.getClass().getSimpleName();
     }
 
-    /**
-     * Constant to aid conversion to base 2 logarithms.
-     *
-     * Conceptually it doesn't really matter what base is used, but 2 is the
-     * standard base for most information theoretic approaches.
-     *
-     * TODO: Move to mlcl-lib/MathUtil
-     */
-    public static final double LOG_2 = Math.log(2.0);
-
-    /**
-     * Return the base 2 logarithm of the parameter v.
-     *
-     * TODO: Move to mlcl-lib/MathUtil
-     *
-     * @param v some values
-     * @return logarithm of the value
-     */
-    public static double log2(final double v) {
-        return Math.log(v) / LOG_2;
-    }
+  
 }
