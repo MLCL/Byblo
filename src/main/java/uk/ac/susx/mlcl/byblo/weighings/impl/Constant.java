@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo.weighings.impl;
 
 import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.weighings.AbstractSimpleWeighting;
+import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 
 /**
  * {@link Weighting} that simply returns the value stored in the vector
@@ -42,7 +43,9 @@ import uk.ac.susx.mlcl.byblo.weighings.AbstractSimpleWeighting;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class Constant extends AbstractSimpleWeighting implements Serializable {
+public final class Constant
+        extends AbstractSimpleWeighting
+        implements Serializable {
 
     public static final double DEFAULT_FACTOR = 1;
 
@@ -84,5 +87,27 @@ public final class Constant extends AbstractSimpleWeighting implements Serializa
     @Override
     public double getLowerBound() {
         return Double.NEGATIVE_INFINITY;
+    }
+
+    private boolean equals(Constant that) {
+        if (Double.doubleToLongBits(this.factor)
+                != Double.doubleToLongBits(that.factor))
+            return false;
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        return equals((Constant) obj);
+    }
+
+    @Override
+    public int hashCode() {
+        final long fBits = Double.doubleToLongBits(this.factor);
+        return (67 * 11 + (int) (fBits ^ (fBits >>> 32)));
     }
 }

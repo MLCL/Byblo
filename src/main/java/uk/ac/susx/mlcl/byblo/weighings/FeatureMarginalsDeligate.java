@@ -30,6 +30,8 @@
  */
 package uk.ac.susx.mlcl.byblo.weighings;
 
+import java.util.Arrays;
+
 /**
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
@@ -127,5 +129,35 @@ public class FeatureMarginalsDeligate implements FeatureMarginalsCarrier {
      */
     protected final double getFeaturePrior(final int key) {
         return getFeatureMarginals(key) / featureTotal;
+    }
+
+    protected boolean equals(FeatureMarginalsDeligate other) {
+        if (!Arrays.equals(this.featureMarginals, other.featureMarginals))
+            return false;
+        if (Double.doubleToLongBits(this.featureTotal) != Double.
+                doubleToLongBits(other.featureTotal))
+            return false;
+        if (this.featureCardinality != other.featureCardinality)
+            return false;
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        return equals((FeatureMarginalsDeligate) obj);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 23 * hash + Arrays.hashCode(this.featureMarginals);
+        final long ftBits = Double.doubleToLongBits(this.featureTotal);
+        hash = 23 * hash + (int) (ftBits ^ (ftBits >>> 32));
+        hash = 23 * hash + (int) (this.featureCardinality ^ (this.featureCardinality >>> 32));
+        return hash;
     }
 }

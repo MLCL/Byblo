@@ -4,6 +4,7 @@
  */
 package uk.ac.susx.mlcl.byblo.weighings.impl;
 
+import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
@@ -13,7 +14,10 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class NullWeighting implements Weighting {
+public final class NullWeighting
+        implements Weighting, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public NullWeighting() {
     }
@@ -36,5 +40,19 @@ public final class NullWeighting implements Weighting {
     @Override
     public String toString() {
         return this.getClass().getSimpleName();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return 41;
     }
 }

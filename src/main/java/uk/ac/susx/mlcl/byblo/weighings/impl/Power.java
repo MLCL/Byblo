@@ -37,7 +37,9 @@ import uk.ac.susx.mlcl.byblo.weighings.AbstractSimpleWeighting;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class Power extends AbstractSimpleWeighting implements Serializable {
+public final class Power
+        extends AbstractSimpleWeighting
+        implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -79,5 +81,27 @@ public final class Power extends AbstractSimpleWeighting implements Serializable
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + "{power=" + power + "}";
+    }
+
+    private boolean equals(Power that) {
+        if (Double.doubleToLongBits(this.power)
+                != Double.doubleToLongBits(that.power))
+            return false;
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        return equals((Power) obj);
+    }
+
+    @Override
+    public int hashCode() {
+        final long pBits = Double.doubleToLongBits(this.power);
+        return (67 * 53 + (int) (pBits ^ (pBits >>> 32)));
     }
 }

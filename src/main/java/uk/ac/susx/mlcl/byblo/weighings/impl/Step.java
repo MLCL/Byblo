@@ -37,7 +37,9 @@ import uk.ac.susx.mlcl.byblo.weighings.AbstractSimpleWeighting;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class Step extends AbstractSimpleWeighting implements Serializable {
+public final class Step
+        extends AbstractSimpleWeighting
+        implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -74,5 +76,27 @@ public final class Step extends AbstractSimpleWeighting implements Serializable 
     @Override
     public String toString() {
         return this.getClass().getSimpleName() + "{boundary=" + boundary + "}";
+    }
+
+    private boolean equals(Step that) {
+        if (Double.doubleToLongBits(this.boundary)
+                != Double.doubleToLongBits(that.boundary))
+            return false;
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        return equals((Step) obj);
+    }
+
+    @Override
+    public int hashCode() {
+        final long bBits = Double.doubleToLongBits(this.boundary);
+        return (67 * 73 + (int) (bBits ^ (bBits >>> 32)));
     }
 }

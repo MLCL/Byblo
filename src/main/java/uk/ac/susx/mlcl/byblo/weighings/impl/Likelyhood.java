@@ -35,12 +35,14 @@ import uk.ac.susx.mlcl.byblo.weighings.AbstractElementwiseWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- * {@link Weighting} that normalizes the feature vector by the total. This is 
+ * {@link Weighting} that normalizes the feature vector by the total. This is
  * effectively the probability of each feature conditioned on the entry.
- * 
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class Likelyhood extends AbstractElementwiseWeighting implements Serializable {
+public final class Likelyhood
+        extends AbstractElementwiseWeighting
+        implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -62,5 +64,19 @@ public final class Likelyhood extends AbstractElementwiseWeighting implements Se
     @Override
     public String toString() {
         return this.getClass().getSimpleName();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return 29;
     }
 }
