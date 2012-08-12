@@ -31,7 +31,7 @@
 package uk.ac.susx.mlcl.byblo.measures.v2.impl;
 
 import java.io.Serializable;
-import uk.ac.susx.mlcl.byblo.measures.v2.DecomposableProximity;
+import uk.ac.susx.mlcl.byblo.measures.v2.DecomposableMeasure;
 import uk.ac.susx.mlcl.byblo.measures.v2.Measures;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.Weightings;
@@ -45,7 +45,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class Jaccard extends DecomposableProximity implements Serializable {
+public final class Jaccard extends DecomposableMeasure implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

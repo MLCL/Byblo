@@ -30,29 +30,39 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.v2;
 
+import uk.ac.susx.mlcl.byblo.measures.v2.impl.Dice;
+import uk.ac.susx.mlcl.byblo.measures.v2.impl.Jaccard;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
+import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- * {@link Measure } is a common super-interface to various similarity measure
- * types. In first instance a similarity measure should implement one of either
- * {@link Proximity }, {@link Distance }, or both.
+ * Measure is a common super-interface to various similarity measure types.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public interface Measure {
 
     /**
-     * Accessor the to similarity score that will be produced by this measure
-     * when two vectors are identical. In the case of proximity scores this
-     * value should usually be 0. For distance metrics it is usually +infinity,
+     * Compute the similarity score between the vector operands.
+     *
+     * @param A first feature vector
+     * @param B second feature vector
+     * @return similarity of the feature vectors
+     */
+    double similarity(SparseDoubleVector A, SparseDoubleVector B);
+
+    /**
+     * Gets the to similarity score that will be produced by this measure when
+     * two vectors are identical. In the case of proximity scores this value
+     * should usually be 0. For distance metrics it is usually +infinity,
      *
      * @return value indicating vectors are identical
      */
     double getHomogeneityBound();
 
     /**
-     * Accessor the similarity score that will be produced by this measure when
-     * two vectors could not be more dissimilar. In the case of proximity scores
+     * Gets the similarity score that will be produced by this measure when two
+     * vectors could not be more dissimilar. In the case of proximity scores
      * this value should usually be 1 or +infinity. For distance metrics it is
      * usually 0,
      *
@@ -61,16 +71,16 @@ public interface Measure {
     double getHeterogeneityBound();
 
     /**
-     * Accessor to the {@link Weighting} scheme that should have been previously
+     * Gets the {@link Weighting} scheme that should have been previously
      * applied to feature vectors before this {@link Measure} implementation is
      * used.
      *
      * Some measures can operate on pretty much any kind of vector (for example
      * geometric distance measures). Others require the vectors to take a
-     * particular form. Set theoretic measures Dice and Jaccard require feature
-     * weights to be positive, though not binary as one might expect since
-     * multi-set generalizations are implemented. Lin and Weeds measure expect
-     * PMI weighting.
+     * particular form. Set theoretic measures {@link Dice} and {@link Jaccard}
+     * require feature weights to be positive, though not binary as one might
+     * expect since multi-set generalizations are implemented. Lin and Weeds
+     * measure expect PMI weighting.
      *
      * @return weighting scheme that should have been previously applied to
      * vectors
@@ -87,10 +97,10 @@ public interface Measure {
      * spaces are possible. In these cases the measure should be marked as
      * non-commutative.
      *
-     * In the case of {@link Distance } measures, a commutative kernel will
-     * define a <em>true</em> metric, while a non-commutative kernel will not.
-     * For example {@link KLDivergence} is a distance measure while
-     * {@link LpSpace} variants are true metrics.
+     * In the case of distance measures, a commutative kernel will define a
+     * <em>true</em> metric, while a non-commutative kernel will not. For
+     * example {@link KLDivergence} is a distance measure while the {@link LpSpace}
+     * variants are true metrics.
      *
      * @return true if the measure defines a symmetric space, false otherwise
      */

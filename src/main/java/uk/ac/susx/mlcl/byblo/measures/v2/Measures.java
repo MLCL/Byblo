@@ -31,7 +31,6 @@
 package uk.ac.susx.mlcl.byblo.measures.v2;
 
 import static java.lang.Math.min;
-import java.text.MessageFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.weighings.Weightings;
@@ -169,158 +168,23 @@ public abstract class Measures {
                 : Math.sqrt(lengthSquared(vector));
     }
 
-    /**
-     *
-     * @param <T>
-     */
-    private static class AutoWeightingAdapter<T extends Measure>
-            extends AbstractForwardingMeasure<T> {
-
-        private AutoWeightingAdapter(T innerMeasure) {
-            super(innerMeasure);
-        }
-
-        protected SparseDoubleVector weight(SparseDoubleVector vector) {
-            return getInnerMeasure().getExpectedWeighting().apply(vector);
-        }
-
-        @Override
-        public String toString() {
-            return "AutoWeighting{measure=" + getInnerMeasure()
-                    + ", weighting=" + getInnerMeasure().getExpectedWeighting() + '}';
-        }
-    }
-
-    /**
-     *
-     */
-    private static class AutoWeightingDistance
-            extends AutoWeightingAdapter<Distance>
-            implements Distance {
-
-        private AutoWeightingDistance(Distance innerMeasure) {
-            super(innerMeasure);
-        }
-
-        @Override
-        public double distance(SparseDoubleVector A, SparseDoubleVector B) {
-            return getInnerMeasure().distance(weight(A), weight(B));
-        }
-    }
-
-    /**
-     *
-     */
-    private static class AutoWeightingProximity
-            extends AutoWeightingAdapter<Proximity>
-            implements Proximity {
-
-        private AutoWeightingProximity(Proximity innerMeasure) {
-            super(innerMeasure);
-        }
-
-        @Override
-        public double proximity(SparseDoubleVector A, SparseDoubleVector B) {
-            return getInnerMeasure().proximity(weight(A), weight(B));
-        }
-    }
-
-    public static Distance autoWeighted(Distance measure) {
-        Checks.checkNotNull("measure", measure);
-        if (measure.getExpectedWeighting().equals(Weightings.none())) {
-            return measure;
-        } else {
-            return new AutoWeightingDistance(measure);
-        }
-    }
-
-    public static Proximity autoWeighted(Proximity measure) {
-        Checks.checkNotNull("measure", measure);
-        if (measure.getExpectedWeighting().equals(Weightings.none())) {
-            return measure;
-        } else {
-            return new AutoWeightingProximity(measure);
-        }
-    }
-
     public static Measure autoWeighted(Measure measure) {
         Checks.checkNotNull("measure", measure);
-        if (measure instanceof Distance) {
-            return autoWeighted((Distance) measure);
-        } else if (measure instanceof Proximity) {
-            return autoWeighted((Proximity) measure);
-        } else {
-            throw new IllegalArgumentException(MessageFormat.format(
-                    "Argument 'measure' expected to be of type Proximity or "
-                    + "Distance but found {0} of type {1}",
-                    measure, measure.getClass()));
-        }
-
-    }
-
-    private static class ReversedDistance
-            extends AbstractForwardingMeasure<Distance>
-            implements Distance {
-
-        private ReversedDistance(Distance innerMeasure) {
-            super(innerMeasure);
-        }
-
-        @Override
-        public double distance(SparseDoubleVector A, SparseDoubleVector B) {
-            return getInnerMeasure().distance(B, A);
-        }
-    }
-
-    private static class ReversedProximity
-            extends AbstractForwardingMeasure<Proximity>
-            implements Proximity {
-
-        private ReversedProximity(Proximity innerMeasure) {
-            super(innerMeasure);
-        }
-
-        @Override
-        public double proximity(SparseDoubleVector A, SparseDoubleVector B) {
-            return getInnerMeasure().proximity(B, A);
-        }
-    }
-
-    public static Distance reverse(Distance measure) {
-        Checks.checkNotNull("measure", measure);
-        if (measure.isCommutative()) {
-            if (LOG.isWarnEnabled())
-                LOG.warn("Attempting to reverse a commutative measure.");
+        if (measure.getExpectedWeighting().equals(Weightings.none())) {
             return measure;
         } else {
-            return new ReversedDistance(measure);
+            return new AutoWeightingMeasure(measure);
         }
-
-    }
-
-    public static Proximity reverse(Proximity measure) {
-        Checks.checkNotNull("measure", measure);
-        if (measure.isCommutative()) {
-            if (LOG.isWarnEnabled())
-                LOG.warn("Attempting to reverse a commutative measure.");
-            return measure;
-        } else {
-            return new ReversedProximity(measure);
-        }
-
     }
 
     public static Measure reverse(Measure measure) {
         Checks.checkNotNull("measure", measure);
-        if (measure instanceof Distance) {
-            return reverse((Distance) measure);
-        } else if (measure instanceof Proximity) {
-            return reverse((Proximity) measure);
+        if (measure.isCommutative()) {
+            if (LOG.isWarnEnabled())
+                LOG.warn("Attempting to reverse a commutative measure.");
+            return measure;
         } else {
-            throw new IllegalArgumentException(MessageFormat.format(
-                    "Argument 'measure' expected to be of type Proximity or "
-                    + "Distance but found {0} of type {1}",
-                    measure, measure.getClass()));
+            return new ReversedMeasure(measure);
         }
 
     }

@@ -33,34 +33,49 @@ package uk.ac.susx.mlcl.byblo.measures.v2;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import uk.ac.susx.mlcl.lib.Checks;
+import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
+ * <code>ForwardingMeasure</code> is an abstract super-class to decorators of
+ * <code>Measure</code> instances.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
- * @param <T>
- *
+ * @param <T> type of Measure being decorated
  */
-public class AbstractForwardingMeasure<T extends Measure> implements Measure {
+public abstract class ForwardingMeasure<T extends Measure>
+        implements Measure {
 
-    private final T innerMeasure;
+    private final T deligate;
 
-    public AbstractForwardingMeasure(T innerMeasure) {
-        Checks.checkNotNull("innerMeasure", innerMeasure);
-        this.innerMeasure = innerMeasure;
+    /**
+     * Constructor used by sub-classes.
+     *
+     * @param deligate The Measure being decorated.
+     */
+    protected ForwardingMeasure(final T deligate) {
+        Checks.checkNotNull("deligate", deligate);
+        this.deligate = deligate;
     }
 
-    public final T getInnerMeasure() {
-        return innerMeasure;
+    @Override
+    public double similarity(
+            final SparseDoubleVector A,
+            final SparseDoubleVector B) {
+        return deligate.similarity(A, B);
+    }
+
+    public final T getDelegate() {
+        return deligate;
     }
 
     @Override
     public double getHomogeneityBound() {
-        return innerMeasure.getHomogeneityBound();
+        return deligate.getHomogeneityBound();
     }
 
     @Override
     public double getHeterogeneityBound() {
-        return innerMeasure.getHeterogeneityBound();
+        return deligate.getHeterogeneityBound();
     }
 
     @Override
@@ -70,13 +85,13 @@ public class AbstractForwardingMeasure<T extends Measure> implements Measure {
 
     @Override
     public boolean isCommutative() {
-        return innerMeasure.isCommutative();
+        return deligate.isCommutative();
     }
 
-    public boolean equals(AbstractForwardingMeasure<?> other) {
-        if (this.innerMeasure != other.innerMeasure && (this.innerMeasure == null || !this.innerMeasure.
-                                                        equals(
-                                                        other.innerMeasure)))
+    public boolean equals(ForwardingMeasure<?> other) {
+        if (this.deligate != other.deligate
+                && (this.deligate == null
+                    || !this.deligate.equals(other.deligate)))
             return false;
         return true;
     }
@@ -87,16 +102,16 @@ public class AbstractForwardingMeasure<T extends Measure> implements Measure {
             return true;
         if (obj == null || getClass() != obj.getClass())
             return false;
-        return equals((AbstractForwardingMeasure) obj);
+        return equals((ForwardingMeasure) obj);
     }
 
     @Override
     public int hashCode() {
-        return 79 * 5 + (this.innerMeasure != null ? this.innerMeasure.hashCode() : 0);
+        return 79 * 5 + (deligate != null ? deligate.hashCode() : 0);
     }
 
     @Override
     public String toString() {
-        return "AutoWeighting{measure=" + innerMeasure + '}';
+        return this.getClass().getSimpleName() + "{deligate=" + deligate + '}';
     }
 }

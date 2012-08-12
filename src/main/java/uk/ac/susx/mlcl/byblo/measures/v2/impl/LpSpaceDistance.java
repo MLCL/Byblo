@@ -32,7 +32,7 @@ package uk.ac.susx.mlcl.byblo.measures.v2.impl;
 
 import java.io.Serializable;
 import static java.lang.Math.*;
-import uk.ac.susx.mlcl.byblo.measures.v2.Distance;
+import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
@@ -55,7 +55,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class LpSpaceDistance implements Distance, Serializable {
+public final class LpSpaceDistance implements Measure, Serializable {
 
     public static final double DEFAULT_POWER = 2;
 
@@ -63,7 +63,7 @@ public final class LpSpaceDistance implements Distance, Serializable {
 
     private double power = Double.NaN;
 
-    private Distance deligate = null;
+    private Measure deligate = null;
 
     public LpSpaceDistance() {
         setPower(DEFAULT_POWER);
@@ -96,8 +96,8 @@ public final class LpSpaceDistance implements Distance, Serializable {
     }
 
     @Override
-    public double distance(SparseDoubleVector A, SparseDoubleVector B) {
-        return deligate.distance(A, B);
+    public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
+        return deligate.similarity(A, B);
     }
 
     @Override
@@ -128,7 +128,7 @@ public final class LpSpaceDistance implements Distance, Serializable {
     /**
      * Abstract super class to the various Lp Space metric implementations.
      */
-    private static abstract class LpSpaceDeligate implements Distance {
+    private static abstract class LpSpaceDeligate implements Measure {
 
         @Override
         public final Weighting getExpectedWeighting() {
@@ -156,12 +156,12 @@ public final class LpSpaceDistance implements Distance, Serializable {
      * not produce the correct results of p = -inf, 0, or +inf.
      */
     private final class MinkowskiDistance extends LpSpaceDeligate
-            implements Distance, Serializable {
+            implements Serializable {
 
         private static final long serialVersionUID = 1L;
 
         @Override
-        public double distance(SparseDoubleVector A, SparseDoubleVector B) {
+        public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
             double distance = 0;
 
             int i = 0, j = 0;
@@ -197,12 +197,12 @@ public final class LpSpaceDistance implements Distance, Serializable {
      * are all used to.
      */
     private static final class EuclideanDistance extends LpSpaceDeligate
-            implements Distance, Serializable {
+            implements Serializable {
 
         private static final long serialVersionUID = 1L;
 
         @Override
-        public double distance(SparseDoubleVector A, SparseDoubleVector B) {
+        public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
             double distance = 0;
 
             int i = 0, j = 0;
@@ -239,12 +239,12 @@ public final class LpSpaceDistance implements Distance, Serializable {
      * distance.
      */
     private static final class ManhattanDistance extends LpSpaceDeligate
-            implements Distance, Serializable {
+            implements Serializable {
 
         private static final long serialVersionUID = 1L;
 
         @Override
-        public double distance(SparseDoubleVector A, SparseDoubleVector B) {
+        public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
             double distance = 0;
 
             int i = 0, j = 0;
@@ -279,12 +279,12 @@ public final class LpSpaceDistance implements Distance, Serializable {
      * Implementation of power-zero L space.
      */
     private static final class HammingDistance extends LpSpaceDeligate
-            implements Distance, Serializable {
+            implements Serializable {
 
         private static final long serialVersionUID = 1L;
 
         @Override
-        public double distance(SparseDoubleVector A, SparseDoubleVector B) {
+        public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
             double distance = 0;
 
             int i = 0, j = 0;
@@ -319,12 +319,12 @@ public final class LpSpaceDistance implements Distance, Serializable {
      * Implementation of power +infinity L-space metric.
      */
     private static final class MaxSpaceDistance extends LpSpaceDeligate
-            implements Distance, Serializable {
+            implements Serializable {
 
         private static final long serialVersionUID = 1L;
 
         @Override
-        public double distance(SparseDoubleVector A, SparseDoubleVector B) {
+        public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
             double distance = 0;
 
             int i = 0, j = 0;
@@ -358,12 +358,12 @@ public final class LpSpaceDistance implements Distance, Serializable {
      * Implementation of power -infinity L-space metric.
      */
     private static final class MinSpaceDistance extends LpSpaceDeligate
-            implements Distance, Serializable {
+            implements Serializable {
 
         private static final long serialVersionUID = 1L;
 
         @Override
-        public double distance(SparseDoubleVector A, SparseDoubleVector B) {
+        public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
             double distance = 0;
 
             int i = 0, j = 0;

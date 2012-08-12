@@ -33,33 +33,21 @@ package uk.ac.susx.mlcl.byblo.measures.v2;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- * {@link Decomposable} defines an interface that measures can optimally
- * implement that breaks down their operation into sub-functions.
- *
- * This interface has been expanded from {@link Proximity} and {@link Distance}
- * (the usual single method interfaces) to allow for pre-calculation of values
- * that are dependant only on one vector.
+ * Decorate a
+ * <code>Measure</code> by reversing the operands of similarity calculations.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public interface Decomposable extends Measure {
+public class ReversedMeasure
+        extends ForwardingMeasure<Measure>
+        implements Measure {
 
-    /**
-     * Calculate the similarity of the given vectors A and B. If possible this
-     * should be based entirely upon shared features, while independent features
-     * can be pre-calculated using {@link #left(SparseDoubleVector)} and
-     * {@link #right(SparseDoubleVector)}. All three values are combined using
-     * {@link Proximity#combine(double, double, double)}.
-     *
-     * @param A the first feature vector
-     * @param B the second feature vector
-     * @return portion of similarity measure dependent on both A and B
-     */
-    double shared(SparseDoubleVector A, SparseDoubleVector B);
+    public ReversedMeasure(final Measure deligate) {
+        super(deligate);
+    }
 
-    double left(SparseDoubleVector A);
-
-    double right(SparseDoubleVector B);
-
-    double combine(double shared, double left, double right);
+    @Override
+    public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
+        return getDelegate().similarity(B, A);
+    }
 }

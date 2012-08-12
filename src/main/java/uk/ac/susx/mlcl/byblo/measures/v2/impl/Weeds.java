@@ -31,7 +31,7 @@
 package uk.ac.susx.mlcl.byblo.measures.v2.impl;
 
 import java.io.Serializable;
-import uk.ac.susx.mlcl.byblo.measures.v2.Proximity;
+import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.PositivePMI;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
@@ -52,7 +52,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class Weeds implements Proximity, Serializable {
+public class Weeds implements Measure, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -100,10 +100,10 @@ public class Weeds implements Proximity, Serializable {
     }
 
     @Override
-    public double proximity(SparseDoubleVector A, SparseDoubleVector B) {
+    public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
 
-        final double recall = RECALL.proximity(A, B);
-        final double precision = PRECISION.proximity(A, B);
+        final double recall = RECALL.similarity(A, B);
+        final double precision = PRECISION.similarity(A, B);
 
         // arithmetic mean
         final double am = (beta * precision) + ((1 - beta) * recall);

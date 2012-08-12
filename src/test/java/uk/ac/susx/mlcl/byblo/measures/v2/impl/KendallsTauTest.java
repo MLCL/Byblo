@@ -287,7 +287,7 @@ public class KendallsTauTest {
     }
 
     public double test(SparseDoubleVector A, SparseDoubleVector B) {
-        final double val = INSTANCE.proximity(A, B);
+        final double val = INSTANCE.similarity(A, B);
         assertFalse("Similarity is NaN", Double.isNaN(val));
         assertFalse("Similarity is " + val, Double.isInfinite(val));
         assertTrue("Similarity < -1", val >= INSTANCE.getHeterogeneityBound());

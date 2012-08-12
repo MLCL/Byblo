@@ -33,17 +33,62 @@ package uk.ac.susx.mlcl.byblo.measures.v2;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
+ * <code>DecomposableMeasure</code> defines a Measure can be optimally extended
+ * to break down internal operation into sub-functions.
  *
+ * This abstract class has been expanded from {@link Measure} to allow for
+ * pre-calculation of values that are dependant only on one vector.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public abstract class DecomposableProximity
-        implements Proximity, Decomposable {
+public abstract class DecomposableMeasure
+        implements Measure {
 
     @Override
-    public final double proximity(
+    public final double similarity(
             final SparseDoubleVector A,
             final SparseDoubleVector B) {
         return combine(shared(A, B), left(A), right(B));
     }
+
+    /**
+     * Calculate the similarity of the given vectors A and B. If possible this
+     * should be based entirely upon shared features, while independent features
+     * can be pre-calculated using {@link #left(SparseDoubleVector)} and
+     * {@link #right(SparseDoubleVector)}. All three values are combined using
+     * {@link Proximity#combine(double, double, double)}.
+     *
+     * @param A the first feature vector
+     * @param B the second feature vector
+     * @return portion of similarity measure dependent on both A and B
+     */
+    public abstract double shared(SparseDoubleVector A, SparseDoubleVector B);
+
+    /**
+     * Calculate some part of the similarity measure, based entirely on the
+     * first feature vectors.
+     *
+     * @param A first feature vector
+     * @return pre-calculated result
+     */
+    public abstract double left(SparseDoubleVector A);
+
+    /**
+     * Calculate some part of the similarity measure, based entirely on the
+     * second feature vectors.
+     *
+     * @param B first feature vector
+     * @return pre-calculated result
+     */
+    public abstract double right(SparseDoubleVector B);
+
+    /**
+     * Combine the the component results into a single similarity score.
+     *
+     * @param shared component derived from both vectors
+     * @param left component derived from first vector
+     * @param right component derived from second vector
+     * @return combined result
+     */
+    public abstract double combine(double shared, double left, double right);
 }
