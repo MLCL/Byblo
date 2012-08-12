@@ -85,7 +85,7 @@ public interface Measure {
      * @return weighting scheme that should have been previously applied to
      * vectors
      */
-    Weighting getExpectedWeighting();
+    Class<? extends Weighting> getExpectedWeighting();
 
     /**
      * Whether or not the operands can be reversed without changing the

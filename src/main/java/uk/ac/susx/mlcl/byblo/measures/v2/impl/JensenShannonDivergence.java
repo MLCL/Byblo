@@ -33,12 +33,12 @@ package uk.ac.susx.mlcl.byblo.measures.v2.impl;
 import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
-import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
+import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- * {@link Distance} measure that computes similarity as the Jensen-Shannon
+ * Distance measure that computes similarity as the Jensen-Shannon
  * divergence.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
@@ -101,9 +101,9 @@ public final class JensenShannonDivergence implements Measure, Serializable {
         return Double.POSITIVE_INFINITY;
     }
 
-    @Override
-    public Weighting getExpectedWeighting() {
-        return Weightings.positive();
+   @Override
+    public Class<? extends Weighting> getExpectedWeighting() {
+        return PositiveWeighting.class;
     }
 
     @Override

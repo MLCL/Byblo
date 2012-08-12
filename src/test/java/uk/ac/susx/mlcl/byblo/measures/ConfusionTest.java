@@ -40,6 +40,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 /**
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @deprecated
  */
 public class ConfusionTest {
 
@@ -51,16 +52,16 @@ public class ConfusionTest {
         output.delete();
 
         try {
-        enableExistTrapping();
-        Tools.main(new String[]{
-                    "allpairs",
-                    "--charset", "UTF-8",
-                    "--measure", "Confusion",
-                    "--input", TEST_FRUIT_EVENTS.toString(),
-                    "--input-features", TEST_FRUIT_FEATURES.toString(),
-                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                    "--output", output.toString()
-                });
+            enableExistTrapping();
+            Tools.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "Confusion",
+                        "--input", TEST_FRUIT_EVENTS.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output.toString()
+                    });
         } finally {
             disableExitTrapping();
         }

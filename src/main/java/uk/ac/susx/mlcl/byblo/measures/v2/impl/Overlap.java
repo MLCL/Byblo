@@ -34,7 +34,7 @@ import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.measures.v2.DecomposableMeasure;
 import uk.ac.susx.mlcl.byblo.measures.v2.Measures;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
-import uk.ac.susx.mlcl.byblo.weighings.Weightings;
+import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
@@ -82,8 +82,8 @@ public class Overlap extends DecomposableMeasure implements Serializable {
     }
 
     @Override
-    public Weighting getExpectedWeighting() {
-        return Weightings.positive();
+    public Class<? extends Weighting> getExpectedWeighting() {
+        return PositiveWeighting.class;
     }
 
     @Override

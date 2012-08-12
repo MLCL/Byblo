@@ -44,48 +44,36 @@ import java.io.File;
 import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
-import uk.ac.susx.mlcl.byblo.io.BybloIO;
-import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
-import uk.ac.susx.mlcl.byblo.io.Token;
-import uk.ac.susx.mlcl.byblo.io.TokenPair;
-import uk.ac.susx.mlcl.byblo.io.Weighted;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
+import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource.WTStatsSource;
-import uk.ac.susx.mlcl.byblo.measures.AbstractMIProximity;
-import uk.ac.susx.mlcl.byblo.measures.CrMi;
-import uk.ac.susx.mlcl.byblo.measures.KendallTau;
-import uk.ac.susx.mlcl.byblo.measures.Lee;
-import uk.ac.susx.mlcl.byblo.measures.Lp;
-import uk.ac.susx.mlcl.byblo.measures.Proximity;
-import uk.ac.susx.mlcl.byblo.measures.ReversedProximity;
+import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
+import uk.ac.susx.mlcl.byblo.measures.v2.Measures;
+import uk.ac.susx.mlcl.byblo.measures.v2.impl.KendallsTau;
+import uk.ac.susx.mlcl.byblo.measures.v2.impl.LeeSkewDivergence;
+import uk.ac.susx.mlcl.byblo.measures.v2.impl.LpSpaceDistance;
+import uk.ac.susx.mlcl.byblo.measures.v2.impl.Weeds;
 import uk.ac.susx.mlcl.byblo.tasks.InvertedApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.NaiveApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.ThreadedApssTask;
+import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsCarrier;
+import uk.ac.susx.mlcl.byblo.weighings.Weighting;
+import uk.ac.susx.mlcl.byblo.weighings.Weightings;
+import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.MiscUtil;
-import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
-import uk.ac.susx.mlcl.lib.commands.DoubleConverter;
-import uk.ac.susx.mlcl.lib.commands.FileDeligate;
-import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
-import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
+import uk.ac.susx.mlcl.lib.commands.*;
+import uk.ac.susx.mlcl.lib.events.ProgressEvent;
+import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.io.Tell;
-import uk.ac.susx.mlcl.lib.events.ProgressEvent;
-import uk.ac.susx.mlcl.lib.events.ProgressListener;
 
 /**
  *
@@ -105,33 +93,33 @@ public class AllPairsCommand extends AbstractCommand {
     public static final int DEFAULT_MINK_P = 2;
 
     @Parameter(names = {"-i", "--input"},
-    description = "Event frequency vectors files.",
-    required = true,
-    validateWith = InputFileValidator.class)
+               description = "Event frequency vectors files.",
+               required = true,
+               validateWith = InputFileValidator.class)
     private File eventsFile;
 
     @Parameter(names = {"-if", "--input-features"},
-    description = "Feature frequencies file",
-    validateWith = InputFileValidator.class)
+               description = "Feature frequencies file",
+               validateWith = InputFileValidator.class)
     private File featuresFile;
 
     @Parameter(names = {"-ie", "--input-entries"},
-    description = "Entry frequencies file",
-    validateWith = InputFileValidator.class)
+               description = "Entry frequencies file",
+               validateWith = InputFileValidator.class)
     private File entriesFile;
 
     @Parameter(names = {"-o", "--output"},
-    description = "Output similarity matrix file.",
-    required = true,
-    validateWith = OutputFileValidator.class)
+               description = "Output similarity matrix file.",
+               required = true,
+               validateWith = OutputFileValidator.class)
     private File outputFile;
 
     @Parameter(names = {"-C", "--chunk-size"},
-    description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
+               description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
     private int chunkSize = ThreadedApssTask.DEFAULT_MAX_CHUNK_SIZE;
 
     @Parameter(names = {"-t", "--threads"},
-    description = "Number of conccurent processing threads.")
+               description = "Number of conccurent processing threads.")
     private int numThreads = Runtime.getRuntime().availableProcessors() + 1;
 
     public static final double DEFAULT_MIN_SIMILARITY = Double.NEGATIVE_INFINITY;
@@ -139,48 +127,50 @@ public class AllPairsCommand extends AbstractCommand {
     public static final double DEFAULT_MAX_SIMILARITY = Double.POSITIVE_INFINITY;
 
     @Parameter(names = {"-Smn", "--similarity-min"},
-    description = "Minimum similarity threshold.",
-    converter = DoubleConverter.class)
+               description = "Minimum similarity threshold.",
+               converter = DoubleConverter.class)
     private double minSimilarity = DEFAULT_MIN_SIMILARITY;
 
     @Parameter(names = {"-Smx", "--similarity-max"},
-    description = "Maximyum similarity threshold.",
-    converter = DoubleConverter.class)
+               description = "Maximyum similarity threshold.",
+               converter = DoubleConverter.class)
     private double maxSimilarity = DEFAULT_MAX_SIMILARITY;
 
     @Parameter(names = {"-ip", "--identity-pairs"},
-    description = "Produce similarity between pair of identical entries.")
+               description = "Produce similarity between pair of identical entries.")
     private boolean outputIdentityPairs = false;
 
     public static final String DEFAULT_MEASURE = "Lin";
 
     @Parameter(names = {"-m", "--measure"},
-    description = "Similarity measure to use.")
+               description = "Similarity measure to use.")
     private String measureName = DEFAULT_MEASURE;
 
     @Parameter(names = {"--measure-reversed"},
-    description = "Swap similarity measure inputs.")
+               description = "Swap similarity measure inputs.")
     private boolean measureReversed = false;
 
     @Parameter(names = {"--lee-alpha"},
-    description = "Alpha parameter to Lee's alpha-skew divergence measure.",
-    converter = DoubleConverter.class)
-    private double leeAlpha = Lee.DEFAULT_ALPHA;
+               description = "Alpha parameter to Lee's alpha-skew divergence measure.",
+               converter = DoubleConverter.class)
+    private double leeAlpha = LeeSkewDivergence.DEFAULT_ALPHA;
 
     @Parameter(names = {"--crmi-beta"},
-    description = "Beta paramter to Weed's CRMI measure.",
-    converter = DoubleConverter.class)
-    private double crmiBeta = CrMi.DEFAULT_BETA;
+               description = "Beta paramter to Weed's CRMI measure.",
+               converter = DoubleConverter.class)
+    private double crmiBeta = Weeds.DEFAULT_BETA;
 
     @Parameter(names = {"--crmi-gamma"},
-    description = "Gamma paramter to Weed's CRMI measure.",
-    converter = DoubleConverter.class)
-    private double crmiGamma = CrMi.DEFAULT_GAMMA;
+               description = "Gamma paramter to Weed's CRMI measure.",
+               converter = DoubleConverter.class)
+    private double crmiGamma = Weeds.DEFAULT_GAMMA;
 
     @Parameter(names = {"--mink-p"},
-    description = "P parameter to Minkowski/Lp space measure.",
-    converter = DoubleConverter.class)
-    private double minkP = Lp.DEFAULT_P;
+               description = "P parameter to Minkowski/Lp space measure.",
+               converter = DoubleConverter.class)
+    private double minkP = LpSpaceDistance.DEFAULT_POWER;
+
+    private Weighting weighting = new NullWeighting();
 
     public enum Algorithm {
 
@@ -200,12 +190,11 @@ public class AllPairsCommand extends AbstractCommand {
         public NaiveApssTask newInstance() throws InstantiationException, IllegalAccessException {
             return getImplementation().newInstance();
         }
-
     }
 
     @Parameter(names = {"--algorithm"},
-    hidden = true,
-    description = "APPS algorithm to use.")
+               hidden = true,
+               description = "APPS algorithm to use.")
     private Algorithm algorithm = Algorithm.Inverted;
 
     public AllPairsCommand(File entriesFile, File featuresFile,
@@ -231,21 +220,34 @@ public class AllPairsCommand extends AbstractCommand {
         }
 
         // Instantiate the denote proxmity measure
-        Proximity prox = getMeasureClass().newInstance();
+        Measure measure = getMeasureClass().newInstance();
 
         // Parameterise those measures that require them
-        if (prox instanceof Lp) {
-            ((Lp) prox).setP(getMinkP());
-        } else if (prox instanceof Lee) {
-            ((Lee) prox).setAlpha(getLeeAlpha());
-        } else if (prox instanceof CrMi) {
-            ((CrMi) prox).setBeta(getCrmiBeta());
-            ((CrMi) prox).setGamma(getCrmiGamma());
+        if (measure instanceof LpSpaceDistance) {
+            ((LpSpaceDistance) measure).setPower(getMinkP());
+        } else if (measure instanceof LeeSkewDivergence) {
+            ((LeeSkewDivergence) measure).setAlpha(getLeeAlpha());
+        } else if (measure instanceof Weeds) {
+            ((Weeds) measure).setBeta(getCrmiBeta());
+            ((Weeds) measure).setGamma(getCrmiGamma());
         }
 
-        // Mutual Information based proximity measures require the frequencies
-        // of each feature, and other associate values
-        if (prox instanceof AbstractMIProximity) {
+
+        if (weighting.getClass().equals(NullWeighting.class)) {
+            weighting = measure.getExpectedWeighting().newInstance();
+        } else {
+            weighting = Weightings.compose(
+                    weighting,
+                    measure.getExpectedWeighting().newInstance());
+        }
+
+
+        // Some weightings schemes require additional context information, 
+        // specifically the feature marginal distribution. Also there is one
+        // measure (Confusion) that requires this information. The KendallsTau
+        // measure just needs the total number of features types.
+        if (measure instanceof FeatureMarginalsCarrier
+                || weighting instanceof FeatureMarginalsCarrier) {
             try {
                 if (LOG.isInfoEnabled()) {
                     LOG.info("Loading features file " + getFeaturesFile());
@@ -253,37 +255,56 @@ public class AllPairsCommand extends AbstractCommand {
 
                 WTStatsSource features = new WTStatsSource(openFeaturesSource());
 
-                AbstractMIProximity bmip = ((AbstractMIProximity) prox);
-                bmip.setFeatureFrequencies(readAllAsArray(features));
-                bmip.setFeatureFrequencySum(features.getWeightSum());
-                bmip.setOccuringFeatureCount(features.getMaxId() + 1);
+                final double[] featureMarginals = readAllAsArray(features);
+                final double grandTotal = features.getWeightSum();
+                final int featureCardinality = features.getMaxId() + 1;
+
+                if (measure instanceof FeatureMarginalsCarrier) {
+                    FeatureMarginalsCarrier fmc = ((FeatureMarginalsCarrier) measure);
+                    fmc.setFeatureMarginals(featureMarginals);
+                    fmc.setGrandTotal(grandTotal);
+                    fmc.setFeatureCardinality(featureCardinality);
+                }
+
+                if (weighting instanceof FeatureMarginalsCarrier) {
+                    FeatureMarginalsCarrier fmc = ((FeatureMarginalsCarrier) weighting);
+                    fmc.setFeatureMarginals(featureMarginals);
+                    fmc.setGrandTotal(grandTotal);
+                    fmc.setFeatureCardinality(featureCardinality);
+                }
+
 
             } catch (IOException e) {
                 throw e;
             }
-        } else if (prox instanceof KendallTau) {
+        } else if (measure instanceof KendallsTau) {
             try {
                 if (LOG.isInfoEnabled()) {
                     LOG.info("Loading entries file for "
-                            + "KendalTau.numFeatures: " + getFeaturesFile());
+                            + "KendallsTau.minCardinality: " + getFeaturesFile());
                 }
 
                 WTStatsSource features = new WTStatsSource(openFeaturesSource());
                 ObjectIO.copy(features, ObjectIO.<Weighted<Token>>nullSink());
-                ((KendallTau) prox).setNumFeatures(features.getMaxId() + 1);
+                ((KendallsTau) measure).setMinCardinality(
+                        features.getMaxId() + 1);
 
             } catch (IOException e) {
                 throw e;
             }
         }
-        //XXX This needs to be sorted out --- filter id must be read from the
-        // stored enumeration, for optimal robustness
-        prox.setFilteredFeatureId(FilterCommand.FILTERED_ID);
+//        //XXX This needs to be sorted out --- filter id must be read from the
+//        // stored enumeration, for optimal robustness
+//        measure.setFilteredFeatureId(FilterCommand.FILTERED_ID);
 
         // Swap the proximity measure inputs if required
         if (isMeasureReversed()) {
-            prox = new ReversedProximity(prox);
+            measure = Measures.reverse(measure);
         }
+
+        // XXX: Apply the weighing at similarity calculation time, 
+        // inefficient but simple for now.
+        measure = Measures.autoWeighted(measure, weighting);
 
 
         // Instantiate two vector source objects than can scan and read the
@@ -307,7 +328,7 @@ public class AllPairsCommand extends AbstractCommand {
         apss.setSourceA(sourceA);
         apss.setSourceB(sourceB);
         apss.setSink(sink);
-        apss.setMeasure(prox);
+        apss.setMeasure(measure);
         apss.setProducatePair(getProductionFilter());
 
 
@@ -318,7 +339,6 @@ public class AllPairsCommand extends AbstractCommand {
                 LOG.info(progressEvent.getSource().getProgressReport());
 //                LOG.info(MiscUtil.memoryInfoString());
             }
-
         });
 
         apss.run();
@@ -382,7 +402,8 @@ public class AllPairsCommand extends AbstractCommand {
                 maxId = k;
         }
         double[] entryFreqs = new double[maxId + 1];
-        ObjectIterator<Int2DoubleMap.Entry> it = entityFrequenciesMap.int2DoubleEntrySet().
+        ObjectIterator<Int2DoubleMap.Entry> it = entityFrequenciesMap.
+                int2DoubleEntrySet().
                 iterator();
         while (it.hasNext()) {
             Int2DoubleMap.Entry entry = it.next();
@@ -454,46 +475,16 @@ public class AllPairsCommand extends AbstractCommand {
     }
 
     @SuppressWarnings("unchecked")
-    public final Class<? extends Proximity> getMeasureClass()
+    public final Class<? extends Measure> getMeasureClass()
             throws ClassNotFoundException {
-        final Map<String, Class<? extends Proximity>> classLookup =
-                buildMeasureClassLookupTable();
+        final Map<String, Class<? extends Measure>> classLookup =
+                Measures.loadMeasureAliasTable();
         final String mname = getMeasureName().toLowerCase().trim();
         if (classLookup.containsKey(mname)) {
             return classLookup.get(mname);
         } else {
-            return (Class<? extends Proximity>) Class.forName(getMeasureName());
+            return (Class<? extends Measure>) Class.forName(getMeasureName());
         }
-    }
-
-    private Map<String, Class<? extends Proximity>> buildMeasureClassLookupTable()
-            throws ClassNotFoundException {
-
-        // Map that will store measure aliases to class
-        final Map<String, Class<? extends Proximity>> classLookup =
-                new HashMap<String, Class<? extends Proximity>>();
-
-        final ResourceBundle res = ResourceBundle.getBundle(
-                uk.ac.susx.mlcl.byblo.measures.Lin.class.getPackage().getName() + ".measures");
-        final String[] measures = res.getString("measures").split(",");
-
-        for (int i = 0; i < measures.length; i++) {
-            final String measure = measures[i].trim();
-            final String className = res.getString(
-                    "measure." + measure + ".class");
-            @SuppressWarnings("unchecked")
-            final Class<? extends Proximity> clazz =
-                    (Class<? extends Proximity>) Class.forName(className);
-            classLookup.put(measure.toLowerCase(), clazz);
-            if (res.containsKey("measure." + measure + ".aliases")) {
-                final String[] aliases = res.getString(
-                        "measure." + measure + ".aliases").split(",");
-                for (String alias : aliases) {
-                    classLookup.put(alias.toLowerCase().trim(), clazz);
-                }
-            }
-        }
-        return classLookup;
     }
 
     @Override
@@ -697,5 +688,4 @@ public class AllPairsCommand extends AbstractCommand {
     public EnumeratorType getEnuemratorType() {
         return indexDeligate.getEnuemratorType();
     }
-
 }

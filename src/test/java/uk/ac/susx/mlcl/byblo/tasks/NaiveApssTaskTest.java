@@ -42,8 +42,8 @@ import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairVectorSource;
-import uk.ac.susx.mlcl.byblo.measures.Jaccard;
-import uk.ac.susx.mlcl.byblo.measures.Proximity;
+import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
+import uk.ac.susx.mlcl.byblo.measures.v2.impl.Jaccard;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
@@ -53,7 +53,7 @@ import uk.ac.susx.mlcl.lib.io.Tell;
  */
 public class NaiveApssTaskTest {
 
-    private static final Proximity MEASURE = new Jaccard();
+    private static final Measure MEASURE = new Jaccard();
 
     private static final Predicate<Weighted<TokenPair>> PAIR_FILTER =
             Weighted.greaterThanOrEqualTo(0.1);
@@ -89,5 +89,4 @@ public class NaiveApssTaskTest {
 
         assertTrue(!result.isEmpty());
     }
-
 }

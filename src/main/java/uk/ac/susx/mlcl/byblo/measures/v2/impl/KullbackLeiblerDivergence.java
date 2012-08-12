@@ -33,13 +33,13 @@ package uk.ac.susx.mlcl.byblo.measures.v2.impl;
 import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
-import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
+import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- * {@link Distance} measure that computes similarity as the Kullback–Leibler
- * divergence, with Laplace smoothing.
+ * Distance measure that computes similarity as the Kullback–Leibler divergence,
+ * with Laplace smoothing.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -119,8 +119,8 @@ public final class KullbackLeiblerDivergence implements Measure, Serializable {
     }
 
     @Override
-    public Weighting getExpectedWeighting() {
-        return Weightings.positive();
+    public Class<? extends Weighting> getExpectedWeighting() {
+        return PositiveWeighting.class;
     }
 
     @Override

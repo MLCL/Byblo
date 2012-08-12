@@ -41,7 +41,7 @@ import uk.ac.susx.mlcl.lib.Checks;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class Bound
+public class Bound
         extends AbstractSimpleWeighting
         implements Serializable {
 

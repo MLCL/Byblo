@@ -34,7 +34,7 @@ import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsCarrier;
 import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsDeligate;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
-import uk.ac.susx.mlcl.byblo.weighings.Weightings;
+import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
@@ -119,8 +119,8 @@ public class Confusion implements Measure, FeatureMarginalsCarrier {
     }
 
     @Override
-    public Weighting getExpectedWeighting() {
-        return Weightings.positive();
+    public Class<? extends Weighting> getExpectedWeighting() {
+        return PositiveWeighting.class;
     }
 
     @Override

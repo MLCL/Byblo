@@ -40,6 +40,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 /**
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @deprecated
  */
 public class JensenTest {
 

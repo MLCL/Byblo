@@ -34,14 +34,13 @@ import java.io.Serializable;
 import java.text.MessageFormat;
 import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
-import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
+import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- * {@link Distance} measure that computes similarity using Lee's alpha-Skew
- * divergence.
+ * Distance measure that computes similarity using Lee's alpha-Skew divergence.
  *
  * Skew divergence is a variant of Kullback–Leibler (KL) divergence. KL
  * divergence is undefined for zero probabilities in the empirical distribution.
@@ -138,8 +137,8 @@ public final class LeeSkewDivergence implements Measure, Serializable {
     }
 
     @Override
-    public Weighting getExpectedWeighting() {
-        return Weightings.positive();
+    public Class<? extends Weighting> getExpectedWeighting() {
+        return PositiveWeighting.class;
     }
 
     @Override

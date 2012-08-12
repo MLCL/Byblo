@@ -125,7 +125,7 @@ public class MeasuresTest {
 
         WEIGHTINGS = new HashMap<Measure, Weighting>();
         for (Measure m : MEASURES) {
-            WEIGHTINGS.put(m, m.getExpectedWeighting());
+            WEIGHTINGS.put(m, m.getExpectedWeighting().newInstance());
         }
 
         final DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();

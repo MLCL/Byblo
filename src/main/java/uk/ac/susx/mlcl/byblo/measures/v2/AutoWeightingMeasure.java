@@ -31,6 +31,8 @@
 package uk.ac.susx.mlcl.byblo.measures.v2;
 
 import java.io.Serializable;
+import uk.ac.susx.mlcl.byblo.weighings.Weighting;
+import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
@@ -49,20 +51,19 @@ public class AutoWeightingMeasure
 
     private static final long serialVersionUID = 1L;
 
-    public AutoWeightingMeasure(Measure deligate) {
+    private final Weighting weighting;
+
+    public AutoWeightingMeasure(Measure deligate, Weighting weighting) {
         super(deligate);
+        Checks.checkNotNull("weighting", weighting);
+        this.weighting = weighting;
     }
 
     @Override
     public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
         return getDelegate().similarity(
-                applyWeighting(A),
-                applyWeighting(B));
-    }
-
-    protected final SparseDoubleVector applyWeighting(
-            final SparseDoubleVector vector) {
-        return getDelegate().getExpectedWeighting().apply(vector);
+                weighting.apply(A),
+                weighting.apply(B));
     }
 
     @Override

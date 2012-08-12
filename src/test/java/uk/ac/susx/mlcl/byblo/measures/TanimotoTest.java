@@ -40,6 +40,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 /**
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @deprecated
  */
 public class TanimotoTest {
 
@@ -70,5 +71,4 @@ public class TanimotoTest {
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
-
 }

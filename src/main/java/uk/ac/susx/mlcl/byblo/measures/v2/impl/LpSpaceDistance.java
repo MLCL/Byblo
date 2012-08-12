@@ -34,7 +34,7 @@ import java.io.Serializable;
 import static java.lang.Math.*;
 import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
-import uk.ac.susx.mlcl.byblo.weighings.Weightings;
+import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
@@ -115,8 +115,8 @@ public final class LpSpaceDistance implements Measure, Serializable {
     }
 
     @Override
-    public Weighting getExpectedWeighting() {
-        return Weightings.none();
+    public Class<? extends Weighting> getExpectedWeighting() {
+        return NullWeighting.class;
     }
 
     @Override
@@ -135,8 +135,8 @@ public final class LpSpaceDistance implements Measure, Serializable {
     private static abstract class LpSpaceDeligate implements Measure {
 
         @Override
-        public final Weighting getExpectedWeighting() {
-            return Weightings.none();
+        public Class<? extends Weighting> getExpectedWeighting() {
+            return NullWeighting.class;
         }
 
         @Override

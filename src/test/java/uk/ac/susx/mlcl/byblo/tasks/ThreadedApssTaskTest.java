@@ -46,8 +46,8 @@ import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairVectorSource;
-import uk.ac.susx.mlcl.byblo.measures.Jaccard;
-import uk.ac.susx.mlcl.byblo.measures.Proximity;
+import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
+import uk.ac.susx.mlcl.byblo.measures.v2.impl.Jaccard;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.Tell;
@@ -62,7 +62,7 @@ public class ThreadedApssTaskTest {
 
     private static final String subject = ThreadedApssTask.class.getName();
 
-    private static final Proximity MEASURE = new Jaccard();
+    private static final Measure MEASURE = new Jaccard();
 
     private static final Predicate<Weighted<TokenPair>> PAIR_FILTER =
             Weighted.greaterThanOrEqualTo(0.1);
@@ -268,7 +268,8 @@ public class ThreadedApssTaskTest {
                     TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
 
-            ObjectSink<Weighted<TokenPair>> sink = ObjectIO.asSink(threadedResults);
+            ObjectSink<Weighted<TokenPair>> sink = ObjectIO.asSink(
+                    threadedResults);
             ThreadedApssTask<Tell> instance = new ThreadedApssTask<Tell>(
                     vsa, vsb, sink);
 
@@ -339,7 +340,8 @@ public class ThreadedApssTaskTest {
                     WeightedTokenPairSource.open(
                     TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
-            ObjectSink<Weighted<TokenPair>> sink = ObjectIO.asSink(threadedResults);
+            ObjectSink<Weighted<TokenPair>> sink = ObjectIO.asSink(
+                    threadedResults);
             ThreadedApssTask<Tell> instance = new ThreadedApssTask<Tell>(
                     vsa, vsb, sink);
 
@@ -387,5 +389,4 @@ public class ThreadedApssTaskTest {
 
         assertEquals(threadedResults, nonThreadedResults);
     }
-
 }
