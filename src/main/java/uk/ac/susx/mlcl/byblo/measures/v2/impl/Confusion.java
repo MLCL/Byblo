@@ -99,7 +99,8 @@ public class Confusion implements Measure, FeatureMarginalsCarrier {
                 final double pFEb = B.values[j] / B.sum;
                 final double pF = featureMarginals.getFeaturePrior(A.keys[i]);
                 final double pEa = A.sum / featureMarginals.getGrandTotal();
-                sum += pFEa * pFEb * pEa / pF;
+                if (pFEa * pFEb * pEa * pF > 0)
+                    sum += pFEa * pFEb * pEa / pF;
                 ++i;
                 ++j;
             }

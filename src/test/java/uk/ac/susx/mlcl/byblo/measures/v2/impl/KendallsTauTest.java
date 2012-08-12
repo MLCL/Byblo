@@ -31,6 +31,7 @@
 package uk.ac.susx.mlcl.byblo.measures.v2.impl;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,12 +40,15 @@ import static org.junit.Assert.*;
 import org.junit.*;
 import static uk.ac.susx.mlcl.TestConstants.DEFAULT_CHARSET;
 import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_EVENTS;
+import uk.ac.susx.mlcl.byblo.Tools;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+import static uk.ac.susx.mlcl.TestConstants.*;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
  * Unit tests for {@link KendallsTau } proximity measure.
@@ -78,6 +82,33 @@ public class KendallsTauTest {
 
     @After
     public void tearDown() {
+    }
+
+    @Test
+    public void testCLI() throws Exception {
+        System.out.println("testCLI");
+
+        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".KendallsTau");
+        output.delete();
+
+        try {
+            enableExistTrapping();
+            Tools.main(new String[]{
+                        "allpairs",
+                        "--charset", "UTF-8",
+                        "--measure", "tau",
+                        "--input", TEST_FRUIT_EVENTS.toString(),
+                        "--input-features", TEST_FRUIT_FEATURES.toString(),
+                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                        "--output", output.toString()
+                    });
+        } finally {
+            disableExitTrapping();
+        }
+
+
+        assertTrue("Output file " + output + " does not exist.", output.exists());
+        assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
     @Test

@@ -38,8 +38,7 @@ import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- * Distance measure that computes similarity as the Jensen-Shannon
- * divergence.
+ * Distance measure that computes similarity as the Jensen-Shannon divergence.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -101,7 +100,7 @@ public final class JensenShannonDivergence implements Measure, Serializable {
         return Double.POSITIVE_INFINITY;
     }
 
-   @Override
+    @Override
     public Class<? extends Weighting> getExpectedWeighting() {
         return PositiveWeighting.class;
     }

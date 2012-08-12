@@ -66,6 +66,7 @@ import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
 import uk.ac.susx.mlcl.byblo.measures.v2.impl.Confusion;
+import uk.ac.susx.mlcl.byblo.measures.v2.impl.ConfusionTest;
 import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsCarrier;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 
@@ -79,7 +80,7 @@ public class MeasuresTest {
     public MeasuresTest() {
     }
 
-    static final double EPSILON = 0;
+    static final double EPSILON = 0.0000000000001;
 
     static Measure[] MEASURES = new Measure[]{
         new Confusion(),
@@ -253,7 +254,7 @@ public class MeasuresTest {
                 if (!(m instanceof Hindle
                       || m instanceof Confusion
                       || m instanceof DotProduct)) {
-                    assertEquals(m.getHomogeneityBound(), result, EPSILON);
+                    assertEquals(m.toString(), m.getHomogeneityBound(), result, EPSILON);
                 }
 
             }
@@ -305,10 +306,12 @@ public class MeasuresTest {
             min = instance.getHomogeneityBound();
             max = instance.getHeterogeneityBound();
         }
-        assertTrue("expected similarity >= " + min + " but found " + val,
-                   val >= min);
-        assertTrue("expected similarity <= " + max + " but found " + val,
-                   val <= max);
+        assertTrue(
+                "expected similarity >= " + min + " but found " + val + " using measure " + instance,
+                val >= min - EPSILON);
+        assertTrue(
+                "expected similarity <= " + max + " but found " + val + " using measure " + instance,
+                val <= max + EPSILON);
 
 
         if (instance.isCommutative()) {
@@ -321,18 +324,4 @@ public class MeasuresTest {
         return val;
     }
 
-    /**
-     * Test of intersection method, of class Measures.
-     */
-    @Test
-    public void testIntersection() {
-        System.out.println("intersection");
-        SparseDoubleVector vectorA = null;
-        SparseDoubleVector vectorB = null;
-        double expResult = 0.0;
-        double result = Measures.intersection(vectorA, vectorB);
-        assertEquals(expResult, result, 0.0);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
 }
