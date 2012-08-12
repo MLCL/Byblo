@@ -52,6 +52,8 @@ public abstract class AbstractSimpleWeighting implements Weighting {
 
     @Override
     public final SparseDoubleVector apply(final SparseDoubleVector from) {
+        if(from.size == 0)
+            return new SparseDoubleVector(from.cardinality, 0);
         final SparseDoubleVector to = from.clone();
         double sum = 0;
         for (int i = 0; i < from.size; i++) {

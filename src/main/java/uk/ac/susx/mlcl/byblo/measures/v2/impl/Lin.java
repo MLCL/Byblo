@@ -84,7 +84,8 @@ public final class Lin extends DecomposableMeasure implements Serializable {
 
     @Override
     public double combine(double shared, double left, double right) {
-        return shared / (left + right);
+        return shared == 0 ? 0 
+                : shared / (left + right);
     }
 
     @Override

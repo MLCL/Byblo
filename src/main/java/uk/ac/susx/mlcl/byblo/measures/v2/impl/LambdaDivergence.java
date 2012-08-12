@@ -60,7 +60,7 @@ public final class LambdaDivergence implements Measure, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final double DEFAULT_LAMBDA = 0.5;
+    public static final double DEFAULT_LAMBDA = 0.5;
 
     private double lambda;
 

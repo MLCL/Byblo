@@ -112,9 +112,6 @@ public final class LeeSkewDivergence implements Measure, Serializable {
                 ++j;
             }
         }
-//        while (i < A.size) {
-//            i++;
-//        }
         while (j < B.size) {
             final double r = B.values[j] / B.sum;
             final double logAvg = log2((1 - alpha) * r);
@@ -147,6 +144,6 @@ public final class LeeSkewDivergence implements Measure, Serializable {
 
     @Override
     public String toString() {
-        return MessageFormat.format("LeeSkewDivergence{alpha={0}}", alpha);
+        return MessageFormat.format("LeeSkewDivergence[alpha={0}]", alpha);
     }
 }

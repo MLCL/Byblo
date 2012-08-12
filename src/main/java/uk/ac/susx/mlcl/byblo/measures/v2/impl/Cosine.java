@@ -64,9 +64,8 @@ public final class Cosine extends DecomposableMeasure implements Serializable {
 
     @Override
     public double combine(double shared, double left, double right) {
-        if (left == 0 || right == 0)
-            return 0;
-        return shared / (left * right);
+        return (left == 0 || right == 0 || shared == 0) ? 0
+                : shared / Math.sqrt(left * right);
     }
 
     @Override
@@ -76,12 +75,12 @@ public final class Cosine extends DecomposableMeasure implements Serializable {
 
     @Override
     public double getHomogeneityBound() {
-        return 0.0;
+        return 1.0;
     }
 
     @Override
     public double getHeterogeneityBound() {
-        return 1.0;
+        return -1.0;
     }
 
     @Override

@@ -101,6 +101,8 @@ public class Weeds implements Measure, Serializable {
 
     @Override
     public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
+        assert beta >= 0 && beta <= 1;
+        assert gamma >= 0 && gamma <= 1;
 
         final double recall = RECALL.similarity(A, B);
         final double precision = PRECISION.similarity(A, B);
@@ -113,7 +115,10 @@ public class Weeds implements Measure, Serializable {
                 ? (2 * precision * recall) / (precision + recall)
                 : 0;
 
-        return gamma * hm + (1 - gamma) * am;
+        final double sim = gamma * hm + (1.0 - gamma) * am;
+
+        assert sim >= 0.0 && sim <= 1.0;
+        return sim;
 
     }
 
@@ -143,5 +148,33 @@ public class Weeds implements Measure, Serializable {
     @Override
     public String toString() {
         return "Weeds{" + "beta=" + beta + ", gamma=" + gamma + '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final Weeds other = (Weeds) obj;
+        if (Double.doubleToLongBits(this.beta) != Double.doubleToLongBits(
+                other.beta))
+            return false;
+        if (Double.doubleToLongBits(this.gamma) != Double.doubleToLongBits(
+                other.gamma))
+            return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 37 * hash + (int) (Double.doubleToLongBits(this.beta) ^ (Double.
+                                                                        doubleToLongBits(
+                                                                        this.beta) >>> 32));
+        hash = 37 * hash + (int) (Double.doubleToLongBits(this.gamma) ^ (Double.
+                                                                         doubleToLongBits(
+                                                                         this.gamma) >>> 32));
+        return hash;
     }
 }

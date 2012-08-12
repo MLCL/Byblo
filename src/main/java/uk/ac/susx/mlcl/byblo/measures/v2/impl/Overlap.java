@@ -62,7 +62,8 @@ public class Overlap extends DecomposableMeasure implements Serializable {
 
     @Override
     public double combine(double shared, double left, double right) {
-        return shared / Math.min(left, right);
+        return shared == 0 ? 0
+                : shared / Math.min(left, right);
     }
 
     @Override
@@ -72,12 +73,12 @@ public class Overlap extends DecomposableMeasure implements Serializable {
 
     @Override
     public double getHomogeneityBound() {
-        return 0.0;
+        return 1.0;
     }
 
     @Override
     public double getHeterogeneityBound() {
-        return 1.0;
+        return 0.0;
     }
 
     @Override
