@@ -41,24 +41,16 @@ import static java.text.MessageFormat.format;
 import java.util.Arrays;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.commands.AbstractExternalSortCommand;
-import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
-import uk.ac.susx.mlcl.byblo.commands.ExternalCountCommand;
-import uk.ac.susx.mlcl.byblo.commands.ExternalKnnSimsCommand;
-import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
-import uk.ac.susx.mlcl.byblo.commands.IndexingCommands;
+import uk.ac.susx.mlcl.byblo.commands.*;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
-import uk.ac.susx.mlcl.byblo.measures.CrMi;
-import uk.ac.susx.mlcl.byblo.measures.Lee;
-import uk.ac.susx.mlcl.byblo.measures.Lp;
+import uk.ac.susx.mlcl.byblo.measures.impl.LambdaDivergence;
+import uk.ac.susx.mlcl.byblo.measures.impl.LeeSkewDivergence;
+import uk.ac.susx.mlcl.byblo.measures.impl.LpSpaceDistance;
+import uk.ac.susx.mlcl.byblo.measures.impl.Weeds;
 import uk.ac.susx.mlcl.byblo.tasks.ThreadedApssTask;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.MiscUtil;
-import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
-import uk.ac.susx.mlcl.lib.commands.DoubleConverter;
-import uk.ac.susx.mlcl.lib.commands.FileDeligate;
-import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
-import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
+import uk.ac.susx.mlcl.lib.commands.*;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 
@@ -82,19 +74,19 @@ public final class FullBuild extends AbstractCommand {
     private FileDeligate fileDeligate = new FileDeligate();
 
     @Parameter(names = {"-i", "--input"},
-    description = "Input instances file",
-    validateWith = InputFileValidator.class,
-    required = true)
+               description = "Input instances file",
+               validateWith = InputFileValidator.class,
+               required = true)
     private File instancesFile;
 
     @Parameter(names = {"-o", "--output"},
-    description = "Output directory. Default: current working directory.")
+               description = "Output directory. Default: current working directory.")
     private File outputDir = null;
 
     @Parameter(names = {"-T", "--temp-dir"},
-    description = "Temorary directory, used during processing. Default: A subdirectory will be created inside the output directory.",
-    converter = TempFileFactoryConverter.class,
-    hidden = HIDE_UNCOMMON_PARAMTERS)
+               description = "Temorary directory, used during processing. Default: A subdirectory will be created inside the output directory.",
+               converter = TempFileFactoryConverter.class,
+               hidden = HIDE_UNCOMMON_PARAMTERS)
     private File tempBaseDir;
 
     private boolean skipIndex1 = false;
@@ -104,122 +96,127 @@ public final class FullBuild extends AbstractCommand {
     private EnumeratorType enumeratorType = EnumeratorType.JDBC;
 
     @Parameter(names = {"-t", "--threads"},
-    description = "Number of concurrent processing threads.")
+               description = "Number of concurrent processing threads.")
     private int numThreads = Runtime.getRuntime().availableProcessors();
 
     /*
      * === COUNTING PARAMATERISATION ===
      */
     @Parameter(names = {"--count-chunk-size"},
-    description = "Number of lines per work unit. Larger values increase performance and memory usage.",
-    hidden = HIDE_UNCOMMON_PARAMTERS)
+               description = "Number of lines per work unit. Larger values increase performance and memory usage.",
+               hidden = HIDE_UNCOMMON_PARAMTERS)
     private int countMaxChunkSize = ExternalCountCommand.DEFAULT_MAX_CHUNK_SIE;
 
     /*
      * === FILTER PARAMATERISATION ===
      */
     @Parameter(names = {"-fef", "--filter-entry-freq"},
-    description = "Minimum entry frequency threshold.",
-    converter = DoubleConverter.class)
+               description = "Minimum entry frequency threshold.",
+               converter = DoubleConverter.class)
     private double filterEntryMinFreq;
 
     @Parameter(names = {"-few", "--filter-entry-whitelist"},
-    description = "Whitelist file containing entries of interest. "
+               description = "Whitelist file containing entries of interest. "
     + "(All others will be ignored)",
-    validateWith = InputFileValidator.class)
+               validateWith = InputFileValidator.class)
     private File filterEntryWhitelist;
 
     @Parameter(names = {"-fep", "--filter-entry-pattern"},
-    description = "Regular expresion that accepted entries must match.")
+               description = "Regular expresion that accepted entries must match.")
     private String filterEntryPattern;
 
     @Parameter(names = {"-fvf", "--filter-event-freq"},
-    description = "Minimum event frequency threshold.",
-    converter = DoubleConverter.class)
+               description = "Minimum event frequency threshold.",
+               converter = DoubleConverter.class)
     private double filterEventMinFreq;
 
     @Parameter(names = {"-fff", "--filter-feature-freq"},
-    description = "Minimum feature frequency threshold.",
-    converter = DoubleConverter.class)
+               description = "Minimum feature frequency threshold.",
+               converter = DoubleConverter.class)
     private double filterFeatureMinFreq;
 
     @Parameter(names = {"-ffw", "--filter-feature-whitelist"},
-    description = "Whitelist file containing features of interest. "
+               description = "Whitelist file containing features of interest. "
     + "(All others will be ignored)",
-    validateWith = InputFileValidator.class)
+               validateWith = InputFileValidator.class)
     private File filterFeatureWhitelist;
 
     @Parameter(names = {"-ffp", "--filter-feature-pattern"},
-    description = "Regular expresion that accepted features must match.")
+               description = "Regular expresion that accepted features must match.")
     private String filterFeaturePattern;
     /*
      * === ALL-PAIRS PARAMATERISATION ===
      */
 
     @Parameter(names = {"-m", "--measure"},
-    description = "Similarity measure to use.")
+               description = "Similarity measure to use.")
     private String measureName = AllPairsCommand.DEFAULT_MEASURE;
 
     @Parameter(names = {"-Smn", "--similarity-min"},
-    description = "Minimum similarity threshold.",
-    converter = DoubleConverter.class)
+               description = "Minimum similarity threshold.",
+               converter = DoubleConverter.class)
     private double minSimilarity = AllPairsCommand.DEFAULT_MIN_SIMILARITY;
 
     @Parameter(names = {"-Smx", "--similarity-max"},
-    description = "Maximyum similarity threshold.",
-    hidden = HIDE_UNCOMMON_PARAMTERS,
-    converter = DoubleConverter.class)
+               description = "Maximyum similarity threshold.",
+               hidden = HIDE_UNCOMMON_PARAMTERS,
+               converter = DoubleConverter.class)
     private double maxSimilarity = AllPairsCommand.DEFAULT_MAX_SIMILARITY;
 
     @Parameter(names = {"--crmi-beta"},
-    description = "Beta paramter to CRMI measure.",
-    hidden = HIDE_UNCOMMON_PARAMTERS,
-    converter = DoubleConverter.class)
-    private double crmiBeta = CrMi.DEFAULT_BETA;
+               description = "Beta paramter to CRMI measure.",
+               hidden = HIDE_UNCOMMON_PARAMTERS,
+               converter = DoubleConverter.class)
+    private double crmiBeta = Weeds.DEFAULT_BETA;
 
     @Parameter(names = {"--crmi-gamma"},
-    description = "Gamma paramter to CRMI measure.",
-    hidden = HIDE_UNCOMMON_PARAMTERS,
-    converter = DoubleConverter.class)
-    private double crmiGamma = CrMi.DEFAULT_GAMMA;
+               description = "Gamma paramter to CRMI measure.",
+               hidden = HIDE_UNCOMMON_PARAMTERS,
+               converter = DoubleConverter.class)
+    private double crmiGamma = Weeds.DEFAULT_GAMMA;
 
     @Parameter(names = {"--mink-p"},
-    description = "P parameter to Minkowski distance measure.",
-    hidden = HIDE_UNCOMMON_PARAMTERS,
-    converter = DoubleConverter.class)
-    private double minkP = Lp.DEFAULT_P;
+               description = "P parameter to Minkowski distance measure.",
+               hidden = HIDE_UNCOMMON_PARAMTERS,
+               converter = DoubleConverter.class)
+    private double minkP = LpSpaceDistance.DEFAULT_POWER;
 
     @Parameter(names = {"--measure-reversed"},
-    description = "Swap similarity measure inputs.",
-    hidden = HIDE_UNCOMMON_PARAMTERS)
+               description = "Swap similarity measure inputs.",
+               hidden = HIDE_UNCOMMON_PARAMTERS)
     private boolean measureReversed = false;
 
     @Parameter(names = {"--lee-alpha"},
-    description = "Alpha parameter to Lee alpha-skew divergence measure.",
-    hidden = HIDE_UNCOMMON_PARAMTERS,
-    converter = DoubleConverter.class)
-    private double leeAlpha = Lee.DEFAULT_ALPHA;
+               description = "Alpha parameter to Lee alpha-skew divergence measure.",
+               hidden = HIDE_UNCOMMON_PARAMTERS,
+               converter = DoubleConverter.class)
+    private double leeAlpha = LeeSkewDivergence.DEFAULT_ALPHA;
+
+    @Parameter(names = {"--lambda-lambda"},
+               description = "lambda parameter to Lambda-Divergence measure.",
+               converter = DoubleConverter.class)
+    private double lambdaLambda = LambdaDivergence.DEFAULT_LAMBDA;
 
     @Parameter(names = {"-ip", "--identity-pairs"},
-    description = "Produce similarity between pair of identical entries.",
-    hidden = HIDE_UNCOMMON_PARAMTERS)
+               description = "Produce similarity between pair of identical entries.",
+               hidden = HIDE_UNCOMMON_PARAMTERS)
     private boolean outputIdentityPairs = false;
 
     @Parameter(names = {"--allpairs-chunk-size"},
-    description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.",
-    hidden = HIDE_UNCOMMON_PARAMTERS)
+               description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.",
+               hidden = HIDE_UNCOMMON_PARAMTERS)
     private int chunkSize = ThreadedApssTask.DEFAULT_MAX_CHUNK_SIZE;
     /*
      * === K-NEAREST-NEIGHBOURS PARAMATERISATION ===
      */
 
     @Parameter(names = {"-k"},
-    description = "The maximum number of neighbours to produce per word.")
+               description = "The maximum number of neighbours to produce per word.")
     private int k = ExternalKnnSimsCommand.DEFAULT_K;
 
     @Parameter(names = {"--knn-chunk-size"},
-    description = "Number of lines per KNN work unit. Larger values increase memory usage and performace.",
-    hidden = HIDE_UNCOMMON_PARAMTERS)
+               description = "Number of lines per KNN work unit. Larger values increase memory usage and performace.",
+               hidden = HIDE_UNCOMMON_PARAMTERS)
     private int knnMaxChunkSize = AbstractExternalSortCommand.DEFAULT_MAX_CHUNK_SIZE;
 
     /**
@@ -250,31 +247,42 @@ public final class FullBuild extends AbstractCommand {
         if (LOG.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
             sb.append("\nConfiguration:\n");
-            sb.append(MessageFormat.format(" * Input instances file: {0}\n", instancesFile));
-            sb.append(MessageFormat.format(" * Output directory: {0} ({1} free)\n", outputDir,
-                                           MiscUtil.humanReadableBytes(outputDir.getFreeSpace())));
-            sb.append(MessageFormat.format(" * Temporary directory: {0} ({1} free)\n",
-                                           tempBaseDir,
-                                           MiscUtil.humanReadableBytes(tempBaseDir.getFreeSpace())));
-            sb.append(MessageFormat.format(" * Character encoding: {0}\n", getCharset()));
+            sb.append(MessageFormat.format(" * Input instances file: {0}\n",
+                                           instancesFile));
+            sb.append(MessageFormat.format(
+                    " * Output directory: {0} ({1} free)\n", outputDir,
+                    MiscUtil.humanReadableBytes(outputDir.getFreeSpace())));
+            sb.append(MessageFormat.format(
+                    " * Temporary directory: {0} ({1} free)\n",
+                    tempBaseDir,
+                    MiscUtil.humanReadableBytes(tempBaseDir.getFreeSpace())));
+            sb.append(MessageFormat.format(" * Character encoding: {0}\n",
+                                           getCharset()));
             sb.append(MessageFormat.format(" * Num. Threads: {0}\n", numThreads));
-            sb.append(MessageFormat.format(" * {0}\n", MiscUtil.memoryInfoString()));
+            sb.append(MessageFormat.format(" * {0}\n",
+                                           MiscUtil.memoryInfoString()));
             sb.append(MessageFormat.format(" * Java Spec: {0} {1}, {2}\n",
-                                           System.getProperty("java.specification.name"),
-                                           System.getProperty("java.specification.version"),
-                                           System.getProperty("java.specification.vendor")));
+                                           System.getProperty(
+                    "java.specification.name"),
+                                           System.getProperty(
+                    "java.specification.version"),
+                                           System.getProperty(
+                    "java.specification.vendor")));
             sb.append(MessageFormat.format(" * Java VM: {0} {1}, {2}\n",
                                            System.getProperty("java.vm.name"),
                                            System.getProperty("java.vm.version"),
                                            System.getProperty("java.vm.vendor")));
             sb.append(MessageFormat.format(" * Java Runtime: {0} {1}\n",
-                                           System.getProperty("java.runtime.name"),
-                                           System.getProperty("java.runtime.version")));
+                                           System.getProperty(
+                    "java.runtime.name"),
+                                           System.getProperty(
+                    "java.runtime.version")));
             sb.append(MessageFormat.format(" * OS: {0} {1} {2}\n",
                                            System.getProperty("os.name"),
                                            System.getProperty("os.version"),
                                            System.getProperty("os.arch")));
-            sb.append(MessageFormat.format(" * Start time: {0,time,full} {0,date,full}\n", startTime));
+            sb.append(MessageFormat.format(
+                    " * Start time: {0,time,full} {0,date,full}\n", startTime));
             sb.append("\n");
             LOG.info(sb.toString());
         }
@@ -291,7 +299,8 @@ public final class FullBuild extends AbstractCommand {
             LOG.info("\n=== Stage 1 of 6: Enumerating Strings ===\n");
 
         System.gc();
-        runIndex(instancesEnumeratedFile, featureEnumeratorFile, entryEnumeratorFile);
+        runIndex(instancesEnumeratedFile, featureEnumeratorFile,
+                 entryEnumeratorFile);
         System.gc();
 
         File entriesFile = new File(outputDir,
@@ -324,7 +333,8 @@ public final class FullBuild extends AbstractCommand {
         File simsFile = new File(outputDir, instancesFile.getName() + ".sims");
 
         System.gc();
-        runAllpairs(entriesFilteredFile, featuresFilteredFile, eventsFilteredFile, simsFile);
+        runAllpairs(entriesFilteredFile, featuresFilteredFile,
+                    eventsFilteredFile, simsFile);
         System.gc();
 
         File neighboursFile = suffixed(simsFile, ".neighbours");
@@ -353,9 +363,13 @@ public final class FullBuild extends AbstractCommand {
         if (LOG.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
             sb.append("\nStats:\n");
-            sb.append(MessageFormat.format(" * End time: {0,time,full} {0,date,full}\n", endTime));
-            sb.append(MessageFormat.format(" * Ellapsed time: {0}\n", formatElapsedTime(endTime - startTime)));
-            sb.append(MessageFormat.format(" * {0}\n", MiscUtil.memoryInfoString()));
+            sb.append(MessageFormat.format(
+                    " * End time: {0,time,full} {0,date,full}\n", endTime));
+            sb.append(
+                    MessageFormat.format(" * Ellapsed time: {0}\n",
+                                         formatElapsedTime(endTime - startTime)));
+            sb.append(MessageFormat.format(" * {0}\n",
+                                           MiscUtil.memoryInfoString()));
             sb.append("\n");
             LOG.info(sb.toString());
         }
@@ -383,12 +397,19 @@ public final class FullBuild extends AbstractCommand {
         if (LOG.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
             sb.append("\nConfiguration:\n");
-            sb.append(MessageFormat.format(" * Input instances file: {0}\n", instancesFile));
-            sb.append(MessageFormat.format(" * Output enumerated instances file: {0}\n", instancesEnumeratedFile));
-            sb.append(MessageFormat.format(" * Output entry index: {0}\n", entryEnumeratorFile));
-            sb.append(MessageFormat.format(" * Output feature index: {0}\n", featureEnumeratorFile));
-            sb.append(MessageFormat.format(" * Start time: {0,time,full} {0,date,full}\n", startTime));
-            sb.append(MessageFormat.format(" * {0}\n", MiscUtil.memoryInfoString()));
+            sb.append(MessageFormat.format(" * Input instances file: {0}\n",
+                                           instancesFile));
+            sb.append(MessageFormat.format(
+                    " * Output enumerated instances file: {0}\n",
+                    instancesEnumeratedFile));
+            sb.append(MessageFormat.format(" * Output entry index: {0}\n",
+                                           entryEnumeratorFile));
+            sb.append(MessageFormat.format(" * Output feature index: {0}\n",
+                                           featureEnumeratorFile));
+            sb.append(MessageFormat.format(
+                    " * Start time: {0,time,full} {0,date,full}\n", startTime));
+            sb.append(MessageFormat.format(" * {0}\n",
+                                           MiscUtil.memoryInfoString()));
             sb.append("\n");
             LOG.info(sb.toString());
         }
@@ -399,7 +420,8 @@ public final class FullBuild extends AbstractCommand {
         indexCmd.setCharset(getCharset());
 
         indexCmd.getIndexDeligate().setEntryEnumeratorFile(entryEnumeratorFile);
-        indexCmd.getIndexDeligate().setFeatureEnumeratorFile(featureEnumeratorFile);
+        indexCmd.getIndexDeligate().setFeatureEnumeratorFile(
+                featureEnumeratorFile);
         indexCmd.getIndexDeligate().setEnumeratorType(enumeratorType);
 
         indexCmd.runCommand();
@@ -411,9 +433,13 @@ public final class FullBuild extends AbstractCommand {
         if (LOG.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
             sb.append("\nStats:\n");
-            sb.append(MessageFormat.format(" * End time: {0,time,full} {0,date,full}\n", endTime));
-            sb.append(MessageFormat.format(" * Ellapsed time: {0}\n", formatElapsedTime(endTime - startTime)));
-            sb.append(MessageFormat.format(" * {0}\n", MiscUtil.memoryInfoString()));
+            sb.append(MessageFormat.format(
+                    " * End time: {0,time,full} {0,date,full}\n", endTime));
+            sb.append(
+                    MessageFormat.format(" * Ellapsed time: {0}\n",
+                                         formatElapsedTime(endTime - startTime)));
+            sb.append(MessageFormat.format(" * {0}\n",
+                                           MiscUtil.memoryInfoString()));
             sb.append("\n");
             LOG.info(sb.toString());
         }
@@ -436,13 +462,20 @@ public final class FullBuild extends AbstractCommand {
         if (LOG.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
             sb.append("\nConfiguration:\n");
-            sb.append(MessageFormat.format(" * Input instances file: {0}\n", instancesEnumeratedFile));
-            sb.append(MessageFormat.format(" * Output entries file: {0}\n", entriesFile));
-            sb.append(MessageFormat.format(" * Output features file: {0}\n", featuresFile));
-            sb.append(MessageFormat.format(" * Output events file: {0}\n", eventsFile));
-            sb.append(MessageFormat.format(" * Chunk size: {0} instances\n", countMaxChunkSize));
-            sb.append(MessageFormat.format(" * Start time: {0,time,full} {0,date,full}\n", startTime));
-            sb.append(MessageFormat.format(" * {0}\n", MiscUtil.memoryInfoString()));
+            sb.append(MessageFormat.format(" * Input instances file: {0}\n",
+                                           instancesEnumeratedFile));
+            sb.append(MessageFormat.format(" * Output entries file: {0}\n",
+                                           entriesFile));
+            sb.append(MessageFormat.format(" * Output features file: {0}\n",
+                                           featuresFile));
+            sb.append(MessageFormat.format(" * Output events file: {0}\n",
+                                           eventsFile));
+            sb.append(MessageFormat.format(" * Chunk size: {0} instances\n",
+                                           countMaxChunkSize));
+            sb.append(MessageFormat.format(
+                    " * Start time: {0,time,full} {0,date,full}\n", startTime));
+            sb.append(MessageFormat.format(" * {0}\n",
+                                           MiscUtil.memoryInfoString()));
             sb.append("\n");
             LOG.info(sb.toString());
         }
@@ -476,10 +509,14 @@ public final class FullBuild extends AbstractCommand {
         if (LOG.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
             sb.append("\nStats:\n");
-            sb.append(MessageFormat.format(" * End time: {0,time,full} {0,date,full}\n", endTime));
-            sb.append(MessageFormat.format(" * Ellapsed time: {0}\n", formatElapsedTime(endTime - startTime)));
+            sb.append(MessageFormat.format(
+                    " * End time: {0,time,full} {0,date,full}\n", endTime));
+            sb.append(
+                    MessageFormat.format(" * Ellapsed time: {0}\n",
+                                         formatElapsedTime(endTime - startTime)));
 
-            sb.append(MessageFormat.format(" * {0}\n", MiscUtil.memoryInfoString()));
+            sb.append(MessageFormat.format(" * {0}\n",
+                                           MiscUtil.memoryInfoString()));
             sb.append("\n");
             LOG.info(sb.toString());
         }
@@ -487,13 +524,15 @@ public final class FullBuild extends AbstractCommand {
 
     static void deleteTempDir(File tempDir, String taskName) {
         if (!tempDir.delete()) {
-            LOG.warn(format("Unable to delete temporary directory for task {1}: {0}",
-                            tempDir, taskName));
+            LOG.warn(format(
+                    "Unable to delete temporary directory for task {1}: {0}",
+                    tempDir, taskName));
             if (tempDir.list().length > 0)
                 LOG.warn(format(
                         "Directory is not empty: {0}; countains {1}",
                         tempDir, Arrays.toString(tempDir.list())));
-            if (tempDir.getParentFile() != null && !tempDir.getParentFile().canWrite())
+            if (tempDir.getParentFile() != null && !tempDir.getParentFile().
+                    canWrite())
                 LOG.warn(format("Insufficient permissions to delete {0}",
                                 tempDir));
         }
@@ -518,22 +557,38 @@ public final class FullBuild extends AbstractCommand {
         if (LOG.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
             sb.append("\nConfiguration:\n");
-            sb.append(MessageFormat.format(" * Input entries file: {0}\n", entriesFile));
-            sb.append(MessageFormat.format(" * Input features file: {0}\n", featuresFile));
-            sb.append(MessageFormat.format(" * Input events file: {0}\n", eventsFile));
-            sb.append(MessageFormat.format(" * Output entries file: {0}\n", entriesFilteredFile));
-            sb.append(MessageFormat.format(" * Output features file: {0}\n", featuresFilteredFile));
-            sb.append(MessageFormat.format(" * Output events file: {0}\n", eventsFilteredFile));
-            sb.append(MessageFormat.format(" * Chunk size: {0} instances\n", countMaxChunkSize));
-            sb.append(MessageFormat.format(" * Min. Entry Freq: {0}\n", filterEntryMinFreq));
-            sb.append(MessageFormat.format(" * Min. Feature Freq: {0}\n", filterFeatureMinFreq));
-            sb.append(MessageFormat.format(" * Min. Event Freq: {0}\n", filterEventMinFreq));
-            sb.append(MessageFormat.format(" * Entry Pattern: {0}\n", filterEntryPattern));
-            sb.append(MessageFormat.format(" * Feature Pattern: {0}\n", filterFeaturePattern));
-            sb.append(MessageFormat.format(" * Entry Whitelist: {0}\n", filterEntryWhitelist));
-            sb.append(MessageFormat.format(" * Feature Whitelist: {0}\n", filterFeatureWhitelist));
-            sb.append(MessageFormat.format(" * Start time: {0,time,full} {0,date,full}\n", startTime));
-            sb.append(MessageFormat.format(" * {0}\n", MiscUtil.memoryInfoString()));
+            sb.append(MessageFormat.format(" * Input entries file: {0}\n",
+                                           entriesFile));
+            sb.append(MessageFormat.format(" * Input features file: {0}\n",
+                                           featuresFile));
+            sb.append(MessageFormat.format(" * Input events file: {0}\n",
+                                           eventsFile));
+            sb.append(MessageFormat.format(" * Output entries file: {0}\n",
+                                           entriesFilteredFile));
+            sb.append(MessageFormat.format(" * Output features file: {0}\n",
+                                           featuresFilteredFile));
+            sb.append(MessageFormat.format(" * Output events file: {0}\n",
+                                           eventsFilteredFile));
+            sb.append(MessageFormat.format(" * Chunk size: {0} instances\n",
+                                           countMaxChunkSize));
+            sb.append(MessageFormat.format(" * Min. Entry Freq: {0}\n",
+                                           filterEntryMinFreq));
+            sb.append(MessageFormat.format(" * Min. Feature Freq: {0}\n",
+                                           filterFeatureMinFreq));
+            sb.append(MessageFormat.format(" * Min. Event Freq: {0}\n",
+                                           filterEventMinFreq));
+            sb.append(MessageFormat.format(" * Entry Pattern: {0}\n",
+                                           filterEntryPattern));
+            sb.append(MessageFormat.format(" * Feature Pattern: {0}\n",
+                                           filterFeaturePattern));
+            sb.append(MessageFormat.format(" * Entry Whitelist: {0}\n",
+                                           filterEntryWhitelist));
+            sb.append(MessageFormat.format(" * Feature Whitelist: {0}\n",
+                                           filterFeatureWhitelist));
+            sb.append(MessageFormat.format(
+                    " * Start time: {0,time,full} {0,date,full}\n", startTime));
+            sb.append(MessageFormat.format(" * {0}\n",
+                                           MiscUtil.memoryInfoString()));
             sb.append("\n");
             LOG.info(sb.toString());
         }
@@ -574,10 +629,15 @@ public final class FullBuild extends AbstractCommand {
         if (LOG.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
             sb.append("\nStats:\n");
-            sb.append(MessageFormat.format(" * End time: {0,time,full} {0,date,full}\n", endTime));
-            sb.append(MessageFormat.format(" * Ellapsed time: {0}\n", formatElapsedTime(endTime - startTime)));
-            sb.append(MessageFormat.format(" * {0}\n", MiscUtil.memoryInfoString()));
-            sb.append(MessageFormat.format(" * Start time: {0,time,full} {0,date,full}\n", startTime));
+            sb.append(MessageFormat.format(
+                    " * End time: {0,time,full} {0,date,full}\n", endTime));
+            sb.append(
+                    MessageFormat.format(" * Ellapsed time: {0}\n",
+                                         formatElapsedTime(endTime - startTime)));
+            sb.append(MessageFormat.format(" * {0}\n",
+                                           MiscUtil.memoryInfoString()));
+            sb.append(MessageFormat.format(
+                    " * Start time: {0,time,full} {0,date,full}\n", startTime));
             sb.append("\n");
             LOG.info(sb.toString());
         }
@@ -595,16 +655,22 @@ public final class FullBuild extends AbstractCommand {
         if (LOG.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
             sb.append("\nConfiguration:\n");
-            sb.append(MessageFormat.format(" * Input entries file: {0}\n", entriesFilteredFile));
-            sb.append(MessageFormat.format(" * Input features file: {0}\n", featuresFilteredFile));
-            sb.append(MessageFormat.format(" * Input events file: {0}\n", eventsFilteredFile));
-            sb.append(MessageFormat.format(" * Ouput sims file: {0}\n", simsFile));
+            sb.append(MessageFormat.format(" * Input entries file: {0}\n",
+                                           entriesFilteredFile));
+            sb.append(MessageFormat.format(" * Input features file: {0}\n",
+                                           featuresFilteredFile));
+            sb.append(MessageFormat.format(" * Input events file: {0}\n",
+                                           eventsFilteredFile));
+            sb.append(
+                    MessageFormat.format(" * Ouput sims file: {0}\n", simsFile));
             sb.append(MessageFormat.format(" * Measure: {0}{1}\n", measureName,
                                            measureReversed ? "(reversed)" : ""));
             sb.append(MessageFormat.format(" * Accept sims range: {0} to {1}\n",
                                            minSimilarity, maxSimilarity));
-            sb.append(MessageFormat.format(" * Start time: {0,time,full} {0,date,full}\n", startTime));
-            sb.append(MessageFormat.format(" * {0}\n", MiscUtil.memoryInfoString()));
+            sb.append(MessageFormat.format(
+                    " * Start time: {0,time,full} {0,date,full}\n", startTime));
+            sb.append(MessageFormat.format(" * {0}\n",
+                                           MiscUtil.memoryInfoString()));
             sb.append("\n");
             LOG.info(sb.toString());
         }
@@ -644,9 +710,13 @@ public final class FullBuild extends AbstractCommand {
         if (LOG.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
             sb.append("\nStats:\n");
-            sb.append(MessageFormat.format(" * End time: {0,time,full} {0,date,full}\n", endTime));
-            sb.append(MessageFormat.format(" * Ellapsed time: {0}\n", formatElapsedTime(endTime - startTime)));
-            sb.append(MessageFormat.format(" * {0}\n", MiscUtil.memoryInfoString()));
+            sb.append(MessageFormat.format(
+                    " * End time: {0,time,full} {0,date,full}\n", endTime));
+            sb.append(
+                    MessageFormat.format(" * Ellapsed time: {0}\n",
+                                         formatElapsedTime(endTime - startTime)));
+            sb.append(MessageFormat.format(" * {0}\n",
+                                           MiscUtil.memoryInfoString()));
             sb.append("\n");
             LOG.info(sb.toString());
         }
@@ -663,11 +733,15 @@ public final class FullBuild extends AbstractCommand {
         if (LOG.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
             sb.append("\nConfiguration:\n");
-            sb.append(MessageFormat.format(" * Input sims file: {0}\n", simsFile));
-            sb.append(MessageFormat.format(" * Ouput neighbours file: {0}\n", neighboursFile));
+            sb.append(
+                    MessageFormat.format(" * Input sims file: {0}\n", simsFile));
+            sb.append(MessageFormat.format(" * Ouput neighbours file: {0}\n",
+                                           neighboursFile));
             sb.append(MessageFormat.format(" * K: {0}\n", k));
-            sb.append(MessageFormat.format(" * Start time: {0,time,full} {0,date,full}\n", startTime));
-            sb.append(MessageFormat.format(" * {0}\n", MiscUtil.memoryInfoString()));
+            sb.append(MessageFormat.format(
+                    " * Start time: {0,time,full} {0,date,full}\n", startTime));
+            sb.append(MessageFormat.format(" * {0}\n",
+                                           MiscUtil.memoryInfoString()));
             sb.append("\n");
             LOG.info(sb.toString());
         }
@@ -696,9 +770,13 @@ public final class FullBuild extends AbstractCommand {
         if (LOG.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
             sb.append("\nStats:\n");
-            sb.append(MessageFormat.format(" * End time: {0,time,full} {0,date,full}\n", endTime));
-            sb.append(MessageFormat.format(" * Ellapsed time: {0}\n", formatElapsedTime(endTime - startTime)));
-            sb.append(MessageFormat.format(" * {0}\n", MiscUtil.memoryInfoString()));
+            sb.append(MessageFormat.format(
+                    " * End time: {0,time,full} {0,date,full}\n", endTime));
+            sb.append(
+                    MessageFormat.format(" * Ellapsed time: {0}\n",
+                                         formatElapsedTime(endTime - startTime)));
+            sb.append(MessageFormat.format(" * {0}\n",
+                                           MiscUtil.memoryInfoString()));
             sb.append("\n");
             LOG.info(sb.toString());
         }
@@ -717,10 +795,15 @@ public final class FullBuild extends AbstractCommand {
         if (LOG.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
             sb.append("\nConfiguration:\n");
-            sb.append(MessageFormat.format(" * Input enuemrated neighbours neighboursFile: {0}\n", neighboursFile));
-            sb.append(MessageFormat.format(" * Ouput neighbours file: {0}\n", neighboursStringsFile));
-            sb.append(MessageFormat.format(" * Start time: {0,time,full} {0,date,full}\n", startTime));
-            sb.append(MessageFormat.format(" * {0}\n", MiscUtil.memoryInfoString()));
+            sb.append(MessageFormat.format(
+                    " * Input enuemrated neighbours neighboursFile: {0}\n",
+                    neighboursFile));
+            sb.append(MessageFormat.format(" * Ouput neighbours file: {0}\n",
+                                           neighboursStringsFile));
+            sb.append(MessageFormat.format(
+                    " * Start time: {0,time,full} {0,date,full}\n", startTime));
+            sb.append(MessageFormat.format(" * {0}\n",
+                                           MiscUtil.memoryInfoString()));
             sb.append("\n");
             LOG.info(sb.toString());
         }
@@ -744,9 +827,13 @@ public final class FullBuild extends AbstractCommand {
         if (LOG.isInfoEnabled()) {
             StringBuilder sb = new StringBuilder();
             sb.append("\nStats:\n");
-            sb.append(MessageFormat.format(" * End time: {0,time,full} {0,date,full}\n", endTime));
-            sb.append(MessageFormat.format(" * Ellapsed time: {0}\n", formatElapsedTime(endTime - startTime)));
-            sb.append(MessageFormat.format(" * {0}\n", MiscUtil.memoryInfoString()));
+            sb.append(MessageFormat.format(
+                    " * End time: {0,time,full} {0,date,full}\n", endTime));
+            sb.append(
+                    MessageFormat.format(" * Ellapsed time: {0}\n",
+                                         formatElapsedTime(endTime - startTime)));
+            sb.append(MessageFormat.format(" * {0}\n",
+                                           MiscUtil.memoryInfoString()));
             sb.append("\n");
             LOG.info(sb.toString());
         }
@@ -969,5 +1056,4 @@ public final class FullBuild extends AbstractCommand {
     public void setTempBaseDir(File tempBaseDirectory) {
         this.tempBaseDir = tempBaseDirectory;
     }
-
 }

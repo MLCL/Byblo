@@ -28,8 +28,52 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+package uk.ac.susx.mlcl.byblo.measures.impl;
+
+import java.io.Serializable;
+import uk.ac.susx.mlcl.byblo.measures.Measure;
+import uk.ac.susx.mlcl.byblo.measures.Measures;
+import uk.ac.susx.mlcl.byblo.weighings.Weighting;
+import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
+import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+
 /**
- * Common interfaces and abstract classes for measures of similarity, proximity,
- * and distance.
+ * Proximity measure calculating proximity as the dot product of the
+ * vectors. For unit vectors this is equivalent to {@link Cosine }.
+ *
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-package uk.ac.susx.mlcl.byblo.measures;
+public final class DotProduct implements Measure, Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
+        return Measures.dotProduct(A, B);
+    }
+
+    @Override
+    public boolean isCommutative() {
+        return true;
+    }
+
+    @Override
+    public double getHomogeneityBound() {
+        return Double.POSITIVE_INFINITY;
+    }
+
+    @Override
+    public double getHeterogeneityBound() {
+        return Double.NEGATIVE_INFINITY;
+    }
+
+    @Override
+    public Class<? extends Weighting> getExpectedWeighting() {
+        return NullWeighting.class;
+    }
+
+    @Override
+    public String toString() {
+        return "DotProduct";
+    }
+}

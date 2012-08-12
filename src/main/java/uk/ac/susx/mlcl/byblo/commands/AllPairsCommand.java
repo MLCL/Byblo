@@ -30,6 +30,12 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import uk.ac.susx.mlcl.byblo.measures.impl.LeeSkewDivergence;
+import uk.ac.susx.mlcl.byblo.measures.impl.LambdaDivergence;
+import uk.ac.susx.mlcl.byblo.measures.impl.KendallsTau;
+import uk.ac.susx.mlcl.byblo.measures.impl.LpSpaceDistance;
+import uk.ac.susx.mlcl.byblo.measures.impl.Weeds;
+import uk.ac.susx.mlcl.byblo.measures.impl.KullbackLeiblerDivergence;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
@@ -53,9 +59,8 @@ import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource.WTStatsSource;
-import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
-import uk.ac.susx.mlcl.byblo.measures.v2.Measures;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.*;
+import uk.ac.susx.mlcl.byblo.measures.Measure;
+import uk.ac.susx.mlcl.byblo.measures.Measures;
 import uk.ac.susx.mlcl.byblo.tasks.InvertedApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.NaiveApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.ThreadedApssTask;
