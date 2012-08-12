@@ -38,6 +38,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * tau(q,r) = sum_i_j( sign((qi - qj)(ri - rj)) / (2 * |V|)  )
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @deprecated replaced by v2 measures and weightings
  */
 public class KendallTau extends AbstractProximity {
 

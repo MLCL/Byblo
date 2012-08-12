@@ -34,6 +34,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @deprecated replaced by v2 measures and weightings
  */
 public class JaccardMi extends AbstractMIProximity {
 
