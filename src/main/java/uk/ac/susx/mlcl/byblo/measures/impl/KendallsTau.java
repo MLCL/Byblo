@@ -36,6 +36,7 @@ import java.text.MessageFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
+import static uk.ac.susx.mlcl.byblo.measures.Measures.epsilonEquals;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
@@ -106,8 +107,8 @@ public final class KendallsTau
      * <tt>minCardinality</tt>.
      *
      * @param minCardinality expected dimensionality of vectors
-     * @throws IllegalArgumentException when
-     * <code>minCardinality</code> is negative
+     * @throws IllegalArgumentException when <code>minCardinality</code> is
+     * negative
      */
     public KendallsTau(final int minCardinality)
             throws IllegalArgumentException {
@@ -135,8 +136,8 @@ public final class KendallsTau
      * vectors for some reason, then method can be used to set it globally.
      *
      * @param minCardinality expected dimensionality of vectors
-     * @throws IllegalArgumentException when
-     * <code>minCardinality</code> is negative
+     * @throws IllegalArgumentException when <code>minCardinality</code> is
+     * negative
      */
     public final void setMinCardinality(int minCardinality)
             throws IllegalArgumentException {
@@ -189,7 +190,7 @@ public final class KendallsTau
                     if (aj < ai && (bj == bi || A.keys[aj] < B.keys[bj])) {
                         // A[j] = A.values[aj]
                         // B[j] = 0
-                        if (A.values[ai] == A.values[aj])
+                        if (epsilonEquals(A.values[ai], A.values[aj], 0))
                             ++aties;
                         ++aj;
                     } else if (bj < bi && (aj == ai || B.keys[bj] < A.keys[aj])) {
@@ -200,7 +201,7 @@ public final class KendallsTau
                     } else if (aj < ai && bj < bi) {
                         // A[j] = A.values[aj]
                         // B[j] = B.values[bj]
-                        if (A.values[ai] == A.values[aj])
+                        if (epsilonEquals(A.values[ai], A.values[aj], 0))
                             ++aties;
                         else
                             cordance += signum(A.values[ai] - A.values[aj])
@@ -225,13 +226,13 @@ public final class KendallsTau
                     } else if (bj < bi && (aj == ai || B.keys[bj] < A.keys[aj])) {
                         // A[j] = 0
                         // B[j] = B.values[bj]
-                        if (B.values[bi] == B.values[bj])
+                        if (epsilonEquals(B.values[bi], B.values[bj], 0))
                             ++bties;
                         ++bj;
                     } else if (aj < ai && bj < bi) {
                         // A[j] = A.values[aj]
                         // B[j] = B.values[bj]
-                        if (B.values[bi] == B.values[bj])
+                        if (epsilonEquals(B.values[bi], B.values[bj], 0))
                             ++bties;
                         else
                             cordance += signum(-A.values[aj])
@@ -251,7 +252,7 @@ public final class KendallsTau
                     if (aj < ai && (bj == bi || A.keys[aj] < B.keys[bj])) {
                         // A[j] = A.values[aj]
                         // B[j] = 0
-                        if (A.values[ai] == A.values[aj])
+                        if (epsilonEquals(A.values[ai], A.values[aj], 0))
                             ++aties;
                         else
                             cordance += signum(A.values[ai] - A.values[aj])
@@ -260,7 +261,7 @@ public final class KendallsTau
                     } else if (bj < bi && (aj == ai || B.keys[bj] < A.keys[aj])) {
                         // A[j] = 0
                         // B[j] = B.values[bj]
-                        if (B.values[bi] == B.values[bj])
+                        if (epsilonEquals(B.values[bi], B.values[bj], 0))
                             ++bties;
                         else
                             cordance += signum(A.values[ai])
@@ -269,11 +270,11 @@ public final class KendallsTau
                     } else if (aj < ai && bj < bi) {
                         // A[j] = A.values[aj]
                         // B[j] = B.values[bj]
-                        if (A.values[ai] == A.values[aj]) {
+                        if (epsilonEquals(A.values[ai], A.values[aj], 0)) {
                             ++aties;
-                            if (B.values[bi] == B.values[bj])
+                            if (epsilonEquals(B.values[bi], B.values[bj], 0))
                                 ++bties;
-                        } else if (B.values[bi] == B.values[bj]) {
+                        } else if (epsilonEquals(B.values[bi], B.values[bj], 0)) {
                             ++bties;
                         } else {
                             cordance += signum(A.values[ai] - A.values[aj])
@@ -328,7 +329,7 @@ public final class KendallsTau
         final double denom = Math.sqrt((n0 - d_aties) * (n0 - d_bties));
 
         // Avoid divide-by-0 errors for uniform vectors
-        final double sim = d_cordance != 0
+        final double sim = !epsilonEquals(d_cordance, 0)
                 ? d_cordance / denom
                 : 0;
 

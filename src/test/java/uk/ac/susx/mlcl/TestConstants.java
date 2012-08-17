@@ -30,6 +30,8 @@
  */
 package uk.ac.susx.mlcl;
 
+import com.google.common.io.Closeables;
+import com.google.common.io.Flushables;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -48,7 +50,11 @@ import uk.ac.susx.mlcl.lib.io.Files;
  */
 public class TestConstants {
 
-    public static final File TEST_DATA_DIR = new File("src/test/resources/uk/ac/susx/mlcl/byblo");
+    private TestConstants() {
+    }
+
+    public static final File TEST_DATA_DIR = new File(
+            "src/test/resources/uk/ac/susx/mlcl/byblo");
 
     public static final File TEST_FRUIT_DIR = TEST_DATA_DIR;
 
@@ -76,10 +82,12 @@ public class TestConstants {
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".events");
 
     public static final File TEST_FRUIT_ENTRIES_FILTERED =
-            new File(TEST_FRUIT_ENTRIES.getParentFile(), TEST_FRUIT_ENTRIES.getName() + ".filtered");
+            new File(TEST_FRUIT_ENTRIES.getParentFile(), TEST_FRUIT_ENTRIES.
+            getName() + ".filtered");
 
     public static final File TEST_FRUIT_FEATURES_FILTERED =
-            new File(TEST_FRUIT_FEATURES.getParentFile(), TEST_FRUIT_FEATURES.getName() + ".filtered");
+            new File(TEST_FRUIT_FEATURES.getParentFile(), TEST_FRUIT_FEATURES.
+            getName() + ".filtered");
 
     public static final File TEST_FRUIT_EVENTS_FILTERED =
             new File(TEST_FRUIT_EVENTS.getParentFile(),
@@ -124,24 +132,35 @@ public class TestConstants {
     ;
 
     static {
-        TEST_OUTPUT_DIR.mkdir();
-        TEST_TMP_DIR.mkdir();
+        if(!TEST_OUTPUT_DIR.exists() && !TEST_OUTPUT_DIR.mkdir())
+            throw new AssertionError();
+        if(!TEST_TMP_DIR.exists() && !TEST_TMP_DIR.mkdir())
+            throw new AssertionError();
     }
 
+    static final Random RAND = new Random();
+
     public static File makeTempFile(int size) throws IOException {
-        final File file = File.createTempFile(TestConstants.class.getName(),
-                                              ".tmp");
-        final OutputStream out = new BufferedOutputStream(
-                new FileOutputStream(file));
-        byte[] data = new byte[1024];
-        new Random().nextBytes(data);
-        int i = 0;
-        while (i < size) {
-            out.write(data, 0, Math.min(data.length, size - i));
-            i += data.length;
+        final File file = File.createTempFile(
+                TestConstants.class.getName(), ".tmp");
+
+        OutputStream out = null;
+        try {
+            out = new BufferedOutputStream(new FileOutputStream(file));
+
+            byte[] data = new byte[1024];
+            RAND.nextBytes(data);
+            int i = 0;
+            while (i < size) {
+                out.write(data, 0, Math.min(data.length, size - i));
+                i += data.length;
+            }
+        } finally {
+            if (out != null) {
+                Flushables.flushQuietly(out);
+                Closeables.closeQuietly(out);
+            }
         }
-        out.flush();
-        out.close();
         return file;
     }
 
@@ -167,19 +186,21 @@ public class TestConstants {
             RandomAccessFile raf = new RandomAccessFile(file, "r");
             raf.seek(file.length() - 1);
             int ch = raf.read();
-            assertEquals(format("Expecting newline chracter at end of inout file: \"{0}\"", file), ch, '\n');
+            assertEquals(format(
+                    "Expecting newline chracter at end of inout file: \"{0}\"",
+                    file), ch, '\n');
             raf.close();
         }
     }
 
-    public static void assertValidJDBCInputFiles(File... files) throws IOException {
+    public static void assertValidJDBMInputFiles(File... files) throws IOException {
         for (File file : files) {
             assertNotNull("File is null.", file);
             assertTrue(format("Input file is null: \"{0}\"", file), file != null);
 
             File data = new File(file.getParentFile(), file.getName() + ".d.0");
             File index = new File(file.getParentFile(), file.getName() + ".i.0");
-            File trans = new File(file.getParentFile(), file.getName() + ".t");
+//            File trans = new File(file.getParentFile(), file.getName() + ".t");
 
             assertValidInputFiles(data, index);
         }
@@ -191,7 +212,7 @@ public class TestConstants {
             assertTrue(format("Input file is null: \"{0}\"", file), file != null);
             File data = new File(file.getParentFile(), file.getName() + ".d.0");
             File index = new File(file.getParentFile(), file.getName() + ".i.0");
-            File trans = new File(file.getParentFile(), file.getName() + ".t");
+//            File trans = new File(file.getParentFile(), file.getName() + ".t");
 
             assertValidInputFiles(data, index);
         }
@@ -212,7 +233,7 @@ public class TestConstants {
         }
     }
 
-    public static void assertValidJDBCOutputFiles(File... files) throws IOException {
+    public static void assertValidJDBMOutputFiles(File... files) throws IOException {
         for (File file : files) {
             assertNotNull("File is null.", file);
             File data = new File(file.getParentFile(), file.getName() + ".d.0");
@@ -229,14 +250,17 @@ public class TestConstants {
                 bigger.length() > smaller.length());
     }
 
-    public static void deleteIfExist(File... files) {
+    public static void deleteIfExist(File... files) throws IOException {
         for (File file : files) {
-            if (file.exists())
-                file.delete();
+            if (file.exists()) {
+                boolean deleted = file.delete();
+                if (!deleted)
+                    throw new IOException("Failed to delete file " + file);
+            }
         }
     }
 
-    public static void deleteJDBCIfExist(File... files) {
+    public static void deleteJDBMIfExist(File... files) throws IOException {
         for (File file : files) {
             File data = new File(file.getParentFile(), file.getName() + ".d.0");
             File index = new File(file.getParentFile(), file.getName() + ".i.0");
@@ -248,5 +272,4 @@ public class TestConstants {
     public static File suffix(File file, String suffix) {
         return new File(file.getParentFile(), file.getName() + suffix);
     }
-
 }

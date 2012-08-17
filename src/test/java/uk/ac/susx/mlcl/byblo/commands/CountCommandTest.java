@@ -35,8 +35,10 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.annotation.Nullable;
 import static org.junit.Assert.*;
 import org.junit.Test;
+import uk.ac.susx.mlcl.TestConstants;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
@@ -61,7 +63,8 @@ public class CountCommandTest {
         countTask.setEventsFile(outEF);
         countTask.setCharset(charset);
         DoubleEnumeratingDeligate idx = new DoubleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, preIndexEntries, preIndexFeatures, null, null);
+                Enumerating.DEFAULT_TYPE, preIndexEntries, preIndexFeatures,
+                null, null);
         countTask.setIndexDeligate(idx);
         countTask.runCommand();
 
@@ -90,12 +93,12 @@ public class CountCommandTest {
         if (preindexedEntries) {
             List<String> tmp = new ArrayList<String>(Arrays.asList(args));
             tmp.add("--enumerated-entries");
-            args = tmp.toArray(new String[0]);
+            args = tmp.toArray(new String[tmp.size()]);
         }
         if (preindexedFeatures) {
             List<String> tmp = new ArrayList<String>(Arrays.asList(args));
             tmp.add("--enumerated-features");
-            args = tmp.toArray(new String[0]);
+            args = tmp.toArray(new String[tmp.size()]);
         }
 
         try {
@@ -115,32 +118,6 @@ public class CountCommandTest {
         assertTrue("Empty output file found: " + outEF, outEF.length() > 0);
     }
 
-    private void runExpectingNullPointer(File inInst, File outE, File outF,
-                                         File outEF, Charset charset,
-                                         boolean preIndexEntries,
-                                         boolean preIndexFeatures) throws Exception {
-        try {
-            runWithAPI(inInst, outE, outF, outEF, charset, preIndexEntries,
-                       preIndexFeatures);
-            fail("NullPointerException should have been thrown.");
-        } catch (NullPointerException ex) {
-            // pass
-        }
-    }
-
-    private void runExpectingIllegalState(File inInst, File outE, File outF,
-                                          File outEF, Charset charset,
-                                          boolean preIndexEntries,
-                                          boolean preIndexFeatures) throws Exception {
-        try {
-            runWithAPI(inInst, outE, outF, outEF, charset, preIndexEntries,
-                       preIndexFeatures);
-            fail("IllegalStateException should have been thrown.");
-        } catch (IllegalStateException ex) {
-            // pass
-        }
-    }
-
     @Test
     public void testRunOnFruitAPI() throws Exception {
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
@@ -151,28 +128,11 @@ public class CountCommandTest {
         final File efActual = new File(TEST_OUTPUT_DIR,
                                        fruitPrefix + ".events");
 
-        eActual.delete();
-        fActual.delete();
-        efActual.delete();
+        TestConstants.deleteIfExist(eActual, fActual, efActual);
 
         runWithAPI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
                    DEFAULT_CHARSET, false, false);
 
-//        assertTrue("Output entries file differs from sampledata file.",
-//                   WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
-//                                             DEFAULT_CHARSET,
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, false, null),
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, false, null),
-//                                             true, false));
-//        assertTrue("Output features file differs from test data file.",
-//                   WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
-//                                             DEFAULT_CHARSET,
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, false, null),
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, false, null),
-//                                             true, false));
-//        assertTrue("Output entry/features file differs from test data file.",
-//                   TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
-//                                         DEFAULT_CHARSET, true, true, true, true));
     }
 
     @Test
@@ -185,36 +145,17 @@ public class CountCommandTest {
         final File efActual = new File(TEST_OUTPUT_DIR,
                                        fruitPrefix + ".events");
 
-        eActual.delete();
-        fActual.delete();
-        efActual.delete();
+        TestConstants.deleteIfExist(eActual, fActual, efActual);
 
         runWithCLI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
                    DEFAULT_CHARSET, false, false);
 
-//        assertTrue("Output entries file differs from sampledata file.",
-//                   WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
-//                                             DEFAULT_CHARSET,
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, false, null),
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, false, null),
-//                                             true, false));
-//        assertTrue("Output features file differs from test data file.",
-//                   WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
-//                                             DEFAULT_CHARSET,
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, false, null),
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, false, null),
-//                                             true, false));
-//        assertTrue("Output entry/features file differs from test data file.",
-//                   TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
-//                                         DEFAULT_CHARSET,
-//                                         new DoubleEnumeratingDeligate(EnumeratorType.JDBC, false, false, null, null),
-//                                         new DoubleEnumeratingDeligate(EnumeratorType.JDBC, false, false, null, null),
-//                                         true, true, true, true));
     }
 
     @Test
     public void testRunOnFruitAPI_Indexed() throws Exception {
-        System.out.println(
+        System.out.
+                println(
                 "Testing " + subject + " on " + TEST_FRUIT_INPUT_INDEXED + " (Indexed)");
 
         final String fruitPrefix = TEST_FRUIT_INPUT_INDEXED.getName();
@@ -223,39 +164,17 @@ public class CountCommandTest {
         final File efActual = new File(TEST_OUTPUT_DIR,
                                        fruitPrefix + ".events");
 
-        eActual.delete();
-        fActual.delete();
-        efActual.delete();
+        TestConstants.deleteIfExist(eActual, fActual, efActual);
 
         runWithAPI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
                    DEFAULT_CHARSET, true, true);
 
-//        assertTrue(MessageFormat.format("Output entries file \"{0}\" differs from expected file \"{1}\".", eActual, TEST_FRUIT_INDEXED_ENTRIES),
-//                   WeightedTokenSource.equal(eActual, TEST_FRUIT_INDEXED_ENTRIES, DEFAULT_CHARSET,
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, true, null),
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, true, null),
-//                                             BybloIO.ENTRIES_SKIP_INDEXED_COLUMN_1, false));
-//
-//        assertTrue("Output features file differs from test data file.",
-//                   WeightedTokenSource.equal(fActual,
-//                                             TEST_FRUIT_INDEXED_FEATURES,
-//                                             DEFAULT_CHARSET, new SingleEnumeratingDeligate(EnumeratorType.JDBC, true, null),
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, true, null),
-//                                             BybloIO.FEATURES_SKIP_INDEXED_COLUMN_1, false));
-//        assertTrue("Output entry/features file differs from test data file.",
-//                   TokenPairSource.equal(efActual,
-//                                         TEST_FRUIT_INDEXED_ENTRY_FEATURES,
-//                                         DEFAULT_CHARSET,
-//                                         new DoubleEnumeratingDeligate(EnumeratorType.JDBC, true, true, null, null),
-//                                         new DoubleEnumeratingDeligate(EnumeratorType.JDBC, true, true, null, null),
-//                                         BybloIO.EVENTS_SKIP_INDEXED_COLUMN_1,
-//                                         BybloIO.EVENTS_SKIP_INDEXED_COLUMN_2,
-//                                         false, false));
     }
 
     @Test
     public void testRunOnFruitCLI_Indexed() throws Exception {
-        System.out.println(
+        System.out.
+                println(
                 "Testing " + subject + " on " + TEST_FRUIT_INPUT_INDEXED + " (Indexed)");
 
         final String fruitPrefix = TEST_FRUIT_INPUT_INDEXED.getName();
@@ -264,68 +183,63 @@ public class CountCommandTest {
         final File efActual = new File(TEST_OUTPUT_DIR,
                                        fruitPrefix + ".events");
 
-        eActual.delete();
-        fActual.delete();
-        efActual.delete();
+        TestConstants.deleteIfExist(eActual, fActual, efActual);
 
         runWithCLI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
                    DEFAULT_CHARSET, true, true);
 
-//        assertTrue("Output entries file differs from sampledata file.",
-//                   WeightedTokenSource.equal(eActual,
-//                                             TEST_FRUIT_INDEXED_ENTRIES,
-//                                             DEFAULT_CHARSET,
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, true, null),
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, true, null),
-//                                             BybloIO.ENTRIES_SKIP_INDEXED_COLUMN_1, false));
-//        assertTrue("Output features file differs from test data file.",
-//                   WeightedTokenSource.equal(fActual,
-//                                             TEST_FRUIT_INDEXED_FEATURES,
-//                                             DEFAULT_CHARSET,
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, true, null),
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, true, null),
-//                                             BybloIO.FEATURES_SKIP_INDEXED_COLUMN_1, false));
-//        assertTrue("Output entry/features file differs from test data file.",
-//                   TokenPairSource.equal(efActual,
-//                                         TEST_FRUIT_INDEXED_ENTRY_FEATURES,
-//                                         DEFAULT_CHARSET,
-//                                         new DoubleEnumeratingDeligate(EnumeratorType.JDBC, true, true, null, null),
-//                                         new DoubleEnumeratingDeligate(EnumeratorType.JDBC, true, true, null, null),
-//                                         BybloIO.EVENTS_SKIP_INDEXED_COLUMN_1,
-//                                         BybloIO.EVENTS_SKIP_INDEXED_COLUMN_2,
-//                                         false, false));
     }
 
-    @Test
-    public void testMissingParameters() throws Exception {
-        System.out.println("Testing " + subject + " for bad parameterisation.");
+    @Test(expected = IllegalStateException.class)
+    public void testIllegalState1() throws Exception {
+        runReplacingFile(0, TEST_OUTPUT_DIR);
+    }
 
+    @Test(expected = IllegalStateException.class)
+    public void testIllegalState2() throws Exception {
+        runReplacingFile(1, TEST_OUTPUT_DIR);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testIllegalState3() throws Exception {
+        runReplacingFile(2, TEST_OUTPUT_DIR);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testIllegalState4() throws Exception {
+        runReplacingFile(3, TEST_OUTPUT_DIR);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullParameter1() throws Exception {
+        runReplacingFile(0, null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullParameter2() throws Exception {
+        runReplacingFile(1, null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullParameter3() throws Exception {
+        runReplacingFile(2, null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullParameter4() throws Exception {
+        runReplacingFile(3, null);
+    }
+
+    void runReplacingFile(int repId, @Nullable File repFile)
+            throws Exception {
         final File instIn = TEST_FRUIT_INPUT;
         final String fruitPrefix = TEST_FRUIT_INPUT.getName();
         final File eOut = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
         final File fOut = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
-        final File efOut = new File(TEST_OUTPUT_DIR,
-                                    fruitPrefix + ".events");
-
-        runExpectingNullPointer(null, eOut, fOut, efOut, DEFAULT_CHARSET, false,
-                                false);
-        runExpectingNullPointer(instIn, null, fOut, efOut, DEFAULT_CHARSET,
-                                false, false);
-        runExpectingNullPointer(instIn, eOut, null, efOut, DEFAULT_CHARSET,
-                                false, false);
-        runExpectingNullPointer(instIn, eOut, fOut, null, DEFAULT_CHARSET, false,
-                                false);
-        runExpectingNullPointer(instIn, eOut, fOut, efOut, null, false, false);
-
-        File dir = TEST_OUTPUT_DIR;
-        runExpectingIllegalState(dir, eOut, fOut, efOut, DEFAULT_CHARSET, false,
-                                 false);
-        runExpectingIllegalState(instIn, dir, fOut, efOut, DEFAULT_CHARSET,
-                                 false, false);
-        runExpectingIllegalState(instIn, eOut, dir, efOut, DEFAULT_CHARSET,
-                                 false, false);
-        runExpectingIllegalState(instIn, eOut, fOut, dir, DEFAULT_CHARSET, false,
-                                 false);
+        final File efOut = new File(TEST_OUTPUT_DIR, fruitPrefix + ".events");
+        File[] files = new File[]{instIn, eOut, fOut, efOut};
+        files[repId] = repFile;
+        runWithAPI(files[0], files[1], files[2], files[3], DEFAULT_CHARSET,
+                   false, false);
     }
-
 }

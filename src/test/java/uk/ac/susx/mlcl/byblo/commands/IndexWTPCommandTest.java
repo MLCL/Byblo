@@ -119,43 +119,43 @@ public class IndexWTPCommandTest {
     }
 
     @Test
-    public void testRunOnFruitAPI_noskip_compact_jdbc() throws Exception {
-        testRunOnFruitAPI("compact-noskip-jdbc-", EnumeratorType.JDBC, false, false, true);
+    public void testRunOnFruitAPI_noskip_compact_jdbm() throws Exception {
+        testRunOnFruitAPI("compact-noskip-jdbm-", EnumeratorType.JDBM, false, false, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipboth_compact_jdbc() throws Exception {
-        testRunOnFruitAPI("compact-skipboth-jdbc-", EnumeratorType.JDBC, true, true, true);
+    public void testRunOnFruitAPI_skipboth_compact_jdbm() throws Exception {
+        testRunOnFruitAPI("compact-skipboth-jdbm-", EnumeratorType.JDBM, true, true, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipleft_compact_jdbc() throws Exception {
-        testRunOnFruitAPI("compact-skipleft-jdbc-", EnumeratorType.JDBC, true, false, true);
+    public void testRunOnFruitAPI_skipleft_compact_jdbm() throws Exception {
+        testRunOnFruitAPI("compact-skipleft-jdbm-", EnumeratorType.JDBM, true, false, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipright_compact_jdbc() throws Exception {
-        testRunOnFruitAPI("compact-skipright-jdbc-", EnumeratorType.JDBC, false, true, true);
+    public void testRunOnFruitAPI_skipright_compact_jdbm() throws Exception {
+        testRunOnFruitAPI("compact-skipright-jdbm-", EnumeratorType.JDBM, false, true, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_noskip_verbose_jdbc() throws Exception {
-        testRunOnFruitAPI("verbose-noskip-jdbc-", EnumeratorType.JDBC, false, false, false);
+    public void testRunOnFruitAPI_noskip_verbose_jdbm() throws Exception {
+        testRunOnFruitAPI("verbose-noskip-jdbm-", EnumeratorType.JDBM, false, false, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipboth_verbose_jdbc() throws Exception {
-        testRunOnFruitAPI("verbose-skipboth-jdbc-", EnumeratorType.JDBC, true, true, false);
+    public void testRunOnFruitAPI_skipboth_verbose_jdbm() throws Exception {
+        testRunOnFruitAPI("verbose-skipboth-jdbm-", EnumeratorType.JDBM, true, true, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipleft_verbose_jdbc() throws Exception {
-        testRunOnFruitAPI("verbose-skipleft-jdbc-", EnumeratorType.JDBC, true, false, false);
+    public void testRunOnFruitAPI_skipleft_verbose_jdbm() throws Exception {
+        testRunOnFruitAPI("verbose-skipleft-jdbm-", EnumeratorType.JDBM, true, false, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipright_verbose_jdbc() throws Exception {
-        testRunOnFruitAPI("verbose-skipright-jdbc-", EnumeratorType.JDBC, false, true, false);
+    public void testRunOnFruitAPI_skipright_verbose_jdbm() throws Exception {
+        testRunOnFruitAPI("verbose-skipright-jdbm-", EnumeratorType.JDBM, false, true, false);
     }
 
     public void testRunOnFruitAPI(
@@ -170,7 +170,7 @@ public class IndexWTPCommandTest {
         final File idx2 = new File(TEST_OUTPUT_DIR, name + ".feature-index");
 
         deleteIfExist(out);
-        deleteJDBCIfExist(idx1, idx2);
+        deleteJDBMIfExist(idx1, idx2);
 
         indexWTP(TEST_FRUIT_EVENTS, out, idx1, idx2, type, skip1, skip2,
                  compact);
@@ -311,8 +311,8 @@ public class IndexWTPCommandTest {
             throws Exception {
         assertValidPlaintextInputFiles(from);
         assertValidOutputFiles(to);
-        if (type == EnumeratorType.JDBC)
-            assertValidJDBCOutputFiles(index1, index2);
+        if (type == EnumeratorType.JDBM)
+            assertValidJDBMOutputFiles(index1, index2);
         else
             assertValidOutputFiles(index1, index2);
 
@@ -325,8 +325,8 @@ public class IndexWTPCommandTest {
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);
-        if (type == EnumeratorType.JDBC)
-            assertValidJDBCInputFiles(index1, index2);
+        if (type == EnumeratorType.JDBM)
+            assertValidJDBMInputFiles(index1, index2);
         else
             assertValidInputFiles(index1, index2);
         assertSizeGT(from, to);
@@ -338,8 +338,8 @@ public class IndexWTPCommandTest {
             throws Exception {
         assertValidPlaintextInputFiles(from);
 
-        if (type == EnumeratorType.JDBC)
-            assertValidJDBCInputFiles(index1, index2);
+        if (type == EnumeratorType.JDBM)
+            assertValidJDBMInputFiles(index1, index2);
         else
             assertValidInputFiles(index1, index2);
         assertValidOutputFiles(to);

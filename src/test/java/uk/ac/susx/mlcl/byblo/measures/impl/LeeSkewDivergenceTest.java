@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import uk.ac.susx.mlcl.byblo.measures.impl.LeeSkewDivergence;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -99,7 +98,7 @@ public class LeeSkewDivergenceTest {
 
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME
                 + String.format(".Lee-%03d", (int) (alpha * 100)));
-        output.delete();
+        deleteIfExist(output);
 
         try {
             enableExistTrapping();
@@ -228,7 +227,7 @@ public class LeeSkewDivergenceTest {
             B.set(RANDOM.nextInt(size * 2), RANDOM.nextDouble());
         }
 
-        double expect = test(A, B);
+        test(A, B);
     }
 
     static List<Indexed<SparseDoubleVector>> loadFruitVectors() throws IOException {

@@ -42,8 +42,8 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import static java.text.MessageFormat.format;
 import java.util.HashMap;
 import java.util.List;
@@ -69,12 +69,12 @@ import uk.ac.susx.mlcl.lib.commands.FileDeligate;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
-import uk.ac.susx.mlcl.lib.io.FileFactory;
-import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
-import uk.ac.susx.mlcl.lib.events.ProgressEvent;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.events.ProgressReporting;
+import uk.ac.susx.mlcl.lib.events.ReportLoggingProgressListener;
+import uk.ac.susx.mlcl.lib.io.FileFactory;
+import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 
 /**
  *
@@ -86,7 +86,7 @@ import uk.ac.susx.mlcl.lib.events.ProgressReporting;
  */
 @Parameters(commandDescription = "Filter a set of frequency files")
 public class FilterCommand extends AbstractCommand
-        implements Serializable, ProgressReporting {
+        implements ProgressReporting {
 
     private static final long serialVersionUID = 1L;
 
@@ -110,42 +110,42 @@ public class FilterCommand extends AbstractCommand
      */
 
     @Parameter(names = {"-iv", "--input-events"},
-    required = true,
-    description = "Input event frequencies file.",
-    validateWith = InputFileValidator.class)
+               required = true,
+               description = "Input event frequencies file.",
+               validateWith = InputFileValidator.class)
     private File inputEventsFile;
 
     @Parameter(names = {"-ie", "--input-entries"},
-    required = true,
-    description = "Input entry frequencies file.",
-    validateWith = InputFileValidator.class)
+               required = true,
+               description = "Input entry frequencies file.",
+               validateWith = InputFileValidator.class)
     private File inputEntriesFile;
 
     @Parameter(names = {"-if", "--input-features"},
-    required = true,
-    description = "Input features frequencies file.",
-    validateWith = InputFileValidator.class)
+               required = true,
+               description = "Input features frequencies file.",
+               validateWith = InputFileValidator.class)
     private File inputFeaturesFile;
     /*
      * === OUTPUT FILES ===
      */
 
     @Parameter(names = {"-ov", "--output-events"},
-    required = true,
-    description = "Output event frequencies file.",
-    validateWith = OutputFileValidator.class)
+               required = true,
+               description = "Output event frequencies file.",
+               validateWith = OutputFileValidator.class)
     private File outputEventsFile;
 
     @Parameter(names = {"-oe", "--output-entries"},
-    required = true,
-    description = "Output entry frequencies file",
-    validateWith = OutputFileValidator.class)
+               required = true,
+               description = "Output entry frequencies file",
+               validateWith = OutputFileValidator.class)
     private File outputEntriesFile;
 
     @Parameter(names = {"-of", "--output-features"},
-    required = true,
-    description = "Output features frequencies file.",
-    validateWith = OutputFileValidator.class)
+               required = true,
+               description = "Output features frequencies file.",
+               validateWith = OutputFileValidator.class)
     private File outputFeaturesFile;
 
     @ParametersDelegate
@@ -155,41 +155,41 @@ public class FilterCommand extends AbstractCommand
      * === FILTER PARAMATERISATION ===
      */
     @Parameter(names = {"-fef", "--filter-entry-freq"},
-    description = "Minimum entry pair frequency threshold.",
-    converter = DoubleConverter.class)
+               description = "Minimum entry pair frequency threshold.",
+               converter = DoubleConverter.class)
     private double filterEntryMinFreq;
 
     @Parameter(names = {"-few", "--filter-entry-whitelist"},
-    description = "Whitelist file containing entries of interest. (All others will be ignored)",
-    validateWith = InputFileValidator.class)
+               description = "Whitelist file containing entries of interest. (All others will be ignored)",
+               validateWith = InputFileValidator.class)
     private File filterEntryWhitelist;
 
     @Parameter(names = {"-fep", "--filter-entry-pattern"},
-    description = "Regular expresion that accepted entries must match.")
+               description = "Regular expresion that accepted entries must match.")
     private String filterEntryPattern;
 
     @Parameter(names = {"-fvf", "--filter-event-freq"},
-    description = "Minimum event frequency threshold.",
-    converter = DoubleConverter.class)
+               description = "Minimum event frequency threshold.",
+               converter = DoubleConverter.class)
     private double filterEventMinFreq;
 
     @Parameter(names = {"-fff", "--filter-feature-freq"},
-    description = "Minimum feature pair frequency threshold.",
-    converter = DoubleConverter.class)
+               description = "Minimum feature pair frequency threshold.",
+               converter = DoubleConverter.class)
     private double filterFeatureMinFreq;
 
     @Parameter(names = {"-ffw", "--filter-feature-whitelist"},
-    description = "Whitelist file containing features of interest. (All others will be ignored)",
-    validateWith = InputFileValidator.class)
+               description = "Whitelist file containing features of interest. (All others will be ignored)",
+               validateWith = InputFileValidator.class)
     private File filterFeatureWhitelist;
 
     @Parameter(names = {"-ffp", "--filter-feature-pattern"},
-    description = "Regular expresion that accepted features must match.")
+               description = "Regular expresion that accepted features must match.")
     private String filterFeaturePattern;
 
     @Parameter(names = {"-T", "--temp-dir"},
-    description = "Temorary directory which will be used during filtering.",
-    converter = TempFileFactoryConverter.class)
+               description = "Temorary directory which will be used during filtering.",
+               converter = TempFileFactoryConverter.class)
     private FileFactory tempFiles = new TempFileFactory();
 
     /*
@@ -197,7 +197,8 @@ public class FilterCommand extends AbstractCommand
      */
     private Predicate<Weighted<Token>> acceptEntry = Predicates2.alwaysTrue();
 
-    private Predicate<Weighted<TokenPair>> acceptEvent = Predicates2.alwaysTrue();
+    private Predicate<Weighted<TokenPair>> acceptEvent = Predicates2.
+            alwaysTrue();
 
     private Predicate<Weighted<Token>> acceptFeature = Predicates2.alwaysTrue();
 
@@ -280,14 +281,7 @@ public class FilterCommand extends AbstractCommand
         activeEntriesFile = inputEntriesFile;
         activeFeaturesFile = inputFeaturesFile;
 
-        progress.addProgressListener(new ProgressListener() {
-
-            @Override
-            public void progressChanged(ProgressEvent progressEvent) {
-                LOG.info(progressEvent.getSource().getProgressReport());
-            }
-
-        });
+        progress.addProgressListener(new ReportLoggingProgressListener(LOG));
 
         progress.setState(State.RUNNING);
         progress.setProgressPercent(0);
@@ -307,33 +301,40 @@ public class FilterCommand extends AbstractCommand
 
 //            if (entryFilterRequired || eventFilterRequired) {
 
-            progress.setMessage("Running filtering pass (#" + (++passCount) + ").");
+            progress.setMessage(
+                    "Running filtering pass (#" + (++passCount) + ").");
 
             if (entryFilterRequired) {
                 filterEntries();
                 ++opCount;
-                progress.setProgressPercent(100 * opCount / (opCount + 3
-                        + (entryFilterRequired ? 1 : 0)
-                        + (eventFilterRequired ? 1 : 0)
-                        + (featureFilterRequired ? 1 : 0)));
+                progress.
+                        setProgressPercent(
+                        100 * opCount / (opCount + 3
+                                         + (entryFilterRequired ? 1 : 0)
+                                         + (eventFilterRequired ? 1 : 0)
+                                         + (featureFilterRequired ? 1 : 0)));
             }
 
             if (eventFilterRequired) {
                 filterEvents();
                 ++opCount;
-                progress.setProgressPercent(100 * opCount / (opCount + 3
-                        + (entryFilterRequired ? 1 : 0)
-                        + (eventFilterRequired ? 1 : 0)
-                        + (featureFilterRequired ? 1 : 0)));
+                progress.
+                        setProgressPercent(
+                        100 * opCount / (opCount + 3
+                                         + (entryFilterRequired ? 1 : 0)
+                                         + (eventFilterRequired ? 1 : 0)
+                                         + (featureFilterRequired ? 1 : 0)));
             }
 
             if (featureFilterRequired) {
                 filterFeatures();
                 ++opCount;
-                progress.setProgressPercent(100 * opCount / (opCount + 3
-                        + (entryFilterRequired ? 1 : 0)
-                        + (eventFilterRequired ? 1 : 0)
-                        + (featureFilterRequired ? 1 : 0)));
+                progress.
+                        setProgressPercent(
+                        100 * opCount / (opCount + 3
+                                         + (entryFilterRequired ? 1 : 0)
+                                         + (eventFilterRequired ? 1 : 0)
+                                         + (featureFilterRequired ? 1 : 0)));
             }
 //            }
 //
@@ -353,19 +354,23 @@ public class FilterCommand extends AbstractCommand
             if (eventFilterRequired) {
                 filterEvents();
                 ++opCount;
-                progress.setProgressPercent(100 * opCount / (opCount + 3
-                        + (entryFilterRequired ? 1 : 0)
-                        + (eventFilterRequired ? 1 : 0)
-                        + (featureFilterRequired ? 1 : 0)));
+                progress.
+                        setProgressPercent(
+                        100 * opCount / (opCount + 3
+                                         + (entryFilterRequired ? 1 : 0)
+                                         + (eventFilterRequired ? 1 : 0)
+                                         + (featureFilterRequired ? 1 : 0)));
             }
 
             if (entryFilterRequired) {
                 filterEntries();
                 ++opCount;
-                progress.setProgressPercent(100 * opCount / (opCount + 3
-                        + (entryFilterRequired ? 1 : 0)
-                        + (eventFilterRequired ? 1 : 0)
-                        + (featureFilterRequired ? 1 : 0)));
+                progress.
+                        setProgressPercent(
+                        100 * opCount / (opCount + 3
+                                         + (entryFilterRequired ? 1 : 0)
+                                         + (eventFilterRequired ? 1 : 0)
+                                         + (featureFilterRequired ? 1 : 0)));
             }
 //            }
         }
@@ -375,50 +380,74 @@ public class FilterCommand extends AbstractCommand
         progress.setMessage("Copying final entries file.");
 
 
-        outputEntriesFile.delete();
+        if (!outputEntriesFile.delete() && LOG.isWarnEnabled()) {
+            LOG.warn("Failed to delete origional entries file: "
+                    + outputEntriesFile);
+        }
+
         if (!activeEntriesFile.renameTo(outputEntriesFile)) {
-            com.google.common.io.Files.copy(activeEntriesFile, outputEntriesFile);
-            if (!activeEntriesFile.equals(inputEntriesFile))
-                activeEntriesFile.delete();
+            com.google.common.io.Files.
+                    copy(activeEntriesFile, outputEntriesFile);
+            if (!activeEntriesFile.equals(inputEntriesFile)) {
+                if (!activeEntriesFile.delete()) {
+                    LOG.warn(MessageFormat.format(
+                            "Failed to delete active entries file: {0}",
+                            activeEntriesFile));
+                }
+            }
         }
         ++opCount;
 
         progress.startAdjusting();
-        progress.setProgressPercent(100 * opCount / (opCount + 2
-                + (entryFilterRequired ? 1 : 0)
-                + (eventFilterRequired ? 1 : 0)
-                + (featureFilterRequired ? 1 : 0)));
+        progress.
+                setProgressPercent(
+                100 * opCount / (opCount + 2
+                                 + (entryFilterRequired ? 1 : 0)
+                                 + (eventFilterRequired ? 1 : 0)
+                                 + (featureFilterRequired ? 1 : 0)));
         progress.setMessage("Copying finaly events file.");
         progress.endAdjusting();
 
-        outputEventsFile.delete();
+        if (!outputEventsFile.delete() && LOG.isWarnEnabled()) {
+            LOG.warn("Failed to delete origional events file: "
+                    + outputEventsFile);
+        }
+
         if (!activeEventsFile.renameTo(outputEventsFile)) {
             com.google.common.io.Files.copy(activeEventsFile,
                                             outputEventsFile);
             if (!activeEventsFile.equals(inputEventsFile))
-                activeEventsFile.delete();
+                if (!activeEventsFile.delete())
+                    LOG.warn("Failed to delete active events file:  "
+                            + activeEventsFile);
         }
         ++opCount;
 
         progress.startAdjusting();
-        progress.setProgressPercent(100 * opCount / (opCount + 1
-                + (entryFilterRequired ? 1 : 0)
-                + (eventFilterRequired ? 1 : 0)
-                + (featureFilterRequired ? 1 : 0)));
+        progress.
+                setProgressPercent(
+                100 * opCount / (opCount + 1
+                                 + (entryFilterRequired ? 1 : 0)
+                                 + (eventFilterRequired ? 1 : 0)
+                                 + (featureFilterRequired ? 1 : 0)));
         progress.setMessage("Copying final features file.");
         progress.endAdjusting();
 
-        outputFeaturesFile.delete();
         if (!activeFeaturesFile.renameTo(outputFeaturesFile)) {
-            com.google.common.io.Files.copy(activeFeaturesFile, outputFeaturesFile);
+            com.google.common.io.Files.copy(activeFeaturesFile,
+                                            outputFeaturesFile);
             if (!activeFeaturesFile.equals(inputFeaturesFile))
-                activeFeaturesFile.delete();
+                if (!activeFeaturesFile.delete())
+                    LOG.warn("Failed to delete active features file:  "
+                            + activeFeaturesFile);
         }
         ++opCount;
-        progress.setProgressPercent(100 * opCount / (opCount + 0
-                + (entryFilterRequired ? 1 : 0)
-                + (eventFilterRequired ? 1 : 0)
-                + (featureFilterRequired ? 1 : 0)));
+        progress.
+                setProgressPercent(
+                100 * opCount / (opCount + 0
+                                 + (entryFilterRequired ? 1 : 0)
+                                 + (eventFilterRequired ? 1 : 0)
+                                 + (featureFilterRequired ? 1 : 0)));
 
 
         if (indexDeligate.isEnumeratorOpen()) {
@@ -449,7 +478,8 @@ public class FilterCommand extends AbstractCommand
         progress.setMessage("Filtering entries.");
 
 
-        final int filteredEntry = getIndexDeligate().getEntryEnumerator().indexOf(
+        final int filteredEntry = getIndexDeligate().getEntryEnumerator().
+                indexOf(
                 FILTERED_STRING);
         double filteredWeight = 0;
 
@@ -472,7 +502,8 @@ public class FilterCommand extends AbstractCommand
 
             if ((inCount % PROGRESS_INTERVAL == 0 || !entriesSource.hasNext())
                     && LOG.isInfoEnabled()) {
-                progress.setMessage(format("Accepted {0} of {1} entries.", outCount, inCount));
+                progress.setMessage(format("Accepted {0} of {1} entries.",
+                                           outCount, inCount));
                 LOG.debug(MiscUtil.memoryInfoString());
             }
         }
@@ -488,7 +519,10 @@ public class FilterCommand extends AbstractCommand
 
 
         if (!activeEntriesFile.equals(inputEntriesFile)) {
-            activeEntriesFile.delete();
+            if (!activeEntriesFile.delete() && LOG.isWarnEnabled()) {
+                LOG.warn("Failed to delete temporary entries file: "
+                        + outputEntriesFile);
+            }
         }
 
         entryFilterRequired = false;
@@ -498,7 +532,8 @@ public class FilterCommand extends AbstractCommand
         if (rejected.size() > 0) {
             eventFilterRequired = true;
             acceptEvent = Predicates2.and(acceptEvent,
-                                          Predicates2.compose(Predicates2.not(Predicates2.in(rejected)),
+                                          Predicates2.compose(Predicates2.
+                    not(Predicates2.in(rejected)),
                                                               eventEntryId()));
         }
 
@@ -518,21 +553,26 @@ public class FilterCommand extends AbstractCommand
         IntSet rejectedFeatures = new IntOpenHashSet();
         IntSet acceptedFeatures = new IntOpenHashSet();
 
-        WeightedTokenPairSource efSrc = BybloIO.openEventsSource(activeEventsFile, getCharset(), indexDeligate);
+        WeightedTokenPairSource efSrc = BybloIO.openEventsSource(
+                activeEventsFile, getCharset(), indexDeligate);
 
         File outputFile = tempFiles.createFile();
 //        outputFile.deleteOnExit();
 
-        WeightedTokenPairSink efSink = BybloIO.openEventsSink(outputFile, getCharset(), indexDeligate);
+        WeightedTokenPairSink efSink = BybloIO.openEventsSink(outputFile,
+                                                              getCharset(),
+                                                              indexDeligate);
 
         progress.setMessage("Filtering events from.");
 
 
         // Store the id of the special filtered feature and entry
         // TODO This can probably be removed now but need to check
-        final int filteredEntry = getIndexDeligate().getEntryEnumerator().indexOf(
+        final int filteredEntry = getIndexDeligate().getEntryEnumerator().
+                indexOf(
                 FILTERED_STRING);
-        final int filteredFeature = getIndexDeligate().getFeatureEnumerator().indexOf(
+        final int filteredFeature = getIndexDeligate().getFeatureEnumerator().
+                indexOf(
                 FILTERED_STRING);
 
         int currentEntryId = -1;
@@ -591,8 +631,10 @@ public class FilterCommand extends AbstractCommand
             }
 
             if ((readCount % PROGRESS_INTERVAL == 0
-                    || !efSrc.hasNext()) && LOG.isInfoEnabled()) {
-                progress.setMessage("Accepted " + writeCount + " of " + readCount + " events.");
+                 || !efSrc.hasNext()) && LOG.isInfoEnabled()) {
+                progress.
+                        setMessage(
+                        "Accepted " + writeCount + " of " + readCount + " events.");
                 LOG.debug(MiscUtil.memoryInfoString());
             }
         }
@@ -622,7 +664,10 @@ public class FilterCommand extends AbstractCommand
 
 
         if (!activeEventsFile.equals(inputEventsFile)) {
-            activeEventsFile.delete();
+            if (!activeEventsFile.delete() && LOG.isWarnEnabled()) {
+                LOG.warn("Failed to delete temporary events file: "
+                        + activeEventsFile);
+            }
         }
 
 
@@ -634,13 +679,15 @@ public class FilterCommand extends AbstractCommand
 
         if (rejectedEntries.size() > 0) {
             acceptEntry = Predicates2.and(acceptEntry,
-                                          Predicates2.compose(Predicates2.not(Predicates2.in(rejectedEntries)), id()));
+                                          Predicates2.compose(Predicates2.
+                    not(Predicates2.in(rejectedEntries)), id()));
             entryFilterRequired = true;
         }
 
         if (rejectedFeatures.size() > 0) {
             acceptFeature = Predicates2.and(acceptFeature,
-                                            Predicates2.not(Predicates2.compose(Predicates2.in(rejectedFeatures), id())));
+                                            Predicates2.not(Predicates2.
+                    compose(Predicates2.in(rejectedFeatures), id())));
             featureFilterRequired = true;
 
         }
@@ -656,11 +703,14 @@ public class FilterCommand extends AbstractCommand
             throws FileNotFoundException, IOException {
         IntSet rejectedFeatures = new IntOpenHashSet();
 
-        WeightedTokenSource featureSource = BybloIO.openFeaturesSource(activeFeaturesFile, getCharset(), indexDeligate);
+        WeightedTokenSource featureSource = BybloIO.openFeaturesSource(
+                activeFeaturesFile, getCharset(), indexDeligate);
 
         File outputFile = tempFiles.createFile();
 
-        WeightedTokenSink featureSink = BybloIO.openFeaturesSink(outputFile, getCharset(), indexDeligate);
+        WeightedTokenSink featureSink = BybloIO.openFeaturesSink(outputFile,
+                                                                 getCharset(),
+                                                                 indexDeligate);
 
         progress.setMessage("Filtering features.");
 
@@ -688,9 +738,10 @@ public class FilterCommand extends AbstractCommand
             }
 
             if ((inCount % PROGRESS_INTERVAL == 0
-                    || !featureSource.hasNext())
+                 || !featureSource.hasNext())
                     && LOG.isInfoEnabled()) {
-                progress.setMessage(format("Accepted {0} of {1} features.", outCount, inCount));
+                progress.setMessage(format("Accepted {0} of {1} features.",
+                                           outCount, inCount));
                 LOG.debug(MiscUtil.memoryInfoString());
             }
         }
@@ -705,7 +756,10 @@ public class FilterCommand extends AbstractCommand
 
 
         if (!activeFeaturesFile.equals(inputFeaturesFile)) {
-            activeFeaturesFile.delete();
+            if (!activeFeaturesFile.delete() && LOG.isWarnEnabled()) {
+                LOG.warn("Failed to delete temporary features file: "
+                        + activeFeaturesFile);
+            }
         }
 
 
@@ -719,7 +773,8 @@ public class FilterCommand extends AbstractCommand
             eventFilterRequired = true;
             acceptEvent = Predicates2.and(
                     acceptEvent,
-                    Predicates2.compose(Predicates2.not(Predicates2.in(rejectedFeatures)), eventFeatureId()));
+                    Predicates2.compose(Predicates2.not(Predicates2.in(
+                    rejectedFeatures)), eventFeatureId()));
 
         }
     }
@@ -786,31 +841,36 @@ public class FilterCommand extends AbstractCommand
     public void addFeaturesMinimumFrequency(double threshold) {
         setAcceptFeatures(Predicates2.<Weighted<Token>>and(
                 getAcceptFeatures(),
-                Predicates2.compose(Predicates2.gte(threshold), this.<Token>weight())));
+                Predicates2.compose(Predicates2.gte(threshold), this.
+                <Token>weight())));
     }
 
     public void addFeaturesMaximumFrequency(double threshold) {
         setAcceptFeatures(Predicates2.<Weighted<Token>>and(
                 getAcceptFeatures(),
-                Predicates2.compose(Predicates2.lte(threshold), this.<Token>weight())));
+                Predicates2.compose(Predicates2.lte(threshold), this.
+                <Token>weight())));
     }
 
     public void addFeaturesFrequencyRange(double min, double max) {
         setAcceptFeatures(Predicates2.<Weighted<Token>>and(
                 getAcceptFeatures(),
-                Predicates2.compose(Predicates2.inRange(min, max), this.<Token>weight())));
+                Predicates2.compose(Predicates2.inRange(min, max), this.
+                <Token>weight())));
     }
 
     public void addFeaturesPattern(String pattern) {
         setAcceptFeatures(Predicates2.<Weighted<Token>>and(
                 getAcceptFeatures(),
-                Predicates2.compose(Predicates2.containsPattern(pattern), featureString())));
+                Predicates2.compose(Predicates2.containsPattern(pattern),
+                                    featureString())));
     }
 
     public void addFeaturesWhitelist(List<String> strings) throws IOException {
         IntSet featureIdSet = new IntOpenHashSet();
         for (String string : strings) {
-            final int id = getIndexDeligate().getFeatureEnumerator().indexOf(string);
+            final int id = getIndexDeligate().getFeatureEnumerator().indexOf(
+                    string);
             featureIdSet.add(id);
         }
         setAcceptFeatures(Predicates2.<Weighted<Token>>and(
@@ -821,12 +881,14 @@ public class FilterCommand extends AbstractCommand
     public void addFeaturesBlacklist(List<String> strings) throws IOException {
         IntSet featureIdSet = new IntOpenHashSet();
         for (String string : strings) {
-            final int id = getIndexDeligate().getFeatureEnumerator().indexOf(string);
+            final int id = getIndexDeligate().getFeatureEnumerator().indexOf(
+                    string);
             featureIdSet.add(id);
         }
         setAcceptFeatures(Predicates2.<Weighted<Token>>and(
                 getAcceptFeatures(),
-                Predicates2.compose(Predicates2.not(Predicates2.in(featureIdSet)), id())));
+                Predicates2.compose(Predicates2.
+                not(Predicates2.in(featureIdSet)), id())));
 
     }
 
@@ -845,19 +907,22 @@ public class FilterCommand extends AbstractCommand
     public void addEventMinimumFrequency(double threshold) {
         setAcceptEvent(Predicates2.<Weighted<TokenPair>>and(
                 getAcceptEvent(),
-                Predicates2.compose(Predicates2.gte(threshold), this.<TokenPair>weight())));
+                Predicates2.compose(Predicates2.gte(threshold), this.
+                <TokenPair>weight())));
     }
 
     public void addEventMaximumFrequency(double threshold) {
         setAcceptEvent(Predicates2.<Weighted<TokenPair>>and(
                 getAcceptEvent(),
-                Predicates2.compose(Predicates2.lte(threshold), this.<TokenPair>weight())));
+                Predicates2.compose(Predicates2.lte(threshold), this.
+                <TokenPair>weight())));
     }
 
     public void addEventFrequencyRange(double min, double max) {
         setAcceptEvent(Predicates2.<Weighted<TokenPair>>and(
                 getAcceptEvent(),
-                Predicates2.compose(Predicates2.inRange(min, max), this.<TokenPair>weight())));
+                Predicates2.compose(Predicates2.inRange(min, max), this.
+                <TokenPair>weight())));
     }
 
     public Predicate<Weighted<Token>> getAcceptEntry() {
@@ -874,31 +939,36 @@ public class FilterCommand extends AbstractCommand
     public void addEntryMinimumFrequency(double threshold) {
         setAcceptEntry(Predicates2.<Weighted<Token>>and(
                 getAcceptEntry(),
-                Predicates2.compose(Predicates2.gte(threshold), this.<Token>weight())));
+                Predicates2.compose(Predicates2.gte(threshold), this.
+                <Token>weight())));
     }
 
     public void addEntryMaximumFrequency(double threshold) {
         setAcceptEntry(Predicates2.<Weighted<Token>>and(
                 getAcceptEntry(),
-                Predicates2.compose(Predicates2.lte(threshold), this.<Token>weight())));
+                Predicates2.compose(Predicates2.lte(threshold), this.
+                <Token>weight())));
     }
 
     public void addEntryFrequencyRange(double min, double max) {
         setAcceptEntry(Predicates2.<Weighted<Token>>and(
                 getAcceptEntry(),
-                Predicates2.compose(Predicates2.inRange(min, max), this.<Token>weight())));
+                Predicates2.compose(Predicates2.inRange(min, max), this.
+                <Token>weight())));
     }
 
     public void addEntryPattern(String pattern) {
         setAcceptEntry(Predicates2.<Weighted<Token>>and(
                 getAcceptEntry(),
-                Predicates2.compose(Predicates2.containsPattern(pattern), entryString())));
+                Predicates2.compose(Predicates2.containsPattern(pattern),
+                                    entryString())));
     }
 
     public void addEntryWhitelist(List<String> strings) throws IOException {
         IntSet entryIdSet = new IntOpenHashSet();
         for (String string : strings) {
-            final int id = getIndexDeligate().getEntryEnumerator().indexOf(string);
+            final int id = getIndexDeligate().getEntryEnumerator().indexOf(
+                    string);
             entryIdSet.add(id);
         }
         setAcceptEntry(Predicates2.<Weighted<Token>>and(
@@ -910,12 +980,14 @@ public class FilterCommand extends AbstractCommand
     public void addEntryBlacklist(List<String> strings) throws IOException {
         IntSet entryIdSet = new IntOpenHashSet();
         for (String string : strings) {
-            final int id = getIndexDeligate().getEntryEnumerator().indexOf(string);
+            final int id = getIndexDeligate().getEntryEnumerator().indexOf(
+                    string);
             entryIdSet.add(id);
         }
         setAcceptEntry(Predicates2.<Weighted<Token>>and(
                 getAcceptEntry(),
-                Predicates2.compose(Predicates2.not(Predicates2.in(entryIdSet)), id())));
+                Predicates2.compose(Predicates2.not(Predicates2.in(entryIdSet)),
+                                    id())));
 
     }
 
@@ -958,8 +1030,10 @@ public class FilterCommand extends AbstractCommand
         // Check that no two files are the same
         for (Map.Entry<String, File> a : allFiles.entrySet()) {
             for (Map.Entry<String, File> b : allFiles.entrySet()) {
-                if (!a.getKey().equals(b.getKey()) && a.getValue().equals(b.getValue())) {
-                    throw new IllegalStateException(a.getKey() + " equal to " + b.getKey());
+                if (!a.getKey().equals(b.getKey()) && a.getValue().equals(b.
+                        getValue())) {
+                    throw new IllegalStateException(a.getKey() + " equal to " + b.
+                            getKey());
                 }
             }
         }
@@ -989,7 +1063,8 @@ public class FilterCommand extends AbstractCommand
                         + " exists but is not writable: " + e.getValue());
             }
             if (!e.getValue().exists()
-                    && !e.getValue().getAbsoluteFile().getParentFile().canWrite()) {
+                    && !e.getValue().getAbsoluteFile().getParentFile().
+                    canWrite()) {
                 throw new IllegalStateException(e.getKey()
                         + " does not exists and can not be reated: "
                         + e.getValue());
@@ -1002,64 +1077,82 @@ public class FilterCommand extends AbstractCommand
     // ==== FIELD EXTRACTION FUNCTIONS ====
     //
     private <T> Function<Weighted<T>, Double> weight() {
-        return new Function<Weighted<T>, Double>() {
+        return new WeightedWeightFunction<T>();
+    }
 
-            @Override
-            public Double apply(Weighted<T> input) {
-                return input.weight();
-            }
+    private static final class WeightedWeightFunction<T>
+            implements Function<Weighted<T>, Double> {
 
-            @Override
-            public String toString() {
-                return "Weight";
-            }
+        private WeightedWeightFunction() {
+        }
 
-        };
+        @Override
+        public Double apply(Weighted<T> input) {
+            return (input != null) ? input.weight() : null;
+        }
+
+        @Override
+        public String toString() {
+            return "Weight";
+        }
     }
 
     private <T> Function<Weighted<Token>, Integer> id() {
-        return new Function<Weighted<Token>, Integer>() {
+        return new WeightTokenIdFunction();
+    }
 
-            @Override
-            public Integer apply(Weighted<Token> input) {
-                return input.record().id();
-            }
+    private static final class WeightTokenIdFunction
+            implements Function<Weighted<Token>, Integer> {
 
-            @Override
-            public String toString() {
-                return "ID";
-            }
+        private WeightTokenIdFunction() {
+        }
 
-        };
+        @Override
+        public Integer apply(Weighted<Token> input) {
+            return input != null ? input.record().id() : null;
+        }
+
+        @Override
+        public String toString() {
+            return "ID";
+        }
     }
 
     private Function<Weighted<Token>, String> entryString() {
-        return new Function<Weighted<Token>, String>() {
+        return new WeightedTokenEntryStringFunction();
+    }
 
-            @Override
-            public String apply(Weighted<Token> input) {
-                try {
-                    return getIndexDeligate().getEntryEnumerator().valueOf(input.record().id());
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
+    private final class WeightedTokenEntryStringFunction
+            implements Function<Weighted<Token>, String> {
+
+        private WeightedTokenEntryStringFunction() {
+        }
+
+        @Override
+        public String apply(Weighted<Token> input) {
+            try {
+                return input == null ? null
+                        : getIndexDeligate().getEntryEnumerator().
+                        valueOf(input.record().id());
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
             }
+        }
 
-            @Override
-            public String toString() {
-                return "EntriesString";
-            }
-
-        };
+        @Override
+        public String toString() {
+            return "EntriesString";
+        }
     }
 
     private Function<Weighted<Token>, String> featureString() {
         return new Function<Weighted<Token>, String>() {
-
             @Override
             public String apply(Weighted<Token> input) {
                 try {
-                    return getIndexDeligate().getFeatureEnumerator().valueOf(input.record().id());
+                    return input == null ? null
+                            : getIndexDeligate().getFeatureEnumerator().
+                            valueOf(input.record().id());
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -1069,82 +1162,88 @@ public class FilterCommand extends AbstractCommand
             public String toString() {
                 return "FeatureString";
             }
-
         };
     }
 
     private Function<Weighted<TokenPair>, Integer> eventEntryId() {
-        return new Function<Weighted<TokenPair>, Integer>() {
+        return new WeightTokenPairEntryIdFunction();
+    }
 
-            @Override
-            public Integer apply(Weighted<TokenPair> input) {
-                return input.record().id1();
-            }
+    private static final class WeightTokenPairEntryIdFunction
+            implements Function<Weighted<TokenPair>, Integer> {
 
-            @Override
-            public String toString() {
-                return "FeatureEntryID";
-            }
+        private WeightTokenPairEntryIdFunction() {
+        }
 
-        };
+        @Override
+        public Integer apply(Weighted<TokenPair> input) {
+            return input == null ? null : input.record().id1();
+        }
+
+        @Override
+        public String toString() {
+            return "FeatureEntryID";
+        }
     }
 
     private Function<Weighted<TokenPair>, Integer> eventFeatureId() {
-        return new Function<Weighted<TokenPair>, Integer>() {
-
-            @Override
-            public Integer apply(Weighted<TokenPair> input) {
-                return input.record().id2();
-            }
-
-            @Override
-            public String toString() {
-                return "EventID";
-            }
-
-        };
+        return new WeightedTokenPairFeatureIdFunction();
     }
 
-    private Function<Weighted<TokenPair>, String> eventFeatureString() {
-        return new Function<Weighted<TokenPair>, String>() {
+    private static class WeightedTokenPairFeatureIdFunction
+            implements Function<Weighted<TokenPair>, Integer> {
 
-            @Override
-            public String apply(Weighted<TokenPair> input) {
-                try {
-                    return getIndexDeligate().getFeatureEnumerator().valueOf(input.record().id2());
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
+        private WeightedTokenPairFeatureIdFunction() {
+        }
 
-            @Override
-            public String toString() {
-                return "EventFeatureString";
-            }
+        @Override
+        public Integer apply(Weighted<TokenPair> input) {
+            return input == null ? null : input.record().id2();
+        }
 
-        };
+        @Override
+        public String toString() {
+            return "EventID";
+        }
     }
 
-    private Function<Weighted<TokenPair>, String> eventEntryString() {
-        return new Function<Weighted<TokenPair>, String>() {
-
-            @Override
-            public String apply(Weighted<TokenPair> input) {
-                try {
-                    return getIndexDeligate().getEntryEnumerator().valueOf(input.record().id1());
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-
-            @Override
-            public String toString() {
-                return "EventEntryString";
-            }
-
-        };
-    }
-
+// 
+//    private Function<Weighted<TokenPair>, String> eventFeatureString() {
+//        return new Function<Weighted<TokenPair>, String>() {
+//            @Override
+//            public String apply(Weighted<TokenPair> input) {
+//                try {
+//                    return getIndexDeligate().getFeatureEnumerator().
+//                            valueOf(input.record().id2());
+//                } catch (IOException ex) {
+//                    throw new RuntimeException(ex);
+//                }
+//            }
+//
+//            @Override
+//            public String toString() {
+//                return "EventFeatureString";
+//            }
+//        };
+//    }
+//    private Function<Weighted<TokenPair>, String> eventEntryString() {
+//        return new Function<Weighted<TokenPair>, String>() {
+//            @Override
+//            public String apply(Weighted<TokenPair> input) {
+//                try {
+//                    return getIndexDeligate().getEntryEnumerator().
+//                            valueOf(input.record().id1());
+//                } catch (IOException ex) {
+//                    throw new RuntimeException(ex);
+//                }
+//            }
+//
+//            @Override
+//            public String toString() {
+//                return "EventEntryString";
+//            }
+//        };
+//    }
     public double getFilterEventMinFreq() {
         return filterEventMinFreq;
     }
@@ -1319,5 +1418,4 @@ public class FilterCommand extends AbstractCommand
                 add("acceptFeature", acceptFeature).
                 add("acceptEvent", acceptEvent);
     }
-
 }

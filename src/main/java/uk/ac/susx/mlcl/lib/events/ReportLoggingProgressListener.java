@@ -28,18 +28,24 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo.weighings.impl;
+package uk.ac.susx.mlcl.lib.events;
+
+import org.apache.commons.logging.Log;
 
 /**
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class PositiveWeighting
-        extends Bound {
+public final class ReportLoggingProgressListener implements ProgressListener {
 
-    private static final long serialVersionUID = 1L;
+    private final Log log;
 
-    public PositiveWeighting() {
-        super(0, Double.POSITIVE_INFINITY);
+    public ReportLoggingProgressListener(Log log) {
+        this.log = log;
+    }
+
+    @Override
+    public void progressChanged(ProgressEvent progressEvent) {
+        log.info(progressEvent.getSource().getProgressReport());
     }
 }

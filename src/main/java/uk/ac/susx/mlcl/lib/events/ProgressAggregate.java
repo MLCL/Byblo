@@ -58,7 +58,7 @@ public class ProgressAggregate extends ProgressDeligate {
     /**
      * Listener that will be attached to every child progress reporter.
      */
-    private final ProgressListener childProgressListener =
+    private transient final ProgressListener childProgressListener =
             new ProgressListener() {
 
                 @Override
@@ -194,7 +194,7 @@ public class ProgressAggregate extends ProgressDeligate {
     }
 
     public ProgressReporting[] getChildProgressReporters() {
-        return children.toArray(new ProgressReporting[0]);
+        return children.toArray(new ProgressReporting[children.size()]);
     }
 
     public boolean hasChildProgressReporters() {

@@ -121,47 +121,47 @@ public class IndexSimsCommandTest {
     }
 
     @Test
-    public void testRunOnFruitAPI_noskip_compact_JDBC() throws Exception {
-        testRunOnFruitAPI("compact-noskip-jdbc-", EnumeratorType.JDBC, false, false, true);
+    public void testRunOnFruitAPI_noskip_compact_jdbm() throws Exception {
+        testRunOnFruitAPI("compact-noskip-jdbm-", EnumeratorType.JDBM, false, false, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipboth_compact_JDBC() throws Exception {
-        testRunOnFruitAPI("compact-skipboth-jdbc-", EnumeratorType.JDBC, true, true, true);
+    public void testRunOnFruitAPI_skipboth_compact_jdbm() throws Exception {
+        testRunOnFruitAPI("compact-skipboth-jdbm-", EnumeratorType.JDBM, true, true, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipleft_compact_JDBC() throws Exception {
-        testRunOnFruitAPI("compact-skipleft-jdbc-", EnumeratorType.JDBC, true, false, true);
+    public void testRunOnFruitAPI_skipleft_compact_jdbm() throws Exception {
+        testRunOnFruitAPI("compact-skipleft-jdbm-", EnumeratorType.JDBM, true, false, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipright_compact_JDBC() throws Exception {
-        testRunOnFruitAPI("compact-skipright-jdbc-", EnumeratorType.JDBC, false, true, true);
+    public void testRunOnFruitAPI_skipright_compact_jdbm() throws Exception {
+        testRunOnFruitAPI("compact-skipright-jdbm-", EnumeratorType.JDBM, false, true, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_noskip_verbose_JDBC() throws Exception {
-        testRunOnFruitAPI("verbose-noskip-jdbc-",
-                          EnumeratorType.JDBC, false, false, false);
+    public void testRunOnFruitAPI_noskip_verbose_jdbm() throws Exception {
+        testRunOnFruitAPI("verbose-noskip-jdbm-",
+                          EnumeratorType.JDBM, false, false, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipboth_verbose_JDBC() throws Exception {
-        testRunOnFruitAPI("verbose-skipboth-jdbc-",
-                          EnumeratorType.JDBC, true, true, false);
+    public void testRunOnFruitAPI_skipboth_verbose_jdbm() throws Exception {
+        testRunOnFruitAPI("verbose-skipboth-jdbm-",
+                          EnumeratorType.JDBM, true, true, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipleft_verbose_JDBC() throws Exception {
-        testRunOnFruitAPI("verbose-skipleft-jdbc-",
-                          EnumeratorType.JDBC, true, false, false);
+    public void testRunOnFruitAPI_skipleft_verbose_jdbm() throws Exception {
+        testRunOnFruitAPI("verbose-skipleft-jdbm-",
+                          EnumeratorType.JDBM, true, false, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipright_verbose_JDBC() throws Exception {
-        testRunOnFruitAPI("verbose-skipright-jdbc-",
-                          EnumeratorType.JDBC, false, true, false);
+    public void testRunOnFruitAPI_skipright_verbose_jdbm() throws Exception {
+        testRunOnFruitAPI("verbose-skipright-jdbm-",
+                          EnumeratorType.JDBM, false, true, false);
     }
 
     public void testRunOnFruitAPI(
@@ -309,8 +309,8 @@ public class IndexSimsCommandTest {
         assertValidPlaintextInputFiles(from);
         assertValidOutputFiles(to);
 
-        if (type == EnumeratorType.JDBC)
-            assertValidJDBCOutputFiles(index);
+        if (type == EnumeratorType.JDBM)
+            assertValidJDBMOutputFiles(index);
         else
             assertValidOutputFiles(index);
 
@@ -326,8 +326,8 @@ public class IndexSimsCommandTest {
         assertValidPlaintextInputFiles(to);
         assertSizeGT(from, to);
 
-        if (type == EnumeratorType.JDBC)
-            assertValidJDBCInputFiles(index);
+        if (type == EnumeratorType.JDBM)
+            assertValidJDBMInputFiles(index);
         else
             assertValidInputFiles(index);
     }
@@ -338,8 +338,8 @@ public class IndexSimsCommandTest {
             throws Exception {
         assertValidPlaintextInputFiles(from);
 
-        if (type == EnumeratorType.JDBC)
-            assertValidJDBCInputFiles(index);
+        if (type == EnumeratorType.JDBM)
+            assertValidJDBMInputFiles(index);
         else
             assertValidInputFiles(index);
         assertValidOutputFiles(to);

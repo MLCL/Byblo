@@ -38,8 +38,6 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
-import uk.ac.susx.mlcl.byblo.enumerators.MemoryBasedStringEnumerator;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
 
@@ -48,42 +46,6 @@ import uk.ac.susx.mlcl.lib.io.ObjectIO;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class FeatureTest {
-
-    private void copyF(File a, File b) throws FileNotFoundException, IOException {
-        Enumerator<String> strEnum = MemoryBasedStringEnumerator.newInstance();
-
-        SingleEnumeratingDeligate del = new SingleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, false, null);
-        WeightedTokenSource aSrc = WeightedTokenSource.open(
-                a, DEFAULT_CHARSET, del, false);
-        WeightedTokenSink bSink = WeightedTokenSink.open(
-                b, DEFAULT_CHARSET, del, false);
-
-        ObjectIO.copy(aSrc, bSink);
-        bSink.close();
-    }
-
-    @Test
-    public void testFeaturesConversion() throws FileNotFoundException, IOException {
-        File a = TEST_FRUIT_FEATURES;
-        File b = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_FEATURES.getName() + ".compact");
-        File c = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_FEATURES.getName() + ".verbose");
-
-        copyF(a, b);
-
-        assertTrue("Compact copy is smaller that verbose source.",
-                   b.length() <= a.length());
-
-        copyF(b, c);
-
-
-        assertTrue("Verbose copy is smaller that compact source.",
-                   c.length() >= b.length());
-        assertTrue("Double converted file is not equal to origion.",
-                   Files.equal(a, c));
-    }
 
     @Test
     public void testFeaturesEnumeratorConversion() throws FileNotFoundException, IOException {
@@ -125,5 +87,4 @@ public class FeatureTest {
         assertTrue("Double converted file is not equal to origion.",
                    Files.equal(a, c));
     }
-
 }

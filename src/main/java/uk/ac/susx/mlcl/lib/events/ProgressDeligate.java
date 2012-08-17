@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.lib.events;
 
-import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -44,7 +43,7 @@ import uk.ac.susx.mlcl.lib.Checks;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class ProgressDeligate implements ProgressReporting, Serializable {
+public class ProgressDeligate implements ProgressReporting {
 
     private static final long serialVersionUID = 1L;
 
@@ -69,7 +68,8 @@ public class ProgressDeligate implements ProgressReporting, Serializable {
 
     private AtomicInteger adjustingCount = new AtomicInteger(0);
 
-    public ProgressDeligate(ProgressReporting outer, boolean progressPercentageSupported) {
+    public ProgressDeligate(ProgressReporting outer,
+                            boolean progressPercentageSupported) {
         if (outer == this)
             throw new IllegalArgumentException("outer == this");
         this.outer = outer;
@@ -191,7 +191,7 @@ public class ProgressDeligate implements ProgressReporting, Serializable {
 
     public void setMessage(String newMessage) {
         Checks.checkNotNull(newMessage);
-        if (this.message != newMessage && (this.message == null || !this.message.equals(newMessage))) {
+        if (this.message == null || !this.message.equals(newMessage)) {
             startAdjusting();
             this.message = newMessage;
             stateChangedSinceLastEvent = true;
@@ -210,7 +210,7 @@ public class ProgressDeligate implements ProgressReporting, Serializable {
         }
         sb.append("(");
         sb.append(isProgressPercentageSupported()
-                  ? getProgressPercent() : "unknown");
+                ? getProgressPercent() : "unknown");
         sb.append("% complete)");
         return sb.toString();
     }
@@ -231,7 +231,8 @@ public class ProgressDeligate implements ProgressReporting, Serializable {
 
     @Override
     public ProgressListener[] getProgressListeners() {
-        return progressListeners.toArray(new ProgressListener[0]);
+        return progressListeners.toArray(new ProgressListener[progressListeners.
+                size()]);
     }
 
     protected void fireProgressChangedEvent() {
@@ -245,23 +246,27 @@ public class ProgressDeligate implements ProgressReporting, Serializable {
         for (ProgressListener progressListener : progressListeners) {
             try {
                 progressListener.progressChanged(event);
-            } catch (Exception ex) {
-                LOG.error(MessageFormat.format(
-                        "Progress listener {0} threw exception while handing event {1}",
-                        progressListener, event), ex);
+            } catch (RuntimeException ex) {
+                LOG.error(MessageFormat.format("Progress listener {0} threw "
+                        + "RuntimeException while handing event {1}; removing "
+                        + "from observer pool.", progressListener, event), ex);
                 removeProgressListener(progressListener);
             }
         }
     }
 
     public boolean equals(ProgressDeligate other) {
-        if (this.progressListeners != other.progressListeners && (this.progressListeners == null || !this.progressListeners.equals(other.progressListeners)))
+        if (this.progressListeners != other.progressListeners && (this.progressListeners == null || !this.progressListeners.
+                                                                  equals(
+                                                                  other.progressListeners)))
             return false;
         if (this.progressPercent != other.progressPercent)
             return false;
-        if (this.outer != other.outer && (this.outer == null || !this.outer.equals(other.outer)))
+        if (this.outer != other.outer && (this.outer == null || !this.outer.
+                                          equals(other.outer)))
             return false;
-        if (this.event != other.event && (this.event == null || !this.event.equals(other.event)))
+        if (this.event != other.event && (this.event == null || !this.event.
+                                          equals(other.event)))
             return false;
         return true;
     }
@@ -293,5 +298,4 @@ public class ProgressDeligate implements ProgressReporting, Serializable {
                 + ", progressPercent=" + progressPercent
                 + '}';
     }
-
 }

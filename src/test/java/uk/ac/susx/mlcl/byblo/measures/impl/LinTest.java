@@ -70,7 +70,7 @@ public class LinTest {
         System.out.println("testCLI");
 
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Lin");
-        output.delete();
+        deleteIfExist(output);
 
         try {
             enableExistTrapping();
@@ -256,7 +256,7 @@ public class LinTest {
             B.set(RANDOM.nextInt(size * 2), RANDOM.nextDouble());
         }
 
-        double expect = test(A, B);
+        test(A, B);
     }
 
     public double test(SparseDoubleVector A, SparseDoubleVector B) {

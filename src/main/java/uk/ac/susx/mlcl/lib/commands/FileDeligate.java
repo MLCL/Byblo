@@ -32,7 +32,6 @@ package uk.ac.susx.mlcl.lib.commands;
 
 import com.beust.jcommander.Parameter;
 import com.google.common.base.Objects;
-import java.io.Serializable;
 import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.Files;
@@ -41,12 +40,12 @@ import uk.ac.susx.mlcl.lib.io.Files;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class FileDeligate implements Serializable {
+public class FileDeligate {
 
     private static final long serialVersionUID = 1L;
 
     @Parameter(names = {"-c", "--charset"},
-    description = "The character set encoding to use for both reading input and writing output files.")
+               description = "The character set encoding to use for both reading input and writing output files.")
     private Charset charset = Files.DEFAULT_CHARSET;
 
     public FileDeligate(Charset charset) {
@@ -74,5 +73,4 @@ public class FileDeligate implements Serializable {
     public final String toString() {
         return toStringHelper().toString();
     }
-
 }

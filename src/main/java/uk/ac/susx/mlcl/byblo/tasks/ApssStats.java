@@ -146,7 +146,7 @@ public final class ApssStats implements Serializable {
         return toStringHelper().toString();
     }
 
-    protected Objects.ToStringHelper toStringHelper() {
+    Objects.ToStringHelper toStringHelper() {
         return Objects.toStringHelper(this).
                 add("candidates", candidates).
                 add("comparisons", comparisons).

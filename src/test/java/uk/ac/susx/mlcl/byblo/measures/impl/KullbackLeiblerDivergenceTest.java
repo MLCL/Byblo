@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import uk.ac.susx.mlcl.byblo.measures.impl.KullbackLeiblerDivergence;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -72,7 +71,7 @@ public class KullbackLeiblerDivergenceTest {
 
         File output = new File(TEST_OUTPUT_DIR,
                                FRUIT_NAME + ".KullbackLeiblerDivergence");
-        output.delete();
+        deleteIfExist(output);
 
         try {
             enableExistTrapping();
@@ -199,7 +198,7 @@ public class KullbackLeiblerDivergenceTest {
             B.set(RANDOM.nextInt(size * 2), RANDOM.nextDouble());
         }
 
-        double expect = test(A, B);
+        test(A, B);
     }
 
     public double test(SparseDoubleVector A, SparseDoubleVector B) {

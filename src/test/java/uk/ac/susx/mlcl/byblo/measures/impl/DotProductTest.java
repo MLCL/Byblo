@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import uk.ac.susx.mlcl.byblo.measures.impl.DotProduct;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +43,6 @@ import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
-import uk.ac.susx.mlcl.byblo.measures.Measure;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
@@ -72,7 +70,7 @@ public class DotProductTest {
         System.out.println("testCLI");
 
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".DotProduct");
-        output.delete();
+        deleteIfExist(output);
 
         try {
             enableExistTrapping();
@@ -236,7 +234,7 @@ public class DotProductTest {
             B.set(RANDOM.nextInt(size * 2), RANDOM.nextDouble());
         }
 
-        double expect = test(A, B);
+        test(A, B);
     }
 
     public double test(SparseDoubleVector A, SparseDoubleVector B) {

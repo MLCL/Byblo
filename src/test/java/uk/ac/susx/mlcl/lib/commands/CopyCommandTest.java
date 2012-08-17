@@ -82,23 +82,28 @@ public class CopyCommandTest {
         StringBuilder sb = new StringBuilder();
         Files.readAll(out, Files.DEFAULT_CHARSET, sb);
         assertEquals(str, sb.toString());
-        in.delete();
-        out.delete();
+        if (!in.delete())
+            throw new IOException("Failed to delete file: " + in);
+        if (!out.delete())
+            throw new IOException("Failed to delete file: " + out);
     }
 
     @Test(expected = FileNotFoundException.class)
     public void testRun_failure_noinput() throws Exception {
         System.out.println("Testing run() -- expecting failure (no input)");
         File in = File.createTempFile(getClass().getName(), "in");
-        in.delete();
+        if (!in.delete())
+            throw new IOException("Failed to delete file: " + in);
         File out = File.createTempFile(getClass().getName(), "out");
         FileCopyCommand instance = new FileCopyCommand(in, out);
         instance.runCommand();
-        in.delete();
-        out.delete();
+        if (!in.delete())
+            throw new IOException("Failed to delete file: " + in);
+        if (!out.delete())
+            throw new IOException("Failed to delete file: " + out);
     }
 
-    @Test(expected=ParameterException.class)
+    @Test(expected = ParameterException.class)
     public void testCLI() throws IOException {
         System.out.println("Testing command line usage.");
         File x = new File("x"), y = new File("y");

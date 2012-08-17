@@ -30,15 +30,15 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
-import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
-import uk.ac.susx.mlcl.lib.events.ProgressListener;
-import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import com.google.common.base.Objects;
 import java.io.Flushable;
 import java.text.MessageFormat;
 import java.util.Comparator;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Comparators;
+import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
+import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 
@@ -59,7 +59,8 @@ public final class ObjectMergeTask<T> extends AbstractTask implements ProgressRe
 
     private Comparator<T> comparator;
 
-    public ObjectMergeTask(ObjectSource<T> sourceA, ObjectSource<T> sourceB, ObjectSink<T> sink,
+    public ObjectMergeTask(ObjectSource<T> sourceA, ObjectSource<T> sourceB,
+                           ObjectSink<T> sink,
                            Comparator<T> comparator) {
         setSourceA(sourceA);
         setSourceB(sourceB);
@@ -67,7 +68,8 @@ public final class ObjectMergeTask<T> extends AbstractTask implements ProgressRe
         setComparator(comparator);
     }
 
-    public ObjectMergeTask(ObjectSource<T> sourceA, ObjectSource<T> sourceB, ObjectSink<T> sink) {
+    public ObjectMergeTask(ObjectSource<T> sourceA, ObjectSource<T> sourceB,
+                           ObjectSink<T> sink) {
         setSourceA(sourceA);
         setSourceB(sourceB);
         setSink(sink);
@@ -118,16 +120,20 @@ public final class ObjectMergeTask<T> extends AbstractTask implements ProgressRe
         if (!super.equals(other))
             return false;
         if (this.getSourceA() != other.getSourceA()
-                && (this.getSourceA() == null || !this.getSourceA().equals(other.getSourceA())))
+                && (this.getSourceA() == null || !this.getSourceA().
+                    equals(other.getSourceA())))
             return false;
         if (this.getSourceB() != other.getSourceB()
-                && (this.getSourceB() == null || !this.getSourceB().equals(other.getSourceB())))
+                && (this.getSourceB() == null || !this.getSourceB().
+                    equals(other.getSourceB())))
             return false;
-        if (this.getSink() != other.getSink() && (this.getSink() == null || !this.getSink().equals(
-                other.getSink())))
+        if (this.getSink() != other.getSink() && (this.getSink() == null || !this.
+                                                  getSink().equals(
+                                                  other.getSink())))
             return false;
         if (this.getComparator() != other.getComparator()
-                && (this.getComparator() == null || !this.getComparator().equals(other.getComparator())))
+                && (this.getComparator() == null || !this.getComparator().
+                    equals(other.getComparator())))
             return false;
         return true;
     }
@@ -160,10 +166,6 @@ public final class ObjectMergeTask<T> extends AbstractTask implements ProgressRe
         Checks.checkNotNull(getComparator());
         if (getSourceA().equals(getSourceB()))
             throw new IllegalStateException("Sources A and B are the same.");
-        if (getSourceA().equals(getSink()))
-            throw new IllegalStateException("Source A is the same as the sink.");
-        if (getSourceB().equals(getSink()))
-            throw new IllegalStateException("Source B is the same as the sink.");
     }
 
     @Override
@@ -192,7 +194,8 @@ public final class ObjectMergeTask<T> extends AbstractTask implements ProgressRe
             ++mergeCount;
 
             if (mergeCount % 1000000 == 0) {
-                progress.setMessage(MessageFormat.format("Merged {0} unique items.", mergeCount));
+                progress.setMessage(MessageFormat.format(
+                        "Merged {0} unique items.", mergeCount));
             }
         }
         while (a != null) {
@@ -201,7 +204,8 @@ public final class ObjectMergeTask<T> extends AbstractTask implements ProgressRe
             ++mergeCount;
 
             if (mergeCount % 1000000 == 0) {
-                progress.setMessage(MessageFormat.format("Merged {0} unique items.", mergeCount));
+                progress.setMessage(MessageFormat.format(
+                        "Merged {0} unique items.", mergeCount));
             }
         }
         while (b != null) {
@@ -210,12 +214,14 @@ public final class ObjectMergeTask<T> extends AbstractTask implements ProgressRe
             ++mergeCount;
 
             if (mergeCount % 1000000 == 0) {
-                progress.setMessage(MessageFormat.format("Merged {0} unique items.", mergeCount));
+                progress.setMessage(MessageFormat.format(
+                        "Merged {0} unique items.", mergeCount));
             }
         }
 
         progress.startAdjusting();
-        progress.setMessage(MessageFormat.format("Merged {0} unique items.", mergeCount));
+        progress.setMessage(MessageFormat.format("Merged {0} unique items.",
+                                                 mergeCount));
         progress.setState(State.COMPLETED);
         progress.endAdjusting();
 
@@ -275,5 +281,4 @@ public final class ObjectMergeTask<T> extends AbstractTask implements ProgressRe
                 add("sink", getSink()).
                 add("comparator", getComparator());
     }
-
 }

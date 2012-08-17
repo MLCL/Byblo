@@ -30,12 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.measures.impl.LeeSkewDivergence;
-import uk.ac.susx.mlcl.byblo.measures.impl.LambdaDivergence;
-import uk.ac.susx.mlcl.byblo.measures.impl.KendallsTau;
-import uk.ac.susx.mlcl.byblo.measures.impl.LpSpaceDistance;
-import uk.ac.susx.mlcl.byblo.measures.impl.Weeds;
-import uk.ac.susx.mlcl.byblo.measures.impl.KullbackLeiblerDivergence;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
@@ -47,12 +41,12 @@ import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import java.io.Closeable;
 import java.io.File;
-import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.BybloSettings;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
@@ -61,6 +55,12 @@ import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource.WTStatsSource;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
 import uk.ac.susx.mlcl.byblo.measures.Measures;
+import uk.ac.susx.mlcl.byblo.measures.impl.KendallsTau;
+import uk.ac.susx.mlcl.byblo.measures.impl.KullbackLeiblerDivergence;
+import uk.ac.susx.mlcl.byblo.measures.impl.LambdaDivergence;
+import uk.ac.susx.mlcl.byblo.measures.impl.LeeSkewDivergence;
+import uk.ac.susx.mlcl.byblo.measures.impl.LpSpaceDistance;
+import uk.ac.susx.mlcl.byblo.measures.impl.Weeds;
 import uk.ac.susx.mlcl.byblo.tasks.InvertedApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.NaiveApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.ThreadedApssTask;
@@ -70,10 +70,8 @@ import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.commands.*;
-import uk.ac.susx.mlcl.lib.events.ProgressEvent;
-import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ReportLoggingProgressListener;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
-import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
@@ -296,7 +294,8 @@ public class AllPairsCommand extends AbstractCommand {
                 || measure instanceof KullbackLeiblerDivergence) {
             try {
                 if (LOG.isInfoEnabled()) {
-                    LOG.info("Loading entries file for "
+                    LOG.
+                            info("Loading entries file for "
                             + "KendallsTau.minCardinality: " + getFeaturesFile());
                 }
 
@@ -342,7 +341,8 @@ public class AllPairsCommand extends AbstractCommand {
         // Create a sink object that will act as a recipient for all pairs that
         // are produced by the algorithm.
 
-        final ObjectSink<Weighted<TokenPair>> sink = openSimsSink();
+        WeightedTokenPairSink sink = openSimsSink();
+
 
         final NaiveApssTask apss = newAlgorithmInstance();
 
@@ -355,21 +355,12 @@ public class AllPairsCommand extends AbstractCommand {
         apss.setProducatePair(getProductionFilter());
 
 
-        apss.addProgressListener(new ProgressListener() {
-
-            @Override
-            public void progressChanged(ProgressEvent progressEvent) {
-                LOG.info(progressEvent.getSource().getProgressReport());
-//                LOG.info(MiscUtil.memoryInfoString());
-            }
-        });
+        apss.addProgressListener(new ReportLoggingProgressListener(LOG));
 
         apss.run();
 
-        if (sink instanceof Flushable)
-            ((Flushable) sink).flush();
-        if (sink instanceof Closeable)
-            ((Closeable) sink).close();
+        sink.flush();
+        sink.close();
 
         if (sourceA instanceof Closeable)
             ((Closeable) sourceA).close();
@@ -407,7 +398,8 @@ public class AllPairsCommand extends AbstractCommand {
                 final double newFreq = oldFreq + entry.weight();
 
                 if (LOG.isWarnEnabled())
-                    LOG.warn("Found duplicate Entry \""
+                    LOG.
+                            warn("Found duplicate Entry \""
                             + (entry.record().id())
                             + "\" (id=" + id
                             + ") in entries file. Merging records. Old frequency = "
@@ -484,7 +476,8 @@ public class AllPairsCommand extends AbstractCommand {
         }
 
         if (!isOutputIdentityPairs()) {
-            pairFilters.add(Predicates.not(Predicates.compose(
+            pairFilters.
+                    add(Predicates.not(Predicates.compose(
                     TokenPair.identity(), Weighted.<TokenPair>recordFunction())));
         }
 
@@ -502,7 +495,8 @@ public class AllPairsCommand extends AbstractCommand {
             throws ClassNotFoundException {
         final Map<String, Class<? extends Measure>> classLookup =
                 Measures.loadMeasureAliasTable();
-        final String mname = getMeasureName().toLowerCase().trim();
+        
+        final String mname = getMeasureName().toLowerCase(BybloSettings.getLocale()).trim();
         if (classLookup.containsKey(mname)) {
             return classLookup.get(mname);
         } else {

@@ -235,12 +235,10 @@ public final class Predicates2 {
         }
 
         @Override
-        public boolean apply(T t) {
+        public boolean apply(final T t) {
             try {
-                return target.contains(t);
-            } catch (NullPointerException e) {
-                return false;
-            } catch (ClassCastException e) {
+                return (t != null) && target.contains(t);
+            } catch (final ClassCastException e) {
                 return false;
             }
         }
@@ -274,10 +272,9 @@ public final class Predicates2 {
                 return "In(" + tmp + ", ...)";
             }
         }
-
     }
 
-    private static class InRange implements Predicate<Double>, Serializable {
+    static class InRange implements Predicate<Double>, Serializable {
 
         private static final long serialVersionUID = 1L;
 
@@ -285,14 +282,14 @@ public final class Predicates2 {
 
         private final double max;
 
-        public InRange(double min, double max) {
+        InRange(double min, double max) {
             this.min = min;
             this.max = max;
         }
 
         @Override
         public boolean apply(Double input) {
-            return input >= min && input <= max;
+            return input != null && (input >= min && input <= max);
         }
 
         @Override
@@ -314,10 +311,12 @@ public final class Predicates2 {
         @Override
         public int hashCode() {
             int hash = 5;
-            hash = 67 * hash + (int) (Double.doubleToLongBits(this.min) ^ (Double.doubleToLongBits(
-                    this.min) >>> 32));
-            hash = 67 * hash + (int) (Double.doubleToLongBits(this.max) ^ (Double.doubleToLongBits(
-                    this.max) >>> 32));
+            hash = 67 * hash + (int) (Double.doubleToLongBits(this.min) ^ (Double.
+                                                                           doubleToLongBits(
+                                                                           this.min) >>> 32));
+            hash = 67 * hash + (int) (Double.doubleToLongBits(this.max) ^ (Double.
+                                                                           doubleToLongBits(
+                                                                           this.max) >>> 32));
             return hash;
         }
 
@@ -327,22 +326,21 @@ public final class Predicates2 {
                     addValue(min + " to " + max).
                     toString();
         }
-
     }
 
-    private static class GreaterThan implements Predicate<Double>, Serializable {
+    static class GreaterThan implements Predicate<Double>, Serializable {
 
         private static final long serialVersionUID = 1L;
 
         private final double threshold;
 
-        public GreaterThan(double threshold) {
+        GreaterThan(double threshold) {
             this.threshold = threshold;
         }
 
         @Override
         public boolean apply(Double input) {
-            return input > threshold;
+            return input != null && input > threshold;
         }
 
         @Override
@@ -352,7 +350,8 @@ public final class Predicates2 {
             if (getClass() != obj.getClass())
                 return false;
             final GreaterThan other = (GreaterThan) obj;
-            if (Double.doubleToLongBits(this.threshold) != Double.doubleToLongBits(other.threshold))
+            if (Double.doubleToLongBits(this.threshold) != Double.
+                    doubleToLongBits(other.threshold))
                 return false;
             return true;
         }
@@ -360,7 +359,9 @@ public final class Predicates2 {
         @Override
         public int hashCode() {
             int hash = 7;
-            hash = 23 * hash + (int) (Double.doubleToLongBits(this.threshold) ^ (Double.doubleToLongBits(this.threshold) >>> 32));
+            hash = 23 * hash + (int) (Double.doubleToLongBits(this.threshold) ^ (Double.
+                                                                                 doubleToLongBits(
+                                                                                 this.threshold) >>> 32));
             return hash;
         }
 
@@ -370,7 +371,6 @@ public final class Predicates2 {
                     addValue(threshold).
                     toString();
         }
-
     }
 
     private static class LessThan implements Predicate<Double>, Serializable {
@@ -379,13 +379,13 @@ public final class Predicates2 {
 
         private final double threshold;
 
-        public LessThan(double threshold) {
+        private LessThan(double threshold) {
             this.threshold = threshold;
         }
 
         @Override
         public boolean apply(Double input) {
-            return input < threshold;
+            return input != null && input < threshold;
         }
 
         @Override
@@ -394,8 +394,9 @@ public final class Predicates2 {
                 return false;
             if (getClass() != obj.getClass())
                 return false;
-            final GreaterThan other = (GreaterThan) obj;
-            if (Double.doubleToLongBits(this.threshold) != Double.doubleToLongBits(other.threshold))
+            final LessThan other = (LessThan) obj;
+            if (Double.doubleToLongBits(this.threshold) != Double.
+                    doubleToLongBits(other.threshold))
                 return false;
             return true;
         }
@@ -403,7 +404,9 @@ public final class Predicates2 {
         @Override
         public int hashCode() {
             int hash = 7;
-            hash = 23 * hash + (int) (Double.doubleToLongBits(this.threshold) ^ (Double.doubleToLongBits(this.threshold) >>> 32));
+            hash = 23 * hash + (int) (Double.doubleToLongBits(this.threshold) ^ (Double.
+                                                                                 doubleToLongBits(
+                                                                                 this.threshold) >>> 32));
             return hash;
         }
 
@@ -413,10 +416,8 @@ public final class Predicates2 {
                     addValue(threshold).
                     toString();
         }
-
     }
 
     private Predicates2() {
     }
-
 }

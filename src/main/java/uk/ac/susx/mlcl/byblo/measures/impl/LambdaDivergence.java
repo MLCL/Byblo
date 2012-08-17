@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo.measures.impl;
 
 import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
+import uk.ac.susx.mlcl.byblo.measures.Measures;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
 import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
@@ -119,14 +120,14 @@ public final class LambdaDivergence implements Measure, Serializable {
             j++;
         }
 
-        
-        
+
+
         return divergence;
     }
 
     @Override
     public boolean isCommutative() {
-        return lambda == 0.5;
+        return Measures.epsilonEquals(lambda, 0.5);
     }
 
     @Override

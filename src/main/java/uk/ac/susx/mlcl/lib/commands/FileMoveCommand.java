@@ -48,7 +48,7 @@ import uk.ac.susx.mlcl.lib.tasks.FileMoveTask;
 public final class FileMoveCommand extends AbstractCommand {
 
     @ParametersDelegate
-    protected final FilePipeDelegate filesDeligate = new FilePipeDelegate();
+    private FilePipeDelegate filesDeligate = new FilePipeDelegate();
 
     public FileMoveCommand(File sourceFile, File destinationFile) {
         filesDeligate.setSourceFile(sourceFile);

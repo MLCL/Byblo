@@ -39,8 +39,6 @@ import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
-import uk.ac.susx.mlcl.byblo.enumerators.MemoryBasedStringEnumerator;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
 
 /**
@@ -50,7 +48,7 @@ import uk.ac.susx.mlcl.lib.io.ObjectIO;
 public class WeightedEntryPairTest {
 
     private void copyWEP(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        Enumerator<String> idx = MemoryBasedStringEnumerator.newInstance();
+//        Enumerator<String> idx = MemoryBasedStringEnumerator.newInstance();
 
         DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
@@ -125,5 +123,4 @@ public class WeightedEntryPairTest {
         assertTrue("Double converted file is not equal to origion.",
                    Files.equal(a, c));
     }
-
 }

@@ -55,19 +55,13 @@ public class JDBMTest {
         /**
          * create (or open existing) database using builder pattern
          */
-        final String fileName = "jdbc-basicExample";
+        final String fileName = "jdbm-basicExample";
         File file = new File(TEST_OUTPUT_DIR, fileName);
 
 
         {
-            deleteIfExist(file.getParentFile().listFiles(new FilenameFilter() {
-
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.startsWith(fileName);
-                }
-
-            }));
+            deleteIfExist(file.getParentFile().
+                    listFiles(new FilenameStartswithFilter(fileName)));
 
             assertValidOutputFiles(file);
 
@@ -115,8 +109,10 @@ public class JDBMTest {
             expected.put(2, "Two");
             expected.put(3, "Three");
 
-            assertArrayEquals(actual.values().toArray(), expected.values().toArray());
-            assertArrayEquals(actual.keySet().toArray(), expected.keySet().toArray());
+            assertArrayEquals(actual.values().toArray(), expected.values().
+                    toArray());
+            assertArrayEquals(actual.keySet().toArray(), expected.keySet().
+                    toArray());
 
 
             db.close();
@@ -136,7 +132,7 @@ public class JDBMTest {
 
     }
 
-    @Test(expected=OutOfMemoryError.class)
+    @Test(expected = OutOfMemoryError.class)
     public void fib() {
 
 
@@ -159,16 +155,10 @@ public class JDBMTest {
     @Test
     public void fib2() throws IOException {
 
-        final String fileName = "jdbc-fib";
+        final String fileName = "jdbm-fib";
         File file = new File(TEST_OUTPUT_DIR, fileName);
-        deleteIfExist(file.getParentFile().listFiles(new FilenameFilter() {
-
-            @Override
-            public boolean accept(File dir, String name) {
-                return name.startsWith(fileName);
-            }
-
-        }));
+        deleteIfExist(file.getParentFile().listFiles(
+                new FilenameStartswithFilter(fileName)));
 
         assertValidOutputFiles(file);
 
@@ -202,4 +192,17 @@ public class JDBMTest {
 
     }
 
+    private static class FilenameStartswithFilter implements FilenameFilter {
+
+        private final String fileName;
+
+        private  FilenameStartswithFilter(String fileName) {
+            this.fileName = fileName;
+        }
+
+        @Override
+        public boolean accept(File dir, String name) {
+            return name.startsWith(fileName);
+        }
+    }
 }

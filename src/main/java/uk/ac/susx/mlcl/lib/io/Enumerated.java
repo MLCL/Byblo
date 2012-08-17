@@ -31,7 +31,6 @@
 package uk.ac.susx.mlcl.lib.io;
 
 import com.google.common.base.Predicate;
-import java.io.Closeable;
 import java.io.IOException;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -40,7 +39,7 @@ import uk.ac.susx.mlcl.lib.Checks;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final  class Enumerated {
+public final class Enumerated {
 
     private Enumerated() {
     }
@@ -134,8 +133,7 @@ public final  class Enumerated {
     }
 
     static class SimpleDSource
-            extends ForwardingDataSource<DataSource>
-            implements DataSource, Closeable {
+            extends ForwardingDataSource<DataSource> {
 
         final Enumerator<String> enumerator;
 
@@ -152,8 +150,7 @@ public final  class Enumerated {
     }
 
     static class SimpleSDSource<S extends SeekableDataSource>
-            extends ForwardingSeekableDataSource<S>
-            implements SeekableDataSource, Closeable {
+            extends ForwardingSeekableDataSource<S> {
 
         final Enumerator<String> enumerator;
 
@@ -190,8 +187,7 @@ public final  class Enumerated {
     }
 
     static class ComplexDSource<T extends DataSource>
-            extends ForwardingDataSource<T>
-            implements DataSource, Closeable {
+            extends ForwardingDataSource<T> {
 
         final Enumerator<String>[] enumerators;
 
@@ -358,8 +354,7 @@ public final  class Enumerated {
     }
 
     static class ComplexDSource2<T extends DataSource>
-            extends ForwardingDataSource<T>
-            implements DataSource, Closeable {
+            extends ForwardingDataSource<T> {
 
         final Enumerator<String> enumerator;
 

@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.lib;
 
 import com.beust.jcommander.Parameter;
 import com.google.common.base.Objects;
+import java.text.MessageFormat;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
@@ -54,13 +55,14 @@ import uk.ac.susx.mlcl.lib.tasks.Task;
 @Deprecated
 public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
 
-    private static final Log LOG = LogFactory.getLog(AbstractParallelCommandTask.class);
+    private static final Log LOG = LogFactory.
+            getLog(AbstractParallelCommandTask.class);
 
     protected static final int DEFAULT_NUM_THREADS =
             Runtime.getRuntime().availableProcessors();
 
     @Parameter(names = {"-t", "--threads"},
-    description = "Number of threads to use.")
+               description = "Number of threads to use.")
     private int nThreads = DEFAULT_NUM_THREADS;
 
     private ExecutorService executor = null;
@@ -72,14 +74,16 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
     public AbstractParallelCommandTask() {
     }
 
-    public void setNumThreads(int nThreads) {
+    public synchronized void setNumThreads(int nThreads) {
         if (nThreads < 1) {
             throw new IllegalArgumentException("nThreads < 1");
         }
 
         if (LOG.isWarnEnabled() && nThreads > Runtime.getRuntime().
                 availableProcessors()) {
-            LOG.warn("nThreads (" + nThreads + ") > availableProcessors (" + Runtime.getRuntime().
+            LOG.
+                    warn("nThreads (" + nThreads + ") > availableProcessors (" + Runtime.
+                    getRuntime().
                     availableProcessors() + ")");
         }
         if (nThreads != this.nThreads) {
@@ -87,11 +91,11 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
         }
     }
 
-    public final int getNumThreads() {
+    public synchronized final int getNumThreads() {
         return nThreads;
     }
 
-    private synchronized final ExecutorService getExecutor() {
+    private synchronized ExecutorService getExecutor() {
         if (executor == null) {
             // Create a new thread pool using an unbounded queue - throttling will
             // be handled by a semaphore
@@ -132,7 +136,6 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
 
         throttle.acquire();
         Runnable wrapper = new Runnable() {
-
             @Override
             public void run() {
                 try {
@@ -141,11 +144,14 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
                     throttle.release();
                 }
             }
-
         };
         try {
             Future<T> future = getExecutor().submit(wrapper, task);
-            getFutureQueue().offer(future);
+            if (!getFutureQueue().add(future))
+                throw new AssertionError(MessageFormat.format(
+                        "Failed to add future {0} to queue, "
+                        + "because it already existed in the queue.",
+                        future));
             return future;
         } catch (RejectedExecutionException e) {
             throttle.release();
@@ -160,8 +166,7 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
     protected Objects.ToStringHelper toStringHelper() {
         return super.toStringHelper().
                 add("threads", getNumThreads()).
-                add("executor", executor).
-                add("futureQueue", futureQueue);
+                add("executor", getExecutor()).
+                add("futureQueue", getFutureQueue());
     }
-
 }

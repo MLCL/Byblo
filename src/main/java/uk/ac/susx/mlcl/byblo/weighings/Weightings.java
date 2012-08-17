@@ -32,8 +32,6 @@ package uk.ac.susx.mlcl.byblo.weighings;
 
 import java.util.Arrays;
 import java.util.Collection;
-import uk.ac.susx.mlcl.byblo.weighings.impl.Bound;
-import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
 import uk.ac.susx.mlcl.lib.Checks;
 
 /**

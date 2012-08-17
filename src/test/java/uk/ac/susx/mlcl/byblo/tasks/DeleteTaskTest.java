@@ -58,7 +58,8 @@ public class DeleteTaskTest {
     public void testRunTask_failure() throws Exception {
         System.out.println("Testing runTask() -- expecting failure");
         File tmp = File.createTempFile(getClass().getName(), "");
-        tmp.delete();
+        if (!tmp.delete())
+            throw new IOException("Failed to delete file: " + tmp);
         assertFalse(tmp.exists());
         FileDeleteTask instance = new FileDeleteTask(tmp);
         instance.run();
@@ -69,7 +70,8 @@ public class DeleteTaskTest {
     public void testRun_failure() throws Exception {
         System.out.println("Testing runTask() -- expecting failure");
         File tmp = File.createTempFile(getClass().getName(), "");
-        tmp.delete();
+        if (!tmp.delete())
+            throw new IOException("Failed to delete file: " + tmp);
         assertFalse(tmp.exists());
         FileDeleteTask instance = new FileDeleteTask(tmp);
         instance.run();
@@ -86,7 +88,7 @@ public class DeleteTaskTest {
         instance = new FileDeleteTask();
         instance.setFile(tmp);
         assertEquals(tmp, instance.getFile());
-        tmp.delete();
+        if (!tmp.delete())
+            throw new IOException("Failed to delete file: " + tmp);
     }
-
 }

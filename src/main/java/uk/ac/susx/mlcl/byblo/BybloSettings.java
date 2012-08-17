@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
@@ -40,6 +41,8 @@ public class BybloSettings {
 
     private final ResourceBundle props;
 
+    private static final Locale locale = Locale.getDefault();
+
     private BybloSettings(ResourceBundle props) {
         this.props = props;
     }
@@ -49,11 +52,18 @@ public class BybloSettings {
                 BybloSettings.class.getPackage().getName() + ".settings"));
     }
 
+    public static Locale getLocale() {
+        return locale;
+    }
+
     public static BybloSettings getInstance() {
         return InstanceHolder.instance;
     }
 
     private static final class InstanceHolder {
+
+        private InstanceHolder() {
+        }
 
         private static final BybloSettings instance = new BybloSettings();
 
@@ -118,5 +128,4 @@ public class BybloSettings {
     private boolean getBoolean(String key) {
         return Boolean.valueOf(props.getString(key));
     }
-
 }

@@ -72,7 +72,8 @@ public final class JDBMStringEnumerator extends BiMapEnumerator<String> {
         this.db = db;
     }
 
-    public JDBMStringEnumerator(DB db, File file, BiMap<Integer, String> map, AtomicInteger nextId) {
+    public JDBMStringEnumerator(DB db, File file, BiMap<Integer, String> map,
+                                AtomicInteger nextId) {
         super(map, nextId);
         this.file = file;
         this.db = db;
@@ -94,7 +95,7 @@ public final class JDBMStringEnumerator extends BiMapEnumerator<String> {
 
     private static final boolean MAP_TYPE_HASH = false;
 
-    protected static JDBMStringEnumerator load(DBMaker maker, File file) {
+    static JDBMStringEnumerator load(DBMaker maker, File file) {
         DB db = maker.make();
 
         Set<String> collections = db.getCollections().keySet();
@@ -121,31 +122,40 @@ public final class JDBMStringEnumerator extends BiMapEnumerator<String> {
             assert backwards.containsKey(FilterCommand.FILTERED_STRING);
             assert forwards.containsKey(FilterCommand.FILTERED_ID);
             assert backwards.get(FilterCommand.FILTERED_STRING) == FilterCommand.FILTERED_ID;
-            assert forwards.get(FilterCommand.FILTERED_ID).equals(FilterCommand.FILTERED_STRING);
+            assert forwards.get(FilterCommand.FILTERED_ID).equals(
+                    FilterCommand.FILTERED_STRING);
 
             assert props.containsKey(COLLECTION_NEXT_ID);
-            nextId = new AtomicInteger(Integer.valueOf(props.get(COLLECTION_NEXT_ID)));
+            nextId = new AtomicInteger(Integer.valueOf(props.get(
+                    COLLECTION_NEXT_ID)));
 
         } else {
 
             if (MAP_TYPE_HASH) {
-                forwards = db.<Integer, String>createHashMap(COLLECTION_FORWARDS);
-                backwards = db.<String, Integer>createHashMap(COLLECTION_BACKWARDS);
+                forwards = db.
+                        <Integer, String>createHashMap(COLLECTION_FORWARDS);
+                backwards = db.<String, Integer>createHashMap(
+                        COLLECTION_BACKWARDS);
                 props = db.<String, String>createHashMap(COLLECTION_PROPERTIES);
             } else {
-                forwards = db.<Integer, String>createTreeMap(COLLECTION_FORWARDS);
-                backwards = db.<String, Integer>createTreeMap(COLLECTION_BACKWARDS);
+                forwards = db.
+                        <Integer, String>createTreeMap(COLLECTION_FORWARDS);
+                backwards = db.<String, Integer>createTreeMap(
+                        COLLECTION_BACKWARDS);
                 props = db.<String, String>createTreeMap(COLLECTION_PROPERTIES);
             }
-            forwards.put(FilterCommand.FILTERED_ID, FilterCommand.FILTERED_STRING);
-            backwards.put(FilterCommand.FILTERED_STRING, FilterCommand.FILTERED_ID);
+            forwards.put(FilterCommand.FILTERED_ID,
+                         FilterCommand.FILTERED_STRING);
+            backwards.put(FilterCommand.FILTERED_STRING,
+                          FilterCommand.FILTERED_ID);
             nextId = new AtomicInteger(FilterCommand.FILTERED_ID + 1);
             props.put(COLLECTION_NEXT_ID, Integer.toString(0));
             db.commit();
         }
 
 
-        ForwardingBiMap<Integer, String> map = ForwardingBiMap.<Integer, String>create(
+        ForwardingBiMap<Integer, String> map = ForwardingBiMap.
+                <Integer, String>create(
                 forwards, backwards);
         JDBMStringEnumerator instance = new JDBMStringEnumerator(
                 db, file, map, nextId);
@@ -163,9 +173,10 @@ public final class JDBMStringEnumerator extends BiMapEnumerator<String> {
         if (file == null) {
             anonymous = true;
             try {
-                file = File.createTempFile("jdbc-", ".tmp");
+                file = File.createTempFile("jdbm-", ".tmp");
             } catch (IOException ex) {
-                Logger.getLogger(JDBMStringEnumerator.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(JDBMStringEnumerator.class.getName()).
+                        log(Level.SEVERE, null, ex);
             }
         } else {
             anonymous = false;
@@ -196,8 +207,9 @@ public final class JDBMStringEnumerator extends BiMapEnumerator<String> {
 
     public void save() {
         if (file == null) {
-            Logger.getLogger(JDBMStringEnumerator.class.getName()).log(Level.WARNING,
-                                                                       "Attempt made to save an enumerator with no attached file.");
+            Logger.getLogger(JDBMStringEnumerator.class.getName()).log(
+                    Level.WARNING,
+                    "Attempt made to save an enumerator with no attached file.");
             return;
         }
 
@@ -215,8 +227,9 @@ public final class JDBMStringEnumerator extends BiMapEnumerator<String> {
 
     public void close() {
         if (db == null || db.isClosed()) {
-            Logger.getLogger(JDBMStringEnumerator.class.getName()).log(Level.WARNING,
-                                                                       "Attempt made to close an enumerator that was not open.");
+            Logger.getLogger(JDBMStringEnumerator.class.getName()).log(
+                    Level.WARNING,
+                    "Attempt made to close an enumerator that was not open.");
             return;
         }
 
@@ -225,4 +238,32 @@ public final class JDBMStringEnumerator extends BiMapEnumerator<String> {
         db.close();
     }
 
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 67 * hash + (this.file != null ? this.file.hashCode() : 0);
+        hash = 67 * hash + (this.db != null ? this.db.hashCode() : 0);
+        hash = 67 * hash + (int) (this.modCount ^ (this.modCount >>> 32));
+        return hash;
+    }
+
+    public boolean equals(JDBMStringEnumerator other) {
+        if (this.file != other.file && (this.file == null || !this.file.
+                                        equals(other.file)))
+            return false;
+        if (this.db != other.db && (this.db == null || !this.db.equals(other.db)))
+            return false;
+        if (this.modCount != other.modCount)
+            return false;
+        return super.equals(other);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        return equals((JDBMStringEnumerator) obj);
+    }
 }

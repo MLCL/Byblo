@@ -31,6 +31,7 @@
 package uk.ac.susx.mlcl.byblo.commands;
 
 import java.io.File;
+import java.io.IOException;
 import static org.junit.Assert.*;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -104,7 +105,8 @@ public class ExternalSimsKnnCommandTest {
     public void testEmptyInputFile() throws Exception {
         try {
             File in = new File(TestConstants.TEST_OUTPUT_DIR, "extknn-test-empty.in");
-            in.createNewFile();
+            if(!in.createNewFile())
+                throw new IOException("unable to create empty file " + in);
             File out = new File(TestConstants.TEST_OUTPUT_DIR, "extknn-test-empty.out");
 
             ExitTrapper.enableExistTrapping();

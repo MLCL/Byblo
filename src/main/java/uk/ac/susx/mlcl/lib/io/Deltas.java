@@ -86,7 +86,7 @@ public final class Deltas {
 
     private static class DeltaIntSource<S extends DataSource>
             extends AbstractDeltaInt<S>
-            implements DataSource, Closeable {
+            implements DataSource {
 
         DeltaIntSource(S inner, Predicate<Integer> deltaCol) {
             super(inner, deltaCol);
@@ -165,7 +165,7 @@ public final class Deltas {
 
     private static class DeltaIntSink<S extends DataSink>
             extends AbstractDeltaInt<S>
-            implements DataSink, Closeable, Flushable {
+            implements DataSink, Flushable {
 
         DeltaIntSink(S inner,
                      Predicate<Integer> deltaCol) {

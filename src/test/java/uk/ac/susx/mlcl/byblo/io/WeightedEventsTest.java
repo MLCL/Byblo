@@ -47,8 +47,6 @@ import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
-import uk.ac.susx.mlcl.byblo.enumerators.MemoryBasedStringEnumerator;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
@@ -84,7 +82,8 @@ public class WeightedEventsTest {
         List<Indexed<SparseDoubleVector>> list = ObjectIO.readAll(aSrc);
         Collections.sort(list);
 
-        FastWeightedTokenPairVectorSink bSink = FastWeightedTokenPairVectorSink.open(
+        FastWeightedTokenPairVectorSink bSink = FastWeightedTokenPairVectorSink.
+                open(
                 b, DEFAULT_CHARSET, del, false, false, compact);
 
 //        WeightedTokenPairVectorSink bSink = new WeightedTokenPairVectorSink(
@@ -170,7 +169,7 @@ public class WeightedEventsTest {
 
         WeightedTokenPairSource src =
                 WeightedTokenPairSource.open(
-                file, DEFAULT_CHARSET, del,false,false);
+                file, DEFAULT_CHARSET, del, false, false);
         {
             while (src.hasNext()) {
                 final Tell pos = src.position();
@@ -190,7 +189,8 @@ public class WeightedEventsTest {
 
                 System.out.println("expected tell: " + pos);
                 System.out.println(
-                        "expected: " + expected.record().toString(del.getEntryEnumerator(), del.getFeatureEnumerator()));
+                        "expected: " + expected.record().toString(del.
+                        getEntryEnumerator(), del.getFeatureEnumerator()));
 
                 src.position(pos);
 
@@ -200,8 +200,10 @@ public class WeightedEventsTest {
 
                 Weighted<TokenPair> actual = src.read();
                 System.out.println("actual tell: " + src.position());
-                System.out.println("actual: " + actual.record().toString(del.getEntryEnumerator(),
-                                                                         del.getFeatureEnumerator()));
+                System.out.println("actual: " + actual.record().toString(del.
+                        getEntryEnumerator(),
+                                                                         del.
+                        getFeatureEnumerator()));
                 System.out.flush();
 
                 assertEquals(expected, actual);
@@ -272,7 +274,7 @@ public class WeightedEventsTest {
                 Enumerating.DEFAULT_TYPE, true, true, null, null);
 
 
-        Enumerator<String> idx = MemoryBasedStringEnumerator.newInstance();
+//        Enumerator<String> idx = MemoryBasedStringEnumerator.newInstance();
 
         {
             WeightedTokenPairSource aSrc = WeightedTokenPairSource.open(
@@ -324,7 +326,7 @@ public class WeightedEventsTest {
                     a, DEFAULT_CHARSET, indel, false, false);
 
             WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
-                    b, DEFAULT_CHARSET, outdel,true,true, true);
+                    b, DEFAULT_CHARSET, outdel, true, true, true);
             ObjectIO.copy(aSrc, bSink);
             bSink.close();
         }
@@ -334,7 +336,7 @@ public class WeightedEventsTest {
 
         {
             WeightedTokenPairSource bSrc = WeightedTokenPairSource.open(
-                    b, DEFAULT_CHARSET, outdel,true,true);
+                    b, DEFAULT_CHARSET, outdel, true, true);
             WeightedTokenPairSink cSink = WeightedTokenPairSink.open(
                     c, DEFAULT_CHARSET, indel, false, false,
                     false);
@@ -348,5 +350,4 @@ public class WeightedEventsTest {
                 "Double converted file is not equal to origion: " + a + " " + c,
                 Files.equal(a, c));
     }
-
 }

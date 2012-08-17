@@ -51,6 +51,7 @@ import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 public abstract class AbstractCommandTask extends AbstractTask implements Command {
 
     private static final Log LOG = LogFactory.getLog(AbstractCommandTask.class);
+
     @Parameter(names = {"-h", "--help"},
                description = "Display this help message.")
     private boolean usageRequested = false;
@@ -71,12 +72,14 @@ public abstract class AbstractCommandTask extends AbstractTask implements Comman
     @Override
     public void runCommand() throws Exception {
         this.run();
-        while(this.isExceptionTrapped())
+        while (this.isExceptionTrapped())
             this.throwTrappedException();
     }
 
     @Override
-    public void runCommand(String[] args) throws InstantiationException, IllegalAccessException, Exception {
+    public void runCommand(String[] args)
+            throws InstantiationException, IllegalAccessException, Exception {
+        
         Checks.checkNotNull("args", args);
 
         if (LOG.isTraceEnabled())
@@ -95,7 +98,7 @@ public abstract class AbstractCommandTask extends AbstractTask implements Comman
             final StringBuilder builder = new StringBuilder();
             jc.usage(builder);
             System.err.println(builder);
-            System.exit(-1);
+            throw ex;
         }
 
         if (LOG.isTraceEnabled())

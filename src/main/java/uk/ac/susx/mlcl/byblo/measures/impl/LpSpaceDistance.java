@@ -30,9 +30,9 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import java.io.Serializable;
 import static java.lang.Math.*;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
+import uk.ac.susx.mlcl.byblo.measures.Measures;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
@@ -55,7 +55,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class LpSpaceDistance implements Measure, Serializable {
+public final class LpSpaceDistance implements Measure {
 
     public static final double DEFAULT_POWER = 2;
 
@@ -80,17 +80,19 @@ public final class LpSpaceDistance implements Measure, Serializable {
     public final void setPower(final double newPower) {
         if (Double.isNaN(newPower))
             throw new IllegalArgumentException("newPower is NaN");
-        if (power != newPower) {
+        if (!Measures.epsilonEquals(power, newPower, 0)) {
             power = newPower;
-            if (power == 0) {
+            if (Measures.epsilonEquals(power, 0, 0)) {
                 deligate = new HammingDistance();
-            } else if (power == 1) {
+            } else if (Measures.epsilonEquals(power, 1, 0)) {
                 deligate = new ManhattanDistance();
-            } else if (power == 2) {
+            } else if (Measures.epsilonEquals(power, 2, 0)) {
                 deligate = new EuclideanDistance();
-            } else if (power == Double.POSITIVE_INFINITY) {
+            } else if (Measures.
+                    epsilonEquals(power, Double.POSITIVE_INFINITY, 0)) {
                 deligate = new MaxSpaceDistance();
-            } else if (power == Double.NEGATIVE_INFINITY) {
+            } else if (Measures.
+                    epsilonEquals(power, Double.NEGATIVE_INFINITY, 0)) {
                 deligate = new MinSpaceDistance();
             } else {
                 if (deligate == null || deligate.getClass() != MinkowskiDistance.class)
@@ -159,8 +161,7 @@ public final class LpSpaceDistance implements Measure, Serializable {
      * Fallback implementation for arbitrary p-spaces. Not though that it will
      * not produce the correct results of p = -inf, 0, or +inf.
      */
-    private final class MinkowskiDistance extends LpSpaceDeligate
-            implements Serializable {
+    private final class MinkowskiDistance extends LpSpaceDeligate {
 
         private static final long serialVersionUID = 1L;
 
@@ -200,8 +201,7 @@ public final class LpSpaceDistance implements Measure, Serializable {
      * Implementation of the power-2 space; i.e standard Euclidean space that we
      * are all used to.
      */
-    private static final class EuclideanDistance extends LpSpaceDeligate
-            implements Serializable {
+    private static final class EuclideanDistance extends LpSpaceDeligate {
 
         private static final long serialVersionUID = 1L;
 
@@ -242,8 +242,7 @@ public final class LpSpaceDistance implements Measure, Serializable {
      * Implementation of the power-1 space; known as Manhattan or taxicab
      * distance.
      */
-    private static final class ManhattanDistance extends LpSpaceDeligate
-            implements Serializable {
+    private static final class ManhattanDistance extends LpSpaceDeligate {
 
         private static final long serialVersionUID = 1L;
 
@@ -282,8 +281,7 @@ public final class LpSpaceDistance implements Measure, Serializable {
     /**
      * Implementation of power-zero L space.
      */
-    private static final class HammingDistance extends LpSpaceDeligate
-            implements Serializable {
+    private static final class HammingDistance extends LpSpaceDeligate {
 
         private static final long serialVersionUID = 1L;
 
@@ -322,8 +320,7 @@ public final class LpSpaceDistance implements Measure, Serializable {
     /**
      * Implementation of power +infinity L-space metric.
      */
-    private static final class MaxSpaceDistance extends LpSpaceDeligate
-            implements Serializable {
+    private static final class MaxSpaceDistance extends LpSpaceDeligate {
 
         private static final long serialVersionUID = 1L;
 
@@ -360,8 +357,7 @@ public final class LpSpaceDistance implements Measure, Serializable {
     /**
      * Implementation of power -infinity L-space metric.
      */
-    private static final class MinSpaceDistance extends LpSpaceDeligate
-            implements Serializable {
+    private static final class MinSpaceDistance extends LpSpaceDeligate {
 
         private static final long serialVersionUID = 1L;
 

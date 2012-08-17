@@ -41,8 +41,8 @@ import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.byblo.io.WeightSumReducerObjectSink;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**

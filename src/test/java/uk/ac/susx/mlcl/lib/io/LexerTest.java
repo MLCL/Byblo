@@ -31,6 +31,8 @@
 package uk.ac.susx.mlcl.lib.io;
 
 import com.google.common.base.CharMatcher;
+import com.google.common.io.Closeables;
+import com.google.common.io.Flushables;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -104,15 +106,20 @@ public class LexerTest {
         System.out.println();
     }
 
-    private File makeTmpData(String str) throws IOException {
+    private File makeTmpData(String str, Charset charset) throws IOException {
         File tmp = File.createTempFile(this.getClass().getName() + ".", "");
         tmp.deleteOnExit();
 
-        OutputStream out = new FileOutputStream(tmp);
-        out.write(str.getBytes());
-        out.flush();
-        out.close();
-
+        OutputStream out = null;
+        try {
+            out = new FileOutputStream(tmp);
+            out.write(str.getBytes(charset));
+        } finally {
+            if (out != null) {
+                Flushables.flushQuietly(out);
+                Closeables.closeQuietly(out);
+            }
+        }
         return tmp;
     }
 
@@ -122,7 +129,7 @@ public class LexerTest {
 
 
         Charset charset = Files.DEFAULT_CHARSET;
-        File tmp = makeTmpData(CFB);
+        File tmp = makeTmpData(CFB, charset);
 
         Lexer lexer = new Lexer(tmp, charset);
         lexer.setDelimiterMatcher(CharMatcher.is('.'));
@@ -159,7 +166,7 @@ public class LexerTest {
         System.out.println("seekTest");
 
         Charset charset = Files.DEFAULT_CHARSET;
-        File tmp = makeTmpData(CFB);
+        File tmp = makeTmpData(CFB, charset);
 
         Lexer lexer = new Lexer(tmp, charset);
         lexer.setDelimiterMatcher(CharMatcher.is('.'));

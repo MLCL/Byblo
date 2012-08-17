@@ -30,17 +30,15 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import uk.ac.susx.mlcl.byblo.measures.impl.KendallsTau;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import static org.junit.Assert.*;
 import org.junit.*;
-import static uk.ac.susx.mlcl.TestConstants.DEFAULT_CHARSET;
-import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_EVENTS;
+import static org.junit.Assert.*;
+import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.Tools;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
@@ -48,7 +46,6 @@ import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import static uk.ac.susx.mlcl.TestConstants.*;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
@@ -90,7 +87,7 @@ public class KendallsTauTest {
         System.out.println("testCLI");
 
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".KendallsTau");
-        output.delete();
+        deleteIfExist(output);
 
         try {
             enableExistTrapping();
@@ -297,7 +294,7 @@ public class KendallsTauTest {
             B.set(RANDOM.nextInt(size * 2), RANDOM.nextDouble());
         }
 
-        double expect = test(A, B);
+        test(A, B);
     }
 
     @Test

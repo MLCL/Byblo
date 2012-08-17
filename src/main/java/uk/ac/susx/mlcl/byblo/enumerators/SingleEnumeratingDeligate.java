@@ -34,7 +34,6 @@ import com.beust.jcommander.Parameter;
 import com.google.common.base.Objects;
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 
 /**
  *
@@ -42,7 +41,7 @@ import java.io.Serializable;
  */
 public final class SingleEnumeratingDeligate
         extends EnumeratingDeligate
-        implements Serializable, SingleEnumerating {
+        implements SingleEnumerating {
 
     private static final long serialVersionUID = 1L;
 

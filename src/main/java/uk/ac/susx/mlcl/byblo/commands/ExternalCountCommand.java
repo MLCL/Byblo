@@ -65,21 +65,21 @@ import uk.ac.susx.mlcl.lib.commands.FileMoveCommand;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
+import uk.ac.susx.mlcl.lib.events.ProgressAggregate;
+import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ProgressReporting;
+import uk.ac.susx.mlcl.lib.events.ReportLoggingProgressListener;
 import uk.ac.susx.mlcl.lib.io.Chunk;
 import uk.ac.susx.mlcl.lib.io.Chunker;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
-import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
+import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.io.Tell;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import uk.ac.susx.mlcl.lib.tasks.FileDeleteTask;
 import uk.ac.susx.mlcl.lib.tasks.ObjectMergeTask;
 import uk.ac.susx.mlcl.lib.tasks.ObjectSortTask;
-import uk.ac.susx.mlcl.lib.events.ProgressAggregate;
-import uk.ac.susx.mlcl.lib.events.ProgressEvent;
-import uk.ac.susx.mlcl.lib.events.ProgressListener;
-import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import uk.ac.susx.mlcl.lib.tasks.Task;
 
 /**
@@ -139,36 +139,36 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
     public static final int DEFAULT_MAX_CHUNK_SIE = 1000000;
 
     @Parameter(names = {"-C", "--chunk-size"},
-    description = "Number of lines per work unit. Larger value increase performance and memory usage.")
+               description = "Number of lines per work unit. Larger value increase performance and memory usage.")
     private int maxChunkSize = DEFAULT_MAX_CHUNK_SIE;
 
     @Parameter(names = {"-i", "--input"},
-    required = true,
-    description = "Input instances file",
-    validateWith = InputFileValidator.class)
+               required = true,
+               description = "Input instances file",
+               validateWith = InputFileValidator.class)
     private File inputFile;
 
     @Parameter(names = {"-oef", "--output-entry-features"},
-    required = true,
-    description = "Output entry-feature frequencies file",
-    validateWith = OutputFileValidator.class)
+               required = true,
+               description = "Output entry-feature frequencies file",
+               validateWith = OutputFileValidator.class)
     private File eventsFile = null;
 
     @Parameter(names = {"-oe", "--output-entries"},
-    required = true,
-    description = "Output entry frequencies file",
-    validateWith = OutputFileValidator.class)
+               required = true,
+               description = "Output entry frequencies file",
+               validateWith = OutputFileValidator.class)
     private File entriesFile = null;
 
     @Parameter(names = {"-of", "--output-features"},
-    required = true,
-    description = "Output feature frequencies file",
-    validateWith = OutputFileValidator.class)
+               required = true,
+               description = "Output feature frequencies file",
+               validateWith = OutputFileValidator.class)
     private File featuresFile = null;
 
     @Parameter(names = {"-T", "--temporary-directory"},
-    description = "Directory used for holding temporary files.",
-    converter = TempFileFactoryConverter.class)
+               description = "Directory used for holding temporary files.",
+               converter = TempFileFactoryConverter.class)
     private FileFactory tempFileFactory = new TempFileFactory();
 
     private Queue<File> mergeEntryQueue;
@@ -304,14 +304,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
     @Override
     protected void runTask() throws Exception {
 
-        progress.addProgressListener(new ProgressListener() {
-
-            @Override
-            public void progressChanged(ProgressEvent progressEvent) {
-                LOG.info(progressEvent.getSource().getProgressReport());
-            }
-
-        });
+        progress.addProgressListener(new ReportLoggingProgressListener(LOG));
 
 
         progress.startAdjusting();
@@ -333,8 +326,6 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
 
         progress.setState(State.COMPLETED);
 
-
-
     }
 
     void clearCompleted(boolean block) throws Exception {
@@ -347,17 +338,17 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
         } else {
 
             List<Future<? extends Task>> completed = null;
-            for(Future<? extends Task> future : getFutureQueue()) {
-                if(future.isDone()) {
-                    if(completed == null)
+            for (Future<? extends Task> future : getFutureQueue()) {
+                if (future.isDone()) {
+                    if (completed == null)
                         completed = new ArrayList<Future<? extends Task>>();
                     completed.add(future);
                 }
             }
 
-            if(completed != null && !completed.isEmpty()) {
+            if (completed != null && !completed.isEmpty()) {
                 getFutureQueue().removeAll(completed);
-                for(Future<? extends Task> future : completed) {
+                for (Future<? extends Task> future : completed) {
                     handleCompletedTask(future.get());
                 }
             }
@@ -535,20 +526,23 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
 
     private Comparator<Weighted<Token>> getEntryOrder() throws IOException {
         return indexDeligate.isEnumeratedEntries()
-               ? Weighted.recordOrder(Token.indexOrder())
-               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getEntriesEnumeratorCarriar()));
+                ? Weighted.recordOrder(Token.indexOrder())
+                : Weighted.recordOrder(Token.stringOrder(indexDeligate.
+                getEntriesEnumeratorCarriar()));
     }
 
     private Comparator<Weighted<Token>> getFeatureOrder() throws IOException {
         return indexDeligate.isEnumeratedFeatures()
-               ? Weighted.recordOrder(Token.indexOrder())
-               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getFeaturesEnumeratorCarriar()));
+                ? Weighted.recordOrder(Token.indexOrder())
+                : Weighted.recordOrder(Token.stringOrder(indexDeligate.
+                getFeaturesEnumeratorCarriar()));
     }
 
     private Comparator<Weighted<TokenPair>> getEventOrder() throws IOException {
-        return (indexDeligate.isEnumeratedEntries() && indexDeligate.isEnumeratedFeatures())
-               ? Weighted.recordOrder(TokenPair.indexOrder())
-               : Weighted.recordOrder(TokenPair.stringOrder(indexDeligate));
+        return (indexDeligate.isEnumeratedEntries() && indexDeligate.
+                isEnumeratedFeatures())
+                ? Weighted.recordOrder(TokenPair.indexOrder())
+                : Weighted.recordOrder(TokenPair.stringOrder(indexDeligate));
     }
 
     protected void submitCountTask(ObjectSource<TokenPair> instanceSource,
@@ -757,7 +751,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
         }
     }
 
-    protected SeekableObjectSource<Weighted<Token>, Tell> openEntriesSource(File file)
+    protected SeekableObjectSource<Weighted<Token>, Tell> openEntriesSource(
+            File file)
             throws FileNotFoundException, IOException {
         return BybloIO.openEntriesSource(file, getCharset(), indexDeligate);
     }
@@ -767,7 +762,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
                 BybloIO.openEntriesSink(file, getCharset(), indexDeligate));
     }
 
-    protected SeekableObjectSource<Weighted<Token>, Tell> openFeaturesSource(File file)
+    protected SeekableObjectSource<Weighted<Token>, Tell> openFeaturesSource(
+            File file)
             throws FileNotFoundException, IOException {
         return BybloIO.openFeaturesSource(file, getCharset(), indexDeligate);
     }
@@ -788,7 +784,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
                 BybloIO.openEventsSink(file, getCharset(), indexDeligate));
     }
 
-    protected SeekableObjectSource<TokenPair, Tell> openInstancesSource(File file) throws FileNotFoundException, IOException {
+    protected SeekableObjectSource<TokenPair, Tell> openInstancesSource(
+            File file) throws FileNotFoundException, IOException {
         return BybloIO.openInstancesSource(file, getCharset(), indexDeligate);
     }
 
@@ -844,7 +841,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
 
         // For each output file, check that either it exists and it writeable,
         // or that it does not exist but is creatable
-        if (entriesFile.exists() && (!entriesFile.isFile() || !entriesFile.canWrite()))
+        if (entriesFile.exists() && (!entriesFile.isFile() || !entriesFile.
+                                     canWrite()))
             throw new IllegalStateException(
                     "entries file exists but is not writable: " + entriesFile);
         if (!entriesFile.exists() && !entriesFile.getAbsoluteFile().
@@ -853,7 +851,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
             throw new IllegalStateException(
                     "entries file does not exists and can not be reated: " + entriesFile);
         }
-        if (featuresFile.exists() && (!featuresFile.isFile() || !featuresFile.canWrite()))
+        if (featuresFile.exists() && (!featuresFile.isFile() || !featuresFile.
+                                      canWrite()))
             throw new IllegalStateException(
                     "features file exists but is not writable: " + featuresFile);
         if (!featuresFile.exists() && !featuresFile.getAbsoluteFile().
@@ -862,7 +861,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
             throw new IllegalStateException(
                     "features file does not exists and can not be reated: " + featuresFile);
         }
-        if (eventsFile.exists() && (!eventsFile.isFile() || !eventsFile.canWrite()))
+        if (eventsFile.exists() && (!eventsFile.isFile() || !eventsFile.
+                                    canWrite()))
             throw new IllegalStateException(
                     "entry-features file exists but is not writable: " + eventsFile);
         if (!eventsFile.exists() && !eventsFile.getAbsoluteFile().
@@ -952,5 +952,4 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
     public State getState() {
         return progress.getState();
     }
-
 }

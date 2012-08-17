@@ -32,9 +32,11 @@ package uk.ac.susx.mlcl.byblo.weighings;
 
 import it.unimi.dsi.fastutil.ints.AbstractInt2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
+import it.unimi.dsi.fastutil.ints.Int2DoubleMap.Entry;
+import java.io.Serializable;
 import java.util.*;
-import static org.junit.Assert.*;
 import org.junit.*;
+import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
@@ -193,18 +195,21 @@ public class WeightingsTest {
                 // Check there are no zero valued elements
                 for (int i = 0; i < rew.size; i++) {
                     if (rew.values[i] == 0.0)
-                        fail(String.format(
+                        fail(String.
+                                format(
                                 "Found zero value in sparse vector %d at id %d with weighting scheme %s",
                                 entryId, rew.keys[i], weighting.getClass()));
                     if (Double.isNaN(rew.values[i])) {
-                        fail(String.format(
+                        fail(String.
+                                format(
                                 "Found NaN value in sparse vector %d at id %d with weighting scheme %s",
                                 entryId, rew.keys[i], weighting.getClass()));
                     }
 
                     if (rew.values[i] < weighting.getLowerBound() || rew.values[i] > weighting.
                             getUpperBound()) {
-                        fail(String.format(
+                        fail(String.
+                                format(
                                 "sparse vector %d at id %d has value %f outside range with weighting scheme %s",
                                 entryId, rew.keys[i], rew.values[i], weighting.
                                 getClass()));
@@ -262,14 +267,7 @@ public class WeightingsTest {
                     keys[i])));
         }
 
-        Comparator<Int2DoubleMap.Entry> cmp = new Comparator<Int2DoubleMap.Entry>() {
-
-            @Override
-            public int compare(Int2DoubleMap.Entry o1, Int2DoubleMap.Entry o2) {
-                int c = Double.compare(o1.getDoubleValue(), o2.getDoubleValue());
-                return c != 0 ? c : o1.getIntKey() - o2.getIntKey();
-            }
-        };
+        Comparator<Int2DoubleMap.Entry> cmp = new Int2DoubleEntryValueThenKeyComparator();
 
         Collections.sort(alist, cmp);
         Collections.sort(blist, cmp);
@@ -311,5 +309,20 @@ public class WeightingsTest {
             sb.append(' ');
         }
         System.out.println(sb);
+    }
+
+    private static class Int2DoubleEntryValueThenKeyComparator
+            implements Comparator<Entry>, Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        private Int2DoubleEntryValueThenKeyComparator() {
+        }
+
+        @Override
+        public int compare(Int2DoubleMap.Entry o1, Int2DoubleMap.Entry o2) {
+            int c = Double.compare(o1.getDoubleValue(), o2.getDoubleValue());
+            return c != 0 ? c : o1.getIntKey() - o2.getIntKey();
+        }
     }
 }

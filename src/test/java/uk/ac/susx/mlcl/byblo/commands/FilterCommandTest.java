@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo.commands;
 
 import com.google.common.io.Files;
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import org.junit.After;
 import static org.junit.Assert.*;
@@ -56,14 +57,12 @@ public class FilterCommandTest {
     private final static File OUTPUT_FEATURES = new File(TEST_OUTPUT_DIR,
                                                          TEST_FRUIT_FEATURES_FILTERED.getName());
 
-    private final static File OUTPUT_ENTRY_FEATURES = new File(TEST_OUTPUT_DIR,
+    private final static File OUTPUT_EVENTS = new File(TEST_OUTPUT_DIR,
                                                                TEST_FRUIT_EVENTS_FILTERED.getName());
 
     @Before
-    public void setUp() {
-        OUTPUT_ENTRIES.delete();
-        OUTPUT_FEATURES.delete();
-        OUTPUT_ENTRY_FEATURES.delete();
+    public void setUp() throws IOException {
+        deleteIfExist(OUTPUT_ENTRIES, OUTPUT_FEATURES, OUTPUT_EVENTS);
     }
 
     @After
@@ -80,7 +79,7 @@ public class FilterCommandTest {
             "--input-events", TEST_FRUIT_EVENTS.toString(),
             "--output-entries", OUTPUT_ENTRIES.toString(),
             "--output-features", OUTPUT_FEATURES.toString(),
-            "--output-events", OUTPUT_ENTRY_FEATURES.toString(),};
+            "--output-events", OUTPUT_EVENTS.toString(),};
 
         String[] args = new String[commonArgs.length + runArgs.length];
         System.arraycopy(commonArgs, 0, args, 0, commonArgs.length);
@@ -98,8 +97,8 @@ public class FilterCommandTest {
                    OUTPUT_ENTRIES.exists());
         assertTrue("Output file " + OUTPUT_FEATURES + " does not exist.",
                    OUTPUT_FEATURES.exists());
-        assertTrue("Output file " + OUTPUT_ENTRY_FEATURES + " does not exist.",
-                   OUTPUT_ENTRY_FEATURES.exists());
+        assertTrue("Output file " + OUTPUT_EVENTS + " does not exist.",
+                   OUTPUT_EVENTS.exists());
     }
 
     @Test

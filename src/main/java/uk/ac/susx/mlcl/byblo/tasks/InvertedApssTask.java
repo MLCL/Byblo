@@ -35,7 +35,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.apache.commons.logging.Log;
@@ -45,7 +44,6 @@ import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 
 /**
@@ -131,7 +129,7 @@ public final class InvertedApssTask<S> extends NaiveApssTask<S> {
 
     }
 
-    protected Set<Indexed<SparseDoubleVector>> findCandidates(
+    Set<Indexed<SparseDoubleVector>> findCandidates(
             Indexed<SparseDoubleVector> b) {
 
         final Set<Indexed<SparseDoubleVector>> candidates =
@@ -145,7 +143,7 @@ public final class InvertedApssTask<S> extends NaiveApssTask<S> {
         return candidates;
     }
 
-    protected Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> buildIndex()
+    Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> buildIndex()
             throws IOException {
         SeekableObjectSource<? extends Indexed<SparseDoubleVector>, S> src = getSourceA();
         final Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> result =
@@ -165,12 +163,12 @@ public final class InvertedApssTask<S> extends NaiveApssTask<S> {
         return result;
     }
 
-    protected void setIndex(Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> index) {
+    void setIndex(Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> index) {
         Checks.checkNotNull("index is null", index);
         this.index = index;
     }
 
-    protected Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> getIndex() {
+    Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> getIndex() {
         return index;
     }
 
@@ -178,5 +176,4 @@ public final class InvertedApssTask<S> extends NaiveApssTask<S> {
     public String getName() {
         return "inverted-allpairs";
     }
-
 }

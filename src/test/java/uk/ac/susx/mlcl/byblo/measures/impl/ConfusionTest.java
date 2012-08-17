@@ -30,10 +30,8 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import uk.ac.susx.mlcl.byblo.measures.impl.Confusion;
 import java.io.Closeable;
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import static org.junit.Assert.*;
 import org.junit.BeforeClass;
@@ -121,7 +119,8 @@ public class ConfusionTest {
         System.out.println("testCLI");
 
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Confusion");
-        output.delete();
+
+        deleteIfExist(output);
 
         try {
             enableExistTrapping();
@@ -196,7 +195,6 @@ public class ConfusionTest {
 //
 //        assertEquals(expect, actual, EPSILON);
 //    }
-
 //    @Test
 //    public void testSizeTwoVectors() throws Exception {
 //        System.out.println("testSizeTwoVectors");
@@ -214,7 +212,6 @@ public class ConfusionTest {
 //
 //        assertEquals(expect, actual, EPSILON);
 //    }
-
 //    @Test
 //    public void testCommutative() throws Exception {
 //        System.out.println("testCommutative");
@@ -230,7 +227,6 @@ public class ConfusionTest {
 //        double actual = test(B, A);
 //        assertEquals(expect, actual, EPSILON);
 //    }
-
 //    @Test
 //    public void testHomoginiety() throws Exception {
 //        System.out.println("testHomoginiety");
@@ -248,7 +244,6 @@ public class ConfusionTest {
 //
 //        assertEquals(expect, actual, EPSILON);
 //    }
-
     @Test
     public void testHeteroginiety() throws Exception {
         System.out.println("testHeteroginiety");
@@ -297,7 +292,7 @@ public class ConfusionTest {
             B.set(RANDOM.nextInt(size * 2), RANDOM.nextDouble());
         }
 
-        double expect = test(A, B);
+        test(A, B);
     }
 
     public static double test(SparseDoubleVector A, SparseDoubleVector B) {

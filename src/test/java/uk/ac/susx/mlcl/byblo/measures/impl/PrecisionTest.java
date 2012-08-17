@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import uk.ac.susx.mlcl.byblo.measures.impl.Precision;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -71,7 +70,7 @@ public class PrecisionTest {
         System.out.println("testCLI");
 
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Precision");
-        output.delete();
+        deleteIfExist(output);
 
         try {
             enableExistTrapping();
@@ -247,7 +246,7 @@ public class PrecisionTest {
             B.set(RANDOM.nextInt(size * 2), RANDOM.nextDouble());
         }
 
-        double expect = test(A, B);
+        test(A, B);
     }
 
     public double test(SparseDoubleVector A, SparseDoubleVector B) {

@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -91,14 +92,7 @@ public class MergeTaskTest {
         ObjectSource<Integer> src2 = ObjectIO.asSource(in2);
         ObjectSink<Integer> sink = ObjectIO.asSink(out);
 
-        Comparator<Integer> comparator = new Comparator<Integer>() {
-
-            @Override
-            public int compare(Integer o1, Integer o2) {
-                return o1 - o2;
-            }
-
-        };
+        Comparator<Integer> comparator = new IntegerNaturalOrderComparator();
 
         ObjectMergeTask<Integer> instance = new ObjectMergeTask<Integer>();
         instance.setSourceA(src1);
@@ -108,9 +102,22 @@ public class MergeTaskTest {
 
         instance.run();
 
-        assertEquals(n * 2, out.size());
+        assertEquals(n * 2L, out.size());
         for (int i = 1; i < out.size(); i++)
             assertTrue(out.get(i - 1) <= out.get(i));
     }
 
+    protected static final class IntegerNaturalOrderComparator
+            implements Comparator<Integer>, Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        protected IntegerNaturalOrderComparator() {
+        }
+
+        @Override
+        public int compare(final Integer o1, final Integer o2) {
+            return o1 - o2;
+        }
+    }
 }

@@ -80,7 +80,7 @@ public class CompositeWeighting implements Weighting, Serializable {
     }
 
     public Weighting[] getChildWeightings() {
-        return childWeightings.toArray(new Weighting[0]);
+        return childWeightings.toArray(new Weighting[childWeightings.size()]);
     }
 
     @Override

@@ -190,7 +190,6 @@ public abstract class TSV {
             if (out instanceof Flushable)
                 ((Flushable) out).flush();
         }
-
     }
 
     /**
@@ -279,7 +278,8 @@ public abstract class TSV {
             try {
                 return Double.valueOf(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.format(
+                throw new DataFormatException(this, MessageFormat.
+                        format(
                         "Caused by NumberFormatException parsing string \"{0}\"",
                         str), nfe);
             }
@@ -291,7 +291,8 @@ public abstract class TSV {
             try {
                 return Integer.parseInt(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.format(
+                throw new DataFormatException(this, MessageFormat.
+                        format(
                         "Caused by NumberFormatException parsing string \"{0}\"",
                         str), nfe);
             }
@@ -339,7 +340,8 @@ public abstract class TSV {
             try {
                 return Short.parseShort(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.format(
+                throw new DataFormatException(this, MessageFormat.
+                        format(
                         "Caused by NumberFormatException parsing string \"{0}\"",
                         str), nfe);
             }
@@ -351,7 +353,8 @@ public abstract class TSV {
             try {
                 return Long.parseLong(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.format(
+                throw new DataFormatException(this, MessageFormat.
+                        format(
                         "Caused by NumberFormatException parsing string \"{0}\"",
                         str), nfe);
             }
@@ -363,12 +366,12 @@ public abstract class TSV {
             try {
                 return Float.parseFloat(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.format(
+                throw new DataFormatException(this, MessageFormat.
+                        format(
                         "Caused by NumberFormatException parsing string \"{0}\"",
                         str), nfe);
             }
         }
-
     }
 
     /**
@@ -386,11 +389,14 @@ public abstract class TSV {
 
         private final File file;
 
+        private final Charset charset;
+
         public DataFormatException(Source src,
                                    final String message) {
             super(message);
             offset = src.roughPosition();
             file = src.getFile();
+            charset = src.getCharset();
         }
 
         public DataFormatException(Source src,
@@ -399,6 +405,7 @@ public abstract class TSV {
             super(message, cause);
             offset = src.roughPosition();
             file = src.getFile();
+            charset = src.getCharset();
         }
 
         public DataFormatException(Source src) {
@@ -422,25 +429,34 @@ public abstract class TSV {
         public String getMessage() {
             String context;
             try {
-                context = context();
-            } catch (IOException e) {
-                context = null;
+                context = '\'' + context() + '\'';
+            } catch (final IOException ex) {
+                // Yes ex is a dead store, but I don't really care about that 
+                // exception since we are trying to produce a report for 
+                // diagnosing another one.
+                context = "";
             }
 
             return "Invalid format found when parsing TSV file " + getFile()
                     + " near byte offset " + getOffset() + ":"
-                    + (context == null ? "'" : "" + context + "'")
-                    + ": " + super.getMessage();
+                    + context + ": " + super.getMessage();
         }
 
         private String context() throws FileNotFoundException, IOException {
-            RandomAccessFile in = new RandomAccessFile(file, "r");
-            byte[] bytes = new byte[64];
-            in.seek(offset - 32);
-            in.read(bytes);
-            in.close();
-            return new String(bytes);
-        }
+            final long start_offset = Math.max(offset - 32, 0);
+            final int len = 64;
 
+            RandomAccessFile in = null;
+            try {
+                in = new RandomAccessFile(file, "r");
+                final byte[] bytes = new byte[len];
+                in.seek(start_offset);
+                final int nBytesRead = in.read(bytes);
+                return new String(bytes, 0, nBytesRead, charset);
+            } finally {
+                if (in != null)
+                    in.close();
+            }
+        }
     }
 }

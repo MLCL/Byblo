@@ -133,33 +133,33 @@ public class IndexTPCommandTest {
     }
 
     @Test
-    public void testRunOnFruitAPI_skipboth_compact_JDBC() throws Exception {
-        testRunOnFruitAPI("compact-skipboth-jdbc-", EnumeratorType.JDBC, true, true, true);
+    public void testRunOnFruitAPI_skipboth_compact_jdbm() throws Exception {
+        testRunOnFruitAPI("compact-skipboth-jdbm-", EnumeratorType.JDBM, true, true, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipleft_compact_JDBC() throws Exception {
-        testRunOnFruitAPI("compact-skipleft-jdbc-", EnumeratorType.JDBC, true, false, true);
+    public void testRunOnFruitAPI_skipleft_compact_jdbm() throws Exception {
+        testRunOnFruitAPI("compact-skipleft-jdbm-", EnumeratorType.JDBM, true, false, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipright_compact_JDBC() throws Exception {
-        testRunOnFruitAPI("compact-skipright-jdbc-", EnumeratorType.JDBC, false, true, true);
+    public void testRunOnFruitAPI_skipright_compact_jdbm() throws Exception {
+        testRunOnFruitAPI("compact-skipright-jdbm-", EnumeratorType.JDBM, false, true, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipboth_verbose_JDBC() throws Exception {
-        testRunOnFruitAPI("verbose-skipboth-jdbc-", EnumeratorType.JDBC, true, true, false);
+    public void testRunOnFruitAPI_skipboth_verbose_jdbm() throws Exception {
+        testRunOnFruitAPI("verbose-skipboth-jdbm-", EnumeratorType.JDBM, true, true, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipleft_verbose_JDBC() throws Exception {
-        testRunOnFruitAPI("verbose-skipleft-jdbc-", EnumeratorType.JDBC, true, false, false);
+    public void testRunOnFruitAPI_skipleft_verbose_jdbm() throws Exception {
+        testRunOnFruitAPI("verbose-skipleft-jdbm-", EnumeratorType.JDBM, true, false, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipright_verbose_JDBC() throws Exception {
-        testRunOnFruitAPI("verbose-skipright-jdbc-", EnumeratorType.JDBC, false, true, false);
+    public void testRunOnFruitAPI_skipright_verbose_jdbm() throws Exception {
+        testRunOnFruitAPI("verbose-skipright-jdbm-", EnumeratorType.JDBM, false, true, false);
     }
 
     public void testRunOnFruitAPI(
@@ -188,8 +188,8 @@ public class IndexTPCommandTest {
             throws Exception {
         assertValidPlaintextInputFiles(from);
         assertValidOutputFiles(to);
-        if (type == EnumeratorType.JDBC)
-            assertValidJDBCOutputFiles(index1, index2);
+        if (type == EnumeratorType.JDBM)
+            assertValidJDBMOutputFiles(index1, index2);
         else
             assertValidOutputFiles(index1, index2);
 
@@ -202,8 +202,8 @@ public class IndexTPCommandTest {
 
         assertValidPlaintextInputFiles(to);
 
-        if (type == EnumeratorType.JDBC)
-            assertValidJDBCInputFiles(index1, index2);
+        if (type == EnumeratorType.JDBM)
+            assertValidJDBMInputFiles(index1, index2);
         else
             assertValidInputFiles(index1, index2);
         assertSizeGT(from, to);
@@ -213,8 +213,8 @@ public class IndexTPCommandTest {
                                  EnumeratorType type, boolean skip1, boolean skip2, boolean compact)
             throws Exception {
         assertValidPlaintextInputFiles(from);
-        if (type == EnumeratorType.JDBC)
-            assertValidJDBCInputFiles(index1, index2);
+        if (type == EnumeratorType.JDBM)
+            assertValidJDBMInputFiles(index1, index2);
         else
             assertValidInputFiles(index1, index2);
         assertValidOutputFiles(to);

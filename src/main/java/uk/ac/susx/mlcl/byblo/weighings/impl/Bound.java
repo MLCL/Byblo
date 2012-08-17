@@ -65,12 +65,22 @@ public class Bound
         setUpperBound(upperBound);
     }
 
-    public void setLowerBound(final double lowerBound) {
+    @Override
+    public final double getLowerBound() {
+        return lowerBound;
+    }
+
+    @Override
+    public final double getUpperBound() {
+        return upperBound;
+    }
+
+    public final void setLowerBound(final double lowerBound) {
         Checks.checkNotNaN("lowerBound", lowerBound);
         this.lowerBound = lowerBound;
     }
 
-    public void setUpperBound(final double upperBound) {
+    public final void setUpperBound(final double upperBound) {
         Checks.checkNotNaN("upperBound", upperBound);
         this.upperBound = upperBound;
     }
@@ -82,16 +92,6 @@ public class Bound
         else if (value >= upperBound)
             return upperBound;
         return value;
-    }
-
-    @Override
-    public double getLowerBound() {
-        return lowerBound;
-    }
-
-    @Override
-    public double getUpperBound() {
-        return upperBound;
     }
 
     @Override

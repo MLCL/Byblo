@@ -93,8 +93,8 @@ public class ExternalSortEventsCommandTest {
 
         File randomisedFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".sims.randomised");
         File sortedFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".sims.sorted");
-        File entryIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".entry-index");
-        File featureIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".feature-index");
+//        File entryIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".entry-index");
+//        File featureIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".feature-index");
 
         final DoubleEnumerating idx = new DoubleEnumeratingDeligate(
                 Enumerating.DEFAULT_TYPE,
@@ -125,8 +125,8 @@ public class ExternalSortEventsCommandTest {
                                        FRUIT_NAME + ".indexed.sims.randomised");
         File sortedFile = new File(TEST_OUTPUT_DIR,
                                    FRUIT_NAME + ".indexed.sims.sorted");
-        File entryIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".entry-index");
-        File featureIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".feature-index");
+//        File entryIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".entry-index");
+//        File featureIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".feature-index");
 
 
         final DoubleEnumerating idx = new DoubleEnumeratingDeligate(

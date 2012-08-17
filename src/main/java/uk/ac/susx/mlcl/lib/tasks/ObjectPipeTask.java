@@ -33,7 +33,6 @@ package uk.ac.susx.mlcl.lib.tasks;
 import com.google.common.base.Objects;
 import java.io.Flushable;
 import java.io.IOException;
-import java.io.Serializable;
 import java.text.MessageFormat;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
@@ -47,7 +46,7 @@ import uk.ac.susx.mlcl.lib.io.ObjectSource;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class ObjectPipeTask<T> extends AbstractTask
-        implements Serializable, ProgressReporting {
+        implements ProgressReporting {
 
     private static final long serialVersionUID = 1L;
 
@@ -87,8 +86,6 @@ public class ObjectPipeTask<T> extends AbstractTask
     protected void initialiseTask() throws Exception {
         Checks.checkNotNull("sink", sink);
         Checks.checkNotNull("source", source);
-        if (getSource().equals(getSink()))
-            throw new IllegalStateException("Source is the same as the sink.");
     }
 
     @Override

@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import uk.ac.susx.mlcl.byblo.measures.impl.LambdaDivergence;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -98,7 +97,7 @@ public class LambdaDivergenceTest {
                                FRUIT_NAME
                 + String.format(".LambdaDivergence-lambda%03d",
                                 (int) (lambda * 100)));
-        output.delete();
+        deleteIfExist(output);
 
         try {
             enableExistTrapping();
@@ -271,7 +270,7 @@ public class LambdaDivergenceTest {
             B.set(RANDOM.nextInt(size * 2), RANDOM.nextDouble());
         }
 
-        double expect = test(A, B);
+        test(A, B);
     }
 
     public double test(SparseDoubleVector A, SparseDoubleVector B) {

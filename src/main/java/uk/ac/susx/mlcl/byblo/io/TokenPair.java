@@ -60,12 +60,12 @@ public final class TokenPair implements
     /**
      * Indexed identifier of the first entry.
      */
-      int id1;
+    int id1;
 
     /**
      * Indexed identifier of the second entry.
      */
-      int id2;
+    int id2;
 
     /**
      * Constructor used during cloning. Sub-classes should implement a similar
@@ -117,7 +117,8 @@ public final class TokenPair implements
     public String toString(Enumerator<String> stringIndex1,
                            Enumerator<String> stringIndex2) {
         return Objects.toStringHelper(this).
-                add("1", stringIndex1.valueOf(id1)).add("2", stringIndex2.valueOf(
+                add("1", stringIndex1.valueOf(id1)).add("2", stringIndex2.
+                valueOf(
                 id2)).
                 toString();
     }
@@ -155,11 +156,11 @@ public final class TokenPair implements
         return 13 * this.id1 + this.id2;
     }
 
-    protected final Object writeReplace() {
+    final Object writeReplace() {
         return new Serializer(this);
     }
 
-    private static final class Serializer
+    public static final class Serializer
             implements Externalizable {
 
         private static final long serialVersionUID = 1;
@@ -169,7 +170,7 @@ public final class TokenPair implements
         public Serializer() {
         }
 
-        public Serializer(final TokenPair pair) {
+        Serializer(final TokenPair pair) {
             if (pair == null) {
                 throw new NullPointerException("pair == null");
             }
@@ -191,66 +192,56 @@ public final class TokenPair implements
             pair = new TokenPair(x_id, y_id);
         }
 
-        protected final Object readResolve() {
+        final Object readResolve() {
             return pair;
         }
-
     }
 
     public static Predicate<TokenPair> identity() {
         return new Predicate<TokenPair>() {
-
             @Override
             public boolean apply(TokenPair input) {
-                return input.id1() == input.id2();
+                return input != null && input.id1() == input.id2();
             }
 
             @Override
             public String toString() {
                 return "identity";
             }
-
         };
     }
 
     public static Comparator<TokenPair> indexOrder() {
         return new Comparator<TokenPair>() {
-
             @Override
             public int compare(TokenPair a, TokenPair b) {
                 int c = a.id1() - b.id1();
                 return c != 0 ? c : a.id2() - b.id2();
             }
-
         };
     }
 
     public static Comparator<TokenPair> firstIndexOrder() {
         return new Comparator<TokenPair>() {
-
             @Override
             public int compare(TokenPair a, TokenPair b) {
                 return a.id1() - b.id1();
             }
-
         };
     }
 
     public static Comparator<TokenPair> secondIndexOrder() {
         return new Comparator<TokenPair>() {
-
             @Override
             public int compare(TokenPair a, TokenPair b) {
                 return a.id2() - b.id2();
             }
-
         };
     }
 
     public static Comparator<TokenPair> stringOrder(
             final DoubleEnumerating idx) {
         return new Comparator<TokenPair>() {
-
             @Override
             public int compare(final TokenPair a, final TokenPair b) {
                 try {
@@ -258,19 +249,18 @@ public final class TokenPair implements
                     int c = en1.valueOf(a.id1()).compareTo(en1.valueOf(b.id1()));
                     final Enumerator<String> en2 = idx.getFeatureEnumerator();
                     return c != 0 ? c
-                           : en2.valueOf(a.id2()).compareTo(en2.valueOf(b.id2()));
+                            : en2.valueOf(a.id2()).compareTo(en2.
+                            valueOf(b.id2()));
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
             }
-
         };
     }
 
     public static Comparator<TokenPair> firstStringOrder(
             final SingleEnumerating idx) {
         return new Comparator<TokenPair>() {
-
             @Override
             public int compare(final TokenPair a, final TokenPair b) {
                 try {
@@ -280,14 +270,12 @@ public final class TokenPair implements
                     throw new RuntimeException(ex);
                 }
             }
-
         };
     }
 
     public static Comparator<TokenPair> secondStringOrder(
             final SingleEnumerating idx) {
         return new Comparator<TokenPair>() {
-
             @Override
             public int compare(final TokenPair a, final TokenPair b) {
                 try {
@@ -297,8 +285,6 @@ public final class TokenPair implements
                     throw new RuntimeException(ex);
                 }
             }
-
         };
     }
-
 }

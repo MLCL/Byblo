@@ -94,7 +94,7 @@ public class WeightedTokenSource
 
                 @Override
                 public boolean apply(Integer column) {
-                    return column == 0;
+                    return column != null && column == 0;
                 }
 
             });

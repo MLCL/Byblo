@@ -75,8 +75,7 @@ public final class Token implements Serializable, Comparable<Token>, Cloneable {
      * <em>will</em> be consider equal.</p>
      *
      * @param obj the reference object with which to compare.
-     * @return
-     * <code>true</code> if this object is the same as the obj argument;
+     * @return <code>true</code> if this object is the same as the obj argument;
      * <code>false</code> otherwise.
      */
     @Override
@@ -121,11 +120,11 @@ public final class Token implements Serializable, Comparable<Token>, Cloneable {
         return new Token(this);
     }
 
-    protected final Object writeReplace() {
+    final Object writeReplace() {
         return new Serializer(this);
     }
 
-    private static final class Serializer
+    public static final class Serializer
             implements Externalizable {
 
         private static final long serialVersionUID = 1;
@@ -135,7 +134,7 @@ public final class Token implements Serializable, Comparable<Token>, Cloneable {
         public Serializer() {
         }
 
-        public Serializer(final Token token) {
+        Serializer(final Token token) {
             if (token == null)
                 throw new NullPointerException("token == null");
             this.token = token;
@@ -154,27 +153,23 @@ public final class Token implements Serializable, Comparable<Token>, Cloneable {
             token = new Token(id);
         }
 
-        protected final Object readResolve() {
+        final Object readResolve() {
             return token;
         }
-
     }
 
     public static Comparator<Token> indexOrder() {
         return new Comparator<Token>() {
-
             @Override
             public int compare(final Token a, final Token b) {
                 return a.id() - b.id();
             }
-
         };
     }
 
     public static Comparator<Token> stringOrder(
             final SingleEnumerating idx) {
         return new Comparator<Token>() {
-
             @Override
             public int compare(final Token a, final Token b) {
                 try {
@@ -188,8 +183,6 @@ public final class Token implements Serializable, Comparable<Token>, Cloneable {
                     throw new RuntimeException(ex);
                 }
             }
-
         };
     }
-
 }

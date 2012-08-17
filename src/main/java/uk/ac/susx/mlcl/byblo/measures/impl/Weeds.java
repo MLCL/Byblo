@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo.measures.impl;
 
 import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
+import uk.ac.susx.mlcl.byblo.measures.Measures;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.PositivePMI;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
@@ -127,7 +128,8 @@ public class Weeds implements Measure, Serializable {
         // If gamma = 1.0 then only then harmonic component is used, hense the 
         // measure is symetric. Otherwise some portion of the arithimentic 
         // component is used which is symetric only when beta = 0.5.
-        return gamma == 1.0 || beta == 0.5;
+        return Measures.epsilonEquals(gamma, 1.0)
+                || Measures.epsilonEquals(beta, 0.5);
     }
 
     @Override

@@ -214,7 +214,8 @@ public final class Lexer implements Seekable<Tell>, Closeable {
 
         if (LOG.isTraceEnabled()) {
             LOG.trace("Decoding bytes to charset " + channel.getCharset());
-            LOG.trace(
+            LOG.
+                    trace(
                     "Initializing buffer capacity to " + INITIAL_BUFFER_SIZE + " chars.");
         }
         cbuf = CharBuffer.allocate(INITIAL_BUFFER_SIZE);
@@ -380,10 +381,11 @@ public final class Lexer implements Seekable<Tell>, Closeable {
     }
 
     /**
-     * Access a single character in the current lexeme. Useful for getting a
+     * Get a single character in the current lexeme. Useful for getting a
      * delimiter character without building a string: use
      * <code>charAt(0)</code>.
      *
+     * @param offset the index of the character to get
      * @return character at given offset from the start of the current lexeme.
      * @throws IndexOutOfBoundsException when offset >= lexeme length
      * @throws IllegalStateException when any consistency check fails
@@ -477,7 +479,8 @@ public final class Lexer implements Seekable<Tell>, Closeable {
                                              cbuf.capacity() + required - available);
 
             if (LOG.isTraceEnabled()) {
-                LOG.trace("Growing character buffer from length " + cbuf.capacity() + " to " + newCapacity);
+                LOG.trace("Growing character buffer from length " + cbuf.
+                        capacity() + " to " + newCapacity);
             }
 
             final CharBuffer src = cbuf;
@@ -524,9 +527,11 @@ public final class Lexer implements Seekable<Tell>, Closeable {
      * <code>offset</code>. If the
      * <code>offset</code> is not at a valid lexical boundary, behavior will be
      * undefined. Correct behavior is only guaranteed when the given
-     * <code>offset</code> is a value previously return by a call to {@link #position()}.</p>
+     * <code>offset</code> is a value previously return by a call to
+     * {@link #position()}.</p>
      *
-     * <p>Note: After performing a {@link #position(uk.ac.susx.mlcl.lib.io.Tell)}, the line and column
+     * <p>Note: After performing a
+     * {@link #position(uk.ac.susx.mlcl.lib.io.Tell)}, the line and column
      * number may be incorrect. The column number will correct itself after the
      * next new-line, but the line number will always be wrong, unless a seek(0)
      * is performed. After a call to seek the following fields may be
@@ -539,7 +544,8 @@ public final class Lexer implements Seekable<Tell>, Closeable {
      * @throws IOException
      */
     @Override
-    public void position(final Tell offset) throws IOException {
+    public void position(final Tell offset)
+            throws IOException, CharacterCodingException {
         this.pos = offset.value(Position.class).clone();
 
         channel.position(pos.channelOffset);
@@ -578,7 +584,7 @@ public final class Lexer implements Seekable<Tell>, Closeable {
             this.bufferOffset = bufferOffset;
         }
 
-        public Position() {
+        private Position() {
             this(0, 0);
         }
 
@@ -606,6 +612,5 @@ public final class Lexer implements Seekable<Tell>, Closeable {
         public String toString() {
             return "Position{" + "channelOffset=" + channelOffset + ", bufferOffset=" + bufferOffset + '}';
         }
-
     }
 }

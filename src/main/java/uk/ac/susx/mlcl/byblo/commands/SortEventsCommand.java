@@ -35,8 +35,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
@@ -53,9 +51,9 @@ import uk.ac.susx.mlcl.lib.io.ObjectSource;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class SortEventsCommand extends AbstractSortCommand<Weighted<TokenPair>> {
-
-    private static final Log LOG = LogFactory.getLog(
-            SortEntriesCommand.class);
+//
+//    private static final Log LOG = LogFactory.getLog(
+//            SortEventsCommand.class);
 
     @ParametersDelegate
     private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();

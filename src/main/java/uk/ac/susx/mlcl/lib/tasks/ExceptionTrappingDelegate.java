@@ -127,12 +127,13 @@ public final class ExceptionTrappingDelegate
             return false;
         final ExceptionTrappingDelegate that = (ExceptionTrappingDelegate) obj;
         return this.getExceptionQueue() == that.getExceptionQueue()
-                || (this.getExceptionQueue() != null && this.getExceptionQueue().equals(that.getExceptionQueue()));
+                || (this.getExceptionQueue() != null && this.getExceptionQueue().
+                    equals(that.getExceptionQueue()));
     }
 
     @Override
     public int hashCode() {
-        return this.getExceptionQueue() != null ? this.getExceptionQueue().hashCode() : 0;
+        assert this.getExceptionQueue() != null;
+        return this.getExceptionQueue().hashCode();
     }
-
 }

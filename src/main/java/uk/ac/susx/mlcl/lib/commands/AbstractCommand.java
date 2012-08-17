@@ -52,7 +52,7 @@ public abstract class AbstractCommand implements Command {
     private static final Log LOG = LogFactory.getLog(AbstractCommand.class);
 
     @Parameter(names = {"-h", "--help"},
-    description = "Display this help message.")
+               description = "Display this help message.")
     private boolean usageRequested = false;
 
     private final Map<String, Class<? extends Command>> subCommands;
@@ -125,7 +125,7 @@ public abstract class AbstractCommand implements Command {
             }
 
             System.err.println(sb);
-            System.exit(-1);
+            throw ex;
         }
 
 
@@ -148,14 +148,17 @@ public abstract class AbstractCommand implements Command {
             StringBuilder sb = new StringBuilder();
             jc.usage(sb);
             System.err.println(sb);
-            System.exit(-1);
+
+            throw new ParameterException("Command reguired but not given.");
 
         } else {
 
             if (jc.getParsedCommand() != null) {
-                Command instance = subCommandInstances.get(jc.getParsedCommand());
+                Command instance = subCommandInstances.
+                        get(jc.getParsedCommand());
                 if (LOG.isTraceEnabled())
-                    LOG.trace(
+                    LOG.
+                            trace(
                             "Running subcommand " + jc.getParsedCommand() + ": " + instance);
                 instance.runCommand();
             } else {
@@ -176,5 +179,4 @@ public abstract class AbstractCommand implements Command {
                 add("help", isUsageRequested()).
                 add("subCommands", subCommands);
     }
-
 }

@@ -39,12 +39,10 @@ import uk.ac.susx.mlcl.byblo.commands.CountCommand;
 import uk.ac.susx.mlcl.byblo.commands.ExternalCountCommand;
 import uk.ac.susx.mlcl.byblo.commands.ExternalKnnSimsCommand;
 import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
-import uk.ac.susx.mlcl.byblo.commands.IndexingCommands;
 import static uk.ac.susx.mlcl.byblo.commands.IndexSimsCommandTest.*;
 import static uk.ac.susx.mlcl.byblo.commands.IndexTPCommandTest.*;
 import uk.ac.susx.mlcl.byblo.commands.KnnSimsCommand;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
-import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
 
@@ -745,7 +743,7 @@ public class FullBuildTest2 {
 //
 //    }
     @Test
-    public void BuildTest() throws Exception {
+    public void testBuild() throws Exception {
         final String affix = "1-";
         boolean serial = true;
         boolean preindexedEntries = false;
@@ -755,12 +753,13 @@ public class FullBuildTest2 {
         EnumeratorType type = EnumeratorType.Memory;
 
         parallelBuildTest(affix, serial, type,
-                          preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2);
+                          preindexedEntries, preindexedFeatures, skipIndex1,
+                          skipIndex2);
 
     }
 
     @Test
-    public void BuildTest_parallel() throws Exception {
+    public void testBuild_parallel() throws Exception {
         final String affix = "2-";
         boolean serial = false;
         boolean preindexedEntries = false;
@@ -770,12 +769,13 @@ public class FullBuildTest2 {
         EnumeratorType type = EnumeratorType.Memory;
 
         parallelBuildTest(affix, serial, type,
-                          preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2);
+                          preindexedEntries, preindexedFeatures, skipIndex1,
+                          skipIndex2);
 
     }
 
     @Test
-    public void BuildTest_preindex() throws Exception {
+    public void testBuild_preindex() throws Exception {
         final String affix = "3-";
         boolean serial = true;
         boolean preindexedEntries = true;
@@ -785,12 +785,13 @@ public class FullBuildTest2 {
         EnumeratorType type = EnumeratorType.Memory;
 
         parallelBuildTest(affix, serial, type,
-                          preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2);
+                          preindexedEntries, preindexedFeatures, skipIndex1,
+                          skipIndex2);
 
     }
 
     @Test
-    public void BuildTest_parallel_preindex() throws Exception {
+    public void testBuild_parallel_preindex() throws Exception {
         final String affix = "4-";
         boolean serial = false;
         boolean preindexedEntries = true;
@@ -800,12 +801,13 @@ public class FullBuildTest2 {
         EnumeratorType type = EnumeratorType.Memory;
 
         parallelBuildTest(affix, serial, type,
-                          preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2);
+                          preindexedEntries, preindexedFeatures, skipIndex1,
+                          skipIndex2);
 
     }
 
     @Test
-    public void BuildTest_skipindex() throws Exception {
+    public void testBuild_skipindex() throws Exception {
         final String affix = "5-";
         boolean serial = true;
         boolean preindexedEntries = true;
@@ -815,12 +817,13 @@ public class FullBuildTest2 {
         EnumeratorType type = EnumeratorType.Memory;
 
         parallelBuildTest(affix, serial, type,
-                          preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2);
+                          preindexedEntries, preindexedFeatures, skipIndex1,
+                          skipIndex2);
 
     }
 
     @Test
-    public void BuildTest_parallel_skipindex() throws Exception {
+    public void testBuild_parallel_skipindex() throws Exception {
         final String affix = "6-";
         boolean serial = false;
         boolean preindexedEntries = true;
@@ -830,102 +833,109 @@ public class FullBuildTest2 {
         EnumeratorType type = EnumeratorType.Memory;
 
         parallelBuildTest(affix, serial, type,
-                          preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2);
+                          preindexedEntries, preindexedFeatures, skipIndex1,
+                          skipIndex2);
 
     }
 
     @Test
-    public void BuildTest_jdbc() throws Exception {
+    public void testBuild_jdbm() throws Exception {
         final String affix = "7-";
         boolean serial = true;
         boolean preindexedEntries = false;
         boolean preindexedFeatures = false;
         boolean skipIndex1 = false;
         boolean skipIndex2 = false;
-        EnumeratorType type = EnumeratorType.JDBC;
+        EnumeratorType type = EnumeratorType.JDBM;
 
         parallelBuildTest(affix, serial, type,
-                          preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2);
+                          preindexedEntries, preindexedFeatures, skipIndex1,
+                          skipIndex2);
 
     }
 
     @Test
-    public void BuildTest_parallel_jdbc() throws Exception {
+    public void testBuild_parallel_jdbm() throws Exception {
         final String affix = "8-";
         boolean serial = false;
         boolean preindexedEntries = false;
         boolean preindexedFeatures = false;
         boolean skipIndex1 = false;
         boolean skipIndex2 = false;
-        EnumeratorType type = EnumeratorType.JDBC;
+        EnumeratorType type = EnumeratorType.JDBM;
 
         parallelBuildTest(affix, serial, type,
-                          preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2);
+                          preindexedEntries, preindexedFeatures, skipIndex1,
+                          skipIndex2);
 
     }
 
     @Test
-    public void BuildTest_preindex_jdbc() throws Exception {
+    public void testBuild_preindex_jdbm() throws Exception {
         final String affix = "9-";
         boolean serial = true;
         boolean preindexedEntries = true;
         boolean preindexedFeatures = true;
         boolean skipIndex1 = false;
         boolean skipIndex2 = false;
-        EnumeratorType type = EnumeratorType.JDBC;
+        EnumeratorType type = EnumeratorType.JDBM;
 
         parallelBuildTest(affix, serial, type,
-                          preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2);
+                          preindexedEntries, preindexedFeatures, skipIndex1,
+                          skipIndex2);
 
     }
 
     @Test
-    public void BuildTest_parallel_preindex_jdbc() throws Exception {
+    public void testBuild_parallel_preindex_jdbm() throws Exception {
         final String affix = "10-";
         boolean serial = false;
         boolean preindexedEntries = true;
         boolean preindexedFeatures = true;
         boolean skipIndex1 = false;
         boolean skipIndex2 = false;
-        EnumeratorType type = EnumeratorType.JDBC;
+        EnumeratorType type = EnumeratorType.JDBM;
 
         parallelBuildTest(affix, serial, type,
-                          preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2);
+                          preindexedEntries, preindexedFeatures, skipIndex1,
+                          skipIndex2);
 
     }
 
     @Test
-    public void BuildTest_skipindex_jdbc() throws Exception {
+    public void testBuild_skipindex_jdbm() throws Exception {
         final String affix = "11-";
         boolean serial = true;
         boolean preindexedEntries = true;
         boolean preindexedFeatures = true;
         boolean skipIndex1 = true;
         boolean skipIndex2 = true;
-        EnumeratorType type = EnumeratorType.JDBC;
+        EnumeratorType type = EnumeratorType.JDBM;
 
         parallelBuildTest(affix, serial, type,
-                          preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2);
+                          preindexedEntries, preindexedFeatures, skipIndex1,
+                          skipIndex2);
 
     }
 
     @Test
-    public void BuildTest_parallel_skipindex_jdbc() throws Exception {
+    public void testBuild_parallel_skipindex_jdbm() throws Exception {
         final String affix = "12-";
         boolean serial = false;
         boolean preindexedEntries = true;
         boolean preindexedFeatures = true;
         boolean skipIndex1 = true;
         boolean skipIndex2 = true;
-        EnumeratorType type = EnumeratorType.JDBC;
+        EnumeratorType type = EnumeratorType.JDBM;
 
         parallelBuildTest(affix, serial, type,
-                          preindexedEntries, preindexedFeatures, skipIndex1, skipIndex2);
+                          preindexedEntries, preindexedFeatures, skipIndex1,
+                          skipIndex2);
 
     }
 
     @Test
-    public void BuildTestall() throws Exception {
+    public void buildTestall() throws Exception {
         for (boolean serial : new boolean[]{true, false}) {
             for (boolean preindexedEntries : new boolean[]{true, false}) {
                 for (boolean preindexedFeatures : new boolean[]{true, false}) {
@@ -964,7 +974,8 @@ public class FullBuildTest2 {
         File instances = TEST_FRUIT_INPUT;
         final Charset charet = DEFAULT_CHARSET;
 
-        File instancesIndexed = new File(TEST_OUTPUT_DIR, affix + instances.getName() + ".indexed");
+        File instancesIndexed = new File(TEST_OUTPUT_DIR, affix + instances.
+                getName() + ".indexed");
 
         File entryIndex = new File(TEST_OUTPUT_DIR,
                                    affix + instances.getName() + ".entry-index");
@@ -1051,7 +1062,8 @@ public class FullBuildTest2 {
 
         // All pairs
 
-        assertValidPlaintextInputFiles(eventsFiltered, entriesFiltered, featuresFiltered);
+        assertValidPlaintextInputFiles(eventsFiltered, entriesFiltered,
+                                       featuresFiltered);
         deleteIfExist(similarities);
 
         DoubleEnumeratingDeligate allpairsIndex = new DoubleEnumeratingDeligate(
@@ -1114,7 +1126,8 @@ public class FullBuildTest2 {
 
         filter.runCommand();
 
-        assertValidPlaintextInputFiles(eventsFiltered, entriesFiltered, featuresFiltered);
+        assertValidPlaintextInputFiles(eventsFiltered, entriesFiltered,
+                                       featuresFiltered);
 //        assertSizeGT(events, eventsFiltered);
 //        assertSizeGT(entries, entriesFiltered);
 //        assertSizeGT(features, featuresFiltered);
@@ -1151,7 +1164,6 @@ public class FullBuildTest2 {
         assertValidPlaintextInputFiles(to);
         assertSizeGT(from, to);
     }
-
 //    private static void indexTP(File from, File to,
 //                                File index1, File index2,
 //                                boolean skip1, boolean skip2)
@@ -1188,55 +1200,54 @@ public class FullBuildTest2 {
 //        assertValidPlaintextInputFiles(to);
 //        assertSizeGT(to, from);
 //    }
-    private static void unindexWT(EnumeratorType type, File from, File to, File index,
-                                  boolean skip1, boolean skip2)
-            throws Exception {
-        assertValidPlaintextInputFiles(from);
-
-        IndexingCommands.UnindexEntries unindex = new IndexingCommands.UnindexEntries();
-        unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-        unindex.getFilesDeligate().setSourceFile(from);
-        unindex.getFilesDeligate().setDestinationFile(to);
-        unindex.setIndexDeligate(EnumeratingDeligates.toPair(new SingleEnumeratingDeligate(type, true, index)));
-        unindex.runCommand();
-
-        assertValidPlaintextInputFiles(to);
-        assertSizeGT(to, from);
-    }
-
-    private static void unindexWTP(EnumeratorType type, File from, File to,
-                                   File index1, File index2,
-                                   boolean skip1, boolean skip2)
-            throws Exception {
-        assertValidPlaintextInputFiles(from);
-
-        IndexingCommands.IndexEvents unindex = new IndexingCommands.IndexEvents();
-        unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-        unindex.getFilesDeligate().setSourceFile(from);
-        unindex.getFilesDeligate().setDestinationFile(to);
-        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(type, true, true,
-                                                               index1, index2));
-        unindex.runCommand();
-
-        assertValidPlaintextInputFiles(to);
-        assertSizeGT(to, from);
-    }
-
-    private static void unindexTP(EnumeratorType type, File from, File to,
-                                  File index1, File index2,
-                                  boolean skip1, boolean skip2)
-            throws Exception {
-        assertValidPlaintextInputFiles(from);
-
-        IndexingCommands.IndexInstances unindex = new IndexingCommands.IndexInstances();
-        unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-        unindex.getFilesDeligate().setSourceFile(from);
-        unindex.getFilesDeligate().setDestinationFile(to);
-        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(type, true, true, index1, index2));
-        unindex.runCommand();
-
-        assertValidPlaintextInputFiles(to);
-        assertSizeGT(to, from);
-    }
-
+//    private static void unindexWT(EnumeratorType type, File from, File to, File index,
+//                                  boolean skip1, boolean skip2)
+//            throws Exception {
+//        assertValidPlaintextInputFiles(from);
+//
+//        IndexingCommands.UnindexEntries unindex = new IndexingCommands.UnindexEntries();
+//        unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
+//        unindex.getFilesDeligate().setSourceFile(from);
+//        unindex.getFilesDeligate().setDestinationFile(to);
+//        unindex.setIndexDeligate(EnumeratingDeligates.toPair(new SingleEnumeratingDeligate(type, true, index)));
+//        unindex.runCommand();
+//
+//        assertValidPlaintextInputFiles(to);
+//        assertSizeGT(to, from);
+//    }
+//
+//    private static void unindexWTP(EnumeratorType type, File from, File to,
+//                                   File index1, File index2,
+//                                   boolean skip1, boolean skip2)
+//            throws Exception {
+//        assertValidPlaintextInputFiles(from);
+//
+//        IndexingCommands.IndexEvents unindex = new IndexingCommands.IndexEvents();
+//        unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
+//        unindex.getFilesDeligate().setSourceFile(from);
+//        unindex.getFilesDeligate().setDestinationFile(to);
+//        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(type, true, true,
+//                                                               index1, index2));
+//        unindex.runCommand();
+//
+//        assertValidPlaintextInputFiles(to);
+//        assertSizeGT(to, from);
+//    }
+//
+//    private static void unindexTP(EnumeratorType type, File from, File to,
+//                                  File index1, File index2,
+//                                  boolean skip1, boolean skip2)
+//            throws Exception {
+//        assertValidPlaintextInputFiles(from);
+//
+//        IndexingCommands.IndexInstances unindex = new IndexingCommands.IndexInstances();
+//        unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
+//        unindex.getFilesDeligate().setSourceFile(from);
+//        unindex.getFilesDeligate().setDestinationFile(to);
+//        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(type, true, true, index1, index2));
+//        unindex.runCommand();
+//
+//        assertValidPlaintextInputFiles(to);
+//        assertSizeGT(to, from);
+//    }
 }

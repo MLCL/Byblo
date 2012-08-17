@@ -48,9 +48,9 @@ import uk.ac.susx.mlcl.lib.ZipfianDistribution;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class JDBCStringEnumeratorTest {
+public class JDBMStringEnumeratorTest {
 
-    public JDBCStringEnumeratorTest() {
+    public JDBMStringEnumeratorTest() {
     }
 
     static int populationSize;
@@ -67,7 +67,7 @@ public class JDBCStringEnumeratorTest {
         zipfExponent = 1;
         repeats = 10000;
         zipfDist = new ZipfianDistribution(populationSize, zipfExponent);
-        new JDBCStringEnumeratorTest().performanceTest_JDBM_trans_mru100();
+        new JDBMStringEnumeratorTest().performanceTest_JDBM_trans_mru100();
     }
 
     @AfterClass
@@ -235,7 +235,7 @@ public class JDBCStringEnumeratorTest {
     }
 
     private void performanceTest_JDBM(
-            boolean memory, boolean trans, CacheType cacheType, int mruSize,
+            boolean memory, boolean trans, final CacheType cacheType, int mruSize,
             boolean disableCacheAutoClear, boolean disableLocking) throws IOException {
 
         final DBMaker maker;
@@ -246,7 +246,8 @@ public class JDBCStringEnumeratorTest {
             file = null;
         } else {
             file = File.createTempFile("jdbmtest", "", TEST_OUTPUT_DIR);
-            file.delete();
+            if (!file.delete())
+                throw new IOException("Unable to delete file " + file);
             maker = DBMaker.openFile(file.toString());
             maker.deleteFilesAfterClose();
 
@@ -308,7 +309,7 @@ public class JDBCStringEnumeratorTest {
         Format fmt = new DecimalFormat("%010d");
 
         for (int i = 0; i < repeats; i++) {
-            double u = zipfDist.random();
+            zipfDist.random();
             idx.indexOf(fmt.format(zipfDist.random()));
         }
 
@@ -319,10 +320,9 @@ public class JDBCStringEnumeratorTest {
 
 
         for (int i = 0; i < repeats; i++) {
-            double u = zipfDist.random();
+            zipfDist.random();
             idx.indexOf(fmt.format(zipfDist.random()));
         }
 
     }
-
 }

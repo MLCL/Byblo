@@ -34,9 +34,6 @@ import com.beust.jcommander.Parameter;
 import com.google.common.base.Objects;
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.FullBuild;
@@ -47,7 +44,7 @@ import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class EnumeratingDeligate
-        implements Serializable, Enumerating {
+        implements Enumerating {
 
     private static final Log LOG = LogFactory.getLog(FullBuild.class);
 
@@ -72,32 +69,13 @@ public abstract class EnumeratingDeligate
     public EnumeratingDeligate() {
         this(DEFAULT_TYPE);
     }
-//
-//    @Override
-//    public boolean isEnumeratorSkipIndexed1() {
-//        return skipIndexed1;
-//    }
-//
-//    @Override
-//    public boolean isEnumeratorSkipIndexed2() {
-//        return skipIndexed2;
-//    }
-//
-//    @Override
-//    public void setEnumeratorSkipIndexed1(boolean b) {
-//        skipIndexed1 = b;
-//    }
-//
-//    @Override
-//    public void setEnumeratorSkipIndexed2(boolean b) {
-//        skipIndexed2 = b;
-//    }
 
     @Override
     public EnumeratorType getEnuemratorType() {
         return type;
     }
 
+    @Override
     public void setEnumeratorType(EnumeratorType type) {
         this.type = type;
     }

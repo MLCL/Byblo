@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import com.beust.jcommander.ParameterException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -108,7 +109,10 @@ public final class Tools extends AbstractCommand {
      * @throws Exception when something goes awry.
      */
     public static void main(final String[] args) throws Exception {
-        new Tools().runCommand(args);
+        try {
+            new Tools().runCommand(args);
+        } catch (ParameterException ex) {
+            System.exit(-1);
+        }
     }
-
 }

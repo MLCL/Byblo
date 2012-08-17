@@ -77,7 +77,8 @@ public final class MemoryBasedStringEnumerator extends BiMapEnumerator<String> {
     }
 
     public static MemoryBasedStringEnumerator newInstance(File file) {
-        ForwardingBiMap<Integer, String> map = ForwardingBiMap.<Integer, String>create(
+        ForwardingBiMap<Integer, String> map = ForwardingBiMap.
+                <Integer, String>create(
                 new HashMap<Integer, String>(),
                 new HashMap<String, Integer>());
 
@@ -105,7 +106,8 @@ public final class MemoryBasedStringEnumerator extends BiMapEnumerator<String> {
             throws IOException {
         if (file == null) {
             Logger.getLogger(this.getClass().getName()).log(
-                    Level.WARNING, "Attempt made to save an enumerator with no attached file.");
+                    Level.WARNING,
+                    "Attempt made to save an enumerator with no attached file.");
             return;
         }
 
@@ -120,4 +122,28 @@ public final class MemoryBasedStringEnumerator extends BiMapEnumerator<String> {
         out.close();
     }
 
+    public boolean equals(MemoryBasedStringEnumerator other) {
+        if (this.file != other.file && (this.file == null || !this.file.
+                                        equals(other.file)))
+            return false;
+        return super.equals(other);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 29 * hash + (this.file != null ? this.file.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        return this.equals((MemoryBasedStringEnumerator) obj);
+    }
 }

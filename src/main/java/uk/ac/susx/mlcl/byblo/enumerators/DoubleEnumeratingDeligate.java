@@ -34,7 +34,6 @@ import com.beust.jcommander.Parameter;
 import com.google.common.base.Objects;
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 
 /**
  *
@@ -42,7 +41,7 @@ import java.io.Serializable;
  */
 public final class DoubleEnumeratingDeligate
         extends EnumeratingDeligate
-        implements Serializable, DoubleEnumerating {
+        implements DoubleEnumerating {
 
     private static final long serialVersionUID = 1L;
 
@@ -119,17 +118,19 @@ public final class DoubleEnumeratingDeligate
         return featureEnumeratorFile;
     }
 
+    @Override
     public void setEntryEnumeratorFile(File entryEnumeratorFile) {
         this.entryEnumeratorFile = entryEnumeratorFile;
     }
 
+    @Override
     public void setFeatureEnumeratorFile(File featureEnumeratorFile) {
         this.featureEnumeratorFile = featureEnumeratorFile;
     }
 
     @Override
     public void openEntriesEnumerator() throws IOException {
-        entryEnumerator = open(entryEnumeratorFile);;
+        entryEnumerator = open(entryEnumeratorFile);
     }
 
     @Override

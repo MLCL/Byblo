@@ -106,7 +106,7 @@ public class TokenPairSource
 
                 @Override
                 public boolean apply(Integer column) {
-                    return column == 0;
+                    return column != null && column == 0;
                 }
 
             });
@@ -116,7 +116,7 @@ public class TokenPairSource
 
                 @Override
                 public boolean apply(Integer column) {
-                    return column > 0;
+                    return column != null && column > 0;
                 }
 
             });

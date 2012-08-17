@@ -46,7 +46,7 @@ package uk.ac.susx.mlcl.byblo.weighings;
 public interface FeatureMarginalsCarrier extends MarginalsCarrier {
 
     /**
-     * Accessor to an array containing a mapping from feature id to weighting.
+     * Get an array containing a mapping from feature id to weighting.
      *
      * Stored as a double because it may have been waited in a pre-processing
      * stage, and as an array because it's usually dense.

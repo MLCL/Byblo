@@ -93,7 +93,7 @@ public final class FullBuild extends AbstractCommand {
 
     private boolean skipIndex2 = false;
 
-    private EnumeratorType enumeratorType = EnumeratorType.JDBC;
+    private EnumeratorType enumeratorType = EnumeratorType.JDBM;
 
     @Parameter(names = {"-t", "--threads"},
                description = "Number of concurrent processing threads.")

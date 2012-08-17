@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import java.io.Serializable;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
@@ -61,7 +60,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class Precision extends Recall implements Serializable {
+public class Precision extends Recall {
 
     private static final long serialVersionUID = 1L;
 

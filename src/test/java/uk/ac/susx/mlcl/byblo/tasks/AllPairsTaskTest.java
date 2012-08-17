@@ -37,7 +37,6 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import uk.ac.susx.mlcl.TestConstants;
 import uk.ac.susx.mlcl.byblo.Tools;
 import uk.ac.susx.mlcl.lib.test.ExitTrapper;
@@ -69,13 +68,14 @@ public class AllPairsTaskTest {
 
     @Test
     public void testMainRun() throws Exception {
-        new File("testdata", "out").mkdir();
+
         try {
             ExitTrapper.enableExistTrapping();
             Tools.main(new String[]{"allpairs",
                         "-i", TestConstants.TEST_FRUIT_EVENTS.toString(),
                         "-if", TestConstants.TEST_FRUIT_FEATURES.toString(),
-                        "-o", new File(TestConstants.TEST_OUTPUT_DIR, "bnc-gramrels-fruit.out").toString(),
+                        "-o", new File(TestConstants.TEST_OUTPUT_DIR,
+                                       "bnc-gramrels-fruit.out").toString(),
                         "-C", "500"});
         } finally {
             ExitTrapper.disableExitTrapping();
@@ -84,13 +84,16 @@ public class AllPairsTaskTest {
 
     @Test
     public void testMainRun_Indexed() throws Exception {
-        new File("testdata", "out").mkdir();
         try {
             ExitTrapper.enableExistTrapping();
             Tools.main(new String[]{"allpairs",
-                        "-i", TestConstants.TEST_FRUIT_SKIPINDEXED_EVENTS.toString(),
-                        "-if", TestConstants.TEST_FRUIT_SKIPINDEXED_FEATURES.toString(),
-                        "-o", new File(TestConstants.TEST_OUTPUT_DIR, "bnc-gramrels-fruit.indexed.out").toString(),
+                        "-i", TestConstants.TEST_FRUIT_SKIPINDEXED_EVENTS.
+                        toString(),
+                        "-if", TestConstants.TEST_FRUIT_SKIPINDEXED_FEATURES.
+                        toString(),
+                        "-o", new File(TestConstants.TEST_OUTPUT_DIR,
+                                       "bnc-gramrels-fruit.indexed.out").
+                        toString(),
                         "-C", "500",
                         "--enumerated-entries",
                         "--enumerated-features"});
@@ -110,5 +113,4 @@ public class AllPairsTaskTest {
             ExitTrapper.disableExitTrapping();
         }
     }
-
 }

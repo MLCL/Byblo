@@ -43,6 +43,7 @@ import org.junit.Test;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
+import uk.ac.susx.mlcl.lib.tasks.MergeTaskTest.IntegerNaturalOrderComparator;
 
 /**
  *
@@ -83,13 +84,7 @@ public class SortTaskTest {
         ObjectSource<Integer> src = ObjectIO.asSource(in);
         ObjectSink<Integer> sink = ObjectIO.asSink(out);
 
-        Comparator<Integer> comparator = new Comparator<Integer>() {
-
-            @Override
-            public int compare(Integer o1, Integer o2) {
-                return o1 - o2;
-            }
-        };
+        Comparator<Integer> comparator = new IntegerNaturalOrderComparator();
 
         ObjectSortTask<Integer> instance = new ObjectSortTask<Integer>();
         instance.setSource(src);

@@ -39,8 +39,8 @@ import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**

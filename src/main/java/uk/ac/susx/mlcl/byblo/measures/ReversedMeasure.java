@@ -39,8 +39,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class ReversedMeasure
-        extends ForwardingMeasure<Measure>
-        implements Measure {
+        extends ForwardingMeasure<Measure> {
 
     public ReversedMeasure(final Measure deligate) {
         super(deligate);

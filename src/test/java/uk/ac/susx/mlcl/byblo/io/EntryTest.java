@@ -53,51 +53,6 @@ import uk.ac.susx.mlcl.lib.io.Tell;
  */
 public class EntryTest {
 
-    private void copyE(File a, File b, boolean enumIn,
-                       boolean enumOut)
-            throws FileNotFoundException, IOException {
-
-        SingleEnumeratingDeligate idx = new SingleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, false, null);
-
-        WeightedTokenSource aSrc;
-        WeightedTokenSink bSink;
-        if (enumIn)
-            aSrc = WeightedTokenSource.open(a, DEFAULT_CHARSET, idx, false);
-        else
-            aSrc = WeightedTokenSource.open(a, DEFAULT_CHARSET, idx, false);
-
-        if (enumOut)
-            bSink = WeightedTokenSink.open(b, DEFAULT_CHARSET, idx, false);
-        else
-            bSink = WeightedTokenSink.open(b, DEFAULT_CHARSET, idx, false);
-
-        ObjectIO.copy(aSrc, bSink);
-        bSink.close();
-    }
-
-    @Test
-    public void testEntriesCompactConversion() throws FileNotFoundException, IOException {
-        File a = TEST_FRUIT_ENTRIES;
-        File b = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_ENTRIES.getName() + ".compact");
-        File c = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_ENTRIES.getName() + ".verbose");
-
-        copyE(a, b, true, true);
-
-        assertTrue("Compact copy is smaller that verbose source.",
-                   b.length() <= a.length());
-
-        copyE(b, c, false, true);
-
-
-        assertTrue("Verbose copy is smaller that compact source.",
-                   c.length() >= b.length());
-        assertTrue("Double converted file is not equal to origion.",
-                   Files.equal(a, c));
-    }
-
     @Test
     public void testEntriesEnumeratorConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_ENTRIES;
@@ -173,7 +128,8 @@ public class EntryTest {
 
                 System.out.println("expected tell: " + pos);
                 System.out.println(
-                        "expected: " + expected.record().toString(indel.getEnumerator()));
+                        "expected: " + expected.record().toString(indel.
+                        getEnumerator()));
 
                 src.position(pos);
 
@@ -182,7 +138,8 @@ public class EntryTest {
 
                 Weighted<Token> actual = src.read();
                 System.out.println("actual tell: " + src.position());
-                System.out.println("actual: " + actual.record().toString(indel.getEnumerator()));
+                System.out.println("actual: " + actual.record().toString(indel.
+                        getEnumerator()));
 
                 assertEquals(expected, actual);
             }
@@ -194,5 +151,4 @@ public class EntryTest {
             throws FileNotFoundException, IOException {
         testRandomAccess(TEST_FRUIT_ENTRIES);
     }
-
 }

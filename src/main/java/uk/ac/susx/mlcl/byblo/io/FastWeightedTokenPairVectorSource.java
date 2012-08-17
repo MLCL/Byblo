@@ -181,7 +181,7 @@ public class FastWeightedTokenPairVectorSource
 
                 @Override
                 public boolean apply(Integer column) {
-                    return column == 0;
+                    return column != null && column == 0;
                 }
 
             });
@@ -191,7 +191,7 @@ public class FastWeightedTokenPairVectorSource
 
                 @Override
                 public boolean apply(Integer column) {
-                    return (column + 1) % 2 == 0;
+                    return column != null && (column + 1) % 2 == 0;
                 }
 
             });
@@ -202,7 +202,7 @@ public class FastWeightedTokenPairVectorSource
 
                 @Override
                 public boolean apply(Integer column) {
-                    return column == 0;
+                    return column != null && column == 0;
                 }
 
             });
@@ -214,7 +214,7 @@ public class FastWeightedTokenPairVectorSource
 
                 @Override
                 public boolean apply(Integer column) {
-                    return (column + 1) % 2 == 0;
+                    return column != null && (column + 1) % 2 == 0;
                 }
 
             });

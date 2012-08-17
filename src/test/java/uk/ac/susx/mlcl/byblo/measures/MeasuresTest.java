@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.measures;
 
-import uk.ac.susx.mlcl.byblo.measures.Measure;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,10 +39,15 @@ import java.util.Map;
 import java.util.Random;
 import org.junit.*;
 import static org.junit.Assert.*;
+import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
+import uk.ac.susx.mlcl.byblo.measures.impl.Confusion;
 import uk.ac.susx.mlcl.byblo.measures.impl.Cosine;
 import uk.ac.susx.mlcl.byblo.measures.impl.Dice;
 import uk.ac.susx.mlcl.byblo.measures.impl.DotProduct;
@@ -60,16 +64,10 @@ import uk.ac.susx.mlcl.byblo.measures.impl.Overlap;
 import uk.ac.susx.mlcl.byblo.measures.impl.Precision;
 import uk.ac.susx.mlcl.byblo.measures.impl.Recall;
 import uk.ac.susx.mlcl.byblo.measures.impl.Weeds;
-import uk.ac.susx.mlcl.lib.collect.Indexed;
-import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
-import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
-import uk.ac.susx.mlcl.byblo.measures.impl.Confusion;
-import uk.ac.susx.mlcl.byblo.measures.impl.ConfusionTest;
 import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsCarrier;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
+import uk.ac.susx.mlcl.lib.collect.Indexed;
+import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
  * Perform a set of tests on ALL measures.
@@ -209,22 +207,16 @@ public class MeasuresTest {
         for (int r = 0; r < repeats; r++) {
             int i = RANDOM.nextInt(FRUIT_EVENTS.size());
             int j = RANDOM.nextInt(FRUIT_EVENTS.size());
-//            System.out.println("repeat " + r + ": entries " + FRUIT_EVENTS.get(i).
-//                    key()
-//                    + " and " + FRUIT_EVENTS.get(j).key());
 
             SparseDoubleVector A = FRUIT_EVENTS.get(i).value();
             SparseDoubleVector B = FRUIT_EVENTS.get(j).value();
 
             for (Measure m : MEASURES) {
-//                System.out.print("\tmeasure " + m + ": ");
                 SparseDoubleVector wA = WEIGHTINGS.get(m).apply(A);
                 SparseDoubleVector wB = WEIGHTINGS.get(m).apply(B);
 
-                double result = test(m, wA, wB);
-//                System.out.println(result);
+                test(m, wA, wB);
             }
-
         }
     }
 
@@ -255,7 +247,8 @@ public class MeasuresTest {
                 if (!(m instanceof Hindle
                       || m instanceof Confusion
                       || m instanceof DotProduct)) {
-                    assertEquals(m.toString(), m.getHomogeneityBound(), result, EPSILON);
+                    assertEquals(m.toString(), m.getHomogeneityBound(), result,
+                                 EPSILON);
                 }
 
             }
@@ -272,20 +265,15 @@ public class MeasuresTest {
         for (int r = 0; r < repeats; r++) {
             int i = FRUIT_EVENTS.size() - 1;
             int j = RANDOM.nextInt(FRUIT_EVENTS.size());
-//            System.out.println("repeat " + r + ": entries " + FRUIT_EVENTS.get(i).
-//                    key()
-//                    + " and " + FRUIT_EVENTS.get(j).key());
 
             SparseDoubleVector A = FRUIT_EVENTS.get(i).value();
             SparseDoubleVector B = FRUIT_EVENTS.get(j).value();
 
             for (Measure m : MEASURES) {
-//                System.out.print("\tmeasure " + m + ": ");
                 SparseDoubleVector wA = WEIGHTINGS.get(m).apply(A);
                 SparseDoubleVector wB = WEIGHTINGS.get(m).apply(B);
 
-                double result = test(m, wA, wB);
-//                System.out.println(result);
+                test(m, wA, wB);
             }
 
         }
@@ -324,5 +312,4 @@ public class MeasuresTest {
 
         return val;
     }
-
 }

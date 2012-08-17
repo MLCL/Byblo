@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import uk.ac.susx.mlcl.byblo.measures.impl.Jaccard;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -71,7 +70,7 @@ public class JaccardTest {
         System.out.println("testJaccardCLI");
 
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Jaccard");
-        output.delete();
+        deleteIfExist(output);
 
         try {
             enableExistTrapping();
@@ -105,8 +104,8 @@ public class JaccardTest {
         int q = 3; // number of variables that positive for the th objects and negative for the th object
         int r = 0; // number of variables that negative for the th objects and positive for the th object
         int s = 0; // number of variables that negative for both objects
-        int t = p + q + r + s; // total number of variables
-        double jaccardDistance = (double) (q + r) / (double) (p + q + r);
+//        int t = p + q + r + s; // total number of variables
+//        double jaccardDistance = (double) (q + r) / (double) (p + q + r);
         double jaccardCoef = (double) p / (double) (p + q + r);
 
         SparseDoubleVector vecA = SparseDoubleVector.from(objectA);
@@ -388,7 +387,7 @@ public class JaccardTest {
             B.set(RANDOM.nextInt(size * 2), RANDOM.nextDouble());
         }
 
-        double expect = test(A, B);
+        test(A, B);
     }
 
     public double test(SparseDoubleVector A, SparseDoubleVector B) {

@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.BybloSettings;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -215,6 +216,44 @@ public abstract class Measures {
         return Math.log(v) / LOG_2;
     }
 
+    /**
+     * Small value used to measure equality of double precision floating point
+     * numbers while avoiding floating point errors.
+     *
+     * TODO: Move to mlcl-lib
+     */
+    private static final double DEFAULT_EPSILON = 0.0000001;
+
+    /**
+     * Check that two floating point numbers are equal within error epsilon.
+     *
+     * TODO: Move to mlcl-lib
+     *
+     * @param a first value
+     * @param b second value
+     * @param epsilon maximum difference error
+     * @return true if operands are within <tt>epsilon</tt>.
+     */
+    public static boolean epsilonEquals(final double a, final double b,
+                                        final double epsilon) {
+        return Double.compare(a, b) == 0
+                || Math.abs(a - b) <= epsilon;
+    }
+
+    /**
+     * Check that two floating point numbers are equal within
+     * {@link #DEFAULT_EPSILON }.
+     *
+     * TODO: Move to mlcl-lib
+     *
+     * @param a first value
+     * @param b second value
+     * @return true if operands are within {@link #DEFAULT_EPSILON}.
+     */
+    public static boolean epsilonEquals(final double a, final double b) {
+        return epsilonEquals(a, b, DEFAULT_EPSILON);
+    }
+
     public static Map<String, Class<? extends Measure>> loadMeasureAliasTable()
             throws ClassNotFoundException {
 
@@ -234,12 +273,15 @@ public abstract class Measures {
             @SuppressWarnings("unchecked")
             final Class<? extends Measure> clazz =
                     (Class<? extends Measure>) Class.forName(className);
-            classLookup.put(measure.toLowerCase(), clazz);
+            classLookup.put(measure.toLowerCase(BybloSettings.getLocale()),
+                            clazz);
             if (res.containsKey("measure." + measure + ".aliases")) {
                 final String[] aliases = res.getString(
                         "measure." + measure + ".aliases").split(",");
                 for (String alias : aliases) {
-                    classLookup.put(alias.toLowerCase().trim(), clazz);
+                    classLookup.
+                            put(alias.toLowerCase(BybloSettings.getLocale()).
+                            trim(), clazz);
                 }
             }
         }
