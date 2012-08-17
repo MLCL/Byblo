@@ -41,7 +41,7 @@ import uk.ac.susx.mlcl.lib.Checks;
 /**
  * Implementation of ProgressReporting that can be used as a deligate by
  * containing objects.
- *
+ * <p/>
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class ProgressDeligate implements ProgressReporting {
@@ -121,10 +121,10 @@ public class ProgressDeligate implements ProgressReporting {
     /**
      * Indicate the start of series of updates that should be considered a
      * single atomic transaction.
-     *
+     * <p/>
      * This method is used (in conjuction with {@link #endAdjusting() } to avoid
      * multiple events being fired during a sequence of state changes.
-     *
+     * <p/>
      * @throws IllegalStateException if adjustingCount is negative
      */
     public void startAdjusting() throws IllegalStateException {
@@ -137,10 +137,10 @@ public class ProgressDeligate implements ProgressReporting {
     /**
      * Indicate the end of series of updates that should be considered a single
      * atomic transaction.
-     *
+     * <p/>
      * This method is used (in conjuction with {@link #startAdjusting() } to
      * avoid multiple events being fired during a sequence of state changes.
-     *
+     * <p/>
      * @throws IllegalStateException if no transaction has been started
      */
     public void endAdjusting() {
@@ -261,9 +261,10 @@ public class ProgressDeligate implements ProgressReporting {
     }
 
     public boolean equals(ProgressDeligate other) {
-        if (this.progressListeners != other.progressListeners && (this.progressListeners == null || !this.progressListeners.
-                                                                  equals(
-                                                                  other.progressListeners)))
+        if (this.progressListeners != other.progressListeners
+                && (this.progressListeners == null || !this.progressListeners.
+                    equals(
+                    other.progressListeners)))
             return false;
         if (this.progressPercent != other.progressPercent)
             return false;

@@ -296,8 +296,10 @@ public class IndexWTPCommandTest {
 
             List<Tell> pa = new ArrayList<Tell>();
             List<Tell> pb = new ArrayList<Tell>();
-            List<Indexed<SparseDoubleVector>> va = new ArrayList<Indexed<SparseDoubleVector>>();
-            List<Indexed<SparseDoubleVector>> vb = new ArrayList<Indexed<SparseDoubleVector>>();
+            List<Indexed<SparseDoubleVector>> va =
+                    new ArrayList<Indexed<SparseDoubleVector>>();
+            List<Indexed<SparseDoubleVector>> vb =
+                    new ArrayList<Indexed<SparseDoubleVector>>();
 
             // sequential
             while (wtpsa.hasNext() && wtpsb.hasNext()) {
@@ -343,7 +345,8 @@ public class IndexWTPCommandTest {
         else
             assertValidOutputFiles(index1, index2);
 
-        IndexingCommands.IndexEvents unindex = new IndexingCommands.IndexEvents();
+        IndexingCommands.IndexEvents unindex =
+                new IndexingCommands.IndexEvents();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
@@ -371,7 +374,8 @@ public class IndexWTPCommandTest {
             assertValidInputFiles(index1, index2);
         assertValidOutputFiles(to);
 
-        IndexingCommands.UnindexEvents unindex = new IndexingCommands.UnindexEvents();
+        IndexingCommands.UnindexEvents unindex =
+                new IndexingCommands.UnindexEvents();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);

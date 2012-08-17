@@ -35,7 +35,7 @@ import java.io.IOException;
 /**
  * Denotes an object which while perform string enumeration on some or all of
  * the data it reads and writes.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public interface Enumerating {

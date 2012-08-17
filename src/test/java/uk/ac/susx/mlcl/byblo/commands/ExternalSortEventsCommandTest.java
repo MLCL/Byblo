@@ -215,7 +215,8 @@ public class ExternalSortEventsCommandTest {
 
         {
             WeightedTokenPairSource x = openSource(inputFile, idx, false, false);
-            WeightedTokenPairSource y = openSource(sortedFile, idx, false, false);
+            WeightedTokenPairSource y =
+                    openSource(sortedFile, idx, false, false);
             assertTrue("Sorted file length differs from input",
                        ObjectIO.flush(x) == ObjectIO.flush(y));
             x.close();
@@ -224,8 +225,9 @@ public class ExternalSortEventsCommandTest {
         }
         // load the sorted output file and check it's sensible
 
-        WeightedTokenPairSource sortedSource = openSource(sortedFile, idx, false,
-                                                          false);
+        WeightedTokenPairSource sortedSource =
+                openSource(sortedFile, idx, false,
+                           false);
         List<Weighted<TokenPair>> actual = ObjectIO.readAll(sortedSource);
         inputSource.close();
 

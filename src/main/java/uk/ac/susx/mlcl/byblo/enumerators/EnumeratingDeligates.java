@@ -164,7 +164,8 @@ public final class EnumeratingDeligates {
 
         @Override
         public String toString() {
-            return this.getClass().getSimpleName() + "{" + "inner=" + inner + '}';
+            return this.getClass().getSimpleName() + "{" + "inner=" + inner
+                    + '}';
         }
     }
 

@@ -49,7 +49,7 @@ import uk.ac.susx.mlcl.lib.collect.ForwardingBiMap;
 /**
  * A simple enumerator that delegates to BiMap for enumeration storage, and
  * assigns current max + 1 as the next key.
- *
+ * <p/>
  * @param <T> type of object being indexed.
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -63,11 +63,11 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
 
     /**
      * Dependency injection constructor to be used by subclasses only.
-     *
+     * <p/>
      * Checks nextId with an assert only, so will accept invalid nextId's when
      * assertions are disabled.
-     *
-     * @param map BiMap to delegate storage too.
+     * <p/>
+     * @param map    BiMap to delegate storage too.
      * @param nextId Integer value of key to assign to next added element.
      */
     protected BiMapEnumerator(

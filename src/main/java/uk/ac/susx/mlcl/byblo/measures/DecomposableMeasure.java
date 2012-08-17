@@ -36,10 +36,10 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 /**
  * <code>DecomposableMeasure</code> defines a Measure can be optimally extended
  * to break down internal operation into sub-functions.
- *
+ * <p/>
  * This abstract class has been expanded from {@link Measure} to allow for
  * pre-calculation of values that are dependant only on one vector.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Immutable
@@ -59,7 +59,7 @@ public abstract class DecomposableMeasure
      * can be pre-calculated using {@link #left(SparseDoubleVector)} and
      * {@link #right(SparseDoubleVector)}. All three values are combined using
      * {@link Proximity#combine(double, double, double)}.
-     *
+     * <p/>
      * @param A the first feature vector
      * @param B the second feature vector
      * @return portion of similarity measure dependent on both A and B
@@ -69,7 +69,7 @@ public abstract class DecomposableMeasure
     /**
      * Calculate some part of the similarity measure, based entirely on the
      * first feature vectors.
-     *
+     * <p/>
      * @param A first feature vector
      * @return pre-calculated result
      */
@@ -78,7 +78,7 @@ public abstract class DecomposableMeasure
     /**
      * Calculate some part of the similarity measure, based entirely on the
      * second feature vectors.
-     *
+     * <p/>
      * @param B first feature vector
      * @return pre-calculated result
      */
@@ -86,10 +86,10 @@ public abstract class DecomposableMeasure
 
     /**
      * Combine the the component results into a single similarity score.
-     *
+     * <p/>
      * @param shared component derived from both vectors
-     * @param left component derived from first vector
-     * @param right component derived from second vector
+     * @param left   component derived from first vector
+     * @param right  component derived from second vector
      * @return combined result
      */
     public abstract double combine(double shared, double left, double right);

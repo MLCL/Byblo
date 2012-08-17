@@ -40,9 +40,9 @@ import javax.annotation.concurrent.Immutable;
 /**
  * <tt>Weighted</tt> objects represent a weighting or frequency applied to some
  * discrete record.
- *
+ * <p/>
  * <p>Instances of <tt>Weighted</tt> are immutable.<p>
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T> Type of record being weighted
  */
@@ -76,14 +76,14 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
 
     /**
      * Indicates whether some other object is "equal to" this one.
-     *
+     * <p/>
      * <p>Note that only the <tt>entryId</tt> field is used for equality. I.e
      * two objects with the same <tt>entryId</tt>, but differing weights
      * <em>will</em> be consider equal.</p>
-     *
+     * <p/>
      * @param obj the reference object with which to compare.
      * @return <code>true</code> if this object is the same as the obj argument;
-     * <code>false</code> otherwise.
+     *         <code>false</code> otherwise.
      */
     @Override
     public boolean equals(Object obj) {
@@ -155,7 +155,8 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
         return new Predicate<Weighted<T>>() {
             @Override
             public boolean apply(Weighted<T> pair) {
-                return pair != null && Math.abs(pair.weight() - weight) < 0.0000001;
+                return pair != null && Math.abs(pair.weight() - weight)
+                        < 0.0000001;
             }
 
             @Override

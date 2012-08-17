@@ -43,14 +43,14 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 /**
  * A {@link Weighting} composed of one or more other weightings that will be
  * applied in sequence.
- *
+ * <p/>
  * Note that the weightings will only be applied to the feature vectors (the
  * conditional feature distributions), not on the marginal feature distribution.
  * This latter should be updated at the end of the sequence but not during.
  * Therefore it is unsafe to have a contextual weighting (implementing
  * {@link FeatureMarginalsCarrier}) in a {@link CompositeWeighting } unless it
  * is the first element. A warning will be printed if this is detected.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class CompositeWeighting implements Weighting, Serializable {

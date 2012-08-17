@@ -48,7 +48,8 @@ import uk.ac.susx.mlcl.lib.events.ProgressReporting;
  */
 public class FileCopyTask extends AbstractTask implements ProgressReporting {
 
-    protected final ProgressDeligate progress = new ProgressDeligate(this, false);
+    protected final ProgressDeligate progress =
+            new ProgressDeligate(this, false);
 
     private File sourceFile;
 

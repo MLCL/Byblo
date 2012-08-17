@@ -37,10 +37,10 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 /**
  * Weights features by normalizing by the geometric mean of it's marginal
  * frequencies.
- *
+ * <p/>
  * Monotonic with {@link SquaredPMI} and partially monotonic with
  * {@link ChiSquared}.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class GeoMean

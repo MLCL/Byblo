@@ -51,16 +51,18 @@ import uk.ac.susx.mlcl.lib.tasks.ObjectMergeTask;
 /**
  * Merges the contents of two sorted source files, line by line, into a
  * destination file.
- *
+ * <p/>
  * The source files are assumed to already be ordered according to the
  * comparator.
- *
+ * <p/>
  * Any file denoted by the name string "-" is assumed to be standard-in in the
  * case of source files, and standard out in the case of destination files..
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-@Parameters(commandDescription = "Merges the contents of two sorted source files, line by line, into a destination file.")
+@Parameters(
+commandDescription =
+"Merges the contents of two sorted source files, line by line, into a destination file.")
 public abstract class AbstractMergeCommand<T> extends AbstractCommand {
 
     private static final Log LOG = LogFactory.getLog(AbstractMergeCommand.class);
@@ -122,7 +124,8 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
                     info(
                     "Running merge from \"" + getFileDeligate().getSourceFileA()
                     + "\" and \"" + getFileDeligate().getSourceFileB()
-                    + "\" to \"" + getFileDeligate().getDestinationFile() + "\".");
+                    + "\" to \"" + getFileDeligate().getDestinationFile()
+                    + "\".");
 
         ObjectSource<T> srcA = openSource(getFileDeligate().getSourceFileA());
         ObjectSource<T> srcB = openSource(getFileDeligate().getSourceFileB());
@@ -148,7 +151,9 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
             LOG.info("Completed merge.");
     }
 
-    protected abstract ObjectSource<T> openSource(File file) throws FileNotFoundException, IOException;
+    protected abstract ObjectSource<T> openSource(File file)
+            throws FileNotFoundException, IOException;
 
-    protected abstract ObjectSink<T> openSink(File file) throws FileNotFoundException, IOException;
+    protected abstract ObjectSink<T> openSink(File file)
+            throws FileNotFoundException, IOException;
 }

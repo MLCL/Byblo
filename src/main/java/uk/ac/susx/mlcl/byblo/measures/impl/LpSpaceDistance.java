@@ -40,19 +40,19 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 /**
  *
  * <h4>Notes</h4>
- *
+ * <p/>
  * <ul>
- *
+ * <p/>
  * <li>All results are inverted to produce proximities rather than distances.
  * I.e Values are between 0 and 1 (inclusive) where 0 indicates infinite
  * distance, and 1 indicates no distance at all.</li>
- *
+ * <p/>
  * <li>L0 is defined as the L0 "norm" (with quotes) by David Donoho. This is
  * effectively the non-zero cardinality of the absolute difference between
  * vectors.</li>
- *
+ * <p/>
  * </ul>
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class LpSpaceDistance implements Measure {
@@ -95,7 +95,8 @@ public final class LpSpaceDistance implements Measure {
                     epsilonEquals(power, Double.NEGATIVE_INFINITY, 0)) {
                 deligate = new MinSpaceDistance();
             } else {
-                if (deligate == null || deligate.getClass() != MinkowskiDistance.class)
+                if (deligate == null || deligate.getClass()
+                        != MinkowskiDistance.class)
                     deligate = new MinkowskiDistance();
             }
         }

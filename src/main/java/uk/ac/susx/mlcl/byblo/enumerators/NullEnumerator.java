@@ -36,10 +36,10 @@ import java.util.Map.Entry;
 
 /**
  * A stub implementation of an enumerator, used a placeholder.
- *
+ * <p/>
  * It should never be actually used, so functionality results in an
  * UnsupportedOperationException.
- *
+ * <p/>
  * @param <T> type of object being indexed.
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */

@@ -34,13 +34,13 @@ import java.util.Map.Entry;
 
 /**
  * Interface defining a unique indexing of complex objects (usually strings).
- *
+ * <p/>
  * Implementations of this interface are expected to associate each unique
  * object with an integer value. When an object is queried using indexOf for the
  * first time a new unique integer is returned. On subsequent queries of of the
  * same object, the same unique integer will be returned. After an object has
  * been assigned a unique id it can be retrieved using the valueOf method.
- *
+ * <p/>
  * @param <T> type of object being indexed.
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -53,7 +53,7 @@ public interface Enumerator<T> extends Iterable<Entry<Integer, T>> {
 
     /**
      * Retrieve the unique index for the given object.
-     *
+     * <p/>
      * @param value object to index
      * @return the index
      * @throws NullPointerException when value is null
@@ -62,7 +62,7 @@ public interface Enumerator<T> extends Iterable<Entry<Integer, T>> {
 
     /**
      * Retrieve the object for the given unique index.
-     *
+     * <p/>
      * @param index index of object to retrieve
      * @return the object
      * @throws IllegalArgumentException when index is negative

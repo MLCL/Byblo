@@ -70,7 +70,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
  * Perform a set of tests on ALL measures.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class MeasuresTest {
@@ -279,10 +279,12 @@ public class MeasuresTest {
             max = instance.getHeterogeneityBound();
         }
         assertTrue(
-                "expected similarity >= " + min + " but found " + val + " using measure " + instance,
+                "expected similarity >= " + min + " but found " + val
+                + " using measure " + instance,
                 val >= min - EPSILON);
         assertTrue(
-                "expected similarity <= " + max + " but found " + val + " using measure " + instance,
+                "expected similarity <= " + max + " but found " + val
+                + " using measure " + instance,
                 val <= max + EPSILON);
 
 

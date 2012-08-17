@@ -39,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
  * <code>ProgressListener</code> implementation that simply writes the progress
  * report of each even received to a
  * <code>Log</code>
- *
+ * <p/>
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -50,7 +50,7 @@ public final class ReportLoggingProgressListener implements ProgressListener {
     /**
      * Log progress event reports to given
      * <code>log</code>.
-     *
+     * <p/>
      * @param log destination logger for event progress reports
      */
     public ReportLoggingProgressListener(final Log log) {

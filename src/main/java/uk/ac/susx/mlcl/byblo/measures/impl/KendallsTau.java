@@ -45,29 +45,29 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * Kendall's Tau Rank Correlation Coefficient measures the similarity of two
  * lists of ranked data as the proportion of pairs that are concordant between
  * the lists.
- *
+ * <p/>
  * <h4>Notes:</h4>
- *
+ * <p/>
  * <ul>
- *
+ * <p/>
  * <li>This implementation is the "Tau B" variant, which makes adjustments for
  * tied elements in a manner suitable for equal cardinality vectors. Identical
  * vectors will always produce a similarity of +1 irrespective of ties </li>
- *
+ * <p/>
  * <li> Vectors that contain only the same value (i.e no ranked data at all)
  * will be given a score of 0.</li>
- *
+ * <p/>
  * <li>The {@link KendallsTau } measure is extremely inefficient (quadratic in
  * the number of features). For large numbers of dense feature vectors it will
  * become prohibitively slow. There is a more efficient algorithm for this
  * measure but it's pretty complicated to implement for sparse vectors.</li>
- *
+ * <p/>
  * <li>Ideally the cardinality should be set correctly in vectors to get
  * accurate results, however this is not strictly required. In the event that
  * vector cardinalities differ, the larger value will be used.</li>
- *
+ * <p/>
  * </ul>
- *
+ * <p/>
  * @author Hamish I A Morgan <tt>&lt;hamish.morgan@sussex.ac.uk&gt;</tt>
  * @see "A New Measure of Rank Correlation." Maurice Kendall (1938). Biometrika
  * 30 (1–2): 81–89."
@@ -92,7 +92,7 @@ public final class KendallsTau
 
     /**
      * Construct a new instance of {@link KendallsTau } similarity measure.
-     *
+     * <p/>
      * The <tt>minCardinality</tt> field is initialized to
      * {@link KendallsTau#DEFAULT_MIN_CARDINALITY}, which is {@value
      * #DEFAULT_MIN_CARDINALITY}
@@ -105,10 +105,10 @@ public final class KendallsTau
      * Construct new instance of {@link KendallsTau } similarity measure,
      * initializing the expected dimensionality of vectors to
      * <tt>minCardinality</tt>.
-     *
+     * <p/>
      * @param minCardinality expected dimensionality of vectors
      * @throws IllegalArgumentException when <code>minCardinality</code> is
-     * negative
+     *                                  negative
      */
     public KendallsTau(final int minCardinality)
             throws IllegalArgumentException {
@@ -122,7 +122,7 @@ public final class KendallsTau
 
     /**
      * Get the minimum (usually the actual) cardinality of vectors.
-     *
+     * <p/>
      * @return expected dimensionality of vectors
      */
     public final int getMinCardinality() {
@@ -131,13 +131,13 @@ public final class KendallsTau
 
     /**
      * Set the minimum (usually the actual) cardinality of vectors.
-     *
+     * <p/>
      * If the vector cardinality is known before hand, but is not set on the
      * vectors for some reason, then method can be used to set it globally.
-     *
+     * <p/>
      * @param minCardinality expected dimensionality of vectors
      * @throws IllegalArgumentException when <code>minCardinality</code> is
-     * negative
+     *                                  negative
      */
     public final void setMinCardinality(int minCardinality)
             throws IllegalArgumentException {
@@ -153,7 +153,7 @@ public final class KendallsTau
      * values indicate a greater degree of similarity. Specifically the
      * orientation of this measure is: -1 indicating total disagreement, +1
      * indicating total agreement, and ~0 indicating independence.
-     *
+     * <p/>
      * @param A first feature vector
      * @param B second feature vector
      * @return rank correlation of the feature vectors
@@ -355,11 +355,11 @@ public final class KendallsTau
      * The rank correlation score indicating approximate independence between
      * the vectors. Vectors generated from a uniform random distribution are
      * likely to have a score close to this value.
-     *
+     * <p/>
      * Considering pulling this up to the {@link Measure } interface.
-     *
+     * <p/>
      * @return score indicating no positive or negative correlation has been
-     * found.
+     *         found.
      */
     public double getIndependenceBound() {
         return 0.0;

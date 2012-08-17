@@ -43,9 +43,9 @@ import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 
 /**
  * <tt>Token</tt> objects represent a single instance of an indexed string.
- *
+ * <p/>
  * <p>Instances of <tt>Token</tt> are immutable.<p>
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Immutable
@@ -71,14 +71,14 @@ public final class Token implements Serializable, Comparable<Token>, Cloneable {
 
     /**
      * Indicates whether some other object is "equal to" this one.
-     *
+     * <p/>
      * <p>Note that only the <tt>entryId</tt> field is used for equality. I.e
      * two objects with the same <tt>entryId</tt>, but differing weights
      * <em>will</em> be consider equal.</p>
-     *
+     * <p/>
      * @param obj the reference object with which to compare.
      * @return <code>true</code> if this object is the same as the obj argument;
-     * <code>false</code> otherwise.
+     *         <code>false</code> otherwise.
      */
     @Override
     public boolean equals(Object obj) {

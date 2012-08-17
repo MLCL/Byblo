@@ -55,11 +55,13 @@ public final class OutputFileValidator implements IParameterValidator {
         if (file.exists()) {
             if (file.isDirectory()) {
                 throw new ParameterException(
-                        "Output file \"" + value + "\" exists but is a directory.");
+                        "Output file \"" + value
+                        + "\" exists but is a directory.");
             }
             if (!file.isFile()) {
                 throw new ParameterException(
-                        "Output file \"" + value + "\" exists but is not an ordinary file.");
+                        "Output file \"" + value
+                        + "\" exists but is not an ordinary file.");
             }
             if (!file.canWrite()) {
                 throw new ParameterException(
@@ -68,7 +70,8 @@ public final class OutputFileValidator implements IParameterValidator {
         } else {
             if (file.getParentFile() == null || !file.getParentFile().canWrite()) {
                 throw new ParameterException(
-                        "Output file \"" + value + "\" does not exist and the parent directory is not writable.");
+                        "Output file \"" + value
+                        + "\" does not exist and the parent directory is not writable.");
             }
         }
     }

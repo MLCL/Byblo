@@ -980,7 +980,8 @@ public class FullBuildTest2 {
         File entryIndex = new File(TEST_OUTPUT_DIR,
                                    affix + instances.getName() + ".entry-index");
         File featureIndex = new File(TEST_OUTPUT_DIR,
-                                     affix + instances.getName() + ".feature-index");
+                                     affix + instances.getName()
+                + ".feature-index");
 
         File events = new File(TEST_OUTPUT_DIR,
                                affix + instances.getName() + ".events");

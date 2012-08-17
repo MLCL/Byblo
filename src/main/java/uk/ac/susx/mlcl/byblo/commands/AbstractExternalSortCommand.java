@@ -92,7 +92,8 @@ public abstract class AbstractExternalSortCommand<T>
     public static final int DEFAULT_MAX_CHUNK_SIZE = 500000;
 
     @Parameter(names = {"-C", "--chunk-size"},
-               description = "Number of lines that will be read and sorted in RAM at one "
+               description =
+    "Number of lines that will be read and sorted in RAM at one "
     + "time (per thread). Larger values increase memory usage and performace.")
     private int maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
 
@@ -100,7 +101,8 @@ public abstract class AbstractExternalSortCommand<T>
     private final FilePipeDelegate fileDeligate = new FilePipeDelegate();
 
     @Parameter(names = {"-T", "--temporary-directory"},
-               description = "Directory which will be used for storing temporary files.",
+               description =
+    "Directory which will be used for storing temporary files.",
                converter = TempFileFactoryConverter.class)
     private FileFactory tempFileFactory = new TempFileFactory();
 
@@ -283,13 +285,11 @@ public abstract class AbstractExternalSortCommand<T>
                     ((Closeable) mergeTask.getSourceB()).close();
 
                 if (!nextFileToMerge[i].delete() && LOG.isWarnEnabled())
-                    LOG.
-                            warn("Failed to delete input file 1 to completed merge: "
+                    LOG.warn("Failed to delete input file 1 from merge: "
                             + nextFileToMerge[i].getName());
 
                 if (!nextFileToMerge[i + 1].delete() && LOG.isWarnEnabled())
-                    LOG.
-                            warn("Failed to delete input file 2 to completed merge: "
+                    LOG.warn("Failed to delete input file 2 from merge: "
                             + nextFileToMerge[i + 1].getName());
 
 
@@ -363,11 +363,13 @@ public abstract class AbstractExternalSortCommand<T>
     }
 
     @Override
-    protected <T extends Task> Future<T> submitTask(final T task) throws InterruptedException {
+    protected <T extends Task> Future<T> submitTask(final T task)
+            throws InterruptedException {
         return super.submitTask(task);
     }
 
-    protected void queueMergeTask(File file, int depth) throws IOException, Exception {
+    protected void queueMergeTask(File file, int depth)
+            throws IOException, Exception {
         Checks.checkNotNull("file", file);
 
         if (nextFileToMerge[depth] == null) {
@@ -394,7 +396,8 @@ public abstract class AbstractExternalSortCommand<T>
         return task;
     }
 
-    protected ObjectSortTask<T> createSortTask(Chunk<T> chunk, File dst) throws IOException {
+    protected ObjectSortTask<T> createSortTask(Chunk<T> chunk, File dst)
+            throws IOException {
         ObjectSink<T> sink = openSink(dst);
         ObjectSortTask<T> task = new ObjectSortTask<T>();
         task.setSource(chunk);
@@ -410,7 +413,8 @@ public abstract class AbstractExternalSortCommand<T>
         return task;
     }
 
-    protected ObjectMergeTask<T> createMergeTask(File srcA, File srcB, File dst) throws IOException {
+    protected ObjectMergeTask<T> createMergeTask(File srcA, File srcB, File dst)
+            throws IOException {
         ObjectSource<T> source1 = openSource(srcA);
         ObjectSource<T> source2 = openSource(srcB);
         ObjectSink<T> sink = openSink(dst);
@@ -446,11 +450,13 @@ public abstract class AbstractExternalSortCommand<T>
         return fileDeligate.getCharset();
     }
 
-    public final void setSourceFile(File sourceFile) throws NullPointerException {
+    public final void setSourceFile(File sourceFile)
+            throws NullPointerException {
         fileDeligate.setSourceFile(sourceFile);
     }
 
-    public final void setDestinationFile(File destFile) throws NullPointerException {
+    public final void setDestinationFile(File destFile)
+            throws NullPointerException {
         fileDeligate.setDestinationFile(destFile);
     }
 
@@ -462,7 +468,8 @@ public abstract class AbstractExternalSortCommand<T>
         return fileDeligate.getDestinationFile();
     }
 
-    protected abstract SeekableObjectSource<T, ?> openSource(File file) throws IOException;
+    protected abstract SeekableObjectSource<T, ?> openSource(File file)
+            throws IOException;
 
     protected abstract ObjectSink<T> openSink(File file) throws IOException;
 

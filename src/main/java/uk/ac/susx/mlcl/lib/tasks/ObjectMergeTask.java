@@ -127,7 +127,8 @@ public final class ObjectMergeTask<T> extends AbstractTask implements ProgressRe
                 && (this.getSourceB() == null || !this.getSourceB().
                     equals(other.getSourceB())))
             return false;
-        if (this.getSink() != other.getSink() && (this.getSink() == null || !this.
+        if (this.getSink() != other.getSink() && (this.getSink() == null
+                                                  || !this.
                                                   getSink().equals(
                                                   other.getSink())))
             return false;

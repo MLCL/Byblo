@@ -37,16 +37,16 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
  * {@link Weighting} that ranks features using the T-Test hypothesis test.
- *
+ * <p/>
  * Our null hypothesis (H0) is that the feature and entry are co-occurring by
  * chance, i.e that the probability of their joint distribution is approximately
  * equal to the product of their priors. This, subject to the assumption that
  * the probabilities are normally distributed (which they aren't in general.)
- *
+ * <p/>
  * This method is proposed in James Curran's PhD thesis "From Distributional to
  * Semantic Similarity." (2004) where it was shown to outperform other
  * weightings in a limited experiment.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class TTest

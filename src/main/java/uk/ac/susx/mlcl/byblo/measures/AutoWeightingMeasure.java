@@ -39,10 +39,10 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * A
  * <code>Measure</code> decorator, that will automatically apply the delegate
  * measures expected weighting scheme.
- *
+ * <p/>
  * The weighting scheme to use is determined by calling
  * {@link Measure#getExpectedWeighting() }.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class AutoWeightingMeasure

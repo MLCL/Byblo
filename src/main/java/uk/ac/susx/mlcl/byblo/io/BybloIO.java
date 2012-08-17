@@ -44,7 +44,7 @@ import uk.ac.susx.mlcl.byblo.weighings.MarginalDistribution;
 /**
  * Static utility class that provides functions for opening the various file
  * types.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class BybloIO {
@@ -55,8 +55,8 @@ public final class BybloIO {
     public static TokenPairSource openInstancesSource(
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
-        return TokenPairSource.
-                open(
+        return TokenPairSource
+                .open(
                 file, charset, idx,
                 BybloSettings.getInstance().isInstancesSkipIndexColumn1Enabled(),
                 BybloSettings.getInstance().isInstancesSkipIndexColumn2Enabled());
@@ -65,8 +65,8 @@ public final class BybloIO {
     public static TokenPairSink openInstancesSink(
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
-        return TokenPairSink.
-                open(
+        return TokenPairSink
+                .open(
                 file, charset, idx,
                 BybloSettings.getInstance().isInstancesSkipIndexColumn1Enabled(),
                 BybloSettings.getInstance().isInstancesSkipIndexColumn1Enabled(),

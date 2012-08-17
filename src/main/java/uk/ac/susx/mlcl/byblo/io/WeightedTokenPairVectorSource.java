@@ -46,7 +46,7 @@ import uk.ac.susx.mlcl.lib.io.Tell;
 /**
  * Wraps a {@link WeightedTokenPairVectorSource} to produce complete feature
  * vectors instead of just individual entry/feature records.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class WeightedTokenPairVectorSource
@@ -122,7 +122,8 @@ public class WeightedTokenPairVectorSource
             throw new IllegalArgumentException();
         }
 
-        List<Int2DoubleMap.Entry> entries = new ArrayList<Int2DoubleMap.Entry>(map.
+        List<Int2DoubleMap.Entry> entries =
+                new ArrayList<Int2DoubleMap.Entry>(map.
                 int2DoubleEntrySet());
         Collections.sort(entries, new Comparator<Int2DoubleMap.Entry>() {
             @Override
@@ -140,8 +141,9 @@ public class WeightedTokenPairVectorSource
             values[i] = entries.get(i).getDoubleValue();
         }
 
-        SparseDoubleVector vec = new SparseDoubleVector(keys, values,
-                                                        cardinality, keys.length);
+        SparseDoubleVector vec =
+                new SparseDoubleVector(keys, values,
+                                       cardinality, keys.length);
         vec.compact();
         return vec;
     }

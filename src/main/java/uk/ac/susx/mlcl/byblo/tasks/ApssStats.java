@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * An instance of ApssStats collects various bits of information about an an
  * All-Pairs process, that can be used for debugging and performance evaluation.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class ApssStats implements Serializable {
@@ -57,11 +57,11 @@ public final class ApssStats implements Serializable {
 
     /**
      * Dependency injection constructor.
-     *
-     * @param candidates Count of candidate pairs
+     * <p/>
+     * @param candidates  Count of candidate pairs
      * @param comparisons Count of "slow" comparisons (e.g dot products).
      * @param productions Count of unique pairs found.
-     * @param srcReads Count of records read.
+     * @param srcReads    Count of records read.
      */
     protected ApssStats(AtomicLong candidates, AtomicLong comparisons,
                         AtomicLong productions, AtomicLong srcReads) {

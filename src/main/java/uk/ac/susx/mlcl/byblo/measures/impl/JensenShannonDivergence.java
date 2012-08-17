@@ -40,7 +40,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
  * Distance measure that computes similarity as the Jensen-Shannon divergence.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Immutable

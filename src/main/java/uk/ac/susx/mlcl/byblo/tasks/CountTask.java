@@ -57,7 +57,7 @@ import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 /**
  * <p>Read in a raw feature instances, to produce three frequency cuonts:
  * entries, features, and event pairs.</p>
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class CountTask extends AbstractTask
@@ -191,8 +191,9 @@ public final class CountTask extends AbstractTask
                 new Object2IntOpenHashMap<TokenPair>(initSize, loadFactor);
         eventFreq.defaultReturnValue(0);
 
-        final Int2IntOpenHashMap featureFreq = new Int2IntOpenHashMap(initSize,
-                                                                      loadFactor);
+        final Int2IntOpenHashMap featureFreq =
+                new Int2IntOpenHashMap(initSize,
+                                       loadFactor);
         featureFreq.defaultReturnValue(0);
 
         final Int2IntOpenHashMap entryFreq = new Int2IntOpenHashMap(initSize,
@@ -227,7 +228,8 @@ public final class CountTask extends AbstractTask
 
 
         {
-            List<Weighted<Token>> entries = int2IntMapToWeightedTokens(entryFreq);
+            List<Weighted<Token>> entries =
+                    int2IntMapToWeightedTokens(entryFreq);
             Collections.sort(entries, getEntryComparator());
             ObjectIO.copy(entries, getEntrySink());
         }

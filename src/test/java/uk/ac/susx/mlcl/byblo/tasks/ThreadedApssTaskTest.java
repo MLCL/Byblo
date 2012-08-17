@@ -173,8 +173,10 @@ public class ThreadedApssTaskTest {
 
 
 
-        List<Weighted<TokenPair>> naiveResults = new ArrayList<Weighted<TokenPair>>();
-        List<Weighted<TokenPair>> invertedResults = new ArrayList<Weighted<TokenPair>>();
+        List<Weighted<TokenPair>> naiveResults =
+                new ArrayList<Weighted<TokenPair>>();
+        List<Weighted<TokenPair>> invertedResults =
+                new ArrayList<Weighted<TokenPair>>();
 
         {
             DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
@@ -192,7 +194,8 @@ public class ThreadedApssTaskTest {
                     TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
 
-            List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
+            List<Weighted<TokenPair>> result =
+                    new ArrayList<Weighted<TokenPair>>();
             ObjectSink<Weighted<TokenPair>> sink = ObjectIO.asSink(result);
             ThreadedApssTask<Tell> instance = new ThreadedApssTask<Tell>(
                     vsa, vsb, sink);
@@ -223,7 +226,8 @@ public class ThreadedApssTaskTest {
                     TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
 
-            List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
+            List<Weighted<TokenPair>> result =
+                    new ArrayList<Weighted<TokenPair>>();
             ObjectSink<Weighted<TokenPair>> sink = ObjectIO.asSink(result);
             ThreadedApssTask<Tell> instance = new ThreadedApssTask<Tell>(
                     vsa, vsb, sink);
@@ -246,13 +250,15 @@ public class ThreadedApssTaskTest {
 
     @Test
     public void compareNaive_Threaded_vs_NonThreaded() throws Exception {
-        System.out.
-                println(
+        System.out
+                .println(
                 "Testing " + subject + " compare Naive Threaded vs Non-Threaded");
 
 
-        List<Weighted<TokenPair>> threadedResults = new ArrayList<Weighted<TokenPair>>();
-        List<Weighted<TokenPair>> nonThreadedResults = new ArrayList<Weighted<TokenPair>>();
+        List<Weighted<TokenPair>> threadedResults =
+                new ArrayList<Weighted<TokenPair>>();
+        List<Weighted<TokenPair>> nonThreadedResults =
+                new ArrayList<Weighted<TokenPair>>();
 
         {
             DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
@@ -322,12 +328,14 @@ public class ThreadedApssTaskTest {
 
     @Test
     public void compareInverted_Threaded_vs_NonThreaded() throws Exception {
-        System.out.
-                println(
+        System.out
+                .println(
                 "Testing " + subject + " compare Naive Threaded vs Non-Threaded");
 
-        List<Weighted<TokenPair>> threadedResults = new ArrayList<Weighted<TokenPair>>();
-        List<Weighted<TokenPair>> nonThreadedResults = new ArrayList<Weighted<TokenPair>>();
+        List<Weighted<TokenPair>> threadedResults =
+                new ArrayList<Weighted<TokenPair>>();
+        List<Weighted<TokenPair>> nonThreadedResults =
+                new ArrayList<Weighted<TokenPair>>();
 
         {
             DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(

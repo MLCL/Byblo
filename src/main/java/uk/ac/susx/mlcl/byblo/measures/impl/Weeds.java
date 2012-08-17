@@ -40,17 +40,17 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 /**
  *
  * Parameters
- *
+ * <p/>
  * β γ Special Case
- *
+ * <p/>
  * - 1 harmonic mean of precision and recall (F-score) (DiceMi) β 0 weighted
  * arithmetic mean of precision and recall 1 0 precision 0 0 recall 0.5 0
  * unweighted arithmetic mean
- *
+ * <p/>
  * <ul> <li>Weeds, Julie, and David Weir. (December 2005) Co-occurrence
  * Retrieval: A Flexible Framework for Lexical Distributional Similarity.
  * Computational Linguistics 31, no. 4: 439-475.</li> </ul>
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class Weeds implements Measure, Serializable {
@@ -88,7 +88,8 @@ public class Weeds implements Measure, Serializable {
     public final void setGamma(final double gamma) {
         if (gamma < 0 || gamma > 1)
             throw new IllegalArgumentException(
-                    "beta parameter expected in range 0 to 1, but found " + gamma);
+                    "beta parameter expected in range 0 to 1, but found "
+                    + gamma);
         this.gamma = gamma;
     }
 
@@ -171,12 +172,14 @@ public class Weeds implements Measure, Serializable {
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 37 * hash + (int) (Double.doubleToLongBits(this.beta) ^ (Double.
-                                                                        doubleToLongBits(
-                                                                        this.beta) >>> 32));
-        hash = 37 * hash + (int) (Double.doubleToLongBits(this.gamma) ^ (Double.
-                                                                         doubleToLongBits(
-                                                                         this.gamma) >>> 32));
+        hash = 37 * hash + (int) (Double.doubleToLongBits(this.beta) ^ (Double
+                                                                        .doubleToLongBits(
+                                                                        this.beta)
+                                                                        >>> 32));
+        hash = 37 * hash + (int) (Double.doubleToLongBits(this.gamma) ^ (Double
+                                                                         .doubleToLongBits(
+                                                                         this.gamma)
+                                                                         >>> 32));
         return hash;
     }
 }

@@ -49,7 +49,7 @@ import uk.ac.susx.mlcl.lib.io.TSV;
 /**
  * An <tt>TokenPairSink</tt> object is used to store {@link TokenPair} objects
  * in a flat file.
- *
+ * <p/>
  * <p>The basic file format is Tab-Separated-Values (TSV) where records are
  * delimited by new-lines, and values are delimited by tabs. Two variants are
  * supported: verbose and compact. In verbose mode each {@link TokenPair}
@@ -57,7 +57,7 @@ import uk.ac.susx.mlcl.lib.io.TSV;
  * entry and a feature. In compact mode each TSV record consists of a single
  * entry followed by the features from all sequentially written
  * {@link TokenPair} objects that share the same entry.</p>
- *
+ * <p/>
  * Verbose mode example:
  * <pre>
  *      entry1  feature1
@@ -67,17 +67,17 @@ import uk.ac.susx.mlcl.lib.io.TSV;
  *      enrty3  feature4
  *      enrty3  feature1
  * </pre>
- *
+ * <p/>
  * Equivalent compact mode example:
  * <pre>
  *      entry1  feature1 feature2
  *      entry2  feature3
  *      entry3  feature2 feature4 feature1
  * </pre>
- *
+ * <p/>
  * <p>Compact mode is the default behavior, since it can reduce file sizes by
  * approximately 50%, with corresponding reductions in I/O overhead.</p>
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class TokenPairSink implements ObjectSink<TokenPair>, Closeable, Flushable {
@@ -135,7 +135,8 @@ public class TokenPairSink implements ObjectSink<TokenPair>, Closeable, Flushabl
 
         if (!idx.isEnumeratedEntries() || !idx.isEnumeratedFeatures()) {
             @SuppressWarnings("unchecked")
-            Enumerator<String>[] enumerators = (Enumerator<String>[]) new Enumerator[2];
+            Enumerator<String>[] enumerators =
+                    (Enumerator<String>[]) new Enumerator[2];
             if (!idx.isEnumeratedEntries())
                 enumerators[0] = idx.getEntryEnumerator();
             if (!idx.isEnumeratedFeatures())

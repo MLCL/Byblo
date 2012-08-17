@@ -56,7 +56,7 @@ import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 
 /**
  * Run complete build of Byblo, performing all stages in order.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Parameters(commandDescription = "Run the full thesaurus building pipeline.")
@@ -80,11 +80,13 @@ public final class FullBuild extends AbstractCommand {
     private File instancesFile;
 
     @Parameter(names = {"-o", "--output"},
-               description = "Output directory. Default: current working directory.")
+               description =
+    "Output directory. Default: current working directory.")
     private File outputDir = null;
 
     @Parameter(names = {"-T", "--temp-dir"},
-               description = "Temorary directory, used during processing. Default: A subdirectory will be created inside the output directory.",
+               description =
+    "Temorary directory, used during processing. Default: A subdirectory will be created inside the output directory.",
                converter = TempFileFactoryConverter.class,
                hidden = HIDE_UNCOMMON_PARAMTERS)
     private File tempBaseDir;
@@ -103,7 +105,8 @@ public final class FullBuild extends AbstractCommand {
      * === COUNTING PARAMATERISATION ===
      */
     @Parameter(names = {"--count-chunk-size"},
-               description = "Number of lines per work unit. Larger values increase performance and memory usage.",
+               description =
+    "Number of lines per work unit. Larger values increase performance and memory usage.",
                hidden = HIDE_UNCOMMON_PARAMTERS)
     private int countMaxChunkSize = ExternalCountCommand.DEFAULT_MAX_CHUNK_SIE;
 
@@ -122,7 +125,8 @@ public final class FullBuild extends AbstractCommand {
     private File filterEntryWhitelist;
 
     @Parameter(names = {"-fep", "--filter-entry-pattern"},
-               description = "Regular expresion that accepted entries must match.")
+               description =
+    "Regular expresion that accepted entries must match.")
     private String filterEntryPattern;
 
     @Parameter(names = {"-fvf", "--filter-event-freq"},
@@ -142,7 +146,8 @@ public final class FullBuild extends AbstractCommand {
     private File filterFeatureWhitelist;
 
     @Parameter(names = {"-ffp", "--filter-feature-pattern"},
-               description = "Regular expresion that accepted features must match.")
+               description =
+    "Regular expresion that accepted features must match.")
     private String filterFeaturePattern;
     /*
      * === ALL-PAIRS PARAMATERISATION ===
@@ -187,7 +192,8 @@ public final class FullBuild extends AbstractCommand {
     private boolean measureReversed = false;
 
     @Parameter(names = {"--lee-alpha"},
-               description = "Alpha parameter to Lee alpha-skew divergence measure.",
+               description =
+    "Alpha parameter to Lee alpha-skew divergence measure.",
                hidden = HIDE_UNCOMMON_PARAMTERS,
                converter = DoubleConverter.class)
     private double leeAlpha = LeeSkewDivergence.DEFAULT_ALPHA;
@@ -198,12 +204,14 @@ public final class FullBuild extends AbstractCommand {
     private double lambdaLambda = LambdaDivergence.DEFAULT_LAMBDA;
 
     @Parameter(names = {"-ip", "--identity-pairs"},
-               description = "Produce similarity between pair of identical entries.",
+               description =
+    "Produce similarity between pair of identical entries.",
                hidden = HIDE_UNCOMMON_PARAMTERS)
     private boolean outputIdentityPairs = false;
 
     @Parameter(names = {"--allpairs-chunk-size"},
-               description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.",
+               description =
+    "Number of entries to compare per work unit. Larger value increase performance and memory usage.",
                hidden = HIDE_UNCOMMON_PARAMTERS)
     private int chunkSize = ThreadedApssTask.DEFAULT_MAX_CHUNK_SIZE;
     /*
@@ -211,13 +219,16 @@ public final class FullBuild extends AbstractCommand {
      */
 
     @Parameter(names = {"-k"},
-               description = "The maximum number of neighbours to produce per word.")
+               description =
+    "The maximum number of neighbours to produce per word.")
     private int k = ExternalKnnSimsCommand.DEFAULT_K;
 
     @Parameter(names = {"--knn-chunk-size"},
-               description = "Number of lines per KNN work unit. Larger values increase memory usage and performace.",
+               description =
+    "Number of lines per KNN work unit. Larger values increase memory usage and performace.",
                hidden = HIDE_UNCOMMON_PARAMTERS)
-    private int knnMaxChunkSize = AbstractExternalSortCommand.DEFAULT_MAX_CHUNK_SIZE;
+    private int knnMaxChunkSize =
+            AbstractExternalSortCommand.DEFAULT_MAX_CHUNK_SIZE;
 
     /**
      * Should only be instantiated through the main method.
@@ -371,8 +382,8 @@ public final class FullBuild extends AbstractCommand {
             sb.append("\nStats:\n");
             sb.append(MessageFormat.format(
                     " * End time: {0,time,full} {0,date,full}\n", endTime));
-            sb.
-                    append(
+            sb
+                    .append(
                     MessageFormat.format(" * Ellapsed time: {0}\n",
                                          formatElapsedTime(endTime - startTime)));
             sb.append(MessageFormat.format(" * {0}\n",
@@ -421,7 +432,8 @@ public final class FullBuild extends AbstractCommand {
             LOG.info(sb.toString());
         }
 
-        IndexingCommands.IndexInstances indexCmd = new IndexingCommands.IndexInstances();
+        IndexingCommands.IndexInstances indexCmd =
+                new IndexingCommands.IndexInstances();
         indexCmd.setSourceFile(instancesFile);
         indexCmd.setDestinationFile(instancesEnumeratedFile);
         indexCmd.setCharset(getCharset());
@@ -442,8 +454,8 @@ public final class FullBuild extends AbstractCommand {
             sb.append("\nStats:\n");
             sb.append(MessageFormat.format(
                     " * End time: {0,time,full} {0,date,full}\n", endTime));
-            sb.
-                    append(
+            sb
+                    .append(
                     MessageFormat.format(" * Ellapsed time: {0}\n",
                                          formatElapsedTime(endTime - startTime)));
             sb.append(MessageFormat.format(" * {0}\n",
@@ -519,8 +531,8 @@ public final class FullBuild extends AbstractCommand {
             sb.append("\nStats:\n");
             sb.append(MessageFormat.format(
                     " * End time: {0,time,full} {0,date,full}\n", endTime));
-            sb.
-                    append(
+            sb
+                    .append(
                     MessageFormat.format(" * Ellapsed time: {0}\n",
                                          formatElapsedTime(endTime - startTime)));
 
@@ -640,8 +652,8 @@ public final class FullBuild extends AbstractCommand {
             sb.append("\nStats:\n");
             sb.append(MessageFormat.format(
                     " * End time: {0,time,full} {0,date,full}\n", endTime));
-            sb.
-                    append(
+            sb
+                    .append(
                     MessageFormat.format(" * Ellapsed time: {0}\n",
                                          formatElapsedTime(endTime - startTime)));
             sb.append(MessageFormat.format(" * {0}\n",
@@ -722,8 +734,8 @@ public final class FullBuild extends AbstractCommand {
             sb.append("\nStats:\n");
             sb.append(MessageFormat.format(
                     " * End time: {0,time,full} {0,date,full}\n", endTime));
-            sb.
-                    append(
+            sb
+                    .append(
                     MessageFormat.format(" * Ellapsed time: {0}\n",
                                          formatElapsedTime(endTime - startTime)));
             sb.append(MessageFormat.format(" * {0}\n",
@@ -783,8 +795,8 @@ public final class FullBuild extends AbstractCommand {
             sb.append("\nStats:\n");
             sb.append(MessageFormat.format(
                     " * End time: {0,time,full} {0,date,full}\n", endTime));
-            sb.
-                    append(
+            sb
+                    .append(
                     MessageFormat.format(" * Ellapsed time: {0}\n",
                                          formatElapsedTime(endTime - startTime)));
             sb.append(MessageFormat.format(" * {0}\n",
@@ -820,7 +832,8 @@ public final class FullBuild extends AbstractCommand {
             LOG.info(sb.toString());
         }
 
-        IndexingCommands.UnindexNeighbours unindexCmd = new IndexingCommands.UnindexNeighbours();
+        IndexingCommands.UnindexNeighbours unindexCmd =
+                new IndexingCommands.UnindexNeighbours();
         unindexCmd.setSourceFile(neighboursFile);
         unindexCmd.setDestinationFile(neighboursStringsFile);
         unindexCmd.setCharset(getCharset());
@@ -842,8 +855,8 @@ public final class FullBuild extends AbstractCommand {
             sb.append("\nStats:\n");
             sb.append(MessageFormat.format(
                     " * End time: {0,time,full} {0,date,full}\n", endTime));
-            sb.
-                    append(
+            sb
+                    .append(
                     MessageFormat.format(" * Ellapsed time: {0}\n",
                                          formatElapsedTime(endTime - startTime)));
             sb.append(MessageFormat.format(" * {0}\n",

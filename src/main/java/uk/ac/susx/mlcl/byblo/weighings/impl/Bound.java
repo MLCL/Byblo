@@ -38,7 +38,7 @@ import uk.ac.susx.mlcl.lib.Checks;
 
 /**
  * A {@link Weighting} bounds each feature weighting within a fixed range.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class Bound

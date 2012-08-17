@@ -61,7 +61,7 @@ import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
  * The most basic implementation of all-pairs similarity search. Will only
  * perform better than the inverted index approach {@link InvertedApssTask} with
  * very dense vectors.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <P> The generic-type for offset positions.
  */
@@ -113,7 +113,7 @@ public class NaiveApssTask<P> extends AbstractTask
     /**
      * Constructor of minimal parameterisation, taking arguments that must be
      * given to the algorithm for it to be in a runnable state.
-     *
+     * <p/>
      * @param Q
      * @param R
      * @param sink
@@ -233,7 +233,8 @@ public class NaiveApssTask<P> extends AbstractTask
 
     @Override
     protected void runTask() throws Exception {
-        List<Weighted<TokenPair>> pairBuffer = new ArrayList<Weighted<TokenPair>>();
+        List<Weighted<TokenPair>> pairBuffer =
+                new ArrayList<Weighted<TokenPair>>();
         final P restartB = getSourceB().position();
 
         progress.startAdjusting();
@@ -294,7 +295,7 @@ public class NaiveApssTask<P> extends AbstractTask
     /**
      * Confirm that the algorithm has been correctly parameterized such that it
      * is likely to run without error.
-     *
+     * <p/>
      * @throws IOException if something goes wrong with input sources
      */
     protected void checkState() throws IOException {

@@ -47,7 +47,7 @@ import uk.ac.susx.mlcl.lib.io.TSV;
 /**
  * An <tt>WeightedTokenPairSink</tt> object is used to store {@link TokenPair}
  * objects in a flat file.
- *
+ * <p/>
  * <p>The basic file format is Tab-Separated-Values (TSV) where records are
  * delimited by new-lines, and values are delimited by tabs. Two variants are
  * supported: verbose and compact. In verbose mode each {@link TokenPair}
@@ -56,7 +56,7 @@ import uk.ac.susx.mlcl.lib.io.TSV;
  * single entry followed by the second-entry/weight pairs from all sequentially
  * written {@link WeightedTokenPairSink} objects that share the same first
  * entry.</p>
- *
+ * <p/>
  * Verbose mode example:
  * <pre>
  *      entry1  entry1    weight1
@@ -66,17 +66,17 @@ import uk.ac.susx.mlcl.lib.io.TSV;
  *      enrty3  entry4    weight5
  *      enrty3  entry1    weight6
  * </pre>
- *
+ * <p/>
  * Equivalent compact mode example:
  * <pre>
  *      entry1  entry1    weight1 entry2    weight2
  *      entry2  entry3    weight3
  *      entry3  entry2    weight4 entry4    weight5 entry1    weight6
  * </pre>
- *
+ * <p/>
  * <p>Compact mode is the default behavior, since it can reduce file sizes by
  * approximately 50%, with corresponding reductions in I/O overhead.</p>
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class WeightedTokenPairSink

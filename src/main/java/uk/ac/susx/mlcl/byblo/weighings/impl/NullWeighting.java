@@ -38,7 +38,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 /**
  * A {@link Weighting} that does nothing; simply returning the feature vector
  * unmodified.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Immutable

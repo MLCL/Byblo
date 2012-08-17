@@ -62,7 +62,8 @@ public abstract class AbstractParallelCommand extends AbstractCommand {
         if (LOG.isWarnEnabled() && nThreads > Runtime.getRuntime().
                 availableProcessors()) {
             LOG.
-                    warn("nThreads (" + nThreads + ") > availableProcessors (" + Runtime.
+                    warn("nThreads (" + nThreads + ") > availableProcessors ("
+                    + Runtime.
                     getRuntime().
                     availableProcessors() + ")");
         }

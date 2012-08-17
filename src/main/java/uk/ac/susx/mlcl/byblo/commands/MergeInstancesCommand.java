@@ -50,7 +50,8 @@ import uk.ac.susx.mlcl.lib.io.ObjectSource;
 public class MergeInstancesCommand extends AbstractMergeCommand<TokenPair> {
 
     @ParametersDelegate
-    private DoubleEnumeratingDeligate indexDeligate = new DoubleEnumeratingDeligate();
+    private DoubleEnumeratingDeligate indexDeligate =
+            new DoubleEnumeratingDeligate();
 
     public MergeInstancesCommand(
             File sourceFileA, File sourceFileB, File destinationFile,

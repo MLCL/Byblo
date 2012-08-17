@@ -46,9 +46,9 @@ import uk.ac.susx.mlcl.lib.Checks;
 
 /**
  * TokenPair holds the unique ids of two indexed strings.
- *
+ * <p/>
  * <p>Instances of <tt>TokenPair</tt> are immutable.<p>
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Immutable
@@ -72,9 +72,9 @@ public final class TokenPair implements
     /**
      * Constructor used during cloning. Sub-classes should implement a similar
      * constructor and call this one.
-     *
+     * <p/>
      * @param that
-     * @throws NullPointerException if the argument is null
+     * @throws NullPointerException     if the argument is null
      * @throws IllegalArgumentException
      */
     protected TokenPair(final TokenPair that)
@@ -86,7 +86,7 @@ public final class TokenPair implements
 
     /**
      * Construct a new pair using the given arguments.
-     *
+     * <p/>
      * @param id1 Indexed identifier of the first item.
      * @param id2 Indexed identifier of the second item.
      */
@@ -127,9 +127,9 @@ public final class TokenPair implements
 
     /**
      * Comparator that orders two pairs: first by the id1, then by id2.
-     *
+     * <p/>
      * It is entirely consistent with equals() and hashCode().
-     *
+     * <p/>
      * @param that object to compare to
      * @return -1 if this < that, +1 if this > that, 0 otherwise
      * @throws NullPointerException if the argument is null

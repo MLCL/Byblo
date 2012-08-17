@@ -80,7 +80,8 @@ import uk.ac.susx.mlcl.lib.io.Tell;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-@Parameters(commandDescription = "Perform all-pair similarity search on the given input frequency files.")
+@Parameters(commandDescription =
+"Perform all-pair similarity search on the given input frequency files.")
 public class AllPairsCommand extends AbstractCommand {
 
     private static final Log LOG = LogFactory.getLog(AllPairsCommand.class);
@@ -116,7 +117,8 @@ public class AllPairsCommand extends AbstractCommand {
     private File outputFile;
 
     @Parameter(names = {"-C", "--chunk-size"},
-               description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
+               description =
+    "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
     private int chunkSize = ThreadedApssTask.DEFAULT_MAX_CHUNK_SIZE;
 
     @Parameter(names = {"-t", "--threads"},
@@ -138,7 +140,8 @@ public class AllPairsCommand extends AbstractCommand {
     private double maxSimilarity = DEFAULT_MAX_SIMILARITY;
 
     @Parameter(names = {"-ip", "--identity-pairs"},
-               description = "Produce similarity between pair of identical entries.")
+               description =
+    "Produce similarity between pair of identical entries.")
     private boolean outputIdentityPairs = false;
 
     public static final String DEFAULT_MEASURE = "Lin";
@@ -152,7 +155,8 @@ public class AllPairsCommand extends AbstractCommand {
     private boolean measureReversed = false;
 
     @Parameter(names = {"--lee-alpha"},
-               description = "Alpha parameter to Lee's alpha-skew divergence measure.",
+               description =
+    "Alpha parameter to Lee's alpha-skew divergence measure.",
                converter = DoubleConverter.class)
     private double leeAlpha = LeeSkewDivergence.DEFAULT_ALPHA;
 
@@ -286,9 +290,9 @@ public class AllPairsCommand extends AbstractCommand {
                 || measure instanceof KullbackLeiblerDivergence) {
             try {
                 if (LOG.isInfoEnabled()) {
-                    LOG.
-                            info("Loading entries file for "
-                            + "KendallsTau.minCardinality: " + getFeaturesFile());
+                    LOG.info("Loading entries file for "
+                            + "KendallsTau.minCardinality: "
+                            + getFeaturesFile());
                 }
 
                 WTStatsSource features = new WTStatsSource(openFeaturesSource());
@@ -373,7 +377,8 @@ public class AllPairsCommand extends AbstractCommand {
         }
     }
 
-    public static double[] readAllAsArray(ObjectSource<Weighted<Token>> src) throws IOException {
+    public static double[] readAllAsArray(ObjectSource<Weighted<Token>> src)
+            throws IOException {
 
         Int2DoubleMap entityFrequenciesMap = new Int2DoubleOpenHashMap();
         while (src.hasNext()) {
@@ -468,8 +473,8 @@ public class AllPairsCommand extends AbstractCommand {
         }
 
         if (!isOutputIdentityPairs()) {
-            pairFilters.
-                    add(Predicates.not(Predicates.compose(
+            pairFilters
+                    .add(Predicates.not(Predicates.compose(
                     TokenPair.identity(), Weighted.<TokenPair>recordFunction())));
         }
 

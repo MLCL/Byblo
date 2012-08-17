@@ -33,7 +33,7 @@ package uk.ac.susx.mlcl.lib.events;
 /**
  * Defines a common interface for tasks which can report their progress as a
  * percentage completed.
- *
+ * <p/>
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public interface ProgressReporting {
@@ -43,21 +43,24 @@ public interface ProgressReporting {
      */
     enum State {
 
-        PENDING, RUNNING, COMPLETED, ERROR;
+        PENDING,
+        RUNNING,
+        COMPLETED,
+        ERROR;
 
     }
 
     /**
      * A string identifier for this progress reporter, that can be used by
      * progress reports.
-     *
+     * <p/>
      * @return human readable identifier
      */
     String getName();
 
     /**
      * Accessor to the operations progress towards completion as a percentage.
-     *
+     * <p/>
      * @return percentage completed as an integer in the interval [0,100]
      * @throws UnsupportedOperationException when unsupported
      */
@@ -66,11 +69,11 @@ public interface ProgressReporting {
     /**
      * Whether or not the ProgressReporting implementation supports progress
      * reporting as a percentage towards completion.
-     *
+     * <p/>
      * Not all ProgressReporting tasks can estimate the total progress towards
      * completion, for example because the task operates on a data stream of
      * unknown length. In this case the implementation should return false.
-     *
+     * <p/>
      * @return true if progress percentage, false otherwise.
      */
     boolean isProgressPercentageSupported();
@@ -78,7 +81,7 @@ public interface ProgressReporting {
     /**
      * Accessor to the state of this progress reporter. (As defined in
      * {@link State}.)
-     *
+     * <p/>
      * @return the state
      */
     State getState();
@@ -92,19 +95,19 @@ public interface ProgressReporting {
     /**
      * Attach a ProgressListener that will be notified when the progress changes
      * (presumably when it increases).
-     *
+     * <p/>
      * If the given progress listener is already attached then nothing will
      * change.
-     *
+     * <p/>
      * @param progressListener listener to be notified of progress changes
      */
     void addProgressListener(ProgressListener progressListener);
 
     /**
      * Detach a ProgressListener from receiving progress change events.
-     *
+     * <p/>
      * If the listener is not already attached then nothing happens.
-     *
+     * <p/>
      * @param progressListener listener to be removed
      */
     void removeProgressListener(ProgressListener progressListener);

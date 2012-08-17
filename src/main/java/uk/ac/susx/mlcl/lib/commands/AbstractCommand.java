@@ -159,7 +159,8 @@ public abstract class AbstractCommand implements Command {
                 if (LOG.isTraceEnabled())
                     LOG.
                             trace(
-                            "Running subcommand " + jc.getParsedCommand() + ": " + instance);
+                            "Running subcommand " + jc.getParsedCommand() + ": "
+                            + instance);
                 instance.runCommand();
             } else {
                 LOG.trace("Running command: " + this);

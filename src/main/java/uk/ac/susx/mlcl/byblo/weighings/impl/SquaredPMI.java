@@ -37,17 +37,17 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
  * Squared PMI.
- *
+ * <p/>
  * \[ pmi^2(x,y) = \log( p(x,y)^2 / (p(x)p(y)) ) \]
- *
+ * <p/>
  * Orientation of the scores is 0, log p(x,y), -infinity; for maximal positive
  * correlation, no correlation, and maximal negative correlation
- *
+ * <p/>
  *
  * Proposed in: Daille, B.: Approche mixte pour l'extraction automatique de
  * terminologie: statistiquesicales et ltres linguistiques. PhD thesis,
  * Universite Paris 7
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class SquaredPMI

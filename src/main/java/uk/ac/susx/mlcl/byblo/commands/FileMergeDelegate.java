@@ -61,7 +61,8 @@ public final class FileMergeDelegate extends FileDeligate implements Serializabl
 
     @Parameter(names = {"-of", "--output-file"},
                required = true,
-               description = "The output file to which both input will be merged.",
+               description =
+    "The output file to which both input will be merged.",
                validateWith = OutputFileValidator.class)
     private File destinationFile;
 

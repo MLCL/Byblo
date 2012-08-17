@@ -61,10 +61,11 @@ import uk.ac.susx.mlcl.lib.io.Files;
 /**
  * <p>Read in a raw feature instances file, to produce three frequency files:
  * entries, features, and entry-feature pairs.</p>
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-@Parameters(commandDescription = "Read in a raw feature instances file, to produce three "
+@Parameters(commandDescription =
+"Read in a raw feature instances file, to produce three "
 + "frequency files: entries, contexts, and features.")
 public class CountCommand extends AbstractCommand {
 
@@ -105,13 +106,13 @@ public class CountCommand extends AbstractCommand {
 
     /**
      * Dependency injection constructor with all fields parameterised.
-     *
+     * <p/>
      * @param instancesFile input file containing entry/context instances
-     * @param eventsFile output file for entry/context/frequency triples
-     * @param entriesFile output file for entry/frequency pairs
-     * @param featuresFile output file for context/frequency pairs
+     * @param eventsFile    output file for entry/context/frequency triples
+     * @param entriesFile   output file for entry/frequency pairs
+     * @param featuresFile  output file for context/frequency pairs
      * @param indexDeligate
-     * @param charset character set to use for all file I/O
+     * @param charset       character set to use for all file I/O
      * @throws NullPointerException if any argument is null
      */
     public CountCommand(final File instancesFile, final File eventsFile,
@@ -134,11 +135,11 @@ public class CountCommand extends AbstractCommand {
      * Minimal parameterisation constructor, with all fields that must be set
      * for the task to be functional. Character set will be set to software
      * default from {@link Files#DEFAULT_CHARSET}.
-     *
+     * <p/>
      * @param instancesFile input file containing entry/context instances
-     * @param eventsFile output file for entry/context/frequency triples
-     * @param entriesFile output file for entry/frequency pairs
-     * @param featuresFile output file for context/frequency pairs
+     * @param eventsFile    output file for entry/context/frequency triples
+     * @param entriesFile   output file for entry/frequency pairs
+     * @param featuresFile  output file for context/frequency pairs
      * @throws NullPointerException if any argument is null
      */
     public CountCommand(
@@ -300,7 +301,7 @@ public class CountCommand extends AbstractCommand {
      * Method that performance a number of sanity checks on the parameterisation
      * of this class. It is necessary to do this because the the class can be
      * instantiated via a null constructor when run from the command line.
-     *
+     * <p/>
      * @throws NullPointerException
      * @throws IllegalStateException
      * @throws FileNotFoundException
@@ -360,7 +361,8 @@ public class CountCommand extends AbstractCommand {
                 getParentFile().
                 canWrite()) {
             throw new IllegalStateException(
-                    "entries file does not exists and can not be reated: " + entriesFile);
+                    "entries file does not exists and can not be reated: "
+                    + entriesFile);
         }
         if (featuresFile.exists() && (!featuresFile.isFile() || !featuresFile.
                                       canWrite())) {
@@ -371,18 +373,21 @@ public class CountCommand extends AbstractCommand {
                 getParentFile().
                 canWrite()) {
             throw new IllegalStateException(
-                    "features file does not exists and can not be reated: " + featuresFile);
+                    "features file does not exists and can not be reated: "
+                    + featuresFile);
         }
         if (eventsFile.exists() && (!eventsFile.isFile() || !eventsFile.
                                     canWrite())) {
             throw new IllegalStateException(
-                    "entry-features file exists but is not writable: " + eventsFile);
+                    "entry-features file exists but is not writable: "
+                    + eventsFile);
         }
         if (!eventsFile.exists() && !eventsFile.getAbsoluteFile().
                 getParentFile().
                 canWrite()) {
             throw new IllegalStateException(
-                    "entry-features file does not exists and can not be reated: " + eventsFile);
+                    "entry-features file does not exists and can not be reated: "
+                    + eventsFile);
         }
     }
 

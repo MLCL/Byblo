@@ -41,20 +41,20 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
  * Distance measure that computes similarity as the lambda divergence.
- *
+ * <p/>
  * The lambda weighted average of KL divergences of two distribution Q and R:
- *
+ * <p/>
  * lambdaD(Q||R) = lambda * D(Q||M) + (1 - lambda) * D(R||M)
- *
+ * <p/>
  * where M is the the mixed distribution:
- *
+ * <p/>
  * M = lambda * Q + (1 - lambda) * R:
- *
+ * <p/>
  * For lambda = 0.5 we have the Jensen-Shannon Divergence.
- *
+ * <p/>
  * For lambda = 0 and lambda = 1 the divergence is always 0, which is
  * meaningless. Hence, lambda must be in the range 0 &lt; lambda &lt; 1.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class LambdaDivergence implements Measure, Serializable {

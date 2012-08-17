@@ -52,7 +52,8 @@ import uk.ac.susx.mlcl.lib.io.ObjectSource;
 public class MergeEventsCommand extends AbstractMergeCommand<Weighted<TokenPair>> {
 
     @ParametersDelegate
-    private DoubleEnumeratingDeligate indexDeligate = new DoubleEnumeratingDeligate();
+    private DoubleEnumeratingDeligate indexDeligate =
+            new DoubleEnumeratingDeligate();
 
     public MergeEventsCommand(
             File sourceFileA, File sourceFileB, File destinationFile,

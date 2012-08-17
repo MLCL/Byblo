@@ -37,7 +37,7 @@ import uk.ac.susx.mlcl.lib.Checks;
 /**
  * Implementation of ProgressReporting that reports progress based on the totals
  * of summed number of child ProgressReporting objects.
- *
+ * <p/>
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class ProgressAggregate extends ProgressDeligate {
@@ -88,7 +88,7 @@ public class ProgressAggregate extends ProgressDeligate {
      * Calculate the average progress across all children. Uses integer
      * arithmetic to insure that 100% progress must be reached when (and only
      * when) all children are at 100%.
-     *
+     * <p/>
      * If there are no children, then progress is always 0%.
      */
     protected void updateProgress() {
@@ -112,8 +112,10 @@ public class ProgressAggregate extends ProgressDeligate {
                 childProgressSum += child.getProgressPercent();
             }  // otherwise progress is 0
 
-            anyChildRunning = anyChildRunning || child.getState() == State.RUNNING;
-            allChildrenCompleted = allChildrenCompleted && child.getState() == State.COMPLETED;
+            anyChildRunning = anyChildRunning || child.getState()
+                    == State.RUNNING;
+            allChildrenCompleted = allChildrenCompleted && child.getState()
+                    == State.COMPLETED;
         }
 
         // The aggregate is considered running if when any child is running
@@ -208,7 +210,8 @@ public class ProgressAggregate extends ProgressDeligate {
         if (getClass() != obj.getClass())
             return false;
         final ProgressAggregate other = (ProgressAggregate) obj;
-        if (this.children != other.children && (this.children == null || !this.children.
+        if (this.children != other.children && (this.children == null
+                                                || !this.children.
                                                 equals(other.children)))
             return false;
         return super.equals(other);
@@ -217,7 +220,8 @@ public class ProgressAggregate extends ProgressDeligate {
     @Override
     public int hashCode() {
         int hash = super.hashCode();
-        hash = 29 * hash + (this.children != null ? this.children.hashCode() : 0);
+        hash = 29 * hash
+                + (this.children != null ? this.children.hashCode() : 0);
         return hash;
     }
 

@@ -55,16 +55,18 @@ import uk.ac.susx.mlcl.lib.io.ObjectSource;
  * Task that read in a file and produces the k-nearest-neighbors for each base
  * entry. Assumes the file is composed of entry, entry, weight triples that are
  * delimited by tabs.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-@Parameters(commandDescription = "Perform k-nearest-neighbours on a similarity file.")
+@Parameters(commandDescription =
+"Perform k-nearest-neighbours on a similarity file.")
 public final class KnnSimsCommand extends SortEventsCommand {
 
     private static final Log LOG = LogFactory.getLog(KnnSimsCommand.class);
 
     @Parameter(names = {"-k"},
-               description = "The maximum number of neighbours to produce per word.")
+               description =
+    "The maximum number of neighbours to produce per word.")
     private int k = ExternalKnnSimsCommand.DEFAULT_K;
 
     private Comparator<Weighted<TokenPair>> classComparator =

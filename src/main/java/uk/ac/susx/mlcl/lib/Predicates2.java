@@ -311,12 +311,14 @@ public final class Predicates2 {
         @Override
         public int hashCode() {
             int hash = 5;
-            hash = 67 * hash + (int) (Double.doubleToLongBits(this.min) ^ (Double.
-                                                                           doubleToLongBits(
-                                                                           this.min) >>> 32));
-            hash = 67 * hash + (int) (Double.doubleToLongBits(this.max) ^ (Double.
-                                                                           doubleToLongBits(
-                                                                           this.max) >>> 32));
+            hash = 67 * hash + (int) (Double.doubleToLongBits(this.min)
+                                      ^ (Double.
+                                         doubleToLongBits(
+                                         this.min) >>> 32));
+            hash = 67 * hash + (int) (Double.doubleToLongBits(this.max)
+                                      ^ (Double.
+                                         doubleToLongBits(
+                                         this.max) >>> 32));
             return hash;
         }
 
@@ -359,9 +361,10 @@ public final class Predicates2 {
         @Override
         public int hashCode() {
             int hash = 7;
-            hash = 23 * hash + (int) (Double.doubleToLongBits(this.threshold) ^ (Double.
-                                                                                 doubleToLongBits(
-                                                                                 this.threshold) >>> 32));
+            hash = 23 * hash + (int) (Double.doubleToLongBits(this.threshold)
+                                      ^ (Double.
+                                         doubleToLongBits(
+                                         this.threshold) >>> 32));
             return hash;
         }
 
@@ -404,9 +407,10 @@ public final class Predicates2 {
         @Override
         public int hashCode() {
             int hash = 7;
-            hash = 23 * hash + (int) (Double.doubleToLongBits(this.threshold) ^ (Double.
-                                                                                 doubleToLongBits(
-                                                                                 this.threshold) >>> 32));
+            hash = 23 * hash + (int) (Double.doubleToLongBits(this.threshold)
+                                      ^ (Double.
+                                         doubleToLongBits(
+                                         this.threshold) >>> 32));
             return hash;
         }
 

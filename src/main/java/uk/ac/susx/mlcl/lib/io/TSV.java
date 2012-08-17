@@ -92,7 +92,7 @@ public abstract class TSV {
 
     /**
      * Class that holds functionality to read a Tab Separated Values file.
-     *
+     * <p/>
      * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
      */
     public static final class Sink extends TSV implements Closeable, Flushable, DataSink {
@@ -194,7 +194,7 @@ public abstract class TSV {
 
     /**
      * Class that holds functionality to read a Tab Separated Values file.
-     *
+     * <p/>
      * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
      */
     public static final class Source extends TSV implements Closeable, SeekableDataSource {
@@ -278,8 +278,8 @@ public abstract class TSV {
             try {
                 return Double.valueOf(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.
-                        format(
+                throw new DataFormatException(this, MessageFormat
+                        .format(
                         "Caused by NumberFormatException parsing string \"{0}\"",
                         str), nfe);
             }
@@ -291,8 +291,8 @@ public abstract class TSV {
             try {
                 return Integer.parseInt(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.
-                        format(
+                throw new DataFormatException(this, MessageFormat
+                        .format(
                         "Caused by NumberFormatException parsing string \"{0}\"",
                         str), nfe);
             }
@@ -308,7 +308,8 @@ public abstract class TSV {
         private void expectType(Lexer.Type expected, Lexer.Type actual) throws DataFormatException {
             if (expected != actual) {
                 throw new DataFormatException(this,
-                                              "Expecting type " + expected + " but found " + actual);
+                                              "Expecting type " + expected
+                        + " but found " + actual);
             }
         }
 
@@ -340,8 +341,8 @@ public abstract class TSV {
             try {
                 return Short.parseShort(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.
-                        format(
+                throw new DataFormatException(this, MessageFormat
+                        .format(
                         "Caused by NumberFormatException parsing string \"{0}\"",
                         str), nfe);
             }
@@ -353,8 +354,8 @@ public abstract class TSV {
             try {
                 return Long.parseLong(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.
-                        format(
+                throw new DataFormatException(this, MessageFormat
+                        .format(
                         "Caused by NumberFormatException parsing string \"{0}\"",
                         str), nfe);
             }
@@ -366,8 +367,8 @@ public abstract class TSV {
             try {
                 return Float.parseFloat(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.
-                        format(
+                throw new DataFormatException(this, MessageFormat
+                        .format(
                         "Caused by NumberFormatException parsing string \"{0}\"",
                         str), nfe);
             }

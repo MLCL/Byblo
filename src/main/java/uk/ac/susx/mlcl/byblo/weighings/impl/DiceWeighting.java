@@ -39,12 +39,12 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * {@link Weighting} using Dice's coefficient, that produces a score from the
  * entry/feature intersection (joint) probability over the sum of the prior
  * probabilities.
- *
+ * <p/>
  * Warning: There isn't really a good probabilistic rational for this weighting.
  * It is included out of completeness and because it has been discussed in the
  * literature; e.g. James Curran's PhD thesis "From Distributional to Semantic
  * Similarity." (2004)
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class DiceWeighting

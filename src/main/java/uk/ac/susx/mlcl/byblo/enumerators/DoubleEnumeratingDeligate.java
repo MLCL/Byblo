@@ -47,11 +47,13 @@ public final class DoubleEnumeratingDeligate
     private static final long serialVersionUID = 1L;
 
     @Parameter(names = {"-Ee", "--enumerated-entries"},
-               description = "Whether tokens in the first column of the input file are indexed.")
+               description =
+    "Whether tokens in the first column of the input file are indexed.")
     private boolean enumeratedEntries = DEFAULT_IS_ENUMERATED;
 
     @Parameter(names = {"-Ef", "--enumerated-features"},
-               description = "Whether entries in the second column of the input file are indexed.")
+               description =
+    "Whether entries in the second column of the input file are indexed.")
     private boolean enumeratedFeatures = DEFAULT_IS_ENUMERATED;
 
     @Parameter(names = {"-Xe", "--entries-index-file"},

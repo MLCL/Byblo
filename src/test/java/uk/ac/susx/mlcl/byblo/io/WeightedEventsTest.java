@@ -256,7 +256,8 @@ public class WeightedEventsTest {
         assertTrue("Verbose copy is smaller that compact source.",
                    c.length() >= b.length());
         assertTrue(
-                "Double converted file is not equal to origion: " + a + " => " + c,
+                "Double converted file is not equal to origion: " + a + " => "
+                + c,
                 Files.equal(a, c));
     }
 
@@ -312,8 +313,9 @@ public class WeightedEventsTest {
         File a = TEST_FRUIT_EVENTS;
         File b = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_EVENTS.getName() + ".enum.skip.compact");
-        File c = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_EVENTS.getName() + ".enum.skip.compact.str");
+        File c =
+                new File(TEST_OUTPUT_DIR,
+                         TEST_FRUIT_EVENTS.getName() + ".enum.skip.compact.str");
 
         DoubleEnumeratingDeligate indel = new DoubleEnumeratingDeligate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);

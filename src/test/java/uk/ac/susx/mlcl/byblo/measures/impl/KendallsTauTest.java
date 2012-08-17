@@ -50,7 +50,7 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
  * Unit tests for {@link KendallsTau } proximity measure.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class KendallsTauTest {
@@ -326,7 +326,8 @@ public class KendallsTauTest {
 
     static double tauB_naive1(SparseDoubleVector A, SparseDoubleVector B) {
         assert A.cardinality == B.cardinality :
-                "Cardinalities not equal " + A.cardinality + " != " + B.cardinality;
+                "Cardinalities not equal " + A.cardinality + " != "
+                + B.cardinality;
 
         final int n = A.cardinality;
         long conc = 0;

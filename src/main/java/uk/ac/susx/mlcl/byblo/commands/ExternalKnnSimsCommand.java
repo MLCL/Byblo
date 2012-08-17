@@ -56,7 +56,8 @@ import uk.ac.susx.mlcl.lib.io.ObjectSink;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-@Parameters(commandDescription = "Perform k-nearest-neighbours on a similarity file.")
+@Parameters(commandDescription =
+"Perform k-nearest-neighbours on a similarity file.")
 public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
 
     private static final Log LOG = LogFactory.getLog(
@@ -67,7 +68,8 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
     private static final long serialVersionUID = 1L;
 
     @Parameter(names = {"-k"},
-               description = "The number of neighbours to produce for each base entry.")
+               description =
+    "The number of neighbours to produce for each base entry.")
     private int k = DEFAULT_K;
 
     private Comparator<Weighted<TokenPair>> classComparator =

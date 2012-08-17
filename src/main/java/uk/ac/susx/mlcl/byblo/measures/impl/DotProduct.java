@@ -41,7 +41,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 /**
  * Proximity measure calculating proximity as the dot product of the vectors.
  * For unit vectors this is equivalent to {@link Cosine }.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Immutable

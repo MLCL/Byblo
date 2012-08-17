@@ -38,7 +38,7 @@ import uk.ac.susx.mlcl.lib.tasks.FileCopyTask;
 
 /**
  * Copy a source file to a destination.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Parameters(commandDescription = "Copy a file.")

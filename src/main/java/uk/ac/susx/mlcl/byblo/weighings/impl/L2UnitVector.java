@@ -38,7 +38,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 /**
  * {@link Weighting} that normalizes the feature vector to an L2 unit vector, by
  * dividing by the normal.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Immutable
@@ -78,9 +78,9 @@ public final class L2UnitVector
 
     /**
      * The magnitude of the vector, i.e the L2 vector normal.
-     *
+     * <p/>
      * TODO: Move to mlcl-lib/SparseDoubleVector
-     *
+     * <p/>
      * @param vector
      * @return magnitude of vector
      */
@@ -90,9 +90,9 @@ public final class L2UnitVector
 
     /**
      * Calculate the square of the L@ norm of vector.
-     *
+     * <p/>
      * TODO: Move to mlcl-lib/SparseDoubleVector
-     *
+     * <p/>
      * @param vector
      * @return magnitude squared of vector
      */

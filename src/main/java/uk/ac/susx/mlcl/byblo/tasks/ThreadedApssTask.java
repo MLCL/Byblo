@@ -61,7 +61,7 @@ import uk.ac.susx.mlcl.lib.tasks.Task;
  * An all pairs similarity search implementation that parallelises another
  * implementation. This is achieved by breaking the work down into chunks that
  * are run concurrently.
- *
+ * <p/>
  * @param <S> Type of "tell" object used to seek into the data source.
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -69,7 +69,8 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
 
     private static final Log LOG = LogFactory.getLog(ThreadedApssTask.class);
 
-    private Class<? extends NaiveApssTask> innerAlgorithm = InvertedApssTask.class;
+    private Class<? extends NaiveApssTask> innerAlgorithm =
+            InvertedApssTask.class;
 
     private static final int DEFAULT_NUM_THREADS =
             Runtime.getRuntime().availableProcessors() + 1;
@@ -219,7 +220,9 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
 
     void updateProgress() {
         if (nChunks != 0) {
-            double prog = (completedCount + queuedCount) / (double) (nChunks * nChunks * 2);
+            double prog = (completedCount + queuedCount) / (double) (nChunks
+                                                                     * nChunks
+                                                                     * 2);
             progress.setProgressPercent((int) (100 * prog));
         }
     }

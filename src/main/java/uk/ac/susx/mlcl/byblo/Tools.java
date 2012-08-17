@@ -49,7 +49,7 @@ import uk.ac.susx.mlcl.lib.commands.Command;
 
 /**
  * Main method class for running various tools from the command line.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class Tools extends AbstractCommand {
@@ -104,7 +104,7 @@ public final class Tools extends AbstractCommand {
 
     /**
      * Main method.
-     *
+     * <p/>
      * @param args command line argument
      * @throws Exception when something goes awry.
      */

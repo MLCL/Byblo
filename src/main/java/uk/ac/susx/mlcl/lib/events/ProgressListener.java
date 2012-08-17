@@ -35,7 +35,7 @@ import java.util.EventListener;
 /**
  * Interface that should be implemented by objects that can receive progress
  * events.
- *
+ * <p/>
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public interface ProgressListener extends EventListener {
@@ -43,7 +43,7 @@ public interface ProgressListener extends EventListener {
     /**
      * Method will be called by progress event dispatchers (probably
      * implementing {@link ProgressReporting}), whenever the progress changes.
-     *
+     * <p/>
      * @param progressEvent
      */
     void progressChanged(ProgressEvent progressEvent);

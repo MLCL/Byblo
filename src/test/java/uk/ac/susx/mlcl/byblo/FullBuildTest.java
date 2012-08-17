@@ -99,7 +99,8 @@ public class FullBuildTest {
             String sampleName, boolean skip1, boolean skip2) throws Exception {
 
         File input = new File(TEST_DATA_DIR,
-                              "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample" + sampleName);
+                              "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample"
+                + sampleName);
 
         String name = "medtest-" + sampleName;
         if (skip1 && skip2)

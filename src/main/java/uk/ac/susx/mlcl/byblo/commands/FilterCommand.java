@@ -81,7 +81,7 @@ import uk.ac.susx.mlcl.lib.io.TempFileFactory;
  * TODO: Efficiency improvements could be found be combining predicates more
  * intelligently. If, for e.g, one predicate was found to be implied by another
  * then only the stronger need be taken.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Parameters(commandDescription = "Filter a set of frequency files")
@@ -160,12 +160,14 @@ public class FilterCommand extends AbstractCommand
     private double filterEntryMinFreq;
 
     @Parameter(names = {"-few", "--filter-entry-whitelist"},
-               description = "Whitelist file containing entries of interest. (All others will be ignored)",
+               description =
+    "Whitelist file containing entries of interest. (All others will be ignored)",
                validateWith = InputFileValidator.class)
     private File filterEntryWhitelist;
 
     @Parameter(names = {"-fep", "--filter-entry-pattern"},
-               description = "Regular expresion that accepted entries must match.")
+               description =
+    "Regular expresion that accepted entries must match.")
     private String filterEntryPattern;
 
     @Parameter(names = {"-fvf", "--filter-event-freq"},
@@ -179,16 +181,19 @@ public class FilterCommand extends AbstractCommand
     private double filterFeatureMinFreq;
 
     @Parameter(names = {"-ffw", "--filter-feature-whitelist"},
-               description = "Whitelist file containing features of interest. (All others will be ignored)",
+               description =
+    "Whitelist file containing features of interest. (All others will be ignored)",
                validateWith = InputFileValidator.class)
     private File filterFeatureWhitelist;
 
     @Parameter(names = {"-ffp", "--filter-feature-pattern"},
-               description = "Regular expresion that accepted features must match.")
+               description =
+    "Regular expresion that accepted features must match.")
     private String filterFeaturePattern;
 
     @Parameter(names = {"-T", "--temp-dir"},
-               description = "Temorary directory which will be used during filtering.",
+               description =
+    "Temorary directory which will be used during filtering.",
                converter = TempFileFactoryConverter.class)
     private FileFactory tempFiles = new TempFileFactory();
 
@@ -595,7 +600,8 @@ public class FilterCommand extends AbstractCommand
 
             if (record.record().id1() != currentEntryId) {
 
-                if (currentEntryId != -1 && currentEntryFilteredFeatureWeight != 0) {
+                if (currentEntryId != -1 && currentEntryFilteredFeatureWeight
+                        != 0) {
                     if (currentEventCount == 0) {
                         filteredEntryWeight += currentEntryFilteredFeatureWeight;
                     } else {
@@ -634,7 +640,8 @@ public class FilterCommand extends AbstractCommand
                  || !efSrc.hasNext()) && LOG.isInfoEnabled()) {
                 progress.
                         setMessage(
-                        "Accepted " + writeCount + " of " + readCount + " events.");
+                        "Accepted " + writeCount + " of " + readCount
+                        + " events.");
                 LOG.debug(MiscUtil.memoryInfoString());
             }
         }
@@ -995,7 +1002,7 @@ public class FilterCommand extends AbstractCommand
      * Method that performance a number of sanity checks on the parameterisation
      * of this class. It is necessary to do this because the the class can be
      * instantiated via a null constructor when run from the command line.
-     *
+     * <p/>
      * @throws NullPointerException
      * @throws IllegalStateException
      * @throws FileNotFoundException
@@ -1032,7 +1039,8 @@ public class FilterCommand extends AbstractCommand
             for (Map.Entry<String, File> b : allFiles.entrySet()) {
                 if (!a.getKey().equals(b.getKey()) && a.getValue().equals(b.
                         getValue())) {
-                    throw new IllegalStateException(a.getKey() + " equal to " + b.
+                    throw new IllegalStateException(a.getKey() + " equal to "
+                            + b.
                             getKey());
                 }
             }

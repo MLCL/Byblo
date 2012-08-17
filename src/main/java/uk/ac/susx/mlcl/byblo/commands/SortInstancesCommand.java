@@ -50,7 +50,8 @@ public final class SortInstancesCommand extends AbstractSortCommand<TokenPair> {
 
 //    private static final Log LOG = LogFactory.getLog(SortInstancesCommand.class);
     @ParametersDelegate
-    private DoubleEnumeratingDeligate indexDeligate = new DoubleEnumeratingDeligate();
+    private DoubleEnumeratingDeligate indexDeligate =
+            new DoubleEnumeratingDeligate();
 
     public SortInstancesCommand(File sourceFile, File destinationFile,
                                 Charset charset,

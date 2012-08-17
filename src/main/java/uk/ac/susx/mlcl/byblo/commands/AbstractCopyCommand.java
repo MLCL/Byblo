@@ -56,7 +56,7 @@ import uk.ac.susx.mlcl.lib.tasks.ObjectPipeTask;
 /**
  * Abstract super class for all tasks that require copying data from one file to
  * another.
- *
+ * <p/>
  * @param <T>
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */

@@ -50,7 +50,8 @@ public class ObjectPipeTask<T> extends AbstractTask
 
     private static final long serialVersionUID = 1L;
 
-    protected final ProgressDeligate progress = new ProgressDeligate(this, false);
+    protected final ProgressDeligate progress =
+            new ProgressDeligate(this, false);
 
     private ObjectSource<T> source;
 

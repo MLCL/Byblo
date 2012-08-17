@@ -151,7 +151,8 @@ public class WeightingsTest {
 
 //            System.out.println(" > testing entry id " + entryId);
 
-            SparseDoubleVector[] reweighted = new SparseDoubleVector[WEIGHT_CLASSES.length];
+            SparseDoubleVector[] reweighted =
+                    new SparseDoubleVector[WEIGHT_CLASSES.length];
             for (int wgtIdx = 0; wgtIdx < WEIGHT_CLASSES.length; wgtIdx++) {
                 Weighting weighting = wgts[wgtIdx];
 //                System.out.println("weighting: " + wgt);
@@ -166,21 +167,22 @@ public class WeightingsTest {
                 // Check there are no zero valued elements
                 for (int i = 0; i < rew.size; i++) {
                     if (rew.values[i] == 0.0)
-                        fail(String.
-                                format(
+                        fail(String
+                                .format(
                                 "Found zero value in sparse vector %d at id %d with weighting scheme %s",
                                 entryId, rew.keys[i], weighting.getClass()));
                     if (Double.isNaN(rew.values[i])) {
-                        fail(String.
-                                format(
+                        fail(String
+                                .format(
                                 "Found NaN value in sparse vector %d at id %d with weighting scheme %s",
                                 entryId, rew.keys[i], weighting.getClass()));
                     }
 
-                    if (rew.values[i] < weighting.getLowerBound() || rew.values[i] > weighting.
+                    if (rew.values[i] < weighting.getLowerBound()
+                            || rew.values[i] > weighting.
                             getUpperBound()) {
-                        fail(String.
-                                format(
+                        fail(String
+                                .format(
                                 "sparse vector %d at id %d has value %f outside range with weighting scheme %s",
                                 entryId, rew.keys[i], rew.values[i], weighting.
                                 getClass()));
@@ -193,7 +195,8 @@ public class WeightingsTest {
             }
 
 
-            boolean[][] m = new boolean[WEIGHT_CLASSES.length][WEIGHT_CLASSES.length];
+            boolean[][] m =
+                    new boolean[WEIGHT_CLASSES.length][WEIGHT_CLASSES.length];
 //
             for (int i = 0; i < WEIGHT_CLASSES.length; i++) {
                 for (int j = 0; j < i; j++) {
@@ -238,7 +241,8 @@ public class WeightingsTest {
                     keys[i])));
         }
 
-        Comparator<Int2DoubleMap.Entry> cmp = new Int2DoubleEntryValueThenKeyComparator();
+        Comparator<Int2DoubleMap.Entry> cmp =
+                new Int2DoubleEntryValueThenKeyComparator();
 
         Collections.sort(alist, cmp);
         Collections.sort(blist, cmp);

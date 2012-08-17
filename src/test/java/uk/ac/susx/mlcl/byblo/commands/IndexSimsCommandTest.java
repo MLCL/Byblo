@@ -289,8 +289,10 @@ public class IndexSimsCommandTest {
 
             List<Tell> pa = new ArrayList<Tell>();
             List<Tell> pb = new ArrayList<Tell>();
-            List<Indexed<SparseDoubleVector>> va = new ArrayList<Indexed<SparseDoubleVector>>();
-            List<Indexed<SparseDoubleVector>> vb = new ArrayList<Indexed<SparseDoubleVector>>();
+            List<Indexed<SparseDoubleVector>> va =
+                    new ArrayList<Indexed<SparseDoubleVector>>();
+            List<Indexed<SparseDoubleVector>> vb =
+                    new ArrayList<Indexed<SparseDoubleVector>>();
 
             // sequential
             while (wtpsa.hasNext() && wtpsb.hasNext()) {
@@ -337,7 +339,8 @@ public class IndexSimsCommandTest {
         else
             assertValidOutputFiles(index);
 
-        IndexingCommands.IndexSims indexCommand = new IndexingCommands.IndexSims();
+        IndexingCommands.IndexSims indexCommand =
+                new IndexingCommands.IndexSims();
         indexCommand.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         indexCommand.getFilesDeligate().setSourceFile(from);
         indexCommand.getFilesDeligate().setDestinationFile(to);

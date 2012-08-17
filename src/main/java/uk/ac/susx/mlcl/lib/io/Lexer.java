@@ -49,25 +49,25 @@ import org.apache.commons.logging.LogFactory;
  * <p>A {@link Lexer} performs lexical analysis of some delimited input file. It
  * produces lexemes (lexical tokens) that can be interpreted by a parser or
  * handler of some sort.</p>
- *
+ * <p/>
  * <p>Written as a replacement for the many other tokenisers available, it
  * offers a unique combination of features:</p>
- *
+ * <p/>
  * <ul> <li>Extremely fast, NIO based, buffered reading.</li>
- *
+ * <p/>
  * <li>Semi-random access allowing return to any previous lexeme position.</li>
- *
+ * <p/>
  * <li>No unnecessary object instantiation (e.g. {@link String} fragments). This
  * is achieved using lazy iteration with an advance/accessor control. Insures
  * that only the absolute minimum amount of work is done at each step.</li>
- *
+ * <p/>
  * </ul>
- *
+ * <p/>
  * <p>{@link Lexer} is not thread safe and must be synchronized externally if
  * concurrent access is required.</p>
- *
+ * <p/>
  * <p>Requires Java 6</p>
- *
+ * <p/>
  * <h4>Example Usage:</h4>
  * <pre>
  * File infile = new File("/path/to/data/file");
@@ -88,20 +88,20 @@ import org.apache.commons.logging.LogFactory;
  *         lexer.value());
  * }
  * </pre>
- *
+ * <p/>
  * <h4>ToDo</h4> <ul> <li>Implement configurable lexeme types. Each type should
  * be defined by a name and a character matcher. The character matcher is a
  * function that takes a character as it's argument and returns whether or
  * lamnda not that character is in some set. The class can provide default
  * implementations of common character matchers, such as for whitespace, but the
  * user can define them as required.</li>
- *
+ * <p/>
  * <li>Extend the character matching to string sequences. This would enable more
  * complex lexical entities, but is starting to blur the line between lexical
  * and syntactic analysis.</li>
- *
+ * <p/>
  * </ul>
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class Lexer implements Seekable<Tell>, Closeable {
@@ -116,7 +116,7 @@ public final class Lexer implements Seekable<Tell>, Closeable {
      * <p>The number of characters that can be stored in cbuf. If more space is
      * required then the buffer will grow: n' = 2 * n + 1, where n is the
      * current buffer size, and n' is new buffer size.</p>
-     *
+     * <p/>
      * <p>Note that the buffer size is not, and should not, be configurable
      * because it doesn't work as one would normally expect. This buffer is
      * <em>not</em> for File I/O performance enhancement, which is handled by
@@ -180,7 +180,7 @@ public final class Lexer implements Seekable<Tell>, Closeable {
 
     /**
      * The offset in bbuf at the start of the previous read.
-     *
+     * <p/>
      * The *character* offset of the data in cbuf from the start of bbuf. Note
      * that this may or may not be the same as the byte offset in bbuf depending
      * on the character encoding.
@@ -205,7 +205,7 @@ public final class Lexer implements Seekable<Tell>, Closeable {
     /**
      * <p>Construct a new instance of {@link Lexer} that reads from the given
      * channel.</p>
-     *
+     * <p/>
      * @param channel The channel to read from
      * @throws NullPointerException if buffer or charset are null
      */
@@ -216,7 +216,8 @@ public final class Lexer implements Seekable<Tell>, Closeable {
             LOG.trace("Decoding bytes to charset " + channel.getCharset());
             LOG.
                     trace(
-                    "Initializing buffer capacity to " + INITIAL_BUFFER_SIZE + " chars.");
+                    "Initializing buffer capacity to " + INITIAL_BUFFER_SIZE
+                    + " chars.");
         }
         cbuf = CharBuffer.allocate(INITIAL_BUFFER_SIZE);
         cbuf.flip();
@@ -255,7 +256,7 @@ public final class Lexer implements Seekable<Tell>, Closeable {
 
     /**
      * Return true if the Lexer can produce more elements of any kind.
-     *
+     * <p/>
      * @return true if there are more elements, false otherwise.
      * @throws CharacterCodingException When byte to char decoding fails
      * @throws ClosedChannelException
@@ -268,7 +269,7 @@ public final class Lexer implements Seekable<Tell>, Closeable {
 
     /**
      * Move internal pointers to the next lexeme.
-     *
+     * <p/>
      * @throws CharacterCodingException When byte to char decoding fails
      * @throws ClosedChannelException
      * @throws IOException
@@ -333,7 +334,7 @@ public final class Lexer implements Seekable<Tell>, Closeable {
 
     /**
      * Return the {@link Type} of the current lexeme.
-     *
+     * <p/>
      * @return the type of the current lexeme
      * @throws IllegalStateException when any consistency check fails
      */
@@ -343,10 +344,10 @@ public final class Lexer implements Seekable<Tell>, Closeable {
 
     /**
      * Return the character offset of the start of the current lexeme.
-     *
+     * <p/>
      * This can on occasions be incorrect (for e.g. after a call to seek()) and
      * so should not be relied upon for lexeme identification.
-     *
+     * <p/>
      * @return character offset of the start of the current lexeme
      * @throws IllegalStateException when any consistency check fails
      */
@@ -356,10 +357,10 @@ public final class Lexer implements Seekable<Tell>, Closeable {
 
     /**
      * Return the character offset of the end of the current lexeme.
-     *
+     * <p/>
      * This can on occasions be incorrect (for e.g. after a call to seek()) and
      * so should not be relied upon for lexeme identification.
-     *
+     * <p/>
      * @return character offset of the end of the current lexeme
      * @throws IllegalStateException when any consistency check fails
      */
@@ -370,7 +371,7 @@ public final class Lexer implements Seekable<Tell>, Closeable {
     /**
      * Instantiate and populate a StringBuilder object with the characters that
      * constitute the current lexeme.
-     *
+     * <p/>
      * @return characters constituting the current lexeme
      * @throws IllegalStateException when any consistency check fails
      */
@@ -384,11 +385,11 @@ public final class Lexer implements Seekable<Tell>, Closeable {
      * Get a single character in the current lexeme. Useful for getting a
      * delimiter character without building a string: use
      * <code>charAt(0)</code>.
-     *
+     * <p/>
      * @param offset the index of the character to get
      * @return character at given offset from the start of the current lexeme.
      * @throws IndexOutOfBoundsException when offset >= lexeme length
-     * @throws IllegalStateException when any consistency check fails
+     * @throws IllegalStateException     when any consistency check fails
      */
     public final char charAt(final int offset)
             throws IndexOutOfBoundsException, IllegalStateException {
@@ -401,7 +402,7 @@ public final class Lexer implements Seekable<Tell>, Closeable {
      * Write a characters for the current lexeme to the StringBuilder given as
      * an argument. Very useful when syntactic analysis demands lexemes to be
      * concatenated.
-     *
+     * <p/>
      * @param builder StringBuilder to write the lexeme characters to
      * @throws IllegalStateException when any consistency check fails
      */
@@ -415,10 +416,10 @@ public final class Lexer implements Seekable<Tell>, Closeable {
      * Attempt to reconstruct the whole line on which the current lexeme occurs
      * and return it as a CharSequence. This can be used to produce much more
      * helpful error messages.
-     *
+     * <p/>
      * Note that this method is not guaranteed to success, since it will only
      * return whatever data is still available in the character buffer.
-     *
+     * <p/>
      * @return the full line of the current lexeme if possible
      * @throws IllegalStateException when any consistency check fails
      */
@@ -455,7 +456,7 @@ public final class Lexer implements Seekable<Tell>, Closeable {
      * Check that the CharBuffer has required characters to be read between the
      * current position and the limit. If it doesn't then more data is decode
      * from the input ByteBuffer.
-     *
+     * <p/>
      * @param required
      * @throws CharacterCodingException
      */
@@ -476,7 +477,8 @@ public final class Lexer implements Seekable<Tell>, Closeable {
             // the contents of the current buffer from the start of the current
             // lexeme to a new buffer.
             final int newCapacity = Math.max(cbuf.capacity() * 2 + 1,
-                                             cbuf.capacity() + required - available);
+                                             cbuf.capacity() + required
+                    - available);
 
             if (LOG.isTraceEnabled()) {
                 LOG.trace("Growing character buffer from length " + cbuf.
@@ -510,11 +512,11 @@ public final class Lexer implements Seekable<Tell>, Closeable {
      * advanced lexeme. Return a long integer denoting this position. Passing
      * this integer as an argument to seek() will return Lexer to the state it
      * was at when tell was called.</p>
-     *
+     * <p/>
      * <p>Note that there is some overhead to calling tell, since the remaining
      * decoded character must be re-encoded to determine byte position. Try to
      * call this method as infrequently as possible.</p>
-     *
+     * <p/>
      * @return byte offset of the current lexeme.
      */
     @Override
@@ -529,7 +531,7 @@ public final class Lexer implements Seekable<Tell>, Closeable {
      * undefined. Correct behavior is only guaranteed when the given
      * <code>offset</code> is a value previously return by a call to
      * {@link #position()}.</p>
-     *
+     * <p/>
      * <p>Note: After performing a
      * {@link #position(uk.ac.susx.mlcl.lib.io.Tell)}, the line and column
      * number may be incorrect. The column number will correct itself after the
@@ -538,7 +540,7 @@ public final class Lexer implements Seekable<Tell>, Closeable {
      * inconsistent:</p> <dl> <dt><code>number</code></dt><dd>will continue from
      * the current value</dd> <dt><code>line</code></dt><dd>will restart from
      * 0</dd> <dt><code>column</code></dt><dd>will restart from 0</dd> </dl>
-     *
+     * <p/>
      * @param offset position in the underlying byte buffer to jump to
      * @throws CharacterCodingException
      * @throws IOException
@@ -610,7 +612,8 @@ public final class Lexer implements Seekable<Tell>, Closeable {
 
         @Override
         public String toString() {
-            return "Position{" + "channelOffset=" + channelOffset + ", bufferOffset=" + bufferOffset + '}';
+            return "Position{" + "channelOffset=" + channelOffset
+                    + ", bufferOffset=" + bufferOffset + '}';
         }
     }
 }

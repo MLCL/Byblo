@@ -79,7 +79,8 @@ public abstract class EnumeratingDeligate
 
     protected Enumerator<String> open(File file) throws IOException {
         Enumerator<String> out = type.open(file);
-        if (out.indexOf(FilterCommand.FILTERED_STRING) != FilterCommand.FILTERED_ID)
+        if (out.indexOf(FilterCommand.FILTERED_STRING)
+                != FilterCommand.FILTERED_ID)
             throw new AssertionError();
         return out;
     }
@@ -89,14 +90,16 @@ public abstract class EnumeratingDeligate
 
 
         type.save(enumerator);
-        if (enumerator.indexOf(FilterCommand.FILTERED_STRING) != FilterCommand.FILTERED_ID)
+        if (enumerator.indexOf(FilterCommand.FILTERED_STRING)
+                != FilterCommand.FILTERED_ID)
             throw new AssertionError();
     }
 
     protected void close(Enumerator<String> enumerator) throws IOException {
         Checks.checkNotNull("enumerator", enumerator);
 
-        if (enumerator.indexOf(FilterCommand.FILTERED_STRING) != FilterCommand.FILTERED_ID)
+        if (enumerator.indexOf(FilterCommand.FILTERED_STRING)
+                != FilterCommand.FILTERED_ID)
             throw new AssertionError();
         type.close(enumerator);
     }

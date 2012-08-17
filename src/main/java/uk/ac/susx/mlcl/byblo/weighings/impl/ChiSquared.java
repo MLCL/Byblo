@@ -40,20 +40,20 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * Our null hypothesis (H0) is that the feature and entry are co-occurring by
  * chance, i.e that the probability of their joint distribution is approximately
  * equal to the product of their priors.
- *
+ * <p/>
  * This method is proposed in James Curran's PhD thesis "From Distributional to
  * Semantic Similarity." (2004) although the description contains errors so it's
  * a little hard to know exactly what was done here, especially since there are
  * numerous Chi-squared distribution based hypothesis tests.
- *
+ * <p/>
  * Described by Christopher D. Manningand and Hinrich Schutze (1999)
  * "Foundations of Statistical Natural Language Processing." MIT Press,
  * Cambridge, MA USA.
- *
+ * <p/>
  * Seems to be mostly monotonic with {@link SquaredPMI} and {@link GeoMean}
  * weighting schemes, although there are a few exceptions. Not sure if this is
  * down a real difference or just floating point errors.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class ChiSquared

@@ -40,17 +40,17 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * {@link Weighting} that implements that re-weights features using the
  * log-likelihood-ratio hypothesis test. That is the log of ratio between the
  * null hypothesis (H0) and alternate hypothesis (Ha).
- *
+ * <p/>
  * H0: That the entry and feature occur together by change, measured as the
  * probability of the feature conditioned on all other entries.
- *
+ * <p/>
  * Ha: That the entry and feature are positively correlated, measured as the
  * conditional probability of the feature in the context of the entry.
- *
+ * <p/>
  * Described by Christopher D. Manningand and Hinrich Schutze (1999)
  * "Foundations of Statistical Natural Language Processing." MIT Press,
  * Cambridge, MA USA.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class LLR

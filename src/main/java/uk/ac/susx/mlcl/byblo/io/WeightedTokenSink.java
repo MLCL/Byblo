@@ -47,7 +47,7 @@ import uk.ac.susx.mlcl.lib.io.TSV;
 /**
  * An <tt>WeightedTokenSink</tt> object is used to store {@link Token} objects
  * in a flat file.
- *
+ * <p/>
  * <p>The basic file format is Tab-Separated-Values (TSV) where records are
  * delimited by new-lines, and values are delimited by tabs. Two variants are
  * supported: verbose and compact. In verbose mode each {@link Token}
@@ -55,7 +55,7 @@ import uk.ac.susx.mlcl.lib.io.TSV;
  * entry and it's weight. In compact mode each TSV record consists of a single
  * entry followed by the weights of all sequentially written {@link Token}
  * objects that share the same entry.</p>
- *
+ * <p/>
  * Verbose mode example:
  * <pre>
  *      entry1  weight1
@@ -65,17 +65,17 @@ import uk.ac.susx.mlcl.lib.io.TSV;
  *      enrty3  weight5
  *      enrty3  weight6
  * </pre>
- *
+ * <p/>
  * Equivalent compact mode example:
  * <pre>
  *      entry1  weight1 weight2
  *      entry2  weight3
  *      entry3  weight4 weight5 weight6
  * </pre>
- *
+ * <p/>
  * <p>Compact mode is the default behavior, since it can reduce file sizes by
  * approximately 50%, with corresponding reductions in I/O overhead.</p>
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class WeightedTokenSink implements ObjectSink<Weighted<Token>>, Closeable, Flushable {
@@ -107,7 +107,8 @@ public class WeightedTokenSink implements ObjectSink<Weighted<Token>>, Closeable
     }
 
     public static WeightedTokenSink open(
-            File f, Charset charset, SingleEnumerating idx, boolean skip1) throws IOException {
+            File f, Charset charset, SingleEnumerating idx, boolean skip1)
+            throws IOException {
         DataSink tsv = new TSV.Sink(f, charset);
 
         if (skip1) {

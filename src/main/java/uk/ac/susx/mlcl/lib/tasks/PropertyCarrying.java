@@ -32,19 +32,19 @@ package uk.ac.susx.mlcl.lib.tasks;
 
 /**
  * Interface for objects that can carry arbitrary properties with them.
- *
+ * <p/>
  * This is primarily a hack, to allow object to store external information with
  * them, rather than manage the data properly. Usage should probably be avoided
  * but often the overhead of not using this interface is ridiculous, so it
  * stands as an unhappy compromise,
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public interface PropertyCarrying {
 
     /**
      * Retrieve a property with the given key.
-     *
+     * <p/>
      * @param key unique string identified of the property
      * @return value associated with the key
      * @throws NullPointerException if key is null
@@ -54,8 +54,8 @@ public interface PropertyCarrying {
 
     /**
      * Store a property value with the given key.
-     *
-     * @param key unique string identified of the property
+     * <p/>
+     * @param key   unique string identified of the property
      * @param value object to associate with the key
      * @throws NullPointerException if key is null
      */

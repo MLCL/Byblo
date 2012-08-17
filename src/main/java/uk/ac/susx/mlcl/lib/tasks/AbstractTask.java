@@ -38,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Abstract super class to all task objects, implementing common functionality.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class AbstractTask implements Task {
@@ -132,8 +132,10 @@ public abstract class AbstractTask implements Task {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 11 * hash + (this.properties != null ? this.properties.hashCode() : 0);
-        hash = 11 * hash + (this.exceptionDeligate != null ? this.exceptionDeligate.
+        hash = 11 * hash + (this.properties != null ? this.properties.hashCode()
+                            : 0);
+        hash = 11 * hash + (this.exceptionDeligate != null
+                            ? this.exceptionDeligate.
                             hashCode() : 0);
         return hash;
     }

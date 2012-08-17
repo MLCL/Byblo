@@ -45,7 +45,8 @@ public class FileDeligate {
     private static final long serialVersionUID = 1L;
 
     @Parameter(names = {"-c", "--charset"},
-               description = "The character set encoding to use for both reading input and writing output files.")
+               description =
+    "The character set encoding to use for both reading input and writing output files.")
     private Charset charset = Files.DEFAULT_CHARSET;
 
     public FileDeligate(Charset charset) {

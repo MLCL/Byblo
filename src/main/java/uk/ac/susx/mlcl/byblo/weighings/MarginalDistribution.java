@@ -68,7 +68,7 @@ public final class MarginalDistribution {
 
     /**
      * Full dependency injection constructor.
-     *
+     * <p/>
      * @param frequencies
      * @param frequencySum
      * @param nonZeroCardinality
@@ -90,7 +90,7 @@ public final class MarginalDistribution {
     /**
      * Constructor that automatically calculates the sum and non-zero
      * cardinality from the provided frequency array.
-     *
+     * <p/>
      * @param frequencies
      */
     public MarginalDistribution(final double[] frequencies) {
@@ -101,9 +101,9 @@ public final class MarginalDistribution {
 
     /**
      * Count the number of elements in the given array which are not zero.
-     *
+     * <p/>
      * TODO: Move to mlcl-lib
-     *
+     * <p/>
      * @param frequencies
      * @return
      */
@@ -118,10 +118,10 @@ public final class MarginalDistribution {
 
     /**
      * Get an array containing a mapping from id to frequency.
-     *
+     * <p/>
      * Stored as a double because it may have been waited in a pre-processing
      * stage, and as an array because it's usually dense.
-     *
+     * <p/>
      * Warning: This method copies the array (which may be very large) so care
      * should taken to either store the result, or use other accessors such as
      * {@link #getFrequency(int) }
@@ -135,10 +135,10 @@ public final class MarginalDistribution {
     /**
      * Return the frequency of a particular event marginal, denoted by the index
      * <code>i</code>.
-     *
+     * <p/>
      * @param index The event marginal id (dimension) to access
      * @return The frequency of that event marginal over the whole join
-     * distribution.
+     *         distribution.
      */
     public @Nonnegative
     double getFrequency(@Nonnegative int index) {
@@ -168,7 +168,7 @@ public final class MarginalDistribution {
 
     /**
      * The number of unique features.
-     *
+     * <p/>
      * @return number of unique featuress.
      */
     public final @Nonnegative
@@ -180,7 +180,7 @@ public final class MarginalDistribution {
      * Return the independent probability of a particular event marginal,
      * calculated as the frequency of the marginal divided by the sum of all
      * frequencies in the distribution.
-     *
+     * <p/>
      * @param index event marginal id (dimension)
      * @return independent prior probability of that event marginal occurring.
      */

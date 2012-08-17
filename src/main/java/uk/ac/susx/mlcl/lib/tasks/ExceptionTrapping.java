@@ -35,14 +35,14 @@ package uk.ac.susx.mlcl.lib.tasks;
  * throwing them directly. This is useful for certain functionality, such as
  * when code is executing inside another thread: i.e implementing the Runnable
  * interface which does not support checked exceptions.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public interface ExceptionTrapping {
 
     /**
      * Whether or not at leat 1 exception is currently caught by this object.
-     *
+     * <p/>
      * @return True if an exception has been caught, false otherwise
      */
     boolean isExceptionTrapped();
@@ -50,22 +50,22 @@ public interface ExceptionTrapping {
     /**
      * Return the oldest exception that was previously caught, clearing it
      * internally.
-     *
+     * <p/>
      * Repeated calls to this method may return addition exceptions; in a
      * first-in/first-out order. When no exception remain this method returns
      * null.
-     *
+     * <p/>
      * @return the exception, or null if no exception is caught
      */
     Exception getTrappedException();
 
     /**
      * Throws the oldest exception that was previously caught.
-     *
+     * <p/>
      * Repeated calls to this method may throw addition exceptions; in a
      * first-in/first-out order. When no exception remain this method does
      * nothing.
-     *
+     * <p/>
      * @throws Exception the exception
      */
     void throwTrappedException() throws Exception;

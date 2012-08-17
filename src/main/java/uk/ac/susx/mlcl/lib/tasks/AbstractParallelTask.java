@@ -74,7 +74,8 @@ public abstract class AbstractParallelTask extends AbstractTask {
         if (LOG.isWarnEnabled() && numThreads
                 > Runtime.getRuntime().availableProcessors()) {
             LOG.
-                    warn("numThreads (" + numThreads + ") > availableProcessors (" + Runtime.
+                    warn("numThreads (" + numThreads
+                    + ") > availableProcessors (" + Runtime.
                     getRuntime().
                     availableProcessors() + ")");
         }
@@ -176,12 +177,14 @@ public abstract class AbstractParallelTask extends AbstractTask {
             return false;
         if (this.getNumThreads() != other.getNumThreads())
             return false;
-        if (this.getExecutor() != other.getExecutor() && (this.getExecutor() == null || !this.
+        if (this.getExecutor() != other.getExecutor() && (this.getExecutor()
+                                                          == null || !this.
                                                           getExecutor().
                                                           equals(other.
                                                           getExecutor())))
             return false;
-        if (this.futureQueue != other.futureQueue && (this.futureQueue == null || !this.futureQueue.
+        if (this.futureQueue != other.futureQueue && (this.futureQueue == null
+                                                      || !this.futureQueue.
                                                       equals(other.futureQueue)))
             return false;
         return true;

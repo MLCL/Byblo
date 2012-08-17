@@ -209,7 +209,8 @@ public class IndexTPCommandTest {
         else
             assertValidOutputFiles(index1, index2);
 
-        IndexingCommands.IndexInstances unindex = new IndexingCommands.IndexInstances();
+        IndexingCommands.IndexInstances unindex =
+                new IndexingCommands.IndexInstances();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
@@ -237,7 +238,8 @@ public class IndexTPCommandTest {
             assertValidInputFiles(index1, index2);
         assertValidOutputFiles(to);
 
-        IndexingCommands.IndexInstances unindex = new IndexingCommands.IndexInstances();
+        IndexingCommands.IndexInstances unindex =
+                new IndexingCommands.IndexInstances();
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);

@@ -41,7 +41,7 @@ import uk.ac.susx.mlcl.lib.Checks;
 /**
  * Simple implementation of the ExceptionTrapping functionality, to be used as a
  * delegate by other classes.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class ExceptionTrappingDelegate
@@ -79,7 +79,7 @@ public final class ExceptionTrappingDelegate
 
     /**
      * Called by the encapsulating class when an exception is caught.
-     *
+     * <p/>
      * @param exception caught exception
      * @throws NullPointerException if exception is null
      */
@@ -127,8 +127,8 @@ public final class ExceptionTrappingDelegate
             return false;
         final ExceptionTrappingDelegate that = (ExceptionTrappingDelegate) obj;
         return this.getExceptionQueue() == that.getExceptionQueue()
-                || (this.getExceptionQueue() != null && this.getExceptionQueue().
-                    equals(that.getExceptionQueue()));
+                || (this.getExceptionQueue() != null && this.getExceptionQueue()
+                    .equals(that.getExceptionQueue()));
     }
 
     @Override

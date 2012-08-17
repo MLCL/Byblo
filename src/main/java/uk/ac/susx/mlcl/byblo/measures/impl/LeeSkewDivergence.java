@@ -41,24 +41,24 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
  * Distance measure that computes similarity using Lee's alpha-Skew divergence.
- *
+ * <p/>
  * Skew divergence is a variant of Kullback–Leibler (KL) divergence. KL
  * divergence is undefined for zero probabilities in the empirical distribution.
  * To resolve this problem divergence is measured from a mixed distribution;
  * computed as the weighted average of the two distributions. The alpha
  * parameter controls this weighting.
- *
+ * <p/>
  * Alpha takes a value in the range [0,1] exclusive, where 0 is entirely the
  * first distribution, 1 is entirely the second distribution, and 0.5 is the
  * average distribution. Note that alpha <em>must<em> not be exactly 0 or 1, or
  * it becomes undefined for zero estimates just like KL divergence.
- *
+ * <p/>
  * Not a true metric, but effectively a distance measure.
- *
+ * <p/>
  * Lillian Lee (2001) "On the Effectiveness of the Skew Divergence for
  * Statistical Language Analysis" Artificial Intelligence and Statistics 2001,
  * pp. 65--72, 2001
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class LeeSkewDivergence implements Measure, Serializable {

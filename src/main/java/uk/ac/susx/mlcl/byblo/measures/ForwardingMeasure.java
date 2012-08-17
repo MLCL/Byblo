@@ -39,7 +39,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 /**
  * <code>ForwardingMeasure</code> is an abstract super-class to decorators of
  * <code>Measure</code> instances.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T> type of Measure being decorated
  */
@@ -50,7 +50,7 @@ public abstract class ForwardingMeasure<T extends Measure>
 
     /**
      * Constructor used by sub-classes.
-     *
+     * <p/>
      * @param deligate The Measure being decorated.
      */
     protected ForwardingMeasure(final T deligate) {

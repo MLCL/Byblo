@@ -124,7 +124,8 @@ public class CountCommandTest {
 
         final String fruitPrefix = TEST_FRUIT_INPUT.getName();
         final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
-        final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
+        final File fActual =
+                new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
         final File efActual = new File(TEST_OUTPUT_DIR,
                                        fruitPrefix + ".events");
 
@@ -141,7 +142,8 @@ public class CountCommandTest {
 
         final String fruitPrefix = TEST_FRUIT_INPUT.getName();
         final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
-        final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
+        final File fActual =
+                new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
         final File efActual = new File(TEST_OUTPUT_DIR,
                                        fruitPrefix + ".events");
 
@@ -156,11 +158,13 @@ public class CountCommandTest {
     public void testRunOnFruitAPI_Indexed() throws Exception {
         System.out.
                 println(
-                "Testing " + subject + " on " + TEST_FRUIT_INPUT_INDEXED + " (Indexed)");
+                "Testing " + subject + " on " + TEST_FRUIT_INPUT_INDEXED
+                + " (Indexed)");
 
         final String fruitPrefix = TEST_FRUIT_INPUT_INDEXED.getName();
         final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
-        final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
+        final File fActual =
+                new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
         final File efActual = new File(TEST_OUTPUT_DIR,
                                        fruitPrefix + ".events");
 
@@ -175,11 +179,13 @@ public class CountCommandTest {
     public void testRunOnFruitCLI_Indexed() throws Exception {
         System.out.
                 println(
-                "Testing " + subject + " on " + TEST_FRUIT_INPUT_INDEXED + " (Indexed)");
+                "Testing " + subject + " on " + TEST_FRUIT_INPUT_INDEXED
+                + " (Indexed)");
 
         final String fruitPrefix = TEST_FRUIT_INPUT_INDEXED.getName();
         final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
-        final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
+        final File fActual =
+                new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
         final File efActual = new File(TEST_OUTPUT_DIR,
                                        fruitPrefix + ".events");
 

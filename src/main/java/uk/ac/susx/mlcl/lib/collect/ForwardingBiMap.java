@@ -108,7 +108,7 @@ public final class ForwardingBiMap<K, V>
      * @param value
      * @return
      * @throws ClassCastException if value is an inappropriate type for this
-     * maps values
+     *                            maps values
      */
     @Override
     public boolean containsValue(final Object value)

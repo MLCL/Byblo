@@ -86,7 +86,8 @@ import uk.ac.susx.mlcl.lib.tasks.Task;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-@Parameters(commandDescription = "Freqency count a structured input instance file.")
+@Parameters(commandDescription =
+"Freqency count a structured input instance file.")
 public class ExternalCountCommand extends AbstractParallelCommandTask
         implements ProgressReporting {
 
@@ -106,25 +107,33 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
 
     protected static final String KEY_DST_ENTRIES_FILE = "KEY_DST_ENTRIES_FILE";
 
-    protected static final String KEY_DST_FEATURES_FILE = "KEY_DST_FEATURES_FILE";
+    protected static final String KEY_DST_FEATURES_FILE =
+            "KEY_DST_FEATURES_FILE";
 
     protected static final String KEY_DST_EVENTS_FILE = "KEY_DST_EVENTS_FILE";
 
-    protected static final String VALUE_TASK_TYPE_DELETE = "VALUE_TASK_TYPE_DELETE";
+    protected static final String VALUE_TASK_TYPE_DELETE =
+            "VALUE_TASK_TYPE_DELETE";
 
-    protected static final String VALUE_TASK_TYPE_COUNT = "VALUE_TASK_TYPE_COUNT";
+    protected static final String VALUE_TASK_TYPE_COUNT =
+            "VALUE_TASK_TYPE_COUNT";
 
-    protected static final String VALUE_TASK_TYPE_MERGE = "VALUE_TASK_TYPE_MERGE";
+    protected static final String VALUE_TASK_TYPE_MERGE =
+            "VALUE_TASK_TYPE_MERGE";
 
     protected static final String VALUE_TASK_TYPE_SORT = "VALUE_TASK_TYPE_SORT";
 
-    protected static final String VALUE_DATA_TYPE_INPUT = "VALUE_DATA_TYPE_INPUT";
+    protected static final String VALUE_DATA_TYPE_INPUT =
+            "VALUE_DATA_TYPE_INPUT";
 
-    protected static final String VALUE_DATA_TYPE_ENTRIES = "VALUE_DATA_TYPE_ENTRIES";
+    protected static final String VALUE_DATA_TYPE_ENTRIES =
+            "VALUE_DATA_TYPE_ENTRIES";
 
-    protected static final String VALUE_DATA_TYPE_FEATURES = "VALUE_DATA_TYPE_FEATURES";
+    protected static final String VALUE_DATA_TYPE_FEATURES =
+            "VALUE_DATA_TYPE_FEATURES";
 
-    protected static final String VALUE_DATA_TYPE_EVENTS = "VALUE_DATA_TYPE_EVENTS";
+    protected static final String VALUE_DATA_TYPE_EVENTS =
+            "VALUE_DATA_TYPE_EVENTS";
 
     private static final boolean DEBUG = false;
 
@@ -139,7 +148,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
     public static final int DEFAULT_MAX_CHUNK_SIE = 1000000;
 
     @Parameter(names = {"-C", "--chunk-size"},
-               description = "Number of lines per work unit. Larger value increase performance and memory usage.")
+               description =
+    "Number of lines per work unit. Larger value increase performance and memory usage.")
     private int maxChunkSize = DEFAULT_MAX_CHUNK_SIE;
 
     @Parameter(names = {"-i", "--input"},
@@ -797,7 +807,7 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
      * Method that performance a number of sanity checks on the parameterisation
      * of this class. It is necessary to do this because the the class can be
      * instantiated via a null constructor when run from the command line.
-     *
+     * <p/>
      * @throws NullPointerException
      * @throws IllegalStateException
      * @throws FileNotFoundException
@@ -849,7 +859,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
                 getParentFile().
                 canWrite()) {
             throw new IllegalStateException(
-                    "entries file does not exists and can not be reated: " + entriesFile);
+                    "entries file does not exists and can not be reated: "
+                    + entriesFile);
         }
         if (featuresFile.exists() && (!featuresFile.isFile() || !featuresFile.
                                       canWrite()))
@@ -859,17 +870,20 @@ public class ExternalCountCommand extends AbstractParallelCommandTask
                 getParentFile().
                 canWrite()) {
             throw new IllegalStateException(
-                    "features file does not exists and can not be reated: " + featuresFile);
+                    "features file does not exists and can not be reated: "
+                    + featuresFile);
         }
         if (eventsFile.exists() && (!eventsFile.isFile() || !eventsFile.
                                     canWrite()))
             throw new IllegalStateException(
-                    "entry-features file exists but is not writable: " + eventsFile);
+                    "entry-features file exists but is not writable: "
+                    + eventsFile);
         if (!eventsFile.exists() && !eventsFile.getAbsoluteFile().
                 getParentFile().
                 canWrite()) {
             throw new IllegalStateException(
-                    "entry-features file does not exists and can not be reated: " + eventsFile);
+                    "entry-features file does not exists and can not be reated: "
+                    + eventsFile);
         }
     }
 

@@ -51,7 +51,7 @@ import uk.ac.susx.mlcl.lib.tasks.ObjectSortTask;
 /**
  * Task that takes a single input file and sorts it according to some
  * comparator, then writes the results to an output file.
- *
+ * <p/>
  * @param <T>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -114,7 +114,8 @@ public abstract class AbstractSortCommand<T> extends AbstractCopyCommand<T> {
                     info(
                     "Running memory sort from \"" + getFilesDeligate().
                     getSourceFile()
-                    + "\" to \"" + getFilesDeligate().getDestinationFile() + "\".");
+                    + "\" to \"" + getFilesDeligate().getDestinationFile()
+                    + "\".");
 
         ObjectSource<T> src = openSource(getFilesDeligate().getSourceFile());
         ObjectSink<T> snk = openSink(getFilesDeligate().getDestinationFile());

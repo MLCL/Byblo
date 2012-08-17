@@ -46,7 +46,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 /**
  * Static utility class providing common functionality to various similarity
  * measures.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Immutable
@@ -64,7 +64,7 @@ public abstract class Measures {
      * Produce the multi-set intersection of the feature vectors
      * <tt>vectorA</tt> and <tt>vectorB</tt>. Calculated as the sum of the of
      * the minimum value at each index.
-     *
+     * <p/>
      * @param vectorA first feature vector
      * @param vectorB second feature vector
      * @return multi-set intersection of feature vectors
@@ -94,7 +94,7 @@ public abstract class Measures {
      * Produce the multi-set union of the feature vectors <tt>vectorA</tt> and
      * <tt>vectorB</tt>. Calculated as the sum of the multi-set cardinality of
      * both vectors, minute the intersection.
-     *
+     * <p/>
      * @param vectorA first feature vector
      * @param vectorB second feature vector
      * @return multi-set union of vectors
@@ -109,7 +109,7 @@ public abstract class Measures {
 
     /**
      * Return the multi-set cardinality of the vector, which is the sum.
-     *
+     * <p/>
      * @param vector feature vector to calculate cardinality of
      * @return cardinality
      */
@@ -121,7 +121,7 @@ public abstract class Measures {
     /**
      * Calculate the inner product of vectors <tt>vectorA</tt> and
      * <tt>vectorB</tt>.
-     *
+     * <p/>
      * @param vectorA first feature vector
      * @param vectorB second feature vector
      * @return inner product
@@ -150,7 +150,7 @@ public abstract class Measures {
     /**
      * Calculate the squared length of the vector; i.e the inner product of the
      * vector with itself.
-     *
+     * <p/>
      * @param vector vector to calculate the squared length of
      * @return squared length
      */
@@ -165,7 +165,7 @@ public abstract class Measures {
     /**
      * Return the length of the vector (i.e the vector normal) calculated as the
      * square-root of the inner product of the vector with itself.
-     *
+     * <p/>
      * @param vector vector to calculate the length of
      * @return length
      */
@@ -198,19 +198,19 @@ public abstract class Measures {
 
     /**
      * Constant to aid conversion to base 2 logarithms.
-     *
+     * <p/>
      * Conceptually it doesn't really matter what base is used, but 2 is the
      * standard base for most information theoretic approaches.
-     *
+     * <p/>
      * TODO: Move to mlcl-lib/MathUtil
      */
     public static final double LOG_2 = Math.log(2.0);
 
     /**
      * Return the base 2 logarithm of the parameter v.
-     *
+     * <p/>
      * TODO: Move to mlcl-lib/MathUtil
-     *
+     * <p/>
      * @param v some values
      * @return logarithm of the value
      */
@@ -221,18 +221,18 @@ public abstract class Measures {
     /**
      * Small value used to measure equality of double precision floating point
      * numbers while avoiding floating point errors.
-     *
+     * <p/>
      * TODO: Move to mlcl-lib
      */
     private static final double DEFAULT_EPSILON = 0.0000001;
 
     /**
      * Check that two floating point numbers are equal within error epsilon.
-     *
+     * <p/>
      * TODO: Move to mlcl-lib
-     *
-     * @param a first value
-     * @param b second value
+     * <p/>
+     * @param a       first value
+     * @param b       second value
      * @param epsilon maximum difference error
      * @return true if operands are within <tt>epsilon</tt>.
      */
@@ -245,9 +245,9 @@ public abstract class Measures {
     /**
      * Check that two floating point numbers are equal within
      * {@link #DEFAULT_EPSILON }.
-     *
+     * <p/>
      * TODO: Move to mlcl-lib
-     *
+     * <p/>
      * @param a first value
      * @param b second value
      * @return true if operands are within {@link #DEFAULT_EPSILON}.

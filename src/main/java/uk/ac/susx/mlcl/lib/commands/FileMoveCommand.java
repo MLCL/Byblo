@@ -38,10 +38,10 @@ import uk.ac.susx.mlcl.lib.tasks.FileMoveTask;
 
 /**
  * Move source file to a destination.
- *
+ * <p/>
  * Attempts to perform a fast rename if possible. Otherwise it falls back to
  * slower copy and delete.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Parameters(commandDescription = "Move a file.")

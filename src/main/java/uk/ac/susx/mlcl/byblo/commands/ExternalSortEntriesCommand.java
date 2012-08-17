@@ -81,7 +81,8 @@ public class ExternalSortEntriesCommand extends AbstractExternalSortCommand<Weig
     }
 
     @Override
-    protected SeekableObjectSource<Weighted<Token>, Tell> openSource(File file) throws IOException {
+    protected SeekableObjectSource<Weighted<Token>, Tell> openSource(File file)
+            throws IOException {
         return BybloIO.openEntriesSource(file, getCharset(), indexDeligate);
     }
 

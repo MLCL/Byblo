@@ -37,10 +37,10 @@ import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 /**
  * {@link Weighting} that simply returns the value stored in the vector
  * parameter multiplied by some constant.
- *
+ * <p/>
  * Used when no re-weighting is required (i.e identity) or when some constant
  * scaFling is useful.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class Constant
