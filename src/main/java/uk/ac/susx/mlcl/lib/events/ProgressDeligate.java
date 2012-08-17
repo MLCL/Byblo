@@ -33,6 +33,7 @@ package uk.ac.susx.mlcl.lib.events;
 import java.text.MessageFormat;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.Nullable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -52,14 +53,17 @@ public class ProgressDeligate implements ProgressReporting {
     private CopyOnWriteArrayList<ProgressListener> progressListeners =
             new CopyOnWriteArrayList<ProgressListener>();
 
+    @Nullable
     private final ProgressReporting outer;
 
     private final boolean progressPercentageSupported;
 
     private int progressPercent = 0;
 
+    @Nullable
     private ProgressEvent event = null;
 
+    @Nullable
     private String message = null;
 
     private State state = State.PENDING;
@@ -68,7 +72,7 @@ public class ProgressDeligate implements ProgressReporting {
 
     private AtomicInteger adjustingCount = new AtomicInteger(0);
 
-    public ProgressDeligate(ProgressReporting outer,
+    public ProgressDeligate(@Nullable ProgressReporting outer,
                             boolean progressPercentageSupported) {
         if (outer == this)
             throw new IllegalArgumentException("outer == this");
@@ -76,7 +80,7 @@ public class ProgressDeligate implements ProgressReporting {
         this.progressPercentageSupported = progressPercentageSupported;
     }
 
-    public ProgressDeligate(ProgressReporting outer) {
+    public ProgressDeligate(@Nullable ProgressReporting outer) {
         if (outer == this)
             throw new IllegalArgumentException("outer == this");
         this.outer = outer;
@@ -101,7 +105,7 @@ public class ProgressDeligate implements ProgressReporting {
         this.stateChangedSinceLastEvent = true;
     }
 
-    public ProgressReporting getOuter() {
+    public @Nullable ProgressReporting getOuter() {
         return outer;
     }
 

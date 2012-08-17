@@ -34,6 +34,7 @@ import com.beust.jcommander.Parameter;
 import com.google.common.base.Objects;
 import java.io.File;
 import java.io.IOException;
+import javax.annotation.Nullable;
 
 /**
  *
@@ -56,7 +57,7 @@ public final class SingleEnumeratingDeligate
     private Enumerator<String> enumerator = null;
 
     public SingleEnumeratingDeligate(
-            EnumeratorType type, boolean enumerated, File indexFile) {
+            EnumeratorType type, boolean enumerated, @Nullable File indexFile) {
         super(type);
         this.enumerationEnabled = enumerated;
         this.enumeratorFile = indexFile;

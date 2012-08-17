@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.lib.events;
 
+import com.google.common.base.Preconditions;
 import java.util.EventObject;
 
 /**
@@ -50,7 +51,7 @@ public class ProgressEvent extends EventObject {
     }
 
     public void setSource(ProgressReporting source) {
+        Preconditions.checkNotNull(source, "source");
         this.source = source;
     }
-
 }

@@ -31,4 +31,7 @@
 /**
  * Project specific tasks.
  */
+@ParametersAreNonnullByDefault
 package uk.ac.susx.mlcl.byblo.tasks;
+
+import javax.annotation.ParametersAreNonnullByDefault;

@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Nullable;
 import org.apache.jdbm.DB;
 import org.apache.jdbm.DBMaker;
 import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
@@ -89,7 +90,7 @@ public final class JDBMStringEnumerator extends BiMapEnumerator<String> {
         }
     }
 
-    public static JDBMStringEnumerator newInstance(File file) {
+    public static JDBMStringEnumerator newInstance(@Nullable File file) {
         return load(file);
     }
 
@@ -167,7 +168,7 @@ public final class JDBMStringEnumerator extends BiMapEnumerator<String> {
         return instance;
     }
 
-    public static JDBMStringEnumerator load(File file) {
+    public static JDBMStringEnumerator load(@Nullable File file) {
 
         final boolean anonymous;
         if (file == null) {

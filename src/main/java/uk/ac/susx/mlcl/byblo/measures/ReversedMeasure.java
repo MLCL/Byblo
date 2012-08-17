@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.measures;
 
+import javax.annotation.concurrent.Immutable;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**

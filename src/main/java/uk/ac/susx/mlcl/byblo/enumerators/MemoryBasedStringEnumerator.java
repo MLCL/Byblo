@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Nullable;
 import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
 import uk.ac.susx.mlcl.lib.collect.ForwardingBiMap;
 import uk.ac.susx.mlcl.lib.io.Files;
@@ -51,7 +52,7 @@ public final class MemoryBasedStringEnumerator extends BiMapEnumerator<String> {
 
     private static final long serialVersionUID = 1L;
 
-    private final File file;
+    private final @Nullable File file;
 
     public MemoryBasedStringEnumerator(File file) {
         super();
@@ -59,7 +60,7 @@ public final class MemoryBasedStringEnumerator extends BiMapEnumerator<String> {
     }
 
     public MemoryBasedStringEnumerator(
-            File file, BiMap<Integer, String> map, AtomicInteger nextId) {
+           @Nullable File file, BiMap<Integer, String> map, AtomicInteger nextId) {
         super(map, nextId);
         this.file = file;
     }
@@ -76,7 +77,7 @@ public final class MemoryBasedStringEnumerator extends BiMapEnumerator<String> {
         return newInstance(null);
     }
 
-    public static MemoryBasedStringEnumerator newInstance(File file) {
+    public static MemoryBasedStringEnumerator newInstance(@Nullable File file) {
         ForwardingBiMap<Integer, String> map = ForwardingBiMap.
                 <Integer, String>create(
                 new HashMap<Integer, String>(),

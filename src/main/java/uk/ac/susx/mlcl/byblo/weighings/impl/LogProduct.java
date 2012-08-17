@@ -31,6 +31,7 @@
 package uk.ac.susx.mlcl.byblo.weighings.impl;
 
 import java.io.Serializable;
+import javax.annotation.concurrent.Immutable;
 import uk.ac.susx.mlcl.byblo.weighings.AbstractSimpleWeighting;
 import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 
@@ -38,6 +39,7 @@ import uk.ac.susx.mlcl.byblo.weighings.Weightings;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@Immutable
 public final class LogProduct
         extends AbstractSimpleWeighting
         implements Serializable {

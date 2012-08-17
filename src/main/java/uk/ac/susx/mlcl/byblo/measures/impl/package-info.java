@@ -31,4 +31,8 @@
 /**
  * Concrete implementations for measures of similarity, proximity, and distance.
  */
+@ParametersAreNonnullByDefault 
 package uk.ac.susx.mlcl.byblo.measures.impl;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+

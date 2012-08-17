@@ -31,6 +31,7 @@
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
 import java.io.Serializable;
+import javax.annotation.concurrent.Immutable;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
@@ -42,6 +43,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@Immutable
 public final class JensenShannonDivergence implements Measure, Serializable {
 
     private static final long serialVersionUID = 1L;

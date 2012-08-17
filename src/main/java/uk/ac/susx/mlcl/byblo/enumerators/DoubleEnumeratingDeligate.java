@@ -34,6 +34,7 @@ import com.beust.jcommander.Parameter;
 import com.google.common.base.Objects;
 import java.io.File;
 import java.io.IOException;
+import javax.annotation.Nullable;
 
 /**
  *
@@ -46,19 +47,19 @@ public final class DoubleEnumeratingDeligate
     private static final long serialVersionUID = 1L;
 
     @Parameter(names = {"-Ee", "--enumerated-entries"},
-    description = "Whether tokens in the first column of the input file are indexed.")
+               description = "Whether tokens in the first column of the input file are indexed.")
     private boolean enumeratedEntries = DEFAULT_IS_ENUMERATED;
 
     @Parameter(names = {"-Ef", "--enumerated-features"},
-    description = "Whether entries in the second column of the input file are indexed.")
+               description = "Whether entries in the second column of the input file are indexed.")
     private boolean enumeratedFeatures = DEFAULT_IS_ENUMERATED;
 
     @Parameter(names = {"-Xe", "--entries-index-file"},
-    description = "Index file for enumerating entries.")
+               description = "Index file for enumerating entries.")
     private File entryEnumeratorFile = null;
 
     @Parameter(names = {"-Xf", "--features-index-file"},
-    description = "Index file for enumerating features.")
+               description = "Index file for enumerating features.")
     private File featureEnumeratorFile = null;
 
     private Enumerator<String> entryEnumerator = null;
@@ -66,9 +67,13 @@ public final class DoubleEnumeratingDeligate
     private Enumerator<String> featureEnumerator = null;
 
     protected DoubleEnumeratingDeligate(
-            EnumeratorType type, boolean enumeratedEntries, boolean enumeratedFeatures,
-            File entryIndexFile, File featureIndexFile,
-            Enumerator<String> entryEnumerator, Enumerator<String> featureEnumerator) {
+            EnumeratorType type,
+            boolean enumeratedEntries,
+            boolean enumeratedFeatures,
+            @Nullable File entryIndexFile,
+            @Nullable File featureIndexFile,
+            @Nullable Enumerator<String> entryEnumerator,
+            @Nullable Enumerator<String> featureEnumerator) {
         super(type);
         this.enumeratedEntries = enumeratedEntries;
         this.enumeratedFeatures = enumeratedFeatures;
@@ -79,9 +84,13 @@ public final class DoubleEnumeratingDeligate
     }
 
     public DoubleEnumeratingDeligate(
-            EnumeratorType type, boolean enumeratedEntries, boolean enumeratedFeatures,
-            File entryIndexFile, File featureIndexFile) {
-        this(type, enumeratedEntries, enumeratedFeatures, entryIndexFile, featureIndexFile,
+            EnumeratorType type,
+            boolean enumeratedEntries,
+            boolean enumeratedFeatures,
+            @Nullable File entryIndexFile,
+            @Nullable File featureIndexFile) {
+        this(type, enumeratedEntries, enumeratedFeatures, entryIndexFile,
+             featureIndexFile,
              null, null);
     }
 
@@ -235,5 +244,4 @@ public final class DoubleEnumeratingDeligate
     public boolean isEnumeratorOpen() {
         return isEntriesEnumeratorOpen() || isFeaturesEnumeratorOpen();
     }
-
 }

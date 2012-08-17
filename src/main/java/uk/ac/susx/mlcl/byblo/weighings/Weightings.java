@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo.weighings;
 
 import java.util.Arrays;
 import java.util.Collection;
+import javax.annotation.concurrent.Immutable;
 import uk.ac.susx.mlcl.lib.Checks;
 
 /**
@@ -39,6 +40,7 @@ import uk.ac.susx.mlcl.lib.Checks;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@Immutable
 public final class Weightings {
 
     /**

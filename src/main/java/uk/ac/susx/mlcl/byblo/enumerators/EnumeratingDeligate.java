@@ -34,10 +34,8 @@ import com.beust.jcommander.Parameter;
 import com.google.common.base.Objects;
 import java.io.File;
 import java.io.IOException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.FullBuild;
 import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
+import uk.ac.susx.mlcl.lib.Checks;
 
 /**
  *
@@ -46,8 +44,7 @@ import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
 public abstract class EnumeratingDeligate
         implements Enumerating {
 
-    private static final Log LOG = LogFactory.getLog(FullBuild.class);
-
+//    private static final Log LOG = LogFactory.getLog(EnumeratingDeligate.class);
     private static final long serialVersionUID = 1L;
 //
 //    @Parameter(names = {"-s1", "--skipindexed1"},
@@ -88,20 +85,17 @@ public abstract class EnumeratingDeligate
     }
 
     protected void save(Enumerator<String> enumerator) throws IOException {
-        if (enumerator == null) {
-            LOG.warn("Attempt made to save an enumerator that was not open.");
-            return;
-        }
+        Checks.checkNotNull("enumerator", enumerator);
+
+
         type.save(enumerator);
         if (enumerator.indexOf(FilterCommand.FILTERED_STRING) != FilterCommand.FILTERED_ID)
             throw new AssertionError();
     }
 
     protected void close(Enumerator<String> enumerator) throws IOException {
-        if (enumerator == null) {
-            LOG.warn("Attempt made to close an enumerator that was not open.");
-            return;
-        }
+        Checks.checkNotNull("enumerator", enumerator);
+
         if (enumerator.indexOf(FilterCommand.FILTERED_STRING) != FilterCommand.FILTERED_ID)
             throw new AssertionError();
         type.close(enumerator);
@@ -115,5 +109,4 @@ public abstract class EnumeratingDeligate
     public final String toString() {
         return toStringHelper().toString();
     }
-
 }

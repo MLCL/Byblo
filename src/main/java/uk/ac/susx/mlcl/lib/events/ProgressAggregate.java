@@ -31,11 +31,12 @@
 package uk.ac.susx.mlcl.lib.events;
 
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.annotation.Nullable;
 import uk.ac.susx.mlcl.lib.Checks;
 
 /**
  * Implementation of ProgressReporting that reports progress based on the totals
- * of sum number of child ProgressReporting objects.
+ * of summed number of child ProgressReporting objects.
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -73,7 +74,7 @@ public class ProgressAggregate extends ProgressDeligate {
 
             };
 
-    public ProgressAggregate(ProgressReporting outer) {
+    public ProgressAggregate(@Nullable ProgressReporting outer) {
         super(outer, true);
     }
 

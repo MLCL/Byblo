@@ -32,4 +32,8 @@
  * Common interfaces and abstract classes for measures of similarity, proximity,
  * and distance.
  */
+@ParametersAreNonnullByDefault 
 package uk.ac.susx.mlcl.byblo.measures;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+

@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
+import javax.annotation.concurrent.Immutable;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsCarrier;
 import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsDeligate;
@@ -75,6 +76,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@Immutable
 public class Confusion implements Measure, FeatureMarginalsCarrier {
 
     private final FeatureMarginalsDeligate featureMarginals =

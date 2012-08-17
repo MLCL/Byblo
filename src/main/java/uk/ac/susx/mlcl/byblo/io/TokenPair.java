@@ -38,6 +38,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
 import java.util.Comparator;
+import javax.annotation.concurrent.Immutable;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
@@ -50,6 +51,7 @@ import uk.ac.susx.mlcl.lib.Checks;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@Immutable
 public final class TokenPair implements
         Comparable<TokenPair>, Serializable, Cloneable {
 

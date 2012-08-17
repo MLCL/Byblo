@@ -28,46 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.lib.events;
+@ParametersAreNonnullByDefault
+package uk.ac.susx.mlcl.byblo.io;
 
-import com.google.common.base.Preconditions;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-/**
- * Trivial
- * <code>ProgressListener</code> implementation that simply writes the progress
- * report of each even received to a
- * <code>Log</code>
- *
- *
- * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
- */
-public final class ReportLoggingProgressListener implements ProgressListener {
-
-    private final Log log;
-
-    /**
-     * Log progress event reports to given
-     * <code>log</code>.
-     *
-     * @param log destination logger for event progress reports
-     */
-    public ReportLoggingProgressListener(final Log log) {
-        Preconditions.checkNotNull(log, "log");
-        this.log = log;
-    }
-
-    /**
-     * Log progress event reports to logger for this class.
-     */
-    public ReportLoggingProgressListener() {
-        this(LogFactory.getLog(ReportLoggingProgressListener.class));
-    }
-
-    @Override
-    public void progressChanged(final ProgressEvent progressEvent) {
-        if (log.isInfoEnabled())
-            log.info(progressEvent.getSource().getProgressReport());
-    }
-}
+import javax.annotation.ParametersAreNonnullByDefault;

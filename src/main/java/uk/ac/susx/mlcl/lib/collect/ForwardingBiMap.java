@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.lib.collect;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ForwardingMap;
 import java.io.Externalizable;
@@ -39,6 +40,8 @@ import java.io.ObjectOutput;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import uk.ac.susx.mlcl.lib.Checks;
 
 /**
@@ -58,7 +61,7 @@ public final class ForwardingBiMap<K, V>
 
     protected ForwardingBiMap(
             Map<K, V> forwards,
-            ForwardingBiMap<V, K> inverse) {
+            @Nullable ForwardingBiMap<V, K> inverse) {
         this.deligate = forwards;
         this.inverse = inverse;
     }
@@ -77,9 +80,9 @@ public final class ForwardingBiMap<K, V>
     }
 
     @Override
-    public V put(K k, V v) {
-        Checks.checkNotNull("key", k);
-        Checks.checkNotNull("value", v);
+    public V put(@Nonnull K k, @Nonnull V v) {
+        Preconditions.checkNotNull(k, "key");
+        Preconditions.checkNotNull(v, "value");
 
         if (containsValue(v)) {
             if (get(k).equals(v))
@@ -92,9 +95,9 @@ public final class ForwardingBiMap<K, V>
     }
 
     @Override
-    public V forcePut(K k, V v) {
-        Checks.checkNotNull("key", k);
-        Checks.checkNotNull("value", v);
+    public V forcePut(@Nonnull K k, @Nonnull V v) {
+        Preconditions.checkNotNull(k, "key");
+        Preconditions.checkNotNull(v, "value");
 
         inverse.deligate.put(v, k);
         return deligate.put(k, v);

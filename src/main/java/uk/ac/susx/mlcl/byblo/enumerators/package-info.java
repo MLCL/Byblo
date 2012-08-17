@@ -32,4 +32,8 @@
  * Contains classes related to the construction and maintenance of indexed
  * vocabularies of objects.
  */
+@ParametersAreNonnullByDefault 
 package uk.ac.susx.mlcl.byblo.enumerators;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+
