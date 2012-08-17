@@ -61,7 +61,6 @@ public class ProgressAggregate extends ProgressDeligate {
      */
     private transient final ProgressListener childProgressListener =
             new ProgressListener() {
-
                 @Override
                 public void progressChanged(ProgressEvent progressEvent) {
                     Checks.checkNotNull(progressEvent);
@@ -71,7 +70,6 @@ public class ProgressAggregate extends ProgressDeligate {
                     setStateChangedSinceLastEvent();
                     endAdjusting();
                 }
-
             };
 
     public ProgressAggregate(@Nullable ProgressReporting outer) {
@@ -155,7 +153,8 @@ public class ProgressAggregate extends ProgressDeligate {
                 for (int i = 0; i < depth + 1; i++)
                     sb.append('\t');
                 if (child instanceof ProgressAggregate)
-                    sb.append(((ProgressAggregate) child).getDeepProgressReport(depth + 1));
+                    sb.append(((ProgressAggregate) child).
+                            getDeepProgressReport(depth + 1));
                 else {
                     sb.append(child.getProgressReport());
                 }
@@ -209,7 +208,8 @@ public class ProgressAggregate extends ProgressDeligate {
         if (getClass() != obj.getClass())
             return false;
         final ProgressAggregate other = (ProgressAggregate) obj;
-        if (this.children != other.children && (this.children == null || !this.children.equals(other.children)))
+        if (this.children != other.children && (this.children == null || !this.children.
+                                                equals(other.children)))
             return false;
         return super.equals(other);
     }
@@ -225,5 +225,4 @@ public class ProgressAggregate extends ProgressDeligate {
     public String toString() {
         return "ProgressAggregate{" + "children=" + children + '}';
     }
-
 }

@@ -50,5 +50,4 @@ public interface SingleEnumerating extends Enumerating {
     public void setEnumeratorFile(File enumeratorFile);
 
     public void setEnumerationEnabled(boolean enumerationEnabled);
-
 }

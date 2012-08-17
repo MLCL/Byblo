@@ -45,17 +45,17 @@ import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.TSV;
 
 /**
- * An <tt>WeightedTokenPairSink</tt> object is used to store
- * {@link TokenPair} objects in a flat file.
+ * An <tt>WeightedTokenPairSink</tt> object is used to store {@link TokenPair}
+ * objects in a flat file.
  *
  * <p>The basic file format is Tab-Separated-Values (TSV) where records are
  * delimited by new-lines, and values are delimited by tabs. Two variants are
- * supported: verbose and compact. In verbose mode each
- * {@link TokenPair} corresponds to a single TSV record; i.e one line per object
- * consisting of two entries, and their weight. In compact mode each TSV record
- * consists of a single entry followed by the second-entry/weight pairs from all
- * sequentially written
- * {@link WeightedTokenPairSink} objects that share the same first entry.</p>
+ * supported: verbose and compact. In verbose mode each {@link TokenPair}
+ * corresponds to a single TSV record; i.e one line per object consisting of two
+ * entries, and their weight. In compact mode each TSV record consists of a
+ * single entry followed by the second-entry/weight pairs from all sequentially
+ * written {@link WeightedTokenPairSink} objects that share the same first
+ * entry.</p>
  *
  * Verbose mode example:
  * <pre>
@@ -109,54 +109,47 @@ public class WeightedTokenPairSink
     }
 
     public static WeightedTokenPairSink open(
-            File file, Charset charset, DoubleEnumerating idx, boolean skip1, boolean skip2, boolean compact)
+            File file, Charset charset, DoubleEnumerating idx, boolean skip1,
+            boolean skip2, boolean compact)
             throws IOException {
         DataSink tsv = new TSV.Sink(file, charset);
 
 
         if (skip1) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
-
                 @Override
                 public boolean apply(Integer column) {
                     return column != null && column == 0;
                 }
-
             });
         }
 
         if (skip2) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
-
                 @Override
                 public boolean apply(Integer column) {
                     return column != null && (column + 1) % 2 == 0;
                 }
-
             });
         }
 
         if (!idx.isEnumeratedEntries()) {
             tsv = Enumerated.enumerated(tsv, idx.getEntryEnumerator(),
                                         new Predicate<Integer>() {
-
                 @Override
                 public boolean apply(Integer column) {
                     return column != null && column == 0;
                 }
-
             });
         }
 
         if (!idx.isEnumeratedFeatures()) {
             tsv = Enumerated.enumerated(tsv, idx.getFeatureEnumerator(),
                                         new Predicate<Integer>() {
-
                 @Override
                 public boolean apply(Integer column) {
                     return column != null && (column + 1) % 2 == 0;
                 }
-
             });
         }
 
@@ -165,5 +158,4 @@ public class WeightedTokenPairSink
 
         return new WeightedTokenPairSink(tsv);
     }
-
 }

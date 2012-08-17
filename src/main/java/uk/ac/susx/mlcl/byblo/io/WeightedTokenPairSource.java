@@ -98,52 +98,45 @@ public class WeightedTokenPairSource
     }
 
     public static WeightedTokenPairSource open(
-            File file, Charset charset, DoubleEnumerating idx, boolean skip1, boolean skip2)
+            File file, Charset charset, DoubleEnumerating idx, boolean skip1,
+            boolean skip2)
             throws IOException {
         SeekableDataSource tsv = new TSV.Source(file, charset);
 
 
         if (skip1) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
-
                 @Override
                 public boolean apply(Integer column) {
                     return column != null && column == 0;
                 }
-
             });
         }
         if (skip2) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
-
                 @Override
                 public boolean apply(Integer column) {
                     return column != null && (column + 1) % 2 == 0;
                 }
-
             });
         }
         if (!idx.isEnumeratedEntries()) {
             tsv = Enumerated.enumerated(tsv, idx.getEntryEnumerator(),
                                         new Predicate<Integer>() {
-
                 @Override
                 public boolean apply(Integer column) {
                     return column != null && column == 0;
                 }
-
             });
         }
 
         if (!idx.isEnumeratedFeatures()) {
             tsv = Enumerated.enumerated(tsv, idx.getFeatureEnumerator(),
                                         new Predicate<Integer>() {
-
                 @Override
                 public boolean apply(Integer column) {
                     return column != null && (column + 1) % 2 == 0;
                 }
-
             });
         }
 
@@ -151,5 +144,4 @@ public class WeightedTokenPairSource
 
         return new WeightedTokenPairSource(tsv);
     }
-
 }

@@ -50,7 +50,7 @@ public class FileDeleteCommand extends AbstractCommand {
 
     @Parameter(names = {"-f", "--file"},
                description = "File to deleted",
-               validateWith = InputFileValidator.class, required=true)
+               validateWith = InputFileValidator.class, required = true)
     private File file = null;
 
     public FileDeleteCommand(File file) {
@@ -69,7 +69,7 @@ public class FileDeleteCommand extends AbstractCommand {
         if (!file.exists())
             throw new FileNotFoundException("Unnable to delete file because it "
                     + "doesn't exist: \"" + file + "\"");
-        
+
         if (!file.delete())
             throw new IOException("Unnable to delete file: \"" + file + "\"");
     }

@@ -76,7 +76,7 @@ public class FileMoveTask extends FileCopyTask {
 
 
         // Check the configuration state
-        if (getSrcFile().equals(getDstFile())) 
+        if (getSrcFile().equals(getDstFile()))
             throw new IllegalStateException("sourceFile equals destinationFile");
 
         move(getSrcFile(), getDstFile());
@@ -85,5 +85,4 @@ public class FileMoveTask extends FileCopyTask {
         progress.setState(State.COMPLETED);
 
     }
-
 }

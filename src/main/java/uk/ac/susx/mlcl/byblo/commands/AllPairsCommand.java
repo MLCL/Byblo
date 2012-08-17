@@ -65,6 +65,7 @@ import uk.ac.susx.mlcl.byblo.tasks.InvertedApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.NaiveApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.ThreadedApssTask;
 import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsCarrier;
+import uk.ac.susx.mlcl.byblo.weighings.MarginalDistribution;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
@@ -266,24 +267,15 @@ public class AllPairsCommand extends AbstractCommand {
                     LOG.info("Loading features file " + getFeaturesFile());
                 }
 
-                WTStatsSource features = new WTStatsSource(openFeaturesSource());
+                final MarginalDistribution fmd =
+                        BybloIO.readMarginalDistribution(openFeaturesSource());
 
-                final double[] featureMarginals = readAllAsArray(features);
-                final double grandTotal = features.getWeightSum();
-                final int featureCardinality = features.getMaxId() + 1;
-
-                if (measure instanceof FeatureMarginalsCarrier) {
-                    FeatureMarginalsCarrier fmc = ((FeatureMarginalsCarrier) measure);
-                    fmc.setFeatureMarginals(featureMarginals);
-                    fmc.setGrandTotal(grandTotal);
-                    fmc.setFeatureCardinality(featureCardinality);
-                }
+                if (measure instanceof FeatureMarginalsCarrier)
+                    ((FeatureMarginalsCarrier) measure).setFeatureMarginals(fmd);
 
                 if (weighting instanceof FeatureMarginalsCarrier) {
-                    FeatureMarginalsCarrier fmc = ((FeatureMarginalsCarrier) weighting);
-                    fmc.setFeatureMarginals(featureMarginals);
-                    fmc.setGrandTotal(grandTotal);
-                    fmc.setFeatureCardinality(featureCardinality);
+                    ((FeatureMarginalsCarrier) weighting).setFeatureMarginals(
+                            fmd);
                 }
 
 
@@ -495,8 +487,9 @@ public class AllPairsCommand extends AbstractCommand {
             throws ClassNotFoundException {
         final Map<String, Class<? extends Measure>> classLookup =
                 Measures.loadMeasureAliasTable();
-        
-        final String mname = getMeasureName().toLowerCase(BybloSettings.getLocale()).trim();
+
+        final String mname = getMeasureName().toLowerCase(BybloSettings.
+                getLocale()).trim();
         if (classLookup.containsKey(mname)) {
             return classLookup.get(mname);
         } else {

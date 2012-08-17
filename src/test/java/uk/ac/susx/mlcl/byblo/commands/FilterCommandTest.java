@@ -52,13 +52,16 @@ public class FilterCommandTest {
     private static final String SUBJECT = FilterCommand.class.getName();
 
     private final static File OUTPUT_ENTRIES = new File(TEST_OUTPUT_DIR,
-                                                        TEST_FRUIT_ENTRIES_FILTERED.getName());
+                                                        TEST_FRUIT_ENTRIES_FILTERED.
+            getName());
 
     private final static File OUTPUT_FEATURES = new File(TEST_OUTPUT_DIR,
-                                                         TEST_FRUIT_FEATURES_FILTERED.getName());
+                                                         TEST_FRUIT_FEATURES_FILTERED.
+            getName());
 
     private final static File OUTPUT_EVENTS = new File(TEST_OUTPUT_DIR,
-                                                               TEST_FRUIT_EVENTS_FILTERED.getName());
+                                                       TEST_FRUIT_EVENTS_FILTERED.
+            getName());
 
     @Before
     public void setUp() throws IOException {
@@ -103,7 +106,8 @@ public class FilterCommandTest {
 
     @Test
     public void testMainMethodRun_fruit_entryFreqFilter() throws Exception {
-        System.out.println(
+        System.out.
+                println(
                 "Testing " + SUBJECT + ": on fruit, from main method, filter by Entry freqency.");
 
         runWithCLI(new String[]{"--filter-entry-freq", "50"});
@@ -111,7 +115,8 @@ public class FilterCommandTest {
 
     @Test
     public void testMainMethodRun_fruit_featureFreqFilter() throws Exception {
-        System.out.println(
+        System.out.
+                println(
                 "Testing " + SUBJECT + " on fruit from main method, filter by context freqency.");
 
         runWithCLI(new String[]{"--filter-feature-freq", "50"});
@@ -119,7 +124,8 @@ public class FilterCommandTest {
 
     @Test
     public void testMainMethodRun_fruit_eventFreqFilter() throws Exception {
-        System.out.println(
+        System.out.
+                println(
                 "Testing FilterTask on fruit from main method, filter by feature freqency.");
 
         runWithCLI(new String[]{"--filter-event-freq", "5"});
@@ -127,13 +133,15 @@ public class FilterCommandTest {
 
     @Test
     public void testMainMethodRun_fruit_EntryWhitelistFilter() throws Exception {
-        System.out.println(
+        System.out.
+                println(
                 "Testing FilterTask: on fruit, from main method, filter by entry word list.");
 
         File entryWorldList = new File(TEST_OUTPUT_DIR,
                                        TEST_FRUIT_INPUT.getName() + ".entry-whitelist");
 
-        Files.write("apple\norange\npear\nbanana", entryWorldList, Charset.forName("UTF-8"));
+        Files.write("apple\norange\npear\nbanana", entryWorldList, Charset.
+                forName("UTF-8"));
 
         runWithCLI(new String[]{"--filter-entry-whitelist",
                     entryWorldList.toString()});
@@ -141,20 +149,24 @@ public class FilterCommandTest {
 
     @Test
     public void testMainMethodRun_fruit_featureWhitelistFilter() throws Exception {
-        System.out.println(
+        System.out.
+                println(
                 "Testing FilterTask: on fruit, from main method, filter by context word list.");
 
-        File contextWorldList = new File(TEST_OUTPUT_DIR, TEST_FRUIT_INPUT.getName() + ".contextWordList");
+        File contextWorldList = new File(TEST_OUTPUT_DIR, TEST_FRUIT_INPUT.
+                getName() + ".contextWordList");
 
         Files.write("det:the\ndet:a\niobj:of\nncmod:back\nncmod:for\npassive",
                     contextWorldList, Charset.forName("UTF-8"));
 
-        runWithCLI(new String[]{"--filter-feature-whitelist", contextWorldList.toString()});
+        runWithCLI(new String[]{"--filter-feature-whitelist", contextWorldList.
+                    toString()});
     }
 
     @Test
     public void testMainMethodRun_fruit_entryPatternFilter() throws Exception {
-        System.out.println(
+        System.out.
+                println(
                 "Testing FilterTask: on fruit, from main method, filter by entry pattern.");
 
         runWithCLI(new String[]{"--filter-entry-pattern", "^.{0,5}$"});
@@ -162,7 +174,8 @@ public class FilterCommandTest {
 
     @Test
     public void testMainMethodRun_fruit_contextPatternFilter() throws Exception {
-        System.out.println(
+        System.out.
+                println(
                 "Testing FilterTask: on fruit, from main method, filter by context pattern.");
 
         runWithCLI(new String[]{"--filter-feature-pattern", "det:.*"});
@@ -170,7 +183,8 @@ public class FilterCommandTest {
 
     @Test
     public void testMainMethodRun_fruit_allFilters() throws Exception {
-        System.out.println(
+        System.out.
+                println(
                 "Testing FilterTask: on fruit, from main method, using all filters.");
 
         File entryWorldList = new File(TEST_OUTPUT_DIR,
@@ -209,5 +223,4 @@ public class FilterCommandTest {
             ExitTrapper.disableExitTrapping();
         }
     }
-
 }

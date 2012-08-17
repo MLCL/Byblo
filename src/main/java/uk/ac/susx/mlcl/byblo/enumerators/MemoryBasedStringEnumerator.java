@@ -52,7 +52,8 @@ public final class MemoryBasedStringEnumerator extends BiMapEnumerator<String> {
 
     private static final long serialVersionUID = 1L;
 
-    private final @Nullable File file;
+    private final @Nullable
+    File file;
 
     public MemoryBasedStringEnumerator(File file) {
         super();
@@ -60,7 +61,8 @@ public final class MemoryBasedStringEnumerator extends BiMapEnumerator<String> {
     }
 
     public MemoryBasedStringEnumerator(
-           @Nullable File file, BiMap<Integer, String> map, AtomicInteger nextId) {
+            @Nullable File file, BiMap<Integer, String> map,
+            AtomicInteger nextId) {
         super(map, nextId);
         this.file = file;
     }

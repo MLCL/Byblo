@@ -70,5 +70,4 @@ public final class NullEnumerator<T> implements Enumerator<T> {
     public String toString() {
         return "NullEnumerator{}";
     }
-
 }

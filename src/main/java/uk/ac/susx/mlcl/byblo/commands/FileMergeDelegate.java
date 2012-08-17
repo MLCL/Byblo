@@ -48,24 +48,25 @@ public final class FileMergeDelegate extends FileDeligate implements Serializabl
     private static final long serialVersionUID = 1L;
 
     @Parameter(names = {"-ifa", "--input-file-a"},
-    required = true,
-    description = "The first file to merge.",
-    validateWith = InputFileValidator.class)
+               required = true,
+               description = "The first file to merge.",
+               validateWith = InputFileValidator.class)
     private File sourceFileA;
 
     @Parameter(names = {"-ifb", "--input-file-b"},
-    required = true,
-    description = "The second file to merge.",
-    validateWith = InputFileValidator.class)
+               required = true,
+               description = "The second file to merge.",
+               validateWith = InputFileValidator.class)
     private File sourceFileB;
 
     @Parameter(names = {"-of", "--output-file"},
-    required = true,
-    description = "The output file to which both input will be merged.",
-    validateWith = OutputFileValidator.class)
+               required = true,
+               description = "The output file to which both input will be merged.",
+               validateWith = OutputFileValidator.class)
     private File destinationFile;
 
-    public FileMergeDelegate(File sourceFileA, File sourceFileB, File destination, Charset charset) {
+    public FileMergeDelegate(File sourceFileA, File sourceFileB,
+                             File destination, Charset charset) {
         super(charset);
         setSourceFileA(sourceFileA);
         setSourceFileB(sourceFileB);
@@ -124,5 +125,4 @@ public final class FileMergeDelegate extends FileDeligate implements Serializabl
                 add("in2", getSourceFileB()).
                 add("out", getDestinationFile());
     }
-
 }

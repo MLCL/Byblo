@@ -111,10 +111,11 @@ public abstract class AbstractTask implements Task {
     protected boolean equals(AbstractTask other) {
         if (this.properties != other.properties
                 && (this.properties == null || !this.properties.equals(
-                other.properties)))
+                    other.properties)))
             return false;
         if (this.exceptionDeligate != other.exceptionDeligate
-                && (this.exceptionDeligate == null || !this.exceptionDeligate.equals(other.exceptionDeligate)))
+                && (this.exceptionDeligate == null || !this.exceptionDeligate.
+                    equals(other.exceptionDeligate)))
             return false;
         return true;
     }
@@ -132,7 +133,8 @@ public abstract class AbstractTask implements Task {
     public int hashCode() {
         int hash = 3;
         hash = 11 * hash + (this.properties != null ? this.properties.hashCode() : 0);
-        hash = 11 * hash + (this.exceptionDeligate != null ? this.exceptionDeligate.hashCode() : 0);
+        hash = 11 * hash + (this.exceptionDeligate != null ? this.exceptionDeligate.
+                            hashCode() : 0);
         return hash;
     }
 
@@ -168,5 +170,4 @@ public abstract class AbstractTask implements Task {
     public final synchronized Exception getTrappedException() {
         return exceptionDeligate.getTrappedException();
     }
-
 }

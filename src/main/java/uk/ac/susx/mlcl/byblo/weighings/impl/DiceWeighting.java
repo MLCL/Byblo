@@ -59,9 +59,10 @@ public final class DiceWeighting
 
         final double likelihood = value / vector.sum;
 
-        final double entryPrior = vector.sum / getGrandTotal();
+        final double entryPrior = vector.sum / getFeatureMarginals().
+                getFrequencySum();
 
-        final double featurePrior = getFeaturePrior(key);
+        final double featurePrior = getFeatureMarginals().getPrior(key);
 
         final double joint = likelihood * entryPrior;
 

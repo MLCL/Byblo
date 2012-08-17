@@ -53,8 +53,8 @@ import uk.ac.susx.mlcl.lib.io.TSV;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
- * Wraps a (something) to produce complete feature
- * vectors instead of just individual entry/feature records.
+ * Wraps a (something) to produce complete feature vectors instead of just
+ * individual entry/feature records.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -145,15 +145,14 @@ public class FastWeightedTokenPairVectorSource
             throw new IllegalArgumentException();
         }
 
-        List<Int2DoubleMap.Entry> entries = new ArrayList<Int2DoubleMap.Entry>(map.int2DoubleEntrySet());
+        List<Int2DoubleMap.Entry> entries = new ArrayList<Int2DoubleMap.Entry>(map.
+                int2DoubleEntrySet());
         Collections.sort(entries, new Comparator<Int2DoubleMap.Entry>() {
-
             @Override
             public final int compare(final Int2DoubleMap.Entry t,
                                      final Int2DoubleMap.Entry t1) {
                 return t.getIntKey() - t1.getIntKey();
             }
-
         });
 
         int[] keys = new int[entries.size()];
@@ -171,52 +170,45 @@ public class FastWeightedTokenPairVectorSource
     }
 
     public static FastWeightedTokenPairVectorSource open(
-            File file, Charset charset, DoubleEnumerating idx, boolean skip1, boolean skip2)
+            File file, Charset charset, DoubleEnumerating idx, boolean skip1,
+            boolean skip2)
             throws IOException {
         SeekableDataSource tsv = new TSV.Source(file, charset);
 
 
         if (skip1) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
-
                 @Override
                 public boolean apply(Integer column) {
                     return column != null && column == 0;
                 }
-
             });
         }
         if (skip2) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
-
                 @Override
                 public boolean apply(Integer column) {
                     return column != null && (column + 1) % 2 == 0;
                 }
-
             });
         }
         if (!idx.isEnumeratedEntries()) {
             tsv = Enumerated.enumerated(tsv, idx.getEntryEnumerator(),
                                         new Predicate<Integer>() {
-
                 @Override
                 public boolean apply(Integer column) {
                     return column != null && column == 0;
                 }
-
             });
         }
 
         if (!idx.isEnumeratedFeatures()) {
             tsv = Enumerated.enumerated(tsv, idx.getFeatureEnumerator(),
                                         new Predicate<Integer>() {
-
                 @Override
                 public boolean apply(Integer column) {
                     return column != null && (column + 1) % 2 == 0;
                 }
-
             });
         }
 
@@ -224,5 +216,4 @@ public class FastWeightedTokenPairVectorSource
 
         return new FastWeightedTokenPairVectorSource(tsv);
     }
-
 }

@@ -289,6 +289,7 @@ public class LinTest {
 
         return val;
     }
+
     static List<Indexed<SparseDoubleVector>> loadFruitVectors() throws IOException {
 
         final DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();

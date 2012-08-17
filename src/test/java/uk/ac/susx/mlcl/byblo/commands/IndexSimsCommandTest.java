@@ -82,62 +82,74 @@ public class IndexSimsCommandTest {
 
     @Test
     public void testRunOnFruitAPI_noskip_compact() throws Exception {
-        testRunOnFruitAPI("compact-noskip-", EnumeratorType.Memory, false, false, true);
+        testRunOnFruitAPI("compact-noskip-", EnumeratorType.Memory, false, false,
+                          true);
     }
 
     @Test
     public void testRunOnFruitAPI_skipboth_compact() throws Exception {
-        testRunOnFruitAPI("compact-skipboth-", EnumeratorType.Memory, true, true, true);
+        testRunOnFruitAPI("compact-skipboth-", EnumeratorType.Memory, true, true,
+                          true);
     }
 
     @Test
     public void testRunOnFruitAPI_skipleft_compact() throws Exception {
-        testRunOnFruitAPI("compact-skipleft-", EnumeratorType.Memory, true, false, true);
+        testRunOnFruitAPI("compact-skipleft-", EnumeratorType.Memory, true,
+                          false, true);
     }
 
     @Test
     public void testRunOnFruitAPI_skipright_compact() throws Exception {
-        testRunOnFruitAPI("compact-skipright-", EnumeratorType.Memory, false, true, true);
+        testRunOnFruitAPI("compact-skipright-", EnumeratorType.Memory, false,
+                          true, true);
     }
 
     @Test
     public void testRunOnFruitAPI_noskip_verbose() throws Exception {
-        testRunOnFruitAPI("verbose-noskip-", EnumeratorType.Memory, false, false, false);
+        testRunOnFruitAPI("verbose-noskip-", EnumeratorType.Memory, false, false,
+                          false);
     }
 
     @Test
     public void testRunOnFruitAPI_skipboth_verbose() throws Exception {
-        testRunOnFruitAPI("verbose-skipboth-", EnumeratorType.Memory, true, true, false);
+        testRunOnFruitAPI("verbose-skipboth-", EnumeratorType.Memory, true, true,
+                          false);
     }
 
     @Test
     public void testRunOnFruitAPI_skipleft_verbose() throws Exception {
-        testRunOnFruitAPI("verbose-skipleft-", EnumeratorType.Memory, true, false, false);
+        testRunOnFruitAPI("verbose-skipleft-", EnumeratorType.Memory, true,
+                          false, false);
     }
 
     @Test
     public void testRunOnFruitAPI_skipright_verbose() throws Exception {
-        testRunOnFruitAPI("verbose-skipright-", EnumeratorType.Memory, false, true, false);
+        testRunOnFruitAPI("verbose-skipright-", EnumeratorType.Memory, false,
+                          true, false);
     }
 
     @Test
     public void testRunOnFruitAPI_noskip_compact_jdbm() throws Exception {
-        testRunOnFruitAPI("compact-noskip-jdbm-", EnumeratorType.JDBM, false, false, true);
+        testRunOnFruitAPI("compact-noskip-jdbm-", EnumeratorType.JDBM, false,
+                          false, true);
     }
 
     @Test
     public void testRunOnFruitAPI_skipboth_compact_jdbm() throws Exception {
-        testRunOnFruitAPI("compact-skipboth-jdbm-", EnumeratorType.JDBM, true, true, true);
+        testRunOnFruitAPI("compact-skipboth-jdbm-", EnumeratorType.JDBM, true,
+                          true, true);
     }
 
     @Test
     public void testRunOnFruitAPI_skipleft_compact_jdbm() throws Exception {
-        testRunOnFruitAPI("compact-skipleft-jdbm-", EnumeratorType.JDBM, true, false, true);
+        testRunOnFruitAPI("compact-skipleft-jdbm-", EnumeratorType.JDBM, true,
+                          false, true);
     }
 
     @Test
     public void testRunOnFruitAPI_skipright_compact_jdbm() throws Exception {
-        testRunOnFruitAPI("compact-skipright-jdbm-", EnumeratorType.JDBM, false, true, true);
+        testRunOnFruitAPI("compact-skipright-jdbm-", EnumeratorType.JDBM, false,
+                          true, true);
     }
 
     @Test
@@ -165,14 +177,16 @@ public class IndexSimsCommandTest {
     }
 
     public void testRunOnFruitAPI(
-            String prefix, EnumeratorType type, boolean skip1, boolean skip2, boolean compact) throws Exception {
+            String prefix, EnumeratorType type, boolean skip1, boolean skip2,
+            boolean compact) throws Exception {
         System.out.println("Testing " + IndexSimsCommandTest.class.getName()
                 + " on " + TEST_FRUIT_SIMS_100NN);
 
         final String name = TEST_FRUIT_SIMS_100NN.getName();
         final File out = new File(TEST_OUTPUT_DIR, prefix + name + ".indexed");
         File out2 = suffix(out, ".unindexed");
-        final File idx = new File(TEST_OUTPUT_DIR, prefix + name + ".entry-index");
+        final File idx = new File(TEST_OUTPUT_DIR,
+                                  prefix + name + ".entry-index");
 
         deleteIfExist(out, idx);
 
@@ -208,17 +222,23 @@ public class IndexSimsCommandTest {
 
         deleteIfExist(outa, idxa, outb, idxb);
 
-        indexSims(TEST_FRUIT_SIMS, outa, idxa, EnumeratorType.Memory, skip1a, skip2a, true);
-        indexSims(TEST_FRUIT_SIMS, outb, idxb, EnumeratorType.Memory, skip1b, skip2b, true);
+        indexSims(TEST_FRUIT_SIMS, outa, idxa, EnumeratorType.Memory, skip1a,
+                  skip2a, true);
+        indexSims(TEST_FRUIT_SIMS, outb, idxb, EnumeratorType.Memory, skip1b,
+                  skip2b, true);
 
         // Read back the data checking it's identical
         {
             WeightedTokenPairSource wtpsa = WeightedTokenPairSource.open(
                     outa, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null), skip1a, skip2a);
+                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true,
+                                                  true, null, null), skip1a,
+                    skip2a);
             WeightedTokenPairSource wtpsb = WeightedTokenPairSource.open(
                     outb, DEFAULT_CHARSET,
-                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, true, null, null), skip1a, skip2a);
+                    new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true,
+                                                  true, null, null), skip1a,
+                    skip2a);
             List<Tell> pa = new ArrayList<Tell>();
             List<Tell> pb = new ArrayList<Tell>();
             List<Weighted<TokenPair>> va = new ArrayList<Weighted<TokenPair>>();
@@ -257,12 +277,14 @@ public class IndexSimsCommandTest {
             WeightedTokenPairVectorSource wtpsa = WeightedTokenPairSource.open(
                     outa, DEFAULT_CHARSET,
                     new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
-                                                  true, true, null, null), skip1a, skip2a).
+                                                  true, true, null, null),
+                    skip1a, skip2a).
                     getVectorSource();
             WeightedTokenPairVectorSource wtpsb = WeightedTokenPairSource.open(
                     outb, DEFAULT_CHARSET,
                     new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
-                                                  true, true, null, null), skip1b, skip2b).
+                                                  true, true, null, null),
+                    skip1b, skip2b).
                     getVectorSource();
 
             List<Tell> pa = new ArrayList<Tell>();
@@ -304,7 +326,8 @@ public class IndexSimsCommandTest {
     }
 
     public static void indexSims(File from, File to, File index,
-                                 EnumeratorType type, boolean skip1, boolean skip2, boolean compact)
+                                 EnumeratorType type, boolean skip1,
+                                 boolean skip2, boolean compact)
             throws Exception {
         assertValidPlaintextInputFiles(from);
         assertValidOutputFiles(to);
@@ -348,12 +371,12 @@ public class IndexSimsCommandTest {
         unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
         unindex.getFilesDeligate().setSourceFile(from);
         unindex.getFilesDeligate().setDestinationFile(to);
-        unindex.setIndexDeligate(EnumeratingDeligates.toPair(new SingleEnumeratingDeligate(
+        unindex.setIndexDeligate(EnumeratingDeligates.
+                toPair(new SingleEnumeratingDeligate(
                 type, true, index)));
         unindex.runCommand();
 
         assertValidPlaintextInputFiles(to);
         assertSizeGT(to, from);
     }
-
 }

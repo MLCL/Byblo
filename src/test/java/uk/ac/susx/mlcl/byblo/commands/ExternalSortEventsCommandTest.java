@@ -91,7 +91,8 @@ public class ExternalSortEventsCommandTest {
         final boolean preindexedTokens1 = false;
         final boolean preindexedTokens2 = false;
 
-        File randomisedFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".sims.randomised");
+        File randomisedFile = new File(TEST_OUTPUT_DIR,
+                                       FRUIT_NAME + ".sims.randomised");
         File sortedFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".sims.sorted");
 //        File entryIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".entry-index");
 //        File featureIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".feature-index");
@@ -102,7 +103,8 @@ public class ExternalSortEventsCommandTest {
                 null, null);
 
         Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(
-                Weighted.recordOrder(TokenPair.firstStringOrder(idx.getEntriesEnumeratorCarriar())),
+                Weighted.recordOrder(TokenPair.firstStringOrder(idx.
+                getEntriesEnumeratorCarriar())),
                 Comparators.reverse(Weighted.<TokenPair>weightOrder()));
 
         testSortWeightedTokenPairCommand(
@@ -159,7 +161,8 @@ public class ExternalSortEventsCommandTest {
 
 
         // load a weighted token pair file
-        WeightedTokenPairSource inputSource = openSource(inputFile, idx, false, false);
+        WeightedTokenPairSource inputSource = openSource(inputFile, idx, false,
+                                                         false);
         List<Weighted<TokenPair>> inputList = ObjectIO.readAll(inputSource);
         inputSource.close();
 
@@ -178,9 +181,11 @@ public class ExternalSortEventsCommandTest {
         randomisedSink.close();
 
         assertTrue("Randomised file does not exist", randomisedFile.exists());
-        assertTrue("Randomised file is not a regular file", randomisedFile.isFile());
+        assertTrue("Randomised file is not a regular file", randomisedFile.
+                isFile());
         {
-            WeightedTokenPairSource x = openSource(randomisedFile, idx, false, false);
+            WeightedTokenPairSource x = openSource(randomisedFile, idx, false,
+                                                   false);
             WeightedTokenPairSource y = openSource(inputFile, idx, false, false);
             assertTrue("Randomised file length differs from input",
                        ObjectIO.flush(x) == ObjectIO.flush(y));
@@ -219,7 +224,8 @@ public class ExternalSortEventsCommandTest {
         }
         // load the sorted output file and check it's sensible
 
-        WeightedTokenPairSource sortedSource = openSource(sortedFile, idx, false, false);
+        WeightedTokenPairSource sortedSource = openSource(sortedFile, idx, false,
+                                                          false);
         List<Weighted<TokenPair>> actual = ObjectIO.readAll(sortedSource);
         inputSource.close();
 
@@ -230,7 +236,8 @@ public class ExternalSortEventsCommandTest {
                     + a + " > " + b, comparator.compare(a, b) <= 0);
         }
 
-        List<Weighted<TokenPair>> expected = new ArrayList<Weighted<TokenPair>>(inputList);
+        List<Weighted<TokenPair>> expected = new ArrayList<Weighted<TokenPair>>(
+                inputList);
         Collections.sort(expected, comparator);
 
 
@@ -266,11 +273,11 @@ public class ExternalSortEventsCommandTest {
     }
 
     private static WeightedTokenPairSink openSink(
-            File file, DoubleEnumerating idx, boolean compact, boolean skip1, boolean skip2)
+            File file, DoubleEnumerating idx, boolean compact, boolean skip1,
+            boolean skip2)
             throws IOException {
         return WeightedTokenPairSink.open(
                 file, DEFAULT_CHARSET,
                 idx, skip1, skip2, compact);
     }
-
 }

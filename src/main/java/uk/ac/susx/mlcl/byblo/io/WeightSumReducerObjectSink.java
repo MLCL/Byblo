@@ -79,5 +79,4 @@ public class WeightSumReducerObjectSink<T>
         flush();
         super.close();
     }
-
 }

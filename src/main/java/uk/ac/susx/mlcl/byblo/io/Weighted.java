@@ -35,6 +35,7 @@ import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 import java.io.Serializable;
 import java.util.Comparator;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * <tt>Weighted</tt> objects represent a weighting or frequency applied to some
@@ -45,6 +46,7 @@ import java.util.Comparator;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T> Type of record being weighted
  */
+@Immutable
 public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
 
     private static final long serialVersionUID = 1L;

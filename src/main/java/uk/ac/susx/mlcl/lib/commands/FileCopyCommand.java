@@ -59,7 +59,7 @@ public class FileCopyCommand extends AbstractCommand {
         filesDeligate.setSourceFile(sourceFile);
     }
 
-    public final void setDestinationFile(File destFile)  {
+    public final void setDestinationFile(File destFile) {
         filesDeligate.setDestinationFile(destFile);
     }
 
@@ -90,5 +90,4 @@ public class FileCopyCommand extends AbstractCommand {
                 add("from", filesDeligate.getSourceFile()).
                 add("to", filesDeligate.getDestinationFile());
     }
-
 }

@@ -39,8 +39,8 @@ import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- * Proximity measure calculating proximity as the dot product of the
- * vectors. For unit vectors this is equivalent to {@link Cosine }.
+ * Proximity measure calculating proximity as the dot product of the vectors.
+ * For unit vectors this is equivalent to {@link Cosine }.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */

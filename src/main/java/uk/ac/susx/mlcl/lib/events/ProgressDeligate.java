@@ -105,7 +105,8 @@ public class ProgressDeligate implements ProgressReporting {
         this.stateChangedSinceLastEvent = true;
     }
 
-    public @Nullable ProgressReporting getOuter() {
+    public @Nullable
+    ProgressReporting getOuter() {
         return outer;
     }
 

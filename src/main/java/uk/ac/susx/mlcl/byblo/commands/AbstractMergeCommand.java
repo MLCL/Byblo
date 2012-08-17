@@ -69,12 +69,13 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
     private final FileMergeDelegate fileDeligate = new FileMergeDelegate();
 
     @Parameter(names = {"-r", "--reverse"},
-    description = "Reverse the result of comparisons.")
+               description = "Reverse the result of comparisons.")
     private boolean reverse = false;
 
     private Comparator<T> comparator;
 
-    public AbstractMergeCommand(File sourceFileA, File sourceFileB, File destination,
+    public AbstractMergeCommand(File sourceFileA, File sourceFileB,
+                                File destination,
                                 Charset charset, Comparator<T> comparator) {
         fileDeligate.setSourceFileA(sourceFileA);
         fileDeligate.setSourceFileB(sourceFileB);
@@ -117,7 +118,9 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
     @Override
     public void runCommand() throws Exception {
         if (LOG.isInfoEnabled())
-            LOG.info("Running merge from \"" + getFileDeligate().getSourceFileA()
+            LOG.
+                    info(
+                    "Running merge from \"" + getFileDeligate().getSourceFileA()
                     + "\" and \"" + getFileDeligate().getSourceFileB()
                     + "\" to \"" + getFileDeligate().getDestinationFile() + "\".");
 
@@ -148,5 +151,4 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
     protected abstract ObjectSource<T> openSource(File file) throws FileNotFoundException, IOException;
 
     protected abstract ObjectSink<T> openSink(File file) throws FileNotFoundException, IOException;
-
 }

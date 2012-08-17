@@ -40,13 +40,11 @@ import java.util.Random;
 import org.junit.*;
 import static org.junit.Assert.*;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
 import uk.ac.susx.mlcl.byblo.measures.impl.Confusion;
 import uk.ac.susx.mlcl.byblo.measures.impl.Cosine;
 import uk.ac.susx.mlcl.byblo.measures.impl.Dice;
@@ -65,6 +63,7 @@ import uk.ac.susx.mlcl.byblo.measures.impl.Precision;
 import uk.ac.susx.mlcl.byblo.measures.impl.Recall;
 import uk.ac.susx.mlcl.byblo.measures.impl.Weeds;
 import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsCarrier;
+import uk.ac.susx.mlcl.byblo.weighings.MarginalDistribution;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
@@ -154,36 +153,20 @@ public class MeasuresTest {
             v.value().cardinality = card;
         }
 
-
-        WeightedTokenSource featsSrc = BybloIO.openFeaturesSource(
+        // Load the feature contexts
+        MarginalDistribution fmd = BybloIO.readFeaturesMarginalDistribution(
                 TEST_FRUIT_FEATURES, DEFAULT_CHARSET,
                 EnumeratingDeligates.toSingleFeatures(indexDeligate));
 
-        WeightedTokenSource.WTStatsSource featsStatSrc =
-                new WeightedTokenSource.WTStatsSource(featsSrc);
-
-
-        double[] feats = AllPairsCommand.readAllAsArray(featsStatSrc);
-        double featsSum = featsStatSrc.getWeightSum();
-        int featusCard = featsStatSrc.getMaxId() + 1;
-
         for (Measure m : MEASURES) {
-
-            if (m instanceof FeatureMarginalsCarrier) {
-                ((FeatureMarginalsCarrier) m).setFeatureCardinality(featusCard);
-                ((FeatureMarginalsCarrier) m).setFeatureMarginals(feats);
-                ((FeatureMarginalsCarrier) m).setGrandTotal(featsSum);
-            }
+            if (m instanceof FeatureMarginalsCarrier)
+                ((FeatureMarginalsCarrier) m).setFeatureMarginals(fmd);
 
             Weighting w = WEIGHTINGS.get(m);
+            if (w instanceof FeatureMarginalsCarrier)
+                ((FeatureMarginalsCarrier) w).setFeatureMarginals(fmd);
 
-            if (w instanceof FeatureMarginalsCarrier) {
-                ((FeatureMarginalsCarrier) w).setFeatureCardinality(featusCard);
-                ((FeatureMarginalsCarrier) w).setFeatureMarginals(feats);
-                ((FeatureMarginalsCarrier) w).setGrandTotal(featsSum);
-            }
         }
-
     }
 
     @AfterClass

@@ -61,18 +61,20 @@ public abstract class AbstractSortCommand<T> extends AbstractCopyCommand<T> {
     private static final Log LOG = LogFactory.getLog(AbstractSortCommand.class);
 
     @Parameter(names = {"-r", "--reverse"},
-    description = "Reverse the result of comparisons.")
+               description = "Reverse the result of comparisons.")
     private boolean reverse = false;
 
     private Comparator<T> comparator = null;
 
-    public AbstractSortCommand(File sourceFile, File destinationFile, Charset charset,
+    public AbstractSortCommand(File sourceFile, File destinationFile,
+                               Charset charset,
                                Comparator<T> comparator) {
         super(sourceFile, destinationFile, charset);
         this.comparator = comparator;
     }
 
-    public AbstractSortCommand(File sourceFile, File destinationFile, Charset charset) {
+    public AbstractSortCommand(File sourceFile, File destinationFile,
+                               Charset charset) {
         super(sourceFile, destinationFile, charset);
     }
 
@@ -108,7 +110,10 @@ public abstract class AbstractSortCommand<T> extends AbstractCopyCommand<T> {
     @Override
     public void runCommand() throws Exception {
         if (LOG.isInfoEnabled())
-            LOG.info("Running memory sort from \"" + getFilesDeligate().getSourceFile()
+            LOG.
+                    info(
+                    "Running memory sort from \"" + getFilesDeligate().
+                    getSourceFile()
                     + "\" to \"" + getFilesDeligate().getDestinationFile() + "\".");
 
         ObjectSource<T> src = openSource(getFilesDeligate().getSourceFile());
@@ -152,5 +157,4 @@ public abstract class AbstractSortCommand<T> extends AbstractCopyCommand<T> {
     @Override
     protected abstract ObjectSink<T> openSink(File file)
             throws FileNotFoundException, IOException;
-
 }

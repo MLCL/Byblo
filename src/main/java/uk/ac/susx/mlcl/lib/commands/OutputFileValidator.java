@@ -54,19 +54,22 @@ public final class OutputFileValidator implements IParameterValidator {
         }
         if (file.exists()) {
             if (file.isDirectory()) {
-                throw new ParameterException("Output file \"" + value + "\" exists but is a directory.");
+                throw new ParameterException(
+                        "Output file \"" + value + "\" exists but is a directory.");
             }
             if (!file.isFile()) {
-                throw new ParameterException("Output file \"" + value + "\" exists but is not an ordinary file.");
+                throw new ParameterException(
+                        "Output file \"" + value + "\" exists but is not an ordinary file.");
             }
             if (!file.canWrite()) {
-                throw new ParameterException("Output file \"" + value + "\" is not writeable.");
+                throw new ParameterException(
+                        "Output file \"" + value + "\" is not writeable.");
             }
         } else {
             if (file.getParentFile() == null || !file.getParentFile().canWrite()) {
-                throw new ParameterException("Output file \"" + value + "\" does not exist and the parent directory is not writable.");
+                throw new ParameterException(
+                        "Output file \"" + value + "\" does not exist and the parent directory is not writable.");
             }
         }
     }
-
 }

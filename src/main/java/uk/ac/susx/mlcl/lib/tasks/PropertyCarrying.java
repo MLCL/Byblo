@@ -61,5 +61,4 @@ public interface PropertyCarrying {
      */
     void setProperty(String key, String value)
             throws NullPointerException;
-
 }

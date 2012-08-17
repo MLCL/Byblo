@@ -110,7 +110,7 @@ public class LpSpaceDistanceTest {
 
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME
                 + String.format(".L-%4.2f-Space", power));
-       deleteIfExist(output);
+        deleteIfExist(output);
 
         try {
             enableExistTrapping();

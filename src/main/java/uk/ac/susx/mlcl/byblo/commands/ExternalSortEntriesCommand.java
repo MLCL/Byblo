@@ -93,5 +93,4 @@ public class ExternalSortEntriesCommand extends AbstractExternalSortCommand<Weig
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }
-
 }

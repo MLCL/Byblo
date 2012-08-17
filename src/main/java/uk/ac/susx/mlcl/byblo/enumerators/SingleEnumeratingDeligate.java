@@ -47,11 +47,11 @@ public final class SingleEnumeratingDeligate
     private static final long serialVersionUID = 1L;
 
     @Parameter(names = {"-E", "--enumerated"},
-    description = "Whether tokens in the input file are enumerated.")
+               description = "Whether tokens in the input file are enumerated.")
     private boolean enumerationEnabled = DEFAULT_IS_ENUMERATED;
 
     @Parameter(names = {"-X", "--index-file"},
-    description = "Index for the string tokens.")
+               description = "Index for the string tokens.")
     private File enumeratorFile = null;
 
     private Enumerator<String> enumerator = null;
@@ -128,5 +128,4 @@ public final class SingleEnumeratingDeligate
     public DoubleEnumerating getEnumeratorPairCarriar() {
         return EnumeratingDeligates.toPair(this);
     }
-
 }

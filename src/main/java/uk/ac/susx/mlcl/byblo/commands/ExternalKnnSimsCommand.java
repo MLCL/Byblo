@@ -67,7 +67,7 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
     private static final long serialVersionUID = 1L;
 
     @Parameter(names = {"-k"},
-    description = "The number of neighbours to produce for each base entry.")
+               description = "The number of neighbours to produce for each base entry.")
     private int k = DEFAULT_K;
 
     private Comparator<Weighted<TokenPair>> classComparator =
@@ -192,7 +192,8 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
             throws FileNotFoundException, IOException {
         return new KFirstReducingObjectSink<Weighted<TokenPair>>(
                 new WeightSumReducerObjectSink<TokenPair>(
-                BybloIO.openNeighboursSink(file, getCharset(), getIndexDeligate())),
+                BybloIO.openNeighboursSink(file, getCharset(),
+                                           getIndexDeligate())),
                 classComparator, k);
 
     }
@@ -201,7 +202,4 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
     public String getName() {
         return "knn-sims";
     }
-
-
-
 }

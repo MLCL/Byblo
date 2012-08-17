@@ -79,5 +79,4 @@ public class WeightStatsObjectSource<T> extends CountingObjectSource<ObjectSourc
         weightMin = Math.min(weightMin, wt.weight());
         return wt;
     }
-
 }

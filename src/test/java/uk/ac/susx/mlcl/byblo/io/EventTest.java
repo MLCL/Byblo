@@ -115,9 +115,11 @@ public class EventTest {
 
 
         DoubleEnumerating indel = EnumeratingDeligates.toPair(
-                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false, idxFile));
+                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false,
+                                              idxFile));
         DoubleEnumerating outdel = EnumeratingDeligates.toPair(
-                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, idxFile));
+                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true,
+                                              idxFile));
 
         {
 
@@ -152,5 +154,4 @@ public class EventTest {
         assertTrue("Double converted file is not equal to origion.",
                    Files.equal(a, c));
     }
-
 }

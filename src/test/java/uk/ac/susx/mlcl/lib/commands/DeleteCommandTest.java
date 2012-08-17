@@ -62,5 +62,4 @@ public class DeleteCommandTest {
 
         jc.usage();
     }
-
 }

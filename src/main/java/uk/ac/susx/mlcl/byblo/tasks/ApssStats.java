@@ -46,21 +46,25 @@ import java.util.concurrent.atomic.AtomicLong;
 public final class ApssStats implements Serializable {
 
     private static final long serialVersionUID = 4248533084667228992L;
+
     private final AtomicLong candidates;
+
     private final AtomicLong comparisons;
+
     private final AtomicLong productions;
+
     private final AtomicLong srcReads;
 
     /**
      * Dependency injection constructor.
      *
-     * @param candidates    Count of candidate pairs
-     * @param comparisons   Count of "slow" comparisons (e.g dot products).
-     * @param productions   Count of unique pairs found.
-     * @param srcReads      Count of records read.
+     * @param candidates Count of candidate pairs
+     * @param comparisons Count of "slow" comparisons (e.g dot products).
+     * @param productions Count of unique pairs found.
+     * @param srcReads Count of records read.
      */
     protected ApssStats(AtomicLong candidates, AtomicLong comparisons,
-            AtomicLong productions, AtomicLong srcReads) {
+                        AtomicLong productions, AtomicLong srcReads) {
         this.candidates = candidates;
         this.comparisons = comparisons;
         this.productions = productions;

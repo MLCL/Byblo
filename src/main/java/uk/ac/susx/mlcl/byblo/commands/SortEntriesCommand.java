@@ -61,7 +61,8 @@ public final class SortEntriesCommand extends AbstractSortCommand<Weighted<Token
 
     public SortEntriesCommand(File sourceFile, File destinationFile,
                               Charset charset, SingleEnumerating indexDeligate) {
-        super(sourceFile, destinationFile, charset, Weighted.recordOrder(Token.indexOrder()));
+        super(sourceFile, destinationFile, charset, Weighted.recordOrder(Token.
+                indexOrder()));
         setIndexDeligate(indexDeligate);
     }
 
@@ -83,7 +84,8 @@ public final class SortEntriesCommand extends AbstractSortCommand<Weighted<Token
 
     @Override
     protected ObjectSink<Weighted<Token>> openSink(File file) throws FileNotFoundException, IOException {
-        return new WeightSumReducerObjectSink<Token>(BybloIO.openEntriesSink(file, getCharset(), indexDeligate));
+        return new WeightSumReducerObjectSink<Token>(BybloIO.openEntriesSink(
+                file, getCharset(), indexDeligate));
 
     }
 
@@ -95,5 +97,4 @@ public final class SortEntriesCommand extends AbstractSortCommand<Weighted<Token
         Checks.checkNotNull("indexDeligate", indexDeligate);
         this.indexDeligate = indexDeligate;
     }
-
 }

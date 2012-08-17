@@ -79,7 +79,7 @@ public abstract class AbstractCommandTask extends AbstractTask implements Comman
     @Override
     public void runCommand(String[] args)
             throws InstantiationException, IllegalAccessException, Exception {
-        
+
         Checks.checkNotNull("args", args);
 
         if (LOG.isTraceEnabled())

@@ -62,8 +62,9 @@ public final class LLR
     @Override
     public double apply(final SparseDoubleVector vector, int key, double value) {
         final double Ha = Weightings.log2(value / vector.sum);
-        final double H0 = Weightings.log2((getFeatureMarginal(key) - value)
-                / (getGrandTotal() - vector.sum));
+        final double H0 = Weightings.log2((getFeatureMarginals().getFrequency(
+                                           key) - value)
+                / (getFeatureMarginals().getFrequencySum() - vector.sum));
         return 2 * (Ha - H0);
     }
 

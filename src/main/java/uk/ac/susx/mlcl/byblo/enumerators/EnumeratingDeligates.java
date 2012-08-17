@@ -60,7 +60,6 @@ public final class EnumeratingDeligates {
     public static DoubleEnumerating decorateEnumerated(
             final DoubleEnumerating inner, final boolean enumerated) {
         return new EnumeratingDeligates.DoubleToDoubleAdapter(inner) {
-
             @Override
             public boolean isEnumeratedEntries() {
                 return enumerated;
@@ -70,19 +69,16 @@ public final class EnumeratingDeligates {
             public boolean isEnumeratedFeatures() {
                 return enumerated;
             }
-
         };
     }
 
     public static SingleEnumerating decorateEnumerated(
             final SingleEnumerating inner, final boolean enumerated) {
         return new EnumeratingDeligates.SingleToSingleAdapter(inner) {
-
             @Override
             public boolean isEnumerationEnabled() {
                 return enumerated;
             }
-
         };
     }
 
@@ -117,7 +113,8 @@ public final class EnumeratingDeligates {
             if (getClass() != obj.getClass())
                 return false;
             final AdapterBase<?> other = (AdapterBase<?>) obj;
-            if (this.inner != other.inner && (this.inner == null || !this.inner.equals(other.inner)))
+            if (this.inner != other.inner && (this.inner == null || !this.inner.
+                                              equals(other.inner)))
                 return false;
             return true;
         }
@@ -169,7 +166,6 @@ public final class EnumeratingDeligates {
         public String toString() {
             return this.getClass().getSimpleName() + "{" + "inner=" + inner + '}';
         }
-
     }
 
     public static class SingleToPairAdapter
@@ -284,7 +280,6 @@ public final class EnumeratingDeligates {
         public boolean isFeaturesEnumeratorOpen() {
             return getInner().isEnumeratorOpen();
         }
-
     }
 
     public static class PairToFeaturesSingleAdapter
@@ -344,7 +339,6 @@ public final class EnumeratingDeligates {
         public boolean isEnumeratorOpen() {
             return getInner().isEnumeratorOpen();
         }
-
     }
 
     public static class PairToEntriesSingleAdapter
@@ -404,7 +398,6 @@ public final class EnumeratingDeligates {
         public boolean isEnumeratorOpen() {
             return getInner().isEnumeratorOpen();
         }
-
     }
 
     public abstract static class SingleToSingleAdapter
@@ -464,7 +457,6 @@ public final class EnumeratingDeligates {
         public boolean isEnumeratorOpen() {
             return getInner().isEnumeratorOpen();
         }
-
     }
 
     public abstract static class DoubleToDoubleAdapter
@@ -579,6 +571,5 @@ public final class EnumeratingDeligates {
         public boolean isFeaturesEnumeratorOpen() {
             return getInner().isFeaturesEnumeratorOpen();
         }
-
     }
 }

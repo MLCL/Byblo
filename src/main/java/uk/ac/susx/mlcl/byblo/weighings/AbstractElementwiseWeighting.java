@@ -33,7 +33,9 @@ package uk.ac.susx.mlcl.byblo.weighings;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- * {@linkElementwiseWeighting} maps element-wise from a single feature input
+ * {
+ *
+ * @linkElementwiseWeighting} maps element-wise from a single feature input
  * weight to the output weight, but with addition contextual information
  * provided.
  *
@@ -51,7 +53,7 @@ public abstract class AbstractElementwiseWeighting implements Weighting {
 
     @Override
     public final SparseDoubleVector apply(final SparseDoubleVector from) {
-        if(from.size == 0)
+        if (from.size == 0)
             return new SparseDoubleVector(from.cardinality, 0);
         final SparseDoubleVector to = from.clone();
         double sum = 0;
@@ -84,5 +86,4 @@ public abstract class AbstractElementwiseWeighting implements Weighting {
 
     @Override
     public abstract double getUpperBound();
-    
 }

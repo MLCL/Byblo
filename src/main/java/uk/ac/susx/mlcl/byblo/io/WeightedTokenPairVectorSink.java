@@ -70,5 +70,4 @@ public class WeightedTokenPairVectorSink
     public void close() throws IOException {
         inner.close();
     }
-
 }

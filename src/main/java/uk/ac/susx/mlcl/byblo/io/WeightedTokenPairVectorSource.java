@@ -122,15 +122,14 @@ public class WeightedTokenPairVectorSource
             throw new IllegalArgumentException();
         }
 
-        List<Int2DoubleMap.Entry> entries = new ArrayList<Int2DoubleMap.Entry>(map.int2DoubleEntrySet());
+        List<Int2DoubleMap.Entry> entries = new ArrayList<Int2DoubleMap.Entry>(map.
+                int2DoubleEntrySet());
         Collections.sort(entries, new Comparator<Int2DoubleMap.Entry>() {
-
             @Override
             public final int compare(final Int2DoubleMap.Entry t,
                                      final Int2DoubleMap.Entry t1) {
                 return t.getIntKey() - t1.getIntKey();
             }
-
         });
 
         int[] keys = new int[entries.size()];
@@ -146,5 +145,4 @@ public class WeightedTokenPairVectorSource
         vec.compact();
         return vec;
     }
-
 }

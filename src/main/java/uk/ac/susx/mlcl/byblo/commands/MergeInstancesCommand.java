@@ -55,7 +55,8 @@ public class MergeInstancesCommand extends AbstractMergeCommand<TokenPair> {
     public MergeInstancesCommand(
             File sourceFileA, File sourceFileB, File destinationFile,
             Charset charset, DoubleEnumeratingDeligate indexDeligate) {
-        super(sourceFileA, sourceFileB, destinationFile, charset, TokenPair.indexOrder());
+        super(sourceFileA, sourceFileB, destinationFile, charset, TokenPair.
+                indexOrder());
         setIndexDeligate(indexDeligate);
     }
 
@@ -81,12 +82,14 @@ public class MergeInstancesCommand extends AbstractMergeCommand<TokenPair> {
 
     @Override
     protected ObjectSource<TokenPair> openSource(File file) throws FileNotFoundException, IOException {
-        return BybloIO.openInstancesSource(file, getFileDeligate().getCharset(), indexDeligate);
+        return BybloIO.openInstancesSource(file, getFileDeligate().getCharset(),
+                                           indexDeligate);
     }
 
     @Override
     protected ObjectSink<TokenPair> openSink(File file) throws FileNotFoundException, IOException {
-        return BybloIO.openInstancesSink(file, getFileDeligate().getCharset(), indexDeligate);
+        return BybloIO.openInstancesSink(file, getFileDeligate().getCharset(),
+                                         indexDeligate);
     }
 
     public static void main(String[] args) throws Exception {
@@ -97,5 +100,4 @@ public class MergeInstancesCommand extends AbstractMergeCommand<TokenPair> {
     protected Objects.ToStringHelper toStringHelper() {
         return super.toStringHelper().add("indexing", indexDeligate);
     }
-
 }

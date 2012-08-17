@@ -326,11 +326,11 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
         return nThreads;
     }
 
-     synchronized final ExecutorService getExecutor() {
+    synchronized final ExecutorService getExecutor() {
         return executor;
     }
 
-     synchronized final Queue<Future<? extends Task>> getFutureQueue() {
+    synchronized final Queue<Future<? extends Task>> getFutureQueue() {
         return futureQueue;
     }
 

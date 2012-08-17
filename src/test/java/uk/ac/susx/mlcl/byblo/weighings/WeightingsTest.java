@@ -102,35 +102,17 @@ public class WeightingsTest {
         DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
 
         // Load the feature contexts
-
-        WeightedTokenSource featsSrc = BybloIO.openFeaturesSource(
+        MarginalDistribution fmd = BybloIO.readFeaturesMarginalDistribution(
                 TEST_FRUIT_FEATURES, DEFAULT_CHARSET,
                 EnumeratingDeligates.toSingleFeatures(indexDeligate));
 
-        WeightedTokenSource.WTStatsSource featsStatSrc =
-                new WeightedTokenSource.WTStatsSource(featsSrc);
-
-
-        double[] feats = AllPairsCommand.readAllAsArray(featsStatSrc);
-        double featsSum = featsStatSrc.getWeightSum();
-        int featusCard = featsStatSrc.getMaxId() + 1;
-
         // Load the entry contexts
-
-        WeightedTokenSource entsSrc = BybloIO.openFeaturesSource(
+        MarginalDistribution emd = BybloIO.readEntriesMarginalDistribution(
                 TEST_FRUIT_ENTRIES, DEFAULT_CHARSET,
                 EnumeratingDeligates.toSingleFeatures(indexDeligate));
 
-        WeightedTokenSource.WTStatsSource entsStatSrc =
-                new WeightedTokenSource.WTStatsSource(entsSrc);
-
-
-        double[] ents = AllPairsCommand.readAllAsArray(entsStatSrc);
-        double entsSum = featsStatSrc.getWeightSum();
-        int entsCard = featsStatSrc.getMaxId() + 1;
-
         assertEquals("marginal distributions totals differ",
-                     featsSum, entsSum, 0.000001);
+                     fmd.getFrequencySum(), emd.getFrequencySum(), 0.000001);
 
         // Load the events vectors
 
@@ -140,23 +122,11 @@ public class WeightingsTest {
         for (int i = 0; i < WEIGHT_CLASSES.length; i++) {
             Weighting wgt = WEIGHT_CLASSES[i].newInstance();
 
+            if (wgt instanceof FeatureMarginalsCarrier)
+                ((FeatureMarginalsCarrier) wgt).setFeatureMarginals(fmd);
 
-            if (wgt instanceof MarginalsCarrier) {
-                MarginalsCarrier mc = (MarginalsCarrier) wgt;
-                mc.setGrandTotal(featsSum);
-            }
-
-            if (wgt instanceof FeatureMarginalsCarrier) {
-                FeatureMarginalsCarrier fmc = (FeatureMarginalsCarrier) wgt;
-                fmc.setFeatureMarginals(feats);
-                fmc.setFeatureCardinality(featusCard);
-            }
-
-            if (wgt instanceof EntryMarginalsCarrier) {
-                EntryMarginalsCarrier fmc = (EntryMarginalsCarrier) wgt;
-                fmc.setEntryMarginals(ents);
-                fmc.setEntryCardinality(entsCard);
-            }
+            if (wgt instanceof EntryMarginalsCarrier)
+                ((EntryMarginalsCarrier) wgt).setEntryMarginals(emd);
 
             wgts[i] = wgt;
         }
@@ -165,7 +135,8 @@ public class WeightingsTest {
                 BybloIO.openEventsVectorSource(
                 TEST_FRUIT_EVENTS, DEFAULT_CHARSET, indexDeligate);
 
-        List<Indexed<SparseDoubleVector>> vecs = new ArrayList<Indexed<SparseDoubleVector>>();
+        List<Indexed<SparseDoubleVector>> vecs =
+                new ArrayList<Indexed<SparseDoubleVector>>();
         while (eventSrc.hasNext())
             vecs.add(eventSrc.read());
 

@@ -216,12 +216,12 @@ public final class CountTask extends AbstractTask
 
         progress.startAdjusting();
         progress.
-                                              setProgressPercent(
-                                              (int) (100 * instanceCount
-                                                     / (instanceCount + entryFreq.
-                                                        size() + featureFreq.
-                                                        size() + eventFreq.
-                                                        size())));
+                setProgressPercent(
+                (int) (100 * instanceCount
+                       / (instanceCount + entryFreq.
+                          size() + featureFreq.
+                          size() + eventFreq.
+                          size())));
         progress.setMessage("Writing entries.");
         progress.endAdjusting();
 
@@ -234,10 +234,14 @@ public final class CountTask extends AbstractTask
         if (getEntrySink() instanceof Flushable)
             ((Flushable) getEntrySink()).flush();
         progress.startAdjusting();
-        progress.setProgressPercent((int) (100 * (instanceCount + entryFreq.
-                                                  size())
-                                           / (instanceCount + entryFreq.size() + featureFreq.
-                                              size() + eventFreq.size())));
+        progress.
+                setProgressPercent(
+                (int) (100 * (instanceCount + entryFreq.
+                              size())
+                       / (instanceCount + entryFreq.
+                          size() + featureFreq.
+                          size() + eventFreq.
+                          size())));
         progress.setMessage("Writing features.");
         progress.endAdjusting();
 
@@ -252,10 +256,15 @@ public final class CountTask extends AbstractTask
             ((Flushable) getFeatureSink()).flush();
 
         progress.startAdjusting();
-        progress.setProgressPercent((int) (100 * (instanceCount + entryFreq.
-                                                  size() + featureFreq.size())
-                                           / (instanceCount + entryFreq.size() + featureFreq.
-                                              size() + eventFreq.size())));
+        progress.
+                setProgressPercent(
+                (int) (100 * (instanceCount + entryFreq.
+                              size() + featureFreq.
+                              size())
+                       / (instanceCount + entryFreq.
+                          size() + featureFreq.
+                          size() + eventFreq.
+                          size())));
         progress.setMessage("Writing events.");
         progress.endAdjusting();
 

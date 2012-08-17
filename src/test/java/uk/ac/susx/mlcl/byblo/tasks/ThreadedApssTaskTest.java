@@ -70,7 +70,8 @@ public class ThreadedApssTaskTest {
     @Test
     public void testCLI() throws Exception {
         String output = new File(TEST_OUTPUT_DIR,
-                                 TEST_FRUIT_INPUT.getName() + ".sims").toString();
+                                 TEST_FRUIT_INPUT.getName() + ".sims").
+                toString();
         String[] args = {
             "allpairs",
             "--input", TEST_FRUIT_EVENTS.toString(),
@@ -245,7 +246,8 @@ public class ThreadedApssTaskTest {
 
     @Test
     public void compareNaive_Threaded_vs_NonThreaded() throws Exception {
-        System.out.println(
+        System.out.
+                println(
                 "Testing " + subject + " compare Naive Threaded vs Non-Threaded");
 
 
@@ -320,7 +322,8 @@ public class ThreadedApssTaskTest {
 
     @Test
     public void compareInverted_Threaded_vs_NonThreaded() throws Exception {
-        System.out.println(
+        System.out.
+                println(
                 "Testing " + subject + " compare Naive Threaded vs Non-Threaded");
 
         List<Weighted<TokenPair>> threadedResults = new ArrayList<Weighted<TokenPair>>();

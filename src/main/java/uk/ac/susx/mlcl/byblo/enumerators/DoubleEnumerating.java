@@ -78,5 +78,4 @@ public interface DoubleEnumerating extends Enumerating {
     boolean isEnumeratedFeatures();
 
     void setEnumeratedFeatures(boolean enumeratedFeatures);
-
 }

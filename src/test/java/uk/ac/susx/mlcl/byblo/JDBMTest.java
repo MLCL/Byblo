@@ -196,7 +196,7 @@ public class JDBMTest {
 
         private final String fileName;
 
-        private  FilenameStartswithFilter(String fileName) {
+        private FilenameStartswithFilter(String fileName) {
             this.fileName = fileName;
         }
 

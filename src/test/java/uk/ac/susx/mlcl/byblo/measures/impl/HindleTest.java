@@ -156,7 +156,7 @@ public class HindleTest {
         A.set(1, 1);
         B.set(0, 1);
         B.set(1, 1);
-        double expect =2;
+        double expect = 2;
         double actual = test(A, B);
 
         assertEquals(expect, actual, EPSILON);
@@ -177,7 +177,6 @@ public class HindleTest {
         double actual = test(B, A);
         assertEquals(expect, actual, EPSILON);
     }
-
 
     @Test
     public void testHeteroginiety() throws Exception {

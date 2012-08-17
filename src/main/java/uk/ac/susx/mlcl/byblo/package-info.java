@@ -32,8 +32,7 @@
  * Contains code unique to the Byblo thesaurus builder application. In the
  * current from none of this is thought to be re-usable in other projects.
  */
-@ParametersAreNonnullByDefault 
+@ParametersAreNonnullByDefault
 package uk.ac.susx.mlcl.byblo;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-

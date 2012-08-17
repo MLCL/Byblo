@@ -54,7 +54,7 @@ import uk.ac.susx.mlcl.lib.io.ObjectSource;
  * @author hiam20
  */
 public abstract class IndexingCommands<T>
-    extends AbstractCopyCommand<T> {
+        extends AbstractCopyCommand<T> {
 
     @ParametersDelegate
     private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate(
@@ -107,7 +107,8 @@ public abstract class IndexingCommands<T>
         public IndexEntries(
                 File sourceFile, File destinationFile, Charset charset,
                 SingleEnumerating indexDeligate) {
-            super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(indexDeligate));
+            super(sourceFile, destinationFile, charset, EnumeratingDeligates.
+                    toPair(indexDeligate));
         }
 
         public IndexEntries() {
@@ -121,21 +122,23 @@ public abstract class IndexingCommands<T>
 
         @Override
         protected void checkState() throws Exception {
-            Checks.checkNotNull("indexFile", EnumeratingDeligates.toSingleEntries(getIndexDeligate()).getEnumeratorFile());
+            Checks.checkNotNull("indexFile", EnumeratingDeligates.
+                    toSingleEntries(getIndexDeligate()).getEnumeratorFile());
         }
 
         @Override
         protected ObjectSource<Weighted<Token>> openSource(File file)
                 throws FileNotFoundException, IOException {
-            return BybloIO.openEntriesSource(file, getCharset(), getSourceIndexDeligate());
+            return BybloIO.openEntriesSource(file, getCharset(),
+                                             getSourceIndexDeligate());
         }
 
         @Override
         protected ObjectSink<Weighted<Token>> openSink(File file)
                 throws FileNotFoundException, IOException {
-            return BybloIO.openEntriesSink(file, getCharset(), getSinkIndexDeligate());
+            return BybloIO.openEntriesSink(file, getCharset(),
+                                           getSinkIndexDeligate());
         }
-
     }
 
     public static class IndexFeatures extends IndexingCommands<Weighted<Token>> {
@@ -143,7 +146,8 @@ public abstract class IndexingCommands<T>
         public IndexFeatures(
                 File sourceFile, File destinationFile, Charset charset,
                 SingleEnumerating indexDeligate) {
-            super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(indexDeligate));
+            super(sourceFile, destinationFile, charset, EnumeratingDeligates.
+                    toPair(indexDeligate));
         }
 
         @Override
@@ -157,21 +161,23 @@ public abstract class IndexingCommands<T>
 
         @Override
         public void checkState() throws Exception {
-            Checks.checkNotNull("indexFile", EnumeratingDeligates.toSingleFeatures(getIndexDeligate()).getEnumeratorFile());
+            Checks.checkNotNull("indexFile", EnumeratingDeligates.
+                    toSingleFeatures(getIndexDeligate()).getEnumeratorFile());
         }
 
         @Override
         protected ObjectSource<Weighted<Token>> openSource(File file)
                 throws FileNotFoundException, IOException {
-            return BybloIO.openFeaturesSource(file, getCharset(), getSourceIndexDeligate());
+            return BybloIO.openFeaturesSource(file, getCharset(),
+                                              getSourceIndexDeligate());
         }
 
         @Override
         protected ObjectSink<Weighted<Token>> openSink(File file)
                 throws FileNotFoundException, IOException {
-            return BybloIO.openFeaturesSink(file, getCharset(), getSinkIndexDeligate());
+            return BybloIO.openFeaturesSink(file, getCharset(),
+                                            getSinkIndexDeligate());
         }
-
     }
 
     public static class IndexEvents extends IndexingCommands<Weighted<TokenPair>> {
@@ -193,22 +199,25 @@ public abstract class IndexingCommands<T>
 
         @Override
         public void checkState() throws Exception {
-            Checks.checkNotNull("indexFile1", getIndexDeligate().getEntryEnumeratorFile());
-            Checks.checkNotNull("indexFile2", getIndexDeligate().getFeatureEnumeratorFile());
+            Checks.checkNotNull("indexFile1", getIndexDeligate().
+                    getEntryEnumeratorFile());
+            Checks.checkNotNull("indexFile2", getIndexDeligate().
+                    getFeatureEnumeratorFile());
         }
 
         @Override
         protected ObjectSource<Weighted<TokenPair>> openSource(File file)
                 throws FileNotFoundException, IOException {
-            return BybloIO.openEventsSource(file, getCharset(), getSourceIndexDeligate());
+            return BybloIO.openEventsSource(file, getCharset(),
+                                            getSourceIndexDeligate());
         }
 
         @Override
         protected ObjectSink<Weighted<TokenPair>> openSink(File file)
                 throws FileNotFoundException, IOException {
-            return BybloIO.openEventsSink(file, getCharset(), getSinkIndexDeligate());
+            return BybloIO.openEventsSink(file, getCharset(),
+                                          getSinkIndexDeligate());
         }
-
     }
 
     public static class IndexInstances extends IndexingCommands<TokenPair> {
@@ -230,22 +239,25 @@ public abstract class IndexingCommands<T>
 
         @Override
         public void checkState() throws Exception {
-            Checks.checkNotNull("indexFile1", getIndexDeligate().getEntryEnumeratorFile());
-            Checks.checkNotNull("indexFile2", getIndexDeligate().getFeatureEnumeratorFile());
+            Checks.checkNotNull("indexFile1", getIndexDeligate().
+                    getEntryEnumeratorFile());
+            Checks.checkNotNull("indexFile2", getIndexDeligate().
+                    getFeatureEnumeratorFile());
         }
 
         @Override
         protected ObjectSource<TokenPair> openSource(File file)
                 throws FileNotFoundException, IOException {
-            return BybloIO.openInstancesSource(file, getCharset(), getSourceIndexDeligate());
+            return BybloIO.openInstancesSource(file, getCharset(),
+                                               getSourceIndexDeligate());
         }
 
         @Override
         protected ObjectSink<TokenPair> openSink(File file)
                 throws FileNotFoundException, IOException {
-            return BybloIO.openInstancesSink(file, getCharset(), getSinkIndexDeligate());
+            return BybloIO.openInstancesSink(file, getCharset(),
+                                             getSinkIndexDeligate());
         }
-
     }
 
     public static class IndexNeighbours extends IndexingCommands<Weighted<TokenPair>> {
@@ -253,7 +265,8 @@ public abstract class IndexingCommands<T>
         public IndexNeighbours(
                 File sourceFile, File destinationFile, Charset charset,
                 SingleEnumerating indexDeligate) {
-            super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(indexDeligate));
+            super(sourceFile, destinationFile, charset, EnumeratingDeligates.
+                    toPair(indexDeligate));
         }
 
         public IndexNeighbours() {
@@ -267,21 +280,23 @@ public abstract class IndexingCommands<T>
 
         @Override
         public void checkState() throws Exception {
-            Checks.checkNotNull("indexFile", EnumeratingDeligates.toSingleEntries(getIndexDeligate()).getEnumeratorFile());
+            Checks.checkNotNull("indexFile", EnumeratingDeligates.
+                    toSingleEntries(getIndexDeligate()).getEnumeratorFile());
         }
 
         @Override
         protected ObjectSource<Weighted<TokenPair>> openSource(File file)
                 throws FileNotFoundException, IOException {
-            return BybloIO.openNeighboursSource(file, getCharset(), getSourceIndexDeligate());
+            return BybloIO.openNeighboursSource(file, getCharset(),
+                                                getSourceIndexDeligate());
         }
 
         @Override
         protected ObjectSink<Weighted<TokenPair>> openSink(File file)
                 throws FileNotFoundException, IOException {
-            return BybloIO.openNeighboursSink(file, getCharset(), getSinkIndexDeligate());
+            return BybloIO.openNeighboursSink(file, getCharset(),
+                                              getSinkIndexDeligate());
         }
-
     }
 
     public static class IndexSims extends IndexingCommands<Weighted<TokenPair>> {
@@ -289,7 +304,8 @@ public abstract class IndexingCommands<T>
         public IndexSims(
                 File sourceFile, File destinationFile, Charset charset,
                 SingleEnumerating indexDeligate) {
-            super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(indexDeligate));
+            super(sourceFile, destinationFile, charset, EnumeratingDeligates.
+                    toPair(indexDeligate));
         }
 
         public IndexSims() {
@@ -303,21 +319,23 @@ public abstract class IndexingCommands<T>
 
         @Override
         public void checkState() throws Exception {
-            Checks.checkNotNull("indexFile", EnumeratingDeligates.toSingleEntries(getIndexDeligate()).getEnumeratorFile());
+            Checks.checkNotNull("indexFile", EnumeratingDeligates.
+                    toSingleEntries(getIndexDeligate()).getEnumeratorFile());
         }
 
         @Override
         protected ObjectSource<Weighted<TokenPair>> openSource(File file)
                 throws FileNotFoundException, IOException {
-            return BybloIO.openSimsSource(file, getCharset(), getSourceIndexDeligate());
+            return BybloIO.openSimsSource(file, getCharset(),
+                                          getSourceIndexDeligate());
         }
 
         @Override
         protected ObjectSink<Weighted<TokenPair>> openSink(File file)
                 throws FileNotFoundException, IOException {
-            return BybloIO.openSimsSink(file, getCharset(), getSinkIndexDeligate());
+            return BybloIO.openSimsSink(file, getCharset(),
+                                        getSinkIndexDeligate());
         }
-
     }
 
     public static class UnindexEntries extends IndexEntries {
@@ -325,7 +343,8 @@ public abstract class IndexingCommands<T>
         public UnindexEntries() {
         }
 
-        public UnindexEntries(File sourceFile, File destinationFile, Charset charset, SingleEnumerating indexDeligate) {
+        public UnindexEntries(File sourceFile, File destinationFile,
+                              Charset charset, SingleEnumerating indexDeligate) {
             super(sourceFile, destinationFile, charset, indexDeligate);
         }
 
@@ -343,7 +362,6 @@ public abstract class IndexingCommands<T>
         protected DoubleEnumerating getSourceIndexDeligate() {
             return super.getSinkIndexDeligate();
         }
-
     }
 
     public static class UnindexFeatures extends IndexFeatures {
@@ -351,7 +369,8 @@ public abstract class IndexingCommands<T>
         public UnindexFeatures() {
         }
 
-        public UnindexFeatures(File sourceFile, File destinationFile, Charset charset, SingleEnumerating indexDeligate) {
+        public UnindexFeatures(File sourceFile, File destinationFile,
+                               Charset charset, SingleEnumerating indexDeligate) {
             super(sourceFile, destinationFile, charset, indexDeligate);
         }
 
@@ -369,7 +388,6 @@ public abstract class IndexingCommands<T>
         protected DoubleEnumerating getSourceIndexDeligate() {
             return super.getSinkIndexDeligate();
         }
-
     }
 
     public static class UnindexInstances extends IndexInstances {
@@ -377,7 +395,8 @@ public abstract class IndexingCommands<T>
         public UnindexInstances() {
         }
 
-        public UnindexInstances(File sourceFile, File destinationFile, Charset charset, DoubleEnumerating indexDeligate) {
+        public UnindexInstances(File sourceFile, File destinationFile,
+                                Charset charset, DoubleEnumerating indexDeligate) {
             super(sourceFile, destinationFile, charset, indexDeligate);
         }
 
@@ -395,7 +414,6 @@ public abstract class IndexingCommands<T>
         protected DoubleEnumerating getSourceIndexDeligate() {
             return super.getSinkIndexDeligate();
         }
-
     }
 
     public static class UnindexEvents extends IndexEvents {
@@ -403,7 +421,8 @@ public abstract class IndexingCommands<T>
         public UnindexEvents() {
         }
 
-        public UnindexEvents(File sourceFile, File destinationFile, Charset charset, DoubleEnumerating indexDeligate) {
+        public UnindexEvents(File sourceFile, File destinationFile,
+                             Charset charset, DoubleEnumerating indexDeligate) {
             super(sourceFile, destinationFile, charset, indexDeligate);
         }
 
@@ -421,7 +440,6 @@ public abstract class IndexingCommands<T>
         protected DoubleEnumerating getSourceIndexDeligate() {
             return super.getSinkIndexDeligate();
         }
-
     }
 
     public static class UnindexNeighbours extends IndexNeighbours {
@@ -429,7 +447,9 @@ public abstract class IndexingCommands<T>
         public UnindexNeighbours() {
         }
 
-        public UnindexNeighbours(File sourceFile, File destinationFile, Charset charset, SingleEnumerating indexDeligate) {
+        public UnindexNeighbours(File sourceFile, File destinationFile,
+                                 Charset charset,
+                                 SingleEnumerating indexDeligate) {
             super(sourceFile, destinationFile, charset, indexDeligate);
         }
 
@@ -447,7 +467,6 @@ public abstract class IndexingCommands<T>
         protected DoubleEnumerating getSourceIndexDeligate() {
             return super.getSinkIndexDeligate();
         }
-
     }
 
     public static class UnindexSims extends IndexSims {
@@ -455,7 +474,8 @@ public abstract class IndexingCommands<T>
         public UnindexSims() {
         }
 
-        public UnindexSims(File sourceFile, File destinationFile, Charset charset, SingleEnumerating indexDeligate) {
+        public UnindexSims(File sourceFile, File destinationFile,
+                           Charset charset, SingleEnumerating indexDeligate) {
             super(sourceFile, destinationFile, charset, indexDeligate);
         }
 
@@ -473,6 +493,5 @@ public abstract class IndexingCommands<T>
         protected DoubleEnumerating getSourceIndexDeligate() {
             return super.getSinkIndexDeligate();
         }
-
     }
 }

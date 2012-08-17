@@ -64,7 +64,7 @@ public final class ChiSquared
 
     @Override
     public double apply(SparseDoubleVector vector, int key, double value) {
-        final double N = getGrandTotal();
+        final double N = getFeatureMarginals().getFrequencySum();
 
         // The following are the value in contingency table:
 
@@ -73,7 +73,7 @@ public final class ChiSquared
         // weighting for the entry without the feature 
         final double O12 = vector.sum - value;
         // weighting for all other entries with the feature 
-        final double O21 = getFeatureMarginal(key) - value;
+        final double O21 = getFeatureMarginals().getFrequency(key) - value;
         // weighting for all other entries with all other feature 
         final double O22 = N - O11 - O12 - O21;
 
@@ -102,7 +102,7 @@ public final class ChiSquared
             return true;
         if (obj == null || getClass() != obj.getClass())
             return false;
-        return super.equals((AbstractContextualWeighting)this);
+        return super.equals((AbstractContextualWeighting) this);
     }
 
     @Override

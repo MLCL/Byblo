@@ -47,8 +47,8 @@ import uk.ac.susx.mlcl.lib.io.TSV;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
- * An <tt>TokenPairSource</tt> object is used to retrieve
- * {@link TokenPair} objects from a flat file.
+ * An <tt>TokenPairSource</tt> object is used to retrieve {@link TokenPair}
+ * objects from a flat file.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see TokenPairSink
@@ -97,28 +97,25 @@ public class TokenPairSource
     }
 
     public static TokenPairSource open(
-            File file, Charset charset, DoubleEnumerating idx, boolean skip1, boolean skip2)
+            File file, Charset charset, DoubleEnumerating idx, boolean skip1,
+            boolean skip2)
             throws IOException {
         SeekableDataSource tsv = new TSV.Source(file, charset);
 
         if (skip1) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
-
                 @Override
                 public boolean apply(Integer column) {
                     return column != null && column == 0;
                 }
-
             });
         }
         if (skip2) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
-
                 @Override
                 public boolean apply(Integer column) {
                     return column != null && column > 0;
                 }
-
             });
         }
 
@@ -135,5 +132,4 @@ public class TokenPairSource
         }
         return new TokenPairSource(tsv);
     }
-
 }

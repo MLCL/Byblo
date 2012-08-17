@@ -38,13 +38,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.Tools;
-import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
+import uk.ac.susx.mlcl.byblo.weighings.MarginalDistribution;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
@@ -94,24 +93,11 @@ public class ConfusionTest {
             v.value().cardinality = card;
         }
 
-
-        WeightedTokenSource featsSrc = BybloIO.openFeaturesSource(
+        MarginalDistribution fmd = BybloIO.readFeaturesMarginalDistribution(
                 TEST_FRUIT_FEATURES, DEFAULT_CHARSET,
                 EnumeratingDeligates.toSingleFeatures(indexDeligate));
 
-        WeightedTokenSource.WTStatsSource featsStatSrc =
-                new WeightedTokenSource.WTStatsSource(featsSrc);
-
-
-        final double[] feats = AllPairsCommand.readAllAsArray(featsStatSrc);
-        final double featsSum = featsStatSrc.getWeightSum();
-        final int featusCard = featsStatSrc.getMaxId() + 1;
-
-        INSTANCE.setFeatureCardinality(featusCard);
-        INSTANCE.setFeatureMarginals(feats);
-        INSTANCE.setGrandTotal(featsSum);
-
-
+        INSTANCE.setFeatureMarginals(fmd);
     }
 
     @Test

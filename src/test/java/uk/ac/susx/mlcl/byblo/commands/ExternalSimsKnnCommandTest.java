@@ -75,8 +75,10 @@ public class ExternalSimsKnnCommandTest {
                 Enumerating.DEFAULT_TYPE, false, false, null, null));
 
         knnCmd.setMaxChunkSize(100000);
-        knnCmd.setClassComparator(Weighted.recordOrder(TokenPair.firstIndexOrder()));
-        knnCmd.setNearnessComparator(Comparators.reverse(Weighted.<TokenPair>weightOrder()));
+        knnCmd.setClassComparator(Weighted.recordOrder(TokenPair.
+                firstIndexOrder()));
+        knnCmd.setNearnessComparator(Comparators.reverse(Weighted.
+                <TokenPair>weightOrder()));
         knnCmd.setK(100);
 
         knnCmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
@@ -104,10 +106,12 @@ public class ExternalSimsKnnCommandTest {
     @Ignore
     public void testEmptyInputFile() throws Exception {
         try {
-            File in = new File(TestConstants.TEST_OUTPUT_DIR, "extknn-test-empty.in");
-            if(!in.createNewFile())
+            File in = new File(TestConstants.TEST_OUTPUT_DIR,
+                               "extknn-test-empty.in");
+            if (!in.createNewFile())
                 throw new IOException("unable to create empty file " + in);
-            File out = new File(TestConstants.TEST_OUTPUT_DIR, "extknn-test-empty.out");
+            File out = new File(TestConstants.TEST_OUTPUT_DIR,
+                                "extknn-test-empty.out");
 
             ExitTrapper.enableExistTrapping();
             Tools.main(new String[]{"knn", "-i", in.toString(),
@@ -118,5 +122,4 @@ public class ExternalSimsKnnCommandTest {
             ExitTrapper.disableExitTrapping();
         }
     }
-
 }

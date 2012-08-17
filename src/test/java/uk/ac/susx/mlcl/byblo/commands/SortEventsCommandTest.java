@@ -88,16 +88,21 @@ public class SortEventsCommandTest {
         final boolean preindexedTokens1 = false;
         final boolean preindexedTokens2 = false;
 
-        File randomisedFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".sims.randomised");
+        File randomisedFile = new File(TEST_OUTPUT_DIR,
+                                       FRUIT_NAME + ".sims.randomised");
         File sortedFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".sims.sorted");
-        File entriesIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".entry-index");
-        File featuresIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".feature-index");
+        File entriesIndex = new File(TEST_OUTPUT_DIR,
+                                     FRUIT_NAME + ".entry-index");
+        File featuresIndex = new File(TEST_OUTPUT_DIR,
+                                      FRUIT_NAME + ".feature-index");
 
         final DoubleEnumeratingDeligate idx = new DoubleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, preindexedTokens1, preindexedTokens2, entriesIndex, featuresIndex);
+                Enumerating.DEFAULT_TYPE, preindexedTokens1, preindexedTokens2,
+                entriesIndex, featuresIndex);
 
         Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(
-                Weighted.recordOrder(TokenPair.firstStringOrder(idx.getEntriesEnumeratorCarriar())),
+                Weighted.recordOrder(TokenPair.firstStringOrder(idx.
+                getEntriesEnumeratorCarriar())),
                 Comparators.reverse(Weighted.<TokenPair>weightOrder()));
 
         testSortWeightedTokenPairCommand(
@@ -116,21 +121,27 @@ public class SortEventsCommandTest {
         final boolean preindexedTokens1 = true;
         final boolean preindexedTokens2 = true;
 
-        File randomisedFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".indexed.sims.randomised");
-        File sortedFile = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".indexed.sims.sorted");
-        File entriesIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".entry-index");
-        File featuresIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".feature-index");
+        File randomisedFile = new File(TEST_OUTPUT_DIR,
+                                       FRUIT_NAME + ".indexed.sims.randomised");
+        File sortedFile = new File(TEST_OUTPUT_DIR,
+                                   FRUIT_NAME + ".indexed.sims.sorted");
+        File entriesIndex = new File(TEST_OUTPUT_DIR,
+                                     FRUIT_NAME + ".entry-index");
+        File featuresIndex = new File(TEST_OUTPUT_DIR,
+                                      FRUIT_NAME + ".feature-index");
 
 
         final DoubleEnumeratingDeligate idx = new DoubleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, preindexedTokens1, preindexedTokens2, entriesIndex, featuresIndex);
+                Enumerating.DEFAULT_TYPE, preindexedTokens1, preindexedTokens2,
+                entriesIndex, featuresIndex);
 
 
         Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(
                 Weighted.recordOrder(TokenPair.firstIndexOrder()),
                 Comparators.reverse(Weighted.<TokenPair>weightOrder()));
 
-        testSortWeightedTokenPairCommand(inputFile, randomisedFile, sortedFile, idx, comparator);
+        testSortWeightedTokenPairCommand(inputFile, randomisedFile, sortedFile,
+                                         idx, comparator);
 
 
     }
@@ -144,7 +155,8 @@ public class SortEventsCommandTest {
 
         assertTrue("Input file does not exist", inputFile.exists());
         assertTrue("Input file is not a regular file", inputFile.isFile());
-        assertTrue("Input file length differs from input", inputFile.length() > 0);
+        assertTrue("Input file length differs from input",
+                   inputFile.length() > 0);
 
 
         // load a weighted token pair file
@@ -160,13 +172,15 @@ public class SortEventsCommandTest {
 
         // write to a temporary file
 
-        WeightedTokenPairSink randomisedSink = openSink(randomisedFile, idx, false);
+        WeightedTokenPairSink randomisedSink = openSink(randomisedFile, idx,
+                                                        false);
         ObjectIO.copy(list, randomisedSink);
         randomisedSink.flush();
         randomisedSink.close();
 
         assertTrue("Randomised file does not exist", randomisedFile.exists());
-        assertTrue("Randomised file is not a regular file", randomisedFile.isFile());
+        assertTrue("Randomised file is not a regular file", randomisedFile.
+                isFile());
 
         {
             WeightedTokenPairSource x = openSource(inputFile, idx);
@@ -211,7 +225,8 @@ public class SortEventsCommandTest {
         inputSource.close();
 
 
-        List<Weighted<TokenPair>> listCopy = new ArrayList<Weighted<TokenPair>>(list);
+        List<Weighted<TokenPair>> listCopy = new ArrayList<Weighted<TokenPair>>(
+                list);
         Collections.sort(listCopy, comparator);
 
 
@@ -239,7 +254,8 @@ public class SortEventsCommandTest {
             swap(list, i, rand.nextInt(list.size()));
     }
 
-    private static WeightedTokenPairSource openSource(File file, DoubleEnumeratingDeligate idx)
+    private static WeightedTokenPairSource openSource(File file,
+                                                      DoubleEnumeratingDeligate idx)
             throws IOException {
         return WeightedTokenPairSource.open(
                 file, DEFAULT_CHARSET,
@@ -254,5 +270,4 @@ public class SortEventsCommandTest {
                 idx, false, false, compact);
         return sink;
     }
-
 }

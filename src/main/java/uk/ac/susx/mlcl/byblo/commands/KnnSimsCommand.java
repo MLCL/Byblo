@@ -64,7 +64,7 @@ public final class KnnSimsCommand extends SortEventsCommand {
     private static final Log LOG = LogFactory.getLog(KnnSimsCommand.class);
 
     @Parameter(names = {"-k"},
-    description = "The maximum number of neighbours to produce per word.")
+               description = "The maximum number of neighbours to produce per word.")
     private int k = ExternalKnnSimsCommand.DEFAULT_K;
 
     private Comparator<Weighted<TokenPair>> classComparator =
@@ -75,7 +75,8 @@ public final class KnnSimsCommand extends SortEventsCommand {
 
     public KnnSimsCommand(File sourceFile, File destinationFile, Charset charset,
                           SingleEnumerating indexDeligate, int k) throws IOException {
-        super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(indexDeligate));
+        super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(
+                indexDeligate));
         super.setComparator(Comparators.fallback(
                 classComparator, nearnessComparator));
         setK(k);
@@ -86,14 +87,15 @@ public final class KnnSimsCommand extends SortEventsCommand {
     }
 
     public Comparator<Weighted<TokenPair>> getCombinedComparator() {
-        return Comparators.fallback(getClassComparator(), getNearnessComparator());
+        return Comparators.fallback(getClassComparator(),
+                                    getNearnessComparator());
     }
 
     @Override
     public Comparator<Weighted<TokenPair>> getComparator() {
         return isReverse()
-               ? Comparators.reverse(getCombinedComparator())
-               : getCombinedComparator();
+                ? Comparators.reverse(getCombinedComparator())
+                : getCombinedComparator();
     }
 
     @Override
@@ -139,7 +141,8 @@ public final class KnnSimsCommand extends SortEventsCommand {
         final ObjectSource<Weighted<TokenPair>> src =
                 first
                 ? BybloIO.openSimsSource(file, getCharset(), getIndexDeligate())
-                : BybloIO.openNeighboursSource(file, getCharset(), getIndexDeligate());
+                : BybloIO.openNeighboursSource(file, getCharset(),
+                                               getIndexDeligate());
         first = true;
         return src;
     }
@@ -149,7 +152,8 @@ public final class KnnSimsCommand extends SortEventsCommand {
             throws FileNotFoundException, IOException {
         return new KFirstReducingObjectSink<Weighted<TokenPair>>(
                 new WeightSumReducerObjectSink<TokenPair>(
-                BybloIO.openNeighboursSink(file, getCharset(), getIndexDeligate())),
+                BybloIO.openNeighboursSink(file, getCharset(),
+                                           getIndexDeligate())),
                 classComparator, k);
 
     }
@@ -159,5 +163,4 @@ public final class KnnSimsCommand extends SortEventsCommand {
         return super.toStringHelper().
                 add("k", k);
     }
-
 }

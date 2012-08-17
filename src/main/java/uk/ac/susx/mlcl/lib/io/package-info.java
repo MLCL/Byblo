@@ -35,4 +35,3 @@
 package uk.ac.susx.mlcl.lib.io;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-

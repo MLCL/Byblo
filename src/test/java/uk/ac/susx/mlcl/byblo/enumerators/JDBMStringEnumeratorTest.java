@@ -235,7 +235,8 @@ public class JDBMStringEnumeratorTest {
     }
 
     private void performanceTest_JDBM(
-            boolean memory, boolean trans, final CacheType cacheType, int mruSize,
+            boolean memory, boolean trans, final CacheType cacheType,
+            int mruSize,
             boolean disableCacheAutoClear, boolean disableLocking) throws IOException {
 
         final DBMaker maker;

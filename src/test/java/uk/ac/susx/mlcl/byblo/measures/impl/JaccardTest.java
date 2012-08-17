@@ -138,7 +138,8 @@ public class JaccardTest {
         intersection.addAll(A);
         intersection.retainAll(B);
 
-        double jaccardCoef = (double) intersection.size() / (double) union.size();
+        double jaccardCoef = (double) intersection.size() / (double) union.
+                size();
 
 
         SparseDoubleVector vecA = new SparseDoubleVector(10);

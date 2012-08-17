@@ -57,7 +57,8 @@ public class MergeEventsCommand extends AbstractMergeCommand<Weighted<TokenPair>
     public MergeEventsCommand(
             File sourceFileA, File sourceFileB, File destinationFile,
             Charset charset, DoubleEnumeratingDeligate indexDeligate) {
-        super(sourceFileA, sourceFileB, destinationFile, charset, Weighted.recordOrder(TokenPair.indexOrder()));
+        super(sourceFileA, sourceFileB, destinationFile, charset, Weighted.
+                recordOrder(TokenPair.indexOrder()));
         setIndexDeligate(indexDeligate);
     }
 
@@ -72,7 +73,6 @@ public class MergeEventsCommand extends AbstractMergeCommand<Weighted<TokenPair>
 
     }
 
-
     public final DoubleEnumeratingDeligate getIndexDeligate() {
         return indexDeligate;
     }
@@ -84,12 +84,14 @@ public class MergeEventsCommand extends AbstractMergeCommand<Weighted<TokenPair>
 
     @Override
     protected ObjectSource<Weighted<TokenPair>> openSource(File file) throws FileNotFoundException, IOException {
-        return BybloIO.openEventsSource(file, getFileDeligate().getCharset(), indexDeligate);
+        return BybloIO.openEventsSource(file, getFileDeligate().getCharset(),
+                                        indexDeligate);
     }
 
     @Override
     protected ObjectSink<Weighted<TokenPair>> openSink(File file) throws FileNotFoundException, IOException {
-        return new WeightSumReducerObjectSink<TokenPair>(BybloIO.openEventsSink(file, getFileDeligate().getCharset(), indexDeligate));
+        return new WeightSumReducerObjectSink<TokenPair>(BybloIO.openEventsSink(
+                file, getFileDeligate().getCharset(), indexDeligate));
     }
 
     public static void main(String[] args) throws Exception {
@@ -100,5 +102,4 @@ public class MergeEventsCommand extends AbstractMergeCommand<Weighted<TokenPair>
     protected ToStringHelper toStringHelper() {
         return super.toStringHelper().add("indexing", indexDeligate);
     }
-
 }

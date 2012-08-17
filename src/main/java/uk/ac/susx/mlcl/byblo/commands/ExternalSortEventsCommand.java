@@ -74,12 +74,10 @@ public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weigh
     @Override
     public void runCommand() throws Exception {
         this.addProgressListener(new ProgressListener() {
-
             @Override
             public void progressChanged(ProgressEvent progressEvent) {
                 LOG.info(getProgressReport());
             }
-
         });
 
         super.runCommand();
@@ -93,7 +91,8 @@ public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weigh
 
     @Override
     protected ObjectSink<Weighted<TokenPair>> openSink(File file) throws IOException {
-        return new WeightSumReducerObjectSink<TokenPair>(BybloIO.openEventsSink(file, getCharset(), indexDeligate));
+        return new WeightSumReducerObjectSink<TokenPair>(BybloIO.openEventsSink(
+                file, getCharset(), indexDeligate));
     }
 
     @Override
@@ -133,5 +132,4 @@ public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weigh
     public boolean isEnumeratedEntries() {
         return indexDeligate.isEnumeratedEntries();
     }
-
 }
