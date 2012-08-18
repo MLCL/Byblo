@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo.weighings.impl;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
+import javax.annotation.CheckReturnValue;
 import uk.ac.susx.mlcl.byblo.weighings.AbstractSimpleWeighting;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -41,6 +42,7 @@ import uk.ac.susx.mlcl.lib.Checks;
  * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@CheckReturnValue
 public class Bound
         extends AbstractSimpleWeighting
         implements Serializable {

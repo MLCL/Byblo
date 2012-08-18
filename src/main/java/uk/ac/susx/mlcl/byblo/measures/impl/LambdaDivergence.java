@@ -31,6 +31,8 @@
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
 import java.io.Serializable;
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnegative;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
 import uk.ac.susx.mlcl.byblo.measures.Measures;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
@@ -57,27 +59,31 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@CheckReturnValue
 public final class LambdaDivergence implements Measure, Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @Nonnegative
     public static final double DEFAULT_LAMBDA = 0.5;
 
+    @Nonnegative
     private double lambda;
 
     public LambdaDivergence() {
         setLambda(DEFAULT_LAMBDA);
     }
 
-    public LambdaDivergence(double lambda) {
+    public LambdaDivergence(@Nonnegative double lambda) {
         setLambda(lambda);
     }
 
+    @Nonnegative
     public final double getLambda() {
         return lambda;
     }
 
-    public final void setLambda(double lambda) {
+    public final void setLambda(@Nonnegative double lambda) {
         Checks.checkRangeExcl("lambda", lambda, 0.0, 1.0);
         this.lambda = lambda;
     }

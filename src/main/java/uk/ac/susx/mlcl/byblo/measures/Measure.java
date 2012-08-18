@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.measures;
 
+import javax.annotation.CheckReturnValue;
 import uk.ac.susx.mlcl.byblo.measures.impl.Dice;
 import uk.ac.susx.mlcl.byblo.measures.impl.Jaccard;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
@@ -49,6 +50,7 @@ public interface Measure {
      * @param B second feature vector
      * @return similarity of the feature vectors
      */
+    @CheckReturnValue
     double similarity(SparseDoubleVector A, SparseDoubleVector B);
 
     /**
@@ -58,6 +60,7 @@ public interface Measure {
      * <p/>
      * @return value indicating vectors are identical
      */
+    @CheckReturnValue
     double getHomogeneityBound();
 
     /**
@@ -68,6 +71,7 @@ public interface Measure {
      * <p/>
      * @return value indicating vectors are maximally dissimilar
      */
+    @CheckReturnValue
     double getHeterogeneityBound();
 
     /**
@@ -85,6 +89,7 @@ public interface Measure {
      * @return weighting scheme that should have been previously applied to
      *         vectors
      */
+    @CheckReturnValue
     Class<? extends Weighting> getExpectedWeighting();
 
     /**
@@ -104,5 +109,6 @@ public interface Measure {
      * <p/>
      * @return true if the measure defines a symmetric space, false otherwise
      */
+    @CheckReturnValue
     boolean isCommutative();
 }

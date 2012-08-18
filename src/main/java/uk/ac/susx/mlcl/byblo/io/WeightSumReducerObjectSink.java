@@ -31,6 +31,7 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import java.io.IOException;
+import javax.annotation.WillClose;
 import uk.ac.susx.mlcl.lib.io.ForwardingObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 
@@ -75,6 +76,7 @@ public class WeightSumReducerObjectSink<T>
     }
 
     @Override
+    @WillClose
     public void close() throws IOException {
         flush();
         super.close();

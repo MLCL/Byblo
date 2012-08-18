@@ -33,6 +33,7 @@ package uk.ac.susx.mlcl.lib.io;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
+import javax.annotation.WillClose;
 import uk.ac.susx.mlcl.lib.Checks;
 
 /**
@@ -182,6 +183,7 @@ public final class Compact {
         }
 
         @Override
+        @WillClose
         public void close() throws IOException {
             if (currentHead != null) {
                 inner.endOfRecord();

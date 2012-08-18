@@ -43,6 +43,7 @@ import uk.ac.susx.mlcl.lib.collect.ArrayMath;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Immutable
+@CheckReturnValue
 public final class MarginalDistribution {
 
     /**
@@ -109,7 +110,6 @@ public final class MarginalDistribution {
      * @return
      */
     @Nonnegative
-    @CheckReturnValue
     private static int nonZeroCardinality(final double[] frequencies) {
         int nonZeroCardinality = 0;
         for (double f : frequencies)
@@ -130,7 +130,6 @@ public final class MarginalDistribution {
      *
      * @return marginal scores for each event marginal
      */
-    @CheckReturnValue
     public double[] getFrequencies() {
         return Arrays.copyOf(frequencies, frequencies.length);
     }
@@ -143,7 +142,6 @@ public final class MarginalDistribution {
      * @return The frequency of that event marginal over the whole join
      *         distribution.
      */
-    @CheckReturnValue
     @Nonnegative
     public double getFrequency(@Nonnegative int index) {
         return frequencies[index];
@@ -153,7 +151,6 @@ public final class MarginalDistribution {
      *
      * @return
      */
-    @CheckReturnValue
     @Nonnegative
     public double getFrequencySum() {
         return frequencySum;
@@ -166,7 +163,6 @@ public final class MarginalDistribution {
      *
      * @return number of actually occurring feature types
      */
-    @CheckReturnValue
     @Nonnegative
     public int getNonZeroCardinality() {
         return nonZeroCardinality;
@@ -177,7 +173,6 @@ public final class MarginalDistribution {
      * <p/>
      * @return number of unique featuress.
      */
-    @CheckReturnValue
     @Nonnegative
     public final int getCardinality() {
         return frequencies.length;
@@ -191,7 +186,6 @@ public final class MarginalDistribution {
      * @param index event marginal id (dimension)
      * @return independent prior probability of that event marginal occurring.
      */
-    @CheckReturnValue
     @Nonnegative
     public final double getPrior(@Nonnegative final int index) {
         return frequencySum == 0 ? 0

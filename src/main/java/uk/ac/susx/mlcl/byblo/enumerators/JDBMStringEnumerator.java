@@ -39,6 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nullable;
+import javax.annotation.WillClose;
 import org.apache.jdbm.DB;
 import org.apache.jdbm.DBMaker;
 import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
@@ -227,6 +228,7 @@ public final class JDBMStringEnumerator extends BiMapEnumerator<String> {
         db.commit();
     }
 
+    @WillClose
     public void close() {
         if (db == null || db.isClosed()) {
             Logger.getLogger(JDBMStringEnumerator.class.getName()).log(

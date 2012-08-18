@@ -34,6 +34,7 @@ import static java.lang.Math.min;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+import javax.annotation.CheckReturnValue;
 import javax.annotation.concurrent.Immutable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,6 +51,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Immutable
+@CheckReturnValue
 public abstract class Measures {
 
     private static final Log LOG = LogFactory.getLog(Measures.class);

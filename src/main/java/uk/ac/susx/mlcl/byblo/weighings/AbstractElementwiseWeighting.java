@@ -30,6 +30,8 @@
  */
 package uk.ac.susx.mlcl.byblo.weighings;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.concurrent.Immutable;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
@@ -43,6 +45,8 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@Immutable
+@CheckReturnValue
 public abstract class AbstractElementwiseWeighting implements Weighting {
 
     /**

@@ -32,6 +32,8 @@ package uk.ac.susx.mlcl.byblo.measures.impl;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnegative;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
@@ -44,6 +46,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@CheckReturnValue
 public final class KullbackLeiblerDivergence implements Measure, Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -52,11 +55,13 @@ public final class KullbackLeiblerDivergence implements Measure, Serializable {
      * Default expected minimum dimensionality of vectors ({@value}) if not
      * explicitly set.
      */
+    @Nonnegative
     public static final int DEFAULT_MIN_CARDINALITY = 1;
 
     /**
      * Expected dimensionality of vectors.
      */
+    @Nonnegative
     private int minCardinality;
 
     /**
@@ -80,7 +85,8 @@ public final class KullbackLeiblerDivergence implements Measure, Serializable {
      * @throws IllegalArgumentException when <code>minCardinality</code> is
      *                                  negative
      */
-    public KullbackLeiblerDivergence(final int minCardinality)
+    public KullbackLeiblerDivergence(@Nonnegative
+            final int minCardinality)
             throws IllegalArgumentException {
         setMinCardinality(minCardinality);
     }
@@ -90,6 +96,7 @@ public final class KullbackLeiblerDivergence implements Measure, Serializable {
      * <p/>
      * @return expected dimensionality of vectors
      */
+    @Nonnegative
     public final int getMinCardinality() {
         return minCardinality;
     }
@@ -104,7 +111,7 @@ public final class KullbackLeiblerDivergence implements Measure, Serializable {
      * @throws IllegalArgumentException when <code>minCardinality</code> is
      *                                  negative
      */
-    public final void setMinCardinality(int minCardinality)
+    public final void setMinCardinality(@Nonnegative int minCardinality)
             throws IllegalArgumentException {
         if (minCardinality <= 0)
             throw new IllegalArgumentException(MessageFormat.format(

@@ -32,6 +32,8 @@ package uk.ac.susx.mlcl.byblo.measures.impl;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnegative;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
@@ -61,12 +63,15 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@CheckReturnValue
 public final class LeeSkewDivergence implements Measure, Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @Nonnegative
     public static final double DEFAULT_ALPHA = 0.99;
 
+    @Nonnegative
     private double alpha;
 
     public LeeSkewDivergence() {
@@ -77,11 +82,12 @@ public final class LeeSkewDivergence implements Measure, Serializable {
         setAlpha(alpha);
     }
 
+    @Nonnegative
     public final double getAlpha() {
         return alpha;
     }
 
-    public final void setAlpha(double alpha) {
+    public final void setAlpha(@Nonnegative double alpha) {
         Checks.checkNotNaN("alpha", alpha);
         Checks.checkFinite("alpha", alpha);
         Checks.checkRangeExcl("alpha", alpha, 0.0, 1.0);

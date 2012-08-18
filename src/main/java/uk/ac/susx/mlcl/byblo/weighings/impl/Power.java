@@ -31,12 +31,14 @@
 package uk.ac.susx.mlcl.byblo.weighings.impl;
 
 import java.io.Serializable;
+import javax.annotation.CheckReturnValue;
 import uk.ac.susx.mlcl.byblo.weighings.AbstractSimpleWeighting;
 
 /**
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@CheckReturnValue
 public final class Power
         extends AbstractSimpleWeighting
         implements Serializable {

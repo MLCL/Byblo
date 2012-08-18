@@ -43,6 +43,7 @@ import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
+import javax.annotation.WillClose;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -180,6 +181,7 @@ public abstract class TSV {
         }
 
         @Override
+        @WillClose
         public void close() throws IOException {
             if (out instanceof Closeable)
                 ((Closeable) out).close();
@@ -321,6 +323,7 @@ public abstract class TSV {
         }
 
         @Override
+        @WillClose
         public void close() throws IOException {
             lexer.close();
         }

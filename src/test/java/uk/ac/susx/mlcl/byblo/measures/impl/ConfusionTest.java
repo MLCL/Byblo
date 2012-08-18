@@ -85,9 +85,7 @@ public class ConfusionTest {
         FRUIT_EVENTS.add(new Indexed<SparseDoubleVector>(
                 Integer.MAX_VALUE, new SparseDoubleVector(card, 0)));
 
-        if (eventSrc instanceof Closeable) {
-            ((Closeable) eventSrc).close();
-        }
+        eventSrc.close();
 
         for (Indexed<SparseDoubleVector> v : FRUIT_EVENTS) {
             v.value().cardinality = card;

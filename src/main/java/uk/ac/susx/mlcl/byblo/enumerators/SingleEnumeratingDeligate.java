@@ -35,6 +35,7 @@ import com.google.common.base.Objects;
 import java.io.File;
 import java.io.IOException;
 import javax.annotation.Nullable;
+import javax.annotation.WillClose;
 
 /**
  *
@@ -112,6 +113,7 @@ public final class SingleEnumeratingDeligate
     }
 
     @Override
+    @WillClose
     public void closeEnumerator() throws IOException {
         close(enumerator);
         enumerator = null;

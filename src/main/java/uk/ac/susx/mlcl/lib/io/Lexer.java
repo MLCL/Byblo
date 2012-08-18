@@ -42,6 +42,7 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.util.NoSuchElementException;
+import javax.annotation.WillClose;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -567,6 +568,7 @@ public final class Lexer implements Seekable<Tell>, Closeable {
     }
 
     @Override
+    @WillClose
     public void close() throws IOException {
         channel.close();
     }

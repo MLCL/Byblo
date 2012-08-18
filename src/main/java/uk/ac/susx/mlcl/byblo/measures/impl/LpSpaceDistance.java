@@ -31,6 +31,8 @@
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
 import static java.lang.Math.*;
+import javax.annotation.CheckReturnValue;
+import javax.annotation.concurrent.Immutable;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
 import uk.ac.susx.mlcl.byblo.measures.Measures;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
@@ -55,6 +57,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@CheckReturnValue
 public final class LpSpaceDistance implements Measure {
 
     public static final double DEFAULT_POWER = 2;
@@ -135,6 +138,8 @@ public final class LpSpaceDistance implements Measure {
     /**
      * Abstract super class to the various Lp Space metric implementations.
      */
+    @Immutable
+    @CheckReturnValue
     private static abstract class LpSpaceDeligate implements Measure {
 
         @Override
@@ -162,6 +167,7 @@ public final class LpSpaceDistance implements Measure {
      * Fallback implementation for arbitrary p-spaces. Not though that it will
      * not produce the correct results of p = -inf, 0, or +inf.
      */
+    @CheckReturnValue
     private final class MinkowskiDistance extends LpSpaceDeligate {
 
         private static final long serialVersionUID = 1L;
@@ -202,6 +208,8 @@ public final class LpSpaceDistance implements Measure {
      * Implementation of the power-2 space; i.e standard Euclidean space that we
      * are all used to.
      */
+    @Immutable
+    @CheckReturnValue
     private static final class EuclideanDistance extends LpSpaceDeligate {
 
         private static final long serialVersionUID = 1L;
@@ -243,6 +251,8 @@ public final class LpSpaceDistance implements Measure {
      * Implementation of the power-1 space; known as Manhattan or taxicab
      * distance.
      */
+    @Immutable
+    @CheckReturnValue
     private static final class ManhattanDistance extends LpSpaceDeligate {
 
         private static final long serialVersionUID = 1L;
@@ -282,6 +292,8 @@ public final class LpSpaceDistance implements Measure {
     /**
      * Implementation of power-zero L space.
      */
+    @Immutable
+    @CheckReturnValue
     private static final class HammingDistance extends LpSpaceDeligate {
 
         private static final long serialVersionUID = 1L;
@@ -321,6 +333,8 @@ public final class LpSpaceDistance implements Measure {
     /**
      * Implementation of power +infinity L-space metric.
      */
+    @Immutable
+    @CheckReturnValue
     private static final class MaxSpaceDistance extends LpSpaceDeligate {
 
         private static final long serialVersionUID = 1L;
@@ -358,6 +372,8 @@ public final class LpSpaceDistance implements Measure {
     /**
      * Implementation of power -infinity L-space metric.
      */
+    @Immutable
+    @CheckReturnValue
     private static final class MinSpaceDistance extends LpSpaceDeligate {
 
         private static final long serialVersionUID = 1L;

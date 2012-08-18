@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
@@ -77,7 +78,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-@Immutable
+@CheckReturnValue
 public class Confusion implements Measure, FeatureMarginalsCarrier {
 
     @Nullable
@@ -105,6 +106,7 @@ public class Confusion implements Measure, FeatureMarginalsCarrier {
     }
 
     @Override
+    @CheckReturnValue
     public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
         final double N = featureMarginals.getFrequencySum();
 

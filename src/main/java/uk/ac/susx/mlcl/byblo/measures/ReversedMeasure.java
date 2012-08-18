@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.measures;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.concurrent.Immutable;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
@@ -39,6 +40,8 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@Immutable
+@CheckReturnValue
 public class ReversedMeasure
         extends ForwardingMeasure<Measure> {
 

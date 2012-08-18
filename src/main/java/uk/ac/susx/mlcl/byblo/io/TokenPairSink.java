@@ -37,6 +37,7 @@ import java.io.FileNotFoundException;
 import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import javax.annotation.WillClose;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.lib.io.Compact;
@@ -97,6 +98,7 @@ public class TokenPairSink implements ObjectSink<TokenPair>, Closeable, Flushabl
     }
 
     @Override
+    @WillClose
     public void close() throws IOException {
         if (inner instanceof Closeable)
             ((Closeable) inner).close();

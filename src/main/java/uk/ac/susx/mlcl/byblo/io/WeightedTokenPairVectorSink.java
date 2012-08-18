@@ -33,6 +33,7 @@ package uk.ac.susx.mlcl.byblo.io;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
+import javax.annotation.WillClose;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
@@ -67,6 +68,7 @@ public class WeightedTokenPairVectorSink
     }
 
     @Override
+    @WillClose
     public void close() throws IOException {
         inner.close();
     }

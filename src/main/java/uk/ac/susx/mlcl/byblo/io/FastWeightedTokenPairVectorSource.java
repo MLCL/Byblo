@@ -33,6 +33,7 @@ package uk.ac.susx.mlcl.byblo.io;
 import com.google.common.base.Predicate;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.CharacterCodingException;
@@ -41,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import javax.annotation.WillClose;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
@@ -59,7 +61,8 @@ import uk.ac.susx.mlcl.lib.io.Tell;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class FastWeightedTokenPairVectorSource
-        implements SeekableObjectSource<Indexed<SparseDoubleVector>, Tell> {
+        implements SeekableObjectSource<Indexed<SparseDoubleVector>, Tell>,
+        Closeable {
 
     private final SeekableDataSource inner;
 
@@ -134,6 +137,13 @@ public class FastWeightedTokenPairVectorSource
             next_id1 = -1;
             throw e;
         }
+    }
+
+    @Override
+    @WillClose
+    public void close() throws IOException {
+        if (inner instanceof Closeable)
+            ((Closeable) inner).close();
     }
 
     public static SparseDoubleVector toDoubleVector(Int2DoubleMap map,

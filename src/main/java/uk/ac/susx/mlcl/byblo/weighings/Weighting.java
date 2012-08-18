@@ -38,6 +38,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@CheckReturnValue
 public interface Weighting {
 
     /**
@@ -54,7 +55,6 @@ public interface Weighting {
      * @param from vector to re-weight
      * @return Re-weighted vector.
      */
-    @CheckReturnValue
     SparseDoubleVector apply(SparseDoubleVector from);
 
     /**
@@ -63,7 +63,6 @@ public interface Weighting {
      * <p/>
      * @return minimum possible weighting value
      */
-    @CheckReturnValue
     double getLowerBound();
 
     /**
@@ -72,6 +71,5 @@ public interface Weighting {
      * <p/>
      * @return maximum possible weighting value
      */
-    @CheckReturnValue
     double getUpperBound();
 }

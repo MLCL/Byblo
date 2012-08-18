@@ -40,8 +40,16 @@ import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 import static java.text.MessageFormat.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import static org.junit.Assert.*;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.io.BybloIO;
+import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
+import uk.ac.susx.mlcl.lib.collect.Indexed;
+import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.Files;
 
 /**
@@ -49,6 +57,19 @@ import uk.ac.susx.mlcl.lib.io.Files;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class TestConstants {
+
+    public static List<Indexed<SparseDoubleVector>> loadFruitVectors() throws IOException {
+        final DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
+        final FastWeightedTokenPairVectorSource eventSrc =
+                BybloIO.openEventsVectorSource(TEST_FRUIT_EVENTS,
+                                               DEFAULT_CHARSET, indexDeligate);
+        final List<Indexed<SparseDoubleVector>> vecs =
+                new ArrayList<Indexed<SparseDoubleVector>>();
+        while (eventSrc.hasNext())
+            vecs.add(eventSrc.read());
+        eventSrc.close();
+        return vecs;
+    }
 
     private TestConstants() {
     }

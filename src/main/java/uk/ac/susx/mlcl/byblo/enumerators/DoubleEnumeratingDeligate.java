@@ -35,6 +35,7 @@ import com.google.common.base.Objects;
 import java.io.File;
 import java.io.IOException;
 import javax.annotation.Nullable;
+import javax.annotation.WillClose;
 
 /**
  *
@@ -182,6 +183,7 @@ public final class DoubleEnumeratingDeligate
     }
 
     @Override
+    @WillClose
     public void closeEnumerator() throws IOException {
         if (isFeaturesEnumeratorOpen())
             closeFeaturesEnumerator();

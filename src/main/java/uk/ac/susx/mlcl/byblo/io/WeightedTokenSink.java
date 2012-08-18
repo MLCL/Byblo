@@ -37,6 +37,7 @@ import java.io.FileNotFoundException;
 import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import javax.annotation.WillClose;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 import uk.ac.susx.mlcl.lib.io.DataSink;
 import uk.ac.susx.mlcl.lib.io.Deltas;
@@ -101,6 +102,7 @@ public class WeightedTokenSink implements ObjectSink<Weighted<Token>>, Closeable
     }
 
     @Override
+    @WillClose
     public void close() throws IOException {
         if (inner instanceof Closeable)
             ((Closeable) inner).close();

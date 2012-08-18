@@ -38,12 +38,14 @@ import java.util.List;
 import java.util.Random;
 import org.junit.*;
 import static org.junit.Assert.*;
+import uk.ac.susx.mlcl.TestConstants;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.Tools;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
+import uk.ac.susx.mlcl.byblo.measures.MeasuresTestSuite;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
@@ -256,7 +258,7 @@ public class KendallsTauTest {
         System.out.println("testFruitData");
         int limit = 5;
 
-        List<Indexed<SparseDoubleVector>> vecs = loadFruitVectors();
+        List<Indexed<SparseDoubleVector>> vecs = TestConstants.loadFruitVectors();
 
         limit = Math.min(limit, vecs.size());
 
@@ -355,23 +357,6 @@ public class KendallsTauTest {
         return conc / denom;
     }
 
-    static List<Indexed<SparseDoubleVector>> loadFruitVectors() throws IOException {
-
-        final DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
-        final FastWeightedTokenPairVectorSource eventSrc =
-                BybloIO.openEventsVectorSource(
-                TEST_FRUIT_EVENTS, DEFAULT_CHARSET, indexDeligate);
-        final List<Indexed<SparseDoubleVector>> vecs =
-                new ArrayList<Indexed<SparseDoubleVector>>();
-        while (eventSrc.hasNext())
-            vecs.add(eventSrc.read());
-
-        if (eventSrc instanceof Closeable) {
-            ((Closeable) eventSrc).close();
-        }
-
-        return vecs;
-    }
 //    
 //    static double tauA_naive1(SparseDoubleVector A, SparseDoubleVector B) {
 //        assert A.cardinality == B.cardinality :

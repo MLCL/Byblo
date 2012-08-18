@@ -34,6 +34,7 @@ import com.beust.jcommander.Parameter;
 import com.google.common.base.Objects;
 import java.io.File;
 import java.io.IOException;
+import javax.annotation.WillClose;
 import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
 import uk.ac.susx.mlcl.lib.Checks;
 
@@ -95,6 +96,7 @@ public abstract class EnumeratingDeligate
             throw new AssertionError();
     }
 
+    @WillClose
     protected void close(Enumerator<String> enumerator) throws IOException {
         Checks.checkNotNull("enumerator", enumerator);
 

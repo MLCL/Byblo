@@ -34,6 +34,7 @@ import com.google.common.base.Predicate;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
+import javax.annotation.WillClose;
 
 /**
  *
@@ -78,6 +79,7 @@ public final class Deltas {
         }
 
         @Override
+        @WillClose
         public void close() throws IOException {
             if (inner instanceof Closeable)
                 ((Closeable) inner).close();
