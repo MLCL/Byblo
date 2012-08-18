@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import javax.annotation.CheckReturnValue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
@@ -70,10 +71,16 @@ public final class SortEntriesCommand extends AbstractSortCommand<Weighted<Token
     }
 
     @Override
-    public void runCommand() throws Exception {
-        super.runCommand();
-        indexDeligate.saveEnumerator();
-        indexDeligate.closeEnumerator();
+    @CheckReturnValue
+    public boolean runCommand() {
+        try {
+            boolean result = super.runCommand();
+            indexDeligate.saveEnumerator();
+            indexDeligate.closeEnumerator();
+            return result;
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
 
     }
 

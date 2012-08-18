@@ -68,7 +68,7 @@ public class SimsKnnCommandTest {
         knnTask.setNearnessComparator(
                 Comparators.reverse(Weighted.<TokenPair>weightOrder()));
 
-        knnTask.runCommand();
+        assertTrue(knnTask.runCommand());
 
 
         assertTrue("Output files not created.", out.exists());
@@ -97,7 +97,7 @@ public class SimsKnnCommandTest {
                 Comparators.reverse(
                 Weighted.<TokenPair>weightOrder()));
 
-        knnTask.runCommand();
+        assertTrue(knnTask.runCommand());
 
         assertTrue("Output files not created.", out.exists());
         assertTrue("Empty output file found.", out.length() > 0);

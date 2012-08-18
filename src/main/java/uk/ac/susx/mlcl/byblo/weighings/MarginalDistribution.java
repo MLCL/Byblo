@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo.weighings;
 
 import com.google.common.base.Preconditions;
 import java.util.Arrays;
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnegative;
 import javax.annotation.concurrent.Immutable;
 import uk.ac.susx.mlcl.byblo.measures.Measures;
@@ -107,8 +108,9 @@ public final class MarginalDistribution {
      * @param frequencies
      * @return
      */
-    private static @Nonnegative
-    int nonZeroCardinality(final double[] frequencies) {
+    @Nonnegative
+    @CheckReturnValue
+    private static int nonZeroCardinality(final double[] frequencies) {
         int nonZeroCardinality = 0;
         for (double f : frequencies)
             if (!Measures.epsilonEquals(f, 0, 0))
@@ -128,6 +130,7 @@ public final class MarginalDistribution {
      *
      * @return marginal scores for each event marginal
      */
+    @CheckReturnValue
     public double[] getFrequencies() {
         return Arrays.copyOf(frequencies, frequencies.length);
     }
@@ -140,8 +143,9 @@ public final class MarginalDistribution {
      * @return The frequency of that event marginal over the whole join
      *         distribution.
      */
-    public @Nonnegative
-    double getFrequency(@Nonnegative int index) {
+    @CheckReturnValue
+    @Nonnegative
+    public double getFrequency(@Nonnegative int index) {
         return frequencies[index];
     }
 
@@ -149,8 +153,9 @@ public final class MarginalDistribution {
      *
      * @return
      */
-    public @Nonnegative
-    double getFrequencySum() {
+    @CheckReturnValue
+    @Nonnegative
+    public double getFrequencySum() {
         return frequencySum;
     }
 
@@ -161,8 +166,9 @@ public final class MarginalDistribution {
      *
      * @return number of actually occurring feature types
      */
-    public @Nonnegative
-    int getNonZeroCardinality() {
+    @CheckReturnValue
+    @Nonnegative
+    public int getNonZeroCardinality() {
         return nonZeroCardinality;
     }
 
@@ -171,8 +177,9 @@ public final class MarginalDistribution {
      * <p/>
      * @return number of unique featuress.
      */
-    public final @Nonnegative
-    int getCardinality() {
+    @CheckReturnValue
+    @Nonnegative
+    public final int getCardinality() {
         return frequencies.length;
     }
 
@@ -184,8 +191,9 @@ public final class MarginalDistribution {
      * @param index event marginal id (dimension)
      * @return independent prior probability of that event marginal occurring.
      */
-    public final @Nonnegative
-    double getPrior(@Nonnegative final int index) {
+    @CheckReturnValue
+    @Nonnegative
+    public final double getPrior(@Nonnegative final int index) {
         return frequencySum == 0 ? 0
                 : frequencies[index] / frequencySum;
     }

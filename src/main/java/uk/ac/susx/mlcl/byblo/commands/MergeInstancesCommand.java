@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import javax.annotation.CheckReturnValue;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
@@ -64,13 +65,21 @@ public class MergeInstancesCommand extends AbstractMergeCommand<TokenPair> {
     public MergeInstancesCommand() {
     }
 
+   
     @Override
-    public void runCommand() throws Exception {
-        super.runCommand();
-        indexDeligate.saveEnumerator();
-        indexDeligate.closeEnumerator();
+    @CheckReturnValue
+    public boolean runCommand() {
+        try {
+            boolean result = super.runCommand();
+            indexDeligate.saveEnumerator();
+            indexDeligate.closeEnumerator();
+            return result;
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
 
     }
+
 
     public final DoubleEnumeratingDeligate getIndexDeligate() {
         return indexDeligate;
@@ -91,10 +100,6 @@ public class MergeInstancesCommand extends AbstractMergeCommand<TokenPair> {
     protected ObjectSink<TokenPair> openSink(File file) throws FileNotFoundException, IOException {
         return BybloIO.openInstancesSink(file, getFileDeligate().getCharset(),
                                          indexDeligate);
-    }
-
-    public static void main(String[] args) throws Exception {
-        new MergeInstancesCommand().runCommand(args);
     }
 
     @Override

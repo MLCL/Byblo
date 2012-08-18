@@ -35,6 +35,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
+import javax.annotation.CheckReturnValue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.commands.Command;
@@ -70,15 +71,17 @@ public abstract class AbstractCommandTask extends AbstractTask implements Comman
     }
 
     @Override
-    public void runCommand() throws Exception {
+    @CheckReturnValue
+    public boolean runCommand() {
         this.run();
         while (this.isExceptionTrapped())
-            this.throwTrappedException();
+            throw new RuntimeException(getTrappedException());
+        return true;
     }
 
     @Override
-    public void runCommand(String[] args)
-            throws InstantiationException, IllegalAccessException, Exception {
+    @CheckReturnValue
+    public boolean runCommand(String[] args) {
 
         Checks.checkNotNull("args", args);
 
@@ -101,16 +104,19 @@ public abstract class AbstractCommandTask extends AbstractTask implements Comman
             throw ex;
         }
 
-        if (LOG.isTraceEnabled())
-            LOG.trace("Running command " + this);
-
         if (this.isUsageRequested()) {
             jc.usage();
         } else {
-            this.runCommand();
+            if (LOG.isTraceEnabled())
+                LOG.trace("Running command " + this);
+
+            if (!this.runCommand())
+                return false;
+
+            if (LOG.isTraceEnabled())
+                LOG.trace("Completed command " + this);
         }
 
-        if (LOG.isTraceEnabled())
-            LOG.trace("Completed command " + this);
+        return true;
     }
 }

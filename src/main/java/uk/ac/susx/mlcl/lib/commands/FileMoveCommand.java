@@ -34,6 +34,7 @@ import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
 import java.io.File;
+import javax.annotation.CheckReturnValue;
 import uk.ac.susx.mlcl.lib.tasks.FileMoveTask;
 
 /**
@@ -75,7 +76,8 @@ public final class FileMoveCommand extends AbstractCommand {
     }
 
     @Override
-    public void runCommand() throws Exception {
+    @CheckReturnValue
+    public boolean runCommand() {
 
         FileMoveTask task = new FileMoveTask(
                 filesDeligate.getSourceFile(),
@@ -84,7 +86,9 @@ public final class FileMoveCommand extends AbstractCommand {
         task.run();
 
         while (task.isExceptionTrapped())
-            task.throwTrappedException();
+            throw new RuntimeException(task.getTrappedException());
+        
+        return true;
     }
 
     @Override

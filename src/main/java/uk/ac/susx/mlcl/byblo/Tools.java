@@ -34,6 +34,7 @@ import com.beust.jcommander.ParameterException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.CheckReturnValue;
 import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
 import uk.ac.susx.mlcl.byblo.commands.ExternalCountCommand;
 import uk.ac.susx.mlcl.byblo.commands.ExternalKnnSimsCommand;
@@ -98,7 +99,8 @@ public final class Tools extends AbstractCommand {
     }
 
     @Override
-    public void runCommand() throws Exception {
+    @CheckReturnValue
+    public boolean runCommand() {
         throw new UnsupportedOperationException("Not supported.");
     }
 
@@ -109,10 +111,7 @@ public final class Tools extends AbstractCommand {
      * @throws Exception when something goes awry.
      */
     public static void main(final String[] args) throws Exception {
-        try {
-            new Tools().runCommand(args);
-        } catch (ParameterException ex) {
+        if (!new Tools().runCommand(args))
             System.exit(-1);
-        }
     }
 }

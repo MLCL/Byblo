@@ -75,7 +75,7 @@ public class CopyCommandTest {
         Files.writeAll(in, Files.DEFAULT_CHARSET, str);
         File out = File.createTempFile(getClass().getName(), "out");
         FileCopyCommand instance = new FileCopyCommand(in, out);
-        instance.runCommand();
+        assertTrue(instance.runCommand());
         assertTrue(out.exists());
         assertEquals(in.length(), out.length());
 
@@ -88,7 +88,7 @@ public class CopyCommandTest {
             throw new IOException("Failed to delete file: " + out);
     }
 
-    @Test(expected = FileNotFoundException.class)
+    @Test(expected = RuntimeException.class)
     public void testRun_failure_noinput() throws Exception {
         System.out.println("Testing run() -- expecting failure (no input)");
         File in = File.createTempFile(getClass().getName(), "in");
@@ -96,7 +96,7 @@ public class CopyCommandTest {
             throw new IOException("Failed to delete file: " + in);
         File out = File.createTempFile(getClass().getName(), "out");
         FileCopyCommand instance = new FileCopyCommand(in, out);
-        instance.runCommand();
+        assertTrue(instance.runCommand());
         if (!in.delete())
             throw new IOException("Failed to delete file: " + in);
         if (!out.delete())

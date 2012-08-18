@@ -106,7 +106,9 @@ public class JDBMTest {
         long used0 = 0;
         long used1 = memoryUsed();
 
-        // GC until memory is stable
+        // GC until memory is stable --- "extremely dubious" is what this kind
+        // of code has been described as before, but in this case it's fine I 
+        // promise. It's needed or benchmarking.
         while (used0 != used1) {
             System.gc();
             used0 = used1;

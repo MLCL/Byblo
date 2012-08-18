@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import javax.annotation.CheckReturnValue;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
@@ -64,11 +65,16 @@ public final class SortInstancesCommand extends AbstractSortCommand<TokenPair> {
     }
 
     @Override
-    public void runCommand() throws Exception {
-        super.runCommand();
-        indexDeligate.saveEnumerator();
-        indexDeligate.closeEnumerator();
-
+    @CheckReturnValue
+    public boolean runCommand() {
+        try {
+            boolean result = super.runCommand();
+            indexDeligate.saveEnumerator();
+            indexDeligate.closeEnumerator();
+            return result;
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     @Override

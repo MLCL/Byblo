@@ -35,6 +35,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.CheckReturnValue;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
@@ -71,12 +74,18 @@ public abstract class IndexingCommands<T>
     }
 
     @Override
-    public void runCommand() throws Exception {
-        checkState();
-        super.runCommand();
+    @CheckReturnValue
+    public boolean runCommand() {
+        try {
+            checkState();
+            boolean result = super.runCommand();
 
-        indexDeligate.saveEnumerator();
-        indexDeligate.closeEnumerator();
+            indexDeligate.saveEnumerator();
+            indexDeligate.closeEnumerator();
+            return result;
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     @Override

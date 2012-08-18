@@ -34,6 +34,9 @@ import com.beust.jcommander.ParametersDelegate;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.CheckReturnValue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
@@ -72,7 +75,8 @@ public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weigh
     }
 
     @Override
-    public void runCommand() throws Exception {
+    @CheckReturnValue
+    public boolean runCommand() {
         this.addProgressListener(new ProgressListener() {
             @Override
             public void progressChanged(ProgressEvent progressEvent) {
@@ -80,12 +84,18 @@ public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weigh
             }
         });
 
-        super.runCommand();
+        boolean result = super.runCommand();
 
         if (indexDeligate.isEnumeratorOpen()) {
-            indexDeligate.saveEnumerator();
-            indexDeligate.closeEnumerator();
+            try {
+                indexDeligate.saveEnumerator();
+                indexDeligate.closeEnumerator();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         }
+
+        return result;
 
     }
 

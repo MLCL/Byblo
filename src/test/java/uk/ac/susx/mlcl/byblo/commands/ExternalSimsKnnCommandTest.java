@@ -83,7 +83,7 @@ public class ExternalSimsKnnCommandTest {
 
         knnCmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
 
-        knnCmd.runCommand();
+        assertTrue(knnCmd.runCommand());
 
 
         assertTrue("Output files not created.", out.exists());

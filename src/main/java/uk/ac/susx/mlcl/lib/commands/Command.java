@@ -30,13 +30,47 @@
  */
 package uk.ac.susx.mlcl.lib.commands;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
+
 /**
- *
+ * <code>Command</code> defines an interface for an object that can be run from
+ * the command line.
+ * <p/>
+ * Note that both {@link #runCommand() } and {@link #runCommand(java.lang.String[])
+ * } will return
+ * <code>false</code> when a problem occurred, which was handled internally. For
+ * example when a invalid command line parameters are found, the method should
+ * have already displayed a message to std-err. In this case the application is
+ * expected to exit with non-zero status, but that's up to the caller. When the
+ * command encounters an exception it is unable to handle it will throw a
+ * {@link RuntimeException}. If the command completed successfully those methods
+ * will return
+ * <code>true</code>
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public interface Command {
 
-    void runCommand() throws Exception;
+    /**
+     * Run the command with no arguments, either because it requires none, or
+     * because they have been injected elsewhere.
+     * <p/>
+     * Note:
+     * <code>runCommand</code> will return false if a problem occurred that was
+     * handled internally. For example when a
+     * <p/>
+     * @return true if the command complete successfully, false otherwise
+     */
+    @CheckReturnValue
+    boolean runCommand();
 
-    void runCommand(String[] args) throws Exception;
+    /**
+     * Run the command with the given command line arguments.
+     * <p/>
+     * @param args tokenised command line arguments
+     * @return true if the command complete successfully, false otherwise
+     */
+    @CheckReturnValue
+    boolean runCommand(@Nonnull String[] args);
 }

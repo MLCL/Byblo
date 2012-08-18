@@ -347,7 +347,7 @@ public class IndexSimsCommandTest {
 
         indexCommand.setIndexDeligate(EnumeratingDeligates.toPair(
                 new SingleEnumeratingDeligate(type, true, index)));
-        indexCommand.runCommand();
+        assertTrue(indexCommand.runCommand());
 
         assertValidPlaintextInputFiles(to);
         assertSizeGT(from, to);
@@ -377,7 +377,7 @@ public class IndexSimsCommandTest {
         unindex.setIndexDeligate(EnumeratingDeligates.
                 toPair(new SingleEnumeratingDeligate(
                 type, true, index)));
-        unindex.runCommand();
+        assertTrue(unindex.runCommand());
 
         assertValidPlaintextInputFiles(to);
         assertSizeGT(to, from);

@@ -40,6 +40,9 @@ import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Comparator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.CheckReturnValue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -108,36 +111,46 @@ public abstract class AbstractSortCommand<T> extends AbstractCopyCommand<T> {
     }
 
     @Override
-    public void runCommand() throws Exception {
-        if (LOG.isInfoEnabled())
-            LOG.
-                    info(
-                    "Running memory sort from \"" + getFilesDeligate().
-                    getSourceFile()
-                    + "\" to \"" + getFilesDeligate().getDestinationFile()
-                    + "\".");
+    @CheckReturnValue
+    public boolean runCommand() {
+        try {
+            if (LOG.isInfoEnabled())
+                LOG.info("Running memory sort from \"" + getFilesDeligate().
+                        getSourceFile()
+                        + "\" to \"" + getFilesDeligate().getDestinationFile()
+                        + "\".");
 
-        ObjectSource<T> src = openSource(getFilesDeligate().getSourceFile());
-        ObjectSink<T> snk = openSink(getFilesDeligate().getDestinationFile());
+            ObjectSource<T> src = openSource(getFilesDeligate().getSourceFile());
+            ObjectSink<T> snk =
+                    openSink(getFilesDeligate().getDestinationFile());
 
-        ObjectSortTask<T> task = new ObjectSortTask<T>();
-        task.setComparator(getComparator());
-        task.setSource(src);
-        task.setSink(snk);
-        task.run();
+            ObjectSortTask<T> task = new ObjectSortTask<T>();
+            task.setComparator(getComparator());
+            task.setSource(src);
+            task.setSink(snk);
+            task.run();
 
-        while (task.isExceptionTrapped())
-            task.throwTrappedException();
+            while (task.isExceptionTrapped())
+                task.throwTrappedException();
 
-        if (snk instanceof Flushable)
-            ((Flushable) snk).flush();
-        if (snk instanceof Closeable)
-            ((Closeable) snk).close();
-        if (src instanceof Closeable)
-            ((Closeable) src).close();
+            if (snk instanceof Flushable)
+                ((Flushable) snk).flush();
+            if (snk instanceof Closeable)
+                ((Closeable) snk).close();
+            if (src instanceof Closeable)
+                ((Closeable) src).close();
 
-        if (LOG.isInfoEnabled())
-            LOG.info("Completed memory sort.");
+            if (LOG.isInfoEnabled())
+                LOG.info("Completed memory sort.");
+
+            return true;
+        } catch (FileNotFoundException ex) {
+            throw new RuntimeException(ex);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     @Override

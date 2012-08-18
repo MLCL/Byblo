@@ -45,6 +45,7 @@ import uk.ac.susx.mlcl.byblo.commands.KnnSimsCommand;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -1034,7 +1035,7 @@ public class FullBuildTest2 {
             count.setEventsFile(events);
             count.setIndexDeligate(countIndex);
             count.setCharset(charet);
-            count.runCommand();
+            assertTrue(count.runCommand());
         } else {
             ExternalCountCommand count = new ExternalCountCommand();
             count.setInstancesFile(instances);
@@ -1043,7 +1044,7 @@ public class FullBuildTest2 {
             count.setEventsFile(events);
             count.setIndexDeligate(countIndex);
             count.getFileDeligate().setCharset(charet);
-            count.runCommand();
+            assertTrue(count.runCommand());
         }
 
         assertValidPlaintextInputFiles(entries, features, events);
@@ -1075,7 +1076,7 @@ public class FullBuildTest2 {
                 charet, allpairsIndex);
         if (serial)
             allpairs.setNumThreads(1);
-        allpairs.runCommand();
+        assertTrue(allpairs.runCommand());
 
         assertValidPlaintextInputFiles(similarities);
         assertSizeGT(TEST_FRUIT_SIMS, similarities);
@@ -1125,7 +1126,7 @@ public class FullBuildTest2 {
                 entryIndex, featureIndex));
         filter.addEventMinimumFrequency(2);
 
-        filter.runCommand();
+        assertTrue(filter.runCommand());
 
         assertValidPlaintextInputFiles(eventsFiltered, entriesFiltered,
                                        featuresFiltered);
@@ -1144,7 +1145,7 @@ public class FullBuildTest2 {
                 from, to, DEFAULT_CHARSET,
                 new SingleEnumeratingDeligate(type,
                                               enumerated, null), 5);
-        knn.runCommand();
+        assertTrue(knn.runCommand());
 
         assertValidPlaintextInputFiles(to);
         assertSizeGT(from, to);
@@ -1160,95 +1161,9 @@ public class FullBuildTest2 {
                 from, to, DEFAULT_CHARSET,
                 new SingleEnumeratingDeligate(type,
                                               enumerated, null), 5);
-        knn.runCommand();
+        assertTrue(knn.runCommand());
 
         assertValidPlaintextInputFiles(to);
         assertSizeGT(from, to);
     }
-//    private static void indexTP(File from, File to,
-//                                File index1, File index2,
-//                                boolean skip1, boolean skip2)
-//            throws Exception {
-//        assertValidPlaintextInputFiles(from);
-//        assertValidOutputFiles(to);
-//
-//        IndexTPCommand unindex = new IndexTPCommand();
-//        unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-//        unindex.getFilesDeligate().setSourceFile(from);
-//        unindex.getFilesDeligate().setDestinationFile(to);
-//        unindex.getFilesDeligate().setCompactFormatDisabled(false);
-//        unindex.setIndexDeligate(new EnumeratorPairBaringDeligate(
-//                true, true, index1, index2, skip1, skip2));
-//        unindex.runCommand();
-//
-//        assertValidPlaintextInputFiles(to);
-//        assertSizeGT(from, to);
-//    }
-//
-//    private static void unindexSims(File from, File to, File index,
-//                                    boolean skip1, boolean skip2)
-//            throws Exception {
-//        assertValidPlaintextInputFiles(from);
-//
-//        UnindexSimsCommand unindex = new UnindexSimsCommand();
-//        unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-//        unindex.getFilesDeligate().setSourceFile(from);
-//        unindex.getFilesDeligate().setDestinationFile(to);
-//        unindex.getFilesDeligate().setCompactFormatDisabled(false);
-//        unindex.setIndexDeligate(new EnumeratorSingleBaringDeligate(true, index, null, skip1, skip2));
-//        unindex.runCommand();
-//
-//        assertValidPlaintextInputFiles(to);
-//        assertSizeGT(to, from);
-//    }
-//    private static void unindexWT(EnumeratorType type, File from, File to, File index,
-//                                  boolean skip1, boolean skip2)
-//            throws Exception {
-//        assertValidPlaintextInputFiles(from);
-//
-//        IndexingCommands.UnindexEntries unindex = new IndexingCommands.UnindexEntries();
-//        unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-//        unindex.getFilesDeligate().setSourceFile(from);
-//        unindex.getFilesDeligate().setDestinationFile(to);
-//        unindex.setIndexDeligate(EnumeratingDeligates.toPair(new SingleEnumeratingDeligate(type, true, index)));
-//        unindex.runCommand();
-//
-//        assertValidPlaintextInputFiles(to);
-//        assertSizeGT(to, from);
-//    }
-//
-//    private static void unindexWTP(EnumeratorType type, File from, File to,
-//                                   File index1, File index2,
-//                                   boolean skip1, boolean skip2)
-//            throws Exception {
-//        assertValidPlaintextInputFiles(from);
-//
-//        IndexingCommands.IndexEvents unindex = new IndexingCommands.IndexEvents();
-//        unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-//        unindex.getFilesDeligate().setSourceFile(from);
-//        unindex.getFilesDeligate().setDestinationFile(to);
-//        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(type, true, true,
-//                                                               index1, index2));
-//        unindex.runCommand();
-//
-//        assertValidPlaintextInputFiles(to);
-//        assertSizeGT(to, from);
-//    }
-//
-//    private static void unindexTP(EnumeratorType type, File from, File to,
-//                                  File index1, File index2,
-//                                  boolean skip1, boolean skip2)
-//            throws Exception {
-//        assertValidPlaintextInputFiles(from);
-//
-//        IndexingCommands.IndexInstances unindex = new IndexingCommands.IndexInstances();
-//        unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-//        unindex.getFilesDeligate().setSourceFile(from);
-//        unindex.getFilesDeligate().setDestinationFile(to);
-//        unindex.setIndexDeligate(new DoubleEnumeratingDeligate(type, true, true, index1, index2));
-//        unindex.runCommand();
-//
-//        assertValidPlaintextInputFiles(to);
-//        assertSizeGT(to, from);
-//    }
 }

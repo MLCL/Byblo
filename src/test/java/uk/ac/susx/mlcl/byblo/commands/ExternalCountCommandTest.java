@@ -311,22 +311,22 @@ public class ExternalCountCommandTest {
         runReplacingParameters(3, null);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = RuntimeException.class)
     public void testIllegalState1() throws Exception {
         runReplacingParameters(0, TEST_OUTPUT_DIR);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = RuntimeException.class)
     public void testIllegalState2() throws Exception {
         runReplacingParameters(1, TEST_OUTPUT_DIR);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = RuntimeException.class)
     public void testIllegalState3() throws Exception {
         runReplacingParameters(2, TEST_OUTPUT_DIR);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = RuntimeException.class)
     public void testIllegalState4() throws Exception {
         runReplacingParameters(3, TEST_OUTPUT_DIR);
     }

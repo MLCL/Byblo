@@ -38,6 +38,7 @@ import com.google.common.base.Objects;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.CheckReturnValue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -70,14 +71,19 @@ public abstract class AbstractCommand implements Command {
     }
 
     @Override
-    public abstract void runCommand() throws Exception;
+    @CheckReturnValue
+    public abstract boolean runCommand();
 
     @Override
-    public void runCommand(final String[] args) throws Exception {
+    @CheckReturnValue
+    public boolean runCommand(final String[] args) {
         Checks.checkNotNull("args", args);
 
         if (LOG.isTraceEnabled())
             LOG.trace("Initialising command: " + this);
+
+        // Store the return status of this invokation.
+        boolean completedSuccesfully = true;
 
         final JCommander jc = new JCommander();
         jc.setProgramName(this.getClass().getSimpleName());
@@ -94,7 +100,16 @@ public abstract class AbstractCommand implements Command {
 
             subCommandInstances = new HashMap<String, Command>();
             for (String command : subCommands.keySet()) {
-                final Command instance = subCommands.get(command).newInstance();
+                final Command instance;
+                try {
+                    instance = subCommands.get(command).newInstance();
+                } catch (InstantiationException ex) {
+                    // Sub-commands MUST be instantiatable by reflection
+                    throw new AssertionError(ex);
+                } catch (IllegalAccessException ex) {
+                    // Sub-commands MUST have a public default constructor
+                    throw new AssertionError(ex);
+                }
                 jc.addCommand(command, instance);
                 subCommandInstances.put(command, instance);
             }
@@ -109,6 +124,49 @@ public abstract class AbstractCommand implements Command {
                 LOG.trace("Parsing command line options.");
             jc.parse(args);
 
+            if (isUsageRequested()) {
+
+                if (LOG.isTraceEnabled())
+                    LOG.trace("Printing usage.");
+
+                if (jc.getParsedCommand() == null) {
+                    jc.usage();
+                } else {
+                    jc.usage(jc.getParsedCommand());
+                }
+
+            } else if (!subCommands.isEmpty() && jc.getParsedCommand() == null) {
+
+                if (LOG.isTraceEnabled())
+                    LOG.trace("Command reguired but not given.");
+
+                System.err.println("Command reguired but not given.");
+                StringBuilder sb = new StringBuilder();
+                jc.usage(sb);
+                System.err.println(sb);
+
+                completedSuccesfully = false;
+
+            } else {
+
+                if (jc.getParsedCommand() != null) {
+                    Command instance = subCommandInstances.
+                            get(jc.getParsedCommand());
+                    if (LOG.isTraceEnabled())
+                        LOG.
+                                trace(
+                                "Running subcommand " + jc.getParsedCommand()
+                                + ": "
+                                + instance);
+                    completedSuccesfully = instance.runCommand();
+
+                } else {
+
+                    LOG.trace("Running command: " + this);
+
+                    completedSuccesfully = this.runCommand();
+                }
+            }
 
         } catch (ParameterException ex) {
             if (LOG.isTraceEnabled())
@@ -125,49 +183,12 @@ public abstract class AbstractCommand implements Command {
             }
 
             System.err.println(sb);
-            throw ex;
+            completedSuccesfully = false;
         }
 
-
-        if (isUsageRequested()) {
-            if (LOG.isTraceEnabled())
-                LOG.trace("Printing usage.");
-
-            if (jc.getParsedCommand() == null) {
-                jc.usage();
-            } else {
-                jc.usage(jc.getParsedCommand());
-            }
-
-        } else if (!subCommands.isEmpty() && jc.getParsedCommand() == null) {
-
-            if (LOG.isTraceEnabled())
-                LOG.trace("Command reguired but not given.");
-
-            System.err.println("Command reguired but not given.");
-            StringBuilder sb = new StringBuilder();
-            jc.usage(sb);
-            System.err.println(sb);
-
-            throw new ParameterException("Command reguired but not given.");
-
-        } else {
-
-            if (jc.getParsedCommand() != null) {
-                Command instance = subCommandInstances.
-                        get(jc.getParsedCommand());
-                if (LOG.isTraceEnabled())
-                    LOG.
-                            trace(
-                            "Running subcommand " + jc.getParsedCommand() + ": "
-                            + instance);
-                instance.runCommand();
-            } else {
-                LOG.trace("Running command: " + this);
-                this.runCommand();
-            }
-        }
         LOG.trace("Completed command: " + this);
+
+        return completedSuccesfully;
     }
 
     @Override

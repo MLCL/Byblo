@@ -41,6 +41,9 @@ import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Comparator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.CheckReturnValue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
@@ -118,37 +121,51 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
     }
 
     @Override
-    public void runCommand() throws Exception {
-        if (LOG.isInfoEnabled())
-            LOG.
-                    info(
-                    "Running merge from \"" + getFileDeligate().getSourceFileA()
-                    + "\" and \"" + getFileDeligate().getSourceFileB()
-                    + "\" to \"" + getFileDeligate().getDestinationFile()
-                    + "\".");
+    @CheckReturnValue
+    public boolean runCommand() {
+        try {
+            if (LOG.isInfoEnabled())
+                LOG.
+                        info(
+                        "Running merge from \"" + getFileDeligate()
+                        .getSourceFileA()
+                        + "\" and \"" + getFileDeligate().getSourceFileB()
+                        + "\" to \"" + getFileDeligate().getDestinationFile()
+                        + "\".");
 
-        ObjectSource<T> srcA = openSource(getFileDeligate().getSourceFileA());
-        ObjectSource<T> srcB = openSource(getFileDeligate().getSourceFileB());
-        ObjectSink<T> snk = openSink(getFileDeligate().getDestinationFile());
+            ObjectSource<T> srcA =
+                    openSource(getFileDeligate().getSourceFileA());
+            ObjectSource<T> srcB =
+                    openSource(getFileDeligate().getSourceFileB());
+            ObjectSink<T> snk = openSink(getFileDeligate().getDestinationFile());
 
-        ObjectMergeTask<T> task = new ObjectMergeTask<T>(
-                srcA, srcB, snk, getComparator());
-        task.run();
-        while (task.isExceptionTrapped())
-            task.throwTrappedException();
+            ObjectMergeTask<T> task = new ObjectMergeTask<T>(
+                    srcA, srcB, snk, getComparator());
+            task.run();
+            while (task.isExceptionTrapped())
+                task.throwTrappedException();
 
-        if (snk instanceof Flushable)
-            ((Flushable) snk).flush();
+            if (snk instanceof Flushable)
+                ((Flushable) snk).flush();
 
-        if (srcA instanceof Closeable)
-            ((Closeable) srcA).close();
-        if (srcB instanceof Closeable)
-            ((Closeable) srcB).close();
-        if (snk instanceof Closeable)
-            ((Closeable) snk).close();
+            if (srcA instanceof Closeable)
+                ((Closeable) srcA).close();
+            if (srcB instanceof Closeable)
+                ((Closeable) srcB).close();
+            if (snk instanceof Closeable)
+                ((Closeable) snk).close();
 
-        if (LOG.isInfoEnabled())
-            LOG.info("Completed merge.");
+            if (LOG.isInfoEnabled())
+                LOG.info("Completed merge.");
+
+            return true;
+        } catch (FileNotFoundException ex) {
+            throw new RuntimeException(ex);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     protected abstract ObjectSource<T> openSource(File file)

@@ -202,7 +202,7 @@ public class SortEventsCommandTest {
                 idx);
         cmd.setIndexDeligate(idx);
         cmd.setComparator(comparator);
-        cmd.runCommand();
+        assertTrue(cmd.runCommand());
 
 
         assertTrue("Sorted file does not exist", sortedFile.exists());

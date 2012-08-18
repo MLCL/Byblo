@@ -39,6 +39,7 @@ import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -216,7 +217,7 @@ public class IndexTPCommandTest {
         unindex.getFilesDeligate().setDestinationFile(to);
         unindex.setIndexDeligate(new DoubleEnumeratingDeligate(type, true, true,
                                                                index1, index2));
-        unindex.runCommand();
+        assertTrue(unindex.runCommand());
 
         assertValidPlaintextInputFiles(to);
 
@@ -246,7 +247,7 @@ public class IndexTPCommandTest {
 
         unindex.setIndexDeligate(new DoubleEnumeratingDeligate(type, true, true,
                                                                index1, index2));
-        unindex.runCommand();
+        assertTrue(unindex.runCommand());
 
         assertValidPlaintextInputFiles(to);
         assertSizeGT(to, from);

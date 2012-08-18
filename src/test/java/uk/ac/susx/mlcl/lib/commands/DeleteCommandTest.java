@@ -55,7 +55,7 @@ public class DeleteCommandTest {
         assertTrue(tmp.exists());
         assertEquals(tmp, instance.getFile());
 
-        instance.runCommand();
+        assertTrue(instance.runCommand());
 
 
         assertFalse(tmp.exists());

@@ -66,7 +66,7 @@ public class CountCommandTest {
                 Enumerating.DEFAULT_TYPE, preIndexEntries, preIndexFeatures,
                 null, null);
         countTask.setIndexDeligate(idx);
-        countTask.runCommand();
+        assertTrue(countTask.runCommand());
 
         assertTrue("Output files not created: " + outE, outE.exists());
         assertTrue("Output files not created: " + outF, outF.exists());
@@ -103,7 +103,7 @@ public class CountCommandTest {
 
         try {
             enableExistTrapping();
-            CountCommand.main(args);
+            new CountCommand().runCommand(args);
         } finally {
             disableExitTrapping();
         }
@@ -196,22 +196,22 @@ public class CountCommandTest {
 
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = RuntimeException.class)
     public void testIllegalState1() throws Exception {
         runReplacingFile(0, TEST_OUTPUT_DIR);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = RuntimeException.class)
     public void testIllegalState2() throws Exception {
         runReplacingFile(1, TEST_OUTPUT_DIR);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = RuntimeException.class)
     public void testIllegalState3() throws Exception {
         runReplacingFile(2, TEST_OUTPUT_DIR);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = RuntimeException.class)
     public void testIllegalState4() throws Exception {
         runReplacingFile(3, TEST_OUTPUT_DIR);
     }

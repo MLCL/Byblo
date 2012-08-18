@@ -48,6 +48,9 @@ import static java.text.MessageFormat.format;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.CheckReturnValue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
@@ -248,220 +251,216 @@ public class FilterCommand extends AbstractCommand
     }
 
     @Override
-    public void runCommand() throws Exception {
+    @CheckReturnValue
+    public boolean runCommand() {
         if (LOG.isInfoEnabled())
             LOG.info("Running filtering.");
         if (LOG.isDebugEnabled())
             LOG.debug(this);
 
+        try {
 
-        if (filterFeatureMinFreq > 0) {
-            addFeaturesMinimumFrequency(filterFeatureMinFreq);
-        }
-        if (filterFeaturePattern != null) {
-            addFeaturesPattern(filterFeaturePattern);
-        }
-        if (filterFeatureWhitelist != null) {
-            addFeaturesWhitelist(com.google.common.io.Files.readLines(
-                    filterFeatureWhitelist, getCharset()));
-        }
+            if (filterFeatureMinFreq > 0) {
+                addFeaturesMinimumFrequency(filterFeatureMinFreq);
+            }
+            if (filterFeaturePattern != null) {
+                addFeaturesPattern(filterFeaturePattern);
+            }
+            if (filterFeatureWhitelist != null) {
+                addFeaturesWhitelist(com.google.common.io.Files.readLines(
+                        filterFeatureWhitelist, getCharset()));
+            }
 
-        if (filterEntryMinFreq > 0) {
-            addEntryMinimumFrequency(filterEntryMinFreq);
-        }
-        if (filterEntryPattern != null) {
-            addEntryPattern(filterEntryPattern);
-        }
-        if (filterEntryWhitelist != null) {
-            addEntryWhitelist(com.google.common.io.Files.readLines(
-                    filterEntryWhitelist, getCharset()));
-        }
+            if (filterEntryMinFreq > 0) {
+                addEntryMinimumFrequency(filterEntryMinFreq);
+            }
+            if (filterEntryPattern != null) {
+                addEntryPattern(filterEntryPattern);
+            }
+            if (filterEntryWhitelist != null) {
+                addEntryWhitelist(com.google.common.io.Files.readLines(
+                        filterEntryWhitelist, getCharset()));
+            }
 
-        if (filterEventMinFreq > 0) {
-            addEventMinimumFrequency(filterEventMinFreq);
-        }
+            if (filterEventMinFreq > 0) {
+                addEventMinimumFrequency(filterEventMinFreq);
+            }
 
-        checkState();
-        activeEventsFile = inputEventsFile;
-        activeEntriesFile = inputEntriesFile;
-        activeFeaturesFile = inputFeaturesFile;
+            checkState();
+            activeEventsFile = inputEventsFile;
+            activeEntriesFile = inputEntriesFile;
+            activeFeaturesFile = inputFeaturesFile;
 
-        progress.addProgressListener(new ReportLoggingProgressListener(LOG));
+            progress.addProgressListener(new ReportLoggingProgressListener(LOG));
 
-        progress.setState(State.RUNNING);
-        progress.setProgressPercent(0);
+            progress.setState(State.RUNNING);
+            progress.setProgressPercent(0);
 
 
-        // Run the filters forwards then backwards. Each filtering step may
-        // introduce additionaly filters for the other files, so continue
-        // looping until there is no work remaining. Depending on filters this
-        // very unlikely to take more than 3 passes
+            // Run the filters forwards then backwards. Each filtering step may
+            // introduce additionaly filters for the other files, so continue
+            // looping until there is no work remaining. Depending on filters this
+            // very unlikely to take more than 3 passes
 
-        int passCount = 0;
-        int opCount = 0;
+            int passCount = 0;
+            int opCount = 0;
 
-        while (entryFilterRequired
-                || eventFilterRequired
-                || featureFilterRequired) {
+            while (entryFilterRequired
+                    || eventFilterRequired
+                    || featureFilterRequired) {
 
 //            if (entryFilterRequired || eventFilterRequired) {
 
-            progress.setMessage(
-                    "Running filtering pass (#" + (++passCount) + ").");
+                progress.setMessage(
+                        "Running filtering pass (#" + (++passCount) + ").");
 
-            if (entryFilterRequired) {
-                filterEntries();
-                ++opCount;
-                progress.
-                        setProgressPercent(
-                        100 * opCount / (opCount + 3
-                                         + (entryFilterRequired ? 1 : 0)
-                                         + (eventFilterRequired ? 1 : 0)
-                                         + (featureFilterRequired ? 1 : 0)));
-            }
+                if (entryFilterRequired) {
+                    filterEntries();
+                    ++opCount;
+                    progress.
+                            setProgressPercent(
+                            100 * opCount / (opCount + 3
+                                             + (entryFilterRequired ? 1 : 0)
+                                             + (eventFilterRequired ? 1 : 0)
+                                             + (featureFilterRequired ? 1 : 0)));
 
-            if (eventFilterRequired) {
-                filterEvents();
-                ++opCount;
-                progress.
-                        setProgressPercent(
-                        100 * opCount / (opCount + 3
-                                         + (entryFilterRequired ? 1 : 0)
-                                         + (eventFilterRequired ? 1 : 0)
-                                         + (featureFilterRequired ? 1 : 0)));
-            }
+                }
 
-            if (featureFilterRequired) {
-                filterFeatures();
-                ++opCount;
-                progress.
-                        setProgressPercent(
-                        100 * opCount / (opCount + 3
-                                         + (entryFilterRequired ? 1 : 0)
-                                         + (eventFilterRequired ? 1 : 0)
-                                         + (featureFilterRequired ? 1 : 0)));
-            }
+                if (eventFilterRequired) {
+                    filterEvents();
+                    ++opCount;
+                    progress.
+                            setProgressPercent(
+                            100 * opCount / (opCount + 3
+                                             + (entryFilterRequired ? 1 : 0)
+                                             + (eventFilterRequired ? 1 : 0)
+                                             + (featureFilterRequired ? 1 : 0)));
+                }
+
+                if (featureFilterRequired) {
+                    filterFeatures();
+                    ++opCount;
+                    progress.
+                            setProgressPercent(
+                            100 * opCount / (opCount + 3
+                                             + (entryFilterRequired ? 1 : 0)
+                                             + (eventFilterRequired ? 1 : 0)
+                                             + (featureFilterRequired ? 1 : 0)));
+                }
+
+                if (eventFilterRequired) {
+                    filterEvents();
+                    ++opCount;
+                    progress.
+                            setProgressPercent(
+                            100 * opCount / (opCount + 3
+                                             + (entryFilterRequired ? 1 : 0)
+                                             + (eventFilterRequired ? 1 : 0)
+                                             + (featureFilterRequired ? 1 : 0)));
+                }
+
+                if (entryFilterRequired) {
+                    filterEntries();
+                    ++opCount;
+                    progress.
+                            setProgressPercent(
+                            100 * opCount / (opCount + 3
+                                             + (entryFilterRequired ? 1 : 0)
+                                             + (eventFilterRequired ? 1 : 0)
+                                             + (featureFilterRequired ? 1 : 0)));
+                }
 //            }
-//
-//            if (featureFilterRequired || eventFilterRequired) {
-//
-//                progress.setMessage("Running backwards filtering pass (#" + (++passCount) + ").");
-//
-//                if (featureFilterRequired) {
-//                    filterFeatures();
-//                    ++opCount;
-//                    progress.setProgressPercent(100 * opCount / (opCount
-//                            + (entryFilterRequired ? 1 : 0)
-//                            + (eventFilterRequired ? 1 : 0)
-//                            + (featureFilterRequired ? 1 : 0)));
-//                }
-
-            if (eventFilterRequired) {
-                filterEvents();
-                ++opCount;
-                progress.
-                        setProgressPercent(
-                        100 * opCount / (opCount + 3
-                                         + (entryFilterRequired ? 1 : 0)
-                                         + (eventFilterRequired ? 1 : 0)
-                                         + (featureFilterRequired ? 1 : 0)));
             }
 
-            if (entryFilterRequired) {
-                filterEntries();
-                ++opCount;
-                progress.
-                        setProgressPercent(
-                        100 * opCount / (opCount + 3
-                                         + (entryFilterRequired ? 1 : 0)
-                                         + (eventFilterRequired ? 1 : 0)
-                                         + (featureFilterRequired ? 1 : 0)));
+            // Finished filtering so copy the results files to the outputs.
+
+            progress.setMessage("Copying final entries file.");
+
+
+            if (!outputEntriesFile.delete() && LOG.isWarnEnabled()) {
+                LOG.warn("Failed to delete origional entries file: "
+                        + outputEntriesFile);
             }
-//            }
-        }
 
-        // Finished filtering so copy the results files to the outputs.
-
-        progress.setMessage("Copying final entries file.");
-
-
-        if (!outputEntriesFile.delete() && LOG.isWarnEnabled()) {
-            LOG.warn("Failed to delete origional entries file: "
-                    + outputEntriesFile);
-        }
-
-        if (!activeEntriesFile.renameTo(outputEntriesFile)) {
-            com.google.common.io.Files.
-                    copy(activeEntriesFile, outputEntriesFile);
-            if (!activeEntriesFile.equals(inputEntriesFile)) {
-                if (!activeEntriesFile.delete()) {
-                    LOG.warn(MessageFormat.format(
-                            "Failed to delete active entries file: {0}",
-                            activeEntriesFile));
+            if (!activeEntriesFile.renameTo(outputEntriesFile)) {
+                com.google.common.io.Files.
+                        copy(activeEntriesFile, outputEntriesFile);
+                if (!activeEntriesFile.equals(inputEntriesFile)) {
+                    if (!activeEntriesFile.delete()) {
+                        LOG.warn(MessageFormat.format(
+                                "Failed to delete active entries file: {0}",
+                                activeEntriesFile));
+                    }
                 }
             }
+            ++opCount;
+
+            progress.startAdjusting();
+            progress.
+                    setProgressPercent(
+                    100 * opCount / (opCount + 2
+                                     + (entryFilterRequired ? 1 : 0)
+                                     + (eventFilterRequired ? 1 : 0)
+                                     + (featureFilterRequired ? 1 : 0)));
+            progress.setMessage("Copying finaly events file.");
+            progress.endAdjusting();
+
+            if (!outputEventsFile.delete() && LOG.isWarnEnabled()) {
+                LOG.warn("Failed to delete origional events file: "
+                        + outputEventsFile);
+            }
+
+            if (!activeEventsFile.renameTo(outputEventsFile)) {
+                com.google.common.io.Files.copy(activeEventsFile,
+                                                outputEventsFile);
+                if (!activeEventsFile.equals(inputEventsFile))
+                    if (!activeEventsFile.delete())
+                        LOG.warn("Failed to delete active events file:  "
+                                + activeEventsFile);
+            }
+            ++opCount;
+
+            progress.startAdjusting();
+            progress.
+                    setProgressPercent(
+                    100 * opCount / (opCount + 1
+                                     + (entryFilterRequired ? 1 : 0)
+                                     + (eventFilterRequired ? 1 : 0)
+                                     + (featureFilterRequired ? 1 : 0)));
+            progress.setMessage("Copying final features file.");
+            progress.endAdjusting();
+
+            if (!activeFeaturesFile.renameTo(outputFeaturesFile)) {
+                com.google.common.io.Files.copy(activeFeaturesFile,
+                                                outputFeaturesFile);
+                if (!activeFeaturesFile.equals(inputFeaturesFile))
+                    if (!activeFeaturesFile.delete())
+                        LOG.warn("Failed to delete active features file:  "
+                                + activeFeaturesFile);
+            }
+            ++opCount;
+            progress.
+                    setProgressPercent(
+                    100 * opCount / (opCount + 0
+                                     + (entryFilterRequired ? 1 : 0)
+                                     + (eventFilterRequired ? 1 : 0)
+                                     + (featureFilterRequired ? 1 : 0)));
+
+
+            if (indexDeligate.isEnumeratorOpen()) {
+                indexDeligate.saveEnumerator();
+                indexDeligate.closeEnumerator();
+            }
+
+
+            progress.setState(State.COMPLETED);
+            return true;
+
+        } catch (FileNotFoundException ex) {
+            throw new RuntimeException(ex);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
-        ++opCount;
-
-        progress.startAdjusting();
-        progress.
-                setProgressPercent(
-                100 * opCount / (opCount + 2
-                                 + (entryFilterRequired ? 1 : 0)
-                                 + (eventFilterRequired ? 1 : 0)
-                                 + (featureFilterRequired ? 1 : 0)));
-        progress.setMessage("Copying finaly events file.");
-        progress.endAdjusting();
-
-        if (!outputEventsFile.delete() && LOG.isWarnEnabled()) {
-            LOG.warn("Failed to delete origional events file: "
-                    + outputEventsFile);
-        }
-
-        if (!activeEventsFile.renameTo(outputEventsFile)) {
-            com.google.common.io.Files.copy(activeEventsFile,
-                                            outputEventsFile);
-            if (!activeEventsFile.equals(inputEventsFile))
-                if (!activeEventsFile.delete())
-                    LOG.warn("Failed to delete active events file:  "
-                            + activeEventsFile);
-        }
-        ++opCount;
-
-        progress.startAdjusting();
-        progress.
-                setProgressPercent(
-                100 * opCount / (opCount + 1
-                                 + (entryFilterRequired ? 1 : 0)
-                                 + (eventFilterRequired ? 1 : 0)
-                                 + (featureFilterRequired ? 1 : 0)));
-        progress.setMessage("Copying final features file.");
-        progress.endAdjusting();
-
-        if (!activeFeaturesFile.renameTo(outputFeaturesFile)) {
-            com.google.common.io.Files.copy(activeFeaturesFile,
-                                            outputFeaturesFile);
-            if (!activeFeaturesFile.equals(inputFeaturesFile))
-                if (!activeFeaturesFile.delete())
-                    LOG.warn("Failed to delete active features file:  "
-                            + activeFeaturesFile);
-        }
-        ++opCount;
-        progress.
-                setProgressPercent(
-                100 * opCount / (opCount + 0
-                                 + (entryFilterRequired ? 1 : 0)
-                                 + (eventFilterRequired ? 1 : 0)
-                                 + (featureFilterRequired ? 1 : 0)));
-
-
-        if (indexDeligate.isEnumeratorOpen()) {
-            indexDeligate.saveEnumerator();
-            indexDeligate.closeEnumerator();
-        }
-
-
-        progress.setState(State.COMPLETED);
     }
     // Read the entries file, passing it thought the filter. accepted entries
     // are written out to the output file while rejected entries are stored
