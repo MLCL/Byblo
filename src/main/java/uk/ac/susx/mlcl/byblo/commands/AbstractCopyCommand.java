@@ -137,6 +137,7 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand
             @Override
             public void progressChanged(ProgressEvent progressEvent) {
                 LOG.info(progressEvent.getSource().getProgressReport());
+                progress.setMessage(progressEvent.getSource().getProgressReport());
             }
 
         });
