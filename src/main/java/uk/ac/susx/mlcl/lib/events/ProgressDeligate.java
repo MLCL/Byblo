@@ -215,23 +215,39 @@ public class ProgressDeligate implements ProgressReporting, Serializable {
         return sb.toString();
     }
 
+    private static volatile int linkCount = 0;
+
     @Override
     public void addProgressListener(ProgressListener progressListener) {
         Checks.checkNotNull(progressListener);
         if (!progressListeners.contains(progressListener)) {
-            progressListeners.add(progressListener);
+            if (progressListeners.add(progressListener))
+                ++linkCount;
+
+            // While progress reporters don't have to extend (or delegate) this
+            // class to implement ProgressReporting, it is by far the easiest
+            // way. As such most objects will be using an instance of this class
+            // and linkCount will aproximate the total number of attached
+            // listeners. It's easy to forget to remove them so this check
+            // prints a warning when it grown large.
+            if (linkCount >= 100 && linkCount % 100 == 0 && LOG.isWarnEnabled())
+                LOG.warn(MessageFormat.format("Listener link count has grown "
+                        + "to {0}; indicating there may be a leak.", linkCount));
         }
+
     }
 
     @Override
     public void removeProgressListener(ProgressListener progressListener) {
         Checks.checkNotNull(progressListener);
-        progressListeners.remove(progressListener);
+        if (progressListeners.remove(progressListener))
+            --linkCount;
+        assert linkCount >= 0;
     }
 
     @Override
     public ProgressListener[] getProgressListeners() {
-        return progressListeners.toArray(new ProgressListener[0]);
+        return progressListeners.toArray(new ProgressListener[progressListeners.size()]);
     }
 
     protected void fireProgressChangedEvent() {
