@@ -59,6 +59,12 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
     protected static final int DEFAULT_NUM_THREADS =
             Runtime.getRuntime().availableProcessors();
 
+    /**
+     * Number of tasks that will be loaded and queued, in addition to those 
+     * that can be running simultaneously (as defined by {@link #nThreads}.)
+     */
+    public static final int PRELOAD_SIZE = 1;
+    
     @Parameter(names = {"-t", "--threads"},
     description = "Number of threads to use.")
     private int nThreads = DEFAULT_NUM_THREADS;
@@ -111,8 +117,7 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
     @Override
     protected void initialiseTask() throws Exception {
         getExecutor();
-//        throttle = new Semaphore((int)(getNumThreads() * 1.5) + 1);
-        throttle = new Semaphore(getNumThreads() + 1);
+        throttle = new Semaphore(getNumThreads() + PRELOAD_SIZE);
     }
 
     @Override

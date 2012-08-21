@@ -108,14 +108,6 @@ public final class FullBuild extends AbstractCommand {
     private int numThreads = Runtime.getRuntime().availableProcessors();
 
     /*
-     * === COUNTING PARAMATERISATION ===
-     */
-    @Parameter(names = {"--count-chunk-size"},
-    description = "Number of lines per work unit. Larger values increase performance and memory usage.",
-    hidden = HIDE_UNCOMMON_PARAMTERS)
-    private int countMaxChunkSize = ExternalCountCommand.DEFAULT_MAX_CHUNK_SIE;
-
-    /*
      * === FILTER PARAMATERISATION ===
      */
     @Parameter(names = {"-fef", "--filter-entry-freq"},
@@ -217,6 +209,7 @@ public final class FullBuild extends AbstractCommand {
     description = "The maximum number of neighbours to produce per word.")
     private int k = ExternalKnnSimsCommand.DEFAULT_K;
 
+    @Deprecated
     @Parameter(names = {"--knn-chunk-size"},
     description = "Number of lines per KNN work unit. Larger values increase memory usage and performace.",
     hidden = HIDE_UNCOMMON_PARAMTERS)
@@ -440,7 +433,6 @@ public final class FullBuild extends AbstractCommand {
             sb.append(MessageFormat.format(" * Output entries file: {0}\n", entriesFile));
             sb.append(MessageFormat.format(" * Output features file: {0}\n", featuresFile));
             sb.append(MessageFormat.format(" * Output events file: {0}\n", eventsFile));
-            sb.append(MessageFormat.format(" * Chunk size: {0} instances\n", countMaxChunkSize));
             sb.append(MessageFormat.format(" * Start time: {0,time,full} {0,date,full}\n", startTime));
             sb.append(MessageFormat.format(" * {0}\n", MiscUtil.memoryInfoString()));
             sb.append("\n");
@@ -461,8 +453,6 @@ public final class FullBuild extends AbstractCommand {
         countCmd.setEnumeratorType(enumeratorType);
 
         countCmd.setNumThreads(numThreads);
-        countCmd.setMaxChunkSize(countMaxChunkSize);
-
 
         countCmd.runCommand();
 
@@ -524,7 +514,6 @@ public final class FullBuild extends AbstractCommand {
             sb.append(MessageFormat.format(" * Output entries file: {0}\n", entriesFilteredFile));
             sb.append(MessageFormat.format(" * Output features file: {0}\n", featuresFilteredFile));
             sb.append(MessageFormat.format(" * Output events file: {0}\n", eventsFilteredFile));
-            sb.append(MessageFormat.format(" * Chunk size: {0} instances\n", countMaxChunkSize));
             sb.append(MessageFormat.format(" * Min. Entry Freq: {0}\n", filterEntryMinFreq));
             sb.append(MessageFormat.format(" * Min. Feature Freq: {0}\n", filterFeatureMinFreq));
             sb.append(MessageFormat.format(" * Min. Event Freq: {0}\n", filterEventMinFreq));

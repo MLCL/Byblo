@@ -56,8 +56,8 @@ import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
-import uk.ac.susx.mlcl.lib.events.ProgressEvent;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ReportingProgressListener;
 import uk.ac.susx.mlcl.lib.io.Files;
 
 /**
@@ -260,14 +260,8 @@ public class CountCommand extends AbstractCommand implements Serializable {
                 getEventOrder(), getEntryOrder(), getFeatureOrder());
 
 
-        task.addProgressListener(new ProgressListener() {
-
-            @Override
-            public void progressChanged(ProgressEvent progressEvent) {
-                System.out.println(progressEvent.getSource().getProgressReport());
-            }
-
-        });
+        final ProgressListener listener = new ReportingProgressListener();
+        task.addProgressListener(listener);
 
         task.run();
 
@@ -275,6 +269,9 @@ public class CountCommand extends AbstractCommand implements Serializable {
         while (task.isExceptionTrapped())
             task.throwTrappedException();
 
+
+        task.removeProgressListener(listener);
+        assert task.getProgressListeners().length == 0;
 
         instanceSource.close();
         entrySink.flush();

@@ -31,16 +31,26 @@
 package uk.ac.susx.mlcl.byblo.commands;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import static org.junit.Assert.*;
+
+import org.junit.Ignore;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.Tools;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
+import uk.ac.susx.mlcl.byblo.io.BybloIO;
+import uk.ac.susx.mlcl.byblo.io.TokenPair;
+import uk.ac.susx.mlcl.byblo.io.TokenPairSink;
+import uk.ac.susx.mlcl.lib.MiscUtil;
+import uk.ac.susx.mlcl.lib.events.ProgressEvent;
+import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import uk.ac.susx.mlcl.lib.test.ExitTrapper;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
@@ -55,7 +65,7 @@ public class ExternalCountCommandTest {
 
     private void runWithAPI(
             File inInst, File outE, File outF,
-            File outEF, Charset charset, int chunkSize,
+            File outEF, Charset charset,
             boolean preindexedEntries, boolean preindexedFeatures)
             throws Exception {
         final ExternalCountCommand countCmd = new ExternalCountCommand();
@@ -64,7 +74,6 @@ public class ExternalCountCommandTest {
         countCmd.setFeaturesFile(outF);
         countCmd.setEventsFile(outEF);
         countCmd.getFileDeligate().setCharset(charset);
-        countCmd.setMaxChunkSize(chunkSize);
         countCmd.setIndexDeligate(new DoubleEnumeratingDeligate(
                 Enumerating.DEFAULT_TYPE, preindexedEntries, preindexedFeatures, null, null));
         countCmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
@@ -82,7 +91,7 @@ public class ExternalCountCommandTest {
 
     private void runwithCLI(
             File inInst, File outE, File outF,
-            File outEF, Charset charset, int chunkSize,
+            File outEF, Charset charset,
             boolean preindexedEntries, boolean preindexedFeatures)
             throws Exception {
 
@@ -93,7 +102,6 @@ public class ExternalCountCommandTest {
             "--output-features", outF.toString(),
             "--output-entry-features", outEF.toString(),
             "--charset", charset.name(),
-            "--chunk-size", "" + chunkSize,
             "--temporary-directory", TEST_TMP_DIR.toString()
         };
 
@@ -130,7 +138,7 @@ public class ExternalCountCommandTest {
             File outEF, Charset charset,
             boolean preindexedEntries, boolean preindexedFeatures) throws Exception {
         try {
-            runWithAPI(inInst, outE, outF, outEF, charset, 10000,
+            runWithAPI(inInst, outE, outF, outEF, charset, 
                        preindexedEntries, preindexedFeatures);
             fail("NullPointerException should have been thrown.");
         } catch (NullPointerException ex) {
@@ -143,7 +151,7 @@ public class ExternalCountCommandTest {
             File outEF, Charset charset,
             boolean preindexedEntries, boolean preindexedFeatures) throws Exception {
         try {
-            runWithAPI(inInst, outE, outF, outEF, charset, 10000,
+            runWithAPI(inInst, outE, outF, outEF, charset, 
                        preindexedEntries, preindexedFeatures);
             fail("IllegalStateException should have been thrown.");
         } catch (IllegalStateException ex) {
@@ -166,7 +174,7 @@ public class ExternalCountCommandTest {
         efActual.delete();
 
         runWithAPI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
-                   DEFAULT_CHARSET, 1000000, false, false);
+                   DEFAULT_CHARSET, false, false);
 
 //        assertTrue("Output entries file differs from sampledata file.",
 //                   WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
@@ -194,7 +202,7 @@ public class ExternalCountCommandTest {
         efActual.delete();
 
         runWithAPI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
-                   DEFAULT_CHARSET, 1000000, true, true);
+                   DEFAULT_CHARSET, true, true);
 
 //        assertTrue("Output entries file differs from sampledata file.",
 //                   WeightedTokenSource.equal(eActual, TEST_FRUIT_INDEXED_ENTRIES,
@@ -224,7 +232,7 @@ public class ExternalCountCommandTest {
         efActual.delete();
 
         runWithAPI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
-                   DEFAULT_CHARSET, 30000, false, false);
+                   DEFAULT_CHARSET, false, false);
 
 //        assertTrue("Output entries file differs from sampledata file.",
 //                   WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
@@ -254,7 +262,7 @@ public class ExternalCountCommandTest {
         efActual.delete();
 
         runWithAPI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
-                   DEFAULT_CHARSET, 30000, true, true);
+                   DEFAULT_CHARSET, true, true);
 
 //        assertTrue("Output entries file differs from sampledata file.",
 //                   WeightedTokenSource.equal(eActual, TEST_FRUIT_INDEXED_ENTRIES,
@@ -283,7 +291,7 @@ public class ExternalCountCommandTest {
         efActual.delete();
 
         runwithCLI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
-                   DEFAULT_CHARSET, 1000000, false, false);
+                   DEFAULT_CHARSET,  false, false);
 
 
 //        assertTrue("Output entries file differs from sampledata file.",
@@ -313,7 +321,7 @@ public class ExternalCountCommandTest {
         efActual.delete();
 
         runwithCLI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
-                   DEFAULT_CHARSET, 1000000, true, true);
+                   DEFAULT_CHARSET, true, true);
 
 
 //        assertTrue("Output entries file differs from sampledata file.",
@@ -371,4 +379,122 @@ public class ExternalCountCommandTest {
         }
     }
 
+
+    /**
+     * Tests ExternalCountCommand on a large amount of data that has been 
+     * generated to conform to worst-case memory usage scenario.
+     * 
+     * @throws Exception
+     */
+	@Test
+	@Ignore(value="Takes a rath long time.")
+	public void testExternalCountCommandOnLargeData() throws Exception {
+		System.out.println("testExternalCountCommand()");
+
+		final int nEntries = 1 << 12;
+		final int nFeaturesPerEntry = 1 << 12;
+		final File instancesFile = new File(TEST_OUTPUT_DIR, 
+				String.format("testExternalCountCommand-%dx%d-instances", nEntries, nFeaturesPerEntry));
+		final File entriesFile = new File(TEST_OUTPUT_DIR, instancesFile.getName() + "-entries");
+		final File featuresFile = new File(TEST_OUTPUT_DIR, instancesFile.getName() + "-features");
+		final File eventsFile = new File(TEST_OUTPUT_DIR, instancesFile.getName() + "-events");
+		
+		// Create the test data if necessary
+		if(!instancesFile.exists())
+			generateWorstCaseCountData(instancesFile, nEntries, nFeaturesPerEntry);
+		
+		assertValidPlaintextInputFiles(instancesFile);
+		assertValidOutputFiles(entriesFile, featuresFile, eventsFile);
+
+		deleteIfExist(entriesFile, featuresFile, eventsFile);
+
+		// Instantiate and configure the command
+		final ExternalCountCommand countCmd = new ExternalCountCommand();
+		countCmd.setInstancesFile(instancesFile);
+		countCmd.setEntriesFile(entriesFile);
+		countCmd.setFeaturesFile(featuresFile);
+		countCmd.setEventsFile(eventsFile);
+		countCmd.getFileDeligate().setCharset(DEFAULT_CHARSET);
+		countCmd.setIndexDeligate(new DoubleEnumeratingDeligate(
+				Enumerating.DEFAULT_TYPE, true, true, null, null));
+		countCmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
+
+		// The highest number of cores attempted so far.
+//		countCmd.setNumThreads(64);
+
+		countCmd.addProgressListener(new InfoProgressListener());
+
+		countCmd.runCommand();
+
+		assertValidPlaintextInputFiles(entriesFile, featuresFile, eventsFile);
+
+	}
+
+	private static class InfoProgressListener implements ProgressListener {
+
+		long tick = System.currentTimeMillis();
+
+		@Override
+		public void progressChanged(final ProgressEvent progressEvent) {
+			System.out.println(MiscUtil.memoryInfoString());
+
+			long newTick = System.currentTimeMillis();
+			double tdiff = (newTick - tick) / 1000.0d;
+			tick = newTick;
+
+			System.out.println(MessageFormat.format("Tick: {0} seconds", tdiff));
+
+		}
+
+	}
+
+	/**
+	 * Routine that creates a large amount of data, that should be the absolute
+	 * worst case for counting stage of the pipeline. That is data where entries
+	 * and features only ever appear once, and consequently events also are
+	 * unique. This causes the counting maps to be at the upper bound of their
+	 * potential size.
+	 * 
+	 * @throws IOException
+	 */
+	private static void generateWorstCaseCountData(
+			final File outFile, final int nEntries, 
+			final int nFeaturesPerEntry ) throws IOException {
+		assert nEntries < Integer.MAX_VALUE / nFeaturesPerEntry 
+			: "number of events must be less than max_integer";
+		final int nEvents = nEntries*nFeaturesPerEntry;
+		
+		System.out.printf("Generating worst-case data for ExternalCount " +
+				"(nEntries=%d, nFeaturesPerEntry=%d, nEvents=%d)...%n", 
+				nEntries, nFeaturesPerEntry,nEvents);
+		
+		TokenPairSink sink = null;
+		try {
+			final DoubleEnumeratingDeligate ded = new DoubleEnumeratingDeligate(
+					Enumerating.DEFAULT_TYPE, true, true, null, null);
+
+			sink = BybloIO .openInstancesSink(outFile, DEFAULT_CHARSET, ded);
+
+			
+			for (int entryId = 0; entryId < nEntries; entryId++) {
+				
+				final int startId = entryId * nFeaturesPerEntry;
+				final int endId = (entryId + 1) * nFeaturesPerEntry;
+				
+				for (int featureId = startId; featureId < endId; featureId++) {
+					sink.write(new TokenPair(entryId, featureId));
+					
+					if(featureId % 5000000 == 0 || featureId == nEvents-1) {
+						System.out.printf("> generated %d of %d events (%.2f%% complete)%n", 
+								featureId, nEvents, (100.0d  * featureId) / nEvents);
+					}
+				}
+			}
+		} finally {
+			if (sink != null)
+				sink.close();
+		}
+		
+		System.out.println("Generation completed.");
+	}
 }
