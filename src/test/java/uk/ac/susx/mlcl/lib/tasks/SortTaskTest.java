@@ -80,7 +80,7 @@ public class SortTaskTest {
 
         List<Integer> out = new ArrayList<Integer>();
 
-        ObjectSource<Integer> src = ObjectIO.asSource(in);
+        ObjectSource<Integer> src = ObjectIO.asSource((Iterable<Integer>)in);
         ObjectSink<Integer> sink = ObjectIO.asSink(out);
 
         Comparator<Integer> comparator = new Comparator<Integer>() {
