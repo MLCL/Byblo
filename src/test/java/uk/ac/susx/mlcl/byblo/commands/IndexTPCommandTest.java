@@ -35,8 +35,11 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
+import uk.ac.susx.mlcl.TestConstants;
+import uk.ac.susx.mlcl.TestConstants.InfoProgressListener;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 
@@ -231,4 +234,52 @@ public class IndexTPCommandTest {
         assertSizeGT(to, from);
     }
 
+    
+	@Test
+	@Ignore(value="Takes a rather a long time.")
+	public void testEnumerateInstancesOnWorstCaseData() throws Exception {
+		System.out.println("testEnumerateInstancesOnWorstCaseData()");
+
+		// worst case is that you never see an entry of feature twice
+		final int nEntries = 1 << 12;
+		final int nFeaturesPerEntry = 1 << 12;
+		
+		final File inFile = new File(TEST_OUTPUT_DIR, 
+				String.format("testEnumerateInstancesOnWorstCaseData-%dx%d-instances", nEntries, nFeaturesPerEntry));
+		
+		// Create the test data if necessary
+		if(!inFile.exists())
+			TestConstants.generateUniqueEventsData(
+					inFile, nEntries, nFeaturesPerEntry);
+		
+		File outFile = new File(TEST_OUTPUT_DIR, inFile.getName() + "-enumerated");
+		File entryIdx = new File(TEST_OUTPUT_DIR, inFile.getName() + "-entry-index");
+		File featureIdx = new File(TEST_OUTPUT_DIR, inFile.getName() + "-feature-index");
+		
+		assertValidPlaintextInputFiles(inFile);
+		assertValidOutputFiles(outFile);
+		assertValidJDBCOutputFiles(entryIdx, featureIdx);
+
+		deleteIfExist(outFile);
+		deleteJDBCIfExist(entryIdx, featureIdx);
+
+		final DoubleEnumeratingDeligate ded = new DoubleEnumeratingDeligate(
+				EnumeratorType.JDBC, true, true, entryIdx, featureIdx);
+
+		IndexingCommands.IndexInstances unindex = new IndexingCommands.IndexInstances();
+		unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
+		unindex.getFilesDeligate().setSourceFile(inFile);
+		unindex.getFilesDeligate().setDestinationFile(outFile);
+		unindex.setIndexDeligate(ded);
+
+		unindex.addProgressListener(new InfoProgressListener());
+
+		unindex.runCommand();
+
+		ded.closeEnumerator();
+
+		assertValidPlaintextInputFiles(outFile);
+		assertValidJDBCInputFiles(entryIdx, featureIdx);
+	}
+	
 }

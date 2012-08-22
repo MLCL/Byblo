@@ -30,30 +30,39 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static uk.ac.susx.mlcl.TestConstants.DEFAULT_CHARSET;
+import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_INPUT;
+import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_INPUT_INDEXED;
+import static uk.ac.susx.mlcl.TestConstants.TEST_OUTPUT_DIR;
+import static uk.ac.susx.mlcl.TestConstants.TEST_TMP_DIR;
+import static uk.ac.susx.mlcl.TestConstants.assertValidOutputFiles;
+import static uk.ac.susx.mlcl.TestConstants.assertValidPlaintextInputFiles;
+import static uk.ac.susx.mlcl.TestConstants.deleteIfExist;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.disableExitTrapping;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.enableExistTrapping;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import static org.junit.Assert.*;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import static uk.ac.susx.mlcl.TestConstants.*;
+
+import uk.ac.susx.mlcl.TestConstants;
+import uk.ac.susx.mlcl.TestConstants.InfoProgressListener;
 import uk.ac.susx.mlcl.byblo.Tools;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.TokenPairSink;
-import uk.ac.susx.mlcl.lib.MiscUtil;
-import uk.ac.susx.mlcl.lib.events.ProgressEvent;
-import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import uk.ac.susx.mlcl.lib.test.ExitTrapper;
-import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
  *
@@ -401,7 +410,8 @@ public class ExternalCountCommandTest {
 		
 		// Create the test data if necessary
 		if(!instancesFile.exists())
-			generateWorstCaseCountData(instancesFile, nEntries, nFeaturesPerEntry);
+			TestConstants.generateUniqueEventsData(
+					instancesFile, nEntries, nFeaturesPerEntry);
 		
 		assertValidPlaintextInputFiles(instancesFile);
 		assertValidOutputFiles(entriesFile, featuresFile, eventsFile);
@@ -430,71 +440,4 @@ public class ExternalCountCommandTest {
 
 	}
 
-	private static class InfoProgressListener implements ProgressListener {
-
-		long tick = System.currentTimeMillis();
-
-		@Override
-		public void progressChanged(final ProgressEvent progressEvent) {
-			System.out.println(MiscUtil.memoryInfoString());
-
-			long newTick = System.currentTimeMillis();
-			double tdiff = (newTick - tick) / 1000.0d;
-			tick = newTick;
-
-			System.out.println(MessageFormat.format("Tick: {0} seconds", tdiff));
-
-		}
-
-	}
-
-	/**
-	 * Routine that creates a large amount of data, that should be the absolute
-	 * worst case for counting stage of the pipeline. That is data where entries
-	 * and features only ever appear once, and consequently events also are
-	 * unique. This causes the counting maps to be at the upper bound of their
-	 * potential size.
-	 * 
-	 * @throws IOException
-	 */
-	private static void generateWorstCaseCountData(
-			final File outFile, final int nEntries, 
-			final int nFeaturesPerEntry ) throws IOException {
-		assert nEntries < Integer.MAX_VALUE / nFeaturesPerEntry 
-			: "number of events must be less than max_integer";
-		final int nEvents = nEntries*nFeaturesPerEntry;
-		
-		System.out.printf("Generating worst-case data for ExternalCount " +
-				"(nEntries=%d, nFeaturesPerEntry=%d, nEvents=%d)...%n", 
-				nEntries, nFeaturesPerEntry,nEvents);
-		
-		TokenPairSink sink = null;
-		try {
-			final DoubleEnumeratingDeligate ded = new DoubleEnumeratingDeligate(
-					Enumerating.DEFAULT_TYPE, true, true, null, null);
-
-			sink = BybloIO .openInstancesSink(outFile, DEFAULT_CHARSET, ded);
-
-			
-			for (int entryId = 0; entryId < nEntries; entryId++) {
-				
-				final int startId = entryId * nFeaturesPerEntry;
-				final int endId = (entryId + 1) * nFeaturesPerEntry;
-				
-				for (int featureId = startId; featureId < endId; featureId++) {
-					sink.write(new TokenPair(entryId, featureId));
-					
-					if(featureId % 5000000 == 0 || featureId == nEvents-1) {
-						System.out.printf("> generated %d of %d events (%.2f%% complete)%n", 
-								featureId, nEvents, (100.0d  * featureId) / nEvents);
-					}
-				}
-			}
-		} finally {
-			if (sink != null)
-				sink.close();
-		}
-		
-		System.out.println("Generation completed.");
-	}
 }

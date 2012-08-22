@@ -38,8 +38,19 @@ import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 import static java.text.MessageFormat.*;
+
+import java.text.MessageFormat;
 import java.util.Random;
 import static org.junit.Assert.*;
+import static uk.ac.susx.mlcl.TestConstants.DEFAULT_CHARSET;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
+import uk.ac.susx.mlcl.byblo.io.BybloIO;
+import uk.ac.susx.mlcl.byblo.io.TokenPair;
+import uk.ac.susx.mlcl.byblo.io.TokenPairSink;
+import uk.ac.susx.mlcl.lib.MiscUtil;
+import uk.ac.susx.mlcl.lib.events.ProgressEvent;
+import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.io.Files;
 
 /**
@@ -249,4 +260,82 @@ public class TestConstants {
         return new File(file.getParentFile(), file.getName() + suffix);
     }
 
+    
+    public static class InfoProgressListener implements ProgressListener {
+
+    	private long tick = System.currentTimeMillis();
+
+    	@Override
+    	public void progressChanged(final ProgressEvent progressEvent) {
+    		System.out.println(MiscUtil.memoryInfoString());
+
+    		long newTick = System.currentTimeMillis();
+    		double tdiff = (newTick - tick) / 1000.0d;
+    		tick = newTick;
+
+    		System.out
+    				.println(MessageFormat.format("Tick: {0} seconds", tdiff));
+
+    		//
+    		// MemoryUsage mu = new MemoryUsage();
+    		// mu.add(progressEvent.getSource());
+    		// mu.add(this);
+    		// System.out.println(progressEvent.getSource());
+    		// System.out.println(mu.getInfoString());
+
+    	}
+
+    }
+    
+    
+
+	/**
+	 * Routine that creates a large amount of data, that should be the absolute
+	 * worst case for counting stage of the pipeline. That is data where entries
+	 * and features only ever appear once, and consequently events also are
+	 * unique. This causes the counting maps to be at the upper bound of their
+	 * potential size.
+	 * 
+	 * @throws IOException
+	 */
+	public static void generateUniqueEventsData(
+			final File outFile, final int nEntries, 
+			final int nFeaturesPerEntry ) throws IOException {
+		assert nEntries < Integer.MAX_VALUE / nFeaturesPerEntry 
+			: "number of events must be less than max_integer";
+		final int nEvents = nEntries*nFeaturesPerEntry;
+		
+		System.out.printf("Generating worst-case data for ExternalCount " +
+				"(nEntries=%d, nFeaturesPerEntry=%d, nEvents=%d)...%n", 
+				nEntries, nFeaturesPerEntry,nEvents);
+		
+		TokenPairSink sink = null;
+		try {
+			final DoubleEnumeratingDeligate ded = new DoubleEnumeratingDeligate(
+					Enumerating.DEFAULT_TYPE, true, true, null, null);
+
+			sink = BybloIO .openInstancesSink(outFile, DEFAULT_CHARSET, ded);
+
+			
+			for (int entryId = 0; entryId < nEntries; entryId++) {
+				
+				final int startId = entryId * nFeaturesPerEntry;
+				final int endId = (entryId + 1) * nFeaturesPerEntry;
+				
+				for (int featureId = startId; featureId < endId; featureId++) {
+					sink.write(new TokenPair(entryId, featureId));
+					
+					if(featureId % 5000000 == 0 || featureId == nEvents-1) {
+						System.out.printf("> generated %d of %d events (%.2f%% complete)%n", 
+								featureId, nEvents, (100.0d  * featureId) / nEvents);
+					}
+				}
+			}
+		} finally {
+			if (sink != null)
+				sink.close();
+		}
+		
+		System.out.println("Generation completed.");
+	}
 }
