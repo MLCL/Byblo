@@ -36,7 +36,7 @@
 
     <groupId>uk.ac.susx.mlcl</groupId>
     <artifactId>mlcl-lib</artifactId>
-    <version>0.3-SNAPSHOT</version>
+    <version>0.2.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>mlcl-lib</name>
