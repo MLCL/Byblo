@@ -396,7 +396,7 @@ public class ExternalCountCommandTest {
      * @throws Exception
      */
 	@Test
-	@Ignore(value="Takes a rath long time.")
+	@Ignore(value="Takes a rather a long time.")
 	public void testExternalCountCommandOnLargeData() throws Exception {
 		System.out.println("testExternalCountCommand()");
 
@@ -410,7 +410,7 @@ public class ExternalCountCommandTest {
 		
 		// Create the test data if necessary
 		if(!instancesFile.exists())
-			TestConstants.generateUniqueEventsData(
+			TestConstants.generateUniqueInstanceData(
 					instancesFile, nEntries, nFeaturesPerEntry);
 		
 		assertValidPlaintextInputFiles(instancesFile);

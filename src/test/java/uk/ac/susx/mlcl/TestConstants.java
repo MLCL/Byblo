@@ -298,7 +298,7 @@ public class TestConstants {
 	 * 
 	 * @throws IOException
 	 */
-	public static void generateUniqueEventsData(
+	public static void generateUniqueInstanceData(
 			final File outFile, final int nEntries, 
 			final int nFeaturesPerEntry ) throws IOException {
 		assert nEntries < Integer.MAX_VALUE / nFeaturesPerEntry 

@@ -249,7 +249,7 @@ public class IndexTPCommandTest {
 		
 		// Create the test data if necessary
 		if(!inFile.exists())
-			TestConstants.generateUniqueEventsData(
+			TestConstants.generateUniqueInstanceData(
 					inFile, nEntries, nFeaturesPerEntry);
 		
 		File outFile = new File(TEST_OUTPUT_DIR, inFile.getName() + "-enumerated");

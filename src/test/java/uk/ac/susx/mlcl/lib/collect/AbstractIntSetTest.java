@@ -45,8 +45,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.Random;
 
 import org.junit.Assert;
@@ -54,6 +52,9 @@ import org.junit.Test;
 
 import uk.ac.susx.mlcl.AbstractTest;
 
+/**
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ */
 public abstract class AbstractIntSetTest<T extends IntSet> extends AbstractTest {
 
 	public T newInstance() {

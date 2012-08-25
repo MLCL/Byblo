@@ -91,6 +91,7 @@ public abstract class AbstractExternalSortCommand<T>
 
     public static final int DEFAULT_MAX_CHUNK_SIZE = 500000;
 
+    @Deprecated
     @Parameter(names = {"-C", "--chunk-size"},
     description = "Number of lines that will be read and sorted in RAM at one "
     + "time (per thread). Larger values increase memory usage and performace.")
@@ -162,10 +163,12 @@ public abstract class AbstractExternalSortCommand<T>
         this.comparator = comparator;
     }
 
+    @Deprecated
     public final int getMaxChunkSize() {
         return maxChunkSize;
     }
 
+    @Deprecated
     public final void setMaxChunkSize(int maxChunkSize) {
         if (maxChunkSize < 1) {
             throw new IllegalArgumentException("maxChunkSize < 1");
