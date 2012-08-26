@@ -31,8 +31,10 @@
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
 import java.io.Serializable;
+
 import javax.annotation.CheckReturnValue;
 import javax.annotation.concurrent.Immutable;
+
 import uk.ac.susx.mlcl.byblo.measures.Measure;
 import uk.ac.susx.mlcl.byblo.measures.Measures;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
@@ -43,41 +45,52 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * Proximity measure calculating proximity as the dot product of the vectors.
  * For unit vectors this is equivalent to {@link Cosine }.
  * <p/>
+ * 
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Immutable
 @CheckReturnValue
 public final class DotProduct implements Measure, Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Override
-    public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
-        return Measures.dotProduct(A, B);
-    }
+	@Override
+	public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
+		return Measures.dotProduct(A, B);
+	}
 
-    @Override
-    public boolean isCommutative() {
-        return true;
-    }
+	@Override
+	public boolean isCommutative() {
+		return true;
+	}
 
-    @Override
-    public double getHomogeneityBound() {
-        return Double.POSITIVE_INFINITY;
-    }
+	@Override
+	public double getHomogeneityBound() {
+		return Double.POSITIVE_INFINITY;
+	}
 
-    @Override
-    public double getHeterogeneityBound() {
-        return Double.NEGATIVE_INFINITY;
-    }
+	@Override
+	public double getHeterogeneityBound() {
+		return Double.NEGATIVE_INFINITY;
+	}
 
-    @Override
-    public Class<? extends Weighting> getExpectedWeighting() {
-        return NullWeighting.class;
-    }
+	@Override
+	public Class<? extends Weighting> getExpectedWeighting() {
+		return NullWeighting.class;
+	}
 
-    @Override
-    public String toString() {
-        return "DotProduct";
-    }
+	@Override
+	public String toString() {
+		return "DotProduct";
+	}
+
+	@Override
+	public int hashCode() {
+		return 7;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj == this || (obj != null && getClass() == obj.getClass());
+	}
 }

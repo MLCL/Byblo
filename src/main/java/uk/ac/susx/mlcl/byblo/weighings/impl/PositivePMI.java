@@ -59,11 +59,6 @@ public final class PositivePMI
     }
 
     @Override
-    public String toString() {
-        return this.getClass().getSimpleName();
-    }
-
-    @Override
     public double getLowerBound() {
         return 0.0;
     }
@@ -86,4 +81,6 @@ public final class PositivePMI
     public int hashCode() {
         return 47;
     }
+    
+    
 }

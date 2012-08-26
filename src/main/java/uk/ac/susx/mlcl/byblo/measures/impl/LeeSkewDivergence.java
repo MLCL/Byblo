@@ -30,13 +30,16 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
+import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
+
 import java.io.Serializable;
 import java.text.MessageFormat;
+
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnegative;
+
 import uk.ac.susx.mlcl.byblo.measures.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
-import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
 import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
@@ -61,94 +64,105 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * Statistical Language Analysis" Artificial Intelligence and Statistics 2001,
  * pp. 65--72, 2001
  * <p/>
+ * 
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @CheckReturnValue
 public final class LeeSkewDivergence implements Measure, Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Nonnegative
-    public static final double DEFAULT_ALPHA = 0.99;
+	@Nonnegative
+	public static final double DEFAULT_ALPHA = 0.99;
 
-    @Nonnegative
-    private double alpha;
+	@Nonnegative
+	private double alpha;
 
-    public LeeSkewDivergence() {
-        setAlpha(DEFAULT_ALPHA);
-    }
+	public LeeSkewDivergence() {
+		setAlpha(DEFAULT_ALPHA);
+	}
 
-    public LeeSkewDivergence(double alpha) {
-        setAlpha(alpha);
-    }
+	public LeeSkewDivergence(double alpha) {
+		setAlpha(alpha);
+	}
 
-    @Nonnegative
-    public final double getAlpha() {
-        return alpha;
-    }
+	@Nonnegative
+	public final double getAlpha() {
+		return alpha;
+	}
 
-    public final void setAlpha(@Nonnegative double alpha) {
-        Checks.checkNotNaN("alpha", alpha);
-        Checks.checkFinite("alpha", alpha);
-        Checks.checkRangeExcl("alpha", alpha, 0.0, 1.0);
-        this.alpha = alpha;
-    }
+	public final void setAlpha(@Nonnegative double alpha) {
+		Checks.checkNotNaN("alpha", alpha);
+		Checks.checkFinite("alpha", alpha);
+		Checks.checkRangeExcl("alpha", alpha, 0.0, 1.0);
+		this.alpha = alpha;
+	}
 
-    @Override
-    public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
-        double divergence = 0.0;
+	@Override
+	public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
+		double divergence = 0.0;
 
-        int i = 0;
-        int j = 0;
-        while (i < A.size && j < B.size) {
-            if (A.keys[i] < B.keys[j]) {
-                ++i;
-            } else if (A.keys[i] > B.keys[j]) {
-                final double r = B.values[j] / B.sum;
-                final double logAvg = log2((1 - alpha) * r);
-                divergence += r * (log2(r) - logAvg);
-                ++j;
-            } else {
-                final double q = A.values[i] / A.sum;
-                final double r = B.values[j] / B.sum;
-                final double logAvg = log2(alpha * q + (1 - alpha) * r);
-                divergence += r * (log2(r) - logAvg);
-                ++i;
-                ++j;
-            }
-        }
-        while (j < B.size) {
-            final double r = B.values[j] / B.sum;
-            final double logAvg = log2((1 - alpha) * r);
-            divergence += r * (log2(r) - logAvg);
-            j++;
-        }
+		int i = 0;
+		int j = 0;
+		while (i < A.size && j < B.size) {
+			if (A.keys[i] < B.keys[j]) {
+				++i;
+			} else if (A.keys[i] > B.keys[j]) {
+				final double r = B.values[j] / B.sum;
+				final double logAvg = log2((1 - alpha) * r);
+				divergence += r * (log2(r) - logAvg);
+				++j;
+			} else {
+				final double q = A.values[i] / A.sum;
+				final double r = B.values[j] / B.sum;
+				final double logAvg = log2(alpha * q + (1 - alpha) * r);
+				divergence += r * (log2(r) - logAvg);
+				++i;
+				++j;
+			}
+		}
+		while (j < B.size) {
+			final double r = B.values[j] / B.sum;
+			final double logAvg = log2((1 - alpha) * r);
+			divergence += r * (log2(r) - logAvg);
+			j++;
+		}
 
-        return divergence;
-    }
+		return divergence;
+	}
 
-    @Override
-    public boolean isCommutative() {
-        return false;
-    }
+	@Override
+	public boolean isCommutative() {
+		return false;
+	}
 
-    @Override
-    public double getHomogeneityBound() {
-        return 0;
-    }
+	@Override
+	public double getHomogeneityBound() {
+		return 0;
+	}
 
-    @Override
-    public double getHeterogeneityBound() {
-        return Double.POSITIVE_INFINITY;
-    }
+	@Override
+	public double getHeterogeneityBound() {
+		return Double.POSITIVE_INFINITY;
+	}
 
-    @Override
-    public Class<? extends Weighting> getExpectedWeighting() {
-        return PositiveWeighting.class;
-    }
+	@Override
+	public Class<? extends Weighting> getExpectedWeighting() {
+		return PositiveWeighting.class;
+	}
 
-    @Override
-    public String toString() {
-        return MessageFormat.format("LeeSkewDivergence[alpha={0}]", alpha);
-    }
+	@Override
+	public String toString() {
+		return MessageFormat.format("LeeSkewDivergence[alpha={0}]", alpha);
+	}
+
+	@Override
+	public int hashCode() {
+		return 31;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj == this || (obj != null && getClass() == obj.getClass());
+	}
 }

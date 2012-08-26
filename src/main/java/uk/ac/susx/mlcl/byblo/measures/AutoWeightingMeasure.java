@@ -32,47 +32,49 @@ package uk.ac.susx.mlcl.byblo.measures;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.concurrent.Immutable;
+
+import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsCarrier;
+import uk.ac.susx.mlcl.byblo.weighings.MarginalDistribution;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- * A
- * <code>Measure</code> decorator, that will automatically apply the delegate
+ * A <code>Measure</code> decorator, that will automatically apply the delegate
  * measures expected weighting scheme.
  * <p/>
  * The weighting scheme to use is determined by calling
  * {@link Measure#getExpectedWeighting() }.
  * <p/>
+ * 
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Immutable
 @CheckReturnValue
-public final class AutoWeightingMeasure
-        extends ForwardingMeasure<Measure> {
+public final class AutoWeightingMeasure extends ForwardingMeasure<Measure> {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private final Weighting weighting;
+	private final Weighting weighting;
 
-    public AutoWeightingMeasure(Measure deligate, Weighting weighting) {
-        super(deligate);
-        Checks.checkNotNull("weighting", weighting);
-        this.weighting = weighting;
-    }
+	public AutoWeightingMeasure(Measure deligate, Weighting weighting) {
+		super(deligate);
+		Checks.checkNotNull("weighting", weighting);
+		this.weighting = weighting;
+	}
 
-    @Override
-    public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
-        return getDelegate().similarity(
-                weighting.apply(A),
-                weighting.apply(B));
-    }
+	@Override
+	public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
+		return getDelegate().similarity(weighting.apply(A), weighting.apply(B));
+	}
 
-    @Override
-    public String toString() {
-        return this.getClass().getSimpleName()
-                + "{measure=" + getDelegate()
-                + ", weighting=" + getDelegate().getExpectedWeighting()
-                + '}';
-    }
+	public Weighting getWeighting() {
+		return weighting;
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + "{measure=" + getDelegate()
+				+ ", weighting=" + weighting + '}';
+	}
 }

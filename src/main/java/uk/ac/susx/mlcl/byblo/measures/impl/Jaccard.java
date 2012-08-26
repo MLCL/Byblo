@@ -31,8 +31,10 @@
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
 import java.io.Serializable;
+
 import javax.annotation.CheckReturnValue;
 import javax.annotation.concurrent.Immutable;
+
 import uk.ac.susx.mlcl.byblo.measures.DecomposableMeasure;
 import uk.ac.susx.mlcl.byblo.measures.Measures;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
@@ -45,57 +47,68 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * than zero and one) this measures takes a multi-set view of set operations:
  * intersection is the maximum and union is the minimum.
  * <p/>
+ * 
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Immutable
 @CheckReturnValue
 public final class Jaccard extends DecomposableMeasure implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Override
-    public double shared(final SparseDoubleVector A, final SparseDoubleVector B) {
-        return Measures.intersection(A, B);
-    }
+	@Override
+	public double shared(final SparseDoubleVector A, final SparseDoubleVector B) {
+		return Measures.intersection(A, B);
+	}
 
-    @Override
-    public double left(final SparseDoubleVector A) {
-        return Measures.cardinality(A);
-    }
+	@Override
+	public double left(final SparseDoubleVector A) {
+		return Measures.cardinality(A);
+	}
 
-    @Override
-    public double right(final SparseDoubleVector B) {
-        return Measures.cardinality(B);
-    }
+	@Override
+	public double right(final SparseDoubleVector B) {
+		return Measures.cardinality(B);
+	}
 
-    @Override
-    public double combine(double shared, double left, double right) {
-        return shared == 0 ? 0
-                : shared / (left + right - shared);
-    }
+	@Override
+	public double combine(double shared, double left, double right) {
+		return shared == 0 ? 0 : shared / (left + right - shared);
+	}
 
-    @Override
-    public boolean isCommutative() {
-        return true;
-    }
+	@Override
+	public boolean isCommutative() {
+		return true;
+	}
 
-    @Override
-    public double getHomogeneityBound() {
-        return 1.0;
-    }
+	@Override
+	public double getHomogeneityBound() {
+		return 1.0;
+	}
 
-    @Override
-    public double getHeterogeneityBound() {
-        return 0.0;
-    }
+	@Override
+	public double getHeterogeneityBound() {
+		return 0.0;
+	}
 
-    @Override
-    public Class<? extends Weighting> getExpectedWeighting() {
-        return PositiveWeighting.class;
-    }
+	@Override
+	public Class<? extends Weighting> getExpectedWeighting() {
+		return PositiveWeighting.class;
+	}
 
-    @Override
-    public String toString() {
-        return "Jaccard";
-    }
+	@Override
+	public String toString() {
+		return "Jaccard";
+	}
+
+	@Override
+	public int hashCode() {
+		return 13;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj == this || (obj != null && getClass() == obj.getClass());
+	}
+
 }

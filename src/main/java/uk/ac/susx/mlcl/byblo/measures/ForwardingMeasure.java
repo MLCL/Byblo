@@ -41,81 +41,83 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * <code>ForwardingMeasure</code> is an abstract super-class to decorators of
  * <code>Measure</code> instances.
  * <p/>
+ * 
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
- * @param <T> type of Measure being decorated
+ * @param <T>
+ *            type of Measure being decorated
  */
 @Immutable
 @CheckReturnValue
-public abstract class ForwardingMeasure<T extends Measure>
-        implements Measure {
+public abstract class ForwardingMeasure<T extends Measure> implements Measure {
 
-    private final T deligate;
+	private final T deligate;
 
-    /**
-     * Constructor used by sub-classes.
-     * <p/>
-     * @param deligate The Measure being decorated.
-     */
-    protected ForwardingMeasure(final T deligate) {
-        Checks.checkNotNull("deligate", deligate);
-        this.deligate = deligate;
-    }
+	/**
+	 * Constructor used by sub-classes.
+	 * <p/>
+	 * 
+	 * @param deligate
+	 *            The Measure being decorated.
+	 */
+	protected ForwardingMeasure(final T deligate) {
+		Checks.checkNotNull("deligate", deligate);
+		this.deligate = deligate;
+	}
 
-    @Override
-    public double similarity(
-            final SparseDoubleVector A,
-            final SparseDoubleVector B) {
-        return deligate.similarity(A, B);
-    }
+	@Override
+	public double similarity(final SparseDoubleVector A,
+			final SparseDoubleVector B) {
+		return deligate.similarity(A, B);
+	}
 
-    public final T getDelegate() {
-        return deligate;
-    }
+	public final T getDelegate() {
+		return deligate;
+	}
 
-    @Override
-    public double getHomogeneityBound() {
-        return deligate.getHomogeneityBound();
-    }
+	@Override
+	public double getHomogeneityBound() {
+		return deligate.getHomogeneityBound();
+	}
 
-    @Override
-    public double getHeterogeneityBound() {
-        return deligate.getHeterogeneityBound();
-    }
+	@Override
+	public double getHeterogeneityBound() {
+		return deligate.getHeterogeneityBound();
+	}
 
-    @Override
-    public Class<? extends Weighting> getExpectedWeighting() {
-        return NullWeighting.class;
-    }
+	@Override
+	public Class<? extends Weighting> getExpectedWeighting() {
+		return NullWeighting.class;
+	}
 
-    @Override
-    public boolean isCommutative() {
-        return deligate.isCommutative();
-    }
+	@Override
+	public boolean isCommutative() {
+		return deligate.isCommutative();
+	}
 
-    public boolean equals(ForwardingMeasure<?> other) {
-        if (this.deligate != other.deligate
-                && (this.deligate == null
-                    || !this.deligate.equals(other.deligate)))
-            return false;
-        return true;
-    }
+	public boolean equals(ForwardingMeasure<?> other) {
+		if (this.deligate != other.deligate
+				&& (this.deligate == null || !this.deligate
+						.equals(other.deligate)))
+			return false;
+		return true;
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        return equals((ForwardingMeasure) obj);
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		return equals((ForwardingMeasure) obj);
+	}
 
-    @Override
-    public int hashCode() {
-        return 79 * 5 + (deligate != null ? deligate.hashCode() : 0);
-    }
+	@Override
+	public int hashCode() {
+		return 79 * 5 + (deligate != null ? deligate.hashCode() : 0);
+	}
 
-    @Override
-    public String toString() {
-        return this.getClass().getSimpleName() + "{deligate=" + deligate + '}';
-    }
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + "{deligate=" + deligate + '}';
+	}
 }

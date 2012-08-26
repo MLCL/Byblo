@@ -42,75 +42,95 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 /**
  * Distance measure that computes similarity as the Jensen-Shannon divergence.
  * <p/>
+ * 
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Immutable
 @CheckReturnValue
 public final class JensenShannonDivergence implements Measure, Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Override
-    public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
-        double divergence = 0.0;
+	private static final double EPSILON = 1E-10;
 
-        int i = 0;
-        int j = 0;
-        while (i < A.size && j < B.size) {
-            if (A.keys[i] < B.keys[j]) {
-                final double q = A.values[i] / A.sum;
-                divergence += 0.5 * q;
-                ++i;
-            } else if (A.keys[i] > B.keys[j]) {
-                final double r = B.values[j] / B.sum;
-                divergence += 0.5 * r;
-                ++j;
-            } else {
-                final double q = A.values[i] / A.sum;
-                final double r = B.values[j] / B.sum;
-                final double logAvg = log2(0.5 * (q + r));
-                divergence += 0.5 * q * (log2(q) - logAvg)
-                        + 0.5 * r * (log2(r) - logAvg);
-                ++i;
-                ++j;
-            }
-        }
-        while (i < A.size) {
-            final double q = A.values[i] / A.sum;
-            divergence += 0.5 * q;
-            i++;
-        }
-        while (j < B.size) {
-            final double r = B.values[j] / B.sum;
-            divergence += 0.5 * r;
-            j++;
-        }
+	@Override
+	public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
+		double divergence = 0.0;
 
-        return divergence;
-    }
+		int i = 0;
+		int j = 0;
+		while (i < A.size && j < B.size) {
+			if (A.keys[i] < B.keys[j]) {
+				final double q = A.values[i] / A.sum;
+				divergence += 0.5 * q;
+				++i;
+			} else if (A.keys[i] > B.keys[j]) {
+				final double r = B.values[j] / B.sum;
+				divergence += 0.5 * r;
+				++j;
+			} else {
+				final double q = A.values[i] / A.sum;
+				final double r = B.values[j] / B.sum;
+				final double logAvg = log2(0.5 * (q + r));
+				divergence += 0.5 * q * (log2(q) - logAvg) + 0.5 * r
+						* (log2(r) - logAvg);
+				++i;
+				++j;
+			}
+		}
+		while (i < A.size) {
+			final double q = A.values[i] / A.sum;
+			divergence += 0.5 * q;
+			i++;
+		}
+		while (j < B.size) {
+			final double r = B.values[j] / B.sum;
+			divergence += 0.5 * r;
+			j++;
+		}
 
-    @Override
-    public boolean isCommutative() {
-        return true;
-    }
+		// The algorithm can introduce slight floating point errors so set the
+		// divergence to the bound if it's very close
+		if (Math.abs(divergence - getHeterogeneityBound()) < EPSILON)
+			divergence = getHeterogeneityBound();
+		if (Math.abs(divergence - getHomogeneityBound()) < EPSILON)
+			divergence = getHomogeneityBound();
 
-    @Override
-    public double getHomogeneityBound() {
-        return 0;
-    }
+		return divergence;
+	}
 
-    @Override
-    public double getHeterogeneityBound() {
-        return Double.POSITIVE_INFINITY;
-    }
+	@Override
+	public boolean isCommutative() {
+		return true;
+	}
 
-    @Override
-    public Class<? extends Weighting> getExpectedWeighting() {
-        return PositiveWeighting.class;
-    }
+	@Override
+	public double getHomogeneityBound() {
+		return 0;
+	}
 
-    @Override
-    public String toString() {
-        return "JS-Divergence";
-    }
+	@Override
+	public double getHeterogeneityBound() {
+		return 1;
+	}
+
+	@Override
+	public Class<? extends Weighting> getExpectedWeighting() {
+		return PositiveWeighting.class;
+	}
+
+	@Override
+	public String toString() {
+		return "JS-Divergence";
+	}
+
+	@Override
+	public int hashCode() {
+		return 17;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj == this || (obj != null && getClass() == obj.getClass());
+	}
 }

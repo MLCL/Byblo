@@ -40,7 +40,7 @@ import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- *
+ * 
  * <h4>Notes</h4>
  * <p/>
  * <ul>
@@ -55,357 +55,368 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * <p/>
  * </ul>
  * <p/>
+ * 
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @CheckReturnValue
 public final class LpSpaceDistance implements Measure {
 
-    public static final double DEFAULT_POWER = 2;
+	public static final double DEFAULT_POWER = 2;
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private double power = Double.NaN;
+	private double power = Double.NaN;
 
-    private Measure deligate = null;
+	private Measure deligate = null;
 
-    public LpSpaceDistance() {
-        setPower(DEFAULT_POWER);
-    }
+	public LpSpaceDistance() {
+		setPower(DEFAULT_POWER);
+	}
 
-    public LpSpaceDistance(double power) {
-        setPower(power);
-    }
+	public LpSpaceDistance(double power) {
+		setPower(power);
+	}
 
-    public final double getPower() {
-        return power;
-    }
+	public final double getPower() {
+		return power;
+	}
 
-    public final void setPower(final double newPower) {
-        if (Double.isNaN(newPower))
-            throw new IllegalArgumentException("newPower is NaN");
-        if (!Measures.epsilonEquals(power, newPower, 0)) {
-            power = newPower;
-            if (Measures.epsilonEquals(power, 0, 0)) {
-                deligate = new HammingDistance();
-            } else if (Measures.epsilonEquals(power, 1, 0)) {
-                deligate = new ManhattanDistance();
-            } else if (Measures.epsilonEquals(power, 2, 0)) {
-                deligate = new EuclideanDistance();
-            } else if (Measures.
-                    epsilonEquals(power, Double.POSITIVE_INFINITY, 0)) {
-                deligate = new MaxSpaceDistance();
-            } else if (Measures.
-                    epsilonEquals(power, Double.NEGATIVE_INFINITY, 0)) {
-                deligate = new MinSpaceDistance();
-            } else {
-                if (deligate == null || deligate.getClass()
-                        != MinkowskiDistance.class)
-                    deligate = new MinkowskiDistance();
-            }
-        }
-    }
+	public final void setPower(final double newPower) {
+		if (Double.isNaN(newPower))
+			throw new IllegalArgumentException("newPower is NaN");
+		if (!Measures.epsilonEquals(power, newPower, 0)) {
+			power = newPower;
+			if (Measures.epsilonEquals(power, 0, 0)) {
+				deligate = new HammingDistance();
+			} else if (Measures.epsilonEquals(power, 1, 0)) {
+				deligate = new ManhattanDistance();
+			} else if (Measures.epsilonEquals(power, 2, 0)) {
+				deligate = new EuclideanDistance();
+			} else if (Measures.epsilonEquals(power, Double.POSITIVE_INFINITY,
+					0)) {
+				deligate = new MaxSpaceDistance();
+			} else if (Measures.epsilonEquals(power, Double.NEGATIVE_INFINITY,
+					0)) {
+				deligate = new MinSpaceDistance();
+			} else {
+				if (deligate == null
+						|| deligate.getClass() != MinkowskiDistance.class)
+					deligate = new MinkowskiDistance();
+			}
+		}
+	}
 
-    @Override
-    public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
-        return deligate.similarity(A, B);
-    }
+	@Override
+	public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
+		return deligate.similarity(A, B);
+	}
 
-    @Override
-    public double getHomogeneityBound() {
-        return deligate.getHomogeneityBound();
-    }
+	@Override
+	public double getHomogeneityBound() {
+		return deligate.getHomogeneityBound();
+	}
 
-    @Override
-    public double getHeterogeneityBound() {
-        return deligate.getHeterogeneityBound();
-    }
+	@Override
+	public double getHeterogeneityBound() {
+		return deligate.getHeterogeneityBound();
+	}
 
-    @Override
-    public Class<? extends Weighting> getExpectedWeighting() {
-        return NullWeighting.class;
-    }
+	@Override
+	public Class<? extends Weighting> getExpectedWeighting() {
+		return NullWeighting.class;
+	}
 
-    @Override
-    public String toString() {
-        return "Lp{" + "p=" + power + '}';
-    }
+	@Override
+	public String toString() {
+		return "Lp{" + "p=" + power + '}';
+	}
 
-    @Override
-    public boolean isCommutative() {
-        return true;
-    }
+	@Override
+	public boolean isCommutative() {
+		return true;
+	}
 
-    /**
-     * Abstract super class to the various Lp Space metric implementations.
-     */
-    @Immutable
-    @CheckReturnValue
-    private static abstract class LpSpaceDeligate implements Measure {
+	/**
+	 * Abstract super class to the various Lp Space metric implementations.
+	 */
+	@Immutable
+	@CheckReturnValue
+	private static abstract class LpSpaceDeligate implements Measure {
 
-        @Override
-        public Class<? extends Weighting> getExpectedWeighting() {
-            return NullWeighting.class;
-        }
+		@Override
+		public Class<? extends Weighting> getExpectedWeighting() {
+			return NullWeighting.class;
+		}
 
-        @Override
-        public final boolean isCommutative() {
-            return true;
-        }
+		@Override
+		public final boolean isCommutative() {
+			return true;
+		}
 
-        @Override
-        public final double getHomogeneityBound() {
-            return 0.0;
-        }
+		@Override
+		public final double getHomogeneityBound() {
+			return 0.0;
+		}
 
-        @Override
-        public final double getHeterogeneityBound() {
-            return Double.POSITIVE_INFINITY;
-        }
-    }
+		@Override
+		public final double getHeterogeneityBound() {
+			return Double.POSITIVE_INFINITY;
+		}
+	}
 
-    /**
-     * Fallback implementation for arbitrary p-spaces. Not though that it will
-     * not produce the correct results of p = -inf, 0, or +inf.
-     */
-    @CheckReturnValue
-    private final class MinkowskiDistance extends LpSpaceDeligate {
+	/**
+	 * Fallback implementation for arbitrary p-spaces. Not though that it will
+	 * not produce the correct results of p = -inf, 0, or +inf.
+	 */
+	@CheckReturnValue
+	private final class MinkowskiDistance extends LpSpaceDeligate {
 
-        private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 1L;
 
-        @Override
-        public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
-            double distance = 0;
+		@Override
+		public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
+			double distance = 0;
 
-            int i = 0, j = 0;
-            while (i < A.size && j < B.size) {
-                if (A.keys[i] < B.keys[j]) {
-                    distance += pow(A.values[i], power);
-                    i++;
-                } else if (A.keys[i] > B.keys[j]) {
-                    distance += pow(B.values[j], power);
-                    j++;
-                } else {
-                    distance += pow(abs(A.values[i] - B.values[j]), power);
-                    i++;
-                    j++;
-                }
+			int i = 0, j = 0;
+			while (i < A.size && j < B.size) {
+				if (A.keys[i] < B.keys[j]) {
+					distance += pow(A.values[i], power);
+					i++;
+				} else if (A.keys[i] > B.keys[j]) {
+					distance += pow(B.values[j], power);
+					j++;
+				} else {
+					distance += pow(abs(A.values[i] - B.values[j]), power);
+					i++;
+					j++;
+				}
 
-            }
-            while (i < A.size) {
-                distance += pow(A.values[i], power);
-                i++;
-            }
-            while (j < B.size) {
-                distance += pow(B.values[j], power);
-                j++;
-            }
+			}
+			while (i < A.size) {
+				distance += pow(A.values[i], power);
+				i++;
+			}
+			while (j < B.size) {
+				distance += pow(B.values[j], power);
+				j++;
+			}
 
-            return Math.pow(distance, 1.0 / power);
-        }
-    }
+			return Math.pow(distance, 1.0 / power);
+		}
+	}
 
-    /**
-     * Implementation of the power-2 space; i.e standard Euclidean space that we
-     * are all used to.
-     */
-    @Immutable
-    @CheckReturnValue
-    private static final class EuclideanDistance extends LpSpaceDeligate {
+	/**
+	 * Implementation of the power-2 space; i.e standard Euclidean space that we
+	 * are all used to.
+	 */
+	@Immutable
+	@CheckReturnValue
+	private static final class EuclideanDistance extends LpSpaceDeligate {
 
-        private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 1L;
 
-        @Override
-        public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
-            double distance = 0;
+		@Override
+		public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
+			double distance = 0;
 
-            int i = 0, j = 0;
-            while (i < A.size && j < B.size) {
-                if (A.keys[i] < B.keys[j]) {
-                    distance += A.values[i] * A.values[i];
-                    i++;
-                } else if (A.keys[i] > B.keys[j]) {
-                    distance += B.values[j] * B.values[j];
-                    j++;
-                } else {
-                    distance += (A.values[i] - B.values[j])
-                            * (A.values[i] - B.values[j]);
-                    i++;
-                    j++;
-                }
+			int i = 0, j = 0;
+			while (i < A.size && j < B.size) {
+				if (A.keys[i] < B.keys[j]) {
+					distance += A.values[i] * A.values[i];
+					i++;
+				} else if (A.keys[i] > B.keys[j]) {
+					distance += B.values[j] * B.values[j];
+					j++;
+				} else {
+					distance += (A.values[i] - B.values[j])
+							* (A.values[i] - B.values[j]);
+					i++;
+					j++;
+				}
 
-            }
-            while (i < A.size) {
-                distance += A.values[i] * A.values[i];
-                i++;
-            }
-            while (j < B.size) {
-                distance += B.values[j] * B.values[j];
-                j++;
-            }
+			}
+			while (i < A.size) {
+				distance += A.values[i] * A.values[i];
+				i++;
+			}
+			while (j < B.size) {
+				distance += B.values[j] * B.values[j];
+				j++;
+			}
 
-            return Math.sqrt(distance);
-        }
-    }
+			return Math.sqrt(distance);
+		}
+	}
 
-    /**
-     * Implementation of the power-1 space; known as Manhattan or taxicab
-     * distance.
-     */
-    @Immutable
-    @CheckReturnValue
-    private static final class ManhattanDistance extends LpSpaceDeligate {
+	/**
+	 * Implementation of the power-1 space; known as Manhattan or taxicab
+	 * distance.
+	 */
+	@Immutable
+	@CheckReturnValue
+	private static final class ManhattanDistance extends LpSpaceDeligate {
 
-        private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 1L;
 
-        @Override
-        public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
-            double distance = 0;
+		@Override
+		public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
+			double distance = 0;
 
-            int i = 0, j = 0;
-            while (i < A.size && j < B.size) {
-                if (A.keys[i] < B.keys[j]) {
-                    distance += abs(A.values[i]);
-                    i++;
-                } else if (A.keys[i] > B.keys[j]) {
-                    distance += abs(B.values[j]);
-                    j++;
-                } else {
-                    distance += abs(A.values[i] - B.values[j]);
-                    i++;
-                    j++;
-                }
+			int i = 0, j = 0;
+			while (i < A.size && j < B.size) {
+				if (A.keys[i] < B.keys[j]) {
+					distance += abs(A.values[i]);
+					i++;
+				} else if (A.keys[i] > B.keys[j]) {
+					distance += abs(B.values[j]);
+					j++;
+				} else {
+					distance += abs(A.values[i] - B.values[j]);
+					i++;
+					j++;
+				}
 
-            }
-            while (i < A.size) {
-                distance += abs(A.values[i]);
-                i++;
-            }
-            while (j < B.size) {
-                distance += abs(B.values[j]);
-                j++;
-            }
+			}
+			while (i < A.size) {
+				distance += abs(A.values[i]);
+				i++;
+			}
+			while (j < B.size) {
+				distance += abs(B.values[j]);
+				j++;
+			}
 
-            return distance;
-        }
-    }
+			return distance;
+		}
+	}
 
-    /**
-     * Implementation of power-zero L space.
-     */
-    @Immutable
-    @CheckReturnValue
-    private static final class HammingDistance extends LpSpaceDeligate {
+	/**
+	 * Implementation of power-zero L space.
+	 */
+	@Immutable
+	@CheckReturnValue
+	private static final class HammingDistance extends LpSpaceDeligate {
 
-        private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 1L;
 
-        @Override
-        public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
-            double distance = 0;
+		@Override
+		public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
+			double distance = 0;
 
-            int i = 0, j = 0;
-            while (i < A.size && j < B.size) {
-                if (A.keys[i] < B.keys[j]) {
-                    distance += signum(abs(A.values[i]));
-                    i++;
-                } else if (A.keys[i] > B.keys[j]) {
-                    distance += signum(abs(B.values[j]));
-                    j++;
-                } else {
-                    distance += signum(abs(A.values[i] - B.values[j]));
-                    i++;
-                    j++;
-                }
+			int i = 0, j = 0;
+			while (i < A.size && j < B.size) {
+				if (A.keys[i] < B.keys[j]) {
+					distance += signum(abs(A.values[i]));
+					i++;
+				} else if (A.keys[i] > B.keys[j]) {
+					distance += signum(abs(B.values[j]));
+					j++;
+				} else {
+					distance += signum(abs(A.values[i] - B.values[j]));
+					i++;
+					j++;
+				}
 
-            }
-            while (i < A.size) {
-                distance += signum(abs(A.values[i]));
-                i++;
-            }
-            while (j < B.size) {
-                distance += signum(abs(B.values[j]));
-                j++;
-            }
+			}
+			while (i < A.size) {
+				distance += signum(abs(A.values[i]));
+				i++;
+			}
+			while (j < B.size) {
+				distance += signum(abs(B.values[j]));
+				j++;
+			}
 
-            return distance;
-        }
-    }
+			return distance;
+		}
+	}
 
-    /**
-     * Implementation of power +infinity L-space metric.
-     */
-    @Immutable
-    @CheckReturnValue
-    private static final class MaxSpaceDistance extends LpSpaceDeligate {
+	/**
+	 * Implementation of power +infinity L-space metric.
+	 */
+	@Immutable
+	@CheckReturnValue
+	private static final class MaxSpaceDistance extends LpSpaceDeligate {
 
-        private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 1L;
 
-        @Override
-        public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
-            double distance = 0;
+		@Override
+		public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
+			double distance = 0;
 
-            int i = 0, j = 0;
-            while (i < A.size && j < B.size) {
-                if (A.keys[i] < B.keys[j]) {
-                    distance = max(distance, abs(A.values[i]));
-                    i++;
-                } else if (A.keys[i] > B.keys[j]) {
-                    distance = max(distance, abs(B.values[j]));
-                    j++;
-                } else {
-                    distance = max(distance, abs(A.values[i] - B.values[j]));
-                    i++;
-                    j++;
-                }
-            }
-            while (i < A.size) {
-                distance = max(distance, abs(A.values[i]));
-                i++;
-            }
-            while (j < B.size) {
-                distance = max(distance, abs(B.values[j]));
-                j++;
-            }
-            return distance;
-        }
-    }
+			int i = 0, j = 0;
+			while (i < A.size && j < B.size) {
+				if (A.keys[i] < B.keys[j]) {
+					distance = max(distance, abs(A.values[i]));
+					i++;
+				} else if (A.keys[i] > B.keys[j]) {
+					distance = max(distance, abs(B.values[j]));
+					j++;
+				} else {
+					distance = max(distance, abs(A.values[i] - B.values[j]));
+					i++;
+					j++;
+				}
+			}
+			while (i < A.size) {
+				distance = max(distance, abs(A.values[i]));
+				i++;
+			}
+			while (j < B.size) {
+				distance = max(distance, abs(B.values[j]));
+				j++;
+			}
+			return distance;
+		}
+	}
 
-    /**
-     * Implementation of power -infinity L-space metric.
-     */
-    @Immutable
-    @CheckReturnValue
-    private static final class MinSpaceDistance extends LpSpaceDeligate {
+	/**
+	 * Implementation of power -infinity L-space metric.
+	 */
+	@Immutable
+	@CheckReturnValue
+	private static final class MinSpaceDistance extends LpSpaceDeligate {
 
-        private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 1L;
 
-        @Override
-        public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
-            double distance = 0;
+		@Override
+		public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
+			double distance = 0;
 
-            int i = 0, j = 0;
-            while (i < A.size && j < B.size) {
-                if (A.keys[i] < B.keys[j]) {
-                    distance = min(distance, abs(A.values[i]));
-                    i++;
-                } else if (A.keys[i] > B.keys[j]) {
-                    distance = min(distance, abs(B.values[j]));
-                    j++;
-                } else {
-                    distance = min(distance, abs(A.values[i] - B.values[j]));
-                    i++;
-                    j++;
-                }
-            }
-            while (i < A.size) {
-                distance = min(distance, abs(A.values[i]));
-                i++;
-            }
-            while (j < B.size) {
-                distance = min(distance, abs(B.values[j]));
-                j++;
-            }
+			int i = 0, j = 0;
+			while (i < A.size && j < B.size) {
+				if (A.keys[i] < B.keys[j]) {
+					distance = min(distance, abs(A.values[i]));
+					i++;
+				} else if (A.keys[i] > B.keys[j]) {
+					distance = min(distance, abs(B.values[j]));
+					j++;
+				} else {
+					distance = min(distance, abs(A.values[i] - B.values[j]));
+					i++;
+					j++;
+				}
+			}
+			while (i < A.size) {
+				distance = min(distance, abs(A.values[i]));
+				i++;
+			}
+			while (j < B.size) {
+				distance = min(distance, abs(B.values[j]));
+				j++;
+			}
 
-            return distance;
-        }
-    }
+			return distance;
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return 39;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj == this || (obj != null && getClass() == obj.getClass());
+	}
 }

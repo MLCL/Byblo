@@ -32,7 +32,7 @@ package uk.ac.susx.mlcl.byblo.measures.impl;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
+
 import uk.ac.susx.mlcl.byblo.measures.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsCarrier;
 import uk.ac.susx.mlcl.byblo.weighings.MarginalDistribution;
@@ -58,104 +58,115 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * <p/>
  * </ul>
  * <p/>
+ * 
  * @see JE Weeds (2003) "Measures and Applications of Lexical Distributional
- * Similarity", which references (Sugawara, Nishimura, Toshioka, Okachi, &
- * Kaneko, 1985; Essen & Steinbiss, 1992; Grishman & Sterling, 1993; Dagan et
- * al., 1999; Lapata et al., 2001)
- * <p/>
+ *      Similarity", which references (Sugawara, Nishimura, Toshioka, Okachi, &
+ *      Kaneko, 1985; Essen & Steinbiss, 1992; Grishman & Sterling, 1993; Dagan
+ *      et al., 1999; Lapata et al., 2001)
+ *      <p/>
  * @see Essen, Ute and Volker Steinbiss. 1992. Co-occurrence smoothing for
- * stochastic language modeling. In Proceedings of ICASSP, volume 1, pages
- * 161{164.
- * <p/>
+ *      stochastic language modeling. In Proceedings of ICASSP, volume 1, pages
+ *      161{164.
+ *      <p/>
  * @see Sugawara, K., M. Nishimura, K. Toshioka, M. Okochi, and T. Kaneko. 1985.
- * Isolated word recognition using hidden Markov models. In Proceedings of
- * ICASSP, pages 1--4, Tampa, Florida. IEEE.
- * <p/>
+ *      Isolated word recognition using hidden Markov models. In Proceedings of
+ *      ICASSP, pages 1--4, Tampa, Florida. IEEE.
+ *      <p/>
  * @see Grishman, Ralph and John Sterling. 1993. Smoothing of automatically
- * generated selectional constraints. In Human Language Technology, pages
- * 254{259, San Francisco, California. Advanced Research Projects Agency,
- * Software and Intelligent Systems Technology Oce, Morgan Kaufmann.
- * <p/>
+ *      generated selectional constraints. In Human Language Technology, pages
+ *      254{259, San Francisco, California. Advanced Research Projects Agency,
+ *      Software and Intelligent Systems Technology Oce, Morgan Kaufmann.
+ *      <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @CheckReturnValue
 public class Confusion implements Measure, FeatureMarginalsCarrier {
 
-    @Nullable
-    private MarginalDistribution featureMarginals = null;
+	@Nullable
+	private MarginalDistribution featureMarginals = null;
 
-    public Confusion() {
-    }
+	public Confusion() {
+	}
 
-    @Override
-    public MarginalDistribution getFeatureMarginals() {
-        if (featureMarginals == null)
-            throw new IllegalStateException(
-                    "marginals requested before they where set.");
-        return featureMarginals;
-    }
+	@Override
+	public MarginalDistribution getFeatureMarginals() {
+		if (featureMarginals == null)
+			throw new IllegalStateException(
+					"marginals requested before they where set.");
+		return featureMarginals;
+	}
 
-    @Override
-    public void setFeatureMarginals(MarginalDistribution featureMarginals) {
-        this.featureMarginals = featureMarginals;
-    }
+	@Override
+	public void setFeatureMarginals(MarginalDistribution featureMarginals) {
+		this.featureMarginals = featureMarginals;
+	}
 
-    @Override
-    public boolean isFeatureMarginalsSet() {
-        return featureMarginals != null;
-    }
+	@Override
+	public boolean isFeatureMarginalsSet() {
+		return featureMarginals != null;
+	}
 
-    @Override
-    @CheckReturnValue
-    public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
-        final double N = featureMarginals.getFrequencySum();
+	@Override
+	@CheckReturnValue
+	public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
+		final double N = featureMarginals.getFrequencySum();
 
-        double sum = 0.0;
+		double sum = 0.0;
 
-        int i = 0;
-        int j = 0;
-        while (i < A.size && j < B.size) {
-            if (A.keys[i] < B.keys[j]) {
-                ++i;
-            } else if (A.keys[i] > B.keys[j]) {
-                ++j;
-            } else {
-                final double pFEa = A.values[i] / A.sum;
-                final double pFEb = B.values[j] / B.sum;
-                final double pF = featureMarginals.getPrior(A.keys[i]);
-                final double pEa = A.sum / N;
-                if (pFEa * pFEb * pEa * pF > 0)
-                    sum += pFEa * pFEb * pEa / pF;
-                ++i;
-                ++j;
-            }
-        }
+		int i = 0;
+		int j = 0;
+		while (i < A.size && j < B.size) {
+			if (A.keys[i] < B.keys[j]) {
+				++i;
+			} else if (A.keys[i] > B.keys[j]) {
+				++j;
+			} else {
+				final double pFEa = A.values[i] / A.sum;
+				final double pFEb = B.values[j] / B.sum;
+				final double pF = featureMarginals.getPrior(A.keys[i]);
+				final double pEa = A.sum / N;
+				if (pFEa * pFEb * pEa * pF > 0)
+					sum += pFEa * pFEb * pEa / pF;
+				++i;
+				++j;
+			}
+		}
 
-        return sum;
-    }
+		return sum;
+	}
 
-    @Override
-    public double getHomogeneityBound() {
-        return 1;
-    }
+	@Override
+	public double getHomogeneityBound() {
+		return 1;
+	}
 
-    @Override
-    public double getHeterogeneityBound() {
-        return 0;
-    }
+	@Override
+	public double getHeterogeneityBound() {
+		return 0;
+	}
 
-    @Override
-    public Class<? extends Weighting> getExpectedWeighting() {
-        return PositiveWeighting.class;
-    }
+	@Override
+	public Class<? extends Weighting> getExpectedWeighting() {
+		return PositiveWeighting.class;
+	}
 
-    @Override
-    public boolean isCommutative() {
-        return false;
-    }
+	@Override
+	public boolean isCommutative() {
+		return false;
+	}
 
-    @Override
-    public String toString() {
-        return "Confusion";
-    }
+	@Override
+	public String toString() {
+		return "Confusion";
+	}
+
+	@Override
+	public int hashCode() {
+		return 3;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj == this || (obj != null && getClass() == obj.getClass());
+	}
 }

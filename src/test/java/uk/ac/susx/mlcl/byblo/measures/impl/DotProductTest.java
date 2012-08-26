@@ -30,245 +30,154 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import static org.junit.Assert.*;
-import org.junit.BeforeClass;
+import static org.junit.Assert.assertEquals;
+import junit.framework.Assert;
+
+import org.junit.Ignore;
 import org.junit.Test;
-import uk.ac.susx.mlcl.TestConstants;
-import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.Tools;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
-import uk.ac.susx.mlcl.byblo.io.BybloIO;
-import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
-import uk.ac.susx.mlcl.byblo.measures.MeasuresTestSuite;
-import uk.ac.susx.mlcl.lib.collect.Indexed;
+
+import uk.ac.susx.mlcl.byblo.measures.Measure;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
- *
+ * 
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class DotProductTest {
+public class DotProductTest extends AbstractMeasureTest<DotProduct> {
 
-    static DotProduct INSTANCE;
+	@Override
+	Class<? extends DotProduct> getMeasureClass() {
+		return DotProduct.class;
+	}
 
-    static final double EPSILON = 0;
+	@Override
+	String getMeasureName() {
+		return "dp";
+	}
 
-    static Random RANDOM;
+	/**
+	 * Identity score varies bases on vector magnitude so homogeneity bound
+	 * can't be reached.
+	 */
+	@Test
+	@Override
+	public void testSizeOneVectors() {
+		System.out.println("testSizeOneVectors");
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        INSTANCE = new DotProduct();
-        RANDOM = new Random(1234);
-    }
+		final int size = 100;
+		final SparseDoubleVector A = new SparseDoubleVector(size, 1);
+		final SparseDoubleVector B = new SparseDoubleVector(size, 1);
+		A.set(0, 1);
+		B.set(0, 1);
+		final double expect = 1; // newInstance().getHomogeneityBound();
+		final double actual = similarity(newInstance(), A, B);
+		Assert.assertEquals(expect, actual, EPSILON);
+	}
 
-    @Test
-    public void testCLI() throws Exception {
-        System.out.println("testCLI");
+	/**
+	 * Identity score varies bases on vector magnitude so homogeneity bound
+	 * can't be reached.
+	 */
+	@Test
+	@Override
+	public void testSizeTwoVectors() {
+		System.out.println("testSizeTwoVectors");
+		int size = 100;
+		SparseDoubleVector A = new SparseDoubleVector(size, 2);
+		SparseDoubleVector B = new SparseDoubleVector(size, 2);
+		A.set(0, 1);
+		A.set(1, 1);
+		B.set(0, 1);
+		B.set(1, 1);
+		double expect = 2; // newInstance().getHomogeneityBound();
+		double actual = similarity(newInstance(), A, B);
 
-        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".DotProduct");
-        deleteIfExist(output);
+		Assert.assertEquals(expect, actual, EPSILON);
+	}
 
-        try {
-            enableExistTrapping();
-            Tools.main(new String[]{
-                        "allpairs",
-                        "--charset", "UTF-8",
-                        "--measure", "dp",
-                        "--input", TEST_FRUIT_EVENTS.toString(),
-                        "--input-features", TEST_FRUIT_FEATURES.toString(),
-                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                        "--output", output.toString()
-                    });
-        } finally {
-            disableExitTrapping();
-        }
+	@Test
+	@Override
+	public void testCardinalityOneVectors() {
+		System.out.println("testCardinalityOneVectors");
+		SparseDoubleVector A = new SparseDoubleVector(1, 1);
+		SparseDoubleVector B = new SparseDoubleVector(1, 1);
+		A.set(0, 1);
+		B.set(0, 1);
+		Measure instance = newInstance();
+		double expect = 1; //instance.getHomogeneityBound();
+		double actual = similarity(instance, A, B);
 
+		Assert.assertEquals(expect, actual, EPSILON);
+	}
 
-        assertTrue("Output file " + output + " does not exist.", output.exists());
-        assertTrue("Output file " + output + " is empty.", output.length() > 0);
-    }
+	
+	/**
+	 * Identity score varies bases on vector magnitude so homogeneity bound
+	 * can't be reached.
+	 */
+	@Test
+	@Ignore
+	@Override
+	public void testHomoginiety() {
+		throw new UnsupportedOperationException();
+	}
+	/**
+	 * Identity score varies bases on vector magnitude so homogeneity bound
+	 * can't be reached.
+	 */
+	@Test
+	@Ignore
+	@Override
+	public void testHomoginiety2() {
+		throw new UnsupportedOperationException();
+	}
 
-    @Test
-    public void testBothEmptyVectors() throws Exception {
-        System.out.println("testBothEmptyVectors");
-        int size = 100;
-        SparseDoubleVector A = new SparseDoubleVector(size, 0);
-        SparseDoubleVector B = new SparseDoubleVector(size, 0);
-        double expect = 0;
-        double actual = test(A, B);
-
-        assertEquals(expect, actual, EPSILON);
-    }
-
-    @Test
-    public void testOneEmptyVector() throws Exception {
-        System.out.println("testOneEmptyVector");
-        int size = 100;
-        SparseDoubleVector A = new SparseDoubleVector(size, 0);
-        SparseDoubleVector B = new SparseDoubleVector(size, size);
-        for (int i = 0; i < size; i++)
-            B.set(i, RANDOM.nextDouble());
-
-        double expect = 0;
-        double actual = test(A, B);
-
-        assertEquals(expect, actual, EPSILON);
-    }
-
-    @Test
-    public void testSizeOneVectors() throws Exception {
-        System.out.println("testSizeOneVectors");
-        int size = 100;
-        SparseDoubleVector A = new SparseDoubleVector(size, 1);
-        SparseDoubleVector B = new SparseDoubleVector(size, 1);
-        A.set(0, 1);
-        B.set(0, 1);
-        double expect = 1;
-        double actual = test(A, B);
-
-        assertEquals(expect, actual, EPSILON);
-    }
-
-    @Test
-    public void testCardinalityOneVectors() throws Exception {
-        System.out.println("testCardinalityOneVectors");
-        SparseDoubleVector A = new SparseDoubleVector(1, 1);
-        SparseDoubleVector B = new SparseDoubleVector(1, 1);
-        A.set(0, 1);
-        B.set(0, 1);
-        double expect = 1;
-        double actual = test(A, B);
-
-        assertEquals(expect, actual, EPSILON);
-    }
-
-    @Test
-    public void testSizeTwoVectors() throws Exception {
-        System.out.println("testSizeTwoVectors");
-        int size = 100;
-        SparseDoubleVector A = new SparseDoubleVector(size, 2);
-        SparseDoubleVector B = new SparseDoubleVector(size, 2);
-        A.set(0, 1);
-        A.set(1, 1);
-        B.set(0, 1);
-        B.set(1, 1);
-        double expect = 2;
-        double actual = test(A, B);
-
-        assertEquals(expect, actual, EPSILON);
-    }
-
-    @Test
-    public void testCommutative() throws Exception {
-        System.out.println("testCommutative");
-        int size = 100;
-        SparseDoubleVector A = new SparseDoubleVector(size, size);
-        SparseDoubleVector B = new SparseDoubleVector(size, size);
-        for (int i = 0; i < size; i++) {
-            A.set(i, RANDOM.nextDouble());
-            B.set(i, RANDOM.nextDouble());
-        }
-
-        double expect = test(A, B);
-        double actual = test(B, A);
-        assertEquals(expect, actual, EPSILON);
-    }
-
-    @Test
-    public void testHeteroginiety() throws Exception {
-        System.out.println("testHeteroginiety");
-        int size = 100;
-        SparseDoubleVector A = new SparseDoubleVector(size, size);
-        SparseDoubleVector B = new SparseDoubleVector(size, size);
-        for (int i = 0; i < size / 2; i++) {
-            A.set(i * 2, i);
-            B.set(i * 2 + 1, i);
-        }
-
-        double expect = 0;
-        double actual = test(A, B);
-
-        assertEquals(expect, actual, EPSILON);
-    }
-
-    @Test
-    public void testFruitData() throws Exception {
-        System.out.println("testFruitData");
-        int limit = 5;
-
-        List<Indexed<SparseDoubleVector>> vecs = TestConstants.loadFruitVectors();
-
-        limit = Math.min(limit, vecs.size());
-
-        final double[][] results = new double[limit][limit];
-        for (int i = 0; i < limit; i++) {
-            for (int j = 0; j < limit; j++) {
-                SparseDoubleVector A = vecs.get(i).value();
-                SparseDoubleVector B = vecs.get(j).value();
-                results[i][j] = test(A, B);
-            }
-        }
-
-        // triangular mirrors should be equal
-        for (int i = 0; i < limit; i++) {
-            for (int j = 0; j < limit; j++) {
-                assertEquals(results[i][j], results[j][i], EPSILON);
-            }
-        }
-    }
-
-    @Test
-    public void testLargeCardinality() throws Exception {
-        System.out.println("testLargeCardinality");
-        final int size = 100;
-        final SparseDoubleVector A = new SparseDoubleVector(
-                Integer.MAX_VALUE, size);
-        final SparseDoubleVector B = new SparseDoubleVector(
-                Integer.MAX_VALUE, size);
-        for (int i = 0; i < size; i++) {
-            A.set(RANDOM.nextInt(size * 2), RANDOM.nextDouble());
-            B.set(RANDOM.nextInt(size * 2), RANDOM.nextDouble());
-        }
-
-        test(A, B);
-    }
-
-    public double test(SparseDoubleVector A, SparseDoubleVector B) {
-        final double val = INSTANCE.similarity(A, B);
-        assertFalse("Similarity is NaN" + " with measure " + INSTANCE,
-                    Double.isNaN(val));
-        assertFalse("Similarity is " + val + " with measure " + INSTANCE,
-                    Double.isInfinite(val));
-
-        final double min, max;
-        if (INSTANCE.getHeterogeneityBound() < INSTANCE.getHomogeneityBound()) {
-            min = INSTANCE.getHeterogeneityBound();
-            max = INSTANCE.getHomogeneityBound();
-        } else {
-            min = INSTANCE.getHomogeneityBound();
-            max = INSTANCE.getHeterogeneityBound();
-        }
-        assertTrue("expected similarity >= " + min + " but found " + val,
-                   val >= min);
-        assertTrue("expected similarity <= " + max + " but found " + val,
-                   val <= max);
+	/**
+	 * Identity score varies bases on vector magnitude so homogeneity bound
+	 * can't be reached.
+	 */
+	@Test
+	@Ignore
+	@Override
+	public void testHeteroginiety() {
+		throw new UnsupportedOperationException();
+	}
 
 
-        if (INSTANCE.isCommutative()) {
-            final double rev = INSTANCE.similarity(B, A);
-            assertEquals("Measure is declared computative, but reversing "
-                    + "operands results in a different score.", rev, val,
-                         EPSILON);
-        }
+	/**
+	 * Identity score varies bases on vector magnitude so homogeneity bound
+	 * can't be reached.
+	 */
+	@Test
+	@Ignore
+	@Override
+	public void testFruitIdentity() {
+		throw new UnsupportedOperationException();
+	}
 
-        return val;
-    }
+	@Test
+	public void testAgainReferenceImplementation() throws Exception {
+		System.out.println("testAgainReferenceImplementation()");
+		
+		final double[] arr1 = new double[] { 0, 1, 0, 3, 0, 8, 0, 3, 0, 6, 0, 2 };
+		final double[] arr2 = new double[] { 6, 2, 0, 4, 5, 1, 9, 0, 5, 2, 0, 0 };
 
+		double expected = 0;
+		for(int i = 0 ; i < arr1.length; i++) 
+			expected += arr1[i] * arr2[i];
+
+		
+		SparseDoubleVector vec1 = new SparseDoubleVector(arr1.length);
+		SparseDoubleVector vec2 = new SparseDoubleVector(arr2.length);
+		
+		for(int i = 0 ; i < arr1.length; i++) {
+			vec1.set(i, arr1[i]);
+			vec2.set(i, arr2[i]);
+		}
+
+		final double actual = similarity(new DotProduct(), vec1, vec2);
+		
+		assertEquals(expected, actual, EPSILON);
+	}
 
 }

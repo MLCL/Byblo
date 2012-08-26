@@ -40,58 +40,67 @@ import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- *
+ * 
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Immutable
 @CheckReturnValue
 public class Overlap extends DecomposableMeasure implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Override
-    public double shared(final SparseDoubleVector A, final SparseDoubleVector B) {
-        return Measures.intersection(A, B);
-    }
+	@Override
+	public double shared(final SparseDoubleVector A, final SparseDoubleVector B) {
+		return Measures.intersection(A, B);
+	}
 
-    @Override
-    public double left(final SparseDoubleVector A) {
-        return Measures.cardinality(A);
-    }
+	@Override
+	public double left(final SparseDoubleVector A) {
+		return Measures.cardinality(A);
+	}
 
-    @Override
-    public double right(final SparseDoubleVector B) {
-        return Measures.cardinality(B);
-    }
+	@Override
+	public double right(final SparseDoubleVector B) {
+		return Measures.cardinality(B);
+	}
 
-    @Override
-    public double combine(double shared, double left, double right) {
-        return shared == 0 ? 0
-                : shared / Math.min(left, right);
-    }
+	@Override
+	public double combine(double shared, double left, double right) {
+		return shared == 0 ? 0 : shared / Math.min(left, right);
+	}
 
-    @Override
-    public boolean isCommutative() {
-        return true;
-    }
+	@Override
+	public boolean isCommutative() {
+		return true;
+	}
 
-    @Override
-    public double getHomogeneityBound() {
-        return 1.0;
-    }
+	@Override
+	public double getHomogeneityBound() {
+		return 1.0;
+	}
 
-    @Override
-    public double getHeterogeneityBound() {
-        return 0.0;
-    }
+	@Override
+	public double getHeterogeneityBound() {
+		return 0.0;
+	}
 
-    @Override
-    public Class<? extends Weighting> getExpectedWeighting() {
-        return PositiveWeighting.class;
-    }
+	@Override
+	public Class<? extends Weighting> getExpectedWeighting() {
+		return PositiveWeighting.class;
+	}
 
-    @Override
-    public String toString() {
-        return "Overlap";
-    }
+	@Override
+	public String toString() {
+		return "Overlap";
+	}
+
+	@Override
+	public int hashCode() {
+		return 41;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj == this || (obj != null && getClass() == obj.getClass());
+	}
 }

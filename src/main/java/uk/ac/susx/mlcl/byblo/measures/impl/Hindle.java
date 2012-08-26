@@ -39,62 +39,71 @@ import uk.ac.susx.mlcl.byblo.weighings.impl.PositivePMI;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- *
- *
+ * 
+ * 
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Immutable
 @CheckReturnValue
 public final class Hindle implements Measure, Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Override
-    public double similarity(
-            final SparseDoubleVector A,
-            final SparseDoubleVector B) {
-        double sum = 0.0;
+	@Override
+	public double similarity(final SparseDoubleVector A,
+			final SparseDoubleVector B) {
+		double sum = 0.0;
 
-        int i = 0;
-        int j = 0;
-        while (i < A.size && j < B.size) {
-            if (A.keys[i] < B.keys[j]) {
-                ++i;
-            } else if (A.keys[i] > B.keys[j]) {
-                ++j;
-            } else {
-                if (A.values[i] > 0 && B.values[j] > 0)
-                    sum += Math.min(A.values[i], B.values[j]);
-                ++i;
-                ++j;
-            }
-        }
+		int i = 0;
+		int j = 0;
+		while (i < A.size && j < B.size) {
+			if (A.keys[i] < B.keys[j]) {
+				++i;
+			} else if (A.keys[i] > B.keys[j]) {
+				++j;
+			} else {
+				if (A.values[i] > 0 && B.values[j] > 0)
+					sum += Math.min(A.values[i], B.values[j]);
+				++i;
+				++j;
+			}
+		}
 
-        return sum;
-    }
+		return sum;
+	}
 
-    @Override
-    public boolean isCommutative() {
-        return true;
-    }
+	@Override
+	public boolean isCommutative() {
+		return true;
+	}
 
-    @Override
-    public double getHomogeneityBound() {
-        return Double.POSITIVE_INFINITY;
-    }
+	@Override
+	public double getHomogeneityBound() {
+		return Double.POSITIVE_INFINITY;
+	}
 
-    @Override
-    public double getHeterogeneityBound() {
-        return 0.0;
-    }
+	@Override
+	public double getHeterogeneityBound() {
+		return 0.0;
+	}
 
-    @Override
-    public Class<? extends Weighting> getExpectedWeighting() {
-        return PositivePMI.class;
-    }
+	@Override
+	public Class<? extends Weighting> getExpectedWeighting() {
+		return PositivePMI.class;
+	}
 
-    @Override
-    public String toString() {
-        return "Hindle";
-    }
+	@Override
+	public String toString() {
+		return "Hindle";
+	}
+
+	@Override
+	public int hashCode() {
+		return 11;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj == this || (obj != null && getClass() == obj.getClass());
+	}
 }

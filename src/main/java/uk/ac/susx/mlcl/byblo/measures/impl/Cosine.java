@@ -43,57 +43,68 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * Proximity measure calculating proximity as the degree orthogonality between
  * vectors; the cosine of the angle between them.
  * <p/>
+ * 
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Immutable
 @CheckReturnValue
 public final class Cosine extends DecomposableMeasure implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Override
-    public double shared(SparseDoubleVector A, SparseDoubleVector B) {
-        return Measures.dotProduct(A, B);
-    }
+	@Override
+	public double shared(SparseDoubleVector A, SparseDoubleVector B) {
+		return Measures.dotProduct(A, B);
+	}
 
-    @Override
-    public double left(SparseDoubleVector A) {
-        return Measures.lengthSquared(A);
-    }
+	@Override
+	public double left(SparseDoubleVector A) {
+		return Measures.lengthSquared(A);
+	}
 
-    @Override
-    public double right(SparseDoubleVector B) {
-        return Measures.lengthSquared(B);
-    }
+	@Override
+	public double right(SparseDoubleVector B) {
+		return Measures.lengthSquared(B);
+	}
 
-    @Override
-    public double combine(double shared, double left, double right) {
-        return (left == 0 || right == 0 || shared == 0) ? 0
-                : shared / Math.sqrt(left * right);
-    }
+	@Override
+	public double combine(double shared, double left, double right) {
+		return (left == 0 || right == 0 || shared == 0) ? 0 : shared
+				/ Math.sqrt(left * right);
+	}
 
-    @Override
-    public boolean isCommutative() {
-        return true;
-    }
+	@Override
+	public boolean isCommutative() {
+		return true;
+	}
 
-    @Override
-    public double getHomogeneityBound() {
-        return 1.0;
-    }
+	@Override
+	public double getHomogeneityBound() {
+		return 1.0;
+	}
 
-    @Override
-    public double getHeterogeneityBound() {
-        return 0;
-    }
+	@Override
+	public double getHeterogeneityBound() {
+		return 0;
+	}
 
-    @Override
-    public Class<? extends Weighting> getExpectedWeighting() {
-        return NullWeighting.class;
-    }
+	@Override
+	public Class<? extends Weighting> getExpectedWeighting() {
+		return NullWeighting.class;
+	}
 
-    @Override
-    public String toString() {
-        return "Cosine";
-    }
+	@Override
+	public String toString() {
+		return "Cosine";
+	}
+
+	@Override
+	public int hashCode() {
+		return 5;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj == this || (obj != null && getClass() == obj.getClass());
+	}
 }

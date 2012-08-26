@@ -31,8 +31,10 @@
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
 import java.io.Serializable;
+
 import javax.annotation.CheckReturnValue;
 import javax.annotation.concurrent.Immutable;
+
 import uk.ac.susx.mlcl.byblo.measures.DecomposableMeasure;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
@@ -64,79 +66,89 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * Note that recall(x,y) = precision(y,x) so the precision can be calculated by
  * wrapping an instance of RecallMi in the ReversedProximity decorator.
  * <p/>
+ * 
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Immutable
 @CheckReturnValue
 public class Recall extends DecomposableMeasure implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Override
-    public double shared(SparseDoubleVector A, SparseDoubleVector B) {
-        double numerator = 0.0;
+	@Override
+	public double shared(SparseDoubleVector A, SparseDoubleVector B) {
+		double numerator = 0.0;
 
-        int i = 0;
-        int j = 0;
-        while (i < A.size && j < B.size) {
-            if (A.keys[i] < B.keys[j]) {
-                ++i;
-            } else if (A.keys[i] > B.keys[j]) {
-                ++j;
-            } else {
-                if (A.values[i] > 0 && B.values[j] > 0)
-                    numerator += A.values[i];
-                ++i;
-                ++j;
-            }
-        }
+		int i = 0;
+		int j = 0;
+		while (i < A.size && j < B.size) {
+			if (A.keys[i] < B.keys[j]) {
+				++i;
+			} else if (A.keys[i] > B.keys[j]) {
+				++j;
+			} else {
+				if (A.values[i] > 0 && B.values[j] > 0)
+					numerator += A.values[i];
+				++i;
+				++j;
+			}
+		}
 
-        return numerator;
-    }
+		return numerator;
+	}
 
-    @Override
-    public double left(SparseDoubleVector A) {
-        double denominator = 0.0;
-        for (int i = 0; i < A.size; i++) {
-            if (A.values[i] > 0)
-                denominator += A.values[i];
-        }
-        return denominator;
-    }
+	@Override
+	public double left(SparseDoubleVector A) {
+		double denominator = 0.0;
+		for (int i = 0; i < A.size; i++) {
+			if (A.values[i] > 0)
+				denominator += A.values[i];
+		}
+		return denominator;
+	}
 
-    @Override
-    public double right(SparseDoubleVector B) {
-        return 0;
-    }
+	@Override
+	public double right(SparseDoubleVector B) {
+		return 0;
+	}
 
-    @Override
-    public double combine(double shared, double left, double right) {
-        return shared == 0 ? 0
-                : shared / left;
-    }
+	@Override
+	public double combine(double shared, double left, double right) {
+		return shared == 0 ? 0 : shared / left;
+	}
 
-    @Override
-    public boolean isCommutative() {
-        return false;
-    }
+	@Override
+	public boolean isCommutative() {
+		return false;
+	}
 
-    @Override
-    public double getHomogeneityBound() {
-        return 1.0;
-    }
+	@Override
+	public double getHomogeneityBound() {
+		return 1.0;
+	}
 
-    @Override
-    public double getHeterogeneityBound() {
-        return 0.0;
-    }
+	@Override
+	public double getHeterogeneityBound() {
+		return 0.0;
+	}
 
-    @Override
-    public Class<? extends Weighting> getExpectedWeighting() {
-        return PositiveWeighting.class;
-    }
+	@Override
+	public Class<? extends Weighting> getExpectedWeighting() {
+		return PositiveWeighting.class;
+	}
 
-    @Override
-    public String toString() {
-        return "Recall";
-    }
+	@Override
+	public String toString() {
+		return "Recall";
+	}
+
+	@Override
+	public int hashCode() {
+		return 47;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj == this || (obj != null && getClass() == obj.getClass());
+	}
 }

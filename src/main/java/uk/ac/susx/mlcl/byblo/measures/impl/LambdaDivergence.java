@@ -57,102 +57,134 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * For lambda = 0 and lambda = 1 the divergence is always 0, which is
  * meaningless. Hence, lambda must be in the range 0 &lt; lambda &lt; 1.
  * <p/>
+ * 
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @CheckReturnValue
 public final class LambdaDivergence implements Measure, Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Nonnegative
-    public static final double DEFAULT_LAMBDA = 0.5;
+	private static final double EPSILON = 1E-10;
+	@Nonnegative
+	public static final double DEFAULT_LAMBDA = 0.5;
 
-    @Nonnegative
-    private double lambda;
+	@Nonnegative
+	private double lambda;
 
-    public LambdaDivergence() {
-        setLambda(DEFAULT_LAMBDA);
-    }
+	public LambdaDivergence() {
+		setLambda(DEFAULT_LAMBDA);
+	}
 
-    public LambdaDivergence(@Nonnegative double lambda) {
-        setLambda(lambda);
-    }
+	public LambdaDivergence(@Nonnegative double lambda) {
+		setLambda(lambda);
+	}
 
-    @Nonnegative
-    public final double getLambda() {
-        return lambda;
-    }
+	@Nonnegative
+	public final double getLambda() {
+		return lambda;
+	}
 
-    public final void setLambda(@Nonnegative double lambda) {
-        Checks.checkRangeExcl("lambda", lambda, 0.0, 1.0);
-        this.lambda = lambda;
-    }
+	public final void setLambda(@Nonnegative double lambda) {
+		Checks.checkRangeExcl("lambda", lambda, 0.0, 1.0);
+		this.lambda = lambda;
+	}
 
-    @Override
-    public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
-        double divergence = 0.0;
+	@Override
+	public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
+		double divergence = 0.0;
 
-        int i = 0;
-        int j = 0;
-        while (i < A.size && j < B.size) {
-            if (A.keys[i] < B.keys[j]) {
-                final double q = A.values[i] / A.sum;
-                divergence += lambda * q * (log2(q) - log2(lambda * q));
-                ++i;
-            } else if (A.keys[i] > B.keys[j]) {
-                final double r = B.values[j] / B.sum;
-                divergence += (1.0 - lambda) * r
-                        * (log2(r) - log2((1.0 - lambda) * r));
-                ++j;
-            } else {
-                final double q = A.values[i] / A.sum;
-                final double r = B.values[j] / B.sum;
-                final double logAvg = log2(lambda * q + (1.0 - lambda) * r);
-                divergence += lambda * q * (log2(q) - logAvg)
-                        + (1.0 - lambda) * r * (log2(r) - logAvg);
-                ++i;
-                ++j;
-            }
-        }
-        while (i < A.size) {
-            final double q = A.values[i] / A.sum;
-            divergence += lambda * q * (log2(q) - log2(lambda * q));
-            i++;
-        }
-        while (j < B.size) {
-            final double r = B.values[j] / B.sum;
-            divergence += (1.0 - lambda) * r * (log2(r) - log2(
-                                                (1.0 - lambda) * r));
-            j++;
-        }
+		int i = 0;
+		int j = 0;
+		while (i < A.size && j < B.size) {
+			if (A.keys[i] < B.keys[j]) {
+				final double q = A.values[i] / A.sum;
+				divergence += lambda * q * (log2(q) - log2(lambda * q));
+				++i;
+			} else if (A.keys[i] > B.keys[j]) {
+				final double r = B.values[j] / B.sum;
+				divergence += (1.0 - lambda) * r
+						* (log2(r) - log2((1.0 - lambda) * r));
+				++j;
+			} else {
+				final double q = A.values[i] / A.sum;
+				final double r = B.values[j] / B.sum;
+				final double logAvg = log2(lambda * q + (1.0 - lambda) * r);
+				divergence += lambda * q * (log2(q) - logAvg) + (1.0 - lambda)
+						* r * (log2(r) - logAvg);
+				++i;
+				++j;
+			}
+		}
+		while (i < A.size) {
+			final double q = A.values[i] / A.sum;
+			divergence += lambda * q * (log2(q) - log2(lambda * q));
+			i++;
+		}
+		while (j < B.size) {
+			final double r = B.values[j] / B.sum;
+			divergence += (1.0 - lambda) * r
+					* (log2(r) - log2((1.0 - lambda) * r));
+			j++;
+		}
 
+		// The algorithm can introduce slight floating point errors so set the
+		// divergence to the bound if it's very close
+		if (Math.abs(divergence - getHeterogeneityBound()) < EPSILON)
+			divergence = getHeterogeneityBound();
+		if (Math.abs(divergence - getHomogeneityBound()) < EPSILON)
+			divergence = getHomogeneityBound();
 
+		return divergence;
+	}
 
-        return divergence;
-    }
+	@Override
+	public boolean isCommutative() {
+		return Measures.epsilonEquals(lambda, 0.5);
+	}
 
-    @Override
-    public boolean isCommutative() {
-        return Measures.epsilonEquals(lambda, 0.5);
-    }
+	@Override
+	public double getHomogeneityBound() {
+		return 0;
+	}
 
-    @Override
-    public double getHomogeneityBound() {
-        return 0;
-    }
+	@Override
+	public double getHeterogeneityBound() {
+		return 1.0;
+	}
 
-    @Override
-    public double getHeterogeneityBound() {
-        return 1.0;
-    }
+	@Override
+	public Class<? extends Weighting> getExpectedWeighting() {
+		return PositiveWeighting.class;
+	}
 
-    @Override
-    public Class<? extends Weighting> getExpectedWeighting() {
-        return PositiveWeighting.class;
-    }
+	@Override
+	public String toString() {
+		return "Lambda-Divergence{lambda=" + lambda + '}';
+	}
 
-    @Override
-    public String toString() {
-        return "Lambda-Divergence{lambda=" + lambda + '}';
-    }
+	@Override
+	public int hashCode() {
+		final int prime = 29;
+		int result = 1;
+		long temp;
+		temp = Double.doubleToLongBits(lambda);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		LambdaDivergence other = (LambdaDivergence) obj;
+		if (Double.doubleToLongBits(lambda) != Double
+				.doubleToLongBits(other.lambda)) {
+			return false;
+		}
+		return true;
+	}
+
 }

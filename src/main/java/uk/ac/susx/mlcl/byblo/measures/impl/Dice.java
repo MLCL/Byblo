@@ -46,51 +46,60 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 @CheckReturnValue
 public final class Dice extends DecomposableMeasure implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Override
-    public double shared(final SparseDoubleVector A, final SparseDoubleVector B) {
-        return Measures.intersection(A, B);
-    }
+	@Override
+	public double shared(final SparseDoubleVector A, final SparseDoubleVector B) {
+		return Measures.intersection(A, B);
+	}
 
-    @Override
-    public double left(final SparseDoubleVector A) {
-        return Measures.cardinality(A);
-    }
+	@Override
+	public double left(final SparseDoubleVector A) {
+		return Measures.cardinality(A);
+	}
 
-    @Override
-    public double right(final SparseDoubleVector B) {
-        return Measures.cardinality(B);
-    }
+	@Override
+	public double right(final SparseDoubleVector B) {
+		return Measures.cardinality(B);
+	}
 
-    @Override
-    public double combine(double shared, double left, double right) {
-        return shared == 0 ? 0
-                : (2d * shared) / (left + right);
-    }
+	@Override
+	public double combine(double shared, double left, double right) {
+		return shared == 0 ? 0 : (2d * shared) / (left + right);
+	}
 
-    @Override
-    public boolean isCommutative() {
-        return true;
-    }
+	@Override
+	public boolean isCommutative() {
+		return true;
+	}
 
-    @Override
-    public double getHomogeneityBound() {
-        return 1.0;
-    }
+	@Override
+	public double getHomogeneityBound() {
+		return 1.0;
+	}
 
-    @Override
-    public double getHeterogeneityBound() {
-        return 0.0;
-    }
+	@Override
+	public double getHeterogeneityBound() {
+		return 0.0;
+	}
 
-    @Override
-    public Class<? extends Weighting> getExpectedWeighting() {
-        return NullWeighting.class;
-    }
+	@Override
+	public Class<? extends Weighting> getExpectedWeighting() {
+		return NullWeighting.class;
+	}
 
-    @Override
-    public String toString() {
-        return "Dice";
-    }
+	@Override
+	public String toString() {
+		return "Dice";
+	}
+
+	@Override
+	public int hashCode() {
+		return 7;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj == this || (obj != null && getClass() == obj.getClass());
+	}
 }

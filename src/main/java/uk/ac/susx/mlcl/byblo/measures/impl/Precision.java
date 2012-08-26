@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo.measures.impl;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.concurrent.Immutable;
+
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
@@ -60,36 +61,47 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * Note that recall(x,y) = precision(y,x) so the precision can be calculated by
  * wrapping an instance of RecallMi in the ReversedProximity decorator.
  * <p/>
+ * 
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Immutable
 @CheckReturnValue
 public class Precision extends Recall {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Override
-    public double shared(SparseDoubleVector A, SparseDoubleVector B) {
-        return super.shared(B, A);
-    }
+	@Override
+	public double shared(SparseDoubleVector A, SparseDoubleVector B) {
+		return super.shared(B, A);
+	}
 
-    @Override
-    public double left(SparseDoubleVector A) {
-        return super.right(A);
-    }
+	@Override
+	public double left(SparseDoubleVector A) {
+		return super.right(A);
+	}
 
-    @Override
-    public double right(SparseDoubleVector B) {
-        return super.left(B);
-    }
+	@Override
+	public double right(SparseDoubleVector B) {
+		return super.left(B);
+	}
 
-    @Override
-    public double combine(double shared, double left, double right) {
-        return shared == 0 ? 0 : shared / right;
-    }
+	@Override
+	public double combine(double shared, double left, double right) {
+		return shared == 0 ? 0 : shared / right;
+	}
 
-    @Override
-    public String toString() {
-        return "Precision";
-    }
+	@Override
+	public String toString() {
+		return "Precision";
+	}
+
+	@Override
+	public int hashCode() {
+		return 43;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj == this || (obj != null && getClass() == obj.getClass());
+	}
 }
