@@ -324,7 +324,7 @@ public final class IntBitSet extends AbstractIntSortedSet implements
 	 */
 	private int nextSetBit(@Nonnegative final int from)
 			throws IndexOutOfBoundsException {
-		assert from >= 0;
+		assert from >= 0 : "from " + from + " < 0";
 		return bits.nextSetBit(from);
 	}
 
@@ -333,26 +333,47 @@ public final class IntBitSet extends AbstractIntSortedSet implements
 	 * occurs strictly before the specified starting index. If no such bit
 	 * exists then -1 is returned.
 	 * 
-	 * @param from
-	 *            the index to start checking from (exclusive).
+	 * @param end
+	 *            the index to start checking backwards from (exclusive).
 	 * @return the index of the previous set bit.
 	 * @throws IndexOutOfBoundsException
 	 *             if the specified index is negative.
 	 */
 	@CheckReturnValue
 	@Nonnegative
-	private int previousSetBit(@Nonnegative final int from)
+	private int previousSetBit(@Nonnegative final int end)
 			throws IndexOutOfBoundsException {
-		if (from < 0 && from != NO_ELEMENT)
+		if (end < 0 && end != NO_ELEMENT)
 			throw new IndexOutOfBoundsException("from < 0");
+
+		// When end is zero, we can never find a previous element
+		if (end == 0)
+			return NO_ELEMENT;
+
+		/*
+		 * Find starting point for backwards search. Either the specified 'end',
+		 * or the BitSet length. Public health warning: BitSet.length() returns
+		 * the NEGATIVE value maxint+1 (-2147483648) when the last (maxint) bit
+		 * is set; causing all kinds of fun.
+		 */
+
+		int element;
+		if (end == NO_ELEMENT)
+			element = bits.length() - 1;
+		else
+			element = Math.min(end - 1, bits.length() - 1);
+
 		// TODO A linear search takes forever; binary search may improve things
-		int element = (from == NO_ELEMENT ? bits.length() : Math.min(from,
-				bits.length())) - 1;
+		// or better yet implement whole word skipping like BitSet
 		while (element >= 0 && !bits.get(element))
 			--element;
-		assert (from == NO_ELEMENT ? true : element < from) : from + ">="
-				+ element;
-		assert element >= 0 || element == NO_ELEMENT;
+
+		// fail if the element we find is outside the range [0,end]
+		if (end != NO_ELEMENT)
+			assert element < end : "element " + element + " >= end " + end;
+		assert element >= 0 || element == NO_ELEMENT : "element " + element
+				+ " < -1";
+
 		return element;
 	}
 
@@ -579,7 +600,9 @@ public final class IntBitSet extends AbstractIntSortedSet implements
 				throw new NoSuchElementException(
 						"iteration has no more elements");
 			prevElement = nextElement;
-			nextElement = nextSetBit(nextElement + 1);
+			// note: previousSetBit is inclusive so search from current + 1
+			nextElement = nextElement == Integer.MAX_VALUE ? NO_ELEMENT
+					: nextSetBit(nextElement + 1);
 			forwards = true;
 			canRemove = true;
 			return prevElement;
@@ -592,7 +615,8 @@ public final class IntBitSet extends AbstractIntSortedSet implements
 				throw new NoSuchElementException(
 						"iteration has no more elements");
 			nextElement = prevElement;
-			prevElement = previousSetBit(prevElement - 1);
+			// note: previousSetBit is exclusive so search from current
+			prevElement = previousSetBit(prevElement);
 			forwards = false;
 			canRemove = true;
 			return nextElement;

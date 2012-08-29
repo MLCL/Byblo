@@ -35,9 +35,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntArrays;
+import it.unimi.dsi.fastutil.ints.IntBidirectionalIterator;
 import it.unimi.dsi.fastutil.ints.IntIterator;
+import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntSortedSet;
 
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 import org.junit.Assert;
@@ -305,4 +309,69 @@ public abstract class AbstractIntSortedSetTest<T extends IntSortedSet> extends
 		assertExhausedIterator(it);
 	}
 
+	/**
+	 * It was discovered that iteration caused problems with integer max value.
+	 */
+	@Test
+	public void testMaxIndexIterators() {
+		System.out.println("testMaxIndexIterators()");
+		int[] testData = new int[] { 0, 1, 50, 99, Integer.MAX_VALUE / 2,
+				Integer.MAX_VALUE - 1, Integer.MAX_VALUE };
+
+		IntArrays.mergeSort(testData);
+
+		IntList forwardsData = IntArrayList.wrap(testData);
+		IntList backwardsData = IntArrayList.wrap(IntArrays.reverse(Arrays
+				.copyOf(testData, testData.length)));
+
+		T instance = newInstance();
+
+		for (int datum : forwardsData)
+			instance.add(datum);
+
+		IntBidirectionalIterator it = instance.iterator();
+
+		Assert.assertFalse(it.hasPrevious());
+		Assert.assertTrue(it.hasNext());
+
+		// iterate forwards
+		for (int datum : forwardsData) {
+			int actual = it.nextInt();
+			System.out.println("n: " + actual);
+			Assert.assertEquals(datum, actual);
+		}
+
+		Assert.assertFalse(it.hasNext());
+		Assert.assertTrue(it.hasPrevious());
+
+		// iterate backwards
+		for (int datum : backwardsData) {
+			int actual = it.previousInt();
+			System.out.println("p: " + actual);
+			Assert.assertEquals(datum, actual);
+		}
+
+		// Repeat the whole thing with autoboxing
+
+		Assert.assertFalse(it.hasPrevious());
+		Assert.assertTrue(it.hasNext());
+
+		// iterate forwards
+		for (Integer datum : forwardsData) {
+			Integer actual = it.next();
+			System.out.println("n: " + actual);
+			Assert.assertEquals(datum, actual);
+		}
+
+		Assert.assertFalse(it.hasNext());
+		Assert.assertTrue(it.hasPrevious());
+
+		// iterate backwards
+		for (Integer datum : backwardsData) {
+			Integer actual = it.previous();
+			System.out.println("p: " + actual);
+			Assert.assertEquals(datum, actual);
+		}
+
+	}
 }
