@@ -46,6 +46,9 @@ import java.util.NoSuchElementException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
+import uk.ac.susx.mlcl.SlowTestCategory;
 
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
@@ -313,6 +316,7 @@ public abstract class AbstractIntSortedSetTest<T extends IntSortedSet> extends
 	 * It was discovered that iteration caused problems with integer max value.
 	 */
 	@Test
+	@Category(SlowTestCategory.class)
 	public void testMaxIndexIterators() {
 		System.out.println("testMaxIndexIterators()");
 		int[] testData = new int[] { 0, 1, 50, 99, Integer.MAX_VALUE / 2,
@@ -351,27 +355,9 @@ public abstract class AbstractIntSortedSetTest<T extends IntSortedSet> extends
 			Assert.assertEquals(datum, actual);
 		}
 
-		// Repeat the whole thing with autoboxing
-
 		Assert.assertFalse(it.hasPrevious());
 		Assert.assertTrue(it.hasNext());
 
-		// iterate forwards
-		for (Integer datum : forwardsData) {
-			Integer actual = it.next();
-			System.out.println("n: " + actual);
-			Assert.assertEquals(datum, actual);
-		}
-
-		Assert.assertFalse(it.hasNext());
-		Assert.assertTrue(it.hasPrevious());
-
-		// iterate backwards
-		for (Integer datum : backwardsData) {
-			Integer actual = it.previous();
-			System.out.println("p: " + actual);
-			Assert.assertEquals(datum, actual);
-		}
-
 	}
+
 }
