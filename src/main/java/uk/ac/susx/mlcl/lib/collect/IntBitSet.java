@@ -53,19 +53,29 @@ import javax.annotation.Nullable;
 import javax.annotation.Signed;
 import javax.annotation.concurrent.NotThreadSafe;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 
 /**
  * An ordered set of <em>positive</em> integers that uses
  * {@link java.util.BitSet} to store elements.
- * 
- * Performance is extremely fast when allocated, running in constant time. It is
- * many times fast than even an highly optimized hash-set such as
+ * <p />
+ * Performance is extremely fast for <code>add</code>, <code>remove</code>, and
+ * <code>contains</code> operations (when allocated); all running in constant
+ * time. It is many times fast than even an highly optimized hash-set such as
  * {@link it.unimi.dsi.fastutil.ints.IntOpenHashSet}. Allocation can take some
  * time, though even a worst case allocation pattern is unlikely to take more
  * than a few 10s of milliseconds on modern hardware.
- * 
+ * <p />
+ * The main performance problems occur with sequential iteration such as seeking
+ * a next or previous element. In the worst case a seek operation is linear in
+ * the size of the range being traversed (for example finding the next element
+ * greater than 10 could take up to MAXINT-10 time). Backwards iteration is
+ * particularly bad but it can not be optimized as thoroughly due to limitations
+ * of underlying BitSet public interface. Due to this limitation the following
+ * operations should be used sparingly and with care: {@link #iterator() },
+ * {@link #intIterator() }, {@link #iterator(int) }, {@link #first() },
+ * {@link #last() }, {@link #firstInt() }, {@link #lastInt() }, {@link #size() }
+ * <p />
  * Memory requirements are dependent on the value of the largest element stored
  * in the set, rather than the number of elements. For densely packed, low
  * valued elements the memory requirements are typically substantially lower
@@ -77,6 +87,25 @@ import com.google.common.base.Preconditions;
  * {@link it.unimi.dsi.fastutil.ints.IntArrayList} and
  * {@link it.unimi.dsi.fastutil.ints.IntOpenHashSet} are bounded at 2GiB, though
  * the latter will only be able to store about 75% the integers effectively.
+ * <p />
+ * TODO: Optimized set operations such as union, intersection, and disjunction
+ * could be implemented between pairs of <code>IntBitSet</code> objects. This
+ * would dramatically improve the performance of
+ * {@link #containsAll(IntCollection)}, {@link #addAll(IntCollection) },
+ * {@link #retainAll(IntCollection) }, and {@link #removeAll(IntCollection) } when
+ * the operand is also a <code>IntBitSet</code> object.
+ * <p />
+ * TODO: Use an array backing, and manage the bit-set internally rather than
+ * backing of to {@link java.util.BitSet}. This would allow for a number of
+ * performance optimizations that require exposure of the underlying data. For
+ * example backwards iteration and seeking performance could be improved by a
+ * factor of ~64.
+ * <p />
+ * TODO: Implement a better search operation for iteration and seeking. Binary
+ * search won't work because a mid point is just a likely to be unset as the
+ * next element. One option is to use a back-off bit-field to record which
+ * partitions of the set are in use; cutting worst case complexity from O(n) to
+ * O(n/k) for k partitions.
  * 
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -199,6 +228,13 @@ public final class IntBitSet extends AbstractIntSortedSet implements
 		}
 	}
 
+	/**
+	 * Add the contents of <code>array</code> to the set.
+	 * 
+	 * @param array
+	 *            data to be added
+	 * @return true if the set changed due to this operation, false otherwise
+	 */
 	public boolean addAll(int... array) {
 		assert array != null;
 		boolean modified = false;
@@ -218,6 +254,13 @@ public final class IntBitSet extends AbstractIntSortedSet implements
 		}
 	}
 
+	/**
+	 * Remove the contents of <code>array</code> from the set.
+	 * 
+	 * @param array
+	 *            data to be remove
+	 * @return true if the set changed due to this operation, false otherwise
+	 */
 	public boolean removeAll(int... array) {
 		assert array != null;
 		boolean modified = false;
@@ -383,11 +426,32 @@ public final class IntBitSet extends AbstractIntSortedSet implements
 	// ========================================================
 	//
 
-	@VisibleForTesting
-	protected final class SubSet extends AbstractIntSortedSet {
+	/**
+	 * Represent a subset over a range of elements, where all operations defer
+	 * to the underlying <code>IntBitSet</code> instance.
+	 */
+	private final class SubSet extends AbstractIntSortedSet {
+
+		/**
+		 * The first element (inclusive) in the SubSet range, or
+		 * {@link IntBitSet#NO_ELEMENT} if there is no start. Note this is not
+		 * necessarily the starting element.
+		 */
 		private final int fromElement;
+		/**
+		 * The last element (exclusive) in the SubSet range, or
+		 * {@link IntBitSet#NO_ELEMENT} if there no end. Note this is not
+		 * necessarily the final element.
+		 */
 		private final int toElement;
+
+		/**
+		 * Whether or not the subset has a lower bound ({@link #fromElement})
+		 */
 		private final boolean isFromElementSet;
+		/**
+		 * Whether or not the subset has an upper bound ({@link #toElement})
+		 */
 		private final boolean isToElementSet;
 
 		private SubSet(final int fromElement, final int toElement) {
@@ -513,8 +577,13 @@ public final class IntBitSet extends AbstractIntSortedSet implements
 		 * necessarily the starting element.
 		 */
 		private final int toElement;
-
+		/**
+		 * Whether or not the iteration has a lower bound ({@link #fromElement})
+		 */
 		private final boolean isFromElementSet;
+		/**
+		 * Whether or not the iteration has an upper bound ({@link #toElement})
+		 */
 		private final boolean isToElementSet;
 
 		/**
