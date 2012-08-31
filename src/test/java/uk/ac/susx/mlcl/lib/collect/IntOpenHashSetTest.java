@@ -41,11 +41,11 @@ import org.junit.Test;
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-@Ignore(value = "Currently fails because of a bug in IntOpenHashSet")
 public class IntOpenHashSetTest {
 
 	@Test
-	public void testStrangeRetainAllCase() {
+    @Ignore(value = "Currently fails because of a bug in IntOpenHashSet")
+    public void testStrangeRetainAllCase() {
 
 		IntArrayList initialElements = IntArrayList.wrap(new int[] { 586, 940,
 				1086, 1110, 1168, 1184, 1185, 1191, 1196, 1229, 1237, 1241,
