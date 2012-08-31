@@ -43,18 +43,31 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import uk.ac.susx.mlcl.AbstractObjectTest;
+import uk.ac.susx.mlcl.testing.AbstractObjectTest;
 
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class AbstractIntSetTest<T extends IntSet> extends
 		AbstractObjectTest<T> {
+
+	public T newInstance(IntCollection c) {
+		return newInstance(IntCollection.class, c);
+	}
+
+	public T newInstance(Collection<? extends Integer> c) {
+		return newInstance(Collection.class, c);
+	}
+
+	public T newInstance(int[] c) {
+		return newInstance(int[].class, c);
+	}
 
 	/**
 	 * Test the ctor that allows us to create from an integer array.

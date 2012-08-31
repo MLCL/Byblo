@@ -32,13 +32,15 @@ package uk.ac.susx.mlcl.byblo.commands;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.text.MessageFormat.format;
-import it.unimi.dsi.fastutil.ints.IntRBTreeSet;
+import static uk.ac.susx.mlcl.lib.Predicates2.alwaysTrue;
+import static uk.ac.susx.mlcl.lib.Predicates2.compose;
+import static uk.ac.susx.mlcl.lib.Predicates2.in;
+import static uk.ac.susx.mlcl.lib.Predicates2.not;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.HashMap;
@@ -62,6 +64,7 @@ import uk.ac.susx.mlcl.byblo.io.WeightedTokenSink;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.Predicates2;
+import uk.ac.susx.mlcl.lib.collect.IntBitSet;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.commands.DoubleConverter;
 import uk.ac.susx.mlcl.lib.commands.FileDeligate;
@@ -91,10 +94,8 @@ import com.google.common.base.Predicate;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Parameters(commandDescription = "Filter a set of frequency files")
-public class FilterCommand extends AbstractCommand implements Serializable,
+public class FilterCommand extends AbstractCommand implements
 		ProgressReporting {
-
-	private static final long serialVersionUID = 1L;
 
 	private static final Log LOG = LogFactory.getLog(FilterCommand.class);
 
@@ -137,7 +138,7 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 	private File outputFeaturesFile;
 
 	@ParametersDelegate
-	private FileDeligate fileDeligate = new FileDeligate();
+	private final FileDeligate fileDeligate = new FileDeligate();
 
 	/*
 	 * === FILTER PARAMATERISATION ===
@@ -169,12 +170,11 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 	/*
 	 * === INTERNAL ===
 	 */
-	private Predicate<Weighted<Token>> acceptEntry = Predicates2.alwaysTrue();
+	private Predicate<Weighted<Token>> acceptEntries = alwaysTrue();
 
-	private Predicate<Weighted<TokenPair>> acceptEvent = Predicates2
-			.alwaysTrue();
+	private Predicate<Weighted<TokenPair>> acceptEvents = alwaysTrue();
 
-	private Predicate<Weighted<Token>> acceptFeature = Predicates2.alwaysTrue();
+	private Predicate<Weighted<Token>> acceptFeatures = alwaysTrue();
 
 	private boolean entryFilterRequired = false;
 
@@ -182,23 +182,33 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 
 	private boolean featureFilterRequired = false;
 
-	// final Enumerator<String> entryIndex =
-	// Enumerators.newDefaultStringEnumerator();
-	//
-	// final Enumerator<String> featureIndex =
-	// Enumerators.newDefaultStringEnumerator();
 	private File activeEventsFile;
 
 	private File activeEntriesFile;
 
 	private File activeFeaturesFile;
 
+	// Store the entry and feature blacklists globally because we need to add
+	// to it throughout the process.
+	private final IntSet entryBlacklist;
+	private final IntSet featureBlacklist;
+
 	public FilterCommand() {
+		featureBlacklist = newIntSet();
+		entryBlacklist = newIntSet();
+		setAcceptFeatures(Predicates2.<Weighted<Token>> and(
+				getAcceptFeatures(), compose(not(in(featureBlacklist)), id())));
+		setAcceptEntries(Predicates2.<Weighted<Token>> and(getAcceptEntries(),
+				compose(not(in(entryBlacklist)), id())));
+		setAcceptEvent(Predicates2.<Weighted<TokenPair>> and(acceptEvents,
+				compose(not(in(entryBlacklist)), eventEntryId()),
+				compose(not(in(featureBlacklist)), eventFeatureId())));
 	}
 
 	public FilterCommand(File inputEventsFile, File inputEntriesFile,
 			File inputFeaturesFile, File outputEventsFile,
 			File outputEntriesFile, File outputFeaturesFile, Charset charset) {
+		this();
 		setCharset(charset);
 		setInputFeaturesFile(inputFeaturesFile);
 		setInputEventsFile(inputEventsFile);
@@ -277,8 +287,6 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 		while (entryFilterRequired || eventFilterRequired
 				|| featureFilterRequired) {
 
-			// if (entryFilterRequired || eventFilterRequired) {
-
 			progress.setMessage("Running filtering pass (#" + (++passCount)
 					+ ").");
 
@@ -311,21 +319,6 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 								+ (eventFilterRequired ? 1 : 0) + (featureFilterRequired ? 1
 									: 0)));
 			}
-			// }
-			//
-			// if (featureFilterRequired || eventFilterRequired) {
-			//
-			// progress.setMessage("Running backwards filtering pass (#" +
-			// (++passCount) + ").");
-			//
-			// if (featureFilterRequired) {
-			// filterFeatures();
-			// ++opCount;
-			// progress.setProgressPercent(100 * opCount / (opCount
-			// + (entryFilterRequired ? 1 : 0)
-			// + (eventFilterRequired ? 1 : 0)
-			// + (featureFilterRequired ? 1 : 0)));
-			// }
 
 			if (eventFilterRequired) {
 				filterEvents();
@@ -346,20 +339,13 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 								+ (eventFilterRequired ? 1 : 0) + (featureFilterRequired ? 1
 									: 0)));
 			}
-			// }
 		}
 
 		// Finished filtering so copy the results files to the outputs.
 
 		progress.setMessage("Copying final entries file.");
 
-		outputEntriesFile.delete();
-		if (!activeEntriesFile.renameTo(outputEntriesFile)) {
-			com.google.common.io.Files.copy(activeEntriesFile,
-					outputEntriesFile);
-			if (!activeEntriesFile.equals(inputEntriesFile))
-				activeEntriesFile.delete();
-		}
+		finaliseFile(inputEntriesFile, activeEntriesFile, outputEntriesFile);
 		++opCount;
 
 		progress.startAdjusting();
@@ -371,12 +357,7 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 		progress.setMessage("Copying finaly events file.");
 		progress.endAdjusting();
 
-		outputEventsFile.delete();
-		if (!activeEventsFile.renameTo(outputEventsFile)) {
-			com.google.common.io.Files.copy(activeEventsFile, outputEventsFile);
-			if (!activeEventsFile.equals(inputEventsFile))
-				activeEventsFile.delete();
-		}
+		finaliseFile(inputEventsFile, activeEventsFile, outputEventsFile);
 		++opCount;
 
 		progress.startAdjusting();
@@ -388,13 +369,8 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 		progress.setMessage("Copying final features file.");
 		progress.endAdjusting();
 
-		outputFeaturesFile.delete();
-		if (!activeFeaturesFile.renameTo(outputFeaturesFile)) {
-			com.google.common.io.Files.copy(activeFeaturesFile,
-					outputFeaturesFile);
-			if (!activeFeaturesFile.equals(inputFeaturesFile))
-				activeFeaturesFile.delete();
-		}
+		finaliseFile(inputFeaturesFile, activeFeaturesFile, outputFeaturesFile);
+
 		++opCount;
 		progress.setProgressPercent(100
 				* opCount
@@ -408,6 +384,40 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 		}
 
 		progress.setState(State.COMPLETED);
+	}
+
+	private static void finaliseFile(File inputFile, File activeFile,
+			File outputFile) throws IOException {
+		assert inputFile != null : "inputFile is null";
+		assert activeFile != null : "activeFile is null";
+		assert outputFile != null : "outputFile is null";
+		assert inputFile.exists() : "inputFile does not exist";
+		assert activeFile.exists() : "activeFile does not exist";
+
+		// Output file can't just be written over because we are going to try
+		// and rename to it, so delete it first if it exists.
+		if (outputFile.exists() && !outputFile.delete())
+			throw new IOException("Failed to delete output entries file: "
+					+ outputFile);
+
+		assert !outputFile.exists() : "outputFile already exists";
+
+		// Move the active to the output file. First try renaming which is much
+		// faster but only works if both are on the same file system. Otherwise
+		// fall back to a copy then delete.
+		if (activeFile.equals(inputFile)) {
+			com.google.common.io.Files.copy(inputFile, outputFile);
+		} else if (!activeFile.renameTo(outputFile)) {
+			com.google.common.io.Files.copy(activeFile, outputFile);
+			if (!activeFile.equals(inputFile)) {
+				if (activeFile.delete())
+					throw new IOException("Failed to delete active file: "
+							+ activeFile);
+			}
+		}
+
+		assert inputFile.exists() : "inputFile does not exist";
+		assert outputFile.exists() : "outputFile does not exist";
 	}
 
 	// Read the entries file, passing it thought the filter. accepted entries
@@ -440,7 +450,7 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 
 			if (record.record().id() == filteredEntry) {
 				filteredWeight += record.weight();
-			} else if (acceptEntry.apply(record)) {
+			} else if (acceptEntries.apply(record)) {
 				entriesSink.write(record);
 				++outCount;
 			} else {
@@ -475,8 +485,7 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 		// Update the feature acceptance predicate
 		if (rejected.size() > 0) {
 			eventFilterRequired = true;
-			acceptEvent = Predicates2.and(acceptEvent, Predicates2.compose(
-					Predicates2.not(Predicates2.in(rejected)), eventEntryId()));
+			entryBlacklist.addAll(rejected);
 		}
 
 	}
@@ -486,13 +495,20 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 	// only appear in filtered entries to filter the featuress file.
 	private void filterEvents() throws FileNotFoundException, IOException {
 
-		IntSet acceptedEntries = newIntSet();
-		IntSet rejectedEntries = newIntSet();
+		// We wish to know which entries where *always* rejected, but this
+		// information is not available locally because we are streaming the
+		// events. To solve this we keep track of entries that where ever
+		// accepted and ever rejected from the pass. At then end, those entries
+		// that where *only* ever rejected are *always* reject, so should be
+		// removed from the entries file.
+		final IntSet acceptedEntries = newIntSet();
+		final IntSet rejectedEntries = newIntSet();
 
-		IntSet rejectedFeatures = newIntSet();
-		IntSet acceptedFeatures = newIntSet();
+		// Ditto previous comment about entry rejection
+		final IntSet rejectedFeatures = newIntSet();
+		final IntSet acceptedFeatures = newIntSet();
 
-		WeightedTokenPairSource efSrc = BybloIO.openEventsSource(
+		final WeightedTokenPairSource efSrc = BybloIO.openEventsSource(
 				activeEventsFile, getCharset(), indexDeligate);
 
 		File outputFile = tempFiles.createFile();
@@ -551,7 +567,7 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 
 				currentEntryFilteredFeatureWeight += record.weight();
 
-			} else if (acceptEvent.apply(record)) {
+			} else if (acceptEvents.apply(record)) {
 
 				efSink.write(record);
 				++writeCount;
@@ -606,20 +622,14 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 		rejectedEntries.removeAll(acceptedEntries);
 
 		if (rejectedEntries.size() > 0) {
-			acceptEntry = Predicates2.and(acceptEntry, Predicates2.compose(
-					Predicates2.not(Predicates2.in(rejectedEntries)), id()));
+			entryBlacklist.addAll(rejectedEntries);
 			entryFilterRequired = true;
 		}
 
 		if (rejectedFeatures.size() > 0) {
-			acceptFeature = Predicates2.and(
-					acceptFeature,
-					Predicates2.not(Predicates2.compose(
-							Predicates2.in(rejectedFeatures), id())));
+			featureBlacklist.addAll(rejectedFeatures);
 			featureFilterRequired = true;
-
 		}
-
 	}
 
 	// Filter the AllPairsTask file, rejecting all entries that where found to
@@ -651,7 +661,7 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 
 			if (feature.record().id() == filteredId) {
 				filteredWeight += feature.weight();
-			} else if (acceptFeature.apply(feature)) {
+			} else if (acceptFeatures.apply(feature)) {
 				featureSink.write(feature);
 				++outCount;
 			} else {
@@ -684,12 +694,8 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 
 		// Update the feature acceptance predicate
 		if (rejectedFeatures.size() > 0) {
-
 			eventFilterRequired = true;
-			acceptEvent = Predicates2.and(acceptEvent, Predicates2.compose(
-					Predicates2.not(Predicates2.in(rejectedFeatures)),
-					eventFeatureId()));
-
+			featureBlacklist.addAll(rejectedFeatures);
 		}
 	}
 
@@ -742,12 +748,12 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 	}
 
 	public Predicate<Weighted<Token>> getAcceptFeatures() {
-		return acceptFeature;
+		return acceptFeatures;
 	}
 
 	public void setAcceptFeatures(Predicate<Weighted<Token>> acceptFeature) {
-		if (!acceptFeature.equals(this.acceptFeature)) {
-			this.acceptFeature = acceptFeature;
+		if (!acceptFeature.equals(this.acceptFeatures)) {
+			this.acceptFeatures = acceptFeature;
 			featureFilterRequired = true;
 		}
 	}
@@ -790,20 +796,16 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 	public void addFeaturesBlacklist(List<String> strings) throws IOException {
 		IntSet featureIdSet = toEnumeratedIntSet(strings, getIndexDeligate()
 				.getFeatureEnumerator());
-		setAcceptFeatures(Predicates2.<Weighted<Token>> and(
-				getAcceptFeatures(),
-				Predicates2.compose(
-						Predicates2.not(Predicates2.in(featureIdSet)), id())));
-
+		featureBlacklist.addAll(featureIdSet);
 	}
 
 	public Predicate<Weighted<TokenPair>> getAcceptEvent() {
-		return acceptEvent;
+		return acceptEvents;
 	}
 
 	public void setAcceptEvent(Predicate<Weighted<TokenPair>> acceptFeature) {
-		if (!acceptFeature.equals(this.acceptEvent)) {
-			this.acceptEvent = acceptFeature;
+		if (!acceptFeature.equals(this.acceptEvents)) {
+			this.acceptEvents = acceptFeature;
 			eventFilterRequired = true;
 		}
 	}
@@ -829,40 +831,40 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 						this.<TokenPair> weight())));
 	}
 
-	public Predicate<Weighted<Token>> getAcceptEntry() {
-		return acceptEntry;
+	public Predicate<Weighted<Token>> getAcceptEntries() {
+		return acceptEntries;
 	}
 
-	public void setAcceptEntry(Predicate<Weighted<Token>> acceptEntry) {
-		if (!acceptEntry.equals(this.acceptEntry)) {
-			this.acceptEntry = acceptEntry;
+	public void setAcceptEntries(Predicate<Weighted<Token>> acceptEntry) {
+		if (!acceptEntry.equals(this.acceptEntries)) {
+			this.acceptEntries = acceptEntry;
 			entryFilterRequired = true;
 		}
 	}
 
 	public void addEntryMinimumFrequency(double threshold) {
-		setAcceptEntry(Predicates2.<Weighted<Token>> and(
-				getAcceptEntry(),
+		setAcceptEntries(Predicates2.<Weighted<Token>> and(
+				getAcceptEntries(),
 				Predicates2.compose(Predicates2.gte(threshold),
 						this.<Token> weight())));
 	}
 
 	public void addEntryMaximumFrequency(double threshold) {
-		setAcceptEntry(Predicates2.<Weighted<Token>> and(
-				getAcceptEntry(),
+		setAcceptEntries(Predicates2.<Weighted<Token>> and(
+				getAcceptEntries(),
 				Predicates2.compose(Predicates2.lte(threshold),
 						this.<Token> weight())));
 	}
 
 	public void addEntryFrequencyRange(double min, double max) {
-		setAcceptEntry(Predicates2.<Weighted<Token>> and(
-				getAcceptEntry(),
+		setAcceptEntries(Predicates2.<Weighted<Token>> and(
+				getAcceptEntries(),
 				Predicates2.compose(Predicates2.inRange(min, max),
 						this.<Token> weight())));
 	}
 
 	public void addEntryPattern(String pattern) {
-		setAcceptEntry(Predicates2.<Weighted<Token>> and(getAcceptEntry(),
+		setAcceptEntries(Predicates2.<Weighted<Token>> and(getAcceptEntries(),
 				Predicates2.compose(Predicates2.containsPattern(pattern),
 						entryString())));
 	}
@@ -870,7 +872,7 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 	public void addEntryWhitelist(List<String> strings) throws IOException {
 		IntSet entryIdSet = toEnumeratedIntSet(strings, getIndexDeligate()
 				.getEntryEnumerator());
-		setAcceptEntry(Predicates2.<Weighted<Token>> and(getAcceptEntry(),
+		setAcceptEntries(Predicates2.<Weighted<Token>> and(getAcceptEntries(),
 				Predicates2.compose(Predicates2.in(entryIdSet), id())));
 
 	}
@@ -878,9 +880,7 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 	public void addEntryBlacklist(List<String> strings) throws IOException {
 		IntSet entryIdSet = toEnumeratedIntSet(strings, getIndexDeligate()
 				.getEntryEnumerator());
-		setAcceptEntry(Predicates2.<Weighted<Token>> and(getAcceptEntry(),
-				Predicates2.compose(
-						Predicates2.not(Predicates2.in(entryIdSet)), id())));
+		entryBlacklist.addAll(entryIdSet);
 	}
 
 	/**
@@ -907,9 +907,7 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 	 * @return
 	 */
 	static IntSet newIntSet() {
-//		return new IntOpenHashSet();
-//		 return new IntAVLTreeSet();
-		return new IntRBTreeSet();
+		return new IntBitSet();
 	}
 
 	/**
@@ -1313,9 +1311,9 @@ public class FilterCommand extends AbstractCommand implements Serializable,
 				.add("featureMinFreq", filterFeatureMinFreq)
 				.add("featureWhitelist", filterFeatureWhitelist)
 				.add("featurePattern", filterFeaturePattern)
-				.add("tmp", tempFiles).add("acceptEntry", acceptEntry)
-				.add("acceptFeature", acceptFeature)
-				.add("acceptEvent", acceptEvent);
+				.add("tmp", tempFiles).add("acceptEntry", acceptEntries)
+				.add("acceptFeature", acceptFeatures)
+				.add("acceptEvent", acceptEvents);
 	}
 
 }

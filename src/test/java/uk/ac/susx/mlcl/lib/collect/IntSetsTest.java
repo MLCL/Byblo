@@ -45,10 +45,10 @@ import java.lang.reflect.InvocationTargetException;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import uk.ac.susx.mlcl.AbstractTest;
 import uk.ac.susx.mlcl.lib.MemoryUsage;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.UniformIntGenerator;
+import uk.ac.susx.mlcl.testing.AbstractTest;
 
 import com.google.common.base.Stopwatch;
 

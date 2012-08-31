@@ -48,7 +48,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import uk.ac.susx.mlcl.SlowTestCategory;
+import uk.ac.susx.mlcl.testing.SlowTestCategory;
 
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;

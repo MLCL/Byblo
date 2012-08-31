@@ -30,12 +30,21 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import static org.junit.Assert.assertTrue;
+import static uk.ac.susx.mlcl.TestConstants.DEFAULT_CHARSET;
+import static uk.ac.susx.mlcl.TestConstants.FRUIT_NAME;
+import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_SIMS;
+import static uk.ac.susx.mlcl.TestConstants.TEST_OUTPUT_DIR;
+import static uk.ac.susx.mlcl.TestConstants.TEST_TMP_DIR;
+
 import java.io.File;
-import static org.junit.Assert.*;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import uk.ac.susx.mlcl.TestConstants;
-import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.Tools;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
@@ -46,75 +55,96 @@ import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import uk.ac.susx.mlcl.lib.test.ExitTrapper;
 
 /**
- *
+ * 
  * @author Hamish Morgan &ly;hamish.morgan@sussex.ac.uk&gt;
  */
-public class ExternalSimsKnnCommandTest {
+public class ExternalSimsKnnCommandTest extends
+		AbstractCommandTest<ExternalKnnSimsCommand> {
 
-    private static final String subject = ExternalKnnSimsCommand.class.getName();
+	@Override
+	public Class<? extends ExternalKnnSimsCommand> getImplementation() {
+		return ExternalKnnSimsCommand.class;
+	}
 
-    @Test
-    public void testRunOnFruit() throws Exception {
-        System.out.println("Testing " + subject + " on " + TEST_FRUIT_SIMS);
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+	}
 
-        final File in = TEST_FRUIT_SIMS;
-        final File out = new File(TEST_OUTPUT_DIR,
-                                  FRUIT_NAME + ".neighs");
+	@Override
+	@After
+	public void tearDown() throws Exception {
+		super.tearDown();
+	}
 
-        assertTrue(in.exists());
-        assertTrue(in.length() > 0);
+	private static final String subject = ExternalKnnSimsCommand.class
+			.getName();
 
-        final ExternalKnnSimsCommand knnCmd = new ExternalKnnSimsCommand();
+	@Test
+	public void testRunOnFruit() throws Exception {
+		System.out.println("Testing " + subject + " on " + TEST_FRUIT_SIMS);
 
-        knnCmd.getFileDeligate().setSourceFile(in);
-        knnCmd.getFileDeligate().setDestinationFile(out);
-        knnCmd.getFileDeligate().setCharset(DEFAULT_CHARSET);
+		final File in = TEST_FRUIT_SIMS;
+		final File out = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".neighs");
 
-        knnCmd.setIndexDeligate(new DoubleEnumeratingDeligate(
-                Enumerating.DEFAULT_TYPE, false, false, null, null));
+		assertTrue(in.exists());
+		assertTrue(in.length() > 0);
 
-        knnCmd.setMaxChunkSize(100000);
-        knnCmd.setClassComparator(Weighted.recordOrder(TokenPair.firstIndexOrder()));
-        knnCmd.setNearnessComparator(Comparators.reverse(Weighted.<TokenPair>weightOrder()));
-        knnCmd.setK(100);
+		final ExternalKnnSimsCommand knnCmd = new ExternalKnnSimsCommand();
 
-        knnCmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
+		knnCmd.getFileDeligate().setSourceFile(in);
+		knnCmd.getFileDeligate().setDestinationFile(out);
+		knnCmd.getFileDeligate().setCharset(DEFAULT_CHARSET);
 
-        knnCmd.runCommand();
+		knnCmd.setIndexDeligate(new DoubleEnumeratingDeligate(
+				Enumerating.DEFAULT_TYPE, false, false, null, null));
 
+		knnCmd.setMaxChunkSize(100000);
+		knnCmd.setClassComparator(Weighted.recordOrder(TokenPair
+				.firstIndexOrder()));
+		knnCmd.setNearnessComparator(Comparators.reverse(Weighted
+				.<TokenPair> weightOrder()));
+		knnCmd.setK(100);
 
-        assertTrue("Output files not created.", out.exists());
-        assertTrue("Empty output file found.", out.length() > 0);
-    }
+		knnCmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
 
-    @Test
-    public void testExitStatus() throws Exception {
-        try {
-            ExitTrapper.enableExistTrapping();
-            Tools.main(new String[]{"knn"});
-        } catch (ExitTrapper.ExitException ex) {
-            assertTrue("Expecting non-zero exit status.", ex.getStatus() != 0);
-        } finally {
-            ExitTrapper.disableExitTrapping();
-        }
-    }
+		knnCmd.runCommand();
 
-    @Test
-    @Ignore
-    public void testEmptyInputFile() throws Exception {
-        try {
-            File in = new File(TestConstants.TEST_OUTPUT_DIR, "extknn-test-empty.in");
-            in.createNewFile();
-            File out = new File(TestConstants.TEST_OUTPUT_DIR, "extknn-test-empty.out");
+		assertTrue("Output files not created.", out.exists());
+		assertTrue("Empty output file found.", out.length() > 0);
+	}
 
-            ExitTrapper.enableExistTrapping();
-            Tools.main(new String[]{"knn", "-i", in.toString(),
-                        "-o", out.toString()});
-        } catch (ExitTrapper.ExitException ex) {
-            assertTrue("Expecting non-zero exit status.", ex.getStatus() == 0);
-        } finally {
-            ExitTrapper.disableExitTrapping();
-        }
-    }
+	@Test
+	public void testExitStatus() throws Exception {
+		try {
+			ExitTrapper.enableExistTrapping();
+			Tools.main(new String[] { "knn" });
+		} catch (ExitTrapper.ExitException ex) {
+			assertTrue("Expecting non-zero exit status.", ex.getStatus() != 0);
+		} finally {
+			ExitTrapper.disableExitTrapping();
+		}
+	}
+
+	@Test
+	@Ignore
+	public void testEmptyInputFile() throws Exception {
+		try {
+			File in = new File(TestConstants.TEST_OUTPUT_DIR,
+					"extknn-test-empty.in");
+			in.createNewFile();
+			File out = new File(TestConstants.TEST_OUTPUT_DIR,
+					"extknn-test-empty.out");
+
+			ExitTrapper.enableExistTrapping();
+			Tools.main(new String[] { "knn", "-i", in.toString(), "-o",
+					out.toString() });
+		} catch (ExitTrapper.ExitException ex) {
+			assertTrue("Expecting non-zero exit status.", ex.getStatus() == 0);
+		} finally {
+			ExitTrapper.disableExitTrapping();
+		}
+	}
 
 }

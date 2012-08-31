@@ -47,6 +47,7 @@ import static uk.ac.susx.mlcl.TestConstants.assertValidPlaintextInputFiles;
 import static uk.ac.susx.mlcl.TestConstants.deleteIfExist;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.disableExitTrapping;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.enableExistTrapping;
+import it.unimi.dsi.fastutil.ints.IntIterator;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,8 +55,8 @@ import java.nio.charset.Charset;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import uk.ac.susx.mlcl.TestConstants;
 import uk.ac.susx.mlcl.byblo.Tools;
@@ -67,8 +68,10 @@ import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSink;
+import uk.ac.susx.mlcl.lib.PoissonDistribution;
+import uk.ac.susx.mlcl.lib.ZipfianIntGenerator;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
-import uk.ac.susx.mlcl.lib.test.ExitTrapper;
+import uk.ac.susx.mlcl.testing.SlowTestCategory;
 
 import com.google.common.io.Files;
 
@@ -76,7 +79,27 @@ import com.google.common.io.Files;
  * 
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class FilterCommandTest {
+public class FilterCommandTest extends AbstractCommandTest<FilterCommand> {
+
+	@Override
+	public Class<? extends FilterCommand> getImplementation() {
+		return FilterCommand.class;
+	}
+
+	@Override
+	@After
+	public void tearDown() throws Exception {
+		super.tearDown();
+	}
+
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+		OUTPUT_ENTRIES.delete();
+		OUTPUT_FEATURES.delete();
+		OUTPUT_ENTRY_FEATURES.delete();
+	}
 
 	private static final String SUBJECT = FilterCommand.class.getName();
 
@@ -89,17 +112,6 @@ public class FilterCommandTest {
 	private final static File OUTPUT_ENTRY_FEATURES = new File(TEST_OUTPUT_DIR,
 			TEST_FRUIT_EVENTS_FILTERED.getName());
 
-	@Before
-	public void setUp() {
-		OUTPUT_ENTRIES.delete();
-		OUTPUT_FEATURES.delete();
-		OUTPUT_ENTRY_FEATURES.delete();
-	}
-
-	@After
-	public void tearDown() {
-	}
-
 	private void runWithCLI(String[] runArgs) throws Exception {
 
 		String[] commonArgs = { "filter", "--charset", "UTF-8",
@@ -108,7 +120,8 @@ public class FilterCommandTest {
 				"--input-events", TEST_FRUIT_EVENTS.toString(),
 				"--output-entries", OUTPUT_ENTRIES.toString(),
 				"--output-features", OUTPUT_FEATURES.toString(),
-				"--output-events", OUTPUT_ENTRY_FEATURES.toString(), };
+				"--output-events", OUTPUT_ENTRY_FEATURES.toString(),
+				"--temp-dir", TEST_TMP_DIR.toString() };
 
 		String[] args = new String[commonArgs.length + runArgs.length];
 		System.arraycopy(commonArgs, 0, args, 0, commonArgs.length);
@@ -229,19 +242,8 @@ public class FilterCommandTest {
 	}
 
 	@Test
-	public void testExitStatus() throws Exception {
-		try {
-			ExitTrapper.enableExistTrapping();
-			Tools.main(new String[] { "filter" });
-		} catch (ExitTrapper.ExitException ex) {
-			assertTrue("Expecting non-zero exit status.", ex.getStatus() != 0);
-		} finally {
-			ExitTrapper.disableExitTrapping();
-		}
-	}
-
-	@Test
-//	@Ignore(value = "Takes a rather a long time.")
+	// @Ignore(value = "Takes a rather a long time.")
+	@Category(SlowTestCategory.class)
 	public void testFilterCommandOnWorstCaseData() throws Exception {
 		System.out.println("testFilterCommandOnWorstCaseData()");
 
@@ -287,8 +289,67 @@ public class FilterCommandTest {
 		filter.setOutputEntriesFile(outEntries);
 		filter.setOutputFeaturesFile(outFeatures);
 		filter.setOutputEventsFile(outEvents);
-		
+
 		filter.setFilterEntryMinFreq(2);
+
+		filter.addProgressListener(new TestConstants.InfoProgressListener());
+		filter.runCommand();
+
+		assertValidPlaintextInputFiles(outEntries, outFeatures, outEvents);
+	}
+
+	@Test
+	// @Ignore(value = "Takes a rather a long time.")
+	@Category(SlowTestCategory.class)
+	public void testFilterCommandOnWorstCaseData2() throws Exception {
+		System.out.println("testFilterCommandOnWorstCaseData()");
+
+		// worst case is that you never see an entry of feature twice
+		final int nEntries = 1 << 12;
+		final int nFeaturesPerEntry = 1 << 12;
+
+		final String inFileNamePrefix = String.format(
+				"testFilterCommandOnWorstCase2Data-%dx%d", nEntries,
+				nFeaturesPerEntry);
+		final File inEvents = new File(TEST_OUTPUT_DIR, inFileNamePrefix
+				+ "-events");
+		final File inEntries = new File(TEST_OUTPUT_DIR, inFileNamePrefix
+				+ "-entries");
+		final File inFeatures = new File(TEST_OUTPUT_DIR, inFileNamePrefix
+				+ "-features");
+
+		// Create the test data if necessary
+		if (!inEvents.exists()) {
+			generateEventsData(inEntries, inFeatures, inEvents, nEntries,
+					nFeaturesPerEntry);
+		}
+
+		final File outEvents = new File(TEST_OUTPUT_DIR, inEvents.getName()
+				+ "-filtered");
+		final File outEntries = new File(TEST_OUTPUT_DIR, inEntries.getName()
+				+ "-filtered");
+		final File outFeatures = new File(TEST_OUTPUT_DIR, inFeatures.getName()
+				+ "-filtered");
+
+		assertValidPlaintextInputFiles(inEvents, inEntries, inFeatures);
+		assertValidOutputFiles(outEvents, outEntries, outFeatures);
+		deleteIfExist(outEvents, outEntries, outFeatures);
+
+		final FilterCommand filter = new FilterCommand();
+		filter.setCharset(DEFAULT_CHARSET);
+		filter.setIndexDeligate(new DoubleEnumeratingDeligate(
+				Enumerating.DEFAULT_TYPE, true, true, null, null));
+		filter.setTempFiles(new TempFileFactory(TEST_TMP_DIR));
+		filter.setInputEntriesFile(inEntries);
+		filter.setInputFeaturesFile(inFeatures);
+		filter.setInputEventsFile(inEvents);
+		filter.setOutputEntriesFile(outEntries);
+		filter.setOutputFeaturesFile(outFeatures);
+		filter.setOutputEventsFile(outEvents);
+
+		filter.setFilterEntryMinFreq(2);
+		filter.setFilterEventMinFreq(2);
+		filter.setFilterFeatureMinFreq(2);
 
 		filter.addProgressListener(new TestConstants.InfoProgressListener());
 		filter.runCommand();
@@ -325,13 +386,15 @@ public class FilterCommandTest {
 			eventsSink = BybloIO.openEventsSink(eventsFile, DEFAULT_CHARSET,
 					ded);
 
-			for(int i = 0; i < nEvents; i++) {
+			for (int i = 0; i < nEvents; i++) {
 				entriesSink.write(new Weighted<Token>(new Token(i), 1));
 				featuresSink.write(new Weighted<Token>(new Token(i), 1));
-				eventsSink.write(new Weighted<TokenPair>(new TokenPair(i,i),1));
+				eventsSink
+						.write(new Weighted<TokenPair>(new TokenPair(i, i), 1));
 				if (i % 5000000 == 0 || i == nEvents - 1) {
-					System.out.printf("> generated %d of %d events (%.2f%% complete)%n",
-									i, nEvents, (100.0d * i) / nEvents);
+					System.out.printf(
+							"> generated %d of %d events (%.2f%% complete)%n",
+							i, nEvents, (100.0d * i) / nEvents);
 				}
 			}
 		} finally {
@@ -351,4 +414,71 @@ public class FilterCommandTest {
 
 		System.out.println("Generation completed.");
 	}
+
+	/**
+	 * Routine that creates a large amount of data, that should be the absolute
+	 * worst case for filtering stage of the pipeline.
+	 * 
+	 * @throws IOException
+	 */
+	public static void generateEventsData(final File entriesFile,
+			final File featuresFile, final File eventsFile, final int nEntries,
+			final int nFeatures) throws IOException {
+		assert nEntries < Integer.MAX_VALUE / nFeatures : "number of events must be less than max_integer";
+		final int nEvents = nEntries * nFeatures;
+
+		System.out.printf("Generating worst-case data for FilterCommand "
+				+ "(nEntries=%d, nFeaturesPerEntry=%d, nEvents=%d)...%n",
+				nEntries, nFeatures, nEvents);
+
+		IntIterator featureIdGenerator = new ZipfianIntGenerator();
+		IntIterator nFeatureGenerator = new PoissonDistribution(3).generator();
+
+		WeightedTokenSink entriesSink = null;
+		WeightedTokenSink featuresSink = null;
+		WeightedTokenPairSink eventsSink = null;
+		try {
+			final DoubleEnumeratingDeligate ded = new DoubleEnumeratingDeligate(
+					Enumerating.DEFAULT_TYPE, true, true, null, null);
+			entriesSink = BybloIO.openEntriesSink(entriesFile, DEFAULT_CHARSET,
+					ded);
+			featuresSink = BybloIO.openEntriesSink(featuresFile,
+					DEFAULT_CHARSET, ded);
+			eventsSink = BybloIO.openEventsSink(eventsFile, DEFAULT_CHARSET,
+					ded);
+
+			for (int i = 0; i < nEvents; i++) {
+				int j = featureIdGenerator.nextInt();
+				int freq = nFeatureGenerator.nextInt();
+				entriesSink.write(new Weighted<Token>(new Token(
+						(Integer.MAX_VALUE) - i), freq));
+				featuresSink.write(new Weighted<Token>(new Token(
+						(Integer.MAX_VALUE) - j), freq));
+				eventsSink.write(new Weighted<TokenPair>(new TokenPair(
+						(Integer.MAX_VALUE) - i, (Integer.MAX_VALUE - 1)
+								- j), freq));
+				if (i % 5000000 == 0 || i == nEvents - 1) {
+					System.out.printf(
+							"> generated %d of %d events (%.2f%% complete)%n",
+							i, nEvents, (100.0d * i) / nEvents);
+				}
+			}
+		} finally {
+			if (entriesSink != null) {
+				entriesSink.flush();
+				entriesSink.close();
+			}
+			if (featuresSink != null) {
+				featuresSink.flush();
+				featuresSink.close();
+			}
+			if (eventsSink != null) {
+				eventsSink.flush();
+				eventsSink.close();
+			}
+		}
+
+		System.out.println("Generation completed.");
+	}
+
 }

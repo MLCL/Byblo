@@ -1,4 +1,4 @@
-package uk.ac.susx.mlcl;
+package uk.ac.susx.mlcl.testing;
 
 /**
  * Marker interface denoting tests that are likely to take a long time. These

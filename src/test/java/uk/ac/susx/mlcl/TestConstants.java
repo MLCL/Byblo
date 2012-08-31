@@ -30,6 +30,11 @@
  */
 package uk.ac.susx.mlcl;
 
+import static java.text.MessageFormat.format;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,12 +42,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
-import static java.text.MessageFormat.*;
-
 import java.text.MessageFormat;
 import java.util.Random;
-import static org.junit.Assert.*;
-import static uk.ac.susx.mlcl.TestConstants.DEFAULT_CHARSET;
+
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
@@ -235,8 +237,8 @@ public class TestConstants {
 
     public static void assertSizeGT(File bigger, File smaller) throws IOException {
         assertValidPlaintextInputFiles(bigger, smaller);
-        assertTrue(
-                format("\"{0}\" is not smaller than \"{1}\"", smaller, bigger),
+		assertTrue(
+				format("\"{0}\" is not smaller than \"{1}\"", smaller, bigger),
                 bigger.length() > smaller.length());
     }
 

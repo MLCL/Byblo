@@ -30,18 +30,15 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
-import com.beust.jcommander.ParametersDelegate;
-import com.google.common.base.Objects;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.Comparator;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
@@ -60,6 +57,11 @@ import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.events.ReportingProgressListener;
 import uk.ac.susx.mlcl.lib.io.Files;
 
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
+import com.beust.jcommander.ParametersDelegate;
+import com.google.common.base.Objects;
+
 /**
  * <p>Read in a raw feature instances file, to produce three frequency files:
  * entries, features, and entry-feature pairs.</p>
@@ -68,7 +70,7 @@ import uk.ac.susx.mlcl.lib.io.Files;
  */
 @Parameters(commandDescription = "Read in a raw feature instances file, to produce three "
 + "frequency files: entries, contexts, and features.")
-public class CountCommand extends AbstractCommand implements Serializable {
+public class CountCommand extends AbstractCommand {
 
     private static final long serialVersionUID = 1L;
 

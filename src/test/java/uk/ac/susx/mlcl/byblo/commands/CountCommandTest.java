@@ -30,23 +30,50 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static uk.ac.susx.mlcl.TestConstants.DEFAULT_CHARSET;
+import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_INPUT;
+import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_INPUT_INDEXED;
+import static uk.ac.susx.mlcl.TestConstants.TEST_OUTPUT_DIR;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.disableExitTrapping;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.enableExistTrapping;
+
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import static org.junit.Assert.*;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import static uk.ac.susx.mlcl.TestConstants.*;
+
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
-import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class CountCommandTest {
+public class CountCommandTest extends AbstractCommandTest<CountCommand> {
+
+	@Override
+	public Class<? extends CountCommand> getImplementation() {
+		return CountCommand.class;
+	}
+
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+	}
+
+	@Override
+	@After
+	public void tearDown() throws Exception {
+		super.tearDown();
+	}
 
     private static final String subject = CountCommand.class.getName();
 
