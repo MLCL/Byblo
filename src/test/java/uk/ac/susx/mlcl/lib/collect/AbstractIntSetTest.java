@@ -41,77 +41,20 @@ import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntRBTreeSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import uk.ac.susx.mlcl.AbstractTest;
+import uk.ac.susx.mlcl.AbstractObjectTest;
 
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public abstract class AbstractIntSetTest<T extends IntSet> extends AbstractTest {
-
-	public T newInstance() {
-		try {
-			return getImplementation().newInstance();
-		} catch (InstantiationException e) {
-			throw new AssertionError(e);
-		} catch (IllegalAccessException e) {
-			throw new AssertionError(e);
-		}
-	}
-
-	public Constructor<? extends T> getConstructor(Class<?>... paramTypes) {
-		try {
-			return getImplementation().getConstructor(paramTypes);
-		} catch (NoSuchMethodException e) {
-			throw new AssertionError(e);
-		}
-	}
-
-	public T newInstance(Class<?>[] types, Object[] params) {
-		try {
-			return getConstructor(types).newInstance(params);
-		} catch (InstantiationException e) {
-			throw new AssertionError(e);
-		} catch (IllegalAccessException e) {
-			throw new AssertionError(e);
-		} catch (InvocationTargetException e) {
-			throw new AssertionError(e);
-		}
-	}
-
-	public T newInstance(Class<?> type, Object param) {
-		try {
-			return getConstructor(type).newInstance(param);
-		} catch (InstantiationException e) {
-			throw new AssertionError(e);
-		} catch (IllegalAccessException e) {
-			throw new AssertionError(e);
-		} catch (InvocationTargetException e) {
-			throw new AssertionError(e);
-		}
-	}
-
-	public T newInstance(IntCollection c) {
-		return newInstance(IntCollection.class, c);
-	}
-
-	public T newInstance(Collection<? extends Integer> c) {
-		return newInstance(Collection.class, c);
-	}
-
-	public T newInstance(int[] c) {
-		return newInstance(int[].class, c);
-	}
-
-	abstract Class<? extends T> getImplementation();
+public abstract class AbstractIntSetTest<T extends IntSet> extends
+		AbstractObjectTest<T> {
 
 	/**
 	 * Test the ctor that allows us to create from an integer array.
@@ -182,7 +125,6 @@ public abstract class AbstractIntSetTest<T extends IntSet> extends AbstractTest 
 
 	}
 
-
 	//
 	// ===============================================================
 	//
@@ -207,7 +149,6 @@ public abstract class AbstractIntSetTest<T extends IntSet> extends AbstractTest 
 		for (int element : elements)
 			assertTrue("failed to add " + element, set.add(element));
 	}
-
 
 	/**
 	 * Test the isEmpty method.
@@ -728,7 +669,6 @@ public abstract class AbstractIntSetTest<T extends IntSet> extends AbstractTest 
 		}
 	}
 
-
 	/**
 	 * Test the method that adds multiple elements to the set in one call.
 	 */
@@ -791,6 +731,5 @@ public abstract class AbstractIntSetTest<T extends IntSet> extends AbstractTest 
 		assertEquals(6, rs.size());
 
 	}
-
 
 }

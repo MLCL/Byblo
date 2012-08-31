@@ -44,11 +44,43 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Random;
 
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.rules.TestName;
+
 public class AbstractTest {
+	@Rule
+	public final TestName testName = new TestName();
+
+	// An irritating problem is that is that there is no way to insure that
+	// subclasses don't override setup and teardown methods, especially the
+	// static ones.
+
+	@Before
+	public void setUp() throws Exception {
+		System.out.println(MessageFormat.format("Running unit-test: {0}#{1}",
+				this.getClass().getName(), testName.getMethodName()));
+	}
+
+	@After
+	public void tearDown() throws Exception {
+	}
+
+	@BeforeClass
+	public static void setUpClass() throws Exception {
+	}
+
+	@AfterClass
+	public static void tearDownClass() throws Exception {
+	}
 
 	public static Random newRandom() {
 		// -1489608243
@@ -74,9 +106,11 @@ public class AbstractTest {
 
 	public static <T> T assertCloneWithSerialization(final T obj) {
 		try {
+
 			T copy = cloneWithSerialization(obj);
 			assertEquals(obj, copy);
 			return copy;
+
 		} catch (IOException e) {
 			throw new AssertionError(e);
 		} catch (ClassNotFoundException e) {

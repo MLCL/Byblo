@@ -4,7 +4,7 @@ package uk.ac.susx.mlcl;
  * Marker interface denoting tests that are likely to take a long time. These
  * can then be disabled in situations where testing shouldn't take too long, for
  * example when a user compiles the software.
- * 
+ * <p />
  * Tests can be disabled in a number of ways:
  * 
  * <ul>

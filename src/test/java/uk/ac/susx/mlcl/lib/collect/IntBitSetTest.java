@@ -30,6 +30,9 @@
  */
 package uk.ac.susx.mlcl.lib.collect;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -42,7 +45,7 @@ import uk.ac.susx.mlcl.lib.MiscUtil;
 public class IntBitSetTest extends AbstractIntSortedSetTest<IntBitSet> {
 
 	@Override
-	Class<? extends IntBitSet> getImplementation() {
+	public Class<? extends IntBitSet> getImplementation() {
 		return IntBitSet.class;
 	}
 
@@ -76,4 +79,123 @@ public class IntBitSetTest extends AbstractIntSortedSetTest<IntBitSet> {
 
 	}
 
+	/**
+	 * Test the method that adds multiple elements to the set in one call.
+	 */
+	@Test
+	public void testAddAll_IntBitSet() throws InstantiationException,
+			IllegalAccessException {
+
+		final IntBitSet instance = newInstance();
+
+		IntBitSet other1 = newInstance();
+		other1.addAll(5, 6, 7, 9, 10, 12);
+		assertTrue(instance.addAll(other1));
+		assertContainsAllOf(instance, 5, 6, 7, 9, 10, 12);
+		assertEquals(6, instance.size());
+
+		// Add some into the existing set.
+		IntBitSet other2 = newInstance();
+		other2.addAll(2, 3, 8, 14, 15);
+		assertTrue(instance.addAll(other2));
+		assertContainsAllOf(instance, 2, 3, 5, 6, 7, 8, 9, 10, 12, 14, 15);
+		assertEquals(11, instance.size());
+
+		// Add everything again
+		Assert.assertFalse(instance.addAll(other1));
+		Assert.assertFalse(instance.addAll(other2));
+		assertContainsAllOf(instance, 2, 3, 5, 6, 7, 8, 9, 10, 12, 14, 15);
+		assertEquals(11, instance.size());
+
+	}
+
+	/**
+	 * Test the method that adds multiple elements to the set in one call.
+	 */
+	@Test
+	public void testRemoveAll_IntBitSet() throws InstantiationException,
+			IllegalAccessException {
+
+		final IntBitSet instance = newInstance();
+		instance.addAll(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+
+		IntBitSet other1 = newInstance();
+		other1.addAll(5, 6, 7, 9, 10, 12);
+		assertTrue(instance.removeAll(other1));
+		assertContainsNoneOf(instance, 0, 5, 6, 7, 9, 10, 12, 16);
+		assertContainsAllOf(instance, 1, 2, 3, 4, 8, 11, 13, 14, 15);
+		assertEquals(9, instance.size());
+
+		IntBitSet other2 = newInstance();
+		other2.addAll(2, 3, 8, 14, 15);
+		assertTrue(instance.removeAll(other2));
+		assertContainsNoneOf(instance, 0, 2, 3, 5, 6, 7, 8, 9, 10, 12, 14, 15,
+				16);
+		assertContainsAllOf(instance, 1, 4, 11, 13);
+		assertEquals(4, instance.size());
+
+		// Remove everything again
+		Assert.assertFalse(instance.removeAll(other1));
+		Assert.assertFalse(instance.removeAll(other2));
+		assertContainsNoneOf(instance, 0, 2, 3, 5, 6, 7, 8, 9, 10, 12, 14, 15,
+				16);
+		assertContainsAllOf(instance, 1, 4, 11, 13);
+		assertEquals(4, instance.size());
+
+	}
+
+	/**
+	 * Test the method that adds multiple elements to the set in one call.
+	 */
+	@Test
+	public void testRetainAll_IntBitSet() throws InstantiationException,
+			IllegalAccessException {
+
+		final IntBitSet instance = newInstance();
+		instance.addAll(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+
+		IntBitSet other1 = newInstance();
+		other1.addAll(5, 6, 7, 9, 10, 12);
+		assertTrue(instance.retainAll(other1));
+		assertContainsNoneOf(instance, 0, 1, 2, 3, 4, 8, 11, 13, 14, 15, 16);
+		assertContainsAllOf(instance, 5, 6, 7, 9, 10, 12);
+		assertEquals(6, instance.size());
+
+		IntBitSet other2 = newInstance();
+		other2.addAll(2, 3, 5, 8, 10, 14, 15);
+		assertTrue(instance.retainAll(other2));
+		assertContainsNoneOf(instance, 0, 1, 2, 3, 4, 8, 9, 11, 12, 13, 14, 15,
+				16);
+		assertContainsAllOf(instance, 5, 10);
+		assertEquals(2, instance.size());
+
+		// Retain everything again
+		Assert.assertFalse(instance.retainAll(other1));
+		Assert.assertFalse(instance.retainAll(other2));
+		assertContainsNoneOf(instance, 0, 1, 2, 3, 4, 8, 9, 11, 12, 13, 14, 15,
+				16);
+		assertContainsAllOf(instance, 5, 10);
+		assertEquals(2, instance.size());
+
+	}
+
+	/**
+	 * Test the method that adds multiple elements to the set in one call.
+	 */
+	@Test
+	public void testContainsAll_IntBitSet() throws InstantiationException,
+			IllegalAccessException {
+
+		final IntBitSet instance = newInstance();
+		instance.addAll(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15);
+
+		IntBitSet other1 = newInstance();
+		other1.addAll(5, 6, 7, 9, 10, 12);
+		assertTrue(instance.containsAll(other1));
+
+		IntBitSet other2 = newInstance();
+		other2.addAll(2, 3, 5, 8, 10, 14, 15, 16);
+		Assert.assertFalse(instance.containsAll(other2));
+
+	}
 }

@@ -217,6 +217,56 @@ public final class IntBitSet extends AbstractIntSortedSet implements
 		return bits.get(element);
 	}
 
+	/**
+	 * Check that the set contains every element of <code>array</code>.
+	 * 
+	 * @param array
+	 *            data to be checked
+	 * @return true if the set contains every element, false otherwise
+	 */
+	public boolean containsAll(int... array) {
+		for (int v : array) {
+			if (!contains(v))
+				return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Check that the set contains every element of <code>other</code>.
+	 * 
+	 * @param other
+	 *            bitset to be checked
+	 * @return true if the set contains every element, false otherwise
+	 */
+	public boolean containsAll(IntBitSet other) {
+		if (this.bits.length() < other.bits.length()
+				|| this.bits.nextSetBit(0) > other.bits.nextSetBit(0))
+			return false;
+
+		final BitSet otherBitsCopy = (BitSet) other.bits.clone();
+		otherBitsCopy.and(this.bits);
+		return other.bits.equals(otherBitsCopy);
+	}
+
+	@Override
+	public boolean containsAll(Collection<?> c) {
+		if (c.getClass() == IntBitSet.class) {
+			return containsAll((IntBitSet) c);
+		} else {
+			return super.containsAll(c);
+		}
+	}
+
+	@Override
+	public boolean containsAll(IntCollection c) {
+		if (c.getClass() == IntBitSet.class) {
+			return containsAll((IntBitSet) c);
+		} else {
+			return super.containsAll(c);
+		}
+	}
+
 	@Override
 	public boolean add(@Nonnegative final int element) {
 		assert element >= 0;
@@ -225,6 +275,37 @@ public final class IntBitSet extends AbstractIntSortedSet implements
 		} else {
 			bits.set(element);
 			return true;
+		}
+	}
+
+	/**
+	 * Add the contents of <code>other</code> to the set.
+	 * 
+	 * @param other
+	 *            bitset to be added
+	 * @return true if the set changed due to this operation, false otherwise
+	 */
+	public boolean addAll(IntBitSet other) {
+		final int cardinalityBefore = bits.cardinality();
+		this.bits.or(other.bits);
+		return cardinalityBefore != bits.cardinality();
+	}
+
+	@Override
+	public boolean addAll(IntCollection c) {
+		if (c.getClass() == IntBitSet.class) {
+			return addAll((IntBitSet) c);
+		} else {
+			return super.addAll(c);
+		}
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends Integer> c) {
+		if (c.getClass() == IntBitSet.class) {
+			return addAll((IntBitSet) c);
+		} else {
+			return super.addAll(c);
 		}
 	}
 
@@ -254,6 +335,28 @@ public final class IntBitSet extends AbstractIntSortedSet implements
 		}
 	}
 
+	@Override
+	public boolean removeAll(IntCollection c) {
+		if (c.getClass() == IntBitSet.class) {
+			final int cardinalityBefore = bits.cardinality();
+			bits.andNot(((IntBitSet) c).bits);
+			return cardinalityBefore != bits.cardinality();
+		} else {
+			return super.removeAll(c);
+		}
+	}
+
+	@Override
+	public boolean removeAll(Collection<?> c) {
+		if (c.getClass() == IntBitSet.class) {
+			final int cardinalityBefore = bits.cardinality();
+			bits.andNot(((IntBitSet) c).bits);
+			return cardinalityBefore != bits.cardinality();
+		} else {
+			return super.removeAll(c);
+		}
+	}
+
 	/**
 	 * Remove the contents of <code>array</code> from the set.
 	 * 
@@ -266,6 +369,50 @@ public final class IntBitSet extends AbstractIntSortedSet implements
 		boolean modified = false;
 		for (int element : array)
 			modified = remove(element) || modified;
+		return modified;
+	}
+
+	@Override
+	public boolean retainAll(Collection<?> c) {
+		if (c.getClass() == IntBitSet.class) {
+			final int cardinalityBefore = bits.cardinality();
+			bits.and(((IntBitSet) c).bits);
+			return cardinalityBefore != bits.cardinality();
+		} else {
+			return super.retainAll(c);
+		}
+	}
+
+	@Override
+	public boolean retainAll(IntCollection c) {
+		if (c.getClass() == IntBitSet.class) {
+			final int cardinalityBefore = bits.cardinality();
+			bits.and(((IntBitSet) c).bits);
+			return cardinalityBefore != bits.cardinality();
+		} else {
+			return super.retainAll(c);
+		}
+	}
+
+	/**
+	 * Remove all elements from the set that are not present in
+	 * <code>array</code>.
+	 * 
+	 * @param array
+	 *            data to be retained
+	 * @return true if the set changed due to this operation, false otherwise
+	 */
+	public boolean retainAll(int... array) {
+		assert array != null;
+		boolean modified = false;
+		int n = size();
+		final IntIterator it = iterator();
+		while (n-- != 0) {
+			if (!ArrayUtil.contains(array, it.nextInt())) {
+				it.remove();
+				modified = true;
+			}
+		}
 		return modified;
 	}
 
