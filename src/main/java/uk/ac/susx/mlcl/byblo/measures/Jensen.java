@@ -47,56 +47,64 @@ public class Jensen extends AbstractProximity {
 
     public Jensen() {
         if (LOG.isWarnEnabled())
-            LOG.warn("The JensenShannon proximity measure has been "
+            LOG.warn("The JensenShannon proximity measure has not been "
                     + "thoughoughly test and is likely to contain bugs.");
     }
 
-    @Override
+   @Override
     public double shared(SparseDoubleVector A, SparseDoubleVector B) {
-        double comp = 0;
+        double compA = 0;
+        double compB = 0;
 
         int i = 0, j = 0;
         while (i < A.size && j < B.size) {
             if (A.keys[i] < B.keys[j]) {
+                compA += (A.values[i] / A.sum) * LN2;
                 i++;
             } else if (A.keys[i] > B.keys[j]) {
+                compB += (B.values[j] / B.sum) * LN2;
                 j++;
             } else if (isFiltered(A.keys[i])) {
                 i++;
                 j++;
             } else {
-                final double pA = A.values[i] / A.sum;
-                final double pB = B.values[j] / B.sum;
-                final double pAv = Math.log(pA + pB) - LN2;
-                comp += pA * (2 * Math.log(pA) - pAv - LN2)
-                        + pB * (2 * Math.log(pB) - pAv - LN2);
+                final double pA = (A.values[i] / A.sum);
+                final double pB = (B.values[j] / B.sum);
+                final double pM = (pA + pB) / 2;
+                compA += pA * Math.log(pA/pM);
+                compB += pB * Math.log(pB/pM);
                 i++;
                 j++;
             }
         }
 
-        return comp;
+        while (i < A.size) {
+            compA += (A.values[i] / A.sum) * LN2;
+            i++;
+        }
+
+        while (j < B.size) {
+            compB += (B.values[j] / B.sum) * LN2;
+            j++;
+        }
+
+        return (compA + compB) / 2;
     }
 
     @Override
     public double left(SparseDoubleVector A) {
-        double comp = 0;
-        for (int i = 0; i < A.size; i++) {
-            final double pA = A.values[i] / A.sum;
-            comp += pA * (-((pA - 1) * Math.log(pA) - pA * LN2));
-        }
-        return comp;
+        return 0d;
     }
 
     @Override
     public double right(SparseDoubleVector B) {
-        return left(B);
+        return 0d;
     }
 
     @Override
     public double combine(double shared, double left, double right) {
         // Low values indicate similarity so invert the result
-        return 1d / (0.5 * (shared + left + right));
+        return 1d / shared;
     }
 
     @Override
