@@ -98,7 +98,7 @@ public class Jensen extends AbstractProximity {
     @Override
     public double combine(double shared, double left, double right) {
         // Low values indicate similarity so invert the result
-        return 1d / shared;
+        return 1 - shared;
     }
 
     @Override
