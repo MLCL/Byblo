@@ -68,11 +68,11 @@ public class Jensen extends AbstractProximity {
                 i++;
                 j++;
             } else {
-                final double pA = (A.values[i] / A.sum);
-                final double pB = (B.values[j] / B.sum);
-                final double pM = (pA + pB) / 2;
-                compA += pA * Math.log(pA/pM);
-                compB += pB * Math.log(pB/pM);
+                final double pA = A.values[i] / A.sum;
+                final double pB = B.values[j] / B.sum;
+                final double lpAvg = Math.log(pA + pB) - LN2;
+                compA += pA * (Math.log(pA) - lpAvg);
+                compB += pB * (Math.log(pB) - lpAvg);
                 i++;
                 j++;
             }
