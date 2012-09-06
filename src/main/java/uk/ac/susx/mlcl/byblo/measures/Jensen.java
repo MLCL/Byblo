@@ -41,14 +41,9 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  */
 public class Jensen extends AbstractProximity {
 
-    private static final Log LOG = LogFactory.getLog(Jensen.class);
-
     private static final double LN2 = Math.log(2);
 
     public Jensen() {
-        if (LOG.isWarnEnabled())
-            LOG.warn("The JensenShannon proximity measure has not been "
-                    + "thoughoughly test and is likely to contain bugs.");
     }
 
     @Override
