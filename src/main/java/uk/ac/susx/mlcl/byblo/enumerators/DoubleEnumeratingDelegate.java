@@ -40,8 +40,8 @@ import java.io.Serializable;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class DoubleEnumeratingDeligate
-        extends EnumeratingDeligate
+public final class DoubleEnumeratingDelegate
+        extends EnumeratingDelegate
         implements Serializable, DoubleEnumerating {
 
     private static final long serialVersionUID = 1L;
@@ -66,7 +66,7 @@ public final class DoubleEnumeratingDeligate
 
     private Enumerator<String> featureEnumerator = null;
 
-    protected DoubleEnumeratingDeligate(
+    protected DoubleEnumeratingDelegate(
             EnumeratorType type, boolean enumeratedEntries, boolean enumeratedFeatures,
             File entryIndexFile, File featureIndexFile,
             Enumerator<String> entryEnumerator, Enumerator<String> featureEnumerator) {
@@ -79,14 +79,14 @@ public final class DoubleEnumeratingDeligate
         this.featureEnumerator = featureEnumerator;
     }
 
-    public DoubleEnumeratingDeligate(
+    public DoubleEnumeratingDelegate(
             EnumeratorType type, boolean enumeratedEntries, boolean enumeratedFeatures,
             File entryIndexFile, File featureIndexFile) {
         this(type, enumeratedEntries, enumeratedFeatures, entryIndexFile, featureIndexFile,
              null, null);
     }
 
-    public DoubleEnumeratingDeligate() {
+    public DoubleEnumeratingDelegate() {
         this(DEFAULT_TYPE, DEFAULT_IS_ENUMERATED, DEFAULT_IS_ENUMERATED,
              null, null);
     }
@@ -222,12 +222,12 @@ public final class DoubleEnumeratingDeligate
 
     @Override
     public SingleEnumerating getEntriesEnumeratorCarriar() {
-        return EnumeratingDeligates.toSingleEntries(this);
+        return EnumeratingDelegates.toSingleEntries(this);
     }
 
     @Override
     public SingleEnumerating getFeaturesEnumeratorCarriar() {
-        return EnumeratingDeligates.toSingleFeatures(this);
+        return EnumeratingDelegates.toSingleFeatures(this);
     }
 
     @Override

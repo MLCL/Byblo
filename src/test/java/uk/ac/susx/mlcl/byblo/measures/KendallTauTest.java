@@ -60,8 +60,7 @@ public class KendallTauTest {
                         "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                        "--output", output.toString(),
-                        "--chunk-size", "5"
+                        "--output", output.toString()
                     });
         } finally {
             disableExitTrapping();

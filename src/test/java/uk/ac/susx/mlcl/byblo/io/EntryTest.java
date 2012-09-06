@@ -43,7 +43,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDelegate;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
@@ -57,7 +57,7 @@ public class EntryTest {
                        boolean enumOut)
             throws FileNotFoundException, IOException {
 
-        SingleEnumeratingDeligate idx = new SingleEnumeratingDeligate(
+        SingleEnumeratingDelegate idx = new SingleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, null);
 
         WeightedTokenSource aSrc;
@@ -106,9 +106,9 @@ public class EntryTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_ENTRIES.getName() + ".str");
 
-        SingleEnumeratingDeligate indel = new SingleEnumeratingDeligate(
+        SingleEnumeratingDelegate indel = new SingleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, null);
-        SingleEnumeratingDeligate outdel = new SingleEnumeratingDeligate(
+        SingleEnumeratingDelegate outdel = new SingleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, true, null);
 
 
@@ -144,7 +144,7 @@ public class EntryTest {
         final Map<Tell, Weighted<Token>> hist =
                 new HashMap<Tell, Weighted<Token>>();
 
-        SingleEnumeratingDeligate indel = new SingleEnumeratingDeligate(
+        SingleEnumeratingDelegate indel = new SingleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, null);
 
         WeightedTokenSource src = WeightedTokenSource.open(

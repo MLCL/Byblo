@@ -32,58 +32,47 @@ package uk.ac.susx.mlcl.lib.commands;
 
 import com.beust.jcommander.Parameter;
 import com.google.common.base.Objects;
-import java.io.File;
 import java.io.Serializable;
 import java.nio.charset.Charset;
+import uk.ac.susx.mlcl.lib.Checks;
+import uk.ac.susx.mlcl.lib.io.Files;
 
 /**
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class FilePipeDelegate extends FileDelegate implements Serializable {
+public class FileDelegate implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Parameter(names = {"-i", "--input"}, description = "Source file that will be read", validateWith = InputFileValidator.class, required = true)
-    private File sourceFile;
+    @Parameter(names = {"-c", "--charset"},
+    description = "The character set encoding to use for both reading input and writing output files.")
+    private Charset charset = Files.DEFAULT_CHARSET;
 
-    @Parameter(names = {"-o", "--output"}, description = "Destination file that will be writen to.", validateWith = OutputFileValidator.class, required = true)
-    private File destFile;
-
-    public FilePipeDelegate(File sourceFile, File destinationFile, Charset charset) {
-        super(charset);
-        setSourceFile(sourceFile);
-        setDestinationFile(destinationFile);
+    public FileDelegate(Charset charset) {
+        setCharset(charset);
     }
 
-    public FilePipeDelegate() {
+    public FileDelegate() {
     }
 
-    public final File getSourceFile() {
-        return sourceFile;
+    public final Charset getCharset() {
+        return charset;
     }
 
-    public final File getDestinationFile() {
-        return destFile;
+    public final void setCharset(Charset charset) {
+        Checks.checkNotNull(charset);
+        this.charset = charset;
     }
 
-    public final void setSourceFile(final File sourceFile) {
-        if (sourceFile == null)
-            throw new NullPointerException("sourceFile is null");
-        this.sourceFile = sourceFile;
-    }
-
-    public final void setDestinationFile(final File destFile) {
-        if (destFile == null)
-            throw new NullPointerException("destinationFile is null");
-        this.destFile = destFile;
+    protected Objects.ToStringHelper toStringHelper() {
+        return Objects.toStringHelper(this).
+                add("charset", getCharset());
     }
 
     @Override
-    protected Objects.ToStringHelper toStringHelper() {
-        return super.toStringHelper().
-                add("in", getSourceFile()).
-                add("out", getDestinationFile());
+    public final String toString() {
+        return toStringHelper().toString();
     }
 
 }

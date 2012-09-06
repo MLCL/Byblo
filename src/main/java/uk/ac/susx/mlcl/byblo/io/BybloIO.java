@@ -35,7 +35,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.byblo.BybloSettings;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDelegates;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 
 /**
@@ -89,14 +89,14 @@ public final class BybloIO {
     public static WeightedTokenSource openFeaturesSource(
             File file, Charset charset, DoubleEnumerating idx) throws IOException {
         return openFeaturesSource(file, charset,
-                                  EnumeratingDeligates.toSingleFeatures(idx));
+                                  EnumeratingDelegates.toSingleFeatures(idx));
     }
 
     public static WeightedTokenSink openFeaturesSink(
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
         return openFeaturesSink(file, charset,
-                                EnumeratingDeligates.toSingleFeatures(idx));
+                                EnumeratingDelegates.toSingleFeatures(idx));
     }
 
     public static WeightedTokenSource openEntriesSource(
@@ -119,13 +119,13 @@ public final class BybloIO {
 
     public static WeightedTokenSource openEntriesSource(
             File file, Charset charset, DoubleEnumerating idx) throws IOException {
-        return openEntriesSource(file, charset, EnumeratingDeligates.toSingleEntries(idx));
+        return openEntriesSource(file, charset, EnumeratingDelegates.toSingleEntries(idx));
     }
 
     public static WeightedTokenSink openEntriesSink(
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
-        return openEntriesSink(file, charset, EnumeratingDeligates.toSingleEntries(idx));
+        return openEntriesSink(file, charset, EnumeratingDelegates.toSingleEntries(idx));
     }
 
     public static FastWeightedTokenPairVectorSource openEventsVectorSource(
@@ -171,7 +171,7 @@ public final class BybloIO {
             File file, Charset charset, SingleEnumerating idx)
             throws IOException {
         return WeightedTokenPairSource.open(
-                file, charset, EnumeratingDeligates.toPair(idx),
+                file, charset, EnumeratingDelegates.toPair(idx),
                 BybloSettings.getInstance().isSimsSkipIndexColumn1Enabled(),
                 BybloSettings.getInstance().isSimsSkipIndexColumn2Enabled());
     }
@@ -180,7 +180,7 @@ public final class BybloIO {
             File file, Charset charset, SingleEnumerating idx)
             throws IOException {
         return WeightedTokenPairSink.open(
-                file, charset, EnumeratingDeligates.toPair(idx),
+                file, charset, EnumeratingDelegates.toPair(idx),
                 BybloSettings.getInstance().isSimsSkipIndexColumn1Enabled(),
                 BybloSettings.getInstance().isSimsSkipIndexColumn2Enabled(),
                 BybloSettings.getInstance().isSimsCompactEnabled());
@@ -189,20 +189,20 @@ public final class BybloIO {
     public static WeightedTokenPairSource openSimsSource(
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
-        return openSimsSource(file, charset, EnumeratingDeligates.toSingleEntries(idx));
+        return openSimsSource(file, charset, EnumeratingDelegates.toSingleEntries(idx));
     }
 
     public static WeightedTokenPairSink openSimsSink(
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
-        return openSimsSink(file, charset, EnumeratingDeligates.toSingleEntries(idx));
+        return openSimsSink(file, charset, EnumeratingDelegates.toSingleEntries(idx));
     }
 
     public static WeightedTokenPairSource openNeighboursSource(
             File file, Charset charset, SingleEnumerating idx)
             throws IOException {
         return WeightedTokenPairSource.open(
-                file, charset, EnumeratingDeligates.toPair(idx),
+                file, charset, EnumeratingDelegates.toPair(idx),
                 BybloSettings.getInstance().isNeighboursSkipIndexColumn1Enabled(),
                 BybloSettings.getInstance().isNeighboursSkipIndexColumn2Enabled());
     }
@@ -211,7 +211,7 @@ public final class BybloIO {
             File file, Charset charset, SingleEnumerating idx)
             throws IOException {
         return WeightedTokenPairSink.open(
-                file, charset, EnumeratingDeligates.toPair(idx),
+                file, charset, EnumeratingDelegates.toPair(idx),
                 BybloSettings.getInstance().isNeighboursSkipIndexColumn1Enabled(),
                 BybloSettings.getInstance().isNeighboursSkipIndexColumn2Enabled(),
                 BybloSettings.getInstance().isNeighboursCompactEnabled());
@@ -221,14 +221,14 @@ public final class BybloIO {
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
         return openNeighboursSource(file, charset,
-                                    EnumeratingDeligates.toSingleEntries(idx));
+                                    EnumeratingDelegates.toSingleEntries(idx));
     }
 
     public static WeightedTokenPairSink openNeighboursSink(
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
         return openNeighboursSink(file, charset,
-                                  EnumeratingDeligates.toSingleEntries(idx));
+                                  EnumeratingDelegates.toSingleEntries(idx));
     }
 
 }

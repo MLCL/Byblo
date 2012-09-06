@@ -35,7 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.byblo.io.WeightSumReducerObjectSink;
@@ -54,7 +54,7 @@ public class ExternalSortEntriesCommand extends AbstractExternalSortCommand<Weig
     private static final long serialVersionUID = 1L;
 
     @ParametersDelegate
-    private SingleEnumerating indexDeligate = new SingleEnumeratingDeligate();
+    private SingleEnumerating indexDeligate = new SingleEnumeratingDelegate();
 
     public ExternalSortEntriesCommand(
             File sourceFile, File destinationFile, Charset charset,

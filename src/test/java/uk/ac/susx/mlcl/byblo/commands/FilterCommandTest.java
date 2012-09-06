@@ -38,7 +38,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import uk.ac.susx.mlcl.TestConstants;
 import uk.ac.susx.mlcl.byblo.Tools;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.PoissonDistribution;
@@ -259,7 +259,7 @@ public class FilterCommandTest extends AbstractCommandTest<FilterCommand> {
 
         final FilterCommand filter = new FilterCommand();
         filter.setCharset(DEFAULT_CHARSET);
-        filter.setIndexDeligate(new DoubleEnumeratingDeligate(
+        filter.setIndexDeligate(new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, true, true, null, null));
         filter.setTempFiles(new TempFileFactory(TEST_TMP_DIR));
         filter.setInputEntriesFile(inEntries);
@@ -316,7 +316,7 @@ public class FilterCommandTest extends AbstractCommandTest<FilterCommand> {
 
         final FilterCommand filter = new FilterCommand();
         filter.setCharset(DEFAULT_CHARSET);
-        filter.setIndexDeligate(new DoubleEnumeratingDeligate(
+        filter.setIndexDeligate(new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, true, true, null, null));
         filter.setTempFiles(new TempFileFactory(TEST_TMP_DIR));
         filter.setInputEntriesFile(inEntries);
@@ -356,7 +356,7 @@ public class FilterCommandTest extends AbstractCommandTest<FilterCommand> {
         WeightedTokenSink featuresSink = null;
         WeightedTokenPairSink eventsSink = null;
         try {
-            final DoubleEnumeratingDeligate ded = new DoubleEnumeratingDeligate(
+            final DoubleEnumeratingDelegate ded = new DoubleEnumeratingDelegate(
                     Enumerating.DEFAULT_TYPE, true, true, null, null);
             entriesSink = BybloIO.openEntriesSink(entriesFile, DEFAULT_CHARSET,
                     ded);
@@ -417,7 +417,7 @@ public class FilterCommandTest extends AbstractCommandTest<FilterCommand> {
         WeightedTokenSink featuresSink = null;
         WeightedTokenPairSink eventsSink = null;
         try {
-            final DoubleEnumeratingDeligate ded = new DoubleEnumeratingDeligate(
+            final DoubleEnumeratingDelegate ded = new DoubleEnumeratingDelegate(
                     Enumerating.DEFAULT_TYPE, true, true, null, null);
             entriesSink = BybloIO.openEntriesSink(entriesFile, DEFAULT_CHARSET,
                     ded);

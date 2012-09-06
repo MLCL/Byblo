@@ -42,7 +42,7 @@ import it.unimi.dsi.fastutil.ints.IntSortedSet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.io.*;
@@ -93,7 +93,7 @@ public class FilterCommand extends AbstractCommand implements
     public static final int FILTERED_ID = 0;
 
     @ParametersDelegate
-    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
+    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDelegate();
 
     private final ProgressDeligate progress = new ProgressDeligate(this, true);
     /*
@@ -128,7 +128,7 @@ public class FilterCommand extends AbstractCommand implements
     private File outputFeaturesFile;
 
     @ParametersDelegate
-    private final FileDeligate fileDeligate = new FileDeligate();
+    private final FileDelegate fileDelegate = new FileDelegate();
 
     /*
       * === FILTER PARAMATERISATION ===
@@ -1232,11 +1232,11 @@ public class FilterCommand extends AbstractCommand implements
     }
 
     public final void setCharset(Charset charset) {
-        fileDeligate.setCharset(charset);
+        fileDelegate.setCharset(charset);
     }
 
     public final Charset getCharset() {
-        return fileDeligate.getCharset();
+        return fileDelegate.getCharset();
     }
 
     public FileFactory getTempFiles() {

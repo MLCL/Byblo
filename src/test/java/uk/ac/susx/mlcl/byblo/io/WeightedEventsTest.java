@@ -45,7 +45,8 @@ import static org.junit.Assert.*;
 import org.junit.Ignore;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.byblo.enumerators.MemoryBasedStringEnumerator;
@@ -61,7 +62,7 @@ import uk.ac.susx.mlcl.lib.io.Tell;
 public class WeightedEventsTest {
 
     private void copyWEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+        DoubleEnumeratingDelegate del = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
 
         WeightedTokenPairSource aSrc = WeightedTokenPairSource.open(
@@ -74,7 +75,7 @@ public class WeightedEventsTest {
     }
 
     private void copyWEFV(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+        DoubleEnumeratingDelegate del = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
 
         WeightedTokenPairVectorSource aSrc = new WeightedTokenPairVectorSource(
@@ -148,7 +149,7 @@ public class WeightedEventsTest {
     public void testLMSample() throws FileNotFoundException, IOException {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-ef-sample");
         Charset charset = Charset.forName("UTF-8");
-        DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+        DoubleEnumeratingDelegate del = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
 
         WeightedTokenPairSource efSrc = WeightedTokenPairSource.open(
@@ -165,7 +166,7 @@ public class WeightedEventsTest {
         final Map<Tell, Weighted<TokenPair>> hist =
                 new HashMap<Tell, Weighted<TokenPair>>();
 
-        DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+        DoubleEnumeratingDelegate del = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
 
         WeightedTokenPairSource src =
@@ -222,9 +223,9 @@ public class WeightedEventsTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_EVENTS.getName() + ".str");
 
-        DoubleEnumeratingDeligate indel = new DoubleEnumeratingDeligate(
+        DoubleEnumeratingDelegate indel = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
-        DoubleEnumeratingDeligate outdel = new DoubleEnumeratingDeligate(
+        DoubleEnumeratingDelegate outdel = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, true, true, null, null);
 
 
@@ -266,9 +267,9 @@ public class WeightedEventsTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_EVENTS.getName() + ".enum.compact.str");
 
-        DoubleEnumeratingDeligate indel = new DoubleEnumeratingDeligate(
+        DoubleEnumeratingDelegate indel = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
-        DoubleEnumeratingDeligate outdel = new DoubleEnumeratingDeligate(
+        DoubleEnumeratingDelegate outdel = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, true, true, null, null);
 
 
@@ -313,9 +314,9 @@ public class WeightedEventsTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_EVENTS.getName() + ".enum.skip.compact.str");
 
-        DoubleEnumeratingDeligate indel = new DoubleEnumeratingDeligate(
+        DoubleEnumeratingDelegate indel = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
-        DoubleEnumeratingDeligate outdel = new DoubleEnumeratingDeligate(
+        DoubleEnumeratingDelegate outdel = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, true, true, null, null);
 
 

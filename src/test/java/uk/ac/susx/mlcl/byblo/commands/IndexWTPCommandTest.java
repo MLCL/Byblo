@@ -55,7 +55,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
@@ -246,11 +246,11 @@ public class IndexWTPCommandTest extends
 		// Read back the data checking it's identical
 		{
 			WeightedTokenPairSource wtpsa = WeightedTokenPairSource.open(outa,
-					DEFAULT_CHARSET, new DoubleEnumeratingDeligate(
+					DEFAULT_CHARSET, new DoubleEnumeratingDelegate(
 							Enumerating.DEFAULT_TYPE, true, true, null, null),
 					skip1a, skip2a);
 			WeightedTokenPairSource wtpsb = WeightedTokenPairSource.open(outb,
-					DEFAULT_CHARSET, new DoubleEnumeratingDeligate(
+					DEFAULT_CHARSET, new DoubleEnumeratingDelegate(
 							Enumerating.DEFAULT_TYPE, true, true, null, null),
 					skip1b, skip2b);
 			List<Tell> pa = new ArrayList<Tell>();
@@ -291,13 +291,13 @@ public class IndexWTPCommandTest extends
 			WeightedTokenPairVectorSource wtpsa = WeightedTokenPairSource.open(
 					outa,
 					DEFAULT_CHARSET,
-					new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+					new DoubleEnumeratingDelegate(Enumerating.DEFAULT_TYPE,
 							true, true, null, null), skip1a, skip2a)
 					.getVectorSource();
 			WeightedTokenPairVectorSource wtpsb = WeightedTokenPairSource.open(
 					outb,
 					DEFAULT_CHARSET,
-					new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+					new DoubleEnumeratingDelegate(Enumerating.DEFAULT_TYPE,
 							true, true, null, null), skip1b, skip2b)
 					.getVectorSource();
 
@@ -353,7 +353,7 @@ public class IndexWTPCommandTest extends
 		unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
 		unindex.getFilesDeligate().setSourceFile(from);
 		unindex.getFilesDeligate().setDestinationFile(to);
-		unindex.setIndexDeligate(new DoubleEnumeratingDeligate(type, true,
+		unindex.setIndexDeligate(new DoubleEnumeratingDelegate(type, true,
 				true, index1, index2));
 		unindex.runCommand();
 
@@ -380,7 +380,7 @@ public class IndexWTPCommandTest extends
 		unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
 		unindex.getFilesDeligate().setSourceFile(from);
 		unindex.getFilesDeligate().setDestinationFile(to);
-		unindex.setIndexDeligate(new DoubleEnumeratingDeligate(type, true,
+		unindex.setIndexDeligate(new DoubleEnumeratingDelegate(type, true,
 				true, index1, index2));
 		unindex.runCommand();
 

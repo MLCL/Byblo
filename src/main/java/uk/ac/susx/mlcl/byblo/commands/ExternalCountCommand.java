@@ -48,7 +48,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.Token;
@@ -60,13 +60,12 @@ import uk.ac.susx.mlcl.byblo.tasks.CountTask;
 import uk.ac.susx.mlcl.lib.AbstractParallelCommandTask;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.MiscUtil;
-import uk.ac.susx.mlcl.lib.commands.FileDeligate;
+import uk.ac.susx.mlcl.lib.commands.FileDelegate;
 import uk.ac.susx.mlcl.lib.commands.FileMoveCommand;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
 import uk.ac.susx.mlcl.lib.events.ProgressAggregate;
-import uk.ac.susx.mlcl.lib.events.ProgressEvent;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import uk.ac.susx.mlcl.lib.events.ReportingProgressListener;
@@ -138,10 +137,10 @@ public class ExternalCountCommand extends AbstractParallelCommandTask implements
 	private final ProgressAggregate progress = new ProgressAggregate(this);
 
 	@ParametersDelegate
-	private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
+	private DoubleEnumerating indexDeligate = new DoubleEnumeratingDelegate();
 
 	@ParametersDelegate
-	private FileDeligate fileDeligate = new FileDeligate();
+	private FileDelegate fileDeligate = new FileDelegate();
 
 	@Parameter(names = { "-i", "--input" }, required = true, description = "Input instances file", validateWith = InputFileValidator.class)
 	private File inputFile;
@@ -187,12 +186,12 @@ public class ExternalCountCommand extends AbstractParallelCommandTask implements
 		super();
 	}
 
-	public FileDeligate getFileDeligate() {
+	public FileDelegate getFileDeligate() {
 		return fileDeligate;
 	}
 
-	public void setFileDeligate(FileDeligate fileDeligate) {
-		this.fileDeligate = fileDeligate;
+	public void setFileDeligate(FileDelegate fileDelegate) {
+		this.fileDeligate = fileDelegate;
 	}
 
 	public final DoubleEnumerating getIndexDeligate() {

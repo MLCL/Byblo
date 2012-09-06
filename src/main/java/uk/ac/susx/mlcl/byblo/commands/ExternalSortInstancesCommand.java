@@ -35,7 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -52,7 +52,7 @@ public class ExternalSortInstancesCommand extends AbstractExternalSortCommand<To
     private static final long serialVersionUID = 1L;
 
     @ParametersDelegate
-    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
+    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDelegate();
 
     public ExternalSortInstancesCommand(
             File sourceFile, File destinationFile, Charset charset,

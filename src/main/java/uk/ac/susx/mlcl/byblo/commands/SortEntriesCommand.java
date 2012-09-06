@@ -38,7 +38,7 @@ import java.nio.charset.Charset;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.byblo.io.WeightSumReducerObjectSink;
@@ -57,7 +57,7 @@ public final class SortEntriesCommand extends AbstractSortCommand<Weighted<Token
             SortEntriesCommand.class);
 
     @ParametersDelegate
-    private SingleEnumerating indexDeligate = new SingleEnumeratingDeligate();
+    private SingleEnumerating indexDeligate = new SingleEnumeratingDelegate();
 
     public SortEntriesCommand(File sourceFile, File destinationFile,
                               Charset charset, SingleEnumerating indexDeligate) {

@@ -229,7 +229,6 @@ public class NaiveApssTask<P> extends AbstractTask
             ObjectIO.copy(pairs, getSink());
         }
         pairs.clear();
-//        System.out.println(".");
     }
 
     @Override
@@ -239,7 +238,7 @@ public class NaiveApssTask<P> extends AbstractTask
 
         progress.startAdjusting();
         progress.setState(State.RUNNING);
-        progress.setMessage("Reading feature vectors.");
+        progress.setMessage("Running all-pairs.");
         progress.setProgressPercent(0);
         progress.endAdjusting();
 
@@ -269,7 +268,6 @@ public class NaiveApssTask<P> extends AbstractTask
                 if (pruducePair.apply(pair)) {
                     pairBuffer.add(pair);
                     stats.incrementProductionCount();
-
                     if (pairBuffer.size() > PAIR_OUTPUT_BUFFER_SIZE) {
                         writeOutPairs(pairBuffer);
                     }
@@ -278,24 +276,6 @@ public class NaiveApssTask<P> extends AbstractTask
         }
 
         writeOutPairs(pairBuffer);
-
-//        progress.startAdjusting();
-//        progress.setMessage("Sorting pairs.");
-//        progress.setProgressPercent(80);
-//        progress.endAdjusting();
-
-
-//        Collections.sort(pairs, Weighted.recordOrder(TokenPair.indexOrder()));
-//
-//        progress.startAdjusting();
-//        progress.setMessage("Writing pairs.");
-//        progress.setProgressPercent(90);
-//        progress.endAdjusting();
-//
-//        synchronized (getSink()) {
-//            ObjectIO.copy(pairs, getSink());
-//        }
-
 
         progress.startAdjusting();
         progress.setProgressPercent(100);

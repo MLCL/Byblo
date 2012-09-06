@@ -53,7 +53,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
@@ -104,7 +104,7 @@ public class ExternalSortEventsCommandTest extends
 		File featureIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME
 				+ ".feature-index");
 
-		final DoubleEnumerating idx = new DoubleEnumeratingDeligate(
+		final DoubleEnumerating idx = new DoubleEnumeratingDelegate(
 				Enumerating.DEFAULT_TYPE, preindexedTokens1, preindexedTokens2,
 				null, null);
 
@@ -137,7 +137,7 @@ public class ExternalSortEventsCommandTest extends
 		File featureIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME
 				+ ".feature-index");
 
-		final DoubleEnumerating idx = new DoubleEnumeratingDeligate(
+		final DoubleEnumerating idx = new DoubleEnumeratingDelegate(
 				Enumerating.DEFAULT_TYPE, preindexedTokens1, preindexedTokens2,
 				null, null);
 

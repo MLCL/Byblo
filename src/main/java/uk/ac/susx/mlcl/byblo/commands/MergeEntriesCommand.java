@@ -37,7 +37,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.byblo.io.WeightSumReducerObjectSink;
@@ -53,7 +53,7 @@ import uk.ac.susx.mlcl.lib.io.ObjectSource;
 public final class MergeEntriesCommand extends AbstractMergeCommand<Weighted<Token>> {
 
     @ParametersDelegate
-    private SingleEnumerating indexDeligate = new SingleEnumeratingDeligate();
+    private SingleEnumerating indexDeligate = new SingleEnumeratingDelegate();
 
     public MergeEntriesCommand(
             File sourceFileA, File sourceFileB, File destinationFile,

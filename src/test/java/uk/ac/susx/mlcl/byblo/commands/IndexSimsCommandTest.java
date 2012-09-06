@@ -55,11 +55,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
-import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
-import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
-import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.*;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
@@ -239,11 +235,11 @@ public class IndexSimsCommandTest extends
 		// Read back the data checking it's identical
 		{
 			WeightedTokenPairSource wtpsa = WeightedTokenPairSource.open(outa,
-					DEFAULT_CHARSET, new DoubleEnumeratingDeligate(
+					DEFAULT_CHARSET, new DoubleEnumeratingDelegate(
 							Enumerating.DEFAULT_TYPE, true, true, null, null),
 					skip1a, skip2a);
 			WeightedTokenPairSource wtpsb = WeightedTokenPairSource.open(outb,
-					DEFAULT_CHARSET, new DoubleEnumeratingDeligate(
+					DEFAULT_CHARSET, new DoubleEnumeratingDelegate(
 							Enumerating.DEFAULT_TYPE, true, true, null, null),
 					skip1a, skip2a);
 			List<Tell> pa = new ArrayList<Tell>();
@@ -284,13 +280,13 @@ public class IndexSimsCommandTest extends
 			WeightedTokenPairVectorSource wtpsa = WeightedTokenPairSource.open(
 					outa,
 					DEFAULT_CHARSET,
-					new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+					new DoubleEnumeratingDelegate(Enumerating.DEFAULT_TYPE,
 							true, true, null, null), skip1a, skip2a)
 					.getVectorSource();
 			WeightedTokenPairVectorSource wtpsb = WeightedTokenPairSource.open(
 					outb,
 					DEFAULT_CHARSET,
-					new DoubleEnumeratingDeligate(Enumerating.DEFAULT_TYPE,
+					new DoubleEnumeratingDelegate(Enumerating.DEFAULT_TYPE,
 							true, true, null, null), skip1b, skip2b)
 					.getVectorSource();
 
@@ -348,8 +344,8 @@ public class IndexSimsCommandTest extends
 		indexCommand.getFilesDeligate().setSourceFile(from);
 		indexCommand.getFilesDeligate().setDestinationFile(to);
 
-		indexCommand.setIndexDeligate(EnumeratingDeligates
-				.toPair(new SingleEnumeratingDeligate(type, true, index)));
+		indexCommand.setIndexDeligate(EnumeratingDelegates
+				.toPair(new SingleEnumeratingDelegate(type, true, index)));
 		indexCommand.runCommand();
 
 		assertValidPlaintextInputFiles(to);
@@ -376,8 +372,8 @@ public class IndexSimsCommandTest extends
 		unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
 		unindex.getFilesDeligate().setSourceFile(from);
 		unindex.getFilesDeligate().setDestinationFile(to);
-		unindex.setIndexDeligate(EnumeratingDeligates
-				.toPair(new SingleEnumeratingDeligate(type, true, index)));
+		unindex.setIndexDeligate(EnumeratingDelegates
+				.toPair(new SingleEnumeratingDelegate(type, true, index)));
 		unindex.runCommand();
 
 		assertValidPlaintextInputFiles(to);

@@ -52,7 +52,7 @@ import org.junit.Test;
 
 import uk.ac.susx.mlcl.TestConstants;
 import uk.ac.susx.mlcl.TestConstants.InfoProgressListener;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 
 /**
@@ -221,7 +221,7 @@ public class IndexTPCommandTest extends
 		unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
 		unindex.getFilesDeligate().setSourceFile(from);
 		unindex.getFilesDeligate().setDestinationFile(to);
-		unindex.setIndexDeligate(new DoubleEnumeratingDeligate(type, true,
+		unindex.setIndexDeligate(new DoubleEnumeratingDelegate(type, true,
 				true, index1, index2));
 		unindex.runCommand();
 
@@ -249,7 +249,7 @@ public class IndexTPCommandTest extends
 		unindex.getFilesDeligate().setSourceFile(from);
 		unindex.getFilesDeligate().setDestinationFile(to);
 
-		unindex.setIndexDeligate(new DoubleEnumeratingDeligate(type, true,
+		unindex.setIndexDeligate(new DoubleEnumeratingDelegate(type, true,
 				true, index1, index2));
 		unindex.runCommand();
 
@@ -289,7 +289,7 @@ public class IndexTPCommandTest extends
 		deleteIfExist(outFile);
 		deleteJDBCIfExist(entryIdx, featureIdx);
 
-		final DoubleEnumeratingDeligate ded = new DoubleEnumeratingDeligate(
+		final DoubleEnumeratingDelegate ded = new DoubleEnumeratingDelegate(
 				EnumeratorType.JDBC, true, true, entryIdx, featureIdx);
 
 		IndexingCommands.IndexInstances unindex = new IndexingCommands.IndexInstances();

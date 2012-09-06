@@ -40,7 +40,7 @@ import java.nio.charset.Charset;
 import java.util.Comparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDelegates;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
@@ -75,7 +75,7 @@ public final class KnnSimsCommand extends SortEventsCommand {
 
     public KnnSimsCommand(File sourceFile, File destinationFile, Charset charset,
                           SingleEnumerating indexDeligate, int k) throws IOException {
-        super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(indexDeligate));
+        super(sourceFile, destinationFile, charset, EnumeratingDelegates.toPair(indexDeligate));
         super.setComparator(Comparators.fallback(
                 classComparator, nearnessComparator));
         setK(k);

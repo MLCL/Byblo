@@ -46,7 +46,7 @@ import org.junit.Test;
 
 import uk.ac.susx.mlcl.TestConstants;
 import uk.ac.susx.mlcl.byblo.Tools;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
@@ -97,7 +97,7 @@ public class ExternalSimsKnnCommandTest extends
 		knnCmd.getFileDeligate().setDestinationFile(out);
 		knnCmd.getFileDeligate().setCharset(DEFAULT_CHARSET);
 
-		knnCmd.setIndexDeligate(new DoubleEnumeratingDeligate(
+		knnCmd.setIndexDeligate(new DoubleEnumeratingDelegate(
 				Enumerating.DEFAULT_TYPE, false, false, null, null));
 
 		knnCmd.setMaxChunkSize(100000);

@@ -45,7 +45,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
@@ -89,7 +89,7 @@ public class SimsKnnCommandTest extends AbstractCommandTest<KnnSimsCommand> {
 		knnTask.getFilesDeligate().setDestinationFile(out);
 		knnTask.getFilesDeligate().setCharset(DEFAULT_CHARSET);
 		knnTask.setK(100);
-		knnTask.setIndexDeligate(new DoubleEnumeratingDeligate(
+		knnTask.setIndexDeligate(new DoubleEnumeratingDelegate(
 				Enumerating.DEFAULT_TYPE, false, false, null, null));
 		knnTask.setClassComparator(Weighted.recordOrder(TokenPair
 				.firstIndexOrder()));
@@ -116,7 +116,7 @@ public class SimsKnnCommandTest extends AbstractCommandTest<KnnSimsCommand> {
 		knnTask.getFilesDeligate().setDestinationFile(out);
 		knnTask.getFilesDeligate().setCharset(DEFAULT_CHARSET);
 		knnTask.setK(100);
-		knnTask.setIndexDeligate(new DoubleEnumeratingDeligate(
+		knnTask.setIndexDeligate(new DoubleEnumeratingDelegate(
 				Enumerating.DEFAULT_TYPE, false, false, null, null));
 		knnTask.setClassComparator(Weighted.recordOrder(TokenPair
 				.firstIndexOrder()));

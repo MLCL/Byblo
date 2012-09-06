@@ -51,7 +51,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
@@ -102,7 +102,7 @@ public class SortEventsCommandTest extends
 		File featuresIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME
 				+ ".feature-index");
 
-		final DoubleEnumeratingDeligate idx = new DoubleEnumeratingDeligate(
+		final DoubleEnumeratingDelegate idx = new DoubleEnumeratingDelegate(
 				Enumerating.DEFAULT_TYPE, preindexedTokens1, preindexedTokens2,
 				entriesIndex, featuresIndex);
 
@@ -136,7 +136,7 @@ public class SortEventsCommandTest extends
 		File featuresIndex = new File(TEST_OUTPUT_DIR, FRUIT_NAME
 				+ ".feature-index");
 
-		final DoubleEnumeratingDeligate idx = new DoubleEnumeratingDeligate(
+		final DoubleEnumeratingDelegate idx = new DoubleEnumeratingDelegate(
 				Enumerating.DEFAULT_TYPE, preindexedTokens1, preindexedTokens2,
 				entriesIndex, featuresIndex);
 
@@ -151,7 +151,7 @@ public class SortEventsCommandTest extends
 
 	private void testSortWeightedTokenPairCommand(File inputFile,
 			File randomisedFile, File sortedFile,
-			DoubleEnumeratingDeligate idx,
+			DoubleEnumeratingDelegate idx,
 			Comparator<Weighted<TokenPair>> comparator) throws IOException,
 			Exception {
 
@@ -248,13 +248,13 @@ public class SortEventsCommandTest extends
 	}
 
 	private static WeightedTokenPairSource openSource(File file,
-			DoubleEnumeratingDeligate idx) throws IOException {
+			DoubleEnumeratingDelegate idx) throws IOException {
 		return WeightedTokenPairSource.open(file, DEFAULT_CHARSET, idx, false,
 				false);
 	}
 
 	private static WeightedTokenPairSink openSink(File file,
-			DoubleEnumeratingDeligate idx, boolean compact) throws IOException {
+			DoubleEnumeratingDelegate idx, boolean compact) throws IOException {
 		WeightedTokenPairSink sink = WeightedTokenPairSink.open(file,
 				DEFAULT_CHARSET, idx, false, false, compact);
 		return sink;

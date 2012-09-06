@@ -41,7 +41,7 @@ import java.util.Comparator;
 import javax.naming.OperationNotSupportedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDelegates;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
@@ -80,7 +80,7 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
             File sourceFile, File destinationFile, Charset charset,
             SingleEnumerating indexDeligate,
             int k, int maxChunkSize) throws IOException {
-        super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(
+        super(sourceFile, destinationFile, charset, EnumeratingDelegates.toPair(
                 indexDeligate));
         setMaxChunkSize(maxChunkSize);
         setK(k);
@@ -90,7 +90,7 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
             File sourceFile, File destinationFile, Charset charset,
             SingleEnumerating indexDeligate,
             int k) throws IOException {
-        super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(
+        super(sourceFile, destinationFile, charset, EnumeratingDelegates.toPair(
                 indexDeligate));
         setK(k);
     }

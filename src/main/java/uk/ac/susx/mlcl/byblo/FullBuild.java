@@ -51,12 +51,11 @@ import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.measures.CrMi;
 import uk.ac.susx.mlcl.byblo.measures.Lee;
 import uk.ac.susx.mlcl.byblo.measures.Lp;
-import uk.ac.susx.mlcl.byblo.tasks.ThreadedApssTask;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.commands.DoubleConverter;
-import uk.ac.susx.mlcl.lib.commands.FileDeligate;
+import uk.ac.susx.mlcl.lib.commands.FileDelegate;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
@@ -79,7 +78,7 @@ public final class FullBuild extends AbstractCommand {
     public static final boolean HIDE_UNCOMMON_PARAMTERS = false;
 
     @ParametersDelegate
-    private FileDeligate fileDeligate = new FileDeligate();
+    private FileDelegate fileDelegate = new FileDelegate();
 
     @Parameter(names = {"-i", "--input"},
     description = "Input instances file",
@@ -197,10 +196,6 @@ public final class FullBuild extends AbstractCommand {
     hidden = HIDE_UNCOMMON_PARAMTERS)
     private boolean outputIdentityPairs = false;
 
-    @Parameter(names = {"--allpairs-chunk-size"},
-    description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.",
-    hidden = HIDE_UNCOMMON_PARAMTERS)
-    private int chunkSize = ThreadedApssTask.DEFAULT_MAX_CHUNK_SIZE;
     /*
      * === K-NEAREST-NEIGHBOURS PARAMATERISATION ===
      */
@@ -608,7 +603,6 @@ public final class FullBuild extends AbstractCommand {
         allpairsCmd.setOutputFile(simsFile);
 
         allpairsCmd.setNumThreads(numThreads);
-        allpairsCmd.setChunkSize(chunkSize);
 
         allpairsCmd.setMinSimilarity(minSimilarity);
         allpairsCmd.setMaxSimilarity(maxSimilarity);
@@ -936,11 +930,11 @@ public final class FullBuild extends AbstractCommand {
     }
 
     public void setCharset(Charset charset) {
-        fileDeligate.setCharset(charset);
+        fileDelegate.setCharset(charset);
     }
 
     public Charset getCharset() {
-        return fileDeligate.getCharset();
+        return fileDelegate.getCharset();
     }
 
     public File getOutputDir() {

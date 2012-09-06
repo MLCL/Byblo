@@ -49,6 +49,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
+import uk.ac.susx.mlcl.lib.MemoryUsage;
+import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.Chunk;
@@ -80,10 +82,10 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
 
     private Queue<Future<? extends Task>> futureQueue =
             new ArrayDeque<Future<? extends Task>>();
+//
+//    public static final int DEFAULT_MAX_CHUNK_SIZE = 2000;
 
-    public static final int DEFAULT_MAX_CHUNK_SIZE = 2000;
-
-    private int maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
+//    private int maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
 
     private Semaphore throttle;
 
@@ -97,14 +99,14 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
 
     public ThreadedApssTask() {
     }
-
-    public int getMaxChunkSize() {
-        return maxChunkSize;
-    }
-
-    public void setMaxChunkSize(int maxChunkSize) {
-        this.maxChunkSize = maxChunkSize;
-    }
+//
+//    public int getMaxChunkSize() {
+//        return maxChunkSize;
+//    }
+//
+//    public void setMaxChunkSize(int maxChunkSize) {
+//        this.maxChunkSize = maxChunkSize;
+//    }
 
     @Override
     protected void buildPrecalcs() throws IOException {
@@ -127,7 +129,7 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 nThreads, nThreads, 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>());
         futureQueue = new ArrayDeque<Future<? extends Task>>();
-        throttle = new Semaphore(nThreads + 1);
+        throttle = new Semaphore(getThrottleSize());
     }
 
     int nChunks = 0;
@@ -143,6 +145,12 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
         progress.setState(State.RUNNING);
         progress.setMessage("Reading threaded all-pairs.");
         progress.endAdjusting();
+
+        final int  maxChunkSize = estimateChunkSize();
+        if(LOG.isInfoEnabled()) {
+            LOG.info("Chunk-size estimated as: " + maxChunkSize + " vectors per work unit.");
+        }
+
 
         if (LOG.isTraceEnabled()) {
             LOG.trace("Initialising chunker A.");
@@ -335,6 +343,49 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
         this.nThreads = nThreads;
     }
 
+    private int getThrottleSize() {
+        return getNumThreads() * 2 + 1;
+    }
+
+
+    private int estimateChunkSize() {
+
+        // Maximum possible non-zero cardinality of any feature vector. In theory this is maxint, through with real
+        // data that bound never occurs since feature vectors are typically very sparse, especially if filtering has
+        // been performed. Instead we'll take the square root for pretty much no reason what so ever. To improve this
+        // estimation we need to set nFeatures empirically based on the actual data being run, which will require
+        // a whole bunch of re-factoring.
+        final long nFeatures = (int)Math.ceil(Math.sqrt(Integer.MAX_VALUE));
+
+        // number of concurrent worker units that can exist at one time
+        final long nWorkUnits = getNumThreads() + getThrottleSize();
+
+        // each worker has 2 chunks (although it may be less overall because chunks can be shared)
+        final long pairMultiplier = 2;
+
+        // theoretical number of bytes per feature is: 1 x int32 + 1 x double
+        // note that arrays should be packed even on 64 bit platforms
+        final long bytesPerFeature = 4 + 8;
+
+        // It's a tad conservative to use free memory rather than total memory,
+        // but we can't be sure what else is going on
+        final long availableMemory = MiscUtil.freeMaxMemory();
+
+        double chunkSize =  availableMemory /
+                (nFeatures * nWorkUnits * pairMultiplier * bytesPerFeature);
+        assert chunkSize > 0;
+
+        // It's possible that we don't even enough memory for a single
+        if(chunkSize < 1)
+            chunkSize = 1;
+
+        // Finally, we've only really calculated an upper bound. It's conceivable that the software is running in an
+        // environment where it would be preferable not to just use all memory, just because it's there.
+        chunkSize = Math.min(chunkSize, 4000);
+
+        return (int)Math.floor(chunkSize);
+    }
+
     public String getName() {
         return "threaded-allpairs";
     }
@@ -346,7 +397,6 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 add("nThreads", nThreads).
                 add("executor", executor).
                 add("futureQueue", futureQueue).
-                add("maxChunkSize", maxChunkSize).
                 add("throttle", throttle);
     }
 

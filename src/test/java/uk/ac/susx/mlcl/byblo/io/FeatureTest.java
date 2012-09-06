@@ -40,7 +40,7 @@ import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.byblo.enumerators.MemoryBasedStringEnumerator;
-import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDelegate;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
 
 /**
@@ -52,7 +52,7 @@ public class FeatureTest {
     private void copyF(File a, File b) throws FileNotFoundException, IOException {
         Enumerator<String> strEnum = MemoryBasedStringEnumerator.newInstance();
 
-        SingleEnumeratingDeligate del = new SingleEnumeratingDeligate(
+        SingleEnumeratingDelegate del = new SingleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, null);
         WeightedTokenSource aSrc = WeightedTokenSource.open(
                 a, DEFAULT_CHARSET, del, false);
@@ -93,9 +93,9 @@ public class FeatureTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_FEATURES.getName() + ".str");
 
-        SingleEnumeratingDeligate indel = new SingleEnumeratingDeligate(
+        SingleEnumeratingDelegate indel = new SingleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, null);
-        SingleEnumeratingDeligate outdel = new SingleEnumeratingDeligate(
+        SingleEnumeratingDelegate outdel = new SingleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, true, null);
 
 

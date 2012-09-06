@@ -28,51 +28,37 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.lib.commands;
 
-import com.beust.jcommander.Parameter;
-import com.google.common.base.Objects;
-import java.io.Serializable;
-import java.nio.charset.Charset;
-import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.io.Files;
+package uk.ac.susx.mlcl.byblo.tasks;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class FileDeligate implements Serializable {
+public class ThreadedNaiveApssTaskTest extends AbstractAllPairsTaskTest<ThreadedApssTask> {
 
-    private static final long serialVersionUID = 1L;
-
-    @Parameter(names = {"-c", "--charset"},
-    description = "The character set encoding to use for both reading input and writing output files.")
-    private Charset charset = Files.DEFAULT_CHARSET;
-
-    public FileDeligate(Charset charset) {
-        setCharset(charset);
-    }
-
-    public FileDeligate() {
-    }
-
-    public final Charset getCharset() {
-        return charset;
-    }
-
-    public final void setCharset(Charset charset) {
-        Checks.checkNotNull(charset);
-        this.charset = charset;
-    }
-
-    protected Objects.ToStringHelper toStringHelper() {
-        return Objects.toStringHelper(this).
-                add("charset", getCharset());
+    @Override
+    public Class<? extends ThreadedApssTask> getImplementation() {
+        return ThreadedApssTask.class;
     }
 
     @Override
-    public final String toString() {
-        return toStringHelper().toString();
+    public ThreadedApssTask newInstance() {
+        ThreadedApssTask instance = super.newInstance();
+        instance.setInnerAlgorithm(NaiveApssTask.class);
+        return instance;
     }
 
+    @Override
+    public ThreadedApssTask newInstance(Class<?>[] types, Object[] params) {
+        ThreadedApssTask instance = super.newInstance(types, params);
+        instance.setInnerAlgorithm(NaiveApssTask.class);
+        return instance;
+    }
+
+    @Override
+    public ThreadedApssTask newInstance(Class<?> type, Object param) {
+        ThreadedApssTask instance = super.newInstance(type, param);
+        instance.setInnerAlgorithm(NaiveApssTask.class);
+        return instance;
+    }
 }

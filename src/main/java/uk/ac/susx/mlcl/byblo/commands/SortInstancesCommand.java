@@ -37,7 +37,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -53,12 +53,12 @@ public final class SortInstancesCommand extends AbstractSortCommand<TokenPair> {
     private static final Log LOG = LogFactory.getLog(SortEntriesCommand.class);
 
     @ParametersDelegate
-    private DoubleEnumeratingDeligate indexDeligate = new DoubleEnumeratingDeligate();
+    private DoubleEnumeratingDelegate indexDelegate = new DoubleEnumeratingDelegate();
 
     public SortInstancesCommand(File sourceFile, File destinationFile, Charset charset,
-                                DoubleEnumeratingDeligate indexDeligate) {
+                                DoubleEnumeratingDelegate indexDelegate) {
         super(sourceFile, destinationFile, charset, TokenPair.indexOrder());
-        setIndexDeligate(indexDeligate);
+        setIndexDelegate(indexDelegate);
     }
 
     public SortInstancesCommand() {
@@ -67,28 +67,28 @@ public final class SortInstancesCommand extends AbstractSortCommand<TokenPair> {
     @Override
     public void runCommand() throws Exception {
         super.runCommand();
-        indexDeligate.saveEnumerator();
-        indexDeligate.closeEnumerator();
+        indexDelegate.saveEnumerator();
+        indexDelegate.closeEnumerator();
 
     }
 
     @Override
     protected ObjectSource<TokenPair> openSource(File file) throws FileNotFoundException, IOException {
-        return BybloIO.openInstancesSource(file, getCharset(), indexDeligate);
+        return BybloIO.openInstancesSource(file, getCharset(), indexDelegate);
     }
 
     @Override
     protected ObjectSink<TokenPair> openSink(File file) throws FileNotFoundException, IOException {
-        return BybloIO.openInstancesSink(file, getCharset(), indexDeligate);
+        return BybloIO.openInstancesSink(file, getCharset(), indexDelegate);
     }
 
-    public final DoubleEnumeratingDeligate getIndexDeligate() {
-        return indexDeligate;
+    public final DoubleEnumeratingDelegate getIndexDelegate() {
+        return indexDelegate;
     }
 
-    public final void setIndexDeligate(DoubleEnumeratingDeligate indexDeligate) {
-        Checks.checkNotNull("indexDeligate", indexDeligate);
-        this.indexDeligate = indexDeligate;
+    public final void setIndexDelegate(DoubleEnumeratingDelegate indexDelegate) {
+        Checks.checkNotNull("indexDelegate", indexDelegate);
+        this.indexDelegate = indexDelegate;
     }
 
 }

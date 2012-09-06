@@ -106,10 +106,6 @@ public final class InvertedApssTask<S> extends NaiveApssTask<S> {
                     pairs.add(pair);
                     getStats().incrementProductionCount();
 
-
-
-
-
                     if (pairs.size() > PAIR_OUTPUT_BUFFER_SIZE) {
                         writeOutPairs(pairs);
                     }

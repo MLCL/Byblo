@@ -57,7 +57,7 @@ import org.junit.Test;
 import uk.ac.susx.mlcl.TestConstants;
 import uk.ac.susx.mlcl.TestConstants.InfoProgressListener;
 import uk.ac.susx.mlcl.byblo.Tools;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import uk.ac.susx.mlcl.lib.test.ExitTrapper;
@@ -97,7 +97,7 @@ public class ExternalCountCommandTest extends
 		countCmd.setFeaturesFile(outF);
 		countCmd.setEventsFile(outEF);
 		countCmd.getFileDeligate().setCharset(charset);
-		countCmd.setIndexDeligate(new DoubleEnumeratingDeligate(
+		countCmd.setIndexDeligate(new DoubleEnumeratingDelegate(
 				Enumerating.DEFAULT_TYPE, preindexedEntries,
 				preindexedFeatures, null, null));
 		countCmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
@@ -434,7 +434,7 @@ public class ExternalCountCommandTest extends
 		countCmd.setFeaturesFile(featuresFile);
 		countCmd.setEventsFile(eventsFile);
 		countCmd.getFileDeligate().setCharset(DEFAULT_CHARSET);
-		countCmd.setIndexDeligate(new DoubleEnumeratingDeligate(
+		countCmd.setIndexDeligate(new DoubleEnumeratingDelegate(
 				Enumerating.DEFAULT_TYPE, true, true, null, null));
 		countCmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
 
