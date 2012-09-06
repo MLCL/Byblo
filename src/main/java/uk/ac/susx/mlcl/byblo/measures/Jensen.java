@@ -36,7 +36,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
  * Jensen-Shannon divergence
- * 
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class Jensen extends AbstractProximity {
@@ -51,17 +51,17 @@ public class Jensen extends AbstractProximity {
                     + "thoughoughly test and is likely to contain bugs.");
     }
 
-   @Override
+    @Override
     public double shared(SparseDoubleVector A, SparseDoubleVector B) {
         double comp = 0;
 
         int i = 0, j = 0;
         while (i < A.size && j < B.size) {
             if (A.keys[i] < B.keys[j]) {
-                comp += (A.values[i] / A.sum) * LN2;
+                comp += A.values[i] / A.sum;
                 i++;
             } else if (A.keys[i] > B.keys[j]) {
-                comp += (B.values[j] / B.sum) * LN2;
+                comp += B.values[j] / B.sum;
                 j++;
             } else if (isFiltered(A.keys[i])) {
                 i++;
@@ -69,21 +69,21 @@ public class Jensen extends AbstractProximity {
             } else {
                 final double pA = A.values[i] / A.sum;
                 final double pB = B.values[j] / B.sum;
-                final double lpAvg = Math.log(pA + pB) - LN2;
-                comp += pA * (Math.log(pA) - lpAvg);
-                comp += pB * (Math.log(pB) - lpAvg);
+                final double lpAvg = Math.log(pA + pB) / LN2 - 1;
+                comp += pA * (Math.log(pA) / LN2 - lpAvg);
+                comp += pB * (Math.log(pB) / LN2 - lpAvg);
                 i++;
                 j++;
             }
         }
 
         while (i < A.size) {
-            comp += (A.values[i] / A.sum) * LN2;
+            comp += A.values[i] / A.sum;
             i++;
         }
 
         while (j < B.size) {
-            comp += (B.values[j] / B.sum) * LN2;
+            comp += B.values[j] / B.sum;
             j++;
         }
 
