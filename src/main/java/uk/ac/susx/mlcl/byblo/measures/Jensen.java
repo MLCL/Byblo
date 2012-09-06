@@ -53,16 +53,15 @@ public class Jensen extends AbstractProximity {
 
    @Override
     public double shared(SparseDoubleVector A, SparseDoubleVector B) {
-        double compA = 0;
-        double compB = 0;
+        double comp = 0;
 
         int i = 0, j = 0;
         while (i < A.size && j < B.size) {
             if (A.keys[i] < B.keys[j]) {
-                compA += (A.values[i] / A.sum) * LN2;
+                comp += (A.values[i] / A.sum) * LN2;
                 i++;
             } else if (A.keys[i] > B.keys[j]) {
-                compB += (B.values[j] / B.sum) * LN2;
+                comp += (B.values[j] / B.sum) * LN2;
                 j++;
             } else if (isFiltered(A.keys[i])) {
                 i++;
@@ -71,24 +70,24 @@ public class Jensen extends AbstractProximity {
                 final double pA = A.values[i] / A.sum;
                 final double pB = B.values[j] / B.sum;
                 final double lpAvg = Math.log(pA + pB) - LN2;
-                compA += pA * (Math.log(pA) - lpAvg);
-                compB += pB * (Math.log(pB) - lpAvg);
+                comp += pA * (Math.log(pA) - lpAvg);
+                comp += pB * (Math.log(pB) - lpAvg);
                 i++;
                 j++;
             }
         }
 
         while (i < A.size) {
-            compA += (A.values[i] / A.sum) * LN2;
+            comp += (A.values[i] / A.sum) * LN2;
             i++;
         }
 
         while (j < B.size) {
-            compB += (B.values[j] / B.sum) * LN2;
+            comp += (B.values[j] / B.sum) * LN2;
             j++;
         }
 
-        return (compA + compB) / 2;
+        return comp / 2;
     }
 
     @Override
