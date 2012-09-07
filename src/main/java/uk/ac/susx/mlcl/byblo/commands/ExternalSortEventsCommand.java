@@ -45,6 +45,8 @@ import uk.ac.susx.mlcl.byblo.io.WeightSumReducerObjectSink;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import uk.ac.susx.mlcl.lib.Checks;
+import uk.ac.susx.mlcl.lib.MemoryUsage;
+import uk.ac.susx.mlcl.lib.events.ReportingProgressListener;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.events.ProgressEvent;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
@@ -55,8 +57,7 @@ import uk.ac.susx.mlcl.lib.events.ProgressListener;
  */
 public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weighted<TokenPair>> {
 
-    private static final Log LOG = LogFactory.getLog(
-            ExternalSortEventsCommand.class);
+    private static final Log LOG = LogFactory.getLog(ExternalSortEventsCommand.class);
 
     @ParametersDelegate
     private DoubleEnumerating indexDeligate = new DoubleEnumeratingDelegate();
@@ -94,6 +95,11 @@ public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weigh
     @Override
     protected ObjectSink<Weighted<TokenPair>> openSink(File file) throws IOException {
         return new WeightSumReducerObjectSink<TokenPair>(BybloIO.openEventsSink(file, getCharset(), indexDeligate));
+    }
+
+    @Override
+    protected long getBytesPerObject() {
+        return new MemoryUsage().add(new Weighted<TokenPair>(new TokenPair(1,1),1)).getInstanceSizeBytes();
     }
 
     @Override

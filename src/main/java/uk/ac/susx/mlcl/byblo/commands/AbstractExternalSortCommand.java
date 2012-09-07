@@ -39,15 +39,18 @@ import java.io.File;
 import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.tasks.CountTask;
 import uk.ac.susx.mlcl.lib.AbstractParallelCommandTask;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Comparators;
+import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.commands.FilePipeDelegate;
 import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
 import uk.ac.susx.mlcl.lib.events.ProgressAggregate;
@@ -89,14 +92,6 @@ public abstract class AbstractExternalSortCommand<T>
 
     private static final boolean DEBUG = false;
 
-    public static final int DEFAULT_MAX_CHUNK_SIZE = 500000;
-
-    @Deprecated
-    @Parameter(names = {"-C", "--chunk-size"},
-    description = "Number of lines that will be read and sorted in RAM at one "
-    + "time (per thread). Larger values increase memory usage and performace.")
-    private int maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
-
     @ParametersDelegate
     private final FilePipeDelegate fileDeligate = new FilePipeDelegate();
 
@@ -115,12 +110,9 @@ public abstract class AbstractExternalSortCommand<T>
 
     private final ProgressAggregate progress = new ProgressAggregate(this);
 
-    public AbstractExternalSortCommand(File src, File dst, Charset charset,
-                                       Comparator<T> comparator,
-                                       int maxChunkSize) {
+    public AbstractExternalSortCommand(File src, File dst, Charset charset, Comparator<T> comparator) {
         this(src, dst, charset);
         setComparator(comparator);
-        setMaxChunkSize(maxChunkSize);
     }
 
     public AbstractExternalSortCommand(File src, File dst, Charset charset) {
@@ -163,19 +155,6 @@ public abstract class AbstractExternalSortCommand<T>
         this.comparator = comparator;
     }
 
-    @Deprecated
-    public final int getMaxChunkSize() {
-        return maxChunkSize;
-    }
-
-    @Deprecated
-    public final void setMaxChunkSize(int maxChunkSize) {
-        if (maxChunkSize < 1) {
-            throw new IllegalArgumentException("maxChunkSize < 1");
-        }
-        this.maxChunkSize = maxChunkSize;
-    }
-
     void clearCompleted(boolean block) throws Exception {
 
         if (block) {
@@ -210,16 +189,17 @@ public abstract class AbstractExternalSortCommand<T>
     protected void runTask() throws Exception {
 
 
+        final int maxChunkSize = estimateMaxChunkSize();
+        LOG.info(MessageFormat.format("Estimated maximum chunk size: {0}", maxChunkSize));
+
         if (getComparator() == null) {
             throw new NullPointerException();
         }
 
         nextFileToMerge = new File[64];
 
-        final SeekableObjectSource<T, ?> src = openSource(getFileDeligate().
-                getSourceFile());
-        final ObjectSource<Chunk<T>> chunks = Chunker.newInstance(
-                src, getMaxChunkSize());
+        final SeekableObjectSource<T, ?> src = openSource(getFileDeligate().getSourceFile());
+        final ObjectSource<Chunk<T>> chunks = Chunker.newInstance(src, maxChunkSize);
 
         progress.startAdjusting();
         progress.setState(State.RUNNING);
@@ -232,10 +212,6 @@ public abstract class AbstractExternalSortCommand<T>
         while (chunks.hasNext()) {
             clearCompleted(false);
 
-//            while (!getFutureQueue().isEmpty() && getFutureQueue().peek().isDone()) {
-//                handleCompletedTask(getFutureQueue().poll().get());
-//            }
-
             Chunk<T> chunk = chunks.read();
             submitTask(createSortTask(chunk, getTempFileFactory().createFile()));
             progress.endAdjusting();
@@ -245,13 +221,6 @@ public abstract class AbstractExternalSortCommand<T>
         clearCompleted(true);
         progress.endAdjusting();
         progress.startAdjusting();
-
-//        while (!getFutureQueue().isEmpty()) {
-//            Task task = getFutureQueue().poll().get();
-//            handleCompletedTask(task);
-//            progress.endAdjusting();
-//            progress.startAdjusting();
-//        }
 
 
         // Finally merge any remaining files up the stack
@@ -308,7 +277,6 @@ public abstract class AbstractExternalSortCommand<T>
     protected void handleCompletedTask(Task task) throws Exception {
         Checks.checkNotNull("task", task);
         task.throwTrappedException();
-//        final Properties 2p = task.getProperties();
 
         if (task.isExceptionTrapped())
             task.throwTrappedException();
@@ -428,7 +396,6 @@ public abstract class AbstractExternalSortCommand<T>
         return super.toStringHelper().
                 add("in", getFileDeligate().getSourceFile()).
                 add("out", getFileDeligate().getDestinationFile()).
-                add("chunkSize", maxChunkSize).
                 add("temp", getTempFileFactory());
     }
 
@@ -498,6 +465,33 @@ public abstract class AbstractExternalSortCommand<T>
     @Override
     public String getName() {
         return "xsort";
+    }
+
+    protected abstract long getBytesPerObject();
+
+    /**
+     * Calculate a conservative guess at the maximum chunk size we can get away
+     * with given the available memory, and number of simultaneous threads.
+     *
+     * History: In previous version the end user was expected to set this value,
+     * which obviously was a total disaster. Most wouldn't both (because they
+     * didn't know what it was) and result was usually either code running too
+     * slowly, or java running our of heap space.
+     *
+     * @return maximum number of events that should be loaded per worker
+     */
+    private int estimateMaxChunkSize() {
+        // Start by at least trying to GC whatever junk is lying around
+        System.gc();
+        final long bytesAvailable = MiscUtil.freeMaxMemory();
+        final int numTasks = (getNumThreads() + PRELOAD_SIZE);
+        int chunkSize =  (int) (bytesAvailable / (getBytesPerObject() * numTasks));
+
+        int maxChunkSize = 5000000;
+        // In some system we might expect a very large amount of available
+        // memory. In this case we shouldn't set chunk size too large or it
+        // will never parallelise.
+        return Math.min(chunkSize, maxChunkSize);
     }
 
 }

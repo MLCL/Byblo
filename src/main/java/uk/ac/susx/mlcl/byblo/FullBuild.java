@@ -204,12 +204,6 @@ public final class FullBuild extends AbstractCommand {
     description = "The maximum number of neighbours to produce per word.")
     private int k = ExternalKnnSimsCommand.DEFAULT_K;
 
-    @Deprecated
-    @Parameter(names = {"--knn-chunk-size"},
-    description = "Number of lines per KNN work unit. Larger values increase memory usage and performace.",
-    hidden = HIDE_UNCOMMON_PARAMTERS)
-    private int knnMaxChunkSize = AbstractExternalSortCommand.DEFAULT_MAX_CHUNK_SIZE;
-
     /**
      * Should only be instantiated through the main method.
      */
@@ -666,7 +660,6 @@ public final class FullBuild extends AbstractCommand {
 
         knnCmd.setTempFileFactory(knnTmpFact);
         knnCmd.setNumThreads(numThreads);
-        knnCmd.setMaxChunkSize(knnMaxChunkSize);
         knnCmd.setK(k);
 
         knnCmd.runCommand();

@@ -30,8 +30,9 @@
  */
 package uk.ac.susx.mlcl.lib.events;
 
-import java.util.concurrent.CopyOnWriteArrayList;
 import uk.ac.susx.mlcl.lib.Checks;
+
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Implementation of ProgressReporting that reports progress based on the totals
@@ -46,8 +47,7 @@ public class ProgressAggregate extends ProgressDeligate {
     /**
      * Thread safe list of child progress reporters.
      */
-    private CopyOnWriteArrayList<ProgressReporting> children =
-            new CopyOnWriteArrayList<ProgressReporting>();
+    private CopyOnWriteArrayList<ProgressReporting> children = new CopyOnWriteArrayList<ProgressReporting>();
 
     /**
      * Once a child has completed it will be removed from the listener list to
@@ -64,11 +64,15 @@ public class ProgressAggregate extends ProgressDeligate {
                 @Override
                 public void progressChanged(ProgressEvent progressEvent) {
                     Checks.checkNotNull(progressEvent);
-                    assert children.contains(progressEvent.getSource());
-                    startAdjusting();
-                    updateProgress();
-                    setStateChangedSinceLastEvent();
-                    endAdjusting();
+                    // Usually we can expect all events to originate from children, but in a concurrent system we can't
+                    // safely guarantee that to be true; it's possible that an event is fired by a child which is
+                    // removed before the listener receives the event. In this case we should just ignore th event.
+                    if (children.contains(progressEvent.getSource())) {
+                        startAdjusting();
+                        updateProgress();
+                        setStateChangedSinceLastEvent();
+                        endAdjusting();
+                    }
                 }
 
             };
@@ -89,7 +93,7 @@ public class ProgressAggregate extends ProgressDeligate {
      * Calculate the average progress across all children. Uses integer
      * arithmetic to insure that 100% progress must be reached when (and only
      * when) all children are at 100%.
-     *
+     * <p/>
      * If there are no children, then progress is always 0%.
      */
     protected void updateProgress() {
@@ -132,7 +136,6 @@ public class ProgressAggregate extends ProgressDeligate {
     }
 
     /**
-     *
      * @return string representation of the progress
      */
     @Override
@@ -177,8 +180,7 @@ public class ProgressAggregate extends ProgressDeligate {
 
     @Override
     public void setProgressPercent(int progressPercent) {
-        throw new UnsupportedOperationException(
-                "ProgressReporterAgregate inherits progress from it's children.");
+        throw new UnsupportedOperationException(getClass().getSimpleName() + " inherits progress from it's children.");
     }
 
     public void addChildProgressReporter(ProgressReporting child) {
@@ -222,7 +224,7 @@ public class ProgressAggregate extends ProgressDeligate {
 
     @Override
     public String toString() {
-        return "ProgressAggregate{" + "children=" + children + '}';
+        return getClass().getSimpleName() + "[children=" + children + ']';
     }
 
 }

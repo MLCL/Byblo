@@ -30,121 +30,211 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import static org.junit.Assert.assertTrue;
-import static uk.ac.susx.mlcl.TestConstants.DEFAULT_CHARSET;
-import static uk.ac.susx.mlcl.TestConstants.FRUIT_NAME;
-import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_SIMS;
-import static uk.ac.susx.mlcl.TestConstants.TEST_OUTPUT_DIR;
-import static uk.ac.susx.mlcl.TestConstants.TEST_TMP_DIR;
-
-import java.io.File;
-
+import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
+import org.junit.experimental.categories.Category;
 import uk.ac.susx.mlcl.TestConstants;
 import uk.ac.susx.mlcl.byblo.Tools;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDelegate;
+import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
 import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import uk.ac.susx.mlcl.lib.test.ExitTrapper;
+import uk.ac.susx.mlcl.testing.SlowTestCategory;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Random;
+
+import static org.junit.Assert.assertTrue;
+import static uk.ac.susx.mlcl.TestConstants.*;
 
 /**
- * 
  * @author Hamish Morgan &ly;hamish.morgan@sussex.ac.uk&gt;
  */
 public class ExternalSimsKnnCommandTest extends
-		AbstractCommandTest<ExternalKnnSimsCommand> {
+        AbstractCommandTest<ExternalKnnSimsCommand> {
 
-	@Override
-	public Class<? extends ExternalKnnSimsCommand> getImplementation() {
-		return ExternalKnnSimsCommand.class;
-	}
+    @Override
+    public Class<? extends ExternalKnnSimsCommand> getImplementation() {
+        return ExternalKnnSimsCommand.class;
+    }
 
-	@Override
-	@Before
-	public void setUp() throws Exception {
-		super.setUp();
-	}
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
 
-	@Override
-	@After
-	public void tearDown() throws Exception {
-		super.tearDown();
-	}
+    @Override
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
 
-	private static final String subject = ExternalKnnSimsCommand.class
-			.getName();
+    private static final String subject = ExternalKnnSimsCommand.class
+            .getName();
 
-	@Test
-	public void testRunOnFruit() throws Exception {
-		System.out.println("Testing " + subject + " on " + TEST_FRUIT_SIMS);
+    @Test
+    public void testRunOnFruit() throws Exception {
+        System.out.println("Testing " + subject + " on " + TEST_FRUIT_SIMS);
 
-		final File in = TEST_FRUIT_SIMS;
-		final File out = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".neighs");
+        final File in = TEST_FRUIT_SIMS;
+        final File out = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".neighs");
 
-		assertTrue(in.exists());
-		assertTrue(in.length() > 0);
+        assertTrue(in.exists());
+        assertTrue(in.length() > 0);
 
-		final ExternalKnnSimsCommand knnCmd = new ExternalKnnSimsCommand();
+        final ExternalKnnSimsCommand knnCmd = new ExternalKnnSimsCommand();
 
-		knnCmd.getFileDeligate().setSourceFile(in);
-		knnCmd.getFileDeligate().setDestinationFile(out);
-		knnCmd.getFileDeligate().setCharset(DEFAULT_CHARSET);
+        knnCmd.getFileDeligate().setSourceFile(in);
+        knnCmd.getFileDeligate().setDestinationFile(out);
+        knnCmd.getFileDeligate().setCharset(DEFAULT_CHARSET);
 
-		knnCmd.setIndexDeligate(new DoubleEnumeratingDelegate(
-				Enumerating.DEFAULT_TYPE, false, false, null, null));
+        knnCmd.setIndexDeligate(new DoubleEnumeratingDelegate(
+                Enumerating.DEFAULT_TYPE, false, false, null, null));
 
-		knnCmd.setMaxChunkSize(100000);
-		knnCmd.setClassComparator(Weighted.recordOrder(TokenPair
-				.firstIndexOrder()));
-		knnCmd.setNearnessComparator(Comparators.reverse(Weighted
-				.<TokenPair> weightOrder()));
-		knnCmd.setK(100);
+        knnCmd.setClassComparator(Weighted.recordOrder(TokenPair
+                .firstIndexOrder()));
+        knnCmd.setNearnessComparator(Comparators.reverse(Weighted
+                .<TokenPair>weightOrder()));
+        knnCmd.setK(100);
 
-		knnCmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
+        knnCmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
 
-		knnCmd.runCommand();
+        knnCmd.runCommand();
 
-		assertTrue("Output files not created.", out.exists());
-		assertTrue("Empty output file found.", out.length() > 0);
-	}
+        assertTrue("Output files not created.", out.exists());
+        assertTrue("Empty output file found.", out.length() > 0);
+    }
 
-	@Test
-	public void testExitStatus() throws Exception {
-		try {
-			ExitTrapper.enableExistTrapping();
-			Tools.main(new String[] { "knn" });
-		} catch (ExitTrapper.ExitException ex) {
-			assertTrue("Expecting non-zero exit status.", ex.getStatus() != 0);
-		} finally {
-			ExitTrapper.disableExitTrapping();
-		}
-	}
+    @Test
+    public void testExitStatus() throws Exception {
+        try {
+            ExitTrapper.enableExistTrapping();
+            Tools.main(new String[]{"knn"});
+        } catch (ExitTrapper.ExitException ex) {
+            assertTrue("Expecting non-zero exit status.", ex.getStatus() != 0);
+        } finally {
+            ExitTrapper.disableExitTrapping();
+        }
+    }
 
-	@Test
-	@Ignore
-	public void testEmptyInputFile() throws Exception {
-		try {
-			File in = new File(TestConstants.TEST_OUTPUT_DIR,
-					"extknn-test-empty.in");
-			in.createNewFile();
-			File out = new File(TestConstants.TEST_OUTPUT_DIR,
-					"extknn-test-empty.out");
+    @Test
+    @Ignore
+    public void testEmptyInputFile() throws Exception {
+        try {
+            File in = new File(TestConstants.TEST_OUTPUT_DIR,
+                    "extknn-test-empty.in");
+            in.createNewFile();
+            File out = new File(TestConstants.TEST_OUTPUT_DIR,
+                    "extknn-test-empty.out");
 
-			ExitTrapper.enableExistTrapping();
-			Tools.main(new String[] { "knn", "-i", in.toString(), "-o",
-					out.toString() });
-		} catch (ExitTrapper.ExitException ex) {
-			assertTrue("Expecting non-zero exit status.", ex.getStatus() == 0);
-		} finally {
-			ExitTrapper.disableExitTrapping();
-		}
-	}
+            ExitTrapper.enableExistTrapping();
+            Tools.main(new String[]{"knn", "-i", in.toString(), "-o",
+                    out.toString()});
+        } catch (ExitTrapper.ExitException ex) {
+            assertTrue("Expecting non-zero exit status.", ex.getStatus() == 0);
+        } finally {
+            ExitTrapper.disableExitTrapping();
+        }
+    }
 
+
+    @Test
+    @Category(SlowTestCategory.class)
+    public void testRunOnGeneratedData() throws Exception {
+        System.out.println("Testing " + subject + " on " + TEST_FRUIT_SIMS);
+
+        final int nEntries = 4000;
+        final File inSimsFile = new File(TEST_OUTPUT_DIR, String.format(
+                "%s-%dx%d-sims", testName.getMethodName(), nEntries, nEntries));
+        final File outNeighsFile = new File(TEST_OUTPUT_DIR, inSimsFile.getName() + "-neighbours");
+
+        if(!inSimsFile.exists()) {
+            generateSimsData(inSimsFile, nEntries);
+        }
+
+        if(outNeighsFile.exists()) {
+            Assert.assertTrue(outNeighsFile.delete());
+        }
+
+        assertTrue(inSimsFile.exists());
+        assertTrue(inSimsFile.length() > 0);
+
+        final ExternalKnnSimsCommand knnCmd = new ExternalKnnSimsCommand();
+
+        knnCmd.getFileDeligate().setSourceFile(inSimsFile);
+        knnCmd.getFileDeligate().setDestinationFile(outNeighsFile);
+        knnCmd.getFileDeligate().setCharset(DEFAULT_CHARSET);
+
+        knnCmd.setIndexDeligate(new DoubleEnumeratingDelegate(
+                Enumerating.DEFAULT_TYPE, false, false, null, null));
+
+        knnCmd.setClassComparator(Weighted.recordOrder(TokenPair
+                .firstIndexOrder()));
+        knnCmd.setNearnessComparator(Comparators.reverse(Weighted
+                .<TokenPair>weightOrder()));
+        knnCmd.setK(100);
+        knnCmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
+        knnCmd.addProgressListener(new InfoProgressListener());
+
+        knnCmd.runCommand();
+
+
+        assertTrue("Output files not created.", outNeighsFile.exists());
+        assertTrue("Empty output file found.", outNeighsFile.length() > 0);
+    }
+
+    /**
+     * Routine that creates a large amount of data, that should be the absolute
+     * worst case for counting stage of the pipeline. That is data where entries
+     * and features only ever appear once, and consequently events also are
+     * unique. This causes the counting maps to be at the upper bound of their
+     * potential size.
+     *
+     * @throws java.io.IOException
+     */
+    public static void generateSimsData(
+            final File outFile, final int nEntries) throws IOException {
+
+        System.out.printf("Generating sims data for KnnTask (nEntries=%d)...%n", nEntries);
+
+        WeightedTokenPairSink sink = null;
+        Random random = newRandom();
+        try {
+            final SingleEnumeratingDelegate ded = new SingleEnumeratingDelegate(
+                    Enumerating.DEFAULT_TYPE, true, null);
+
+            sink = BybloIO.openSimsSink(outFile, DEFAULT_CHARSET, ded);
+
+            for (int entryId1 = 0; entryId1 < nEntries; entryId1++) {
+                for (int entryId2 = 0; entryId2 < nEntries; entryId2++) {
+
+                    sink.write(new Weighted<TokenPair>(new TokenPair(entryId1, entryId2),
+                            1 - 1 / Math.abs(1 + random.nextGaussian())));
+
+                    if (entryId1 * nEntries + entryId2 % 5000000 == 0
+                            || (entryId1 == nEntries - 1 && entryId2 == nEntries - 1)) {
+                        System.out.printf("> generated %d of %d events (%.2f%% complete)%n",
+                                entryId1 * nEntries + entryId2, nEntries * nEntries,
+                                (100.0d * entryId1 * nEntries + entryId2) / (nEntries * nEntries));
+                    }
+                }
+            }
+        } finally {
+            if (sink != null)
+                sink.close();
+        }
+
+        System.out.println("Generation completed.");
+    }
 }

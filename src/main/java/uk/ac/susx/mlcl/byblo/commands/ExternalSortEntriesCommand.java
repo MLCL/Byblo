@@ -36,11 +36,9 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDelegate;
-import uk.ac.susx.mlcl.byblo.io.BybloIO;
-import uk.ac.susx.mlcl.byblo.io.Token;
-import uk.ac.susx.mlcl.byblo.io.WeightSumReducerObjectSink;
-import uk.ac.susx.mlcl.byblo.io.Weighted;
+import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Checks;
+import uk.ac.susx.mlcl.lib.MemoryUsage;
 import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.Tell;
@@ -76,8 +74,12 @@ public class ExternalSortEntriesCommand extends AbstractExternalSortCommand<Weig
 
     @Override
     protected ObjectSink<Weighted<Token>> openSink(File file) throws IOException {
-        return new WeightSumReducerObjectSink<Token>(
-                BybloIO.openEntriesSink(file, getCharset(), indexDeligate));
+        return new WeightSumReducerObjectSink<Token>(BybloIO.openEntriesSink(file, getCharset(), indexDeligate));
+    }
+
+    @Override
+    protected long getBytesPerObject() {
+        return new MemoryUsage().add(new Weighted<Token>(new Token(1),1)).getInstanceSizeBytes();
     }
 
     @Override

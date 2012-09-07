@@ -198,7 +198,6 @@ public class ExternalSortEventsCommandTest extends
 		cmd.setSourceFile(randomisedFile);
 		cmd.setDestinationFile(sortedFile);
 		cmd.setCharset(DEFAULT_CHARSET);
-		cmd.setMaxChunkSize(1000);
 		cmd.setNumThreads(6);
 		cmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
 		cmd.setIndexDeligate(idx);

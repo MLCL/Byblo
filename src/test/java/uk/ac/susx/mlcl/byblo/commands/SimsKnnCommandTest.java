@@ -40,6 +40,7 @@ import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_SIMS;
 import static uk.ac.susx.mlcl.TestConstants.TEST_OUTPUT_DIR;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.junit.After;
 import org.junit.Before;
@@ -47,7 +48,9 @@ import org.junit.Test;
 
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
+import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
+import uk.ac.susx.mlcl.byblo.io.TokenPairSink;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.Comparators;
 

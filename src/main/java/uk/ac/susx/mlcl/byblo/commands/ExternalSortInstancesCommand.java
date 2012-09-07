@@ -38,7 +38,9 @@ import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
+import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.Checks;
+import uk.ac.susx.mlcl.lib.MemoryUsage;
 import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.Tell;
@@ -69,12 +71,16 @@ public class ExternalSortInstancesCommand extends AbstractExternalSortCommand<To
         super.runCommand();
         indexDeligate.saveEnumerator();
         indexDeligate.closeEnumerator();
-
     }
 
     @Override
     protected ObjectSink<TokenPair> openSink(File file) throws IOException {
         return BybloIO.openInstancesSink(file, getCharset(), indexDeligate);
+    }
+
+    @Override
+    protected long getBytesPerObject() {
+        return new MemoryUsage().add(new TokenPair(1,1)).getInstanceSizeBytes();
     }
 
     @Override
