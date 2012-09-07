@@ -18,7 +18,7 @@ To use this library as part of a Maven managed project, simply add the following
 <dependency>
    	<groupId>uk.ac.susx.mlcl</groupId>
 	<artifactId>mlcl-lib</artifactId>
-	<version>0.2</version>
+	<version>0.2.1</version>
 	<type>jar</type>
 </dependency>
 ```
