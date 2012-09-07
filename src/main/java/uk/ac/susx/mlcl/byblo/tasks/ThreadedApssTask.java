@@ -318,7 +318,7 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
     }
 
     private int getThrottleSize() {
-        return getNumThreads() * 2 + 1;
+        return getNumThreads() + 1;
     }
 
 
@@ -326,25 +326,24 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
 
         // Maximum possible non-zero cardinality of any feature vector. In theory this is Integer.MAX_VALUE, through
         // with real data that bound never occurs since feature vectors are typically very sparse, especially if
-        // filtering has been performed. Instead we'll take the square root for pretty much no reason what so ever. To
-        // improve this estimation we need to set nFeatures empirically based on the actual data being run, which will
-        // require a whole bunch of re-factoring.
-        final long nFeatures = (int) Math.ceil(Math.sqrt(Integer.MAX_VALUE));
+        // filtering has been performed.
+        // TODO: filtering stage should record the largest non-zero cardinality, which should be used for nFeatures.
+        final double nFeatures = 10000;
 
         // number of concurrent worker units that can exist at one time
-        final long nWorkUnits = getNumThreads() + getThrottleSize();
+        final double nWorkUnits = getThrottleSize();
 
-        // each worker has 2 chunks (although it may be less overall because chunks can be shared)
-        final long pairMultiplier = 2;
+        // each worker has 2 chunks, but most of the time at least one of the chunks is shared
+        final double pairMultiplier = (nWorkUnits + 1) / nWorkUnits;
 
         // theoretical number of bytes per feature is: 1 x int32 + 1 x double
         // note that arrays should be packed even on 64 bit platforms
-        final long bytesPerFeature = 4 + 8;
+        final double bytesPerFeature = 4 + 8;
 
         // It's a tad conservative to use free memory rather than total memory,
         // but we can't be sure what else is going on
         System.gc();
-        final long availableMemory = MiscUtil.freeMaxMemory();
+        final double availableMemory = MiscUtil.freeMaxMemory();
 
         double chunkSize = availableMemory / (nFeatures * nWorkUnits * pairMultiplier * bytesPerFeature);
         assert chunkSize > 0;
