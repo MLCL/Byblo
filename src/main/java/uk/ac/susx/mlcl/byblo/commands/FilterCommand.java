@@ -37,6 +37,7 @@ import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Function;
 import com.google.common.base.Objects.ToStringHelper;
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import it.unimi.dsi.fastutil.ints.IntSortedSet;
 import org.apache.commons.logging.Log;
@@ -67,8 +68,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Predicates.*;
 import static java.text.MessageFormat.format;
-import static uk.ac.susx.mlcl.lib.Predicates2.*;
 
 /**
  * TODO: Efficiency improvements could be found be combining predicates more
@@ -197,11 +198,9 @@ public class FilterCommand extends AbstractCommand implements
     public FilterCommand() {
         featureBlacklist = newIntSet(1 << 16);
         entryBlacklist = newIntSet(1 << 16);
-        setAcceptFeatures(Predicates2.<Weighted<Token>>and(
-                getAcceptFeatures(), compose(not(in(featureBlacklist)), id())));
-        setAcceptEntries(Predicates2.<Weighted<Token>>and(getAcceptEntries(),
-                compose(not(in(entryBlacklist)), id())));
-        setAcceptEvent(Predicates2.<Weighted<TokenPair>>and(acceptEvents,
+        setAcceptFeatures(Predicates.<Weighted<Token>>and(getAcceptFeatures(), compose(not(in(featureBlacklist)), id())));
+        setAcceptEntries(Predicates.<Weighted<Token>>and(getAcceptEntries(), compose(not(in(entryBlacklist)), id())));
+        setAcceptEvent(Predicates.<Weighted<TokenPair>>and(getAcceptEvent(),
                 compose(not(in(entryBlacklist)), eventEntryId()),
                 compose(not(in(featureBlacklist)), eventFeatureId())));
     }
@@ -427,9 +426,6 @@ public class FilterCommand extends AbstractCommand implements
 
     private void filterEntries() throws FileNotFoundException, IOException {
 
-//        final IntSet rejected = newIntSet();
-
-
         WeightedTokenSource entriesSource = BybloIO.openEntriesSource(
                 activeEntriesFile, getCharset(), getIndexDelegate());
 
@@ -483,12 +479,7 @@ public class FilterCommand extends AbstractCommand implements
 
         entryFilterRequired = false;
         activeEntriesFile = outputFile;
-//
-//        // Update the feature acceptance predicate
-//        if (rejected.size() > 0) {
-//            eventFilterRequired = true;
-////            entryBlacklist.addAll(rejected);
-//        }
+
 
     }
 
@@ -751,7 +742,7 @@ public class FilterCommand extends AbstractCommand implements
         return acceptFeatures;
     }
 
-    public void setAcceptFeatures(Predicate<Weighted<Token>> acceptFeature) {
+    private void setAcceptFeatures(Predicate<Weighted<Token>> acceptFeature) {
         if (!acceptFeature.equals(this.acceptFeatures)) {
             this.acceptFeatures = acceptFeature;
             featureFilterRequired = true;
@@ -759,38 +750,25 @@ public class FilterCommand extends AbstractCommand implements
     }
 
     public void addFeaturesMinimumFrequency(double threshold) {
-        setAcceptFeatures(Predicates2.<Weighted<Token>>and(
-                getAcceptFeatures(),
-                Predicates2.compose(Predicates2.gte(threshold),
-                        this.<Token>weight())));
+        setAcceptFeatures(Predicates.<Weighted<Token>>and(getAcceptFeatures(), compose(Predicates2.gte(threshold), this.<Token>weight())));
     }
 
     public void addFeaturesMaximumFrequency(double threshold) {
-        setAcceptFeatures(Predicates2.<Weighted<Token>>and(
-                getAcceptFeatures(),
-                Predicates2.compose(Predicates2.lte(threshold),
-                        this.<Token>weight())));
+        setAcceptFeatures(Predicates.<Weighted<Token>>and(getAcceptFeatures(), compose(Predicates2.lte(threshold), this.<Token>weight())));
     }
 
     public void addFeaturesFrequencyRange(double min, double max) {
-        setAcceptFeatures(Predicates2.<Weighted<Token>>and(
-                getAcceptFeatures(),
-                Predicates2.compose(Predicates2.inRange(min, max),
-                        this.<Token>weight())));
+        setAcceptFeatures(Predicates.<Weighted<Token>>and(getAcceptFeatures(), compose(Predicates2.inRange(min, max), this.<Token>weight())));
     }
 
     public void addFeaturesPattern(String pattern) {
-        setAcceptFeatures(Predicates2.<Weighted<Token>>and(
-                getAcceptFeatures(), Predicates2.compose(
-                Predicates2.containsPattern(pattern), featureString())));
+        setAcceptFeatures(Predicates.<Weighted<Token>>and(getAcceptFeatures(), compose(Predicates.containsPattern(pattern), featureString())));
     }
 
     public void addFeaturesWhitelist(List<String> strings) throws IOException {
         IntSet featureIdSet = toEnumeratedIntSet(strings, getIndexDelegate()
                 .getFeatureEnumerator());
-        setAcceptFeatures(Predicates2.<Weighted<Token>>and(
-                getAcceptFeatures(),
-                Predicates2.compose(Predicates2.in(featureIdSet), id())));
+        setAcceptFeatures(Predicates.<Weighted<Token>>and(getAcceptFeatures(), compose(in(featureIdSet), id())));
     }
 
     public void addFeaturesBlacklist(List<String> strings) throws IOException {
@@ -803,7 +781,7 @@ public class FilterCommand extends AbstractCommand implements
         return acceptEvents;
     }
 
-    public void setAcceptEvent(Predicate<Weighted<TokenPair>> acceptFeature) {
+    private void setAcceptEvent(Predicate<Weighted<TokenPair>> acceptFeature) {
         if (!acceptFeature.equals(this.acceptEvents)) {
             this.acceptEvents = acceptFeature;
             eventFilterRequired = true;
@@ -811,31 +789,22 @@ public class FilterCommand extends AbstractCommand implements
     }
 
     public void addEventMinimumFrequency(double threshold) {
-        setAcceptEvent(Predicates2.<Weighted<TokenPair>>and(
-                getAcceptEvent(),
-                Predicates2.compose(Predicates2.gte(threshold),
-                        this.<TokenPair>weight())));
+        setAcceptEvent(Predicates.<Weighted<TokenPair>>and(getAcceptEvent(), compose(Predicates2.gte(threshold), this.<TokenPair>weight())));
     }
 
     public void addEventMaximumFrequency(double threshold) {
-        setAcceptEvent(Predicates2.<Weighted<TokenPair>>and(
-                getAcceptEvent(),
-                Predicates2.compose(Predicates2.lte(threshold),
-                        this.<TokenPair>weight())));
+        setAcceptEvent(Predicates.<Weighted<TokenPair>>and(getAcceptEvent(), compose(Predicates2.lte(threshold), this.<TokenPair>weight())));
     }
 
     public void addEventFrequencyRange(double min, double max) {
-        setAcceptEvent(Predicates2.<Weighted<TokenPair>>and(
-                getAcceptEvent(),
-                Predicates2.compose(Predicates2.inRange(min, max),
-                        this.<TokenPair>weight())));
+        setAcceptEvent(Predicates.<Weighted<TokenPair>>and(getAcceptEvent(), compose(Predicates2.inRange(min, max), this.<TokenPair>weight())));
     }
 
     public Predicate<Weighted<Token>> getAcceptEntries() {
         return acceptEntries;
     }
 
-    public void setAcceptEntries(Predicate<Weighted<Token>> acceptEntry) {
+    private void setAcceptEntries(Predicate<Weighted<Token>> acceptEntry) {
         if (!acceptEntry.equals(this.acceptEntries)) {
             this.acceptEntries = acceptEntry;
             entryFilterRequired = true;
@@ -843,43 +812,30 @@ public class FilterCommand extends AbstractCommand implements
     }
 
     public void addEntryMinimumFrequency(double threshold) {
-        setAcceptEntries(Predicates2.<Weighted<Token>>and(
-                getAcceptEntries(),
-                Predicates2.compose(Predicates2.gte(threshold),
-                        this.<Token>weight())));
+        setAcceptEntries(Predicates.<Weighted<Token>>and(getAcceptEntries(), compose(Predicates2.gte(threshold), this.<Token>weight())));
     }
 
     public void addEntryMaximumFrequency(double threshold) {
-        setAcceptEntries(Predicates2.<Weighted<Token>>and(
-                getAcceptEntries(),
-                Predicates2.compose(Predicates2.lte(threshold),
-                        this.<Token>weight())));
+        setAcceptEntries(Predicates.<Weighted<Token>>and(getAcceptEntries(), compose(Predicates2.lte(threshold), this.<Token>weight())));
     }
 
     public void addEntryFrequencyRange(double min, double max) {
-        setAcceptEntries(Predicates2.<Weighted<Token>>and(
-                getAcceptEntries(),
-                Predicates2.compose(Predicates2.inRange(min, max),
-                        this.<Token>weight())));
+        setAcceptEntries(Predicates.<Weighted<Token>>and(getAcceptEntries(), compose(Predicates2.inRange(min, max), this.<Token>weight())));
     }
 
     public void addEntryPattern(String pattern) {
-        setAcceptEntries(Predicates2.<Weighted<Token>>and(getAcceptEntries(),
-                Predicates2.compose(Predicates2.containsPattern(pattern),
-                        entryString())));
+        setAcceptEntries(Predicates.<Weighted<Token>>and(getAcceptEntries(), compose(Predicates.containsPattern(pattern), entryString())));
     }
 
     public void addEntryWhitelist(List<String> strings) throws IOException {
         IntSet entryIdSet = toEnumeratedIntSet(strings, getIndexDelegate()
                 .getEntryEnumerator());
-        setAcceptEntries(Predicates2.<Weighted<Token>>and(getAcceptEntries(),
-                Predicates2.compose(Predicates2.in(entryIdSet), id())));
+        setAcceptEntries(Predicates.<Weighted<Token>>and(getAcceptEntries(), compose(in(entryIdSet), id())));
 
     }
 
     public void addEntryBlacklist(List<String> strings) throws IOException {
-        IntSet entryIdSet = toEnumeratedIntSet(strings, getIndexDelegate()
-                .getEntryEnumerator());
+        IntSet entryIdSet = toEnumeratedIntSet(strings, getIndexDelegate().getEntryEnumerator());
         entryBlacklist.addAll(entryIdSet);
     }
 

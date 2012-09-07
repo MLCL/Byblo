@@ -30,251 +30,68 @@
  */
 package uk.ac.susx.mlcl.lib;
 
-import com.google.common.base.Function;
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class Predicates2 {
 
-    public static <T> Predicate<T> in(Collection<? extends T> target) {
-        if (target.isEmpty())
-            return alwaysFalse();
-        else
-            return new InPredicate<T>(target);
-    }
-
-    public static <A, B> Predicate<A> compose(
-            Predicate<B> predicate, Function<A, ? extends B> function) {
-        if (predicate.equals(alwaysFalse()))
-            return alwaysFalse();
-        else if (predicate.equals(alwaysTrue()))
-            return alwaysTrue();
-        else
-            return Predicates.compose(predicate, function);
-    }
-
-    public static <T> Predicate<T> alwaysTrue() {
-        return Predicates.alwaysTrue();
-    }
-
-    public static <T> Predicate<T> alwaysFalse() {
-        return Predicates.alwaysFalse();
-    }
-
-    public static <T> Predicate<T> isNull() {
-        return Predicates.isNull();
-    }
-
-    public static <T> Predicate<T> notNull() {
-        return Predicates.notNull();
-    }
-
-    public static <T> Predicate<T> not(Predicate<T> predicate) {
-        if (predicate.equals(alwaysFalse()))
-            return alwaysTrue();
-        else if (predicate.equals(alwaysFalse()))
-            return alwaysTrue();
-        else
-            return Predicates.not(predicate);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> Predicate<T> and(
-            Iterable<? extends Predicate<? super T>> components) {
-        Set<Predicate<? super T>> result = new HashSet<Predicate<? super T>>();
-        for (Predicate<? super T> predicate : components) {
-            if (predicate.equals(alwaysFalse()))
-                return alwaysFalse();
-            else if (!predicate.equals(alwaysTrue()))
-                result.add(Preconditions.checkNotNull(predicate));
-        }
-        if (result.isEmpty())
-            return alwaysTrue();
-        if (result.size() == 1)
-            return (Predicate<T>) result.iterator().next();
-        else
-            return Predicates.and(components);
-    }
-
-    public static <T> Predicate<T> and(Predicate<? super T>... components) {
-        return and(Arrays.asList(components));
-    }
-
-    public static <T> Predicate<T> and(
-            Predicate<? super T> first, Predicate<? super T> second) {
-        return and(Predicates2.<T>asList(first, second));
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> Predicate<T> or(
-            Iterable<? extends Predicate<? super T>> components) {
-        Set<Predicate<? super T>> result = new HashSet<Predicate<? super T>>();
-        for (Predicate<? super T> predicate : components) {
-            if (predicate.equals(alwaysTrue()))
-                return alwaysTrue();
-            else if (!predicate.equals(alwaysFalse()))
-                result.add(Preconditions.checkNotNull(predicate));
-        }
-        if (result.isEmpty())
-            return alwaysFalse();
-        if (result.size() == 1)
-            return (Predicate<T>) result.iterator().next();
-        else
-            return Predicates.or(components);
-    }
-
-    public static <T> Predicate<T> or(Predicate<? super T>... components) {
-        return or(Arrays.asList(components));
-    }
-
-    public static <T> Predicate<T> or(Predicate<? super T> first,
-                                      Predicate<? super T> second) {
-        return or(Predicates2.<T>asList(first, second));
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> List<Predicate<? super T>> asList(
-            Predicate<? super T> first, Predicate<? super T> second) {
-        return Arrays.<Predicate<? super T>>asList(
-                Preconditions.checkNotNull(first),
-                Preconditions.checkNotNull(second));
-    }
-
-    public static <T> Predicate<T> equalTo(T target) {
-        return Predicates.equalTo(target);
-    }
-
-    public static Predicate<Object> instanceOf(Class<?> clazz) {
-        return Predicates.instanceOf(clazz);
-    }
-
-    public static Predicate<CharSequence> containsPattern(String pattern) {
-        return Predicates.containsPattern(pattern);
-    }
-
-    public static Predicate<CharSequence> contains(Pattern pattern) {
-        return Predicates.contains(pattern);
-    }
-
     public static Predicate<Double> lt(final double threshold) {
         if (Double.isNaN(threshold))
-            return alwaysFalse();
+            return Predicates.alwaysFalse();
         else if (threshold == Double.NEGATIVE_INFINITY)
-            return alwaysFalse();
+            return Predicates.alwaysFalse();
         else
             return new LessThan(threshold);
     }
 
     public static Predicate<Double> eq(final double value) {
         if (Double.isNaN(value))
-            return alwaysFalse();
+            return Predicates.alwaysFalse();
         else
             return Predicates.equalTo(value);
     }
 
     public static Predicate<Double> lte(final double threshold) {
         if (Double.isNaN(threshold))
-            return alwaysFalse();
+            return Predicates.alwaysFalse();
         else if (threshold == Double.POSITIVE_INFINITY)
-            return alwaysFalse();
+            return Predicates.alwaysFalse();
         else
-            return not(gt(threshold));
+            return Predicates.not(gt(threshold));
     }
 
     public static Predicate<Double> gt(final double threshold) {
         if (Double.isNaN(threshold))
-            return alwaysFalse();
+            return Predicates.alwaysFalse();
         else if (threshold == Double.POSITIVE_INFINITY)
-            return alwaysFalse();
+            return Predicates.alwaysFalse();
         else
             return new GreaterThan(threshold);
     }
 
     public static Predicate<Double> gte(final double threshold) {
         if (Double.isNaN(threshold))
-            return alwaysFalse();
+            return Predicates.alwaysFalse();
         else if (threshold == Double.NEGATIVE_INFINITY)
-            return alwaysFalse();
+            return Predicates.alwaysFalse();
         else
-            return not(lt(threshold));
+            return Predicates.not(lt(threshold));
     }
 
     public static Predicate<Double> inRange(double min, double max) {
         if (min > max)
-            return alwaysFalse();
+            return Predicates.alwaysFalse();
         if (min == Double.NEGATIVE_INFINITY && max == Double.POSITIVE_INFINITY)
-            return alwaysTrue();
+            return Predicates.alwaysTrue();
         if (Double.isNaN(min) || Double.isNaN(max))
-            return alwaysFalse();
+            return Predicates.alwaysFalse();
         return new InRange(min, max);
-    }
-
-    private static class InPredicate<T> implements Predicate<T>, Serializable {
-
-        private static final long serialVersionUID = 0;
-
-        private final Collection<?> target;
-
-        private InPredicate(Collection<?> target) {
-            this.target = Preconditions.checkNotNull(target);
-        }
-
-        @Override
-        public boolean apply(T t) {
-            try {
-                return target.contains(t);
-            } catch (NullPointerException e) {
-                return false;
-            } catch (ClassCastException e) {
-                return false;
-            }
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj instanceof InPredicate) {
-                InPredicate<?> that = (InPredicate<?>) obj;
-                return target.equals(that.target);
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return target.hashCode();
-        }
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public String toString() {
-            if (target.size() <= 20)
-                return "In(" + target + ")";
-            else {
-                Collection<T> tmp = new ArrayList<T>();
-                int i = 0;
-                Iterator<?> it = target.iterator();
-                while (it.hasNext() && i++ < 20) {
-                    tmp.add((T) it.next());
-                }
-                return "In(" + tmp + ", ...)";
-            }
-        }
-
     }
 
     private static class InRange implements Predicate<Double>, Serializable {
