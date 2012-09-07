@@ -55,6 +55,7 @@
 
         <fileSet>
             <directory>${project.build.directory}</directory>
+            <outputDirectory>.</outputDirectory>
             <includes>
                 <include>${project.build.finalName}.jar</include>
             </includes>
@@ -62,6 +63,7 @@
 
         <fileSet>
             <directory>${project.basedir}/src/main/scripts</directory>
+            <outputDirectory>.</outputDirectory>
             <fileMode>0775</fileMode>
         </fileSet>
     </fileSets>
