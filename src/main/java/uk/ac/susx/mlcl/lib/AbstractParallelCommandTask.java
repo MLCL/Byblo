@@ -97,7 +97,7 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
         return nThreads;
     }
 
-    private synchronized final ExecutorService getExecutor() {
+    private synchronized ExecutorService getExecutor() {
         if (executor == null) {
             // Create a new thread pool using an unbounded queue - throttling will
             // be handled by a semaphore

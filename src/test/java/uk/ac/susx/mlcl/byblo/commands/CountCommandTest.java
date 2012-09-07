@@ -117,12 +117,12 @@ public class CountCommandTest extends AbstractCommandTest<CountCommand> {
         if (preindexedEntries) {
             List<String> tmp = new ArrayList<String>(Arrays.asList(args));
             tmp.add("--enumerated-entries");
-            args = tmp.toArray(new String[0]);
+            args = tmp.toArray(new String[tmp.size()]);
         }
         if (preindexedFeatures) {
             List<String> tmp = new ArrayList<String>(Arrays.asList(args));
             tmp.add("--enumerated-features");
-            args = tmp.toArray(new String[0]);
+            args = tmp.toArray(new String[tmp.size()]);
         }
 
         try {

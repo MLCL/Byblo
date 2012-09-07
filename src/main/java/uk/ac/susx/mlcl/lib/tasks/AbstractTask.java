@@ -123,9 +123,7 @@ public abstract class AbstractTask implements Task {
     public boolean equals(Object obj) {
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
-            return false;
-        return equals((AbstractTask) obj);
+        return getClass() == obj.getClass() && equals((AbstractTask) obj);
     }
 
     @Override

@@ -117,7 +117,7 @@ public class PoissonDistribution {
 	}
 
 	@VisibleForTesting
-	protected static final double factorial(final int n) {
+	protected static double factorial(final int n) {
 		if (n < 0)
 			throw new IllegalArgumentException("n < 0");
 		if (n > 170)

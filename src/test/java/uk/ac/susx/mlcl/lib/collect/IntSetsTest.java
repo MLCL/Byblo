@@ -104,9 +104,9 @@ public class IntSetsTest extends AbstractTest {
 
 				sw.reset();
 				sw.start();
-				for (int j = 0; j < data.length; j++) {
-					intSet.add(data[j]);
-				}
+                for (int aData : data) {
+                    intSet.add(aData);
+                }
 				sw.stop();
 				times[i][r] = sw.elapsedMillis();
 

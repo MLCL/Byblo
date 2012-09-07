@@ -89,10 +89,7 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
         if (obj == this) {
             return true;
         }
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        return equals((Weighted<?>) obj);
+        return !(obj == null || getClass() != obj.getClass()) && equals((Weighted<?>) obj);
     }
 
     public boolean equals(Weighted<?> other) {

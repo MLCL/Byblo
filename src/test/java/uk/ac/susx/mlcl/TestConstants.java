@@ -126,8 +126,6 @@ public class TestConstants {
 
     public static final Charset DEFAULT_CHARSET = Files.DEFAULT_CHARSET;
 
-    ;
-
     static {
         TEST_OUTPUT_DIR.mkdir();
         TEST_TMP_DIR.mkdir();
@@ -153,7 +151,6 @@ public class TestConstants {
     public static void assertValidInputFiles(File... files) throws IOException {
         for (File file : files) {
             assertNotNull("File is null.", file);
-            assertTrue(format("Input file is null: \"{0}\"", file), file != null);
             assertTrue(format("Input file does not exist: \"{0}\" ", file),
                     file.exists());
             assertTrue(
@@ -180,7 +177,6 @@ public class TestConstants {
     public static void assertValidJDBCInputFiles(File... files) throws IOException {
         for (File file : files) {
             assertNotNull("File is null.", file);
-            assertTrue(format("Input file is null: \"{0}\"", file), file != null);
 
             File data = new File(file.getParentFile(), file.getName() + ".d.0");
             File index = new File(file.getParentFile(), file.getName() + ".i.0");
@@ -193,7 +189,6 @@ public class TestConstants {
     public static void assertValidIndexInputFiles(File... files) throws IOException {
         for (File file : files) {
             assertNotNull("File is null.", file);
-            assertTrue(format("Input file is null: \"{0}\"", file), file != null);
             File data = new File(file.getParentFile(), file.getName() + ".d.0");
             File index = new File(file.getParentFile(), file.getName() + ".i.0");
             File trans = new File(file.getParentFile(), file.getName() + ".t");

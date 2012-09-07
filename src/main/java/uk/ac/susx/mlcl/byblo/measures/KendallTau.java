@@ -222,9 +222,7 @@ public class KendallTau extends AbstractProximity {
         // The relationship between these and disjoint features
         sum += 2 * ((numFeatures - unionSize) * intersectionSize);
         //
-        double sim = (double) (sum) / (double) (numFeatures * (numFeatures - 1));
-
-        return sim;
+        return (double) (sum) / (double) (numFeatures * (numFeatures - 1));
     }
 
     @Override

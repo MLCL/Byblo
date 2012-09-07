@@ -196,7 +196,7 @@ public class ProgressAggregate extends ProgressDelegate {
     }
 
     public ProgressReporting[] getChildProgressReporters() {
-        return children.toArray(new ProgressReporting[0]);
+        return children.toArray(new ProgressReporting[children.size()]);
     }
 
     public boolean hasChildProgressReporters() {
@@ -210,9 +210,7 @@ public class ProgressAggregate extends ProgressDelegate {
         if (getClass() != obj.getClass())
             return false;
         final ProgressAggregate other = (ProgressAggregate) obj;
-        if (this.children != other.children && (this.children == null || !this.children.equals(other.children)))
-            return false;
-        return super.equals(other);
+        return !(this.children != other.children && (this.children == null || !this.children.equals(other.children))) && super.equals(other);
     }
 
     @Override

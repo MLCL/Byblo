@@ -149,7 +149,7 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
     }
 
     public boolean equals(BiMapEnumerator<?> other) {
-        if (nextId != other.nextId && (nextId == null || !nextId.equals(other.nextId)))
+        if (!nextId.equals(other.nextId) && (nextId == null || !nextId.equals(other.nextId)))
             return false;
         if (map != other.map && (map == null || !map.equals(other.map)))
             return false;

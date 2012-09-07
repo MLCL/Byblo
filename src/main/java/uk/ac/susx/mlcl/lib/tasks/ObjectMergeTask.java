@@ -136,9 +136,7 @@ public final class ObjectMergeTask<T> extends AbstractTask implements ProgressRe
     public boolean equals(Object obj) {
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
-            return false;
-        return equals((ObjectMergeTask<?>) obj);
+        return getClass() == obj.getClass() && equals((ObjectMergeTask<?>) obj);
     }
 
     @Override

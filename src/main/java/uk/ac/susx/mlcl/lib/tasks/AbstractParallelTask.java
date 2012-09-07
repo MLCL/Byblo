@@ -85,7 +85,7 @@ public abstract class AbstractParallelTask extends AbstractTask {
         return numThreads;
     }
 
-    private synchronized final ExecutorService getExecutor() {
+    private synchronized ExecutorService getExecutor() {
         if (executor == null) {
             // Create a new thread pool using an unbounded queue - throttling will
             // be handled by a semaphore
@@ -186,9 +186,7 @@ public abstract class AbstractParallelTask extends AbstractTask {
     public boolean equals(Object obj) {
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
-            return false;
-        return equals((AbstractParallelTask) obj);
+        return getClass() == obj.getClass() && equals((AbstractParallelTask) obj);
     }
 
     @Override

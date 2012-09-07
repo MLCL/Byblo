@@ -83,9 +83,7 @@ public final class Token implements Serializable, Comparable<Token>, Cloneable {
     public boolean equals(Object obj) {
         if (obj == this)
             return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        return equals((Token) obj);
+        return !(obj == null || getClass() != obj.getClass()) && equals((Token) obj);
     }
 
     public boolean equals(Token other) {

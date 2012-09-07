@@ -222,34 +222,25 @@ public class AllPairsCommand extends AbstractCommand {
         // Mutual Information based proximity measures require the frequencies
         // of each feature, and other associate values
         if (proximity instanceof AbstractMIProximity) {
-            try {
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("Loading features file " + getFeaturesFile());
-                }
-
-                WTStatsSource features = new WTStatsSource(openFeaturesSource());
-
-                AbstractMIProximity bmip = ((AbstractMIProximity) proximity);
-                bmip.setFeatureFrequencies(readAllAsArray(features));
-                bmip.setFeatureFrequencySum(features.getWeightSum());
-                bmip.setOccurringFeatureCount(features.getMaxId() + 1);
-
-            } catch (IOException e) {
-                throw e;
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Loading features file " + getFeaturesFile());
             }
+
+            WTStatsSource features = new WTStatsSource(openFeaturesSource());
+
+            AbstractMIProximity bmip = ((AbstractMIProximity) proximity);
+            bmip.setFeatureFrequencies(readAllAsArray(features));
+            bmip.setFeatureFrequencySum(features.getWeightSum());
+            bmip.setOccurringFeatureCount(features.getMaxId() + 1);
+
         } else if (proximity instanceof KendallTau) {
-            try {
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("Loading entries file for KendalTau.numFeatures: " + getFeaturesFile());
-                }
-
-                WTStatsSource features = new WTStatsSource(openFeaturesSource());
-                ObjectIO.copy(features, ObjectIO.<Weighted<Token>>nullSink());
-                ((KendallTau) proximity).setNumFeatures(features.getMaxId() + 1);
-
-            } catch (IOException e) {
-                throw e;
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Loading entries file for KendalTau.numFeatures: " + getFeaturesFile());
             }
+
+            WTStatsSource features = new WTStatsSource(openFeaturesSource());
+            ObjectIO.copy(features, ObjectIO.<Weighted<Token>>nullSink());
+            ((KendallTau) proximity).setNumFeatures(features.getMaxId() + 1);
         }
         //XXX This needs to be sorted out --- filter id must be read from the
         // stored enumeration, for optimal robustness
@@ -355,9 +346,7 @@ public class AllPairsCommand extends AbstractCommand {
                 maxId = k;
         }
         double[] entryFreqs = new double[maxId + 1];
-        ObjectIterator<Int2DoubleMap.Entry> it = entityFrequenciesMap.int2DoubleEntrySet().iterator();
-        while (it.hasNext()) {
-            Int2DoubleMap.Entry entry = it.next();
+        for (Int2DoubleMap.Entry entry : entityFrequenciesMap.int2DoubleEntrySet()) {
             entryFreqs[entry.getIntKey()] = entry.getDoubleValue();
         }
         return entryFreqs;
@@ -444,8 +433,8 @@ public class AllPairsCommand extends AbstractCommand {
                 uk.ac.susx.mlcl.byblo.measures.Lin.class.getPackage().getName() + ".measures");
         final String[] measures = res.getString("measures").split(",");
 
-        for (int i = 0; i < measures.length; i++) {
-            final String measure = measures[i].trim();
+        for (String measure1 : measures) {
+            final String measure = measure1.trim();
             final String className = res.getString("measure." + measure + ".class");
             @SuppressWarnings("unchecked")
             final Class<? extends Proximity> clazz = (Class<? extends Proximity>) Class.forName(className);

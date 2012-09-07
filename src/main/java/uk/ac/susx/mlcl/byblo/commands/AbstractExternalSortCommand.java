@@ -227,7 +227,7 @@ public abstract class AbstractExternalSortCommand<T>
         for (int i = 0; i < nextFileToMerge.length - 1; i++) {
             if (nextFileToMerge[i] == null) {
 
-                continue;
+               // nothing
 
             } else if (nextFileToMerge[i + 1] == null) {
 

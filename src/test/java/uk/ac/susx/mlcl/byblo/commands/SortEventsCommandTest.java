@@ -255,9 +255,8 @@ public class SortEventsCommandTest extends
 
 	private static WeightedTokenPairSink openSink(File file,
 			DoubleEnumeratingDelegate idx, boolean compact) throws IOException {
-		WeightedTokenPairSink sink = WeightedTokenPairSink.open(file,
+		return WeightedTokenPairSink.open(file,
 				DEFAULT_CHARSET, idx, false, false, compact);
-		return sink;
 	}
 
 }

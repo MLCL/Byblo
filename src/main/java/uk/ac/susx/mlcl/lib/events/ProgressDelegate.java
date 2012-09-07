@@ -277,18 +277,14 @@ public class ProgressDelegate implements ProgressReporting, Serializable {
             return false;
         if (this.outer != other.outer && (this.outer == null || !this.outer.equals(other.outer)))
             return false;
-        if (this.event != other.event && (this.event == null || !this.event.equals(other.event)))
-            return false;
-        return true;
+        return !(this.event != other.event && (this.event == null || !this.event.equals(other.event)));
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
-            return false;
-        return equals((ProgressDelegate) obj);
+        return getClass() == obj.getClass() && equals((ProgressDelegate) obj);
     }
 
     @Override

@@ -129,7 +129,7 @@ public final class DoubleEnumeratingDelegate
 
     @Override
     public void openEntriesEnumerator() throws IOException {
-        entryEnumerator = open(entryEnumeratorFile);;
+        entryEnumerator = open(entryEnumeratorFile);
     }
 
     @Override

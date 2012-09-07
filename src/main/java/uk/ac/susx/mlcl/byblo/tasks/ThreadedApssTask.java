@@ -262,7 +262,7 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
         super.finaliseTask();
     }
 
-    protected <T extends Task> Future<T> queueTask(final T task) throws InterruptedException {
+    protected <T extends Task> void queueTask(final T task) throws InterruptedException {
         if (task == null) {
             throw new NullPointerException("task is null");
         }
@@ -289,7 +289,6 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
         try {
             Future<T> future = getExecutor().submit(wrapper, task);
             getFutureQueue().offer(future);
-            return future;
         } catch (RejectedExecutionException e) {
             throttle.release();
             throw e;

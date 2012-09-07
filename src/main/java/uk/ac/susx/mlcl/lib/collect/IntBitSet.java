@@ -617,9 +617,7 @@ public final class IntBitSet extends AbstractIntSortedSet implements
         public boolean contains(int k) {
             if (isFromElementSet && k < fromElement)
                 return false;
-            if (isToElementSet && k >= toElement)
-                return false;
-            return IntBitSet.this.contains(k);
+            return !(isToElementSet && k >= toElement) && IntBitSet.this.contains(k);
         }
 
         @Override
@@ -832,7 +830,7 @@ public final class IntBitSet extends AbstractIntSortedSet implements
                         + " method.");
             final boolean removed = IntBitSet.this
                     .remove(forwards ? prevElement : nextElement);
-            assert removed == true;
+            assert removed;
             canRemove = false;
         }
 

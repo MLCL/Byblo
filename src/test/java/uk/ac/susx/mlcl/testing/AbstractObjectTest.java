@@ -188,7 +188,7 @@ public abstract class AbstractObjectTest<T> extends AbstractTest {
 	/**
 	 * If the object implements {@link Serializable} interface, then it should
 	 * be possible to serialize then de-serialize the object to receive an exact
-	 * deep copy. All the constraints of {@link #assertCloneEquals()} should
+	 * deep copy. All the constraints of {@link #assertCloneEquals(Object, Object)} } should
 	 * hold.
 	 * 
 	 * @throws ClassNotFoundException

@@ -43,7 +43,7 @@ public interface ProgressReporting {
      */
     enum State {
 
-        PENDING, RUNNING, COMPLETED, ERROR;
+        PENDING, RUNNING, COMPLETED, ERROR
 
     }
 

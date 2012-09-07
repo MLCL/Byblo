@@ -270,7 +270,7 @@ public abstract class AbstractIntSetTest<T extends IntSet> extends
 			assertEquals(1 + i, s.size());
 			assertFalse(s.contains(1));
 			assertTrue(s.remove(2));
-			assertEquals(0 + i, s.size());
+			assertEquals(i, s.size());
 			assertFalse(s.contains(1));
 		}
 	}
