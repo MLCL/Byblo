@@ -24,7 +24,7 @@ manifest.mf
 /libs/*.zip
 
 #IntelliJ
-Byblo.iml
+*.iml
 
 # Emacs
 \#*\#
