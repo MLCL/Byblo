@@ -127,7 +127,7 @@
         </dependency>
 
 
-        <!-- The following dependancies aren't on the central repository, but
+        <!-- The following dependencies aren't on the central repository, but
             are available at http://kungf.eu:8081/nexus/ -->
 
         <dependency>
@@ -142,7 +142,7 @@
             <version>0.2.1-SNAPSHOT</version>
         </dependency>
 
-        <!-- Testing scope dependancies -->
+        <!-- Testing scope dependencies -->
 
         <dependency>
             <groupId>junit</groupId>
