@@ -65,8 +65,8 @@ public class AllPairsTaskTest {
         try {
             ExitTrapper.enableExistTrapping();
             Tools.main(new String[]{"allpairs",
-                    "-i", TestConstants.TEST_FRUIT_SKIPINDEXED_EVENTS.toString(),
-                    "-if", TestConstants.TEST_FRUIT_SKIPINDEXED_FEATURES.toString(),
+                    "-i", TestConstants.TEST_FRUIT_SKIP_INDEXED_EVENTS.toString(),
+                    "-if", TestConstants.TEST_FRUIT_SKIP_INDEXED_FEATURES.toString(),
                     "-o", new File(TestConstants.TEST_OUTPUT_DIR, "bnc-gramrels-fruit.indexed.out").toString(),
                     "--enumerated-entries",
                     "--enumerated-features"});

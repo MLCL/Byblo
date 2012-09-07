@@ -124,7 +124,7 @@ public class FilterCommandTest extends AbstractCommandTest<FilterCommand> {
     @Test
     public void testMainMethodRun_fruit_entryFreqFilter() throws Exception {
         System.out.println("Testing " + SUBJECT
-                + ": on fruit, from main method, filter by Entry freqency.");
+                + ": on fruit, from main method, filter by Entry frequency.");
 
         runWithCLI(new String[]{"--filter-entry-freq", "50"});
     }
@@ -132,7 +132,7 @@ public class FilterCommandTest extends AbstractCommandTest<FilterCommand> {
     @Test
     public void testMainMethodRun_fruit_featureFreqFilter() throws Exception {
         System.out.println("Testing " + SUBJECT
-                + " on fruit from main method, filter by context freqency.");
+                + " on fruit from main method, filter by context frequency.");
 
         runWithCLI(new String[]{"--filter-feature-freq", "50"});
     }
@@ -140,7 +140,7 @@ public class FilterCommandTest extends AbstractCommandTest<FilterCommand> {
     @Test
     public void testMainMethodRun_fruit_eventFreqFilter() throws Exception {
         System.out
-                .println("Testing FilterTask on fruit from main method, filter by feature freqency.");
+                .println("Testing FilterTask on fruit from main method, filter by feature frequency.");
 
         runWithCLI(new String[]{"--filter-event-freq", "5"});
     }
@@ -259,7 +259,7 @@ public class FilterCommandTest extends AbstractCommandTest<FilterCommand> {
 
         final FilterCommand filter = new FilterCommand();
         filter.setCharset(DEFAULT_CHARSET);
-        filter.setIndexDeligate(new DoubleEnumeratingDelegate(
+        filter.setIndexDelegate(new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, true, true, null, null));
         filter.setTempFiles(new TempFileFactory(TEST_TMP_DIR));
         filter.setInputEntriesFile(inEntries);
@@ -316,7 +316,7 @@ public class FilterCommandTest extends AbstractCommandTest<FilterCommand> {
 
         final FilterCommand filter = new FilterCommand();
         filter.setCharset(DEFAULT_CHARSET);
-        filter.setIndexDeligate(new DoubleEnumeratingDelegate(
+        filter.setIndexDelegate(new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, true, true, null, null));
         filter.setTempFiles(new TempFileFactory(TEST_TMP_DIR));
         filter.setInputEntriesFile(inEntries);

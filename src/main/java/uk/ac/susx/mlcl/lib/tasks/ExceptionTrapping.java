@@ -41,7 +41,7 @@ package uk.ac.susx.mlcl.lib.tasks;
 public interface ExceptionTrapping {
 
     /**
-     * Whether or not at leat 1 exception is currently caught by this object.
+     * Whether or not at least 1 exception is currently caught by this object.
      *
      * @return True if an exception has been caught, false otherwise
      */

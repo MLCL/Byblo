@@ -89,7 +89,7 @@ public class CountCommandTest extends AbstractCommandTest<CountCommand> {
         countTask.setCharset(charset);
         DoubleEnumeratingDelegate idx = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, preIndexEntries, preIndexFeatures, null, null);
-        countTask.setIndexDeligate(idx);
+        countTask.setIndexDelegate(idx);
         countTask.runCommand();
 
         assertTrue("Output files not created: " + outE, outE.exists());
@@ -185,21 +185,6 @@ public class CountCommandTest extends AbstractCommandTest<CountCommand> {
         runWithAPI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
                    DEFAULT_CHARSET, false, false);
 
-//        assertTrue("Output entries file differs from sampledata file.",
-//                   WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
-//                                             DEFAULT_CHARSET,
-//                                             new SingleEnumeratingDelegate(EnumeratorType.JDBC, false, null),
-//                                             new SingleEnumeratingDelegate(EnumeratorType.JDBC, false, null),
-//                                             true, false));
-//        assertTrue("Output features file differs from test data file.",
-//                   WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
-//                                             DEFAULT_CHARSET,
-//                                             new SingleEnumeratingDelegate(EnumeratorType.JDBC, false, null),
-//                                             new SingleEnumeratingDelegate(EnumeratorType.JDBC, false, null),
-//                                             true, false));
-//        assertTrue("Output entry/features file differs from test data file.",
-//                   TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
-//                                         DEFAULT_CHARSET, true, true, true, true));
     }
 
     @Test
@@ -219,24 +204,6 @@ public class CountCommandTest extends AbstractCommandTest<CountCommand> {
         runWithCLI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
                    DEFAULT_CHARSET, false, false);
 
-//        assertTrue("Output entries file differs from sampledata file.",
-//                   WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
-//                                             DEFAULT_CHARSET,
-//                                             new SingleEnumeratingDelegate(EnumeratorType.JDBC, false, null),
-//                                             new SingleEnumeratingDelegate(EnumeratorType.JDBC, false, null),
-//                                             true, false));
-//        assertTrue("Output features file differs from test data file.",
-//                   WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
-//                                             DEFAULT_CHARSET,
-//                                             new SingleEnumeratingDelegate(EnumeratorType.JDBC, false, null),
-//                                             new SingleEnumeratingDelegate(EnumeratorType.JDBC, false, null),
-//                                             true, false));
-//        assertTrue("Output entry/features file differs from test data file.",
-//                   TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
-//                                         DEFAULT_CHARSET,
-//                                         new DoubleEnumeratingDelegate(EnumeratorType.JDBC, false, false, null, null),
-//                                         new DoubleEnumeratingDelegate(EnumeratorType.JDBC, false, false, null, null),
-//                                         true, true, true, true));
     }
 
     @Test
@@ -257,27 +224,6 @@ public class CountCommandTest extends AbstractCommandTest<CountCommand> {
         runWithAPI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
                    DEFAULT_CHARSET, true, true);
 
-//        assertTrue(MessageFormat.format("Output entries file \"{0}\" differs from expected file \"{1}\".", eActual, TEST_FRUIT_INDEXED_ENTRIES),
-//                   WeightedTokenSource.equal(eActual, TEST_FRUIT_INDEXED_ENTRIES, DEFAULT_CHARSET,
-//                                             new SingleEnumeratingDelegate(EnumeratorType.JDBC, true, null),
-//                                             new SingleEnumeratingDelegate(EnumeratorType.JDBC, true, null),
-//                                             BybloIO.ENTRIES_SKIP_INDEXED_COLUMN_1, false));
-//
-//        assertTrue("Output features file differs from test data file.",
-//                   WeightedTokenSource.equal(fActual,
-//                                             TEST_FRUIT_INDEXED_FEATURES,
-//                                             DEFAULT_CHARSET, new SingleEnumeratingDelegate(EnumeratorType.JDBC, true, null),
-//                                             new SingleEnumeratingDelegate(EnumeratorType.JDBC, true, null),
-//                                             BybloIO.FEATURES_SKIP_INDEXED_COLUMN_1, false));
-//        assertTrue("Output entry/features file differs from test data file.",
-//                   TokenPairSource.equal(efActual,
-//                                         TEST_FRUIT_INDEXED_ENTRY_FEATURES,
-//                                         DEFAULT_CHARSET,
-//                                         new DoubleEnumeratingDelegate(EnumeratorType.JDBC, true, true, null, null),
-//                                         new DoubleEnumeratingDelegate(EnumeratorType.JDBC, true, true, null, null),
-//                                         BybloIO.EVENTS_SKIP_INDEXED_COLUMN_1,
-//                                         BybloIO.EVENTS_SKIP_INDEXED_COLUMN_2,
-//                                         false, false));
     }
 
     @Test
@@ -298,29 +244,6 @@ public class CountCommandTest extends AbstractCommandTest<CountCommand> {
         runWithCLI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
                    DEFAULT_CHARSET, true, true);
 
-//        assertTrue("Output entries file differs from sampledata file.",
-//                   WeightedTokenSource.equal(eActual,
-//                                             TEST_FRUIT_INDEXED_ENTRIES,
-//                                             DEFAULT_CHARSET,
-//                                             new SingleEnumeratingDelegate(EnumeratorType.JDBC, true, null),
-//                                             new SingleEnumeratingDelegate(EnumeratorType.JDBC, true, null),
-//                                             BybloIO.ENTRIES_SKIP_INDEXED_COLUMN_1, false));
-//        assertTrue("Output features file differs from test data file.",
-//                   WeightedTokenSource.equal(fActual,
-//                                             TEST_FRUIT_INDEXED_FEATURES,
-//                                             DEFAULT_CHARSET,
-//                                             new SingleEnumeratingDelegate(EnumeratorType.JDBC, true, null),
-//                                             new SingleEnumeratingDelegate(EnumeratorType.JDBC, true, null),
-//                                             BybloIO.FEATURES_SKIP_INDEXED_COLUMN_1, false));
-//        assertTrue("Output entry/features file differs from test data file.",
-//                   TokenPairSource.equal(efActual,
-//                                         TEST_FRUIT_INDEXED_ENTRY_FEATURES,
-//                                         DEFAULT_CHARSET,
-//                                         new DoubleEnumeratingDelegate(EnumeratorType.JDBC, true, true, null, null),
-//                                         new DoubleEnumeratingDelegate(EnumeratorType.JDBC, true, true, null, null),
-//                                         BybloIO.EVENTS_SKIP_INDEXED_COLUMN_1,
-//                                         BybloIO.EVENTS_SKIP_INDEXED_COLUMN_2,
-//                                         false, false));
     }
 
     @Test

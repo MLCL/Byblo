@@ -61,7 +61,7 @@ public class AbstractTest {
 	public final TestName testName = new TestName();
 
 	// An irritating problem is that is that there is no way to insure that
-	// subclasses don't override setup and teardown methods, especially the
+	// subclasses don't override setup and tear-down methods, especially the
 	// static ones.
 
 	@Before
@@ -165,9 +165,9 @@ public class AbstractTest {
 			assertFalse("clone() is static",
 					Modifier.isStatic(cloneMethod.getModifiers()));
 			final Object result = cloneMethod.invoke(obj);
-			assertEquals("cloned instance class differes", result.getClass(),
+			assertEquals("cloned instance class different", result.getClass(),
 					obj.getClass());
-			assertEquals("cloned object not equal to origional", obj, result);
+			assertEquals("cloned object not equal to original", obj, result);
 			@SuppressWarnings("unchecked")
 			final T castResult = (T) result;
 			return castResult;
@@ -181,10 +181,10 @@ public class AbstractTest {
 
 	}
 
-	public static void assertExhausedIterator(Iterator<?> it) {
+	public static void assertExhaustedIterator(Iterator<?> it) {
 		try {
 			it.next();
-			fail("Expected iterator to be exhaused by next() succeeded.");
+			fail("Expected iterator to be exhausted by next() succeeded.");
 		} catch (NoSuchElementException e) {
 			// this is supposed to happen
 		}

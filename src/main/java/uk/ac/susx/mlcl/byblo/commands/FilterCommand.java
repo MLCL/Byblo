@@ -50,7 +50,7 @@ import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.Predicates2;
 import uk.ac.susx.mlcl.lib.collect.IntBitSet;
 import uk.ac.susx.mlcl.lib.commands.*;
-import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
+import uk.ac.susx.mlcl.lib.events.ProgressDelegate;
 import uk.ac.susx.mlcl.lib.events.ProgressEvent;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.events.ProgressReporting;
@@ -93,9 +93,9 @@ public class FilterCommand extends AbstractCommand implements
     public static final int FILTERED_ID = 0;
 
     @ParametersDelegate
-    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDelegate();
+    private DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();
 
-    private final ProgressDeligate progress = new ProgressDeligate(this, true);
+    private final ProgressDelegate progress = new ProgressDelegate(this, true);
     /*
       * === INPUT FILES ===
       */
@@ -143,7 +143,7 @@ public class FilterCommand extends AbstractCommand implements
     private File filterEntryWhitelist;
 
     @Parameter(names = {"-fep", "--filter-entry-pattern"},
-            description = "Regular expresion that accepted entries must match.")
+            description = "Regular expression that accepted entries must match.")
     private String filterEntryPattern;
 
     @Parameter(names = {"-fvf", "--filter-event-freq"},
@@ -160,11 +160,11 @@ public class FilterCommand extends AbstractCommand implements
     private File filterFeatureWhitelist;
 
     @Parameter(names = {"-ffp", "--filter-feature-pattern"},
-            description = "Regular expresion that accepted features must match.")
+            description = "Regular expression that accepted features must match.")
     private String filterFeaturePattern;
 
     @Parameter(names = {"-T", "--temp-dir"},
-            description = "Temorary directory which will be used during filtering.",
+            description = "Temporary directory which will be used during filtering.",
             converter = TempFileFactoryConverter.class)
     private FileFactory tempFiles = new TempFileFactory();
 
@@ -219,12 +219,12 @@ public class FilterCommand extends AbstractCommand implements
         setOutputEntriesFile(outputEntriesFile);
     }
 
-    public final DoubleEnumerating getIndexDeligate() {
-        return indexDeligate;
+    public final DoubleEnumerating getIndexDelegate() {
+        return indexDelegate;
     }
 
-    public final void setIndexDeligate(DoubleEnumerating indexDeligate) {
-        this.indexDeligate = indexDeligate;
+    public final void setIndexDelegate(DoubleEnumerating indexDelegate) {
+        this.indexDelegate = indexDelegate;
     }
 
     @Override
@@ -278,7 +278,7 @@ public class FilterCommand extends AbstractCommand implements
         progress.setProgressPercent(0);
 
         // Run the filters forwards then backwards. Each filtering step may
-        // introduce additionaly filters for the other files, so continue
+        // introduce additionally filters for the other files, so continue
         // looping until there is no work remaining. Depending on filters this
         // very unlikely to take more than 3 passes
 
@@ -355,7 +355,7 @@ public class FilterCommand extends AbstractCommand implements
                 / (opCount + 2 + (entryFilterRequired ? 1 : 0)
                 + (eventFilterRequired ? 1 : 0) + (featureFilterRequired ? 1
                 : 0)));
-        progress.setMessage("Copying finaly events file.");
+        progress.setMessage("Copying finally events file.");
         progress.endAdjusting();
 
         finaliseFile(inputEventsFile, activeEventsFile, outputEventsFile);
@@ -379,9 +379,9 @@ public class FilterCommand extends AbstractCommand implements
                 + (eventFilterRequired ? 1 : 0) + (featureFilterRequired ? 1
                 : 0)));
 
-        if (indexDeligate.isEnumeratorOpen()) {
-            indexDeligate.saveEnumerator();
-            indexDeligate.closeEnumerator();
+        if (indexDelegate.isEnumeratorOpen()) {
+            indexDelegate.saveEnumerator();
+            indexDelegate.closeEnumerator();
         }
 
         progress.setState(State.COMPLETED);
@@ -431,16 +431,16 @@ public class FilterCommand extends AbstractCommand implements
 
 
         WeightedTokenSource entriesSource = BybloIO.openEntriesSource(
-                activeEntriesFile, getCharset(), getIndexDeligate());
+                activeEntriesFile, getCharset(), getIndexDelegate());
 
         File outputFile = tempFiles.createFile();
 
         WeightedTokenSink entriesSink = BybloIO.openEntriesSink(outputFile,
-                getCharset(), getIndexDeligate());
+                getCharset(), getIndexDelegate());
 
         progress.setMessage("Filtering entries.");
 
-        final int filteredEntry = getIndexDeligate().getEntryEnumerator()
+        final int filteredEntry = getIndexDelegate().getEntryEnumerator()
                 .indexOf(FILTERED_STRING);
         double filteredWeight = 0;
 
@@ -492,9 +492,9 @@ public class FilterCommand extends AbstractCommand implements
 
     }
 
-    // Filter the AllPairsTask file, rejecting all entires that contain entries
-    // dropped in the entries file filter pass. Store a list of featuress that
-    // only appear in filtered entries to filter the featuress file.
+    // Filter the AllPairsTask file, rejecting all events that contain entries
+    // dropped in the entries file filter pass. Store a list of features that
+    // only appear in filtered entries to filter the features file.
     private void filterEvents() throws FileNotFoundException, IOException {
 
         // We wish to know which entries where *always* rejected, but this
@@ -513,18 +513,18 @@ public class FilterCommand extends AbstractCommand implements
         int maxEntryId = Integer.MIN_VALUE;
 
 
-        final WeightedTokenPairSource efSrc = BybloIO.openEventsSource(activeEventsFile, getCharset(), indexDeligate);
+        final WeightedTokenPairSource efSrc = BybloIO.openEventsSource(activeEventsFile, getCharset(), indexDelegate);
 
         File outputFile = tempFiles.createFile();
 
-        WeightedTokenPairSink efSink = BybloIO.openEventsSink(outputFile, getCharset(), indexDeligate);
+        WeightedTokenPairSink efSink = BybloIO.openEventsSink(outputFile, getCharset(), indexDelegate);
 
         progress.setMessage("Filtering events from.");
 
         // Store the id of the special filtered feature and entry
         // TODO This can probably be removed now but need to check
-        final int filteredEntry = getIndexDeligate().getEntryEnumerator().indexOf(FILTERED_STRING);
-        final int filteredFeature = getIndexDeligate().getFeatureEnumerator().indexOf(FILTERED_STRING);
+        final int filteredEntry = getIndexDelegate().getEntryEnumerator().indexOf(FILTERED_STRING);
+        final int filteredFeature = getIndexDelegate().getFeatureEnumerator().indexOf(FILTERED_STRING);
 
         int currentEntryId = -1;
         int currentEventCount = 0;
@@ -644,19 +644,19 @@ public class FilterCommand extends AbstractCommand implements
     private void filterFeatures() throws FileNotFoundException, IOException {
 
         WeightedTokenSource featureSource = BybloIO.openFeaturesSource(
-                activeFeaturesFile, getCharset(), indexDeligate);
+                activeFeaturesFile, getCharset(), indexDelegate);
 
         File outputFile = tempFiles.createFile();
 
         WeightedTokenSink featureSink = BybloIO.openFeaturesSink(outputFile,
-                getCharset(), indexDeligate);
+                getCharset(), indexDelegate);
 
         progress.setMessage("Filtering features.");
 
-        // Store an filtered wieght here and record it so as to maintain
+        // Store an filtered weight here and record it so as to maintain
         // accurate priors for those features that remain
         double filteredWeight = 0;
-        int filteredId = getIndexDeligate().getFeatureEnumerator().indexOf(
+        int filteredId = getIndexDelegate().getFeatureEnumerator().indexOf(
                 FILTERED_STRING);
 
         long inCount = 0;
@@ -786,7 +786,7 @@ public class FilterCommand extends AbstractCommand implements
     }
 
     public void addFeaturesWhitelist(List<String> strings) throws IOException {
-        IntSet featureIdSet = toEnumeratedIntSet(strings, getIndexDeligate()
+        IntSet featureIdSet = toEnumeratedIntSet(strings, getIndexDelegate()
                 .getFeatureEnumerator());
         setAcceptFeatures(Predicates2.<Weighted<Token>>and(
                 getAcceptFeatures(),
@@ -794,7 +794,7 @@ public class FilterCommand extends AbstractCommand implements
     }
 
     public void addFeaturesBlacklist(List<String> strings) throws IOException {
-        IntSet featureIdSet = toEnumeratedIntSet(strings, getIndexDeligate()
+        IntSet featureIdSet = toEnumeratedIntSet(strings, getIndexDelegate()
                 .getFeatureEnumerator());
         featureBlacklist.addAll(featureIdSet);
     }
@@ -870,7 +870,7 @@ public class FilterCommand extends AbstractCommand implements
     }
 
     public void addEntryWhitelist(List<String> strings) throws IOException {
-        IntSet entryIdSet = toEnumeratedIntSet(strings, getIndexDeligate()
+        IntSet entryIdSet = toEnumeratedIntSet(strings, getIndexDelegate()
                 .getEntryEnumerator());
         setAcceptEntries(Predicates2.<Weighted<Token>>and(getAcceptEntries(),
                 Predicates2.compose(Predicates2.in(entryIdSet), id())));
@@ -878,7 +878,7 @@ public class FilterCommand extends AbstractCommand implements
     }
 
     public void addEntryBlacklist(List<String> strings) throws IOException {
-        IntSet entryIdSet = toEnumeratedIntSet(strings, getIndexDeligate()
+        IntSet entryIdSet = toEnumeratedIntSet(strings, getIndexDelegate()
                 .getEntryEnumerator());
         entryBlacklist.addAll(entryIdSet);
     }
@@ -973,7 +973,7 @@ public class FilterCommand extends AbstractCommand implements
             }
         }
 
-        // For each output file, check that either it exists and it writeable,
+        // For each output file, check that either it exists and it writable,
         // or that it does not exist but is creatable
         for (Map.Entry<String, File> e : outputFiles.entrySet()) {
             if (e.getValue().exists()
@@ -985,7 +985,7 @@ public class FilterCommand extends AbstractCommand implements
                     && !e.getValue().getAbsoluteFile().getParentFile()
                     .canWrite()) {
                 throw new IllegalStateException(e.getKey()
-                        + " does not exists and can not be reated: "
+                        + " does not exists and can not be created: "
                         + e.getValue());
             }
 
@@ -1033,7 +1033,7 @@ public class FilterCommand extends AbstractCommand implements
             @Override
             public String apply(Weighted<Token> input) {
                 try {
-                    return getIndexDeligate().getEntryEnumerator().valueOf(
+                    return getIndexDelegate().getEntryEnumerator().valueOf(
                             input.record().id());
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
@@ -1054,7 +1054,7 @@ public class FilterCommand extends AbstractCommand implements
             @Override
             public String apply(Weighted<Token> input) {
                 try {
-                    return getIndexDeligate().getFeatureEnumerator().valueOf(
+                    return getIndexDelegate().getFeatureEnumerator().valueOf(
                             input.record().id());
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
@@ -1107,7 +1107,7 @@ public class FilterCommand extends AbstractCommand implements
             @Override
             public String apply(Weighted<TokenPair> input) {
                 try {
-                    return getIndexDeligate().getFeatureEnumerator().valueOf(
+                    return getIndexDelegate().getFeatureEnumerator().valueOf(
                             input.record().id2());
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
@@ -1128,7 +1128,7 @@ public class FilterCommand extends AbstractCommand implements
             @Override
             public String apply(Weighted<TokenPair> input) {
                 try {
-                    return getIndexDeligate().getEntryEnumerator().valueOf(
+                    return getIndexDelegate().getEntryEnumerator().valueOf(
                             input.record().id1());
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
@@ -1200,35 +1200,35 @@ public class FilterCommand extends AbstractCommand implements
     }
 
     public void setFeatureEnumeratorFile(File featureEnumeratorFile) {
-        indexDeligate.setFeatureEnumeratorFile(featureEnumeratorFile);
+        indexDelegate.setFeatureEnumeratorFile(featureEnumeratorFile);
     }
 
     public void setEnumeratedFeatures(boolean enumeratedFeatures) {
-        indexDeligate.setEnumeratedFeatures(enumeratedFeatures);
+        indexDelegate.setEnumeratedFeatures(enumeratedFeatures);
     }
 
     public void setEnumeratedEntries(boolean enumeratedEntries) {
-        indexDeligate.setEnumeratedEntries(enumeratedEntries);
+        indexDelegate.setEnumeratedEntries(enumeratedEntries);
     }
 
     public void setEntryEnumeratorFile(File entryEnumeratorFile) {
-        indexDeligate.setEntryEnumeratorFile(entryEnumeratorFile);
+        indexDelegate.setEntryEnumeratorFile(entryEnumeratorFile);
     }
 
     public boolean isEnumeratedFeatures() {
-        return indexDeligate.isEnumeratedFeatures();
+        return indexDelegate.isEnumeratedFeatures();
     }
 
     public boolean isEnumeratedEntries() {
-        return indexDeligate.isEnumeratedEntries();
+        return indexDelegate.isEnumeratedEntries();
     }
 
     public File getFeatureEnumeratorFile() {
-        return indexDeligate.getFeatureEnumeratorFile();
+        return indexDelegate.getFeatureEnumeratorFile();
     }
 
     public File getEntryEnumeratorFile() {
-        return indexDeligate.getEntryEnumeratorFile();
+        return indexDelegate.getEntryEnumeratorFile();
     }
 
     public final void setCharset(Charset charset) {
@@ -1248,11 +1248,11 @@ public class FilterCommand extends AbstractCommand implements
     }
 
     public void setEnumeratorType(EnumeratorType type) {
-        indexDeligate.setEnumeratorType(type);
+        indexDelegate.setEnumeratorType(type);
     }
 
-    public EnumeratorType getEnuemratorType() {
-        return indexDeligate.getEnuemratorType();
+    public EnumeratorType getEnumeratorType() {
+        return indexDelegate.getEnumeratorType();
     }
 
     @Override

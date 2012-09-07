@@ -138,8 +138,8 @@ public final class KnnSimsCommand extends SortEventsCommand {
             throws FileNotFoundException, IOException {
         final ObjectSource<Weighted<TokenPair>> src =
                 first
-                ? BybloIO.openSimsSource(file, getCharset(), getIndexDeligate())
-                : BybloIO.openNeighboursSource(file, getCharset(), getIndexDeligate());
+                ? BybloIO.openSimsSource(file, getCharset(), getIndexDelegate())
+                : BybloIO.openNeighboursSource(file, getCharset(), getIndexDelegate());
         first = true;
         return src;
     }
@@ -149,7 +149,7 @@ public final class KnnSimsCommand extends SortEventsCommand {
             throws FileNotFoundException, IOException {
         return new KFirstReducingObjectSink<Weighted<TokenPair>>(
                 new WeightSumReducerObjectSink<TokenPair>(
-                BybloIO.openNeighboursSink(file, getCharset(), getIndexDeligate())),
+                BybloIO.openNeighboursSink(file, getCharset(), getIndexDelegate())),
                 classComparator, k);
 
     }

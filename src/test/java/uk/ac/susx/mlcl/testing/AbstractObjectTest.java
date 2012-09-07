@@ -187,7 +187,7 @@ public abstract class AbstractObjectTest<T> extends AbstractTest {
 
 	/**
 	 * If the object implements {@link Serializable} interface, then it should
-	 * be possible to serialize then deserialize the object to recieve an exact
+	 * be possible to serialize then de-serialize the object to receive an exact
 	 * deep copy. All the constraints of {@link #assertCloneEquals()} should
 	 * hold.
 	 * 
@@ -219,7 +219,7 @@ public abstract class AbstractObjectTest<T> extends AbstractTest {
 	 * </pre>
 	 */
 	private void assertCloneEquals(Object instance, Object copy) {
-		Assert.assertTrue("cloned object is the the same as the origional",
+		Assert.assertTrue("cloned object is the the same as the original",
 				instance != copy);
 		Assert.assertTrue(MessageFormat.format(
 				"Clone object class identity mismatch; "

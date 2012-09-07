@@ -44,7 +44,7 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.commands.FilePipeDelegate;
-import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
+import uk.ac.susx.mlcl.lib.events.ProgressDelegate;
 import uk.ac.susx.mlcl.lib.io.Files;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
@@ -66,13 +66,13 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand
 
     private static final Log LOG = LogFactory.getLog(AbstractCopyCommand.class);
 
-    protected final ProgressDeligate progress = new ProgressDeligate(this, true);
+    protected final ProgressDelegate progress = new ProgressDelegate(this, true);
 
     @ParametersDelegate
-    private FilePipeDelegate filesDeligate = new FilePipeDelegate();
+    private FilePipeDelegate filesDelegate = new FilePipeDelegate();
 
     public AbstractCopyCommand(File sourceFile, File destinationFile, Charset charset) {
-        filesDeligate = new FilePipeDelegate(sourceFile, destinationFile, charset);
+        filesDelegate = new FilePipeDelegate(sourceFile, destinationFile, charset);
     }
 
     public AbstractCopyCommand(File sourceFile, File destinationFile) {
@@ -82,32 +82,32 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand
     public AbstractCopyCommand() {
     }
 
-    public FilePipeDelegate getFilesDeligate() {
-        return filesDeligate;
+    public FilePipeDelegate getFilesDelegate() {
+        return filesDelegate;
     }
 
     public final void setCharset(Charset charset) {
-        filesDeligate.setCharset(charset);
+        filesDelegate.setCharset(charset);
     }
 
     public final Charset getCharset() {
-        return filesDeligate.getCharset();
+        return filesDelegate.getCharset();
     }
 
     public final void setSourceFile(File sourceFile) throws NullPointerException {
-        filesDeligate.setSourceFile(sourceFile);
+        filesDelegate.setSourceFile(sourceFile);
     }
 
-    public final void setDestinationFile(File destFile) throws NullPointerException {
-        filesDeligate.setDestinationFile(destFile);
+    public final void setDestinationFile(File destinationFile) throws NullPointerException {
+        filesDelegate.setDestinationFile(destinationFile);
     }
 
     public final File getSourceFile() {
-        return filesDeligate.getSourceFile();
+        return filesDelegate.getSourceFile();
     }
 
     public final File getDestinationFile() {
-        return filesDeligate.getDestinationFile();
+        return filesDelegate.getDestinationFile();
     }
 
     @Override
@@ -121,12 +121,12 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand
 //            LOG.info(MessageFormat.format(
 //                    "Running {0} from \"{1}\" to \"{2}\".",
 //                    getName(),
-//                    getFilesDeligate().getSourceFile(),
-//                    getFilesDeligate().getDestinationFile()));
+//                    getFilesDelegate().getSourceFile(),
+//                    getFilesDelegate().getDestinationFile()));
         LOG.debug(MiscUtil.memoryInfoString());
 
-        ObjectSource<T> src = openSource(getFilesDeligate().getSourceFile());
-        ObjectSink<T> snk = openSink(getFilesDeligate().getDestinationFile());
+        ObjectSource<T> src = openSource(getFilesDelegate().getSourceFile());
+        ObjectSink<T> snk = openSink(getFilesDelegate().getDestinationFile());
 
         ObjectPipeTask<T> task = new ObjectPipeTask<T>();
         task.setSource(src);
@@ -200,7 +200,7 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand
     protected Objects.ToStringHelper toStringHelper() {
         return super.toStringHelper().
                 add("name", getName()).
-                add("files", getFilesDeligate());
+                add("files", getFilesDelegate());
     }
 
     protected abstract ObjectSource<T> openSource(File file)

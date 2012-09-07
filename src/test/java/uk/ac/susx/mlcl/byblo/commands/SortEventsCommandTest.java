@@ -108,7 +108,7 @@ public class SortEventsCommandTest extends
 
 		Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(
 				Weighted.recordOrder(TokenPair.firstStringOrder(idx
-						.getEntriesEnumeratorCarriar())), Comparators
+						.getEntriesEnumeratorCarrier())), Comparators
 						.reverse(Weighted.<TokenPair> weightOrder()));
 
 		testSortWeightedTokenPairCommand(inputFile, randomisedFile, sortedFile,
@@ -167,7 +167,7 @@ public class SortEventsCommandTest extends
 
 		assertTrue("Input list is empty", list.size() > 0);
 
-		// scamble it up
+		// scramble it up
 		shuffle(list);
 
 		// write to a temporary file
@@ -196,7 +196,7 @@ public class SortEventsCommandTest extends
 
 		SortEventsCommand cmd = new SortEventsCommand(randomisedFile,
 				sortedFile, DEFAULT_CHARSET, idx);
-		cmd.setIndexDeligate(idx);
+		cmd.setIndexDelegate(idx);
 		cmd.setComparator(comparator);
 		cmd.runCommand();
 

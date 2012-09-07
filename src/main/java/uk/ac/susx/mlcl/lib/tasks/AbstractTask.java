@@ -47,7 +47,7 @@ public abstract class AbstractTask implements Task {
 
     private final Properties properties = new Properties();
 
-    private final ExceptionTrappingDelegate exceptionDeligate =
+    private final ExceptionTrappingDelegate exceptionDelegate =
             new ExceptionTrappingDelegate();
 
     public AbstractTask() {
@@ -75,9 +75,9 @@ public abstract class AbstractTask implements Task {
             runTask();
 
         } catch (Exception ex) {
-            exceptionDeligate.trapException(ex);
+            exceptionDelegate.trapException(ex);
         } catch (Throwable t) {
-            exceptionDeligate.trapException(new RuntimeException(t));
+            exceptionDelegate.trapException(new RuntimeException(t));
         } finally {
 
             try {
@@ -87,9 +87,9 @@ public abstract class AbstractTask implements Task {
                 finaliseTask();
 
             } catch (Exception ex) {
-                exceptionDeligate.trapException(ex);
+                exceptionDelegate.trapException(ex);
             } catch (Throwable t) {
-                exceptionDeligate.trapException(new RuntimeException(t));
+                exceptionDelegate.trapException(new RuntimeException(t));
             }
 
             if (LOG.isTraceEnabled())
@@ -104,7 +104,7 @@ public abstract class AbstractTask implements Task {
 
     protected Objects.ToStringHelper toStringHelper() {
         return Objects.toStringHelper(this).
-                add("exceptions", getExceptionDeligate()).
+                add("exceptions", getExceptionDelegate()).
                 add("properties", properties);
     }
 
@@ -113,8 +113,8 @@ public abstract class AbstractTask implements Task {
                 && (this.properties == null || !this.properties.equals(
                 other.properties)))
             return false;
-        if (this.exceptionDeligate != other.exceptionDeligate
-                && (this.exceptionDeligate == null || !this.exceptionDeligate.equals(other.exceptionDeligate)))
+        if (this.exceptionDelegate != other.exceptionDelegate
+                && (this.exceptionDelegate == null || !this.exceptionDelegate.equals(other.exceptionDelegate)))
             return false;
         return true;
     }
@@ -132,7 +132,7 @@ public abstract class AbstractTask implements Task {
     public int hashCode() {
         int hash = 3;
         hash = 11 * hash + (this.properties != null ? this.properties.hashCode() : 0);
-        hash = 11 * hash + (this.exceptionDeligate != null ? this.exceptionDeligate.hashCode() : 0);
+        hash = 11 * hash + (this.exceptionDelegate != null ? this.exceptionDelegate.hashCode() : 0);
         return hash;
     }
 
@@ -146,27 +146,27 @@ public abstract class AbstractTask implements Task {
         properties.setProperty(key, value);
     }
 
-    protected ExceptionTrappingDelegate getExceptionDeligate() {
-        return exceptionDeligate;
+    protected ExceptionTrappingDelegate getExceptionDelegate() {
+        return exceptionDelegate;
     }
 
     protected final void trapException(Exception exception) {
-        exceptionDeligate.trapException(exception);
+        exceptionDelegate.trapException(exception);
     }
 
     @Override
     public final synchronized void throwTrappedException() throws Exception {
-        exceptionDeligate.throwTrappedException();
+        exceptionDelegate.throwTrappedException();
     }
 
     @Override
     public final synchronized boolean isExceptionTrapped() {
-        return exceptionDeligate.isExceptionTrapped();
+        return exceptionDelegate.isExceptionTrapped();
     }
 
     @Override
     public final synchronized Exception getTrappedException() {
-        return exceptionDeligate.getTrappedException();
+        return exceptionDelegate.getTrappedException();
     }
 
 }

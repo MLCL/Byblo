@@ -46,7 +46,6 @@ import java.util.List;
 import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.tasks.CountTask;
 import uk.ac.susx.mlcl.lib.AbstractParallelCommandTask;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Comparators;
@@ -93,7 +92,7 @@ public abstract class AbstractExternalSortCommand<T>
     private static final boolean DEBUG = false;
 
     @ParametersDelegate
-    private final FilePipeDelegate fileDeligate = new FilePipeDelegate();
+    private final FilePipeDelegate fileDelegate = new FilePipeDelegate();
 
     @Parameter(names = {"-T", "--temporary-directory"},
     description = "Directory which will be used for storing temporary files.",
@@ -116,17 +115,17 @@ public abstract class AbstractExternalSortCommand<T>
     }
 
     public AbstractExternalSortCommand(File src, File dst, Charset charset) {
-        fileDeligate.setSourceFile(src);
-        fileDeligate.setDestinationFile(dst);
-        fileDeligate.setCharset(charset);
+        fileDelegate.setSourceFile(src);
+        fileDelegate.setDestinationFile(dst);
+        fileDelegate.setCharset(charset);
     }
 
     public AbstractExternalSortCommand() {
         super();
     }
 
-    public FilePipeDelegate getFileDeligate() {
-        return fileDeligate;
+    public FilePipeDelegate getFileDelegate() {
+        return fileDelegate;
     }
 
     public FileFactory getTempFileFactory() {
@@ -198,13 +197,13 @@ public abstract class AbstractExternalSortCommand<T>
 
         nextFileToMerge = new File[64];
 
-        final SeekableObjectSource<T, ?> src = openSource(getFileDeligate().getSourceFile());
+        final SeekableObjectSource<T, ?> src = openSource(getFileDelegate().getSourceFile());
         final ObjectSource<Chunk<T>> chunks = Chunker.newInstance(src, maxChunkSize);
 
         progress.startAdjusting();
         progress.setState(State.RUNNING);
         FileMoveTask finalMoveTask = new FileMoveTask();
-        finalMoveTask.setDstFile(getFileDeligate().getDestinationFile());
+        finalMoveTask.setDstFile(getFileDelegate().getDestinationFile());
         progress.addChildProgressReporter(finalMoveTask);
         progress.endAdjusting();
 
@@ -363,7 +362,7 @@ public abstract class AbstractExternalSortCommand<T>
         task.setSink(sink);
         task.setComparator(getComparator());
 
-        task.setProperty(KEY_SRC_FILE, getFileDeligate().
+        task.setProperty(KEY_SRC_FILE, getFileDelegate().
                 getSourceFile().toString());
         task.setProperty(KEY_DST_FILE, dst.toString());
 
@@ -394,33 +393,33 @@ public abstract class AbstractExternalSortCommand<T>
     @Override
     protected ToStringHelper toStringHelper() {
         return super.toStringHelper().
-                add("in", getFileDeligate().getSourceFile()).
-                add("out", getFileDeligate().getDestinationFile()).
+                add("in", getFileDelegate().getSourceFile()).
+                add("out", getFileDelegate().getDestinationFile()).
                 add("temp", getTempFileFactory());
     }
 
     public final void setCharset(Charset charset) {
-        fileDeligate.setCharset(charset);
+        fileDelegate.setCharset(charset);
     }
 
     public final Charset getCharset() {
-        return fileDeligate.getCharset();
+        return fileDelegate.getCharset();
     }
 
     public final void setSourceFile(File sourceFile) throws NullPointerException {
-        fileDeligate.setSourceFile(sourceFile);
+        fileDelegate.setSourceFile(sourceFile);
     }
 
-    public final void setDestinationFile(File destFile) throws NullPointerException {
-        fileDeligate.setDestinationFile(destFile);
+    public final void setDestinationFile(File destinationFile) throws NullPointerException {
+        fileDelegate.setDestinationFile(destinationFile);
     }
 
     public final File getSourceFile() {
-        return fileDeligate.getSourceFile();
+        return fileDelegate.getSourceFile();
     }
 
     public final File getDestinationFile() {
-        return fileDeligate.getDestinationFile();
+        return fileDelegate.getDestinationFile();
     }
 
     protected abstract SeekableObjectSource<T, ?> openSource(File file) throws IOException;
@@ -464,7 +463,7 @@ public abstract class AbstractExternalSortCommand<T>
 
     @Override
     public String getName() {
-        return "xsort";
+        return "ExternalSort";
     }
 
     protected abstract long getBytesPerObject();

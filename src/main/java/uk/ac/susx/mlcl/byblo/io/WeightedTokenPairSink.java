@@ -63,8 +63,8 @@ import uk.ac.susx.mlcl.lib.io.TSV;
  *      entry1  entry2    weight2
  *      entry2  entry3    weight3
  *      entry3  entry2    weight4
- *      enrty3  entry4    weight5
- *      enrty3  entry1    weight6
+ *      entry3  entry4    weight5
+ *      entry3  entry1    weight6
  * </pre>
  *
  * Equivalent compact mode example:

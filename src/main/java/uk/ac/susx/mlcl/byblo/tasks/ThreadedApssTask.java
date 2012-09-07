@@ -325,11 +325,11 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
 
     private int estimateChunkSize() {
 
-        // Maximum possible non-zero cardinality of any feature vector. In theory this is maxint, through with real
-        // data that bound never occurs since feature vectors are typically very sparse, especially if filtering has
-        // been performed. Instead we'll take the square root for pretty much no reason what so ever. To improve this
-        // estimation we need to set nFeatures empirically based on the actual data being run, which will require
-        // a whole bunch of re-factoring.
+        // Maximum possible non-zero cardinality of any feature vector. In theory this is Integer.MAX_VALUE, through
+        // with real data that bound never occurs since feature vectors are typically very sparse, especially if
+        // filtering has been performed. Instead we'll take the square root for pretty much no reason what so ever. To
+        // improve this estimation we need to set nFeatures empirically based on the actual data being run, which will
+        // require a whole bunch of re-factoring.
         final long nFeatures = (int) Math.ceil(Math.sqrt(Integer.MAX_VALUE));
 
         // number of concurrent worker units that can exist at one time

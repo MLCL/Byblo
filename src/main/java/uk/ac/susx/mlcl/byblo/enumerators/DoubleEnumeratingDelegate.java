@@ -94,7 +94,7 @@ public final class DoubleEnumeratingDelegate
     @Override
     public final Enumerator<String> getEntryEnumerator() throws IOException {
         if (entryEnumerator == null) {
-            // if tokens are preindexed then a file MUST be available
+            // if tokens are pre-indexed then a file MUST be available
             // otherwise the file will be loaded if it exists
             openEntriesEnumerator();
         }
@@ -221,12 +221,12 @@ public final class DoubleEnumeratingDelegate
     }
 
     @Override
-    public SingleEnumerating getEntriesEnumeratorCarriar() {
+    public SingleEnumerating getEntriesEnumeratorCarrier() {
         return EnumeratingDelegates.toSingleEntries(this);
     }
 
     @Override
-    public SingleEnumerating getFeaturesEnumeratorCarriar() {
+    public SingleEnumerating getFeaturesEnumeratorCarrier() {
         return EnumeratingDelegates.toSingleFeatures(this);
     }
 

@@ -152,37 +152,37 @@ public class IndexTPCommandTest extends
 
 	@Test
 	public void testRunOnFruitAPI_skipboth_compact_JDBC() throws Exception {
-		testRunOnFruitAPI("compact-skipboth-jdbc-", EnumeratorType.JDBC, true,
+		testRunOnFruitAPI("compact-skipboth-jdbc-", EnumeratorType.JDBM, true,
 				true, true);
 	}
 
 	@Test
 	public void testRunOnFruitAPI_skipleft_compact_JDBC() throws Exception {
-		testRunOnFruitAPI("compact-skipleft-jdbc-", EnumeratorType.JDBC, true,
+		testRunOnFruitAPI("compact-skipleft-jdbc-", EnumeratorType.JDBM, true,
 				false, true);
 	}
 
 	@Test
 	public void testRunOnFruitAPI_skipright_compact_JDBC() throws Exception {
-		testRunOnFruitAPI("compact-skipright-jdbc-", EnumeratorType.JDBC,
+		testRunOnFruitAPI("compact-skipright-jdbc-", EnumeratorType.JDBM,
 				false, true, true);
 	}
 
 	@Test
 	public void testRunOnFruitAPI_skipboth_verbose_JDBC() throws Exception {
-		testRunOnFruitAPI("verbose-skipboth-jdbc-", EnumeratorType.JDBC, true,
+		testRunOnFruitAPI("verbose-skipboth-jdbc-", EnumeratorType.JDBM, true,
 				true, false);
 	}
 
 	@Test
 	public void testRunOnFruitAPI_skipleft_verbose_JDBC() throws Exception {
-		testRunOnFruitAPI("verbose-skipleft-jdbc-", EnumeratorType.JDBC, true,
+		testRunOnFruitAPI("verbose-skipleft-jdbc-", EnumeratorType.JDBM, true,
 				false, false);
 	}
 
 	@Test
 	public void testRunOnFruitAPI_skipright_verbose_JDBC() throws Exception {
-		testRunOnFruitAPI("verbose-skipright-jdbc-", EnumeratorType.JDBC,
+		testRunOnFruitAPI("verbose-skipright-jdbc-", EnumeratorType.JDBM,
 				false, true, false);
 	}
 
@@ -212,22 +212,22 @@ public class IndexTPCommandTest extends
 			throws Exception {
 		assertValidPlaintextInputFiles(from);
 		assertValidOutputFiles(to);
-		if (type == EnumeratorType.JDBC)
+		if (type == EnumeratorType.JDBM)
 			assertValidJDBCOutputFiles(index1, index2);
 		else
 			assertValidOutputFiles(index1, index2);
 
 		IndexingCommands.IndexInstances unindex = new IndexingCommands.IndexInstances();
-		unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-		unindex.getFilesDeligate().setSourceFile(from);
-		unindex.getFilesDeligate().setDestinationFile(to);
+		unindex.getFilesDelegate().setCharset(DEFAULT_CHARSET);
+		unindex.getFilesDelegate().setSourceFile(from);
+		unindex.getFilesDelegate().setDestinationFile(to);
 		unindex.setIndexDeligate(new DoubleEnumeratingDelegate(type, true,
 				true, index1, index2));
 		unindex.runCommand();
 
 		assertValidPlaintextInputFiles(to);
 
-		if (type == EnumeratorType.JDBC)
+		if (type == EnumeratorType.JDBM)
 			assertValidJDBCInputFiles(index1, index2);
 		else
 			assertValidInputFiles(index1, index2);
@@ -238,16 +238,16 @@ public class IndexTPCommandTest extends
 			EnumeratorType type, boolean skip1, boolean skip2, boolean compact)
 			throws Exception {
 		assertValidPlaintextInputFiles(from);
-		if (type == EnumeratorType.JDBC)
+		if (type == EnumeratorType.JDBM)
 			assertValidJDBCInputFiles(index1, index2);
 		else
 			assertValidInputFiles(index1, index2);
 		assertValidOutputFiles(to);
 
 		IndexingCommands.IndexInstances unindex = new IndexingCommands.IndexInstances();
-		unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-		unindex.getFilesDeligate().setSourceFile(from);
-		unindex.getFilesDeligate().setDestinationFile(to);
+		unindex.getFilesDelegate().setCharset(DEFAULT_CHARSET);
+		unindex.getFilesDelegate().setSourceFile(from);
+		unindex.getFilesDelegate().setDestinationFile(to);
 
 		unindex.setIndexDeligate(new DoubleEnumeratingDelegate(type, true,
 				true, index1, index2));
@@ -290,12 +290,12 @@ public class IndexTPCommandTest extends
 		deleteJDBCIfExist(entryIdx, featureIdx);
 
 		final DoubleEnumeratingDelegate ded = new DoubleEnumeratingDelegate(
-				EnumeratorType.JDBC, true, true, entryIdx, featureIdx);
+				EnumeratorType.JDBM, true, true, entryIdx, featureIdx);
 
 		IndexingCommands.IndexInstances unindex = new IndexingCommands.IndexInstances();
-		unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-		unindex.getFilesDeligate().setSourceFile(inFile);
-		unindex.getFilesDeligate().setDestinationFile(outFile);
+		unindex.getFilesDelegate().setCharset(DEFAULT_CHARSET);
+		unindex.getFilesDelegate().setSourceFile(inFile);
+		unindex.getFilesDelegate().setDestinationFile(outFile);
 		unindex.setIndexDeligate(ded);
 
 		unindex.addProgressListener(new InfoProgressListener());

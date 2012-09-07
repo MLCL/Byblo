@@ -49,7 +49,7 @@ import uk.ac.susx.mlcl.lib.tasks.Task;
 /**
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
- * @deprecated temporary class while command and task apis are being separated
+ * @deprecated temporary class while command and task APIs are being separated
  */
 @Deprecated
 public abstract class AbstractParallelCommandTask extends AbstractCommandTask {

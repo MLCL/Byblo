@@ -33,15 +33,11 @@ package uk.ac.susx.mlcl.byblo.tasks;
 import it.unimi.dsi.fastutil.Hash;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
-import java.io.Closeable;
 import java.io.Flushable;
 import java.io.Serializable;
-import java.lang.reflect.Member;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,8 +48,7 @@ import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.MemoryUsage;
-import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
+import uk.ac.susx.mlcl.lib.events.ProgressDelegate;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
@@ -65,7 +60,7 @@ import com.google.common.base.Objects;
 
 /**
  * <p>
- * Read in a raw feature instances, to produce three frequency cuonts: entries,
+ * Read in a raw feature instances, to produce three frequency counts: entries,
  * features, and event pairs.
  * </p>
  * 
@@ -76,7 +71,7 @@ public final class CountTask extends AbstractTask implements Serializable,
 
 	private static final long serialVersionUID = 1L;
 
-	private final ProgressDeligate progress = new ProgressDeligate(this, true);
+	private final ProgressDelegate progress = new ProgressDelegate(this, true);
 
 	/**
 	 * A very rough guess at the amount of memory required of each event read
@@ -291,7 +286,7 @@ public final class CountTask extends AbstractTask implements Serializable,
 		progress.endAdjusting();
 
 		{
-			List<Weighted<TokenPair>> events = obj2intmapToWeightedObjList(eventFreq);
+			List<Weighted<TokenPair>> events = Obj2IntMapToWeightedObjList(eventFreq);
 			eventFreq = null;
 			Collections.sort(events, getEventComparator());
 			ObjectIO.copy(events, getEventSink());
@@ -324,8 +319,8 @@ public final class CountTask extends AbstractTask implements Serializable,
 		return out;
 	}
 
-	private static <T> List<Weighted<T>> obj2intmapToWeightedObjList(
-			final Object2IntMap<T> map) {
+	private static <T> List<Weighted<T>> Obj2IntMapToWeightedObjList(
+            final Object2IntMap<T> map) {
 		final List<Weighted<T>> out = new ArrayList<Weighted<T>>(map.size());
 		for (Object2IntMap.Entry<T> e : map.object2IntEntrySet()) {
 			out.add(new Weighted<T>(e.getKey(), e.getIntValue()));

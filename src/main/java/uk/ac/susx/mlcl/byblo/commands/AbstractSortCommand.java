@@ -108,11 +108,11 @@ public abstract class AbstractSortCommand<T> extends AbstractCopyCommand<T> {
     @Override
     public void runCommand() throws Exception {
         if (LOG.isInfoEnabled())
-            LOG.info("Running memory sort from \"" + getFilesDeligate().getSourceFile()
-                    + "\" to \"" + getFilesDeligate().getDestinationFile() + "\".");
+            LOG.info("Running memory sort from \"" + getFilesDelegate().getSourceFile()
+                    + "\" to \"" + getFilesDelegate().getDestinationFile() + "\".");
 
-        ObjectSource<T> src = openSource(getFilesDeligate().getSourceFile());
-        ObjectSink<T> snk = openSink(getFilesDeligate().getDestinationFile());
+        ObjectSource<T> src = openSource(getFilesDelegate().getSourceFile());
+        ObjectSink<T> snk = openSink(getFilesDelegate().getDestinationFile());
 
         ObjectSortTask<T> task = new ObjectSortTask<T>();
         task.setComparator(getComparator());

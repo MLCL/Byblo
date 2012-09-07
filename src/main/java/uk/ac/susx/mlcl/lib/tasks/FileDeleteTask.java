@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
-import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
+import uk.ac.susx.mlcl.lib.events.ProgressDelegate;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import com.beust.jcommander.Parameters;
@@ -49,7 +49,7 @@ import uk.ac.susx.mlcl.lib.Checks;
 public class FileDeleteTask extends AbstractTask
         implements ProgressReporting {
 
-    private final ProgressDeligate progress = new ProgressDeligate(this, true);
+    private final ProgressDelegate progress = new ProgressDelegate(this, true);
 
     private File file = null;
 
@@ -74,12 +74,12 @@ public class FileDeleteTask extends AbstractTask
 
         if (!getFile().exists())
             throw new FileNotFoundException(format(
-                    "Unnable to delete file because it doesn't exist: \"{0}\"",
+                    "Unable to delete file because it doesn't exist: \"{0}\"",
                     getFile()));
 
         if (!getFile().delete())
             throw new IOException(
-                    "Unnable to delete file: \"" + getFile() + "\"");
+                    "Unable to delete file: \"" + getFile() + "\"");
 
         progress.startAdjusting();
         progress.setProgressPercent(100);

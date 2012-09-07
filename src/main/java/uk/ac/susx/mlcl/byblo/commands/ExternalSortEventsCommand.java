@@ -46,7 +46,6 @@ import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.MemoryUsage;
-import uk.ac.susx.mlcl.lib.events.ReportingProgressListener;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.events.ProgressEvent;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
@@ -60,13 +59,13 @@ public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weigh
     private static final Log LOG = LogFactory.getLog(ExternalSortEventsCommand.class);
 
     @ParametersDelegate
-    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDelegate();
+    private DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();
 
     public ExternalSortEventsCommand(
             File sourceFile, File destinationFile, Charset charset,
-            DoubleEnumerating indexDeligate) {
+            DoubleEnumerating indexDelegate) {
         super(sourceFile, destinationFile, charset);
-        setIndexDeligate(indexDeligate);
+        setIndexDelegate(indexDelegate);
     }
 
     public ExternalSortEventsCommand() {
@@ -85,16 +84,16 @@ public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weigh
 
         super.runCommand();
 
-        if (indexDeligate.isEnumeratorOpen()) {
-            indexDeligate.saveEnumerator();
-            indexDeligate.closeEnumerator();
+        if (indexDelegate.isEnumeratorOpen()) {
+            indexDelegate.saveEnumerator();
+            indexDelegate.closeEnumerator();
         }
 
     }
 
     @Override
     protected ObjectSink<Weighted<TokenPair>> openSink(File file) throws IOException {
-        return new WeightSumReducerObjectSink<TokenPair>(BybloIO.openEventsSink(file, getCharset(), indexDeligate));
+        return new WeightSumReducerObjectSink<TokenPair>(BybloIO.openEventsSink(file, getCharset(), indexDelegate));
     }
 
     @Override
@@ -104,40 +103,40 @@ public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weigh
 
     @Override
     protected WeightedTokenPairSource openSource(File file) throws IOException {
-        return BybloIO.openEventsSource(file, getCharset(), indexDeligate);
+        return BybloIO.openEventsSource(file, getCharset(), indexDelegate);
     }
 
-    public final DoubleEnumerating getIndexDeligate() {
-        return indexDeligate;
+    public final DoubleEnumerating getIndexDelegate() {
+        return indexDelegate;
     }
 
-    public final void setIndexDeligate(DoubleEnumerating indexDeligate) {
-        Checks.checkNotNull("indexDeligate", indexDeligate);
-        this.indexDeligate = indexDeligate;
+    public final void setIndexDelegate(DoubleEnumerating indexDelegate) {
+        Checks.checkNotNull("indexDelegate", indexDelegate);
+        this.indexDelegate = indexDelegate;
     }
 
     public void setEnumeratorType(EnumeratorType type) {
-        indexDeligate.setEnumeratorType(type);
+        indexDelegate.setEnumeratorType(type);
     }
 
-    public EnumeratorType getEnuemratorType() {
-        return indexDeligate.getEnuemratorType();
+    public EnumeratorType getEnumeratorType() {
+        return indexDelegate.getEnumeratorType();
     }
 
     public void setEnumeratedFeatures(boolean enumeratedFeatures) {
-        indexDeligate.setEnumeratedFeatures(enumeratedFeatures);
+        indexDelegate.setEnumeratedFeatures(enumeratedFeatures);
     }
 
     public void setEnumeratedEntries(boolean enumeratedEntries) {
-        indexDeligate.setEnumeratedEntries(enumeratedEntries);
+        indexDelegate.setEnumeratedEntries(enumeratedEntries);
     }
 
     public boolean isEnumeratedFeatures() {
-        return indexDeligate.isEnumeratedFeatures();
+        return indexDelegate.isEnumeratedFeatures();
     }
 
     public boolean isEnumeratedEntries() {
-        return indexDeligate.isEnumeratedEntries();
+        return indexDelegate.isEnumeratedEntries();
     }
 
 }

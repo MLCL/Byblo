@@ -52,7 +52,7 @@ public interface Enumerating {
 
     boolean isEnumeratorOpen();
 
-    EnumeratorType getEnuemratorType();
+    EnumeratorType getEnumeratorType();
 
     void setEnumeratorType(EnumeratorType type);
 

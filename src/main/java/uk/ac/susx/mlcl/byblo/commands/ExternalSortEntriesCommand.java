@@ -52,13 +52,13 @@ public class ExternalSortEntriesCommand extends AbstractExternalSortCommand<Weig
     private static final long serialVersionUID = 1L;
 
     @ParametersDelegate
-    private SingleEnumerating indexDeligate = new SingleEnumeratingDelegate();
+    private SingleEnumerating indexDelegate = new SingleEnumeratingDelegate();
 
     public ExternalSortEntriesCommand(
             File sourceFile, File destinationFile, Charset charset,
-            SingleEnumerating indexDeligate) {
+            SingleEnumerating indexDelegate) {
         super(sourceFile, destinationFile, charset);
-        setIndexDeligate(indexDeligate);
+        setIndexDelegate(indexDelegate);
     }
 
     public ExternalSortEntriesCommand() {
@@ -67,14 +67,14 @@ public class ExternalSortEntriesCommand extends AbstractExternalSortCommand<Weig
     @Override
     public void runCommand() throws Exception {
         super.runCommand();
-        indexDeligate.saveEnumerator();
-        indexDeligate.closeEnumerator();
+        indexDelegate.saveEnumerator();
+        indexDelegate.closeEnumerator();
 
     }
 
     @Override
     protected ObjectSink<Weighted<Token>> openSink(File file) throws IOException {
-        return new WeightSumReducerObjectSink<Token>(BybloIO.openEntriesSink(file, getCharset(), indexDeligate));
+        return new WeightSumReducerObjectSink<Token>(BybloIO.openEntriesSink(file, getCharset(), indexDelegate));
     }
 
     @Override
@@ -84,16 +84,16 @@ public class ExternalSortEntriesCommand extends AbstractExternalSortCommand<Weig
 
     @Override
     protected SeekableObjectSource<Weighted<Token>, Tell> openSource(File file) throws IOException {
-        return BybloIO.openEntriesSource(file, getCharset(), indexDeligate);
+        return BybloIO.openEntriesSource(file, getCharset(), indexDelegate);
     }
 
-    public final SingleEnumerating getIndexDeligate() {
-        return indexDeligate;
+    public final SingleEnumerating getIndexDelegate() {
+        return indexDelegate;
     }
 
-    public final void setIndexDeligate(SingleEnumerating indexDeligate) {
-        Checks.checkNotNull("indexDeligate", indexDeligate);
-        this.indexDeligate = indexDeligate;
+    public final void setIndexDelegate(SingleEnumerating indexDelegate) {
+        Checks.checkNotNull("indexDelegate", indexDelegate);
+        this.indexDelegate = indexDelegate;
     }
 
 }

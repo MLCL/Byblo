@@ -70,8 +70,8 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
     private Comparator<Weighted<TokenPair>> nearnessComparator = Comparators.reverse(Weighted.<TokenPair>weightOrder());
 
     public ExternalKnnSimsCommand(File sourceFile, File destinationFile, Charset charset,
-                                  SingleEnumerating indexDeligate, int k) throws IOException {
-        super(sourceFile, destinationFile, charset, EnumeratingDelegates.toPair(indexDeligate));
+                                  SingleEnumerating indexDelegate, int k) throws IOException {
+        super(sourceFile, destinationFile, charset, EnumeratingDelegates.toPair(indexDelegate));
         setK(k);
     }
 
@@ -139,14 +139,14 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
     @Override
     protected WeightedTokenPairSource openSource(File file)
             throws FileNotFoundException, IOException {
-        return BybloIO.openSimsSource(file, getCharset(), getIndexDeligate());
+        return BybloIO.openSimsSource(file, getCharset(), getIndexDelegate());
     }
 
     @Override
     protected ObjectSink<Weighted<TokenPair>> openSink(File file) throws FileNotFoundException, IOException {
         return new KFirstReducingObjectSink<Weighted<TokenPair>>(
                 new WeightSumReducerObjectSink<TokenPair>(
-                        BybloIO.openNeighboursSink(file, getCharset(), getIndexDeligate())),
+                        BybloIO.openNeighboursSink(file, getCharset(), getIndexDelegate())),
                 classComparator, k);
 
     }

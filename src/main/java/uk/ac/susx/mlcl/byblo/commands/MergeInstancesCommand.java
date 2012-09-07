@@ -82,12 +82,12 @@ public class MergeInstancesCommand extends AbstractMergeCommand<TokenPair> {
 
     @Override
     protected ObjectSource<TokenPair> openSource(File file) throws FileNotFoundException, IOException {
-        return BybloIO.openInstancesSource(file, getFileDeligate().getCharset(), indexDelegate);
+        return BybloIO.openInstancesSource(file, getFileDelegate().getCharset(), indexDelegate);
     }
 
     @Override
     protected ObjectSink<TokenPair> openSink(File file) throws FileNotFoundException, IOException {
-        return BybloIO.openInstancesSink(file, getFileDeligate().getCharset(), indexDelegate);
+        return BybloIO.openInstancesSink(file, getFileDelegate().getCharset(), indexDelegate);
     }
 
     public static void main(String[] args) throws Exception {

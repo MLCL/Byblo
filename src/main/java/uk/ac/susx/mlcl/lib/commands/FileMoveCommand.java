@@ -48,38 +48,38 @@ import uk.ac.susx.mlcl.lib.tasks.FileMoveTask;
 public final class FileMoveCommand extends AbstractCommand {
 
     @ParametersDelegate
-    protected final FilePipeDelegate filesDeligate = new FilePipeDelegate();
+    protected final FilePipeDelegate filesDelegate = new FilePipeDelegate();
 
     public FileMoveCommand(File sourceFile, File destinationFile) {
-        filesDeligate.setSourceFile(sourceFile);
-        filesDeligate.setDestinationFile(destinationFile);
+        filesDelegate.setSourceFile(sourceFile);
+        filesDelegate.setDestinationFile(destinationFile);
     }
 
     public FileMoveCommand() {
     }
 
     public final void setSourceFile(File sourceFile) {
-        filesDeligate.setSourceFile(sourceFile);
+        filesDelegate.setSourceFile(sourceFile);
     }
 
-    public final void setDestinationFile(File destFile) {
-        filesDeligate.setDestinationFile(destFile);
+    public final void setDestinationFile(File destinationFile) {
+        filesDelegate.setDestinationFile(destinationFile);
     }
 
     public final File getSourceFile() {
-        return filesDeligate.getSourceFile();
+        return filesDelegate.getSourceFile();
     }
 
     public final File getDestinationFile() {
-        return filesDeligate.getDestinationFile();
+        return filesDelegate.getDestinationFile();
     }
 
     @Override
     public void runCommand() throws Exception {
 
         FileMoveTask task = new FileMoveTask(
-                filesDeligate.getSourceFile(),
-                filesDeligate.getDestinationFile());
+                filesDelegate.getSourceFile(),
+                filesDelegate.getDestinationFile());
 
         task.run();
 
@@ -90,8 +90,8 @@ public final class FileMoveCommand extends AbstractCommand {
     @Override
     protected Objects.ToStringHelper toStringHelper() {
         return super.toStringHelper().
-                add("from", filesDeligate.getSourceFile()).
-                add("to", filesDeligate.getDestinationFile());
+                add("from", filesDelegate.getSourceFile()).
+                add("to", filesDelegate.getDestinationFile());
     }
 
 }

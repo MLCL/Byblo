@@ -32,7 +32,7 @@
 
 
 # ===========================================
-# Options for Sun Grid Engine submition
+# Options for Sun Grid Engine submission
 # ============================================
 
 # Name of job

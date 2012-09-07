@@ -138,49 +138,49 @@ public class IndexSimsCommandTest extends
 
 	@Test
 	public void testRunOnFruitAPI_noskip_compact_JDBC() throws Exception {
-		testRunOnFruitAPI("compact-noskip-jdbc-", EnumeratorType.JDBC, false,
+		testRunOnFruitAPI("compact-noskip-jdbc-", EnumeratorType.JDBM, false,
 				false, true);
 	}
 
 	@Test
 	public void testRunOnFruitAPI_skipboth_compact_JDBC() throws Exception {
-		testRunOnFruitAPI("compact-skipboth-jdbc-", EnumeratorType.JDBC, true,
+		testRunOnFruitAPI("compact-skipboth-jdbc-", EnumeratorType.JDBM, true,
 				true, true);
 	}
 
 	@Test
 	public void testRunOnFruitAPI_skipleft_compact_JDBC() throws Exception {
-		testRunOnFruitAPI("compact-skipleft-jdbc-", EnumeratorType.JDBC, true,
+		testRunOnFruitAPI("compact-skipleft-jdbc-", EnumeratorType.JDBM, true,
 				false, true);
 	}
 
 	@Test
 	public void testRunOnFruitAPI_skipright_compact_JDBC() throws Exception {
-		testRunOnFruitAPI("compact-skipright-jdbc-", EnumeratorType.JDBC,
+		testRunOnFruitAPI("compact-skipright-jdbc-", EnumeratorType.JDBM,
 				false, true, true);
 	}
 
 	@Test
 	public void testRunOnFruitAPI_noskip_verbose_JDBC() throws Exception {
-		testRunOnFruitAPI("verbose-noskip-jdbc-", EnumeratorType.JDBC, false,
+		testRunOnFruitAPI("verbose-noskip-jdbc-", EnumeratorType.JDBM, false,
 				false, false);
 	}
 
 	@Test
 	public void testRunOnFruitAPI_skipboth_verbose_JDBC() throws Exception {
-		testRunOnFruitAPI("verbose-skipboth-jdbc-", EnumeratorType.JDBC, true,
+		testRunOnFruitAPI("verbose-skipboth-jdbc-", EnumeratorType.JDBM, true,
 				true, false);
 	}
 
 	@Test
 	public void testRunOnFruitAPI_skipleft_verbose_JDBC() throws Exception {
-		testRunOnFruitAPI("verbose-skipleft-jdbc-", EnumeratorType.JDBC, true,
+		testRunOnFruitAPI("verbose-skipleft-jdbc-", EnumeratorType.JDBM, true,
 				false, false);
 	}
 
 	@Test
 	public void testRunOnFruitAPI_skipright_verbose_JDBC() throws Exception {
-		testRunOnFruitAPI("verbose-skipright-jdbc-", EnumeratorType.JDBC,
+		testRunOnFruitAPI("verbose-skipright-jdbc-", EnumeratorType.JDBM,
 				false, true, false);
 	}
 
@@ -334,15 +334,15 @@ public class IndexSimsCommandTest extends
 		assertValidPlaintextInputFiles(from);
 		assertValidOutputFiles(to);
 
-		if (type == EnumeratorType.JDBC)
+		if (type == EnumeratorType.JDBM)
 			assertValidJDBCOutputFiles(index);
 		else
 			assertValidOutputFiles(index);
 
 		IndexingCommands.IndexSims indexCommand = new IndexingCommands.IndexSims();
-		indexCommand.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-		indexCommand.getFilesDeligate().setSourceFile(from);
-		indexCommand.getFilesDeligate().setDestinationFile(to);
+		indexCommand.getFilesDelegate().setCharset(DEFAULT_CHARSET);
+		indexCommand.getFilesDelegate().setSourceFile(from);
+		indexCommand.getFilesDelegate().setDestinationFile(to);
 
 		indexCommand.setIndexDeligate(EnumeratingDelegates
 				.toPair(new SingleEnumeratingDelegate(type, true, index)));
@@ -351,7 +351,7 @@ public class IndexSimsCommandTest extends
 		assertValidPlaintextInputFiles(to);
 		assertSizeGT(from, to);
 
-		if (type == EnumeratorType.JDBC)
+		if (type == EnumeratorType.JDBM)
 			assertValidJDBCInputFiles(index);
 		else
 			assertValidInputFiles(index);
@@ -362,16 +362,16 @@ public class IndexSimsCommandTest extends
 			throws Exception {
 		assertValidPlaintextInputFiles(from);
 
-		if (type == EnumeratorType.JDBC)
+		if (type == EnumeratorType.JDBM)
 			assertValidJDBCInputFiles(index);
 		else
 			assertValidInputFiles(index);
 		assertValidOutputFiles(to);
 
 		IndexingCommands.IndexSims unindex = new IndexingCommands.IndexSims();
-		unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-		unindex.getFilesDeligate().setSourceFile(from);
-		unindex.getFilesDeligate().setDestinationFile(to);
+		unindex.getFilesDelegate().setCharset(DEFAULT_CHARSET);
+		unindex.getFilesDelegate().setSourceFile(from);
+		unindex.getFilesDelegate().setDestinationFile(to);
 		unindex.setIndexDeligate(EnumeratingDelegates
 				.toPair(new SingleEnumeratingDelegate(type, true, index)));
 		unindex.runCommand();

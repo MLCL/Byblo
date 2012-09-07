@@ -101,8 +101,8 @@ public final class EnumeratingDelegates {
         }
 
         @Override
-        public EnumeratorType getEnuemratorType() {
-            return inner.getEnuemratorType();
+        public EnumeratorType getEnumeratorType() {
+            return inner.getEnumeratorType();
         }
 
         @Override
@@ -261,12 +261,12 @@ public final class EnumeratingDelegates {
         }
 
         @Override
-        public SingleEnumerating getEntriesEnumeratorCarriar() {
+        public SingleEnumerating getEntriesEnumeratorCarrier() {
             return getInner();
         }
 
         @Override
-        public SingleEnumerating getFeaturesEnumeratorCarriar() {
+        public SingleEnumerating getFeaturesEnumeratorCarrier() {
             return getInner();
         }
 
@@ -336,7 +336,7 @@ public final class EnumeratingDelegates {
         }
 
         @Override
-        public DoubleEnumerating getEnumeratorPairCarriar() {
+        public DoubleEnumerating getEnumeratorPairCarrier() {
             return getInner();
         }
 
@@ -396,7 +396,7 @@ public final class EnumeratingDelegates {
         }
 
         @Override
-        public DoubleEnumerating getEnumeratorPairCarriar() {
+        public DoubleEnumerating getEnumeratorPairCarrier() {
             return getInner();
         }
 
@@ -456,7 +456,7 @@ public final class EnumeratingDelegates {
         }
 
         @Override
-        public DoubleEnumerating getEnumeratorPairCarriar() {
+        public DoubleEnumerating getEnumeratorPairCarrier() {
             return toPair(this);
         }
 
@@ -546,12 +546,12 @@ public final class EnumeratingDelegates {
         }
 
         @Override
-        public SingleEnumerating getEntriesEnumeratorCarriar() {
+        public SingleEnumerating getEntriesEnumeratorCarrier() {
             return toSingleEntries(this);
         }
 
         @Override
-        public SingleEnumerating getFeaturesEnumeratorCarriar() {
+        public SingleEnumerating getFeaturesEnumeratorCarrier() {
             return toSingleFeatures(this);
         }
 

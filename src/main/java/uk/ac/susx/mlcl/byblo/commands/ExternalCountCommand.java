@@ -64,7 +64,7 @@ import java.util.concurrent.Future;
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-@Parameters(commandDescription = "Freqency count a structured input instance file.")
+@Parameters(commandDescription = "Frequency count a structured input instance file.")
 public class ExternalCountCommand extends AbstractParallelCommandTask implements ProgressReporting {
 
     private static final Log LOG = LogFactory.getLog(ExternalCountCommand.class);
@@ -108,10 +108,10 @@ public class ExternalCountCommand extends AbstractParallelCommandTask implements
     private final ProgressAggregate progress = new ProgressAggregate(this);
 
     @ParametersDelegate
-    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDelegate();
+    private DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();
 
     @ParametersDelegate
-    private FileDelegate fileDeligate = new FileDelegate();
+    private FileDelegate fileDelegate = new FileDelegate();
 
     @Parameter(names = {"-i", "--input"}, required = true,
             description = "Input instances file", validateWith = InputFileValidator.class)
@@ -142,10 +142,10 @@ public class ExternalCountCommand extends AbstractParallelCommandTask implements
     public ExternalCountCommand(final File instancesFile,
                                 final File eventsFile, final File entriesFile,
                                 final File featuresFile, Charset charset,
-                                DoubleEnumerating indexDeligate) {
+                                DoubleEnumerating indexDelegate) {
         this(instancesFile, eventsFile, entriesFile, featuresFile);
-        fileDeligate.setCharset(charset);
-        setIndexDeligate(indexDeligate);
+        fileDelegate.setCharset(charset);
+        setIndexDelegate(indexDelegate);
 
     }
 
@@ -162,21 +162,21 @@ public class ExternalCountCommand extends AbstractParallelCommandTask implements
         super();
     }
 
-    public FileDelegate getFileDeligate() {
-        return fileDeligate;
+    public FileDelegate getFileDelegate() {
+        return fileDelegate;
     }
 
-    public void setFileDeligate(FileDelegate fileDelegate) {
-        this.fileDeligate = fileDelegate;
+    public void setFileDelegate(FileDelegate fileDelegate) {
+        this.fileDelegate = fileDelegate;
     }
 
-    public final DoubleEnumerating getIndexDeligate() {
-        return indexDeligate;
+    public final DoubleEnumerating getIndexDelegate() {
+        return indexDelegate;
     }
 
-    public final void setIndexDeligate(DoubleEnumerating indexDeligate) {
-        Checks.checkNotNull("indexDeligate", indexDeligate);
-        this.indexDeligate = indexDeligate;
+    public final void setIndexDelegate(DoubleEnumerating indexDelegate) {
+        Checks.checkNotNull("indexDelegate", indexDelegate);
+        this.indexDelegate = indexDelegate;
     }
 
     public FileFactory getTempFileFactory() {
@@ -257,9 +257,9 @@ public class ExternalCountCommand extends AbstractParallelCommandTask implements
         clearCompleted(true);
         finish();
 
-        if (indexDeligate.isEnumeratorOpen()) {
-            indexDeligate.saveEnumerator();
-            indexDeligate.closeEnumerator();
+        if (indexDelegate.isEnumeratorOpen()) {
+            indexDelegate.saveEnumerator();
+            indexDelegate.closeEnumerator();
         }
 
         progress.setState(State.COMPLETED);
@@ -453,21 +453,21 @@ public class ExternalCountCommand extends AbstractParallelCommandTask implements
     }
 
     private Comparator<Weighted<Token>> getEntryOrder() throws IOException {
-        return indexDeligate.isEnumeratedEntries() ? Weighted.recordOrder(Token
+        return indexDelegate.isEnumeratedEntries() ? Weighted.recordOrder(Token
                 .indexOrder()) : Weighted.recordOrder(Token
-                .stringOrder(indexDeligate.getEntriesEnumeratorCarriar()));
+                .stringOrder(indexDelegate.getEntriesEnumeratorCarrier()));
     }
 
     private Comparator<Weighted<Token>> getFeatureOrder() throws IOException {
-        return indexDeligate.isEnumeratedFeatures() ? Weighted.recordOrder(Token.indexOrder())
-                : Weighted.recordOrder(Token.stringOrder(indexDeligate.getFeaturesEnumeratorCarriar()));
+        return indexDelegate.isEnumeratedFeatures() ? Weighted.recordOrder(Token.indexOrder())
+                : Weighted.recordOrder(Token.stringOrder(indexDelegate.getFeaturesEnumeratorCarrier()));
     }
 
     private Comparator<Weighted<TokenPair>> getEventOrder() throws IOException {
-        return (indexDeligate.isEnumeratedEntries()
-                && indexDeligate.isEnumeratedFeatures())
+        return (indexDelegate.isEnumeratedEntries()
+                && indexDelegate.isEnumeratedFeatures())
                 ? Weighted.recordOrder(TokenPair.indexOrder())
-                : Weighted.recordOrder(TokenPair.stringOrder(indexDeligate));
+                : Weighted.recordOrder(TokenPair.stringOrder(indexDelegate));
     }
 
     protected void submitCountTask(ObjectSource<TokenPair> instanceSource,
@@ -645,45 +645,45 @@ public class ExternalCountCommand extends AbstractParallelCommandTask implements
 
     protected SeekableObjectSource<Weighted<Token>, Tell> openEntriesSource(
             File file) throws FileNotFoundException, IOException {
-        return BybloIO.openEntriesSource(file, getCharset(), indexDeligate);
+        return BybloIO.openEntriesSource(file, getCharset(), indexDelegate);
     }
 
     protected ObjectSink<Weighted<Token>> openEntriesSink(File file)
             throws FileNotFoundException, IOException {
         return new WeightSumReducerObjectSink<Token>(BybloIO.openEntriesSink(
-                file, getCharset(), indexDeligate));
+                file, getCharset(), indexDelegate));
     }
 
     protected SeekableObjectSource<Weighted<Token>, Tell> openFeaturesSource(
             File file) throws FileNotFoundException, IOException {
-        return BybloIO.openFeaturesSource(file, getCharset(), indexDeligate);
+        return BybloIO.openFeaturesSource(file, getCharset(), indexDelegate);
     }
 
     protected ObjectSink<Weighted<Token>> openFeaturesSink(File file)
             throws FileNotFoundException, IOException {
         return new WeightSumReducerObjectSink<Token>(BybloIO.openFeaturesSink(
-                file, getCharset(), indexDeligate));
+                file, getCharset(), indexDelegate));
     }
 
     protected WeightedTokenPairSource openEventsSource(File file)
             throws FileNotFoundException, IOException {
-        return BybloIO.openEventsSource(file, getCharset(), indexDeligate);
+        return BybloIO.openEventsSource(file, getCharset(), indexDelegate);
     }
 
     protected ObjectSink<Weighted<TokenPair>> openEventsSink(File file)
             throws FileNotFoundException, IOException {
         return new WeightSumReducerObjectSink<TokenPair>(
-                BybloIO.openEventsSink(file, getCharset(), indexDeligate));
+                BybloIO.openEventsSink(file, getCharset(), indexDelegate));
     }
 
     protected SeekableObjectSource<TokenPair, Tell> openInstancesSource(
             File file) throws FileNotFoundException, IOException {
-        return BybloIO.openInstancesSource(file, getCharset(), indexDeligate);
+        return BybloIO.openInstancesSource(file, getCharset(), indexDelegate);
     }
 
     protected ObjectSink<TokenPair> openInstancesSink(File file)
             throws FileNotFoundException, IOException {
-        return BybloIO.openInstancesSink(file, getCharset(), indexDeligate);
+        return BybloIO.openInstancesSink(file, getCharset(), indexDelegate);
     }
 
     /**
@@ -729,28 +729,28 @@ public class ExternalCountCommand extends AbstractParallelCommandTask implements
         if (!inputFile.canRead())
             throw new IllegalStateException("instances file is not readable: " + inputFile);
 
-        // For each output file, check that either it exists and it writeable,
+        // For each output file, check that either it exists and it writable,
         // or that it does not exist but is creatable
         if (entriesFile.exists()
                 && (!entriesFile.isFile() || !entriesFile.canWrite()))
             throw new IllegalStateException("entries file exists but is not writable: " + entriesFile);
         if (!entriesFile.exists()
                 && !entriesFile.getAbsoluteFile().getParentFile().canWrite()) {
-            throw new IllegalStateException("entries file does not exists and can not be reated: " + entriesFile);
+            throw new IllegalStateException("entries file does not exists and can not be created: " + entriesFile);
         }
         if (featuresFile.exists()
                 && (!featuresFile.isFile() || !featuresFile.canWrite()))
             throw new IllegalStateException("features file exists but is not writable: " + featuresFile);
         if (!featuresFile.exists()
                 && !featuresFile.getAbsoluteFile().getParentFile().canWrite()) {
-            throw new IllegalStateException("features file does not exists and can not be reated: " + featuresFile);
+            throw new IllegalStateException("features file does not exists and can not be created: " + featuresFile);
         }
         if (eventsFile.exists()
                 && (!eventsFile.isFile() || !eventsFile.canWrite()))
             throw new IllegalStateException("entry-features file exists but is not writable: " + eventsFile);
         if (!eventsFile.exists()
                 && !eventsFile.getAbsoluteFile().getParentFile().canWrite()) {
-            throw new IllegalStateException("entry-features file does not exists and can not be reated: " + eventsFile);
+            throw new IllegalStateException("entry-features file does not exists and can not be created: " + eventsFile);
         }
     }
 
@@ -759,41 +759,41 @@ public class ExternalCountCommand extends AbstractParallelCommandTask implements
         return super.toStringHelper().add("in", inputFile)
                 .add("entriesOut", entriesFile)
                 .add("featuresOut", featuresFile).add("eventsOut", eventsFile)
-                .add("tempDir", tempFileFactory).add("fd", getFileDeligate())
-                .add("id", getIndexDeligate());
+                .add("tempDir", tempFileFactory).add("fd", getFileDelegate())
+                .add("id", getIndexDelegate());
     }
 
     public void setEnumeratedFeatures(boolean enumeratedFeatures) {
-        indexDeligate.setEnumeratedFeatures(enumeratedFeatures);
+        indexDelegate.setEnumeratedFeatures(enumeratedFeatures);
     }
 
     public void setEnumeratedEntries(boolean enumeratedEntries) {
-        indexDeligate.setEnumeratedEntries(enumeratedEntries);
+        indexDelegate.setEnumeratedEntries(enumeratedEntries);
     }
 
     public boolean isEnumeratedFeatures() {
-        return indexDeligate.isEnumeratedFeatures();
+        return indexDelegate.isEnumeratedFeatures();
     }
 
     public boolean isEnumeratedEntries() {
-        return indexDeligate.isEnumeratedEntries();
+        return indexDelegate.isEnumeratedEntries();
     }
 
     public final void setCharset(Charset charset) {
-        fileDeligate.setCharset(charset);
+        fileDelegate.setCharset(charset);
     }
 
     public final Charset getCharset() {
-        return fileDeligate.getCharset();
+        return fileDelegate.getCharset();
     }
 
     public void setEnumeratorType(EnumeratorType type) {
-        indexDeligate.setEnumeratorType(type);
+        indexDelegate.setEnumeratorType(type);
     }
 
     @Override
     public String getName() {
-        return "xcount";
+        return "ExternalCount";
     }
 
     @Override

@@ -39,16 +39,16 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Checks;
 
 /**
- * Implementation of ProgressReporting that can be used as a deligate by
+ * Implementation of ProgressReporting that can be used as a delegate by
  * containing objects.
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class ProgressDeligate implements ProgressReporting, Serializable {
+public class ProgressDelegate implements ProgressReporting, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Log LOG = LogFactory.getLog(ProgressDeligate.class);
+    private static final Log LOG = LogFactory.getLog(ProgressDelegate.class);
 
     private CopyOnWriteArrayList<ProgressListener> progressListeners =
             new CopyOnWriteArrayList<ProgressListener>();
@@ -69,26 +69,26 @@ public class ProgressDeligate implements ProgressReporting, Serializable {
 
     private AtomicInteger adjustingCount = new AtomicInteger(0);
 
-    public ProgressDeligate(ProgressReporting outer, boolean progressPercentageSupported) {
+    public ProgressDelegate(ProgressReporting outer, boolean progressPercentageSupported) {
         if (outer == this)
             throw new IllegalArgumentException("outer == this");
         this.outer = outer;
         this.progressPercentageSupported = progressPercentageSupported;
     }
 
-    public ProgressDeligate(ProgressReporting outer) {
+    public ProgressDelegate(ProgressReporting outer) {
         if (outer == this)
             throw new IllegalArgumentException("outer == this");
         this.outer = outer;
         this.progressPercentageSupported = true;
     }
 
-    public ProgressDeligate(boolean progressPercentageSupported) {
+    public ProgressDelegate(boolean progressPercentageSupported) {
         this.outer = null;
         this.progressPercentageSupported = progressPercentageSupported;
     }
 
-    public ProgressDeligate() {
+    public ProgressDelegate() {
         this.outer = null;
         this.progressPercentageSupported = true;
     }
@@ -108,7 +108,7 @@ public class ProgressDeligate implements ProgressReporting, Serializable {
     @Override
     public String getName() {
         if (outer == null)
-            return "<unamed deligate>";
+            return "<unnamed delegate>";
         else
             return outer.getName();
     }
@@ -117,7 +117,7 @@ public class ProgressDeligate implements ProgressReporting, Serializable {
      * Indicate the start of series of updates that should be considered a
      * single atomic transaction.
      *
-     * This method is used (in conjuction with {@link #endAdjusting() } to avoid
+     * This method is used (in conjunction with {@link #endAdjusting() } to avoid
      * multiple events being fired during a sequence of state changes.
      *
      * @throws IllegalStateException if adjustingCount is negative
@@ -133,7 +133,7 @@ public class ProgressDeligate implements ProgressReporting, Serializable {
      * Indicate the end of series of updates that should be considered a single
      * atomic transaction.
      *
-     * This method is used (in conjuction with {@link #startAdjusting() } to
+     * This method is used (in conjunction with {@link #startAdjusting() } to
      * avoid multiple events being fired during a sequence of state changes.
      *
      * @throws IllegalStateException if no transaction has been started
@@ -227,7 +227,7 @@ public class ProgressDeligate implements ProgressReporting, Serializable {
             // While progress reporters don't have to extend (or delegate) this
             // class to implement ProgressReporting, it is by far the easiest
             // way. As such most objects will be using an instance of this class
-            // and linkCount will aproximate the total number of attached
+            // and linkCount will approximate the total number of attached
             // listeners. It's easy to forget to remove them so this check
             // prints a warning when it grown large.
             if (linkCount >= 100 && linkCount % 100 == 0 && LOG.isWarnEnabled())
@@ -270,7 +270,7 @@ public class ProgressDeligate implements ProgressReporting, Serializable {
         }
     }
 
-    public boolean equals(ProgressDeligate other) {
+    public boolean equals(ProgressDelegate other) {
         if (this.progressListeners != other.progressListeners && (this.progressListeners == null || !this.progressListeners.equals(other.progressListeners)))
             return false;
         if (this.progressPercent != other.progressPercent)
@@ -288,7 +288,7 @@ public class ProgressDeligate implements ProgressReporting, Serializable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        return equals((ProgressDeligate) obj);
+        return equals((ProgressDelegate) obj);
     }
 
     @Override
@@ -304,7 +304,7 @@ public class ProgressDeligate implements ProgressReporting, Serializable {
 
     @Override
     public String toString() {
-        return "ProgressDeligate{"
+        return "ProgressDelegate{"
                 + "progressListeners=" + progressListeners
                 + ", progressPercent=" + progressPercent
                 + '}';

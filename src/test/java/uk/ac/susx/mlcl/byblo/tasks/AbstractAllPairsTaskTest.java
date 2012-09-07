@@ -34,7 +34,6 @@ package uk.ac.susx.mlcl.byblo.tasks;
 import com.google.common.base.Predicate;
 import it.unimi.dsi.fastutil.ints.IntIterator;
 import junit.framework.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import uk.ac.susx.mlcl.TestConstants;
@@ -93,7 +92,7 @@ public abstract class AbstractAllPairsTaskTest<T extends NaiveApssTask> extends 
 
         final File outSims = new File(TestConstants.TEST_OUTPUT_DIR, outFileName);
 
-        WeightedTokenPairSink result = BybloIO.openSimsSink(outSims, DEFAULT_CHARSET, del.getEntriesEnumeratorCarriar());
+        WeightedTokenPairSink result = BybloIO.openSimsSink(outSims, DEFAULT_CHARSET, del.getEntriesEnumeratorCarrier());
 
         instance.setSourceA(vsa);
         instance.setSourceB(vsb);
@@ -180,7 +179,7 @@ public abstract class AbstractAllPairsTaskTest<T extends NaiveApssTask> extends 
 
         FastWeightedTokenPairVectorSource vsa = BybloIO.openEventsVectorSource(inEvents, DEFAULT_CHARSET, del);
         FastWeightedTokenPairVectorSource vsb = BybloIO.openEventsVectorSource(inEvents, DEFAULT_CHARSET, del);
-        WeightedTokenPairSink result = BybloIO.openSimsSink(outSims, DEFAULT_CHARSET, del.getEntriesEnumeratorCarriar());
+        WeightedTokenPairSink result = BybloIO.openSimsSink(outSims, DEFAULT_CHARSET, del.getEntriesEnumeratorCarrier());
 
         instance.setSourceA(vsa);
         instance.setSourceB(vsb);
@@ -212,7 +211,7 @@ public abstract class AbstractAllPairsTaskTest<T extends NaiveApssTask> extends 
 
     /**
      * Routine that creates a large amount of data, that should be the absolute
-     * worst case for allpairs stage of the pipeline.
+     * worst case for all-pairs stage of the pipeline.
      *
      * @throws java.io.IOException
      */

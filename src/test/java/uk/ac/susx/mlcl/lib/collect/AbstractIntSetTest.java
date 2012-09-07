@@ -70,8 +70,7 @@ public abstract class AbstractIntSetTest<T extends IntSet> extends
 	}
 
 	/**
-	 * Test the ctor that allows us to create from an integer array.
-	 * 
+	 *
 	 * @throws NoSuchMethodException
 	 * @throws InvocationTargetException
 	 * @throws IllegalAccessException
@@ -294,8 +293,7 @@ public abstract class AbstractIntSetTest<T extends IntSet> extends
 	}
 
 	/**
-	 * Test the ctor that allows us to create from an integer array.
-	 * 
+	 *
 	 * @throws NoSuchMethodException
 	 * @throws InvocationTargetException
 	 * @throws IllegalAccessException
@@ -721,8 +719,7 @@ public abstract class AbstractIntSetTest<T extends IntSet> extends
 	}
 
 	/**
-	 * Test the ctor that allows us to create from an integer array.
-	 * 
+	 *
 	 * @throws NoSuchMethodException
 	 * @throws InvocationTargetException
 	 * @throws IllegalAccessException

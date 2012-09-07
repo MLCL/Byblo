@@ -77,7 +77,7 @@ public class AllPairsCommand extends AbstractCommand {
     private static final Log LOG = LogFactory.getLog(AllPairsCommand.class);
 
     @ParametersDelegate
-    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDelegate();
+    private DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();
 
     @ParametersDelegate
     private FileDelegate fileDelegate = new FileDelegate();
@@ -144,7 +144,7 @@ public class AllPairsCommand extends AbstractCommand {
     private double leeAlpha = Lee.DEFAULT_ALPHA;
 
     @Parameter(names = {"--crmi-beta"},
-            description = "Beta paramter to Weed's CRMI measure.",
+            description = "Beta parameter to Weed's CRMI measure.",
             converter = DoubleConverter.class)
     private double crmiBeta = CrMi.DEFAULT_BETA;
 
@@ -186,13 +186,13 @@ public class AllPairsCommand extends AbstractCommand {
 
     public AllPairsCommand(File entriesFile, File featuresFile,
                            File eventsFile, File outputFile,
-                           Charset charset, DoubleEnumerating indexDeligate) {
+                           Charset charset, DoubleEnumerating indexDelegate) {
         setEventsFile(eventsFile);
         setEntriesFile(entriesFile);
         setFeaturesFile(featuresFile);
         setOutputFile(outputFile);
         setCharset(charset);
-        this.indexDeligate = indexDeligate;
+        this.indexDelegate = indexDelegate;
     }
 
     public AllPairsCommand() {
@@ -206,22 +206,22 @@ public class AllPairsCommand extends AbstractCommand {
             LOG.info("Running all-pairs similarity.");
         }
 
-        // Instantiate the denote proxmity measure
-        Proximity prox = getMeasureClass().newInstance();
+        // Instantiate the denote proximity measure
+        Proximity proximity = getMeasureClass().newInstance();
 
         // Parameterise those measures that require them
-        if (prox instanceof Lp) {
-            ((Lp) prox).setP(getMinkP());
-        } else if (prox instanceof Lee) {
-            ((Lee) prox).setAlpha(getLeeAlpha());
-        } else if (prox instanceof CrMi) {
-            ((CrMi) prox).setBeta(getCrmiBeta());
-            ((CrMi) prox).setGamma(getCrmiGamma());
+        if (proximity instanceof Lp) {
+            ((Lp) proximity).setP(getMinkP());
+        } else if (proximity instanceof Lee) {
+            ((Lee) proximity).setAlpha(getLeeAlpha());
+        } else if (proximity instanceof CrMi) {
+            ((CrMi) proximity).setBeta(getCrmiBeta());
+            ((CrMi) proximity).setGamma(getCrmiGamma());
         }
 
         // Mutual Information based proximity measures require the frequencies
         // of each feature, and other associate values
-        if (prox instanceof AbstractMIProximity) {
+        if (proximity instanceof AbstractMIProximity) {
             try {
                 if (LOG.isInfoEnabled()) {
                     LOG.info("Loading features file " + getFeaturesFile());
@@ -229,15 +229,15 @@ public class AllPairsCommand extends AbstractCommand {
 
                 WTStatsSource features = new WTStatsSource(openFeaturesSource());
 
-                AbstractMIProximity bmip = ((AbstractMIProximity) prox);
+                AbstractMIProximity bmip = ((AbstractMIProximity) proximity);
                 bmip.setFeatureFrequencies(readAllAsArray(features));
                 bmip.setFeatureFrequencySum(features.getWeightSum());
-                bmip.setOccuringFeatureCount(features.getMaxId() + 1);
+                bmip.setOccurringFeatureCount(features.getMaxId() + 1);
 
             } catch (IOException e) {
                 throw e;
             }
-        } else if (prox instanceof KendallTau) {
+        } else if (proximity instanceof KendallTau) {
             try {
                 if (LOG.isInfoEnabled()) {
                     LOG.info("Loading entries file for KendalTau.numFeatures: " + getFeaturesFile());
@@ -245,7 +245,7 @@ public class AllPairsCommand extends AbstractCommand {
 
                 WTStatsSource features = new WTStatsSource(openFeaturesSource());
                 ObjectIO.copy(features, ObjectIO.<Weighted<Token>>nullSink());
-                ((KendallTau) prox).setNumFeatures(features.getMaxId() + 1);
+                ((KendallTau) proximity).setNumFeatures(features.getMaxId() + 1);
 
             } catch (IOException e) {
                 throw e;
@@ -253,18 +253,18 @@ public class AllPairsCommand extends AbstractCommand {
         }
         //XXX This needs to be sorted out --- filter id must be read from the
         // stored enumeration, for optimal robustness
-        prox.setFilteredFeatureId(FilterCommand.FILTERED_ID);
+        proximity.setFilteredFeatureId(FilterCommand.FILTERED_ID);
 
         // Swap the proximity measure inputs if required
         if (isMeasureReversed()) {
-            prox = new ReversedProximity(prox);
+            proximity = new ReversedProximity(proximity);
         }
 
 
         // Instantiate two vector source objects than can scan and read the
         // main db. We need two because the algorithm takes all pairwise
-        // combinations of vectors, so will be looking at two differnt points
-        // in the file. Also this allows for the possibility of having differnt
+        // combinations of vectors, so will be looking at two different points
+        // in the file. Also this allows for the possibility of having different
         // files, e.g compare fruit words with cake words
         final FastWeightedTokenPairVectorSource sourceA = openEventsSource();
         final FastWeightedTokenPairVectorSource sourceB = openEventsSource();
@@ -282,7 +282,7 @@ public class AllPairsCommand extends AbstractCommand {
         apss.setSourceA(sourceA);
         apss.setSourceB(sourceB);
         apss.setSink(sink);
-        apss.setMeasure(prox);
+        apss.setMeasure(proximity);
         apss.setProducatePair(getProductionFilter());
 
 
@@ -312,9 +312,9 @@ public class AllPairsCommand extends AbstractCommand {
         if (apss.isExceptionTrapped())
             apss.throwTrappedException();
 
-        if (indexDeligate.isEnumeratorOpen()) {
-            indexDeligate.saveEnumerator();
-            indexDeligate.closeEnumerator();
+        if (indexDelegate.isEnumeratorOpen()) {
+            indexDelegate.saveEnumerator();
+            indexDelegate.closeEnumerator();
         }
 
         if (LOG.isInfoEnabled()) {
@@ -380,19 +380,19 @@ public class AllPairsCommand extends AbstractCommand {
     private WeightedTokenSource openFeaturesSource() throws IOException {
         return BybloIO.openFeaturesSource(
                 getFeaturesFile(), getCharset(),
-                EnumeratingDelegates.toSingleFeatures(getIndexDeligate()));
+                EnumeratingDelegates.toSingleFeatures(getIndexDelegate()));
     }
 
     private FastWeightedTokenPairVectorSource openEventsSource() throws IOException {
         return BybloIO.openEventsVectorSource(
                 getEventsFile(), getCharset(),
-                getIndexDeligate());
+                getIndexDelegate());
     }
 
     private WeightedTokenPairSink openSimsSink() throws IOException {
         return BybloIO.openSimsSink(
                 getOutputFile(), getCharset(),
-                EnumeratingDelegates.toSingleEntries(getIndexDeligate()));
+                EnumeratingDelegates.toSingleEntries(getIndexDelegate()));
 
     }
 
@@ -618,37 +618,37 @@ public class AllPairsCommand extends AbstractCommand {
         this.minkP = minkP;
     }
 
-    public final DoubleEnumerating getIndexDeligate() {
-        return indexDeligate;
+    public final DoubleEnumerating getIndexDelegate() {
+        return indexDelegate;
     }
 
-    public final void setIndexDeligate(DoubleEnumerating indexDeligate) {
-        Checks.checkNotNull("indexDeligate", indexDeligate);
-        this.indexDeligate = indexDeligate;
+    public final void setIndexDelegate(DoubleEnumerating indexDelegate) {
+        Checks.checkNotNull("indexDelegate", indexDelegate);
+        this.indexDelegate = indexDelegate;
     }
 
     public void setEnumeratedFeatures(boolean enumeratedFeatures) {
-        indexDeligate.setEnumeratedFeatures(enumeratedFeatures);
+        indexDelegate.setEnumeratedFeatures(enumeratedFeatures);
     }
 
     public void setEnumeratedEntries(boolean enumeratedEntries) {
-        indexDeligate.setEnumeratedEntries(enumeratedEntries);
+        indexDelegate.setEnumeratedEntries(enumeratedEntries);
     }
 
     public boolean isEnumeratedFeatures() {
-        return indexDeligate.isEnumeratedFeatures();
+        return indexDelegate.isEnumeratedFeatures();
     }
 
     public boolean isEnumeratedEntries() {
-        return indexDeligate.isEnumeratedEntries();
+        return indexDelegate.isEnumeratedEntries();
     }
 
     public void setEnumeratorType(EnumeratorType type) {
-        indexDeligate.setEnumeratorType(type);
+        indexDelegate.setEnumeratorType(type);
     }
 
-    public EnumeratorType getEnuemratorType() {
-        return indexDeligate.getEnuemratorType();
+    public EnumeratorType getEnumeratorType() {
+        return indexDelegate.getEnumeratorType();
     }
 
 }

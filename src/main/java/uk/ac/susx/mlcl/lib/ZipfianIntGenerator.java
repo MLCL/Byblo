@@ -37,7 +37,7 @@ import java.util.Random;
 
 public class ZipfianIntGenerator extends AbstractIntIterator {
 	public static final int NO_LIMIT = -1;
-	private static final int DEFAILT_POPULATION_SIZE = Integer.MAX_VALUE;
+	private static final int DEFAULT_POPULATION_SIZE = Integer.MAX_VALUE;
 	private static final double DEFAULT_EXPONENT = 2.0;
 	private final ZipfianDistribution zd;
 	private final int limit;
@@ -51,11 +51,11 @@ public class ZipfianIntGenerator extends AbstractIntIterator {
 	}
 
 	public ZipfianIntGenerator(int limit) {
-		this(new Random(), limit, DEFAILT_POPULATION_SIZE, DEFAULT_EXPONENT);
+		this(new Random(), limit, DEFAULT_POPULATION_SIZE, DEFAULT_EXPONENT);
 	}
 
 	public ZipfianIntGenerator() {
-		this(new Random(), NO_LIMIT, DEFAILT_POPULATION_SIZE, DEFAULT_EXPONENT);
+		this(new Random(), NO_LIMIT, DEFAULT_POPULATION_SIZE, DEFAULT_EXPONENT);
 	}
 
 	@Override

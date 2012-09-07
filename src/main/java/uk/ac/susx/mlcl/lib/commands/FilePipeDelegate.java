@@ -47,8 +47,8 @@ public final class FilePipeDelegate extends FileDelegate implements Serializable
     @Parameter(names = {"-i", "--input"}, description = "Source file that will be read", validateWith = InputFileValidator.class, required = true)
     private File sourceFile;
 
-    @Parameter(names = {"-o", "--output"}, description = "Destination file that will be writen to.", validateWith = OutputFileValidator.class, required = true)
-    private File destFile;
+    @Parameter(names = {"-o", "--output"}, description = "Destination file that will be written to.", validateWith = OutputFileValidator.class, required = true)
+    private File destinationFile;
 
     public FilePipeDelegate(File sourceFile, File destinationFile, Charset charset) {
         super(charset);
@@ -64,7 +64,7 @@ public final class FilePipeDelegate extends FileDelegate implements Serializable
     }
 
     public final File getDestinationFile() {
-        return destFile;
+        return destinationFile;
     }
 
     public final void setSourceFile(final File sourceFile) {
@@ -73,10 +73,10 @@ public final class FilePipeDelegate extends FileDelegate implements Serializable
         this.sourceFile = sourceFile;
     }
 
-    public final void setDestinationFile(final File destFile) {
-        if (destFile == null)
+    public final void setDestinationFile(final File destinationFile) {
+        if (destinationFile == null)
             throw new NullPointerException("destinationFile is null");
-        this.destFile = destFile;
+        this.destinationFile = destinationFile;
     }
 
     @Override

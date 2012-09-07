@@ -50,9 +50,9 @@ public class CopyCommandTest {
         System.out.println("Testing getSrcFile() and setSrcFile()");
         File x = new File("x");
         FileCopyCommand instance = new FileCopyCommand();
-        instance.filesDeligate.setSourceFile(x);
+        instance.filesDelegate.setSourceFile(x);
         File expResult = x;
-        File result = instance.filesDeligate.getSourceFile();
+        File result = instance.filesDelegate.getSourceFile();
         assertEquals(expResult, result);
     }
 
@@ -61,9 +61,9 @@ public class CopyCommandTest {
         System.out.println("Testing getDstFile() and setDstFile()");
         File x = new File("x");
         FileCopyCommand instance = new FileCopyCommand();
-        instance.filesDeligate.setDestinationFile(x);
+        instance.filesDelegate.setDestinationFile(x);
         File expResult = x;
-        File result = instance.filesDeligate.getDestinationFile();
+        File result = instance.filesDelegate.getDestinationFile();
         assertEquals(expResult, result);
     }
 
@@ -87,7 +87,7 @@ public class CopyCommandTest {
     }
 
     @Test(expected = FileNotFoundException.class)
-    public void testRun_failure_noinput() throws Exception {
+    public void testRun_failure_noInput() throws Exception {
         System.out.println("Testing run() -- expecting failure (no input)");
         File in = File.createTempFile(getClass().getName(), "in");
         in.delete();
@@ -107,8 +107,8 @@ public class CopyCommandTest {
         JCommander jc = new JCommander();
         jc.addObject(instance);
         jc.parse(args);
-        assertEquals(x, instance.filesDeligate.getSourceFile());
-        assertEquals(y, instance.filesDeligate.getDestinationFile());
+        assertEquals(x, instance.filesDelegate.getSourceFile());
+        assertEquals(y, instance.filesDelegate.getDestinationFile());
         jc.usage();
     }
 }

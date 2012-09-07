@@ -40,7 +40,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class ProgressAggregate extends ProgressDeligate {
+public class ProgressAggregate extends ProgressDelegate {
 
     private static final long serialVersionUID = 1L;
 
@@ -84,7 +84,7 @@ public class ProgressAggregate extends ProgressDeligate {
     @Override
     public String getName() {
         if (getOuter() == this || getOuter() == null)
-            return "<unamed aggregate>";
+            return "<unnamed aggregate>";
         else
             return getOuter().getName();
     }

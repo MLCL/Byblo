@@ -97,11 +97,11 @@ public final class Predicates2 {
     public static <T> Predicate<T> and(
             Iterable<? extends Predicate<? super T>> components) {
         Set<Predicate<? super T>> result = new HashSet<Predicate<? super T>>();
-        for (Predicate<? super T> pred : components) {
-            if (pred.equals(alwaysFalse()))
+        for (Predicate<? super T> predicate : components) {
+            if (predicate.equals(alwaysFalse()))
                 return alwaysFalse();
-            else if (!pred.equals(alwaysTrue()))
-                result.add(Preconditions.checkNotNull(pred));
+            else if (!predicate.equals(alwaysTrue()))
+                result.add(Preconditions.checkNotNull(predicate));
         }
         if (result.isEmpty())
             return alwaysTrue();
@@ -124,11 +124,11 @@ public final class Predicates2 {
     public static <T> Predicate<T> or(
             Iterable<? extends Predicate<? super T>> components) {
         Set<Predicate<? super T>> result = new HashSet<Predicate<? super T>>();
-        for (Predicate<? super T> pred : components) {
-            if (pred.equals(alwaysTrue()))
+        for (Predicate<? super T> predicate : components) {
+            if (predicate.equals(alwaysTrue()))
                 return alwaysTrue();
-            else if (!pred.equals(alwaysFalse()))
-                result.add(Preconditions.checkNotNull(pred));
+            else if (!predicate.equals(alwaysFalse()))
+                result.add(Preconditions.checkNotNull(predicate));
         }
         if (result.isEmpty())
             return alwaysFalse();

@@ -110,7 +110,7 @@ public class ExternalSortEventsCommandTest extends
 
 		Comparator<Weighted<TokenPair>> comparator = Comparators.fallback(
 				Weighted.recordOrder(TokenPair.firstStringOrder(idx
-						.getEntriesEnumeratorCarriar())), Comparators
+						.getEntriesEnumeratorCarrier())), Comparators
 						.reverse(Weighted.<TokenPair> weightOrder()));
 
 		testSortWeightedTokenPairCommand(inputFile, randomisedFile, sortedFile,
@@ -168,7 +168,7 @@ public class ExternalSortEventsCommandTest extends
 
 		assertTrue("Input list is empty", inputList.size() > 0);
 
-		// scamble it up
+		// scramble it up
 		shuffle(inputList);
 
 		// write to a temporary file
@@ -200,7 +200,7 @@ public class ExternalSortEventsCommandTest extends
 		cmd.setCharset(DEFAULT_CHARSET);
 		cmd.setNumThreads(6);
 		cmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
-		cmd.setIndexDeligate(idx);
+		cmd.setIndexDelegate(idx);
 		cmd.setComparator(comparator);
 
 		cmd.runCommand();

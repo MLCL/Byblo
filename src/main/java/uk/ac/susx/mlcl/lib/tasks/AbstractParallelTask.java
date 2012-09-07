@@ -120,7 +120,7 @@ public abstract class AbstractParallelTask extends AbstractTask {
             if (LOG.isErrorEnabled()) {
                 LOG.error(null, ex);
             }
-            getExceptionDeligate().trapException(ex);
+            getExceptionDelegate().trapException(ex);
         } finally {
             executor.shutdownNow();
         }

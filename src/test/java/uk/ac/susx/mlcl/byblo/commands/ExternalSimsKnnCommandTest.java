@@ -95,11 +95,11 @@ public class ExternalSimsKnnCommandTest extends
 
         final ExternalKnnSimsCommand knnCmd = new ExternalKnnSimsCommand();
 
-        knnCmd.getFileDeligate().setSourceFile(in);
-        knnCmd.getFileDeligate().setDestinationFile(out);
-        knnCmd.getFileDeligate().setCharset(DEFAULT_CHARSET);
+        knnCmd.getFileDelegate().setSourceFile(in);
+        knnCmd.getFileDelegate().setDestinationFile(out);
+        knnCmd.getFileDelegate().setCharset(DEFAULT_CHARSET);
 
-        knnCmd.setIndexDeligate(new DoubleEnumeratingDelegate(
+        knnCmd.setIndexDelegate(new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null));
 
         knnCmd.setClassComparator(Weighted.recordOrder(TokenPair
@@ -172,11 +172,11 @@ public class ExternalSimsKnnCommandTest extends
 
         final ExternalKnnSimsCommand knnCmd = new ExternalKnnSimsCommand();
 
-        knnCmd.getFileDeligate().setSourceFile(inSimsFile);
-        knnCmd.getFileDeligate().setDestinationFile(outNeighsFile);
-        knnCmd.getFileDeligate().setCharset(DEFAULT_CHARSET);
+        knnCmd.getFileDelegate().setSourceFile(inSimsFile);
+        knnCmd.getFileDelegate().setDestinationFile(outNeighsFile);
+        knnCmd.getFileDelegate().setCharset(DEFAULT_CHARSET);
 
-        knnCmd.setIndexDeligate(new DoubleEnumeratingDelegate(
+        knnCmd.setIndexDelegate(new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null));
 
         knnCmd.setClassComparator(Weighted.recordOrder(TokenPair

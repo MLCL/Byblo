@@ -105,7 +105,7 @@ public class CountCommand extends AbstractCommand {
     private Charset charset = Files.DEFAULT_CHARSET;
 
     @ParametersDelegate
-    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDelegate();
+    private DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();
 
     /**
      * Dependency injection constructor with all fields parameterised.
@@ -114,17 +114,17 @@ public class CountCommand extends AbstractCommand {
      * @param eventsFile output file for entry/context/frequency triples
      * @param entriesFile output file for entry/frequency pairs
      * @param featuresFile output file for context/frequency pairs
-     * @param indexDeligate
+     * @param indexDelegate
      * @param charset character set to use for all file I/O
      * @throws NullPointerException if any argument is null
      */
     public CountCommand(final File instancesFile, final File eventsFile,
                         final File entriesFile, final File featuresFile,
-                        DoubleEnumerating indexDeligate,
+                        DoubleEnumerating indexDelegate,
                         final Charset charset) throws NullPointerException {
         this(instancesFile, eventsFile, entriesFile, featuresFile);
         setCharset(charset);
-        setIndexDeligate(indexDeligate);
+        setIndexDelegate(indexDelegate);
     }
 
     public CountCommand(final File instancesFile, final File eventsFile,
@@ -163,13 +163,13 @@ public class CountCommand extends AbstractCommand {
     public CountCommand() {
     }
 
-    public DoubleEnumerating getIndexDeligate() {
-        return indexDeligate;
+    public DoubleEnumerating getIndexDelegate() {
+        return indexDelegate;
     }
 
-    public final void setIndexDeligate(DoubleEnumerating indexDeligate) {
-        Checks.checkNotNull("indexDeligate", indexDeligate);
-        this.indexDeligate = indexDeligate;
+    public final void setIndexDelegate(DoubleEnumerating indexDelegate) {
+        Checks.checkNotNull("indexDelegate", indexDelegate);
+        this.indexDelegate = indexDelegate;
     }
 
     public final File getFeaturesFile() {
@@ -222,22 +222,22 @@ public class CountCommand extends AbstractCommand {
     }
 
     private Comparator<Weighted<Token>> getEntryOrder() throws IOException {
-        return indexDeligate.isEnumeratedEntries()
+        return indexDelegate.isEnumeratedEntries()
                ? Weighted.recordOrder(Token.indexOrder())
-               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getEntriesEnumeratorCarriar()));
+               : Weighted.recordOrder(Token.stringOrder(indexDelegate.getEntriesEnumeratorCarrier()));
     }
 
     private Comparator<Weighted<Token>> getFeatureOrder() throws IOException {
-        return indexDeligate.isEnumeratedFeatures()
+        return indexDelegate.isEnumeratedFeatures()
                ? Weighted.recordOrder(Token.indexOrder())
-               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getFeaturesEnumeratorCarriar()));
+               : Weighted.recordOrder(Token.stringOrder(indexDelegate.getFeaturesEnumeratorCarrier()));
     }
 
     private Comparator<Weighted<TokenPair>> getEventOrder() throws IOException {
-        return (indexDeligate.isEnumeratedEntries() && indexDeligate.isEnumeratedFeatures())
+        return (indexDelegate.isEnumeratedEntries() && indexDelegate.isEnumeratedFeatures())
                ? Weighted.recordOrder(TokenPair.indexOrder())
                : Weighted.recordOrder(TokenPair.stringOrder(
-                indexDeligate));
+                indexDelegate));
     }
 
     @Override
@@ -248,14 +248,14 @@ public class CountCommand extends AbstractCommand {
 
         checkState();
 
-        final TokenPairSource instanceSource = BybloIO.openInstancesSource(inputFile, charset, indexDeligate);
+        final TokenPairSource instanceSource = BybloIO.openInstancesSource(inputFile, charset, indexDelegate);
 
-        WeightedTokenSink entrySink = BybloIO.openEntriesSink(entriesFile, charset, indexDeligate);
+        WeightedTokenSink entrySink = BybloIO.openEntriesSink(entriesFile, charset, indexDelegate);
 
-        WeightedTokenSink featureSink = BybloIO.openFeaturesSink(featuresFile, charset, indexDeligate);
+        WeightedTokenSink featureSink = BybloIO.openFeaturesSink(featuresFile, charset, indexDelegate);
 
 
-        WeightedTokenPairSink eventsSink = BybloIO.openEventsSink(eventsFile, charset, indexDeligate);
+        WeightedTokenPairSink eventsSink = BybloIO.openEventsSink(eventsFile, charset, indexDelegate);
 
         CountTask task = new CountTask(
                 instanceSource, eventsSink, entrySink, featureSink,
@@ -283,9 +283,9 @@ public class CountCommand extends AbstractCommand {
         eventsSink.flush();
         eventsSink.close();
 
-        if (indexDeligate.isEnumeratorOpen()) {
-            indexDeligate.saveEnumerator();
-            indexDeligate.closeEnumerator();
+        if (indexDelegate.isEnumeratorOpen()) {
+            indexDelegate.saveEnumerator();
+            indexDelegate.closeEnumerator();
         }
 
 
@@ -347,7 +347,7 @@ public class CountCommand extends AbstractCommand {
                     "instances file is not readable: " + inputFile);
         }
 
-        // For each output file, check that either it exists and it writeable,
+        // For each output file, check that either it exists and it writable,
         // or that it does not exist but is creatable
         if (entriesFile.exists() && (!entriesFile.isFile() || !entriesFile.canWrite())) {
             throw new IllegalStateException(
@@ -357,7 +357,7 @@ public class CountCommand extends AbstractCommand {
                 getParentFile().
                 canWrite()) {
             throw new IllegalStateException(
-                    "entries file does not exists and can not be reated: " + entriesFile);
+                    "entries file does not exists and can not be created: " + entriesFile);
         }
         if (featuresFile.exists() && (!featuresFile.isFile() || !featuresFile.canWrite())) {
             throw new IllegalStateException(
@@ -367,7 +367,7 @@ public class CountCommand extends AbstractCommand {
                 getParentFile().
                 canWrite()) {
             throw new IllegalStateException(
-                    "features file does not exists and can not be reated: " + featuresFile);
+                    "features file does not exists and can not be created: " + featuresFile);
         }
         if (eventsFile.exists() && (!eventsFile.isFile() || !eventsFile.canWrite())) {
             throw new IllegalStateException(
@@ -377,7 +377,7 @@ public class CountCommand extends AbstractCommand {
                 getParentFile().
                 canWrite()) {
             throw new IllegalStateException(
-                    "entry-features file does not exists and can not be reated: " + eventsFile);
+                    "entry-features file does not exists and can not be created: " + eventsFile);
         }
     }
 

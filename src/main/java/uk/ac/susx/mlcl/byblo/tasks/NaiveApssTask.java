@@ -52,7 +52,7 @@ import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
-import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
+import uk.ac.susx.mlcl.lib.events.ProgressDelegate;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 
@@ -75,7 +75,7 @@ public class NaiveApssTask<P> extends AbstractTask
      */
     public static final Proximity DEFAULT_MEASURE = new Jaccard();
 
-    protected final ProgressDeligate progress = new ProgressDeligate(this, true);
+    protected final ProgressDelegate progress = new ProgressDelegate(this, true);
 
     private SeekableObjectSource<Indexed<SparseDoubleVector>, P> sourceA;
 

@@ -99,19 +99,19 @@ public class TestConstants {
     public static final File TEST_FRUIT_INDEXED_ENTRIES =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.entries");
 
-    public static final File TEST_FRUIT_SKIPINDEXED_ENTRIES =
+    public static final File TEST_FRUIT_SKIP_INDEXED_ENTRIES =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".skipindexed.entries");
 
     public static final File TEST_FRUIT_INDEXED_FEATURES =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.features");
 
-    public static final File TEST_FRUIT_SKIPINDEXED_FEATURES =
+    public static final File TEST_FRUIT_SKIP_INDEXED_FEATURES =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".skipindexed.features");
 
     public static final File TEST_FRUIT_INDEXED_EVENTS =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.events");
 
-    public static final File TEST_FRUIT_SKIPINDEXED_EVENTS =
+    public static final File TEST_FRUIT_SKIP_INDEXED_EVENTS =
             new File(TEST_FRUIT_DIR, FRUIT_NAME + ".skipindexed.events");
 
     public static final File TEST_FRUIT_INDEXED_SIMS =
@@ -172,7 +172,7 @@ public class TestConstants {
             RandomAccessFile raf = new RandomAccessFile(file, "r");
             raf.seek(file.length() - 1);
             int ch = raf.read();
-            assertEquals(format("Expecting newline chracter at end of inout file: \"{0}\"", file), ch, '\n');
+            assertEquals(format("Expecting newline character at end of inout file: \"{0}\"", file), ch, '\n');
             raf.close();
         }
     }
@@ -208,7 +208,7 @@ public class TestConstants {
             if (file.exists()) {
                 assertTrue(format("Input file is not a regular: \"{0}\"", file),
                         file.isFile());
-                assertTrue(format("Input file is not writeable: \"{0}\"", file),
+                assertTrue(format("Input file is not writable: \"{0}\"", file),
                         file.canWrite());
             } else {
                 assertTrue(format("Cannot be created: \"{0}\"", file),
@@ -264,11 +264,11 @@ public class TestConstants {
             System.out.println(MiscUtil.memoryInfoString());
 
             long newTick = System.currentTimeMillis();
-            double tdiff = (newTick - tick) / 1000.0d;
+            double timeDiff = (newTick - tick) / 1000.0d;
             tick = newTick;
 
             System.out
-                    .println(MessageFormat.format("Tick: {0} seconds", tdiff));
+                    .println(MessageFormat.format("Tick: {0} seconds", timeDiff));
 
             //
 //    		MemoryUsage mu = new MemoryUsage();

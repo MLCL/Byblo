@@ -52,14 +52,14 @@ public final class ForwardingBiMap<K, V>
 
     private static final long serialVersionUID = 1L;
 
-    private final Map<K, V> deligate;
+    private final Map<K, V> delegate;
 
     private transient ForwardingBiMap<V, K> inverse;
 
     protected ForwardingBiMap(
             Map<K, V> forwards,
             ForwardingBiMap<V, K> inverse) {
-        this.deligate = forwards;
+        this.delegate = forwards;
         this.inverse = inverse;
     }
 
@@ -73,7 +73,7 @@ public final class ForwardingBiMap<K, V>
 
     @Override
     protected Map<K, V> delegate() {
-        return deligate;
+        return delegate;
     }
 
     @Override
@@ -85,10 +85,10 @@ public final class ForwardingBiMap<K, V>
             if (get(k).equals(v))
                 return v;
             throw new IllegalArgumentException(
-                    "given value is already bound to a different key in this bimap");
+                    "given value is already bound to a different key in this BiMap");
         }
-        inverse.deligate.put(v, k);
-        return deligate.put(k, v);
+        inverse.delegate.put(v, k);
+        return delegate.put(k, v);
     }
 
     @Override
@@ -96,26 +96,26 @@ public final class ForwardingBiMap<K, V>
         Checks.checkNotNull("key", k);
         Checks.checkNotNull("value", v);
 
-        inverse.deligate.put(v, k);
-        return deligate.put(k, v);
+        inverse.delegate.put(v, k);
+        return delegate.put(k, v);
     }
 
     @Override
     public boolean containsValue(Object value) {
-        return inverse.deligate.containsKey(value);
+        return inverse.delegate.containsKey(value);
     }
 
     @Override
     public V remove(Object key) {
-        final V r = deligate.remove(key);
-        inverse.deligate.remove(r);
+        final V r = delegate.remove(key);
+        inverse.delegate.remove(r);
         return r;
     }
 
     @Override
     public void clear() {
-        deligate.clear();
-        inverse.deligate.clear();
+        delegate.clear();
+        inverse.delegate.clear();
     }
 
     @Override
@@ -126,7 +126,7 @@ public final class ForwardingBiMap<K, V>
 
     @Override
     public Set<V> values() {
-        return inverse.deligate.keySet();
+        return inverse.delegate.keySet();
     }
 
     @Override
@@ -157,8 +157,8 @@ public final class ForwardingBiMap<K, V>
         @Override
         public final void writeExternal(final ObjectOutput out)
                 throws IOException {
-            out.writeObject(instance.deligate);
-            out.writeObject(instance.inverse.deligate);
+            out.writeObject(instance.delegate);
+            out.writeObject(instance.inverse.delegate);
         }
 
         @Override

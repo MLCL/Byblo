@@ -81,7 +81,7 @@ public class FeatureTest {
 
         assertTrue("Verbose copy is smaller that compact source.",
                    c.length() >= b.length());
-        assertTrue("Double converted file is not equal to origion.",
+        assertTrue("Double converted file is not equal to origin.",
                    Files.equal(a, c));
     }
 
@@ -122,7 +122,7 @@ public class FeatureTest {
 
         assertTrue("Verbose copy is smaller that compact source.",
                    c.length() >= b.length());
-        assertTrue("Double converted file is not equal to origion.",
+        assertTrue("Double converted file is not equal to origin.",
                    Files.equal(a, c));
     }
 

@@ -51,7 +51,7 @@ package uk.ac.susx.mlcl.testing;
  * </pre>
  * 
  * </li>
- * <li>Or invoking maver from the command line:
+ * <li>Or invoking maven from the command line:
  * 
  * <pre>
  * $ mvn surefire:test -DexcludedGroups=uk.ac.susx.mlcl.SlowTestCategory

@@ -140,49 +140,49 @@ public class IndexWTPCommandTest extends
 
 	@Test
 	public void testRunOnFruitAPI_noskip_compact_jdbc() throws Exception {
-		testRunOnFruitAPI("compact-noskip-jdbc-", EnumeratorType.JDBC, false,
+		testRunOnFruitAPI("compact-noskip-jdbc-", EnumeratorType.JDBM, false,
 				false, true);
 	}
 
 	@Test
 	public void testRunOnFruitAPI_skipboth_compact_jdbc() throws Exception {
-		testRunOnFruitAPI("compact-skipboth-jdbc-", EnumeratorType.JDBC, true,
+		testRunOnFruitAPI("compact-skipboth-jdbc-", EnumeratorType.JDBM, true,
 				true, true);
 	}
 
 	@Test
 	public void testRunOnFruitAPI_skipleft_compact_jdbc() throws Exception {
-		testRunOnFruitAPI("compact-skipleft-jdbc-", EnumeratorType.JDBC, true,
+		testRunOnFruitAPI("compact-skipleft-jdbc-", EnumeratorType.JDBM, true,
 				false, true);
 	}
 
 	@Test
 	public void testRunOnFruitAPI_skipright_compact_jdbc() throws Exception {
-		testRunOnFruitAPI("compact-skipright-jdbc-", EnumeratorType.JDBC,
+		testRunOnFruitAPI("compact-skipright-jdbc-", EnumeratorType.JDBM,
 				false, true, true);
 	}
 
 	@Test
 	public void testRunOnFruitAPI_noskip_verbose_jdbc() throws Exception {
-		testRunOnFruitAPI("verbose-noskip-jdbc-", EnumeratorType.JDBC, false,
+		testRunOnFruitAPI("verbose-noskip-jdbc-", EnumeratorType.JDBM, false,
 				false, false);
 	}
 
 	@Test
 	public void testRunOnFruitAPI_skipboth_verbose_jdbc() throws Exception {
-		testRunOnFruitAPI("verbose-skipboth-jdbc-", EnumeratorType.JDBC, true,
+		testRunOnFruitAPI("verbose-skipboth-jdbc-", EnumeratorType.JDBM, true,
 				true, false);
 	}
 
 	@Test
 	public void testRunOnFruitAPI_skipleft_verbose_jdbc() throws Exception {
-		testRunOnFruitAPI("verbose-skipleft-jdbc-", EnumeratorType.JDBC, true,
+		testRunOnFruitAPI("verbose-skipleft-jdbc-", EnumeratorType.JDBM, true,
 				false, false);
 	}
 
 	@Test
 	public void testRunOnFruitAPI_skipright_verbose_jdbc() throws Exception {
-		testRunOnFruitAPI("verbose-skipright-jdbc-", EnumeratorType.JDBC,
+		testRunOnFruitAPI("verbose-skipright-jdbc-", EnumeratorType.JDBM,
 				false, true, false);
 	}
 
@@ -344,21 +344,21 @@ public class IndexWTPCommandTest extends
 			throws Exception {
 		assertValidPlaintextInputFiles(from);
 		assertValidOutputFiles(to);
-		if (type == EnumeratorType.JDBC)
+		if (type == EnumeratorType.JDBM)
 			assertValidJDBCOutputFiles(index1, index2);
 		else
 			assertValidOutputFiles(index1, index2);
 
 		IndexingCommands.IndexEvents unindex = new IndexingCommands.IndexEvents();
-		unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-		unindex.getFilesDeligate().setSourceFile(from);
-		unindex.getFilesDeligate().setDestinationFile(to);
+		unindex.getFilesDelegate().setCharset(DEFAULT_CHARSET);
+		unindex.getFilesDelegate().setSourceFile(from);
+		unindex.getFilesDelegate().setDestinationFile(to);
 		unindex.setIndexDeligate(new DoubleEnumeratingDelegate(type, true,
 				true, index1, index2));
 		unindex.runCommand();
 
 		assertValidPlaintextInputFiles(to);
-		if (type == EnumeratorType.JDBC)
+		if (type == EnumeratorType.JDBM)
 			assertValidJDBCInputFiles(index1, index2);
 		else
 			assertValidInputFiles(index1, index2);
@@ -370,16 +370,16 @@ public class IndexWTPCommandTest extends
 			throws Exception {
 		assertValidPlaintextInputFiles(from);
 
-		if (type == EnumeratorType.JDBC)
+		if (type == EnumeratorType.JDBM)
 			assertValidJDBCInputFiles(index1, index2);
 		else
 			assertValidInputFiles(index1, index2);
 		assertValidOutputFiles(to);
 
 		IndexingCommands.UnindexEvents unindex = new IndexingCommands.UnindexEvents();
-		unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-		unindex.getFilesDeligate().setSourceFile(from);
-		unindex.getFilesDeligate().setDestinationFile(to);
+		unindex.getFilesDelegate().setCharset(DEFAULT_CHARSET);
+		unindex.getFilesDelegate().setSourceFile(from);
+		unindex.getFilesDelegate().setDestinationFile(to);
 		unindex.setIndexDeligate(new DoubleEnumeratingDelegate(type, true,
 				true, index1, index2));
 		unindex.runCommand();

@@ -36,7 +36,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
+import uk.ac.susx.mlcl.lib.events.ProgressDelegate;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
@@ -51,7 +51,7 @@ public class ObjectPipeTask<T> extends AbstractTask
 
     private static final long serialVersionUID = 1L;
 
-    protected final ProgressDeligate progress = new ProgressDeligate(this, false);
+    protected final ProgressDelegate progress = new ProgressDelegate(this, false);
 
     private ObjectSource<T> source;
 

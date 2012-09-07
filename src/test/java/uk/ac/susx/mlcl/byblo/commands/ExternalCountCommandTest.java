@@ -96,10 +96,10 @@ public class ExternalCountCommandTest extends
 		countCmd.setEntriesFile(outE);
 		countCmd.setFeaturesFile(outF);
 		countCmd.setEventsFile(outEF);
-		countCmd.getFileDeligate().setCharset(charset);
-		countCmd.setIndexDeligate(new DoubleEnumeratingDelegate(
-				Enumerating.DEFAULT_TYPE, preindexedEntries,
-				preindexedFeatures, null, null));
+		countCmd.getFileDelegate().setCharset(charset);
+		countCmd.setIndexDelegate(new DoubleEnumeratingDelegate(
+                Enumerating.DEFAULT_TYPE, preindexedEntries,
+                preindexedFeatures, null, null));
 		countCmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
 
 		countCmd.runCommand();
@@ -113,9 +113,9 @@ public class ExternalCountCommandTest extends
 		assertTrue("Empty output file found: " + outEF, outEF.length() > 0);
 	}
 
-	private void runwithCLI(File inInst, File outE, File outF, File outEF,
-			Charset charset, boolean preindexedEntries,
-			boolean preindexedFeatures) throws Exception {
+	private void runWithCLI(File inInst, File outE, File outF, File outEF,
+                            Charset charset, boolean preindexedEntries,
+                            boolean preindexedFeatures) throws Exception {
 
 		String[] args = { "count", "--input", inInst.toString(),
 				"--output-entries", outE.toString(), "--output-features",
@@ -191,15 +191,6 @@ public class ExternalCountCommandTest extends
 		runWithAPI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
 				DEFAULT_CHARSET, false, false);
 
-		// assertTrue("Output entries file differs from sampledata file.",
-		// WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
-		// DEFAULT_CHARSET, true, false));
-		// assertTrue("Output features file differs from test data file.",
-		// WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
-		// DEFAULT_CHARSET, true, false));
-		// assertTrue("Output entry/features file differs from test data file.",
-		// TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
-		// DEFAULT_CHARSET, true, true));
 	}
 
 	@Test
@@ -220,15 +211,6 @@ public class ExternalCountCommandTest extends
 		runWithAPI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
 				DEFAULT_CHARSET, true, true);
 
-		// assertTrue("Output entries file differs from sampledata file.",
-		// WeightedTokenSource.equal(eActual, TEST_FRUIT_INDEXED_ENTRIES,
-		// DEFAULT_CHARSET, true, false));
-		// assertTrue("Output features file differs from test data file.",
-		// WeightedTokenSource.equal(fActual, TEST_FRUIT_INDEXED_FEATURES,
-		// DEFAULT_CHARSET, true, false));
-		// assertTrue("Output entry/features file differs from test data file.",
-		// TokenPairSource.equal(efActual, TEST_FRUIT_INDEXED_ENTRY_FEATURES,
-		// DEFAULT_CHARSET, true, true));
 	}
 
 	@Test
@@ -250,15 +232,6 @@ public class ExternalCountCommandTest extends
 		runWithAPI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
 				DEFAULT_CHARSET, false, false);
 
-		// assertTrue("Output entries file differs from sampledata file.",
-		// WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
-		// DEFAULT_CHARSET, true, false));
-		// assertTrue("Output features file differs from test data file.",
-		// WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
-		// DEFAULT_CHARSET, true, false));
-		// assertTrue("Output entry/features file differs from test data file.",
-		// TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
-		// DEFAULT_CHARSET, true, true));
 	}
 
 	@Test
@@ -281,15 +254,6 @@ public class ExternalCountCommandTest extends
 		runWithAPI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
 				DEFAULT_CHARSET, true, true);
 
-		// assertTrue("Output entries file differs from sampledata file.",
-		// WeightedTokenSource.equal(eActual, TEST_FRUIT_INDEXED_ENTRIES,
-		// DEFAULT_CHARSET, true, false));
-		// assertTrue("Output features file differs from test data file.",
-		// WeightedTokenSource.equal(fActual, TEST_FRUIT_INDEXED_FEATURES,
-		// DEFAULT_CHARSET, true, false));
-		// assertTrue("Output entry/features file differs from test data file.",
-		// TokenPairSource.equal(efActual, TEST_FRUIT_INDEXED_ENTRY_FEATURES,
-		// DEFAULT_CHARSET, true, true));
 	}
 
 	@Test
@@ -307,18 +271,9 @@ public class ExternalCountCommandTest extends
 		fActual.delete();
 		efActual.delete();
 
-		runwithCLI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
-				DEFAULT_CHARSET, false, false);
+		runWithCLI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
+                DEFAULT_CHARSET, false, false);
 
-		// assertTrue("Output entries file differs from sampledata file.",
-		// WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
-		// DEFAULT_CHARSET, true, false));
-		// assertTrue("Output features file differs from test data file.",
-		// WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
-		// DEFAULT_CHARSET, true, false));
-		// assertTrue("Output entry/features file differs from test data file.",
-		// TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
-		// DEFAULT_CHARSET, true, true));
 	}
 
 	@Test
@@ -337,18 +292,9 @@ public class ExternalCountCommandTest extends
 		fActual.delete();
 		efActual.delete();
 
-		runwithCLI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
-				DEFAULT_CHARSET, true, true);
+		runWithCLI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
+                DEFAULT_CHARSET, true, true);
 
-		// assertTrue("Output entries file differs from sampledata file.",
-		// WeightedTokenSource.equal(eActual, TEST_FRUIT_INDEXED_ENTRIES,
-		// DEFAULT_CHARSET, true, false));
-		// assertTrue("Output features file differs from test data file.",
-		// WeightedTokenSource.equal(fActual, TEST_FRUIT_INDEXED_FEATURES,
-		// DEFAULT_CHARSET, true, false));
-		// assertTrue("Output entry/features file differs from test data file.",
-		// TokenPairSource.equal(efActual, TEST_FRUIT_INDEXED_ENTRY_FEATURES,
-		// DEFAULT_CHARSET, true, true));
 	}
 
 	@Test
@@ -433,9 +379,9 @@ public class ExternalCountCommandTest extends
 		countCmd.setEntriesFile(entriesFile);
 		countCmd.setFeaturesFile(featuresFile);
 		countCmd.setEventsFile(eventsFile);
-		countCmd.getFileDeligate().setCharset(DEFAULT_CHARSET);
-		countCmd.setIndexDeligate(new DoubleEnumeratingDelegate(
-				Enumerating.DEFAULT_TYPE, true, true, null, null));
+		countCmd.getFileDelegate().setCharset(DEFAULT_CHARSET);
+		countCmd.setIndexDelegate(new DoubleEnumeratingDelegate(
+                Enumerating.DEFAULT_TYPE, true, true, null, null));
 		countCmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
 
 		// The highest number of cores attempted so far.

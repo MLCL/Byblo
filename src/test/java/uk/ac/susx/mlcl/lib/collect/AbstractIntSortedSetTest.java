@@ -197,7 +197,7 @@ public abstract class AbstractIntSortedSetTest<T extends IntSortedSet> extends
 		assertEquals(0, emptyTailSet.size());
 		assertContainsNoneOf(emptyTailSet, 1, 2, 4, 8, 16, 32, 64);
 
-		// TODO: More tailset tests
+		// TODO: More tail-set tests
 	}
 
 	@Test
@@ -273,14 +273,14 @@ public abstract class AbstractIntSortedSetTest<T extends IntSortedSet> extends
 		// Test an enumerator over the empty set.
 		IntIterator it = rs.iterator();
 		assertFalse(it.hasNext());
-		assertExhausedIterator(it);
+		assertExhaustedIterator(it);
 
 		// Test with a single element.
 		rs.add(5);
 		it = rs.iterator();
 		assertTrue(it.hasNext());
 		assertEquals(5, (int) it.next());
-		assertExhausedIterator(it);
+		assertExhaustedIterator(it);
 
 		// Go over a couple of elements in a row.
 		rs.add(6);
@@ -289,7 +289,7 @@ public abstract class AbstractIntSortedSetTest<T extends IntSortedSet> extends
 		assertEquals(5, (int) it.next());
 		assertTrue(it.hasNext());
 		assertEquals(6, (int) it.next());
-		assertExhausedIterator(it);
+		assertExhaustedIterator(it);
 
 		// Test a couple of discontinuous ranges.
 		rs.add(7);
@@ -309,7 +309,7 @@ public abstract class AbstractIntSortedSetTest<T extends IntSortedSet> extends
 		assertEquals(10, (int) it.next());
 		assertTrue(it.hasNext());
 		assertEquals(12, (int) it.next());
-		assertExhausedIterator(it);
+		assertExhaustedIterator(it);
 	}
 
 	/**

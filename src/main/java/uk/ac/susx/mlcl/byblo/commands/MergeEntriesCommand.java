@@ -85,13 +85,13 @@ public final class MergeEntriesCommand extends AbstractMergeCommand<Weighted<Tok
 
     @Override
     protected ObjectSource<Weighted<Token>> openSource(File file) throws FileNotFoundException, IOException {
-        return BybloIO.openEntriesSource(file, getFileDeligate().getCharset(), indexDeligate);
+        return BybloIO.openEntriesSource(file, getFileDelegate().getCharset(), indexDeligate);
     }
 
     @Override
     protected ObjectSink<Weighted<Token>> openSink(File file) throws FileNotFoundException, IOException {
         return new WeightSumReducerObjectSink<Token>(
-                BybloIO.openEntriesSink(file, getFileDeligate().getCharset(), indexDeligate));
+                BybloIO.openEntriesSink(file, getFileDelegate().getCharset(), indexDeligate));
     }
 
     public static void main(String[] args) throws Exception {

@@ -125,7 +125,7 @@ public final class SingleEnumeratingDelegate
     }
 
     @Override
-    public DoubleEnumerating getEnumeratorPairCarriar() {
+    public DoubleEnumerating getEnumeratorPairCarrier() {
         return EnumeratingDelegates.toPair(this);
     }
 

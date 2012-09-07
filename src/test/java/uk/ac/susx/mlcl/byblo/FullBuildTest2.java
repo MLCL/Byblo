@@ -108,7 +108,7 @@ public class FullBuildTest2 {
 	// new DoubleEnumeratingDelegate(Enumerating.DEFAULT_TYPE,
 	// preindexedEntries, preindexedFeatures,
 	// null, null, false, false),
-	// charet);
+	// charset);
 	// count.runCommand();
 	//
 	// // Filter
@@ -118,7 +118,7 @@ public class FullBuildTest2 {
 	//
 	// FilterCommand filter = new FilterCommand(
 	// events, entries, features,
-	// eventsFiltered, entriesFiltered, featuresFiltered, charet);
+	// eventsFiltered, entriesFiltered, featuresFiltered, charset);
 	// filter.addEventMinimumFrequency(2);
 	// filter.runCommand();
 	//
@@ -440,7 +440,7 @@ public class FullBuildTest2 {
 	// DoubleEnumeratingDelegate(Enumerating.DEFAULT_TYPE,
 	// preindexedEntries, preindexedFeatures,
 	// null, null, false, false));
-	// count.getFileDeligate().setCharset(charet);
+	// count.getFileDelegate().setCharset(charet);
 	// count.runCommand();
 	//
 	// assertValidPlaintextInputFiles(entries, features, events);
@@ -706,7 +706,7 @@ public class FullBuildTest2 {
 	// Enumerating.DEFAULT_TYPE,
 	// preindexedEntries, preindexedFeatures,
 	// null, null, skipIndex1, skipIndex2));
-	// count.getFileDeligate().setCharset(charet);
+	// count.getFileDelegate().setCharset(charet);
 	// count.runCommand();
 	//
 	// assertValidPlaintextInputFiles(entries, features, events);
@@ -873,7 +873,7 @@ public class FullBuildTest2 {
 		boolean preindexedFeatures = false;
 		boolean skipIndex1 = false;
 		boolean skipIndex2 = false;
-		EnumeratorType type = EnumeratorType.JDBC;
+		EnumeratorType type = EnumeratorType.JDBM;
 
 		parallelBuildTest(affix, serial, type, preindexedEntries,
 				preindexedFeatures, skipIndex1, skipIndex2);
@@ -888,7 +888,7 @@ public class FullBuildTest2 {
 		boolean preindexedFeatures = false;
 		boolean skipIndex1 = false;
 		boolean skipIndex2 = false;
-		EnumeratorType type = EnumeratorType.JDBC;
+		EnumeratorType type = EnumeratorType.JDBM;
 
 		parallelBuildTest(affix, serial, type, preindexedEntries,
 				preindexedFeatures, skipIndex1, skipIndex2);
@@ -903,7 +903,7 @@ public class FullBuildTest2 {
 		boolean preindexedFeatures = true;
 		boolean skipIndex1 = false;
 		boolean skipIndex2 = false;
-		EnumeratorType type = EnumeratorType.JDBC;
+		EnumeratorType type = EnumeratorType.JDBM;
 
 		parallelBuildTest(affix, serial, type, preindexedEntries,
 				preindexedFeatures, skipIndex1, skipIndex2);
@@ -918,7 +918,7 @@ public class FullBuildTest2 {
 		boolean preindexedFeatures = true;
 		boolean skipIndex1 = false;
 		boolean skipIndex2 = false;
-		EnumeratorType type = EnumeratorType.JDBC;
+		EnumeratorType type = EnumeratorType.JDBM;
 
 		parallelBuildTest(affix, serial, type, preindexedEntries,
 				preindexedFeatures, skipIndex1, skipIndex2);
@@ -933,7 +933,7 @@ public class FullBuildTest2 {
 		boolean preindexedFeatures = true;
 		boolean skipIndex1 = true;
 		boolean skipIndex2 = true;
-		EnumeratorType type = EnumeratorType.JDBC;
+		EnumeratorType type = EnumeratorType.JDBM;
 
 		parallelBuildTest(affix, serial, type, preindexedEntries,
 				preindexedFeatures, skipIndex1, skipIndex2);
@@ -948,7 +948,7 @@ public class FullBuildTest2 {
 		boolean preindexedFeatures = true;
 		boolean skipIndex1 = true;
 		boolean skipIndex2 = true;
-		EnumeratorType type = EnumeratorType.JDBC;
+		EnumeratorType type = EnumeratorType.JDBM;
 
 		parallelBuildTest(affix, serial, type, preindexedEntries,
 				preindexedFeatures, skipIndex1, skipIndex2);
@@ -1048,7 +1048,7 @@ public class FullBuildTest2 {
 			count.setEntriesFile(entries);
 			count.setFeaturesFile(features);
 			count.setEventsFile(events);
-			count.setIndexDeligate(countIndex);
+			count.setIndexDelegate(countIndex);
 			count.setCharset(charet);
 			count.runCommand();
 		} else {
@@ -1057,8 +1057,8 @@ public class FullBuildTest2 {
 			count.setEntriesFile(entries);
 			count.setFeaturesFile(features);
 			count.setEventsFile(events);
-			count.setIndexDeligate(countIndex);
-			count.getFileDeligate().setCharset(charet);
+			count.setIndexDelegate(countIndex);
+			count.getFileDelegate().setCharset(charet);
 			count.runCommand();
 		}
 
@@ -1128,8 +1128,8 @@ public class FullBuildTest2 {
 		FilterCommand filter = new FilterCommand(events, entries, features,
 				eventsFiltered, entriesFiltered, featuresFiltered,
 				DEFAULT_CHARSET);
-		filter.setIndexDeligate(new DoubleEnumeratingDelegate(type,
-				preindexedEntries, preindexedFeatures, entryIndex, featureIndex));
+		filter.setIndexDelegate(new DoubleEnumeratingDelegate(type,
+                preindexedEntries, preindexedFeatures, entryIndex, featureIndex));
 		filter.addEventMinimumFrequency(2);
 		// filter.setTempFiles(new TempFileFactory(TestConstants.TEST_TMP_DIR));
 		filter.setTempFiles(new TempFileFactory(TestConstants.TEST_TMP_DIR));
@@ -1175,10 +1175,10 @@ public class FullBuildTest2 {
 	// assertValidOutputFiles(to);
 	//
 	// IndexTPCommand unindex = new IndexTPCommand();
-	// unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-	// unindex.getFilesDeligate().setSourceFile(from);
-	// unindex.getFilesDeligate().setDestinationFile(to);
-	// unindex.getFilesDeligate().setCompactFormatDisabled(false);
+	// unindex.getFilesDelegate().setCharset(DEFAULT_CHARSET);
+	// unindex.getFilesDelegate().setSourceFile(from);
+	// unindex.getFilesDelegate().setDestinationFile(to);
+	// unindex.getFilesDelegate().setCompactFormatDisabled(false);
 	// unindex.setIndexDelegate(new EnumeratorPairBaringDeligate(
 	// true, true, index1, index2, skip1, skip2));
 	// unindex.runCommand();
@@ -1193,10 +1193,10 @@ public class FullBuildTest2 {
 	// assertValidPlaintextInputFiles(from);
 	//
 	// UnindexSimsCommand unindex = new UnindexSimsCommand();
-	// unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-	// unindex.getFilesDeligate().setSourceFile(from);
-	// unindex.getFilesDeligate().setDestinationFile(to);
-	// unindex.getFilesDeligate().setCompactFormatDisabled(false);
+	// unindex.getFilesDelegate().setCharset(DEFAULT_CHARSET);
+	// unindex.getFilesDelegate().setSourceFile(from);
+	// unindex.getFilesDelegate().setDestinationFile(to);
+	// unindex.getFilesDelegate().setCompactFormatDisabled(false);
 	// unindex.setIndexDelegate(new EnumeratorSingleBaringDeligate(true, index,
 	// null, skip1, skip2));
 	// unindex.runCommand();
@@ -1209,9 +1209,9 @@ public class FullBuildTest2 {
 		assertValidPlaintextInputFiles(from);
 
 		IndexingCommands.UnindexEntries unindex = new IndexingCommands.UnindexEntries();
-		unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-		unindex.getFilesDeligate().setSourceFile(from);
-		unindex.getFilesDeligate().setDestinationFile(to);
+		unindex.getFilesDelegate().setCharset(DEFAULT_CHARSET);
+		unindex.getFilesDelegate().setSourceFile(from);
+		unindex.getFilesDelegate().setDestinationFile(to);
 		unindex.setIndexDeligate(EnumeratingDelegates
 				.toPair(new SingleEnumeratingDelegate(type, true, index)));
 		unindex.runCommand();
@@ -1226,9 +1226,9 @@ public class FullBuildTest2 {
 		assertValidPlaintextInputFiles(from);
 
 		IndexingCommands.IndexEvents unindex = new IndexingCommands.IndexEvents();
-		unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-		unindex.getFilesDeligate().setSourceFile(from);
-		unindex.getFilesDeligate().setDestinationFile(to);
+		unindex.getFilesDelegate().setCharset(DEFAULT_CHARSET);
+		unindex.getFilesDelegate().setSourceFile(from);
+		unindex.getFilesDelegate().setDestinationFile(to);
 		unindex.setIndexDeligate(new DoubleEnumeratingDelegate(type, true,
 				true, index1, index2));
 		unindex.runCommand();
@@ -1243,9 +1243,9 @@ public class FullBuildTest2 {
 		assertValidPlaintextInputFiles(from);
 
 		IndexingCommands.IndexInstances unindex = new IndexingCommands.IndexInstances();
-		unindex.getFilesDeligate().setCharset(DEFAULT_CHARSET);
-		unindex.getFilesDeligate().setSourceFile(from);
-		unindex.getFilesDeligate().setDestinationFile(to);
+		unindex.getFilesDelegate().setCharset(DEFAULT_CHARSET);
+		unindex.getFilesDelegate().setSourceFile(from);
+		unindex.getFilesDelegate().setDestinationFile(to);
 		unindex.setIndexDeligate(new DoubleEnumeratingDelegate(type, true,
 				true, index1, index2));
 		unindex.runCommand();
