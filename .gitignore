@@ -1,10 +1,12 @@
+# Unit tests write to this directory
+testdata/out/
+
 # Eclipse
 .settings
 .metadata
 Servers
 bin
 target
-
 
 # SpringSource Tool Suite
 .springBeans
@@ -19,7 +21,10 @@ nbbuild.xml
 nbactions.xml
 manifest.mf
 /libs/*.jar
+/libs/*.zip
 
+#IntelliJ
+*.iml
 
 # Emacs
 \#*\#
