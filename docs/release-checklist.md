@@ -22,11 +22,11 @@ It is assumed that all development work is committed to the `develop` branch of 
 
  5. Check the licence headers are all correct and up date
 	```
-		$ mvn -P license license:check
+		$ mvn license:check
 	```
 	and if necessary resolve any issues
 	```
-		$ mvn -P license license:format
+		$ mvn license:format
 	```
  6. Check that there are no uncommitted changes in the sources
 
