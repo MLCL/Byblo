@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.AbstractList;
 import java.util.Iterator;
@@ -43,11 +44,11 @@ import uk.ac.susx.mlcl.lib.Checks;
  * @param <T> The atomic type of items in this chunk
  */
 public final class Chunk<T> extends AbstractList<T>
-        implements SeekableObjectSource<T, Integer>, Cloneable {
+        implements SeekableObjectSource<T, Integer>, Cloneable, Closeable {
 
     private String name;
 
-    private final List<T> items;
+    private List<T> items;
 
     private Integer nextIndex;
 
@@ -116,6 +117,12 @@ public final class Chunk<T> extends AbstractList<T>
     @Override
     public Chunk<T> clone() {
         return new Chunk<T>(this);
+    }
+    
+    @Override
+    public void close() throws IOException {
+    	nextIndex = null;
+    	items = null;
     }
 
     @Override

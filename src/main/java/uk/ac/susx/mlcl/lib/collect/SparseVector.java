@@ -121,14 +121,10 @@ public abstract class SparseVector implements Serializable {
             throws NullPointerException, IndexOutOfBoundsException,
             IllegalArgumentException {
         if(keys == null) throw new NullPointerException("keys == null");
-        if(keys.length < 1 || keys.length > cardinality)
+        if(keys.length > cardinality)
             throw new IndexOutOfBoundsException("keys.length");
         if(size < 1 || size > keys.length)
             throw new IndexOutOfBoundsException("size");
-//        if (keys.length > 0) {
-//            checkElementIndex(max(keys), cardinality, "max index");
-//            checkElementIndex(min(keys), cardinality, "min index");
-//        }
 
         this.keys = keys;
         this.cardinality = cardinality;
