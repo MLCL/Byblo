@@ -67,9 +67,9 @@ public interface DoubleEnumerating extends Enumerating {
 
     void closeFeaturesEnumerator() throws IOException;
 
-    SingleEnumerating getEntriesEnumeratorCarriar();
+    SingleEnumerating getEntriesEnumeratorCarrier();
 
-    SingleEnumerating getFeaturesEnumeratorCarriar();
+    SingleEnumerating getFeaturesEnumeratorCarrier();
 
     boolean isEnumeratedEntries();
 

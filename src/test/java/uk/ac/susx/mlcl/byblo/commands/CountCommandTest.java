@@ -30,23 +30,50 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static uk.ac.susx.mlcl.TestConstants.DEFAULT_CHARSET;
+import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_INPUT;
+import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_INPUT_INDEXED;
+import static uk.ac.susx.mlcl.TestConstants.TEST_OUTPUT_DIR;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.disableExitTrapping;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.enableExistTrapping;
+
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import static org.junit.Assert.*;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
-import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 
 /**
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class CountCommandTest {
+public class CountCommandTest extends AbstractCommandTest<CountCommand> {
+
+	@Override
+	public Class<? extends CountCommand> getImplementation() {
+		return CountCommand.class;
+	}
+
+	@Override
+	@Before
+	public void setUp() throws Exception {
+		super.setUp();
+	}
+
+	@Override
+	@After
+	public void tearDown() throws Exception {
+		super.tearDown();
+	}
 
     private static final String subject = CountCommand.class.getName();
 
@@ -60,9 +87,9 @@ public class CountCommandTest {
         countTask.setFeaturesFile(outF);
         countTask.setEventsFile(outEF);
         countTask.setCharset(charset);
-        DoubleEnumeratingDeligate idx = new DoubleEnumeratingDeligate(
+        DoubleEnumeratingDelegate idx = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, preIndexEntries, preIndexFeatures, null, null);
-        countTask.setIndexDeligate(idx);
+        countTask.setIndexDelegate(idx);
         countTask.runCommand();
 
         assertTrue("Output files not created: " + outE, outE.exists());
@@ -90,12 +117,12 @@ public class CountCommandTest {
         if (preindexedEntries) {
             List<String> tmp = new ArrayList<String>(Arrays.asList(args));
             tmp.add("--enumerated-entries");
-            args = tmp.toArray(new String[0]);
+            args = tmp.toArray(new String[tmp.size()]);
         }
         if (preindexedFeatures) {
             List<String> tmp = new ArrayList<String>(Arrays.asList(args));
             tmp.add("--enumerated-features");
-            args = tmp.toArray(new String[0]);
+            args = tmp.toArray(new String[tmp.size()]);
         }
 
         try {
@@ -158,21 +185,6 @@ public class CountCommandTest {
         runWithAPI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
                    DEFAULT_CHARSET, false, false);
 
-//        assertTrue("Output entries file differs from sampledata file.",
-//                   WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
-//                                             DEFAULT_CHARSET,
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, false, null),
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, false, null),
-//                                             true, false));
-//        assertTrue("Output features file differs from test data file.",
-//                   WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
-//                                             DEFAULT_CHARSET,
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, false, null),
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, false, null),
-//                                             true, false));
-//        assertTrue("Output entry/features file differs from test data file.",
-//                   TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
-//                                         DEFAULT_CHARSET, true, true, true, true));
     }
 
     @Test
@@ -192,24 +204,6 @@ public class CountCommandTest {
         runWithCLI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
                    DEFAULT_CHARSET, false, false);
 
-//        assertTrue("Output entries file differs from sampledata file.",
-//                   WeightedTokenSource.equal(eActual, TEST_FRUIT_ENTRIES,
-//                                             DEFAULT_CHARSET,
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, false, null),
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, false, null),
-//                                             true, false));
-//        assertTrue("Output features file differs from test data file.",
-//                   WeightedTokenSource.equal(fActual, TEST_FRUIT_FEATURES,
-//                                             DEFAULT_CHARSET,
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, false, null),
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, false, null),
-//                                             true, false));
-//        assertTrue("Output entry/features file differs from test data file.",
-//                   TokenPairSource.equal(efActual, TEST_FRUIT_ENTRY_FEATURES,
-//                                         DEFAULT_CHARSET,
-//                                         new DoubleEnumeratingDeligate(EnumeratorType.JDBC, false, false, null, null),
-//                                         new DoubleEnumeratingDeligate(EnumeratorType.JDBC, false, false, null, null),
-//                                         true, true, true, true));
     }
 
     @Test
@@ -230,27 +224,6 @@ public class CountCommandTest {
         runWithAPI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
                    DEFAULT_CHARSET, true, true);
 
-//        assertTrue(MessageFormat.format("Output entries file \"{0}\" differs from expected file \"{1}\".", eActual, TEST_FRUIT_INDEXED_ENTRIES),
-//                   WeightedTokenSource.equal(eActual, TEST_FRUIT_INDEXED_ENTRIES, DEFAULT_CHARSET,
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, true, null),
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, true, null),
-//                                             BybloIO.ENTRIES_SKIP_INDEXED_COLUMN_1, false));
-//
-//        assertTrue("Output features file differs from test data file.",
-//                   WeightedTokenSource.equal(fActual,
-//                                             TEST_FRUIT_INDEXED_FEATURES,
-//                                             DEFAULT_CHARSET, new SingleEnumeratingDeligate(EnumeratorType.JDBC, true, null),
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, true, null),
-//                                             BybloIO.FEATURES_SKIP_INDEXED_COLUMN_1, false));
-//        assertTrue("Output entry/features file differs from test data file.",
-//                   TokenPairSource.equal(efActual,
-//                                         TEST_FRUIT_INDEXED_ENTRY_FEATURES,
-//                                         DEFAULT_CHARSET,
-//                                         new DoubleEnumeratingDeligate(EnumeratorType.JDBC, true, true, null, null),
-//                                         new DoubleEnumeratingDeligate(EnumeratorType.JDBC, true, true, null, null),
-//                                         BybloIO.EVENTS_SKIP_INDEXED_COLUMN_1,
-//                                         BybloIO.EVENTS_SKIP_INDEXED_COLUMN_2,
-//                                         false, false));
     }
 
     @Test
@@ -271,29 +244,6 @@ public class CountCommandTest {
         runWithCLI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
                    DEFAULT_CHARSET, true, true);
 
-//        assertTrue("Output entries file differs from sampledata file.",
-//                   WeightedTokenSource.equal(eActual,
-//                                             TEST_FRUIT_INDEXED_ENTRIES,
-//                                             DEFAULT_CHARSET,
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, true, null),
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, true, null),
-//                                             BybloIO.ENTRIES_SKIP_INDEXED_COLUMN_1, false));
-//        assertTrue("Output features file differs from test data file.",
-//                   WeightedTokenSource.equal(fActual,
-//                                             TEST_FRUIT_INDEXED_FEATURES,
-//                                             DEFAULT_CHARSET,
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, true, null),
-//                                             new SingleEnumeratingDeligate(EnumeratorType.JDBC, true, null),
-//                                             BybloIO.FEATURES_SKIP_INDEXED_COLUMN_1, false));
-//        assertTrue("Output entry/features file differs from test data file.",
-//                   TokenPairSource.equal(efActual,
-//                                         TEST_FRUIT_INDEXED_ENTRY_FEATURES,
-//                                         DEFAULT_CHARSET,
-//                                         new DoubleEnumeratingDeligate(EnumeratorType.JDBC, true, true, null, null),
-//                                         new DoubleEnumeratingDeligate(EnumeratorType.JDBC, true, true, null, null),
-//                                         BybloIO.EVENTS_SKIP_INDEXED_COLUMN_1,
-//                                         BybloIO.EVENTS_SKIP_INDEXED_COLUMN_2,
-//                                         false, false));
     }
 
     @Test

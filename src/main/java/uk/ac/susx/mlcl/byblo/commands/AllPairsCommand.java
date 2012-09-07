@@ -39,56 +39,36 @@ import com.google.common.base.Predicates;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDelegates;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
+import uk.ac.susx.mlcl.byblo.io.*;
+import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource.WTStatsSource;
+import uk.ac.susx.mlcl.byblo.measures.*;
+import uk.ac.susx.mlcl.byblo.tasks.InvertedApssTask;
+import uk.ac.susx.mlcl.byblo.tasks.NaiveApssTask;
+import uk.ac.susx.mlcl.byblo.tasks.ThreadedApssTask;
+import uk.ac.susx.mlcl.lib.Checks;
+import uk.ac.susx.mlcl.lib.commands.*;
+import uk.ac.susx.mlcl.lib.events.ProgressEvent;
+import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.io.ObjectIO;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.ObjectSource;
+import uk.ac.susx.mlcl.lib.io.Tell;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
-import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
-import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
-import uk.ac.susx.mlcl.byblo.io.BybloIO;
-import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
-import uk.ac.susx.mlcl.byblo.io.Token;
-import uk.ac.susx.mlcl.byblo.io.TokenPair;
-import uk.ac.susx.mlcl.byblo.io.Weighted;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource.WTStatsSource;
-import uk.ac.susx.mlcl.byblo.measures.AbstractMIProximity;
-import uk.ac.susx.mlcl.byblo.measures.CrMi;
-import uk.ac.susx.mlcl.byblo.measures.KendallTau;
-import uk.ac.susx.mlcl.byblo.measures.Lee;
-import uk.ac.susx.mlcl.byblo.measures.Lp;
-import uk.ac.susx.mlcl.byblo.measures.Proximity;
-import uk.ac.susx.mlcl.byblo.measures.ReversedProximity;
-import uk.ac.susx.mlcl.byblo.tasks.InvertedApssTask;
-import uk.ac.susx.mlcl.byblo.tasks.NaiveApssTask;
-import uk.ac.susx.mlcl.byblo.tasks.ThreadedApssTask;
-import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.MiscUtil;
-import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
-import uk.ac.susx.mlcl.lib.commands.DoubleConverter;
-import uk.ac.susx.mlcl.lib.commands.FileDeligate;
-import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
-import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
-import uk.ac.susx.mlcl.lib.io.ObjectIO;
-import uk.ac.susx.mlcl.lib.io.ObjectSink;
-import uk.ac.susx.mlcl.lib.io.ObjectSource;
-import uk.ac.susx.mlcl.lib.io.Tell;
-import uk.ac.susx.mlcl.lib.events.ProgressEvent;
-import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import java.text.MessageFormat;
+import java.util.*;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Parameters(commandDescription = "Perform all-pair similarity search on the given input frequency files.")
@@ -97,41 +77,37 @@ public class AllPairsCommand extends AbstractCommand {
     private static final Log LOG = LogFactory.getLog(AllPairsCommand.class);
 
     @ParametersDelegate
-    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
+    private DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();
 
     @ParametersDelegate
-    private FileDeligate fileDeligate = new FileDeligate();
+    private FileDelegate fileDelegate = new FileDelegate();
 
     public static final int DEFAULT_MINK_P = 2;
 
     @Parameter(names = {"-i", "--input"},
-    description = "Event frequency vectors files.",
-    required = true,
-    validateWith = InputFileValidator.class)
+            description = "Event frequency vectors files.",
+            required = true,
+            validateWith = InputFileValidator.class)
     private File eventsFile;
 
     @Parameter(names = {"-if", "--input-features"},
-    description = "Feature frequencies file",
-    validateWith = InputFileValidator.class)
+            description = "Feature frequencies file",
+            validateWith = InputFileValidator.class)
     private File featuresFile;
 
     @Parameter(names = {"-ie", "--input-entries"},
-    description = "Entry frequencies file",
-    validateWith = InputFileValidator.class)
+            description = "Entry frequencies file",
+            validateWith = InputFileValidator.class)
     private File entriesFile;
 
     @Parameter(names = {"-o", "--output"},
-    description = "Output similarity matrix file.",
-    required = true,
-    validateWith = OutputFileValidator.class)
+            description = "Output similarity matrix file.",
+            required = true,
+            validateWith = OutputFileValidator.class)
     private File outputFile;
 
-    @Parameter(names = {"-C", "--chunk-size"},
-    description = "Number of entries to compare per work unit. Larger value increase performance and memory usage.")
-    private int chunkSize = ThreadedApssTask.DEFAULT_MAX_CHUNK_SIZE;
-
     @Parameter(names = {"-t", "--threads"},
-    description = "Number of conccurent processing threads.")
+            description = "Number of concurrent processing threads.")
     private int numThreads = Runtime.getRuntime().availableProcessors() + 1;
 
     public static final double DEFAULT_MIN_SIMILARITY = Double.NEGATIVE_INFINITY;
@@ -139,47 +115,47 @@ public class AllPairsCommand extends AbstractCommand {
     public static final double DEFAULT_MAX_SIMILARITY = Double.POSITIVE_INFINITY;
 
     @Parameter(names = {"-Smn", "--similarity-min"},
-    description = "Minimum similarity threshold.",
-    converter = DoubleConverter.class)
+            description = "Minimum similarity threshold.",
+            converter = DoubleConverter.class)
     private double minSimilarity = DEFAULT_MIN_SIMILARITY;
 
     @Parameter(names = {"-Smx", "--similarity-max"},
-    description = "Maximyum similarity threshold.",
-    converter = DoubleConverter.class)
+            description = "Maximum similarity threshold.",
+            converter = DoubleConverter.class)
     private double maxSimilarity = DEFAULT_MAX_SIMILARITY;
 
     @Parameter(names = {"-ip", "--identity-pairs"},
-    description = "Produce similarity between pair of identical entries.")
+            description = "Produce similarity between pair of identical entries.")
     private boolean outputIdentityPairs = false;
 
     public static final String DEFAULT_MEASURE = "Lin";
 
     @Parameter(names = {"-m", "--measure"},
-    description = "Similarity measure to use.")
+            description = "Similarity measure to use.")
     private String measureName = DEFAULT_MEASURE;
 
     @Parameter(names = {"--measure-reversed"},
-    description = "Swap similarity measure inputs.")
+            description = "Swap similarity measure inputs.")
     private boolean measureReversed = false;
 
     @Parameter(names = {"--lee-alpha"},
-    description = "Alpha parameter to Lee's alpha-skew divergence measure.",
-    converter = DoubleConverter.class)
+            description = "Alpha parameter to Lee's alpha-skew divergence measure.",
+            converter = DoubleConverter.class)
     private double leeAlpha = Lee.DEFAULT_ALPHA;
 
     @Parameter(names = {"--crmi-beta"},
-    description = "Beta paramter to Weed's CRMI measure.",
-    converter = DoubleConverter.class)
+            description = "Beta parameter to Weed's CRMI measure.",
+            converter = DoubleConverter.class)
     private double crmiBeta = CrMi.DEFAULT_BETA;
 
     @Parameter(names = {"--crmi-gamma"},
-    description = "Gamma paramter to Weed's CRMI measure.",
-    converter = DoubleConverter.class)
+            description = "Gamma parameter to Weed's CRMI measure.",
+            converter = DoubleConverter.class)
     private double crmiGamma = CrMi.DEFAULT_GAMMA;
 
     @Parameter(names = {"--mink-p"},
-    description = "P parameter to Minkowski/Lp space measure.",
-    converter = DoubleConverter.class)
+            description = "P parameter to Minkowski/Lp space measure.",
+            converter = DoubleConverter.class)
     private double minkP = Lp.DEFAULT_P;
 
     public enum Algorithm {
@@ -204,19 +180,19 @@ public class AllPairsCommand extends AbstractCommand {
     }
 
     @Parameter(names = {"--algorithm"},
-    hidden = true,
-    description = "APPS algorithm to use.")
+            hidden = true,
+            description = "APPS algorithm to use.")
     private Algorithm algorithm = Algorithm.Inverted;
 
     public AllPairsCommand(File entriesFile, File featuresFile,
                            File eventsFile, File outputFile,
-                           Charset charset, DoubleEnumerating indexDeligate) {
+                           Charset charset, DoubleEnumerating indexDelegate) {
         setEventsFile(eventsFile);
         setEntriesFile(entriesFile);
         setFeaturesFile(featuresFile);
         setOutputFile(outputFile);
         setCharset(charset);
-        this.indexDeligate = indexDeligate;
+        this.indexDelegate = indexDelegate;
     }
 
     public AllPairsCommand() {
@@ -230,66 +206,56 @@ public class AllPairsCommand extends AbstractCommand {
             LOG.info("Running all-pairs similarity.");
         }
 
-        // Instantiate the denote proxmity measure
-        Proximity prox = getMeasureClass().newInstance();
+        // Instantiate the denote proximity measure
+        Proximity proximity = getMeasureClass().newInstance();
 
         // Parameterise those measures that require them
-        if (prox instanceof Lp) {
-            ((Lp) prox).setP(getMinkP());
-        } else if (prox instanceof Lee) {
-            ((Lee) prox).setAlpha(getLeeAlpha());
-        } else if (prox instanceof CrMi) {
-            ((CrMi) prox).setBeta(getCrmiBeta());
-            ((CrMi) prox).setGamma(getCrmiGamma());
+        if (proximity instanceof Lp) {
+            ((Lp) proximity).setP(getMinkP());
+        } else if (proximity instanceof Lee) {
+            ((Lee) proximity).setAlpha(getLeeAlpha());
+        } else if (proximity instanceof CrMi) {
+            ((CrMi) proximity).setBeta(getCrmiBeta());
+            ((CrMi) proximity).setGamma(getCrmiGamma());
         }
 
         // Mutual Information based proximity measures require the frequencies
         // of each feature, and other associate values
-        if (prox instanceof AbstractMIProximity) {
-            try {
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("Loading features file " + getFeaturesFile());
-                }
-
-                WTStatsSource features = new WTStatsSource(openFeaturesSource());
-
-                AbstractMIProximity bmip = ((AbstractMIProximity) prox);
-                bmip.setFeatureFrequencies(readAllAsArray(features));
-                bmip.setFeatureFrequencySum(features.getWeightSum());
-                bmip.setOccuringFeatureCount(features.getMaxId() + 1);
-
-            } catch (IOException e) {
-                throw e;
+        if (proximity instanceof AbstractMIProximity) {
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Loading features file " + getFeaturesFile());
             }
-        } else if (prox instanceof KendallTau) {
-            try {
-                if (LOG.isInfoEnabled()) {
-                    LOG.info("Loading entries file for "
-                            + "KendalTau.numFeatures: " + getFeaturesFile());
-                }
 
-                WTStatsSource features = new WTStatsSource(openFeaturesSource());
-                ObjectIO.copy(features, ObjectIO.<Weighted<Token>>nullSink());
-                ((KendallTau) prox).setNumFeatures(features.getMaxId() + 1);
+            WTStatsSource features = new WTStatsSource(openFeaturesSource());
 
-            } catch (IOException e) {
-                throw e;
+            AbstractMIProximity bmip = ((AbstractMIProximity) proximity);
+            bmip.setFeatureFrequencies(readAllAsArray(features));
+            bmip.setFeatureFrequencySum(features.getWeightSum());
+            bmip.setOccurringFeatureCount(features.getMaxId() + 1);
+
+        } else if (proximity instanceof KendallTau) {
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Loading entries file for KendalTau.numFeatures: " + getFeaturesFile());
             }
+
+            WTStatsSource features = new WTStatsSource(openFeaturesSource());
+            ObjectIO.copy(features, ObjectIO.<Weighted<Token>>nullSink());
+            ((KendallTau) proximity).setNumFeatures(features.getMaxId() + 1);
         }
         //XXX This needs to be sorted out --- filter id must be read from the
         // stored enumeration, for optimal robustness
-        prox.setFilteredFeatureId(FilterCommand.FILTERED_ID);
+        proximity.setFilteredFeatureId(FilterCommand.FILTERED_ID);
 
         // Swap the proximity measure inputs if required
         if (isMeasureReversed()) {
-            prox = new ReversedProximity(prox);
+            proximity = new ReversedProximity(proximity);
         }
 
 
         // Instantiate two vector source objects than can scan and read the
         // main db. We need two because the algorithm takes all pairwise
-        // combinations of vectors, so will be looking at two differnt points
-        // in the file. Also this allows for the possibility of having differnt
+        // combinations of vectors, so will be looking at two different points
+        // in the file. Also this allows for the possibility of having different
         // files, e.g compare fruit words with cake words
         final FastWeightedTokenPairVectorSource sourceA = openEventsSource();
         final FastWeightedTokenPairVectorSource sourceB = openEventsSource();
@@ -307,7 +273,7 @@ public class AllPairsCommand extends AbstractCommand {
         apss.setSourceA(sourceA);
         apss.setSourceB(sourceB);
         apss.setSink(sink);
-        apss.setMeasure(prox);
+        apss.setMeasure(proximity);
         apss.setProducatePair(getProductionFilter());
 
 
@@ -337,9 +303,9 @@ public class AllPairsCommand extends AbstractCommand {
         if (apss.isExceptionTrapped())
             apss.throwTrappedException();
 
-        if (indexDeligate.isEnumeratorOpen()) {
-            indexDeligate.saveEnumerator();
-            indexDeligate.closeEnumerator();
+        if (indexDelegate.isEnumeratorOpen()) {
+            indexDelegate.saveEnumerator();
+            indexDelegate.closeEnumerator();
         }
 
         if (LOG.isInfoEnabled()) {
@@ -364,11 +330,9 @@ public class AllPairsCommand extends AbstractCommand {
                 final double newFreq = oldFreq + entry.weight();
 
                 if (LOG.isWarnEnabled())
-                    LOG.warn("Found duplicate Entry \""
-                            + (entry.record().id())
-                            + "\" (id=" + id
-                            + ") in entries file. Merging records. Old frequency = "
-                            + oldFreq + ", new frequency = " + newFreq + ".");
+                    LOG.warn(MessageFormat.format(
+                            "Found duplicate entry (id={0}); merging records. Frequency before: {1}, after: {2}.",
+                            entry.record().id(), oldFreq, newFreq));
 
                 entityFrequenciesMap.put(id, newFreq);
             } else {
@@ -382,10 +346,7 @@ public class AllPairsCommand extends AbstractCommand {
                 maxId = k;
         }
         double[] entryFreqs = new double[maxId + 1];
-        ObjectIterator<Int2DoubleMap.Entry> it = entityFrequenciesMap.int2DoubleEntrySet().
-                iterator();
-        while (it.hasNext()) {
-            Int2DoubleMap.Entry entry = it.next();
+        for (Int2DoubleMap.Entry entry : entityFrequenciesMap.int2DoubleEntrySet()) {
             entryFreqs[entry.getIntKey()] = entry.getDoubleValue();
         }
         return entryFreqs;
@@ -400,7 +361,6 @@ public class AllPairsCommand extends AbstractCommand {
             ThreadedApssTask<Tell> tapss = new ThreadedApssTask<Tell>();
             tapss.setInnerAlgorithm(getAlgorithm().getImplementation());
             tapss.setNumThreads(getNumThreads());
-            tapss.setMaxChunkSize(getChunkSize());
             return tapss;
         }
 
@@ -409,19 +369,19 @@ public class AllPairsCommand extends AbstractCommand {
     private WeightedTokenSource openFeaturesSource() throws IOException {
         return BybloIO.openFeaturesSource(
                 getFeaturesFile(), getCharset(),
-                EnumeratingDeligates.toSingleFeatures(getIndexDeligate()));
+                EnumeratingDelegates.toSingleFeatures(getIndexDelegate()));
     }
 
     private FastWeightedTokenPairVectorSource openEventsSource() throws IOException {
         return BybloIO.openEventsVectorSource(
                 getEventsFile(), getCharset(),
-                getIndexDeligate());
+                getIndexDelegate());
     }
 
     private WeightedTokenPairSink openSimsSink() throws IOException {
         return BybloIO.openSimsSink(
                 getOutputFile(), getCharset(),
-                EnumeratingDeligates.toSingleEntries(getIndexDeligate()));
+                EnumeratingDelegates.toSingleEntries(getIndexDelegate()));
 
     }
 
@@ -430,18 +390,15 @@ public class AllPairsCommand extends AbstractCommand {
                 new ArrayList<Predicate<Weighted<TokenPair>>>();
 
         if (getMinSimilarity() != Double.NEGATIVE_INFINITY) {
-            pairFilters.add(Weighted.<TokenPair>greaterThanOrEqualTo(
-                    getMinSimilarity()));
+            pairFilters.add(Weighted.<TokenPair>greaterThanOrEqualTo(getMinSimilarity()));
         }
 
         if (getMaxSimilarity() != Double.POSITIVE_INFINITY) {
-            pairFilters.add(Weighted.<TokenPair>lessThanOrEqualTo(
-                    getMaxSimilarity()));
+            pairFilters.add(Weighted.<TokenPair>lessThanOrEqualTo(getMaxSimilarity()));
         }
 
         if (!isOutputIdentityPairs()) {
-            pairFilters.add(Predicates.not(Predicates.compose(
-                    TokenPair.identity(), Weighted.<TokenPair>recordFunction())));
+            pairFilters.add(Predicates.not(Predicates.compose(TokenPair.identity(), Weighted.<TokenPair>recordFunction())));
         }
 
         if (pairFilters.size() == 1) {
@@ -458,9 +415,9 @@ public class AllPairsCommand extends AbstractCommand {
             throws ClassNotFoundException {
         final Map<String, Class<? extends Proximity>> classLookup =
                 buildMeasureClassLookupTable();
-        final String mname = getMeasureName().toLowerCase().trim();
-        if (classLookup.containsKey(mname)) {
-            return classLookup.get(mname);
+        final String measureName = getMeasureName().toLowerCase().trim();
+        if (classLookup.containsKey(measureName)) {
+            return classLookup.get(measureName);
         } else {
             return (Class<? extends Proximity>) Class.forName(getMeasureName());
         }
@@ -470,24 +427,20 @@ public class AllPairsCommand extends AbstractCommand {
             throws ClassNotFoundException {
 
         // Map that will store measure aliases to class
-        final Map<String, Class<? extends Proximity>> classLookup =
-                new HashMap<String, Class<? extends Proximity>>();
+        final Map<String, Class<? extends Proximity>> classLookup = new HashMap<String, Class<? extends Proximity>>();
 
         final ResourceBundle res = ResourceBundle.getBundle(
                 uk.ac.susx.mlcl.byblo.measures.Lin.class.getPackage().getName() + ".measures");
         final String[] measures = res.getString("measures").split(",");
 
-        for (int i = 0; i < measures.length; i++) {
-            final String measure = measures[i].trim();
-            final String className = res.getString(
-                    "measure." + measure + ".class");
+        for (String measure1 : measures) {
+            final String measure = measure1.trim();
+            final String className = res.getString("measure." + measure + ".class");
             @SuppressWarnings("unchecked")
-            final Class<? extends Proximity> clazz =
-                    (Class<? extends Proximity>) Class.forName(className);
+            final Class<? extends Proximity> clazz = (Class<? extends Proximity>) Class.forName(className);
             classLookup.put(measure.toLowerCase(), clazz);
             if (res.containsKey("measure." + measure + ".aliases")) {
-                final String[] aliases = res.getString(
-                        "measure." + measure + ".aliases").split(",");
+                final String[] aliases = res.getString("measure." + measure + ".aliases").split(",");
                 for (String alias : aliases) {
                     classLookup.put(alias.toLowerCase().trim(), clazz);
                 }
@@ -504,7 +457,6 @@ public class AllPairsCommand extends AbstractCommand {
                 add("featuresIn", getFeaturesFile()).
                 add("simsOut", getOutputFile()).
                 add("charset", getCharset()).
-                add("chunkSize", getChunkSize()).
                 add("threads", getNumThreads()).
                 add("minSimilarity", getMinSimilarity()).
                 add("maxSimilarity", getMaxSimilarity()).
@@ -563,21 +515,12 @@ public class AllPairsCommand extends AbstractCommand {
     }
 
     public final Charset getCharset() {
-        return fileDeligate.getCharset();
+        return fileDelegate.getCharset();
     }
 
     public final void setCharset(Charset charset) {
         Checks.checkNotNull("charset", charset);
-        this.fileDeligate.setCharset(charset);
-    }
-
-    public final int getChunkSize() {
-        return chunkSize;
-    }
-
-    public final void setChunkSize(int chunkSize) {
-        Checks.checkRangeIncl("chunkSize", chunkSize, 1, Integer.MAX_VALUE);
-        this.chunkSize = chunkSize;
+        this.fileDelegate.setCharset(charset);
     }
 
     public final int getNumThreads() {
@@ -602,8 +545,7 @@ public class AllPairsCommand extends AbstractCommand {
     }
 
     public final void setMaxSimilarity(double maxSimilarity) {
-        Checks.checkRangeIncl("maxSimilarity", maxSimilarity, 0,
-                              Double.POSITIVE_INFINITY);
+        Checks.checkRangeIncl("maxSimilarity", maxSimilarity, 0, Double.POSITIVE_INFINITY);
         this.maxSimilarity = maxSimilarity;
     }
 
@@ -665,37 +607,37 @@ public class AllPairsCommand extends AbstractCommand {
         this.minkP = minkP;
     }
 
-    public final DoubleEnumerating getIndexDeligate() {
-        return indexDeligate;
+    public final DoubleEnumerating getIndexDelegate() {
+        return indexDelegate;
     }
 
-    public final void setIndexDeligate(DoubleEnumerating indexDeligate) {
-        Checks.checkNotNull("indexDeligate", indexDeligate);
-        this.indexDeligate = indexDeligate;
+    public final void setIndexDelegate(DoubleEnumerating indexDelegate) {
+        Checks.checkNotNull("indexDelegate", indexDelegate);
+        this.indexDelegate = indexDelegate;
     }
 
     public void setEnumeratedFeatures(boolean enumeratedFeatures) {
-        indexDeligate.setEnumeratedFeatures(enumeratedFeatures);
+        indexDelegate.setEnumeratedFeatures(enumeratedFeatures);
     }
 
     public void setEnumeratedEntries(boolean enumeratedEntries) {
-        indexDeligate.setEnumeratedEntries(enumeratedEntries);
+        indexDelegate.setEnumeratedEntries(enumeratedEntries);
     }
 
     public boolean isEnumeratedFeatures() {
-        return indexDeligate.isEnumeratedFeatures();
+        return indexDelegate.isEnumeratedFeatures();
     }
 
     public boolean isEnumeratedEntries() {
-        return indexDeligate.isEnumeratedEntries();
+        return indexDelegate.isEnumeratedEntries();
     }
 
     public void setEnumeratorType(EnumeratorType type) {
-        indexDeligate.setEnumeratorType(type);
+        indexDelegate.setEnumeratorType(type);
     }
 
-    public EnumeratorType getEnuemratorType() {
-        return indexDeligate.getEnuemratorType();
+    public EnumeratorType getEnumeratorType() {
+        return indexDelegate.getEnumeratorType();
     }
 
 }

@@ -55,7 +55,7 @@ public enum EnumeratorType {
         @Override
         public void close(Enumerator<String> enumerator) throws IOException {
         }
-    }, JDBC {
+    }, JDBM {
         @Override
         public Enumerator<String> open(File file) {
             if (file == null) {

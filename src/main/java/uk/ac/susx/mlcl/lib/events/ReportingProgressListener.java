@@ -28,51 +28,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.lib.commands;
+package uk.ac.susx.mlcl.lib.events;
 
-import com.beust.jcommander.Parameter;
-import com.google.common.base.Objects;
-import java.io.Serializable;
-import java.nio.charset.Charset;
-import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.io.Files;
 
-/**
- *
- * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
- */
-public class FileDeligate implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    @Parameter(names = {"-c", "--charset"},
-    description = "The character set encoding to use for both reading input and writing output files.")
-    private Charset charset = Files.DEFAULT_CHARSET;
-
-    public FileDeligate(Charset charset) {
-        setCharset(charset);
-    }
-
-    public FileDeligate() {
-    }
-
-    public final Charset getCharset() {
-        return charset;
-    }
-
-    public final void setCharset(Charset charset) {
-        Checks.checkNotNull(charset);
-        this.charset = charset;
-    }
-
-    protected Objects.ToStringHelper toStringHelper() {
-        return Objects.toStringHelper(this).
-                add("charset", getCharset());
-    }
+public class ReportingProgressListener implements ProgressListener {
 
     @Override
-    public final String toString() {
-        return toStringHelper().toString();
+    public void progressChanged(ProgressEvent progressEvent) {
+        System.out.println(progressEvent.getSource().getProgressReport());
     }
 
 }

@@ -39,6 +39,7 @@ import java.io.File;
 import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -48,6 +49,7 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.AbstractParallelCommandTask;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Comparators;
+import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.commands.FilePipeDelegate;
 import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
 import uk.ac.susx.mlcl.lib.events.ProgressAggregate;
@@ -89,15 +91,8 @@ public abstract class AbstractExternalSortCommand<T>
 
     private static final boolean DEBUG = false;
 
-    public static final int DEFAULT_MAX_CHUNK_SIZE = 500000;
-
-    @Parameter(names = {"-C", "--chunk-size"},
-    description = "Number of lines that will be read and sorted in RAM at one "
-    + "time (per thread). Larger values increase memory usage and performace.")
-    private int maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
-
     @ParametersDelegate
-    private final FilePipeDelegate fileDeligate = new FilePipeDelegate();
+    private final FilePipeDelegate fileDelegate = new FilePipeDelegate();
 
     @Parameter(names = {"-T", "--temporary-directory"},
     description = "Directory which will be used for storing temporary files.",
@@ -114,26 +109,23 @@ public abstract class AbstractExternalSortCommand<T>
 
     private final ProgressAggregate progress = new ProgressAggregate(this);
 
-    public AbstractExternalSortCommand(File src, File dst, Charset charset,
-                                       Comparator<T> comparator,
-                                       int maxChunkSize) {
+    public AbstractExternalSortCommand(File src, File dst, Charset charset, Comparator<T> comparator) {
         this(src, dst, charset);
         setComparator(comparator);
-        setMaxChunkSize(maxChunkSize);
     }
 
     public AbstractExternalSortCommand(File src, File dst, Charset charset) {
-        fileDeligate.setSourceFile(src);
-        fileDeligate.setDestinationFile(dst);
-        fileDeligate.setCharset(charset);
+        fileDelegate.setSourceFile(src);
+        fileDelegate.setDestinationFile(dst);
+        fileDelegate.setCharset(charset);
     }
 
     public AbstractExternalSortCommand() {
         super();
     }
 
-    public FilePipeDelegate getFileDeligate() {
-        return fileDeligate;
+    public FilePipeDelegate getFileDelegate() {
+        return fileDelegate;
     }
 
     public FileFactory getTempFileFactory() {
@@ -160,17 +152,6 @@ public abstract class AbstractExternalSortCommand<T>
     public void setComparator(Comparator<T> comparator) {
         Checks.checkNotNull("comparator", comparator);
         this.comparator = comparator;
-    }
-
-    public final int getMaxChunkSize() {
-        return maxChunkSize;
-    }
-
-    public final void setMaxChunkSize(int maxChunkSize) {
-        if (maxChunkSize < 1) {
-            throw new IllegalArgumentException("maxChunkSize < 1");
-        }
-        this.maxChunkSize = maxChunkSize;
     }
 
     void clearCompleted(boolean block) throws Exception {
@@ -207,31 +188,28 @@ public abstract class AbstractExternalSortCommand<T>
     protected void runTask() throws Exception {
 
 
+        final int maxChunkSize = estimateMaxChunkSize();
+        LOG.info(MessageFormat.format("Estimated maximum chunk size: {0}", maxChunkSize));
+
         if (getComparator() == null) {
             throw new NullPointerException();
         }
 
         nextFileToMerge = new File[64];
 
-        final SeekableObjectSource<T, ?> src = openSource(getFileDeligate().
-                getSourceFile());
-        final ObjectSource<Chunk<T>> chunks = Chunker.newInstance(
-                src, getMaxChunkSize());
+        final SeekableObjectSource<T, ?> src = openSource(getFileDelegate().getSourceFile());
+        final ObjectSource<Chunk<T>> chunks = Chunker.newInstance(src, maxChunkSize);
 
         progress.startAdjusting();
         progress.setState(State.RUNNING);
         FileMoveTask finalMoveTask = new FileMoveTask();
-        finalMoveTask.setDstFile(getFileDeligate().getDestinationFile());
+        finalMoveTask.setDstFile(getFileDelegate().getDestinationFile());
         progress.addChildProgressReporter(finalMoveTask);
         progress.endAdjusting();
 
         progress.startAdjusting();
         while (chunks.hasNext()) {
             clearCompleted(false);
-
-//            while (!getFutureQueue().isEmpty() && getFutureQueue().peek().isDone()) {
-//                handleCompletedTask(getFutureQueue().poll().get());
-//            }
 
             Chunk<T> chunk = chunks.read();
             submitTask(createSortTask(chunk, getTempFileFactory().createFile()));
@@ -243,20 +221,13 @@ public abstract class AbstractExternalSortCommand<T>
         progress.endAdjusting();
         progress.startAdjusting();
 
-//        while (!getFutureQueue().isEmpty()) {
-//            Task task = getFutureQueue().poll().get();
-//            handleCompletedTask(task);
-//            progress.endAdjusting();
-//            progress.startAdjusting();
-//        }
-
 
         // Finally merge any remaining files up the stack
         // XXX ideal this should happen automatically.
         for (int i = 0; i < nextFileToMerge.length - 1; i++) {
             if (nextFileToMerge[i] == null) {
 
-                continue;
+               // nothing
 
             } else if (nextFileToMerge[i + 1] == null) {
 
@@ -305,7 +276,6 @@ public abstract class AbstractExternalSortCommand<T>
     protected void handleCompletedTask(Task task) throws Exception {
         Checks.checkNotNull("task", task);
         task.throwTrappedException();
-//        final Properties 2p = task.getProperties();
 
         if (task.isExceptionTrapped())
             task.throwTrappedException();
@@ -392,7 +362,7 @@ public abstract class AbstractExternalSortCommand<T>
         task.setSink(sink);
         task.setComparator(getComparator());
 
-        task.setProperty(KEY_SRC_FILE, getFileDeligate().
+        task.setProperty(KEY_SRC_FILE, getFileDelegate().
                 getSourceFile().toString());
         task.setProperty(KEY_DST_FILE, dst.toString());
 
@@ -423,34 +393,33 @@ public abstract class AbstractExternalSortCommand<T>
     @Override
     protected ToStringHelper toStringHelper() {
         return super.toStringHelper().
-                add("in", getFileDeligate().getSourceFile()).
-                add("out", getFileDeligate().getDestinationFile()).
-                add("chunkSize", maxChunkSize).
+                add("in", getFileDelegate().getSourceFile()).
+                add("out", getFileDelegate().getDestinationFile()).
                 add("temp", getTempFileFactory());
     }
 
     public final void setCharset(Charset charset) {
-        fileDeligate.setCharset(charset);
+        fileDelegate.setCharset(charset);
     }
 
     public final Charset getCharset() {
-        return fileDeligate.getCharset();
+        return fileDelegate.getCharset();
     }
 
     public final void setSourceFile(File sourceFile) throws NullPointerException {
-        fileDeligate.setSourceFile(sourceFile);
+        fileDelegate.setSourceFile(sourceFile);
     }
 
-    public final void setDestinationFile(File destFile) throws NullPointerException {
-        fileDeligate.setDestinationFile(destFile);
+    public final void setDestinationFile(File destinationFile) throws NullPointerException {
+        fileDelegate.setDestinationFile(destinationFile);
     }
 
     public final File getSourceFile() {
-        return fileDeligate.getSourceFile();
+        return fileDelegate.getSourceFile();
     }
 
     public final File getDestinationFile() {
-        return fileDeligate.getDestinationFile();
+        return fileDelegate.getDestinationFile();
     }
 
     protected abstract SeekableObjectSource<T, ?> openSource(File file) throws IOException;
@@ -494,7 +463,34 @@ public abstract class AbstractExternalSortCommand<T>
 
     @Override
     public String getName() {
-        return "xsort";
+        return "ExternalSort";
+    }
+
+    protected abstract long getBytesPerObject();
+
+    /**
+     * Calculate a conservative guess at the maximum chunk size we can get away
+     * with given the available memory, and number of simultaneous threads.
+     *
+     * History: In previous version the end user was expected to set this value,
+     * which obviously was a total disaster. Most wouldn't both (because they
+     * didn't know what it was) and result was usually either code running too
+     * slowly, or java running our of heap space.
+     *
+     * @return maximum number of events that should be loaded per worker
+     */
+    private int estimateMaxChunkSize() {
+        // Start by at least trying to GC whatever junk is lying around
+        System.gc();
+        final long bytesAvailable = MiscUtil.freeMaxMemory();
+        final int numTasks = (getNumThreads() + PRELOAD_SIZE);
+        int chunkSize =  (int) (bytesAvailable / (getBytesPerObject() * numTasks));
+
+        int maxChunkSize = 5000000;
+        // In some system we might expect a very large amount of available
+        // memory. In this case we shouldn't set chunk size too large or it
+        // will never parallelise.
+        return Math.min(chunkSize, maxChunkSize);
     }
 
 }

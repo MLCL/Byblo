@@ -6,7 +6,7 @@ Byblo is a software package for the construction of large-scale *distributional 
 
 ### Informally
 
-Naively, a distributional thesaurus can be thought of much like a tradition thesaurus. It allows one to look up a word, returning a list of synonyms. Unlike traditional thesauri, however, the synonyms are not manually curated by humans, they are calculated using a statistical model, estimated from a text corpus. Notionally the similarity between two terms might be calculated from the intersection of the features of the terms, extracted from a large corpus of text. For example if the phrases "christmas holiday" and "xmas holiday" occur very frequently in the corpus, the model might indicate that *christmas* and *xmas* are similar. Here we have decided that co-occurrent words are features, both *christmas* and *xmas* share the feature *holiday*, so they are similar. 
+Naively, a distributional thesaurus can be thought of much like a tradition thesaurus. It allows one to look up a word, returning a list of synonyms. Unlike traditional thesauri, however, the synonyms are not manually curated by humans, they are calculated using a statistical model, estimated from a text corpus. Notionally the similarity between two terms might be calculated from the intersection of the features of those terms, extracted from a large corpus of text. For example if the phrases "christmas holiday" and "xmas holiday" occur very frequently in the corpus, the model might indicate that *christmas* and *xmas* are similar. Here we have decided that co-occurrent words are features, both *christmas* and *xmas* share the feature *holiday*, so they are similar. 
 
 ### Less Informally
 
@@ -18,9 +18,9 @@ A distributional thesaurus is a resource that contains the estimated *substituta
 
 To provide an intuition, here is an example:
 
-Take as our input corpus a balanced collection of English language text (such as Wikipedia). Let our entries be all unique terms in the corpus. We shall select the features of a base-entry as the frequency of all terms that co-occur in the corpus within a window of Â±1 terms. Finally, the similarity function will be Cosine, which represents the feature sets as high dimensional vectors. Cosine calculates the similarity as being inversely proportional to the degree of orthogonality of vectors. Instructions for the thesaurus build process would proceeds as follows:
+Take as our input corpus a balanced collection of English language text (such as Wikipedia). Let our entries be all unique terms in the corpus. We shall select the features of a base-entry as the frequency of all terms that co-occur in the corpus within a window of A +/- 1 terms. Finally, the similarity function will be Cosine, which represents the feature sets as high dimensional vectors. Cosine calculates the similarity as being inversely proportional to the degree of orthogonality of vectors. Instructions for the thesaurus build process would proceeds as follows:
 
- 1. Tokenise the corpus, extracting a list of all unique terms. For each entry record occurrences of all the other entries within a window of ±1. For example, if we encounter the string "the big red bus", the entry-features produced are the:big, big:the, big:red, red:big, red:bus, and bus:red. Note that this set of the process is not (yet) covered by the provided software.
+ 1. Tokenise the corpus, extracting a list of all unique terms. For each entry record occurrences of all the other entries within a window of +/- 1. For example, if we encounter the string "the big red bus", the entry-features produced are the:big, big:the, big:red, red:big, red:bus, and bus:red. Note that this set of the process is not (yet) covered by the provided software.
 
  2. Count the occurrences of each unique feature with each unique entry. So we may find that the string "red bus" occurs 100 times in the corpus, and that "bus red" occurs 2 times. In this case we produce the features bus:red:102 and red:bus:102 (remember the feature windows is 1 term before and after). In words, we are saying that "red" occurs as a feature of "bus" 102 times, and "bus" occurs as a feature of "red" 102 times. For each entry, construct a multi-set of all the features it occurs with. So "bus" may occur with "green" 23 times, and with "big" 376 times, etc...
 
@@ -41,15 +41,15 @@ The source code can be acquired from the [github repository](https://github.com/
 
 The project requires [Java 6](http://www.oracle.com/technetwork/java/javase/downloads/index.html) installed on the system. It also requires a unix command-line such as Linux or Mac OS X. Windows users may get it to work through [Cygwin](http://www.cygwin.com). The software is compiled using an [Apache Maven](http://maven.apache.org) script. In addition the following Java libraries are required:
 
- * [Google Guava 10.0.1](http://code.google.com/p/guava-libraries/) -- A library containing numerous useful features and tools; mostly the kind of things that should have been included with Java in the first place.
+ * [Google Guava 12.0](http://code.google.com/p/guava-libraries/) -- A library containing numerous useful features and tools; mostly the kind of things that should have been included with Java in the first place.
 
- * [JCommander 1.19](http://github.com/cbeust/jcommander) -- A framework for parsing command line arguments in a very elegant way.
+ * [JCommander 1.25](http://github.com/cbeust/jcommander) -- A framework for parsing command line arguments in a very elegant way.
 
- * [Fastutil 6.4.1](http://fastutil.dsi.unimi.it/) -- A library for collections that handle primitive data types efficiently. It also includes improved implementations of most of the standard collection framework.
+ * [Fastutil 6.4.4](http://fastutil.dsi.unimi.it/) -- A library for collections that handle primitive data types efficiently. It also includes improved implementations of most of the standard collection framework.
 
  * [Commons Logging 1.1.1](http://commons.apache.org/logging/) -- A very light weight wrapper API that enables logging frameworks to be configured and "plugged in" at runtime. 
 
- * [MLCL Lib 0.2-SNAPSHOT](https://github.com/MLCL/MLCLLib) -- A collection of generic Java utilities and classes developed by the authors of Byblo, for use in this and other projects.
+ * [MLCL Lib 0.2.1](https://github.com/MLCL/MLCLLib) -- A collection of generic Java utilities and classes developed by the authors of Byblo, for use in this and other projects.
 
  * [JDBM3 3.0-alpha3](https://github.com/jankotek/JDBM3) -- Embedded Key Value Java Database. Note that at time of writing there is no stable release,
 but the dependancy will be updated as soon as there is. The jar can be downloaded from [http://kungf.eu:8081/nexus/service/local/repositories/releases/content/uk/ac/susx/mlcl/jdbm/3.0-alpha3/jdbm-3.0-alpha3.jar](http://kungf.eu:8081/nexus/service/local/repositories/releases/content/uk/ac/susx/mlcl/jdbm/3.0-alpha3/jdbm-3.0-alpha3.jar)
@@ -58,7 +58,7 @@ The following additional dependancies are optional:
 
  * [JUnit 4.10](http://www.junit.org/) -- Required for unit testing the project.
 
- * [Log4J 1.2](http://logging.apache.org/log4j/1.2/) -- Can be used as a replacement for JDK 1.4 Logging, at the users discretion. 
+ * [Log4J 1.2.16](http://logging.apache.org/log4j/1.2/) -- Can be used as a replacement for JDK 1.4 Logging, at the users discretion. 
 
 
 ## Building
@@ -71,7 +71,7 @@ First source distribution. To compile the software from the command line:
 
 ```sh
 $ cd path/to/byblo/source/distribution
-$ mvn -P release install
+$ mvn -P release package -DskipTests -Dgpg.skip
 ```
 
 This will download all dependencies, compile the source code, and create a new directory `/target/` containing the project `jar` archive, and the various assemblies. (See Build Output bellow) The command will also install the generated artefacts in your local maven repository.
@@ -147,6 +147,6 @@ $ git fetch upstream
 
 If you have changes to contribute back to the main project, send me a pull request by clicking the "Pull Request" button in your fork of the repository. For a detailed description click [here](http://help.github.com/send-pull-requests/).
 
-## Licence
+## License
 
-This software is distributed under the 3-clause [BSD Licence](https://github.com/MLCL/Byblo/wiki/Licence).
+This software is distributed under the 3-clause [BSD License](https://github.com/MLCL/Byblo/wiki/License).

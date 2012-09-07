@@ -33,65 +33,45 @@ package uk.ac.susx.mlcl.byblo.commands;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects.ToStringHelper;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDelegates;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
+import uk.ac.susx.mlcl.byblo.io.*;
+import uk.ac.susx.mlcl.lib.Comparators;
+import uk.ac.susx.mlcl.lib.MemoryUsage;
+import uk.ac.susx.mlcl.lib.io.KFirstReducingObjectSink;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
+
+import javax.naming.OperationNotSupportedException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Comparator;
-import javax.naming.OperationNotSupportedException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
-import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
-import uk.ac.susx.mlcl.byblo.io.BybloIO;
-import uk.ac.susx.mlcl.byblo.io.TokenPair;
-import uk.ac.susx.mlcl.byblo.io.WeightSumReducerObjectSink;
-import uk.ac.susx.mlcl.byblo.io.Weighted;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
-import uk.ac.susx.mlcl.lib.Comparators;
-import uk.ac.susx.mlcl.lib.io.KFirstReducingObjectSink;
-import uk.ac.susx.mlcl.lib.io.ObjectSink;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Parameters(commandDescription = "Perform k-nearest-neighbours on a similarity file.")
 public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
 
-    private static final Log LOG = LogFactory.getLog(
-            ExternalKnnSimsCommand.class);
+    private static final Log LOG = LogFactory.getLog(ExternalKnnSimsCommand.class);
 
     public static final int DEFAULT_K = 100;
 
     private static final long serialVersionUID = 1L;
 
-    @Parameter(names = {"-k"},
-    description = "The number of neighbours to produce for each base entry.")
+    @Parameter(names = {"-k"}, description = "The number of neighbours to produce for each base entry.")
     private int k = DEFAULT_K;
 
-    private Comparator<Weighted<TokenPair>> classComparator =
-            Weighted.recordOrder(TokenPair.firstIndexOrder());
+    private Comparator<Weighted<TokenPair>> classComparator = Weighted.recordOrder(TokenPair.firstIndexOrder());
 
-    private Comparator<Weighted<TokenPair>> nearnessComparator =
-            Comparators.reverse(Weighted.<TokenPair>weightOrder());
+    private Comparator<Weighted<TokenPair>> nearnessComparator = Comparators.reverse(Weighted.<TokenPair>weightOrder());
 
-    public ExternalKnnSimsCommand(
-            File sourceFile, File destinationFile, Charset charset,
-            SingleEnumerating indexDeligate,
-            int k, int maxChunkSize) throws IOException {
-        super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(
-                indexDeligate));
-        setMaxChunkSize(maxChunkSize);
-        setK(k);
-    }
-
-    public ExternalKnnSimsCommand(
-            File sourceFile, File destinationFile, Charset charset,
-            SingleEnumerating indexDeligate,
-            int k) throws IOException {
-        super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(
-                indexDeligate));
+    public ExternalKnnSimsCommand(File sourceFile, File destinationFile, Charset charset,
+                                  SingleEnumerating indexDelegate, int k) throws IOException {
+        super(sourceFile, destinationFile, charset, EnumeratingDelegates.toPair(indexDelegate));
         setK(k);
     }
 
@@ -112,17 +92,14 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
     }
 
     public Comparator<Weighted<TokenPair>> getCombinedComparator() {
-        return Comparators.fallback(
-                getClassComparator(),
-                getNearnessComparator());
+        return Comparators.fallback(getClassComparator(), getNearnessComparator());
     }
 
     public Comparator<Weighted<TokenPair>> getClassComparator() {
         return classComparator;
     }
 
-    public void setClassComparator(
-            Comparator<Weighted<TokenPair>> classComparator) {
+    public void setClassComparator(Comparator<Weighted<TokenPair>> classComparator) {
         this.classComparator = classComparator;
     }
 
@@ -130,8 +107,7 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
         return nearnessComparator;
     }
 
-    public void setNearnessComparator(
-            Comparator<Weighted<TokenPair>> nearnessComparator) {
+    public void setNearnessComparator(Comparator<Weighted<TokenPair>> nearnessComparator) {
         this.nearnessComparator = nearnessComparator;
     }
 
@@ -140,9 +116,8 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
     }
 
     public final void setK(int k) {
-        if (k < 1) {
+        if (k < 1)
             throw new IllegalArgumentException("k < 1");
-        }
         this.k = k;
     }
 
@@ -155,26 +130,6 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
     protected void finaliseTask() throws Exception {
         super.finaliseTask();
     }
-//
-//    @Override
-//    protected ObjectMergeTask<Weighted<TokenPair>> createMergeTask(
-//            File srcA, File srcB, File dst) throws IOException {
-//        ObjectMergeTask<Weighted<TokenPair>> task = super.createMergeTask(
-//                srcA, srcB, dst);
-//        task.setSink(new KFirstReducingObjectSink<Weighted<TokenPair>>(
-//                task.getSink(), getClassComparator(), getK()));
-//        return task;
-//    }
-//
-//    @Override
-//    protected ObjectSortTask<Weighted<TokenPair>> createSortTask(
-//            Chunk<Weighted<TokenPair>> chunk, File dst) throws IOException {
-//        ObjectSortTask<Weighted<TokenPair>> task = super.createSortTask(chunk,
-//                                                                        dst);
-//        task.setSink(new KFirstReducingObjectSink<Weighted<TokenPair>>(
-//                task.getSink(), getClassComparator(), getK()));
-//        return task;
-//    }
 
     @Override
     protected ToStringHelper toStringHelper() {
@@ -184,15 +139,14 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
     @Override
     protected WeightedTokenPairSource openSource(File file)
             throws FileNotFoundException, IOException {
-        return BybloIO.openSimsSource(file, getCharset(), getIndexDeligate());
+        return BybloIO.openSimsSource(file, getCharset(), getIndexDelegate());
     }
 
     @Override
-    protected ObjectSink<Weighted<TokenPair>> openSink(File file)
-            throws FileNotFoundException, IOException {
+    protected ObjectSink<Weighted<TokenPair>> openSink(File file) throws FileNotFoundException, IOException {
         return new KFirstReducingObjectSink<Weighted<TokenPair>>(
                 new WeightSumReducerObjectSink<TokenPair>(
-                BybloIO.openNeighboursSink(file, getCharset(), getIndexDeligate())),
+                        BybloIO.openNeighboursSink(file, getCharset(), getIndexDelegate())),
                 classComparator, k);
 
     }
@@ -202,6 +156,9 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
         return "knn-sims";
     }
 
-
+    @Override
+    protected long getBytesPerObject() {
+        return new MemoryUsage().add(new Weighted<TokenPair>(new TokenPair(1, 1), 1)).getInstanceSizeBytes();
+    }
 
 }

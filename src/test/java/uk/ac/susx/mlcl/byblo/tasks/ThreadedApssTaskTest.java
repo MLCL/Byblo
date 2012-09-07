@@ -31,16 +31,9 @@
 package uk.ac.susx.mlcl.byblo.tasks;
 
 import com.google.common.base.Predicate;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.Tools;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
@@ -51,14 +44,29 @@ import uk.ac.susx.mlcl.byblo.measures.Proximity;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.Tell;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static uk.ac.susx.mlcl.TestConstants.*;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.disableExitTrapping;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.enableExistTrapping;
 
 /**
+ * Some tests are inherited from the abstract-super class. The remainder are mostly legacy tests.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class ThreadedApssTaskTest {
+public class ThreadedApssTaskTest extends AbstractAllPairsTaskTest<ThreadedApssTask> {
+
+    @Override
+    public Class<? extends ThreadedApssTask> getImplementation() {
+        return ThreadedApssTask.class;
+    }
 
     private static final String subject = ThreadedApssTask.class.getName();
 
@@ -70,14 +78,14 @@ public class ThreadedApssTaskTest {
     @Test
     public void testCLI() throws Exception {
         String output = new File(TEST_OUTPUT_DIR,
-                                 TEST_FRUIT_INPUT.getName() + ".sims").toString();
+                TEST_FRUIT_INPUT.getName() + ".sims").toString();
         String[] args = {
-            "allpairs",
-            "--input", TEST_FRUIT_EVENTS.toString(),
-            "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-            "--input-features", TEST_FRUIT_FEATURES.toString(),
-            "--output", output,
-            "--measure", "Jaccard",};
+                "allpairs",
+                "--input", TEST_FRUIT_EVENTS.toString(),
+                "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                "--input-features", TEST_FRUIT_FEATURES.toString(),
+                "--output", output,
+                "--measure", "Jaccard",};
 
         try {
             enableExistTrapping();
@@ -85,7 +93,6 @@ public class ThreadedApssTaskTest {
         } finally {
             disableExitTrapping();
         }
-
 
 
     }
@@ -97,19 +104,19 @@ public class ThreadedApssTaskTest {
     public void testNaive() throws Exception {
         System.out.println("Testing " + subject + " Naive");
 
-        DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+        DoubleEnumeratingDelegate del = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
 
 
         WeightedTokenPairVectorSource vsa =
                 new WeightedTokenPairVectorSource(
-                WeightedTokenPairSource.open(
-                TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
+                        WeightedTokenPairSource.open(
+                                TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
         WeightedTokenPairVectorSource vsb =
                 new WeightedTokenPairVectorSource(
-                WeightedTokenPairSource.open(
-                TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
+                        WeightedTokenPairSource.open(
+                                TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
         List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
         ObjectSink<Weighted<TokenPair>> sink = ObjectIO.asSink(result);
@@ -135,19 +142,19 @@ public class ThreadedApssTaskTest {
     @Test
     public void testInverted() throws Exception {
         System.out.println("Testing " + subject + " Inverted");
-        DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+        DoubleEnumeratingDelegate del = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
 
 
         WeightedTokenPairVectorSource vsa =
                 new WeightedTokenPairVectorSource(
-                WeightedTokenPairSource.open(
-                TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
+                        WeightedTokenPairSource.open(
+                                TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
         WeightedTokenPairVectorSource vsb =
                 new WeightedTokenPairVectorSource(
-                WeightedTokenPairSource.open(
-                TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
+                        WeightedTokenPairSource.open(
+                                TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
         List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
         ObjectSink<Weighted<TokenPair>> sink = ObjectIO.asSink(result);
         ThreadedApssTask<Tell> instance = new ThreadedApssTask<Tell>(
@@ -171,24 +178,23 @@ public class ThreadedApssTaskTest {
                 "Testing " + subject + " comparing Naive and Inverted");
 
 
-
         List<Weighted<TokenPair>> naiveResults = new ArrayList<Weighted<TokenPair>>();
         List<Weighted<TokenPair>> invertedResults = new ArrayList<Weighted<TokenPair>>();
 
         {
-            DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+            DoubleEnumeratingDelegate del = new DoubleEnumeratingDelegate(
                     Enumerating.DEFAULT_TYPE, false, false, null, null);
 
 
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(
-                    WeightedTokenPairSource.open(
-                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
+                            WeightedTokenPairSource.open(
+                                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(
-                    WeightedTokenPairSource.open(
-                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
+                            WeightedTokenPairSource.open(
+                                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
 
             List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
@@ -208,18 +214,18 @@ public class ThreadedApssTaskTest {
         }
 
         {
-            DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+            DoubleEnumeratingDelegate del = new DoubleEnumeratingDelegate(
                     Enumerating.DEFAULT_TYPE, false, false, null, null);
 
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(
-                    WeightedTokenPairSource.open(
-                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
+                            WeightedTokenPairSource.open(
+                                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(
-                    WeightedTokenPairSource.open(
-                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
+                            WeightedTokenPairSource.open(
+                                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
 
             List<Weighted<TokenPair>> result = new ArrayList<Weighted<TokenPair>>();
@@ -253,19 +259,19 @@ public class ThreadedApssTaskTest {
         List<Weighted<TokenPair>> nonThreadedResults = new ArrayList<Weighted<TokenPair>>();
 
         {
-            DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+            DoubleEnumeratingDelegate del = new DoubleEnumeratingDelegate(
                     Enumerating.DEFAULT_TYPE, false, false, null, null);
 
 
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(
-                    WeightedTokenPairSource.open(
-                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
+                            WeightedTokenPairSource.open(
+                                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(
-                    WeightedTokenPairSource.open(
-                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
+                            WeightedTokenPairSource.open(
+                                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
 
             ObjectSink<Weighted<TokenPair>> sink = ObjectIO.asSink(threadedResults);
@@ -286,18 +292,18 @@ public class ThreadedApssTaskTest {
         {
             NaiveApssTask<Tell> instance = new NaiveApssTask<Tell>();
 
-            DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+            DoubleEnumeratingDelegate del = new DoubleEnumeratingDelegate(
                     Enumerating.DEFAULT_TYPE, false, false, null, null);
 
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(
-                    WeightedTokenPairSource.open(
-                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
+                            WeightedTokenPairSource.open(
+                                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(
-                    WeightedTokenPairSource.open(
-                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
+                            WeightedTokenPairSource.open(
+                                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
             instance.setSourceA(vsa);
             instance.setSourceB(vsb);
@@ -326,18 +332,18 @@ public class ThreadedApssTaskTest {
         List<Weighted<TokenPair>> nonThreadedResults = new ArrayList<Weighted<TokenPair>>();
 
         {
-            DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+            DoubleEnumeratingDelegate del = new DoubleEnumeratingDelegate(
                     Enumerating.DEFAULT_TYPE, false, false, null, null);
 
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(
-                    WeightedTokenPairSource.open(
-                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
+                            WeightedTokenPairSource.open(
+                                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(
-                    WeightedTokenPairSource.open(
-                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
+                            WeightedTokenPairSource.open(
+                                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
             ObjectSink<Weighted<TokenPair>> sink = ObjectIO.asSink(threadedResults);
             ThreadedApssTask<Tell> instance = new ThreadedApssTask<Tell>(
@@ -357,18 +363,18 @@ public class ThreadedApssTaskTest {
         {
             InvertedApssTask<Tell> instance = new InvertedApssTask<Tell>();
 
-            DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+            DoubleEnumeratingDelegate del = new DoubleEnumeratingDelegate(
                     Enumerating.DEFAULT_TYPE, false, false, null, null);
 
             WeightedTokenPairVectorSource vsa =
                     new WeightedTokenPairVectorSource(
-                    WeightedTokenPairSource.open(
-                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
+                            WeightedTokenPairSource.open(
+                                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
             WeightedTokenPairVectorSource vsb =
                     new WeightedTokenPairVectorSource(
-                    WeightedTokenPairSource.open(
-                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
+                            WeightedTokenPairSource.open(
+                                    TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false));
 
             instance.setSourceA(vsa);
             instance.setSourceB(vsb);

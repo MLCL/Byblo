@@ -31,24 +31,11 @@
 package uk.ac.susx.mlcl.byblo.tasks;
 
 import com.google.common.base.Objects.ToStringHelper;
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
+import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.Chunk;
@@ -56,6 +43,14 @@ import uk.ac.susx.mlcl.lib.io.Chunker;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.tasks.Task;
+
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.*;
 
 /**
  * An all pairs similarity search implementation that parallelises another
@@ -71,19 +66,13 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
 
     private Class<? extends NaiveApssTask> innerAlgorithm = InvertedApssTask.class;
 
-    private static final int DEFAULT_NUM_THREADS =
-            Runtime.getRuntime().availableProcessors() + 1;
+    private static final int DEFAULT_NUM_THREADS = Runtime.getRuntime().availableProcessors() + 1;
 
     private int nThreads = DEFAULT_NUM_THREADS;
 
     private ExecutorService executor = null;
 
-    private Queue<Future<? extends Task>> futureQueue =
-            new ArrayDeque<Future<? extends Task>>();
-
-    public static final int DEFAULT_MAX_CHUNK_SIZE = 2000;
-
-    private int maxChunkSize = DEFAULT_MAX_CHUNK_SIZE;
+    private Queue<Future<? extends Task>> futureQueue = new ArrayDeque<Future<? extends Task>>();
 
     private Semaphore throttle;
 
@@ -96,14 +85,6 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
     }
 
     public ThreadedApssTask() {
-    }
-
-    public int getMaxChunkSize() {
-        return maxChunkSize;
-    }
-
-    public void setMaxChunkSize(int maxChunkSize) {
-        this.maxChunkSize = maxChunkSize;
     }
 
     @Override
@@ -127,7 +108,7 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 nThreads, nThreads, 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>());
         futureQueue = new ArrayDeque<Future<? extends Task>>();
-        throttle = new Semaphore(nThreads + 1);
+        throttle = new Semaphore(getThrottleSize());
     }
 
     int nChunks = 0;
@@ -143,6 +124,11 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
         progress.setState(State.RUNNING);
         progress.setMessage("Reading threaded all-pairs.");
         progress.endAdjusting();
+
+        final int maxChunkSize = estimateChunkSize();
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Chunk-size estimated as: " + maxChunkSize + " vectors per work unit.");
+        }
 
         if (LOG.isTraceEnabled()) {
             LOG.trace("Initialising chunker A.");
@@ -176,8 +162,7 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 chunkB.setName(Integer.toString(j));
 
                 progress.startAdjusting();
-                progress.setMessage(MessageFormat.format(
-                        "Queueing chunk pair {0,number} and {1,number}", i, j));
+                progress.setMessage(MessageFormat.format("Queueing chunk pair {0,number} and {1,number}", i, j));
                 updateProgress();
                 progress.endAdjusting();
 
@@ -194,10 +179,8 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 queueTask(task);
                 ++queuedCount;
 
-
                 // retrieve the results
                 clearCompleted(false);
-
             }
 
             nChunks = j;
@@ -279,7 +262,7 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
         super.finaliseTask();
     }
 
-    protected <T extends Task> Future<T> queueTask(final T task) throws InterruptedException {
+    protected <T extends Task> void queueTask(final T task) throws InterruptedException {
         if (task == null) {
             throw new NullPointerException("task is null");
         }
@@ -306,7 +289,6 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
         try {
             Future<T> future = getExecutor().submit(wrapper, task);
             getFutureQueue().offer(future);
-            return future;
         } catch (RejectedExecutionException e) {
             throttle.release();
             throw e;
@@ -335,6 +317,48 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
         this.nThreads = nThreads;
     }
 
+    private int getThrottleSize() {
+        return getNumThreads() + 1;
+    }
+
+
+    private int estimateChunkSize() {
+
+        // Maximum possible non-zero cardinality of any feature vector. In theory this is Integer.MAX_VALUE, through
+        // with real data that bound never occurs since feature vectors are typically very sparse, especially if
+        // filtering has been performed.
+        // TODO: filtering stage should record the largest non-zero cardinality, which should be used for nFeatures.
+        final double nFeatures = 10000;
+
+        // number of concurrent worker units that can exist at one time
+        final double nWorkUnits = getThrottleSize();
+
+        // each worker has 2 chunks, but most of the time at least one of the chunks is shared
+        final double pairMultiplier = (nWorkUnits + 1) / nWorkUnits;
+
+        // theoretical number of bytes per feature is: 1 x int32 + 1 x double
+        // note that arrays should be packed even on 64 bit platforms
+        final double bytesPerFeature = 4 + 8;
+
+        // It's a tad conservative to use free memory rather than total memory,
+        // but we can't be sure what else is going on
+        System.gc();
+        final double availableMemory = MiscUtil.freeMaxMemory();
+
+        double chunkSize = availableMemory / (nFeatures * nWorkUnits * pairMultiplier * bytesPerFeature);
+        assert chunkSize > 0;
+
+        // It's possible that we don't even enough memory for a single
+        if (chunkSize < 1)
+            chunkSize = 1;
+
+        // Finally, we've only really calculated an upper bound. It's conceivable that the software is running in an
+        // environment where it would be preferable not to just use all memory, just because it's there.
+        chunkSize = Math.min(chunkSize, 4000);
+
+        return (int) Math.floor(chunkSize);
+    }
+
     public String getName() {
         return "threaded-allpairs";
     }
@@ -346,7 +370,6 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 add("nThreads", nThreads).
                 add("executor", executor).
                 add("futureQueue", futureQueue).
-                add("maxChunkSize", maxChunkSize).
                 add("throttle", throttle);
     }
 

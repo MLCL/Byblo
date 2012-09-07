@@ -66,7 +66,7 @@ public abstract class AbstractMIProximity extends AbstractProximity {
      * this value being less than the cardinality. This could be described as
      * the non-zero cardinality.
      */
-    private long occuringFeatureCount;
+    private long occurringFeatureCount;
 
     /**
      *
@@ -88,8 +88,8 @@ public abstract class AbstractMIProximity extends AbstractProximity {
         this.featureFrequencySum = featureFrequencySum;
     }
 
-    public void setOccuringFeatureCount(int occuringFeatureCount) {
-        this.occuringFeatureCount = occuringFeatureCount;
+    public void setOccurringFeatureCount(int occurringFeatureCount) {
+        this.occurringFeatureCount = occurringFeatureCount;
     }
 
     /**
@@ -104,14 +104,14 @@ public abstract class AbstractMIProximity extends AbstractProximity {
     /**
      * The number of unique features.
      *
-     * @return number of unique featuress.
+     * @return number of unique features.
      */
     public final int getFeatureCount() {
         return featureFrequencies.length;
     }
 
-    public long getOccuringFeatureCount() {
-        return occuringFeatureCount;
+    public long getOccurringFeatureCount() {
+        return occurringFeatureCount;
     }
 
     /**

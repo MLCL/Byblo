@@ -35,7 +35,7 @@ import com.google.common.base.Objects;
 import java.io.File;
 import java.io.Serializable;
 import java.nio.charset.Charset;
-import uk.ac.susx.mlcl.lib.commands.FileDeligate;
+import uk.ac.susx.mlcl.lib.commands.FileDelegate;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
 
@@ -43,7 +43,7 @@ import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class FileMergeDelegate extends FileDeligate implements Serializable {
+public final class FileMergeDelegate extends FileDelegate implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

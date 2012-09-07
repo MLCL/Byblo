@@ -35,16 +35,21 @@ import java.io.IOException;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import uk.ac.susx.mlcl.lib.tasks.FileDeleteTask;
+import uk.ac.susx.mlcl.testing.AbstractObjectTest;
 
 /**
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class DeleteTaskTest {
+public class FileDeleteTaskTest extends AbstractObjectTest<FileDeleteTask> {
+
+    @Override
+    public Class<? extends FileDeleteTask> getImplementation() {
+        return FileDeleteTask.class;
+    }
 
     @Test
     public void testRun_success() throws Exception {
-        System.out.println("Testing run() -- expecting success");
         File tmp = File.createTempFile(getClass().getName(), "");
         assertTrue(tmp.exists());
         FileDeleteTask instance = new FileDeleteTask(tmp);
@@ -56,7 +61,6 @@ public class DeleteTaskTest {
 
     @Test(expected = IOException.class)
     public void testRunTask_failure() throws Exception {
-        System.out.println("Testing runTask() -- expecting failure");
         File tmp = File.createTempFile(getClass().getName(), "");
         tmp.delete();
         assertFalse(tmp.exists());
@@ -67,7 +71,6 @@ public class DeleteTaskTest {
 
     @Test(expected = IOException.class)
     public void testRun_failure() throws Exception {
-        System.out.println("Testing runTask() -- expecting failure");
         File tmp = File.createTempFile(getClass().getName(), "");
         tmp.delete();
         assertFalse(tmp.exists());
@@ -78,7 +81,6 @@ public class DeleteTaskTest {
 
     @Test
     public void testGetSetFile() throws IOException {
-        System.out.println("Testing getFile() and setFile()");
         File tmp = File.createTempFile(getClass().getName(), "");
         FileDeleteTask instance = new FileDeleteTask(tmp);
         File expResult = tmp;

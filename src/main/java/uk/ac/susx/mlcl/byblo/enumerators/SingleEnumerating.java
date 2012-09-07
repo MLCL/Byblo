@@ -45,7 +45,7 @@ public interface SingleEnumerating extends Enumerating {
 
     boolean isEnumerationEnabled();
 
-    DoubleEnumerating getEnumeratorPairCarriar();
+    DoubleEnumerating getEnumeratorPairCarrier();
 
     public void setEnumeratorFile(File enumeratorFile);
 

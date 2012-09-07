@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
-import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
+import uk.ac.susx.mlcl.lib.events.ProgressDelegate;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import com.google.common.base.Objects;
@@ -49,7 +49,7 @@ import uk.ac.susx.mlcl.lib.io.ObjectSource;
  */
 public final class ObjectMergeTask<T> extends AbstractTask implements ProgressReporting {
 
-    private final ProgressDeligate progress = new ProgressDeligate(this, false);
+    private final ProgressDelegate progress = new ProgressDelegate(this, false);
 
     private ObjectSource<T> sourceA;
 
@@ -136,9 +136,7 @@ public final class ObjectMergeTask<T> extends AbstractTask implements ProgressRe
     public boolean equals(Object obj) {
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
-            return false;
-        return equals((ObjectMergeTask<?>) obj);
+        return getClass() == obj.getClass() && equals((ObjectMergeTask<?>) obj);
     }
 
     @Override

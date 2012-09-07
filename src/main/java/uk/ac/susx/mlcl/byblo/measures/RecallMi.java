@@ -36,7 +36,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * This measure attempts to encapsulate, for each pair of feature vectors A and
  * B, how strongly A is described by B. A high similarity is returned when all
  * the features of A, also occur in B. Conversely a low similarity is returned
- * when fews of A's features occur in B. The resultant similarity will be in the
+ * when few of A's features occur in B. The resultant similarity will be in the
  * range 0 (completed different) to 1 (exactly the same).
  *
  * An intuitive analogy is that of the words "orange" and and "fig". "orange" is

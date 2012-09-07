@@ -37,7 +37,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.byblo.io.WeightSumReducerObjectSink;
@@ -53,7 +53,7 @@ import uk.ac.susx.mlcl.lib.io.ObjectSource;
 public final class MergeEntriesCommand extends AbstractMergeCommand<Weighted<Token>> {
 
     @ParametersDelegate
-    private SingleEnumerating indexDeligate = new SingleEnumeratingDeligate();
+    private SingleEnumerating indexDeligate = new SingleEnumeratingDelegate();
 
     public MergeEntriesCommand(
             File sourceFileA, File sourceFileB, File destinationFile,
@@ -85,13 +85,13 @@ public final class MergeEntriesCommand extends AbstractMergeCommand<Weighted<Tok
 
     @Override
     protected ObjectSource<Weighted<Token>> openSource(File file) throws FileNotFoundException, IOException {
-        return BybloIO.openEntriesSource(file, getFileDeligate().getCharset(), indexDeligate);
+        return BybloIO.openEntriesSource(file, getFileDelegate().getCharset(), indexDeligate);
     }
 
     @Override
     protected ObjectSink<Weighted<Token>> openSink(File file) throws FileNotFoundException, IOException {
         return new WeightSumReducerObjectSink<Token>(
-                BybloIO.openEntriesSink(file, getFileDeligate().getCharset(), indexDeligate));
+                BybloIO.openEntriesSink(file, getFileDelegate().getCharset(), indexDeligate));
     }
 
     public static void main(String[] args) throws Exception {

@@ -30,20 +30,17 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
-import com.beust.jcommander.ParametersDelegate;
-import com.google.common.base.Objects;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.Comparator;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
@@ -56,9 +53,14 @@ import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
-import uk.ac.susx.mlcl.lib.events.ProgressEvent;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ReportingProgressListener;
 import uk.ac.susx.mlcl.lib.io.Files;
+
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
+import com.beust.jcommander.ParametersDelegate;
+import com.google.common.base.Objects;
 
 /**
  * <p>Read in a raw feature instances file, to produce three frequency files:
@@ -68,7 +70,7 @@ import uk.ac.susx.mlcl.lib.io.Files;
  */
 @Parameters(commandDescription = "Read in a raw feature instances file, to produce three "
 + "frequency files: entries, contexts, and features.")
-public class CountCommand extends AbstractCommand implements Serializable {
+public class CountCommand extends AbstractCommand {
 
     private static final long serialVersionUID = 1L;
 
@@ -103,7 +105,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
     private Charset charset = Files.DEFAULT_CHARSET;
 
     @ParametersDelegate
-    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
+    private DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();
 
     /**
      * Dependency injection constructor with all fields parameterised.
@@ -112,17 +114,17 @@ public class CountCommand extends AbstractCommand implements Serializable {
      * @param eventsFile output file for entry/context/frequency triples
      * @param entriesFile output file for entry/frequency pairs
      * @param featuresFile output file for context/frequency pairs
-     * @param indexDeligate
+     * @param indexDelegate
      * @param charset character set to use for all file I/O
      * @throws NullPointerException if any argument is null
      */
     public CountCommand(final File instancesFile, final File eventsFile,
                         final File entriesFile, final File featuresFile,
-                        DoubleEnumerating indexDeligate,
+                        DoubleEnumerating indexDelegate,
                         final Charset charset) throws NullPointerException {
         this(instancesFile, eventsFile, entriesFile, featuresFile);
         setCharset(charset);
-        setIndexDeligate(indexDeligate);
+        setIndexDelegate(indexDelegate);
     }
 
     public CountCommand(final File instancesFile, final File eventsFile,
@@ -161,13 +163,13 @@ public class CountCommand extends AbstractCommand implements Serializable {
     public CountCommand() {
     }
 
-    public DoubleEnumerating getIndexDeligate() {
-        return indexDeligate;
+    public DoubleEnumerating getIndexDelegate() {
+        return indexDelegate;
     }
 
-    public final void setIndexDeligate(DoubleEnumerating indexDeligate) {
-        Checks.checkNotNull("indexDeligate", indexDeligate);
-        this.indexDeligate = indexDeligate;
+    public final void setIndexDelegate(DoubleEnumerating indexDelegate) {
+        Checks.checkNotNull("indexDelegate", indexDelegate);
+        this.indexDelegate = indexDelegate;
     }
 
     public final File getFeaturesFile() {
@@ -220,22 +222,22 @@ public class CountCommand extends AbstractCommand implements Serializable {
     }
 
     private Comparator<Weighted<Token>> getEntryOrder() throws IOException {
-        return indexDeligate.isEnumeratedEntries()
+        return indexDelegate.isEnumeratedEntries()
                ? Weighted.recordOrder(Token.indexOrder())
-               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getEntriesEnumeratorCarriar()));
+               : Weighted.recordOrder(Token.stringOrder(indexDelegate.getEntriesEnumeratorCarrier()));
     }
 
     private Comparator<Weighted<Token>> getFeatureOrder() throws IOException {
-        return indexDeligate.isEnumeratedFeatures()
+        return indexDelegate.isEnumeratedFeatures()
                ? Weighted.recordOrder(Token.indexOrder())
-               : Weighted.recordOrder(Token.stringOrder(indexDeligate.getFeaturesEnumeratorCarriar()));
+               : Weighted.recordOrder(Token.stringOrder(indexDelegate.getFeaturesEnumeratorCarrier()));
     }
 
     private Comparator<Weighted<TokenPair>> getEventOrder() throws IOException {
-        return (indexDeligate.isEnumeratedEntries() && indexDeligate.isEnumeratedFeatures())
+        return (indexDelegate.isEnumeratedEntries() && indexDelegate.isEnumeratedFeatures())
                ? Weighted.recordOrder(TokenPair.indexOrder())
                : Weighted.recordOrder(TokenPair.stringOrder(
-                indexDeligate));
+                indexDelegate));
     }
 
     @Override
@@ -246,28 +248,22 @@ public class CountCommand extends AbstractCommand implements Serializable {
 
         checkState();
 
-        final TokenPairSource instanceSource = BybloIO.openInstancesSource(inputFile, charset, indexDeligate);
+        final TokenPairSource instanceSource = BybloIO.openInstancesSource(inputFile, charset, indexDelegate);
 
-        WeightedTokenSink entrySink = BybloIO.openEntriesSink(entriesFile, charset, indexDeligate);
+        WeightedTokenSink entrySink = BybloIO.openEntriesSink(entriesFile, charset, indexDelegate);
 
-        WeightedTokenSink featureSink = BybloIO.openFeaturesSink(featuresFile, charset, indexDeligate);
+        WeightedTokenSink featureSink = BybloIO.openFeaturesSink(featuresFile, charset, indexDelegate);
 
 
-        WeightedTokenPairSink eventsSink = BybloIO.openEventsSink(eventsFile, charset, indexDeligate);
+        WeightedTokenPairSink eventsSink = BybloIO.openEventsSink(eventsFile, charset, indexDelegate);
 
         CountTask task = new CountTask(
                 instanceSource, eventsSink, entrySink, featureSink,
                 getEventOrder(), getEntryOrder(), getFeatureOrder());
 
 
-        task.addProgressListener(new ProgressListener() {
-
-            @Override
-            public void progressChanged(ProgressEvent progressEvent) {
-                System.out.println(progressEvent.getSource().getProgressReport());
-            }
-
-        });
+        final ProgressListener listener = new ReportingProgressListener();
+        task.addProgressListener(listener);
 
         task.run();
 
@@ -275,6 +271,9 @@ public class CountCommand extends AbstractCommand implements Serializable {
         while (task.isExceptionTrapped())
             task.throwTrappedException();
 
+
+        task.removeProgressListener(listener);
+        assert task.getProgressListeners().length == 0;
 
         instanceSource.close();
         entrySink.flush();
@@ -284,9 +283,9 @@ public class CountCommand extends AbstractCommand implements Serializable {
         eventsSink.flush();
         eventsSink.close();
 
-        if (indexDeligate.isEnumeratorOpen()) {
-            indexDeligate.saveEnumerator();
-            indexDeligate.closeEnumerator();
+        if (indexDelegate.isEnumeratorOpen()) {
+            indexDelegate.saveEnumerator();
+            indexDelegate.closeEnumerator();
         }
 
 
@@ -348,7 +347,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
                     "instances file is not readable: " + inputFile);
         }
 
-        // For each output file, check that either it exists and it writeable,
+        // For each output file, check that either it exists and it writable,
         // or that it does not exist but is creatable
         if (entriesFile.exists() && (!entriesFile.isFile() || !entriesFile.canWrite())) {
             throw new IllegalStateException(
@@ -358,7 +357,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
                 getParentFile().
                 canWrite()) {
             throw new IllegalStateException(
-                    "entries file does not exists and can not be reated: " + entriesFile);
+                    "entries file does not exists and can not be created: " + entriesFile);
         }
         if (featuresFile.exists() && (!featuresFile.isFile() || !featuresFile.canWrite())) {
             throw new IllegalStateException(
@@ -368,7 +367,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
                 getParentFile().
                 canWrite()) {
             throw new IllegalStateException(
-                    "features file does not exists and can not be reated: " + featuresFile);
+                    "features file does not exists and can not be created: " + featuresFile);
         }
         if (eventsFile.exists() && (!eventsFile.isFile() || !eventsFile.canWrite())) {
             throw new IllegalStateException(
@@ -378,7 +377,7 @@ public class CountCommand extends AbstractCommand implements Serializable {
                 getParentFile().
                 canWrite()) {
             throw new IllegalStateException(
-                    "entry-features file does not exists and can not be reated: " + eventsFile);
+                    "entry-features file does not exists and can not be created: " + eventsFile);
         }
     }
 

@@ -35,7 +35,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 /**
  * Proximity defines a common interface that all similarity measure must
  * implement. It has been expanded from the usual single method interface, to
- * allow for pre-calculation of values that are independant to one vector. 
+ * allow for pre-calculation of values that are independent to one vector.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -43,7 +43,7 @@ public interface Proximity {
 
     /**
      * Calculate the similarity of the given vectors Q and R. If possible this
-     * should based entirely upon shared features, while independant features
+     * should based entirely upon shared features, while independent features
      * can be pre-calculated using {@link #left(SparseDoubleVector)} and {@link #right(SparseDoubleVector)}. All
      * three values are combined using {@link Proximity#combine(double, double, double)}.
      * If it is not possible to break up the measure in this way, shared should

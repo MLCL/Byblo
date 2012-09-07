@@ -57,7 +57,7 @@ public class FileMoveTask extends FileCopyTask {
 
         if (!from.renameTo(to)) {
             if (LOG.isDebugEnabled())
-                LOG.debug("Cannot performan fast rename; falling back to copy");
+                LOG.debug("Cannot perform a fast rename; falling back to copy");
 
             copy(from, to);
 
