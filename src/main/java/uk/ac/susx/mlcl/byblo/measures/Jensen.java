@@ -30,33 +30,40 @@
  */
 package uk.ac.susx.mlcl.byblo.measures;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- * Jensen-Shannon divergence
+ * Jensen-Shannon Divergence similarity measure, defined as a balanced average of KL-Divergences from the two entry
+ * distributions to the average distribution of both.
+ * <p/>
+ * <pre>
+ *  JSD(Q||R) = 0.5 KLD(Q||M) + 0.5 * KLD(R||M)
+ *              where M = 0.5 * (Q + R)
+ *        and KLD(X||M) = sum_i P(x_i) * log(P(x_i) / P(m_i))
+ * </pre>
+ * <p/>
+ * Base-2 logarithms are used throughout. This is partly because it fits better with the information theoretic notion
+ * of entropy as bits, and partly because it conveniently produces a score in the range 0 to 1.
+ * <p/>
+ * The output is reversed so it's inline with other proximity measures; so 1 indicates maximal similarity
+ * (convergence) and 0 indicates maximal dissimilarity (divergence.
  *
+ * @author David Sheldrick &lt;ds300@sussex.ac.uk&gt;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class Jensen extends AbstractProximity {
 
-    private static final double LN2 = Math.log(2);
-
-    public Jensen() {
-    }
-
     @Override
     public double shared(SparseDoubleVector A, SparseDoubleVector B) {
-        double comp = 0;
+        double divergence = 0;
 
         int i = 0, j = 0;
         while (i < A.size && j < B.size) {
             if (A.keys[i] < B.keys[j]) {
-                comp += A.values[i] / A.sum;
+                divergence += A.values[i] / A.sum;
                 i++;
             } else if (A.keys[i] > B.keys[j]) {
-                comp += B.values[j] / B.sum;
+                divergence += B.values[j] / B.sum;
                 j++;
             } else if (isFiltered(A.keys[i])) {
                 i++;
@@ -64,41 +71,41 @@ public class Jensen extends AbstractProximity {
             } else {
                 final double pA = A.values[i] / A.sum;
                 final double pB = B.values[j] / B.sum;
-                final double lpAvg = Math.log(pA + pB) / LN2 - 1;
-                comp += pA * (Math.log(pA) / LN2 - lpAvg);
-                comp += pB * (Math.log(pB) / LN2 - lpAvg);
+                final double lpAvg = log2(pA + pB) - 1.;
+                divergence += pA * (log2(pA) - lpAvg);
+                divergence += pB * (log2(pB) - lpAvg);
                 i++;
                 j++;
             }
         }
 
         while (i < A.size) {
-            comp += A.values[i] / A.sum;
+            divergence += A.values[i] / A.sum;
             i++;
         }
 
         while (j < B.size) {
-            comp += B.values[j] / B.sum;
+            divergence += B.values[j] / B.sum;
             j++;
         }
 
-        return comp / 2;
+        return divergence / 2.;
     }
 
     @Override
     public double left(SparseDoubleVector A) {
-        return 0d;
+        return 0.;
     }
 
     @Override
     public double right(SparseDoubleVector B) {
-        return 0d;
+        return 0.;
     }
 
     @Override
     public double combine(double shared, double left, double right) {
         // Low values indicate similarity so invert the result
-        return 1 - shared;
+        return 1. - shared;
     }
 
     @Override
@@ -110,4 +117,11 @@ public class Jensen extends AbstractProximity {
     public String toString() {
         return "Jensen{}";
     }
+
+    private static final double LN2 = Math.log(2);
+
+    private static double log2(double value) {
+        return Math.log(value) / LN2;
+    }
+
 }
