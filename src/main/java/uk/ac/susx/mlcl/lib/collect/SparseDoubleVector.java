@@ -41,11 +41,11 @@ import java.util.Arrays;
  * Store a sparse vector of double precision values as an ordered array non-zero
  * indices and an ordered array of values.
  *
- * This is an ideal representation for performing fast dot product, or
- * any other operation that ignores zero values, if the denisity is sufficiently
- * low. Other operations can be slower than a full vector because indicies must
- * be searched for.
- * 
+ * This is an ideal representation for performing fast dot product, or any other
+ * operation that ignores zero values, if the denisity is sufficiently low.
+ * Other operations can be slower than a full vector because indicies must be
+ * searched for.
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class SparseDoubleVector
@@ -152,6 +152,18 @@ public final class SparseDoubleVector
 
     @Override
     public final void compact() {
+        // remove all any zero elements
+        int to = 0, from = 0;
+        while (from < size) {
+            if (values[from] != 0.0) {
+                keys[to] = keys[from];
+                values[to] = values[from];
+                to++;
+            }
+            from++;
+        }
+        size = to;
+        // trim the storage array to the usage
         if (size < keys.length) {
             keys = Arrays.copyOf(keys, size);
             values = Arrays.copyOf(values, keys.length);
@@ -235,7 +247,8 @@ public final class SparseDoubleVector
         for (int i = 0; i < size; i++) {
             if (this.keys[i] != other.keys[i])
                 return false;
-            if (Double.doubleToLongBits(this.values[i]) != Double.doubleToLongBits(
+            if (Double.doubleToLongBits(this.values[i]) != Double.
+                    doubleToLongBits(
                     other.values[i]))
                 return false;
         }
@@ -271,5 +284,4 @@ public final class SparseDoubleVector
     public final boolean contains(final double entry) {
         return ArrayUtil.contains(values, entry, 0, size);
     }
-
 }

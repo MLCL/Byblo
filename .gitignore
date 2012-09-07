@@ -16,6 +16,7 @@ target
 /nbproject/
 /nbproject/*
 nbbuild.xml
+nbactions.xml
 manifest.mf
 /libs/*.jar
 
