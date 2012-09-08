@@ -33,6 +33,7 @@ package uk.ac.susx.mlcl.byblo.weighings.impl;
 import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.weighings.AbstractContextualWeighting;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
+import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
@@ -59,8 +60,8 @@ public final class LLR extends AbstractContextualWeighting
 
     @Override
     public double apply(final SparseDoubleVector vector, int key, double value) {
-        final double Ha = LogProduct.log2(value / vector.sum);
-        final double H0 = LogProduct.log2((getFeatureMarginal(key) - value)
+        final double Ha = Weightings.log2(value / vector.sum);
+        final double H0 = Weightings.log2((getFeatureMarginal(key) - value)
                 / (getGrandTotal() - vector.sum));
         return 2 * (Ha - H0);
     }
