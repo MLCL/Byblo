@@ -45,6 +45,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * pp. 65--72, 2001
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @deprecated replaced by v2 measures and weightings
  */
 public class Lee extends AbstractProximity {
 

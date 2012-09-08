@@ -39,6 +39,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * fields.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @deprecated replaced by v2 measures and weightings
  */
 public abstract class AbstractMIProximity extends AbstractProximity {
 
@@ -184,5 +185,4 @@ public abstract class AbstractMIProximity extends AbstractProximity {
     protected final double prob(final SparseDoubleVector V, final int k) {
         return V.values[k] / V.sum;
     }
-
 }

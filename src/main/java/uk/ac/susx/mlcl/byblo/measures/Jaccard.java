@@ -37,6 +37,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * a set of features, where a non-zero frequency weighting denotes existence.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @deprecated replaced by v2 measures and weightings
  */
 public class Jaccard extends AbstractProximity {
 

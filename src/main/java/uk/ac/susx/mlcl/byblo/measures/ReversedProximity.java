@@ -37,6 +37,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * measures with the inputs the other way around.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @deprecated replaced by v2 measures and weightings
  */
 public final class ReversedProximity implements Proximity {
 

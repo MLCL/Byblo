@@ -35,6 +35,7 @@ package uk.ac.susx.mlcl.byblo.measures;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @deprecated implementation is only correct under some assumptions which
  * aren't enforced.
+ * @deprecated replaced by v2 measures and weightings
  */
 @Deprecated
 public class Tanimoto extends Cosine {

@@ -59,6 +59,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * by wrapping an instance of RecallMi in the ReversedProximity decorator.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @deprecated replaced by v2 measures and weightings
  */
 public class RecallMi extends AbstractMIProximity {
 

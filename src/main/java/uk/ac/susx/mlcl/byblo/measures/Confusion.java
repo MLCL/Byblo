@@ -56,6 +56,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * Expected range: [0,1] (JE Weeds, 2003)
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @deprecated replaced by v2 measures and weightings
  */
 @Beta
 public final class Confusion extends AbstractMIProximity {
