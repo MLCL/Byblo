@@ -1,0 +1,210 @@
+<?xml version="1.0"?>
+<!--
+
+    Copyright (c) 2010-2012, University of Sussex
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     * Redistributions of source code must retain the above copyright notice,
+       this list of conditions and the following disclaimer.
+
+     * Redistributions in binary form must reproduce the above copyright notice,
+       this list of conditions and the following disclaimer in the documentation
+       and/or other materials provided with the distribution.
+
+     * Neither the name of the University of Sussex nor the names of its
+       contributors may be used to endorse or promote products derived from this
+       software without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+-->
+<xs:schema version="1.0"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://byblo.org"
+           xmlns="http://byblo.org"
+           elementFormDefault="qualified">
+
+    <xs:element name="configuration">
+        <xs:complexType>
+            <xs:all>
+                <xs:element name="measure" minOccurs="1"
+                            type="Identifier" />
+                <xs:element name="charset" minOccurs="1"
+                            type="xs:string" />
+                <xs:element name="locale" minOccurs="1"
+                            type="xs:language" />
+                
+                <xs:element name="measures" minOccurs="0" type="Measures" />
+                <xs:element name="weightings" minOccurs="0" type="Weightings"/>
+                <xs:element name="fileFormats" minOccurs="0" 
+                            type="FileFormats"/>
+            </xs:all>
+        </xs:complexType>    
+        
+        <!-- Insure that certain element values as unique -->
+        
+        <xs:unique name="uniqueMeasureNames">
+            <xs:selector xpath="./measures/measure"/>
+            <xs:field xpath="name"/>
+        </xs:unique>
+
+        <xs:unique name="uniqueWeightingNames">
+            <xs:selector xpath="./weightings/weighting"/>
+            <xs:field xpath="name"/>
+        </xs:unique>
+
+        <xs:unique name="uniqueFileFormatNames">
+            <xs:selector xpath="./fileFormats/fileFormat"/>
+            <xs:field xpath="name"/>
+        </xs:unique>
+        
+        <!-- Foreign key constrains -->
+        
+        <xs:key name="measureNameKey">
+            <xs:selector xpath="measures/measure" />
+            <xs:field xpath="name" />
+        </xs:key>
+        
+        <xs:keyref name="measureNameReferences" refer="measureNameKey">
+            <xs:selector xpath="."/>
+            <xs:field xpath="measure"/>
+        </xs:keyref>
+
+    </xs:element>
+
+    <xs:complexType name="Weightings">
+        <xs:sequence>
+            <xs:element name="weighting" minOccurs="0" maxOccurs="unbounded" 
+                        type="Weighting" >                  
+                <!-- Unique parameter names in weighting context -->
+                <xs:unique name="uniqueWeightingParameterName">
+                    <xs:selector xpath="./parameters/parameter"/>
+                    <xs:field xpath="name"/>
+                </xs:unique>
+            </xs:element>
+        </xs:sequence>      
+    </xs:complexType>
+
+    <xs:complexType name="Weighting">
+        <xs:all>
+            <xs:element name="name" minOccurs="1" type="Identifier"/>
+            <xs:element name="class" minOccurs="1" type="xs:string"/>
+            <xs:element name="description" minOccurs="0" type="xs:string"
+                        default=""/>
+            <xs:element name="parameters" minOccurs="0" type="Parameters"/>
+            <xs:element name="aliases" minOccurs="0" type="Aliases"/>
+        </xs:all>
+    </xs:complexType>
+
+      
+    <xs:complexType name="Measures">
+        <xs:sequence>
+            <xs:element name="measure"  minOccurs="0" maxOccurs="unbounded" 
+                        type="Measure" >  
+                    
+                <!-- Unique parameter names in measure context -->
+                <xs:unique name="uniqueMeasureParameterName">
+                    <xs:selector xpath="./parameters/parameter"/>
+                    <xs:field xpath="name"/>
+                </xs:unique>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="Measure">
+        <xs:all>
+            <xs:element name="name" minOccurs="1" type="Identifier"/>
+            <xs:element name="class" minOccurs="1" type="xs:string"/>
+            <xs:element name="description" minOccurs="0" type="xs:string"
+                        default=""/>
+            <xs:element name="parameters" minOccurs="0" type="Parameters"/>
+            <xs:element name="aliases" minOccurs="0" type="Aliases"/>
+        </xs:all>
+    </xs:complexType>                
+
+
+    <xs:complexType name="Aliases">
+        <xs:sequence>
+            <xs:element name="alias"  minOccurs="0" maxOccurs="unbounded" 
+                        type="Identifier" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="Parameters">
+        <xs:sequence>
+            <xs:element name="parameter"  minOccurs="0" 
+                        maxOccurs="unbounded" type="Parameter" />  
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="Parameter">
+        <xs:all>
+            <xs:element name="name" minOccurs="1" type="Identifier"/>
+            <xs:element name="type" minOccurs="0" default="string" >
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="int"/>
+                        <xs:enumeration value="double"/>
+                        <xs:enumeration value="boolean"/>
+                        <xs:enumeration value="string"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="defaultValue" minOccurs="0" type="xs:string"/>
+            <xs:element name="description" minOccurs="0" type="xs:string" 
+                        default=""/>  
+            <xs:element name="required" minOccurs="0" 
+                        type="xs:boolean" default="false" />
+        </xs:all>
+    </xs:complexType>                
+
+
+
+    <xs:complexType name="FileFormats">
+        <xs:sequence>
+            <xs:element name="fileFormat"  minOccurs="0" 
+                        maxOccurs="unbounded" type="FileFormat" >  
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="FileFormat">
+        <xs:all>
+            <xs:element name="name" minOccurs="1" type="Identifier"/>
+            <xs:element name="compact" minOccurs="0" type="xs:boolean" 
+                        default="false"/>
+            <xs:element name="skipIndex" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="column" minOccurs="0" 
+                                    maxOccurs="unbounded" type="xs:boolean" />
+                    </xs:sequence>  
+                </xs:complexType>
+            </xs:element>
+        </xs:all>
+    </xs:complexType> 
+    
+    <xs:simpleType name="Identifier">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[a-zA-Z0-9\-_]*"/>
+            <xs:minLength value="1" />
+            <xs:maxLength value="64" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    
+    
+</xs:schema>
