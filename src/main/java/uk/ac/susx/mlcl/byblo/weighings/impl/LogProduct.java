@@ -38,7 +38,9 @@ import uk.ac.susx.mlcl.byblo.weighings.Weightings;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class LogProduct extends AbstractSimpleWeighting implements Serializable {
+public final class LogProduct
+        extends AbstractSimpleWeighting
+        implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -62,5 +64,17 @@ public final class LogProduct extends AbstractSimpleWeighting implements Seriali
         return this.getClass().getSimpleName();
     }
 
-  
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return 31;
+    }
 }

@@ -15,7 +15,9 @@ import uk.ac.susx.mlcl.lib.Checks;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class Bound extends AbstractSimpleWeighting implements Serializable {
+public final class Bound
+        extends AbstractSimpleWeighting
+        implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -70,5 +72,32 @@ public final class Bound extends AbstractSimpleWeighting implements Serializable
     public String toString() {
         return MessageFormat.format("Bound{{1},{2}}",
                                     getLowerBound(), getUpperBound());
+    }
+
+    private boolean equals(Bound that) {
+        if (Double.doubleToLongBits(this.lowerBound)
+                != Double.doubleToLongBits(that.lowerBound))
+            return false;
+        if (Double.doubleToLongBits(this.upperBound)
+                != Double.doubleToLongBits(that.upperBound))
+            return false;
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        return equals((Bound) obj);
+    }
+
+    @Override
+    public int hashCode() {
+        final long lbBits = Double.doubleToLongBits(this.lowerBound);
+        final long ubBits = Double.doubleToLongBits(this.upperBound);
+        return 67 * (67 * 5 + (int) (lbBits ^ (lbBits >>> 32)))
+                + (int) (ubBits ^ (ubBits >>> 32));
     }
 }

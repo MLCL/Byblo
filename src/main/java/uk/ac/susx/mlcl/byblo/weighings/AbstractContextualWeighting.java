@@ -89,4 +89,27 @@ public abstract class AbstractContextualWeighting
         return featureMarginalsDeligate.getFeatureMarginals(key);
     }
 
+    protected boolean equals(AbstractContextualWeighting other) {
+        if (this.featureMarginalsDeligate != other.featureMarginalsDeligate
+                && (this.featureMarginalsDeligate == null
+                    || !this.featureMarginalsDeligate.equals(
+                    other.featureMarginalsDeligate)))
+            return false;
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == this)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        return equals((AbstractContextualWeighting) obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return 89 * 7 + (this.featureMarginalsDeligate != null
+                         ? this.featureMarginalsDeligate.hashCode() : 0);
+    }
 }

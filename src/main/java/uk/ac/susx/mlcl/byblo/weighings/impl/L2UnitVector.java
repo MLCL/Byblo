@@ -40,7 +40,8 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class L2UnitVector implements Weighting, Serializable {
+public final class L2UnitVector
+        implements Weighting, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -98,5 +99,19 @@ public final class L2UnitVector implements Weighting, Serializable {
         for (int i = 0; i < vector.size; i++)
             lengthSq += vector.values[i] * vector.values[i];
         return lengthSq;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return 19;
     }
 }

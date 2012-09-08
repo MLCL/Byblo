@@ -91,4 +91,28 @@ public class CompositeWeighting implements Weighting, Serializable {
         sb.append('}');
         return sb.toString();
     }
+
+    protected boolean equals(CompositeWeighting that) {
+        if (this.childWeightings != that.childWeightings
+                && (this.childWeightings == null
+                    || !this.childWeightings.equals(that.childWeightings)))
+            return false;
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        return equals((CompositeWeighting) obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return 73 * 79 + (this.childWeightings != null
+                          ? this.childWeightings.hashCode()
+                          : 0);
+    }
 }

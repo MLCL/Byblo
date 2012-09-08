@@ -82,4 +82,5 @@ public abstract class AbstractElementwiseWeighting implements Weighting {
 
     @Override
     public abstract double getUpperBound();
+    
 }

@@ -56,7 +56,8 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class ChiSquared extends AbstractContextualWeighting
+public final class ChiSquared
+        extends AbstractContextualWeighting
         implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -93,5 +94,19 @@ public final class ChiSquared extends AbstractContextualWeighting
     @Override
     public String toString() {
         return this.getClass().getSimpleName();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        return super.equals((AbstractContextualWeighting)this);
+    }
+
+    @Override
+    public int hashCode() {
+        return 7;
     }
 }
