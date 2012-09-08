@@ -30,35 +30,136 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.v2.impl;
 
+import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
+import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsCarrier;
+import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsDeligate;
+import uk.ac.susx.mlcl.byblo.weighings.Weighting;
+import uk.ac.susx.mlcl.byblo.weighings.Weightings;
+import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+
 /**
  * Proximity measure computing the confusion probability between the given
  * vector pair.
  *
- * Essen, Ute and Volker Steinbiss. 1992. Co-occurrence smoothing for stochastic
- * language modeling. In Proceed- ings of ICASSP, volume 1, pages 161{164.
+ * <h4>Notes:</h4>
  *
- * Sugawara, K., M. Nishimura, K. Toshioka, M. Okochi, and T. Kaneko. 1985.
- * Isolated word recognition using hid- den Markov models. In Proceedings of
- * ICASSP, pages 1{4, Tampa, Florida. IEEE.
+ * <ul>
  *
- * Grishman, Ralph and John Sterling. 1993. Smoothing of automatically generated
- * selectional constraints. In Hu- man Language Technology, pages 254{259, San
- * Fran- cisco, California. Advanced Research Projects Agency, Software and
- * Intelligent Systems Technology Oce, Morgan Kaufmann.
+ * <li>The implementation of this measure is rather strange because it requires
+ * contextual information in a way totally unlike any other measure. Normally
+ * when contextual information is required, it can be handled during
+ * pre-weighting, but this measure is the exception.</li>
  *
+ * <li>Unlikely all other measures, confusion has the property that an entry is
+ * not necessarily the most similar entry to itself.</li>
  *
- * Discussed in JE Weeds (2003) "Measures and Applications of Lexical
- * Distributional Similarity", which references (Sugawara, Nishimura, Toshioka,
- * Okachi, & Kaneko, 1985; Essen & Steinbiss, 1992; Grishman & Sterling, 1993;
- * Dagan et al., 1999; Lapata et al., 2001)
+ * </ul>
  *
- * sim(q,r) = sum((P(q_i) * P(r_i)) / P(c_i))
+ * @see JE Weeds (2003) "Measures and Applications of Lexical Distributional
+ * Similarity", which references (Sugawara, Nishimura, Toshioka, Okachi, &
+ * Kaneko, 1985; Essen & Steinbiss, 1992; Grishman & Sterling, 1993; Dagan et
+ * al., 1999; Lapata et al., 2001)
  *
- * Expected range: [0,1] (JE Weeds, 2003)
+ * @see Essen, Ute and Volker Steinbiss. 1992. Co-occurrence smoothing for
+ * stochastic language modeling. In Proceedings of ICASSP, volume 1, pages
+ * 161{164.
+ *
+ * @see Sugawara, K., M. Nishimura, K. Toshioka, M. Okochi, and T. Kaneko. 1985.
+ * Isolated word recognition using hidden Markov models. In Proceedings of
+ * ICASSP, pages 1--4, Tampa, Florida. IEEE.
+ *
+ * @see Grishman, Ralph and John Sterling. 1993. Smoothing of automatically
+ * generated selectional constraints. In Human Language Technology, pages
+ * 254{259, San Francisco, California. Advanced Research Projects Agency,
+ * Software and Intelligent Systems Technology Oce, Morgan Kaufmann.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
- * @deprecated Not actually implemented
  */
-@Deprecated
-public class Confusion {
+public class Confusion implements Measure, FeatureMarginalsCarrier {
+
+    private final FeatureMarginalsDeligate featureMarginals =
+            new FeatureMarginalsDeligate();
+
+    public Confusion() {
+    }
+
+    @Override
+    public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
+        double sum = 0.0;
+
+        int i = 0;
+        int j = 0;
+        while (i < A.size && j < B.size) {
+            if (A.keys[i] < B.keys[j]) {
+                ++i;
+            } else if (A.keys[i] > B.keys[j]) {
+                ++j;
+            } else {
+                final double pFEa = A.values[i] / A.sum;
+                final double pFEb = B.values[j] / B.sum;
+                final double pF = featureMarginals.getFeaturePrior(A.keys[i]);
+                final double pEa = A.sum / featureMarginals.getGrandTotal();
+                sum += pFEa * pFEb * pEa / pF;
+                ++i;
+                ++j;
+            }
+        }
+
+        return sum;
+    }
+
+    @Override
+    public double getHomogeneityBound() {
+        return 1;
+    }
+
+    @Override
+    public double getHeterogeneityBound() {
+        return 0;
+    }
+
+    @Override
+    public Weighting getExpectedWeighting() {
+        return Weightings.positive();
+    }
+
+    @Override
+    public boolean isCommutative() {
+        return false;
+    }
+
+    @Override
+    public final double getGrandTotal() {
+        return featureMarginals.getGrandTotal();
+    }
+
+    @Override
+    public final double[] getFeatureMarginals() {
+        return featureMarginals.getFeatureMarginals();
+    }
+
+    @Override
+    public final long getFeatureCardinality() {
+        return featureMarginals.getFeatureCardinality();
+    }
+
+    @Override
+    public final void setGrandTotal(double featureFrequencySum) {
+        featureMarginals.setGrandTotal(featureFrequencySum);
+    }
+
+    @Override
+    public final void setFeatureMarginals(double[] featureFrequencies) {
+        featureMarginals.setFeatureMarginals(featureFrequencies);
+    }
+
+    @Override
+    public final void setFeatureCardinality(long occuringFeatureCount) {
+        featureMarginals.setFeatureCardinality(occuringFeatureCount);
+    }
+
+    @Override
+    public String toString() {
+        return "Confusion";
+    }
 }

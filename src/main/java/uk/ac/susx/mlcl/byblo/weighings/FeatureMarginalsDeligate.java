@@ -115,7 +115,7 @@ public class FeatureMarginalsDeligate implements FeatureMarginalsCarrier {
      * @param key The feature id (or dimension) to access
      * @return The frequency of that feature over the whole corpus.
      */
-    protected final double getFeatureMarginals(final int key) {
+    public final double getFeatureMarginals(final int key) {
         return featureMarginals[key];
     }
 
@@ -127,7 +127,7 @@ public class FeatureMarginalsDeligate implements FeatureMarginalsCarrier {
      * @param key the feature id (or dimension)
      * @return independent probability of that feature occurring.
      */
-    protected final double getFeaturePrior(final int key) {
+    public final double getFeaturePrior(final int key) {
         return getFeatureMarginals(key) / featureTotal;
     }
 
