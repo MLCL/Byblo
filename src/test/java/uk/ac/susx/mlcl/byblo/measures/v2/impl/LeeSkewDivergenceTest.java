@@ -33,7 +33,9 @@ package uk.ac.susx.mlcl.byblo.measures.v2.impl;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -45,15 +47,16 @@ import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.disableExitTrapping;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.enableExistTrapping;
 
 /**
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class JaccardTest {
+public class LeeSkewDivergenceTest {
 
-    static Jaccard INSTANCE;
+    static LeeSkewDivergence INSTANCE;
 
     static final double EPSILON = 0;
 
@@ -61,15 +64,40 @@ public class JaccardTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        INSTANCE = new Jaccard();
+        INSTANCE = new LeeSkewDivergence();
         RANDOM = new Random(1234);
     }
 
     @Test
-    public void testJaccardCLI() throws Exception {
-        System.out.println("testJaccardCLI");
+    public void testCLI_001() throws Exception {
+        testCLI(0.01);
+    }
 
-        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Jaccard");
+    @Test
+    public void testCLI_010() throws Exception {
+        testCLI(0.10);
+    }
+
+    @Test
+    public void testCLI_050() throws Exception {
+        testCLI(0.50);
+    }
+
+    @Test
+    public void testCLI_090() throws Exception {
+        testCLI(0.90);
+    }
+
+    @Test
+    public void testCLI_099() throws Exception {
+        testCLI(0.99);
+    }
+
+    public void testCLI(double alpha) throws Exception {
+        System.out.printf("testCLI(alpha=%.2f)%n", alpha);
+
+        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME
+                + String.format(".Lee-%03d", (int) (alpha * 100)));
         output.delete();
 
         try {
@@ -77,7 +105,8 @@ public class JaccardTest {
             Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
-                        "--measure", "Jaccard",
+                        "--measure", "lee",
+                        "--lee-alpha", Double.toString(alpha),
                         "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
@@ -92,158 +121,12 @@ public class JaccardTest {
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
     }
 
-    /**
-     * http://people.revoledu.com/kardi/tutorial/Similarity/Jaccard.html
-     */
-    @Test
-    public void testJaccardExample1() {
-        System.out.println("testJaccardExample1");
-        double[] objectA = new double[]{1, 1, 1, 1};
-        double[] objectB = new double[]{0, 1, 0, 0};
-        int p = 1; // number of variables that positive for both objects
-        int q = 3; // number of variables that positive for the th objects and negative for the th object
-        int r = 0; // number of variables that negative for the th objects and positive for the th object
-        int s = 0; // number of variables that negative for both objects
-        int t = p + q + r + s; // total number of variables
-        double jaccardDistance = (double) (q + r) / (double) (p + q + r);
-        double jaccardCoef = (double) p / (double) (p + q + r);
-
-        SparseDoubleVector vecA = SparseDoubleVector.from(objectA);
-        SparseDoubleVector vecB = SparseDoubleVector.from(objectB);
-
-        double result = INSTANCE.combine(INSTANCE.shared(vecA, vecB),
-                                         INSTANCE.left(vecA),
-                                         INSTANCE.left(vecB));
-
-        assertEquals(jaccardCoef, result, 0.0001);
-    }
-
-    /**
-     * http://people.revoledu.com/kardi/tutorial/Similarity/Jaccard.html
-     */
-    @Test
-    public void testJaccardExample2() {
-        System.out.println("testJaccardExample2");
-        Set<Integer> A = new HashSet<Integer>();
-        A.addAll(Arrays.asList(7, 3, 2, 4, 1));
-
-        Set<Integer> B = new HashSet<Integer>();
-        B.addAll(Arrays.asList(4, 1, 9, 7, 5));
-
-        Set<Integer> union = new HashSet<Integer>();
-        union.addAll(A);
-        union.addAll(B);
-
-        Set<Integer> intersection = new HashSet<Integer>();
-        intersection.addAll(A);
-        intersection.retainAll(B);
-
-        double jaccardCoef = (double) intersection.size() / (double) union.size();
-
-
-        SparseDoubleVector vecA = new SparseDoubleVector(10);
-        for (int a : A) {
-            vecA.set(a, 1);
-        }
-        SparseDoubleVector vecB = new SparseDoubleVector(10);
-        for (int b : B) {
-            vecB.set(b, 1);
-        }
-
-        double result = INSTANCE.combine(INSTANCE.shared(vecA, vecB),
-                                         INSTANCE.left(vecA),
-                                         INSTANCE.left(vecB));
-
-        assertEquals(jaccardCoef, result, 0.0001);
-    }
-
-    /**
-     * Test of shared method, of class Jaccard.
-     */
-    @Test
-    public void testShared() {
-        System.out.println("testShared");
-        SparseDoubleVector Q = SparseDoubleVector.from(
-                new double[]{0, 1, 0, 1, 0, 1, 0, 1, 1, 1});
-        SparseDoubleVector R = SparseDoubleVector.from(
-                new double[]{1, 0, 1, 0, 1, 0, 1, 1, 1, 0});
-        double expResult = 2.0;
-        double result = INSTANCE.shared(Q, R);
-        assertEquals(expResult, result, 0.0);
-    }
-
-    /**
-     * Test of left method, of class Jaccard.
-     */
-    @Test
-    public void testLeft() {
-        System.out.println("testLeft");
-        SparseDoubleVector Q = SparseDoubleVector.from(
-                new double[]{0, 1, 0, 1, 0, 1, 0, 1, 1, 1});
-        double expResult = 6.0;
-        double result = INSTANCE.left(Q);
-        assertEquals(expResult, result, 0.0);
-    }
-
-    /**
-     * Test of right method, of class Jaccard.
-     */
-    @Test
-    public void testRight() {
-        System.out.println("testRight");
-        SparseDoubleVector R = SparseDoubleVector.from(
-                new double[]{0, 1, 0, 1, 0, 1, 0, 1, 1, 1});
-        double expResult = 6.0;
-        double result = INSTANCE.right(R);
-        assertEquals(expResult, result, 0.0);
-    }
-
-    /**
-     * Test of combine method, of class Jaccard.
-     */
-    @Test
-    public void testCombine() {
-        System.out.println("testCombine");
-        double shared = 7.0;
-        double left = 5.0;
-        double right = 3.0;
-        double expResult = shared / (left + right - shared);
-        double result = INSTANCE.combine(shared, left, right);
-        assertEquals(expResult, result, 0.0);
-    }
-
-    /**
-     * Test of isSymmetric method, of class Jaccard.
-     */
-    @Test
-    public void testIsSymmetric() {
-        System.out.println("testIsSymmetric");
-        boolean expResult = true;
-        boolean result = INSTANCE.isCommutative();
-        assertEquals(expResult, result);
-    }
-
     @Test
     public void testBothEmptyVectors() throws Exception {
         System.out.println("testBothEmptyVectors");
         int size = 100;
         SparseDoubleVector A = new SparseDoubleVector(size, 0);
         SparseDoubleVector B = new SparseDoubleVector(size, 0);
-        double expect = 0;
-        double actual = test(A, B);
-
-        assertEquals(expect, actual, EPSILON);
-    }
-
-    @Test
-    public void testOneEmptyVector() throws Exception {
-        System.out.println("testOneEmptyVector");
-        int size = 100;
-        SparseDoubleVector A = new SparseDoubleVector(size, 0);
-        SparseDoubleVector B = new SparseDoubleVector(size, size);
-        for (int i = 0; i < size; i++)
-            B.set(i, RANDOM.nextDouble());
-
         double expect = 0;
         double actual = test(A, B);
 
@@ -271,7 +154,7 @@ public class JaccardTest {
         SparseDoubleVector B = new SparseDoubleVector(1, 1);
         A.set(0, 1);
         B.set(0, 1);
-        double expect = 1;
+        double expect = 0;
         double actual = test(A, B);
 
         assertEquals(expect, actual, EPSILON);
@@ -294,22 +177,6 @@ public class JaccardTest {
     }
 
     @Test
-    public void testCommutative() throws Exception {
-        System.out.println("testCommutative");
-        int size = 100;
-        SparseDoubleVector A = new SparseDoubleVector(size, size);
-        SparseDoubleVector B = new SparseDoubleVector(size, size);
-        for (int i = 0; i < size; i++) {
-            A.set(i, RANDOM.nextDouble());
-            B.set(i, RANDOM.nextDouble());
-        }
-
-        double expect = test(A, B);
-        double actual = test(B, A);
-        assertEquals(expect, actual, EPSILON);
-    }
-
-    @Test
     public void testHomoginiety() throws Exception {
         System.out.println("testHomoginiety");
         int size = 100;
@@ -322,23 +189,6 @@ public class JaccardTest {
         }
 
         double expect = INSTANCE.getHomogeneityBound();
-        double actual = test(A, B);
-
-        assertEquals(expect, actual, EPSILON);
-    }
-
-    @Test
-    public void testHeteroginiety() throws Exception {
-        System.out.println("testHeteroginiety");
-        int size = 100;
-        SparseDoubleVector A = new SparseDoubleVector(size, size);
-        SparseDoubleVector B = new SparseDoubleVector(size, size);
-        for (int i = 0; i < size / 2; i++) {
-            A.set(i * 2, i);
-            B.set(i * 2 + 1, i);
-        }
-
-        double expect = INSTANCE.getHeterogeneityBound();
         double actual = test(A, B);
 
         assertEquals(expect, actual, EPSILON);
@@ -362,16 +212,6 @@ public class JaccardTest {
             }
         }
 
-        // diagonals should all be +1
-        for (int i = 0; i < limit; i++) {
-            assertEquals(INSTANCE.getHomogeneityBound(), results[i][i], EPSILON);
-        }
-        // triangular mirrors should be equal
-        for (int i = 0; i < limit; i++) {
-            for (int j = 0; j < limit; j++) {
-                assertEquals(results[i][j], results[j][i], EPSILON);
-            }
-        }
     }
 
     @Test
@@ -390,15 +230,6 @@ public class JaccardTest {
         double expect = test(A, B);
     }
 
-    public double test(SparseDoubleVector A, SparseDoubleVector B) {
-        final double val = INSTANCE.similarity(A, B);
-        assertFalse("Similarity is NaN", Double.isNaN(val));
-        assertFalse("Similarity is " + val, Double.isInfinite(val));
-        assertTrue("Similarity < -1", val >= INSTANCE.getHeterogeneityBound());
-        assertTrue("Similarity > +1", val <= INSTANCE.getHomogeneityBound());
-        return val;
-    }
-
     static List<Indexed<SparseDoubleVector>> loadFruitVectors() throws IOException {
 
         final DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();
@@ -415,5 +246,36 @@ public class JaccardTest {
         }
 
         return vecs;
+    }
+
+    public double test(SparseDoubleVector A, SparseDoubleVector B) {
+        final double val = INSTANCE.similarity(A, B);
+        assertFalse("Similarity is NaN" + " with measure " + INSTANCE,
+                    Double.isNaN(val));
+        assertFalse("Similarity is " + val + " with measure " + INSTANCE,
+                    Double.isInfinite(val));
+
+        final double min, max;
+        if (INSTANCE.getHeterogeneityBound() < INSTANCE.getHomogeneityBound()) {
+            min = INSTANCE.getHeterogeneityBound();
+            max = INSTANCE.getHomogeneityBound();
+        } else {
+            min = INSTANCE.getHomogeneityBound();
+            max = INSTANCE.getHeterogeneityBound();
+        }
+        assertTrue("expected similarity >= " + min + " but found " + val,
+                   val >= min);
+        assertTrue("expected similarity <= " + max + " but found " + val,
+                   val <= max);
+
+
+        if (INSTANCE.isCommutative()) {
+            final double rev = INSTANCE.similarity(B, A);
+            assertEquals("Measure is declared computative, but reversing "
+                    + "operands results in a different score.", rev, val,
+                         EPSILON);
+        }
+
+        return val;
     }
 }

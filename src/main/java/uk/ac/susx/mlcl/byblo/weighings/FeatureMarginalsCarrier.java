@@ -38,7 +38,7 @@ package uk.ac.susx.mlcl.byblo.weighings;
  * {@link FeatureMarginalsCarrier#setFeatureMarginals(double[])}.
  *
  * A relatively painless way to implement this interface is to create a field in
- * measure of type {@link FeatureMarginalsDeligate} class, then delegate
+ * measure of type {@link FeatureMarginalsDelegate} class, then delegate
  * interface calls to this class.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;

@@ -36,7 +36,7 @@ import java.util.Arrays;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class FeatureMarginalsDeligate implements FeatureMarginalsCarrier {
+public class FeatureMarginalsDelegate implements FeatureMarginalsCarrier {
 
     /**
      * A mapping from feature id to frequency, stored as a double because it may
@@ -131,7 +131,7 @@ public class FeatureMarginalsDeligate implements FeatureMarginalsCarrier {
         return getFeatureMarginals(key) / featureTotal;
     }
 
-    protected boolean equals(FeatureMarginalsDeligate other) {
+    protected boolean equals(FeatureMarginalsDelegate other) {
         if (!Arrays.equals(this.featureMarginals, other.featureMarginals))
             return false;
         if (Double.doubleToLongBits(this.featureTotal) != Double.
@@ -148,7 +148,7 @@ public class FeatureMarginalsDeligate implements FeatureMarginalsCarrier {
             return true;
         if (obj == null || getClass() != obj.getClass())
             return false;
-        return equals((FeatureMarginalsDeligate) obj);
+        return equals((FeatureMarginalsDelegate) obj);
     }
 
     @Override

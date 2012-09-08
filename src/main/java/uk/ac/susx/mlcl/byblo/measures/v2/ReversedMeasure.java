@@ -42,8 +42,8 @@ public class ReversedMeasure
         extends ForwardingMeasure<Measure>
         implements Measure {
 
-    public ReversedMeasure(final Measure deligate) {
-        super(deligate);
+    public ReversedMeasure(final Measure delegate) {
+        super(delegate);
     }
 
     @Override

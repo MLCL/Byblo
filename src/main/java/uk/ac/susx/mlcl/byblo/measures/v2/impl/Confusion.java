@@ -32,7 +32,7 @@ package uk.ac.susx.mlcl.byblo.measures.v2.impl;
 
 import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsCarrier;
-import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsDeligate;
+import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsDelegate;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
@@ -77,8 +77,8 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  */
 public class Confusion implements Measure, FeatureMarginalsCarrier {
 
-    private final FeatureMarginalsDeligate featureMarginals =
-            new FeatureMarginalsDeligate();
+    private final FeatureMarginalsDelegate featureMarginals =
+            new FeatureMarginalsDelegate();
 
     public Confusion() {
     }
@@ -99,7 +99,8 @@ public class Confusion implements Measure, FeatureMarginalsCarrier {
                 final double pFEb = B.values[j] / B.sum;
                 final double pF = featureMarginals.getFeaturePrior(A.keys[i]);
                 final double pEa = A.sum / featureMarginals.getGrandTotal();
-                sum += pFEa * pFEb * pEa / pF;
+                if (pFEa * pFEb * pEa * pF > 0)
+                    sum += pFEa * pFEb * pEa / pF;
                 ++i;
                 ++j;
             }

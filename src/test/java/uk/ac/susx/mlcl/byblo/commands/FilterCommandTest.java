@@ -34,6 +34,7 @@ import com.google.common.io.Files;
 import it.unimi.dsi.fastutil.ints.IntIterator;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import uk.ac.susx.mlcl.TestConstants;
@@ -221,7 +222,7 @@ public class FilterCommandTest extends AbstractCommandTest<FilterCommand> {
     }
 
     @Test
-    // @Ignore(value = "Takes a rather a long time.")
+    @Ignore(value = "Takes a rather a long time.")
     @Category(SlowTestCategory.class)
     public void testFilterCommandOnWorstCaseData() throws Exception {
         System.out.println("testFilterCommandOnWorstCaseData()");
@@ -278,7 +279,7 @@ public class FilterCommandTest extends AbstractCommandTest<FilterCommand> {
     }
 
     @Test
-    // @Ignore(value = "Takes a rather a long time.")
+    @Ignore(value = "Takes a rather a long time.")
     @Category(SlowTestCategory.class)
     public void testFilterCommandOnWorstCaseData2() throws Exception {
         System.out.println("testFilterCommandOnWorstCaseData()");

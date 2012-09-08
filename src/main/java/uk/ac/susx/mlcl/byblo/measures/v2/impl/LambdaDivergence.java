@@ -119,6 +119,8 @@ public final class LambdaDivergence implements Measure, Serializable {
             j++;
         }
 
+        
+        
         return divergence;
     }
 
@@ -134,7 +136,7 @@ public final class LambdaDivergence implements Measure, Serializable {
 
     @Override
     public double getHeterogeneityBound() {
-        return Double.POSITIVE_INFINITY;
+        return 1.0;
     }
 
     @Override
@@ -144,6 +146,6 @@ public final class LambdaDivergence implements Measure, Serializable {
 
     @Override
     public String toString() {
-        return "Lambda-Divergence";
+        return "Lambda-Divergence{lambda=" + lambda + '}';
     }
 }

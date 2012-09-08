@@ -45,37 +45,37 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 public abstract class ForwardingMeasure<T extends Measure>
         implements Measure {
 
-    private final T deligate;
+    private final T delegate;
 
     /**
      * Constructor used by sub-classes.
      *
-     * @param deligate The Measure being decorated.
+     * @param delegate The Measure being decorated.
      */
-    protected ForwardingMeasure(final T deligate) {
-        Checks.checkNotNull("deligate", deligate);
-        this.deligate = deligate;
+    protected ForwardingMeasure(final T delegate) {
+        Checks.checkNotNull("delegate", delegate);
+        this.delegate = delegate;
     }
 
     @Override
     public double similarity(
             final SparseDoubleVector A,
             final SparseDoubleVector B) {
-        return deligate.similarity(A, B);
+        return delegate.similarity(A, B);
     }
 
     public final T getDelegate() {
-        return deligate;
+        return delegate;
     }
 
     @Override
     public double getHomogeneityBound() {
-        return deligate.getHomogeneityBound();
+        return delegate.getHomogeneityBound();
     }
 
     @Override
     public double getHeterogeneityBound() {
-        return deligate.getHeterogeneityBound();
+        return delegate.getHeterogeneityBound();
     }
 
     @Override
@@ -85,13 +85,13 @@ public abstract class ForwardingMeasure<T extends Measure>
 
     @Override
     public boolean isCommutative() {
-        return deligate.isCommutative();
+        return delegate.isCommutative();
     }
 
     public boolean equals(ForwardingMeasure<?> other) {
-        if (this.deligate != other.deligate
-                && (this.deligate == null
-                    || !this.deligate.equals(other.deligate)))
+        if (this.delegate != other.delegate
+                && (this.delegate == null
+                    || !this.delegate.equals(other.delegate)))
             return false;
         return true;
     }
@@ -107,11 +107,11 @@ public abstract class ForwardingMeasure<T extends Measure>
 
     @Override
     public int hashCode() {
-        return 79 * 5 + (deligate != null ? deligate.hashCode() : 0);
+        return 79 * 5 + (delegate != null ? delegate.hashCode() : 0);
     }
 
     @Override
     public String toString() {
-        return this.getClass().getSimpleName() + "{deligate=" + deligate + '}';
+        return this.getClass().getSimpleName() + "{delegate=" + delegate + '}';
     }
 }

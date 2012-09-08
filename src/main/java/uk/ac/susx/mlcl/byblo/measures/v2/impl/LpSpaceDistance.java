@@ -63,7 +63,7 @@ public final class LpSpaceDistance implements Measure, Serializable {
 
     private double power = Double.NaN;
 
-    private Measure deligate = null;
+    private Measure delegate = null;
 
     public LpSpaceDistance() {
         setPower(DEFAULT_POWER);
@@ -83,35 +83,35 @@ public final class LpSpaceDistance implements Measure, Serializable {
         if (power != newPower) {
             power = newPower;
             if (power == 0) {
-                deligate = new HammingDistance();
+                delegate = new HammingDistance();
             } else if (power == 1) {
-                deligate = new ManhattanDistance();
+                delegate = new ManhattanDistance();
             } else if (power == 2) {
-                deligate = new EuclideanDistance();
+                delegate = new EuclideanDistance();
             } else if (power == Double.POSITIVE_INFINITY) {
-                deligate = new MaxSpaceDistance();
+                delegate = new MaxSpaceDistance();
             } else if (power == Double.NEGATIVE_INFINITY) {
-                deligate = new MinSpaceDistance();
+                delegate = new MinSpaceDistance();
             } else {
-                if (deligate == null || deligate.getClass() != MinkowskiDistance.class)
-                    deligate = new MinkowskiDistance();
+                if (delegate == null || delegate.getClass() != MinkowskiDistance.class)
+                    delegate = new MinkowskiDistance();
             }
         }
     }
 
     @Override
     public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
-        return deligate.similarity(A, B);
+        return delegate.similarity(A, B);
     }
 
     @Override
     public double getHomogeneityBound() {
-        return deligate.getHomogeneityBound();
+        return delegate.getHomogeneityBound();
     }
 
     @Override
     public double getHeterogeneityBound() {
-        return deligate.getHeterogeneityBound();
+        return delegate.getHeterogeneityBound();
     }
 
     @Override
@@ -132,7 +132,7 @@ public final class LpSpaceDistance implements Measure, Serializable {
     /**
      * Abstract super class to the various Lp Space metric implementations.
      */
-    private static abstract class LpSpaceDeligate implements Measure {
+    private static abstract class LpSpaceDelegate implements Measure {
 
         @Override
         public Class<? extends Weighting> getExpectedWeighting() {
@@ -159,7 +159,7 @@ public final class LpSpaceDistance implements Measure, Serializable {
      * Fallback implementation for arbitrary p-spaces. Not though that it will
      * not produce the correct results of p = -inf, 0, or +inf.
      */
-    private final class MinkowskiDistance extends LpSpaceDeligate
+    private final class MinkowskiDistance extends LpSpaceDelegate
             implements Serializable {
 
         private static final long serialVersionUID = 1L;
@@ -200,7 +200,7 @@ public final class LpSpaceDistance implements Measure, Serializable {
      * Implementation of the power-2 space; i.e standard Euclidean space that we
      * are all used to.
      */
-    private static final class EuclideanDistance extends LpSpaceDeligate
+    private static final class EuclideanDistance extends LpSpaceDelegate
             implements Serializable {
 
         private static final long serialVersionUID = 1L;
@@ -242,7 +242,7 @@ public final class LpSpaceDistance implements Measure, Serializable {
      * Implementation of the power-1 space; known as Manhattan or taxicab
      * distance.
      */
-    private static final class ManhattanDistance extends LpSpaceDeligate
+    private static final class ManhattanDistance extends LpSpaceDelegate
             implements Serializable {
 
         private static final long serialVersionUID = 1L;
@@ -282,7 +282,7 @@ public final class LpSpaceDistance implements Measure, Serializable {
     /**
      * Implementation of power-zero L space.
      */
-    private static final class HammingDistance extends LpSpaceDeligate
+    private static final class HammingDistance extends LpSpaceDelegate
             implements Serializable {
 
         private static final long serialVersionUID = 1L;
@@ -322,7 +322,7 @@ public final class LpSpaceDistance implements Measure, Serializable {
     /**
      * Implementation of power +infinity L-space metric.
      */
-    private static final class MaxSpaceDistance extends LpSpaceDeligate
+    private static final class MaxSpaceDistance extends LpSpaceDelegate
             implements Serializable {
 
         private static final long serialVersionUID = 1L;
@@ -360,7 +360,7 @@ public final class LpSpaceDistance implements Measure, Serializable {
     /**
      * Implementation of power -infinity L-space metric.
      */
-    private static final class MinSpaceDistance extends LpSpaceDeligate
+    private static final class MinSpaceDistance extends LpSpaceDelegate
             implements Serializable {
 
         private static final long serialVersionUID = 1L;

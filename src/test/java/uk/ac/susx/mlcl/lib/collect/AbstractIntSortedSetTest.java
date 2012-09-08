@@ -45,6 +45,7 @@ import java.util.Arrays;
 import java.util.NoSuchElementException;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -317,6 +318,7 @@ public abstract class AbstractIntSortedSetTest<T extends IntSortedSet> extends
 	 */
 	@Test
 	@Category(SlowTestCategory.class)
+    @Ignore
 	public void testMaxIndexIterators() {
 		System.out.println("testMaxIndexIterators()");
 		int[] testData = new int[] { 0, 1, 50, 99, Integer.MAX_VALUE / 2,

@@ -49,10 +49,7 @@ import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource.WTStatsSource;
 import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
 import uk.ac.susx.mlcl.byblo.measures.v2.Measures;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.KendallsTau;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.LeeSkewDivergence;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.LpSpaceDistance;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.Weeds;
+import uk.ac.susx.mlcl.byblo.measures.v2.impl.*;
 import uk.ac.susx.mlcl.byblo.tasks.InvertedApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.NaiveApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.ThreadedApssTask;
@@ -169,6 +166,11 @@ public class AllPairsCommand extends AbstractCommand {
             converter = DoubleConverter.class)
     private double minkP = LpSpaceDistance.DEFAULT_POWER;
 
+    @Parameter(names = {"--lambda-lambda"},
+               description = "lambda parameter to Lambda-Divergence measure.",
+               converter = DoubleConverter.class)
+    private double lambdaLambda = LambdaDivergence.DEFAULT_LAMBDA;
+
     private Weighting weighting = new NullWeighting();
 
     public enum Algorithm {
@@ -224,11 +226,16 @@ public class AllPairsCommand extends AbstractCommand {
         // Parameterise those measures that require them
         if (measure instanceof LpSpaceDistance) {
             ((LpSpaceDistance) measure).setPower(getMinkP());
-        } else if (measure instanceof LeeSkewDivergence) {
+        }
+        if (measure instanceof LeeSkewDivergence) {
             ((LeeSkewDivergence) measure).setAlpha(getLeeAlpha());
-        } else if (measure instanceof Weeds) {
+        }
+        if (measure instanceof Weeds) {
             ((Weeds) measure).setBeta(getCrmiBeta());
             ((Weeds) measure).setGamma(getCrmiGamma());
+        }
+        if (measure instanceof LambdaDivergence) {
+            ((LambdaDivergence) measure).setLambda(getLambdaLambda());
         }
 
 
@@ -241,10 +248,13 @@ public class AllPairsCommand extends AbstractCommand {
         }
 
 
-        // Some weightings schemes require additional context information, 
-        // specifically the feature marginal distribution. Also there is one
-        // measure (Confusion) that requires this information. The KendallsTau
-        // measure just needs the total number of features types.
+        /*
+         * Some weightings schemes require additional context information,
+         * specifically the feature marginal distribution. Also there is one
+         * measure (Confusion) that requires this information. The KendallsTau
+         * and KullbackLeiblerDivergence measure just needs the total number of
+         * features types.
+         */
         if (measure instanceof FeatureMarginalsCarrier
                 || weighting instanceof FeatureMarginalsCarrier) {
             try {
@@ -276,7 +286,8 @@ public class AllPairsCommand extends AbstractCommand {
             } catch (IOException e) {
                 throw e;
             }
-        } else if (measure instanceof KendallsTau) {
+        } else if (measure instanceof KendallsTau
+                || measure instanceof KullbackLeiblerDivergence) {
             try {
                 if (LOG.isInfoEnabled()) {
                     LOG.info("Loading entries file for "
@@ -285,8 +296,15 @@ public class AllPairsCommand extends AbstractCommand {
 
                 WTStatsSource features = new WTStatsSource(openFeaturesSource());
                 ObjectIO.copy(features, ObjectIO.<Weighted<Token>>nullSink());
-                ((KendallsTau) measure).setMinCardinality(
-                        features.getMaxId() + 1);
+
+
+                int cardinality = features.getMaxId() + 1;
+
+                if (measure instanceof KendallsTau)
+                    ((KendallsTau) measure).setMinCardinality(cardinality);
+                if (measure instanceof KullbackLeiblerDivergence)
+                    ((KullbackLeiblerDivergence) measure).setMinCardinality(
+                            cardinality);
 
             } catch (IOException e) {
                 throw e;
@@ -636,6 +654,14 @@ public class AllPairsCommand extends AbstractCommand {
 
     public final void setMinkP(double minkP) {
         this.minkP = minkP;
+    }
+
+    public double getLambdaLambda() {
+        return lambdaLambda;
+    }
+
+    public void setLambdaLambda(double lambdaLambda) {
+        this.lambdaLambda = lambdaLambda;
     }
 
     public final DoubleEnumerating getIndexDelegate() {

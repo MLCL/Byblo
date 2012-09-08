@@ -53,8 +53,8 @@ public class AutoWeightingMeasure
 
     private final Weighting weighting;
 
-    public AutoWeightingMeasure(Measure deligate, Weighting weighting) {
-        super(deligate);
+    public AutoWeightingMeasure(Measure delegate, Weighting weighting) {
+        super(delegate);
         Checks.checkNotNull("weighting", weighting);
         this.weighting = weighting;
     }

@@ -97,13 +97,13 @@ public class WeightingsTest {
     @Test
     public void testWeightingImpls() throws Exception {
         System.out.println("testWeightingImpls");
-        DoubleEnumerating indexDeligate = new DoubleEnumeratingDelegate();
+        DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();
 
         // Load the feature contexts
 
         WeightedTokenSource featsSrc = BybloIO.openFeaturesSource(
                 TEST_FRUIT_FEATURES, DEFAULT_CHARSET,
-                EnumeratingDelegates.toSingleFeatures(indexDeligate));
+                EnumeratingDelegates.toSingleFeatures(indexDelegate));
 
         WeightedTokenSource.WTStatsSource featsStatSrc =
                 new WeightedTokenSource.WTStatsSource(featsSrc);
@@ -117,7 +117,7 @@ public class WeightingsTest {
 
         WeightedTokenSource entsSrc = BybloIO.openFeaturesSource(
                 TEST_FRUIT_ENTRIES, DEFAULT_CHARSET,
-                EnumeratingDelegates.toSingleFeatures(indexDeligate));
+                EnumeratingDelegates.toSingleFeatures(indexDelegate));
 
         WeightedTokenSource.WTStatsSource entsStatSrc =
                 new WeightedTokenSource.WTStatsSource(entsSrc);
@@ -161,7 +161,7 @@ public class WeightingsTest {
 
         FastWeightedTokenPairVectorSource eventSrc =
                 BybloIO.openEventsVectorSource(
-                        TEST_FRUIT_EVENTS, DEFAULT_CHARSET, indexDeligate);
+                        TEST_FRUIT_EVENTS, DEFAULT_CHARSET, indexDelegate);
 
         List<Indexed<SparseDoubleVector>> vecs = new ArrayList<Indexed<SparseDoubleVector>>();
         while (eventSrc.hasNext())

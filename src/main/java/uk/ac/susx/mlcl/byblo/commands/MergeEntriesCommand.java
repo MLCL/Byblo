@@ -53,14 +53,14 @@ import uk.ac.susx.mlcl.lib.io.ObjectSource;
 public final class MergeEntriesCommand extends AbstractMergeCommand<Weighted<Token>> {
 
     @ParametersDelegate
-    private SingleEnumerating indexDeligate = new SingleEnumeratingDelegate();
+    private SingleEnumerating indexDelegate = new SingleEnumeratingDelegate();
 
     public MergeEntriesCommand(
             File sourceFileA, File sourceFileB, File destinationFile,
-            Charset charset, SingleEnumerating indexDeligate) {
+            Charset charset, SingleEnumerating indexDelegate) {
         super(sourceFileA, sourceFileB, destinationFile, charset,
               Weighted.recordOrder(Token.indexOrder()));
-        setIndexDeligate(indexDeligate);
+        setIndexDelegate(indexDelegate);
     }
 
     public MergeEntriesCommand() {
@@ -69,29 +69,29 @@ public final class MergeEntriesCommand extends AbstractMergeCommand<Weighted<Tok
     @Override
     public void runCommand() throws Exception {
         super.runCommand();
-        indexDeligate.saveEnumerator();
-        indexDeligate.closeEnumerator();
+        indexDelegate.saveEnumerator();
+        indexDelegate.closeEnumerator();
 
     }
 
-    public final SingleEnumerating getIndexDeligate() {
-        return indexDeligate;
+    public final SingleEnumerating getIndexDelegate() {
+        return indexDelegate;
     }
 
-    public final void setIndexDeligate(SingleEnumerating indexDeligate) {
-        Checks.checkNotNull("indexDeligate", indexDeligate);
-        this.indexDeligate = indexDeligate;
+    public final void setIndexDelegate(SingleEnumerating indexDelegate) {
+        Checks.checkNotNull("indexDelegate", indexDelegate);
+        this.indexDelegate = indexDelegate;
     }
 
     @Override
     protected ObjectSource<Weighted<Token>> openSource(File file) throws FileNotFoundException, IOException {
-        return BybloIO.openEntriesSource(file, getFileDelegate().getCharset(), indexDeligate);
+        return BybloIO.openEntriesSource(file, getFileDelegate().getCharset(), indexDelegate);
     }
 
     @Override
     protected ObjectSink<Weighted<Token>> openSink(File file) throws FileNotFoundException, IOException {
         return new WeightSumReducerObjectSink<Token>(
-                BybloIO.openEntriesSink(file, getFileDelegate().getCharset(), indexDeligate));
+                BybloIO.openEntriesSink(file, getFileDelegate().getCharset(), indexDelegate));
     }
 
     public static void main(String[] args) throws Exception {
@@ -100,7 +100,7 @@ public final class MergeEntriesCommand extends AbstractMergeCommand<Weighted<Tok
 
     @Override
     protected Objects.ToStringHelper toStringHelper() {
-        return super.toStringHelper().add("indexing", indexDeligate);
+        return super.toStringHelper().add("indexing", indexDelegate);
     }
 
 }

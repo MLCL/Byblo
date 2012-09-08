@@ -344,7 +344,7 @@ public class IndexSimsCommandTest extends
 		indexCommand.getFilesDelegate().setSourceFile(from);
 		indexCommand.getFilesDelegate().setDestinationFile(to);
 
-		indexCommand.setIndexDeligate(EnumeratingDelegates
+		indexCommand.setIndexDelegate(EnumeratingDelegates
 				.toPair(new SingleEnumeratingDelegate(type, true, index)));
 		indexCommand.runCommand();
 
@@ -372,7 +372,7 @@ public class IndexSimsCommandTest extends
 		unindex.getFilesDelegate().setCharset(DEFAULT_CHARSET);
 		unindex.getFilesDelegate().setSourceFile(from);
 		unindex.getFilesDelegate().setDestinationFile(to);
-		unindex.setIndexDeligate(EnumeratingDelegates
+		unindex.setIndexDelegate(EnumeratingDelegates
 				.toPair(new SingleEnumeratingDelegate(type, true, index)));
 		unindex.runCommand();
 

@@ -31,6 +31,7 @@
 package uk.ac.susx.mlcl.byblo.measures.v2.impl;
 
 import java.io.Serializable;
+import java.text.MessageFormat;
 import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
@@ -47,10 +48,75 @@ public final class KullbackLeiblerDivergence implements Measure, Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Default expected minimum dimensionality of vectors ({@value}) if not
+     * explicitly set.
+     */
+    public static final int DEFAULT_MIN_CARDINALITY = 1;
+
+    /**
+     * Expected dimensionality of vectors.
+     */
+    private int minCardinality;
+
+    /**
+     * Construct a new instance of {@link KullbackLeiblerDivergence } similarity
+     * measure.
+     *
+     * The <tt>minCardinality</tt> field is initialized to
+     * {@link KullbackLeiblerDivergence#DEFAULT_MIN_CARDINALITY}, which is
+     * {@value #DEFAULT_MIN_CARDINALITY}
+     */
+    public KullbackLeiblerDivergence() {
+        this(DEFAULT_MIN_CARDINALITY);
+    }
+
+    /**
+     * Construct new instance of {@link KullbackLeiblerDivergence } similarity
+     * measure, initializing the expected dimensionality of vectors to
+     * <tt>minCardinality</tt>.
+     *
+     * @param minCardinality expected dimensionality of vectors
+     * @throws IllegalArgumentException when
+     * <code>minCardinality</code> is negative
+     */
+    public KullbackLeiblerDivergence(final int minCardinality)
+            throws IllegalArgumentException {
+        setMinCardinality(minCardinality);
+    }
+
+    /**
+     * Get the minimum (usually the actual) cardinality of vectors.
+     *
+     * @return expected dimensionality of vectors
+     */
+    public final int getMinCardinality() {
+        return minCardinality;
+    }
+
+    /**
+     * Set the minimum (usually the actual) cardinality of vectors.
+     *
+     * If the vector cardinality is known before hand, but is not set on the
+     * vectors for some reason, then method can be used to set it globally.
+     *
+     * @param minCardinality expected dimensionality of vectors
+     * @throws IllegalArgumentException when
+     * <code>minCardinality</code> is negative
+     */
+    public final void setMinCardinality(int minCardinality)
+            throws IllegalArgumentException {
+        if (minCardinality <= 0)
+            throw new IllegalArgumentException(MessageFormat.format(
+                    "expecting minCardinality > 0, but found {0}",
+                    minCardinality));
+        this.minCardinality = minCardinality;
+    }
+
     @Override
     public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
-        assert A.cardinality == B.cardinality;
-        final int N = Math.max(A.cardinality, B.cardinality);
+        final int N = Math.max(minCardinality,
+                               Math.max(A.cardinality, B.cardinality));
 
         final double sumA = A.sum + N;
         final double sumB = B.sum + N;

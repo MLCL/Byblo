@@ -33,7 +33,9 @@ package uk.ac.susx.mlcl.byblo.measures.v2.impl;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -45,15 +47,16 @@ import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.disableExitTrapping;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.enableExistTrapping;
 
 /**
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class JaccardTest {
+public class WeedsTest {
 
-    static Jaccard INSTANCE;
+    static Weeds INSTANCE;
 
     static final double EPSILON = 0;
 
@@ -61,15 +64,52 @@ public class JaccardTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        INSTANCE = new Jaccard();
+        INSTANCE = new Weeds();
         RANDOM = new Random(1234);
     }
 
     @Test
-    public void testJaccardCLI() throws Exception {
-        System.out.println("testJaccardCLI");
+    public void testCLI_000_100() throws Exception {
+        testCLI(0, 1);
+    }
 
-        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Jaccard");
+    @Test
+    public void testCLI_050_050() throws Exception {
+        testCLI(0.5, 0.5);
+    }
+
+    @Test
+    public void testCLI_100_000() throws Exception {
+        testCLI(1, 0);
+    }
+
+    @Test
+    public void testCLI_075_000() throws Exception {
+        testCLI(0.75, 0);
+    }
+
+    @Test
+    public void testCLI_050_000() throws Exception {
+        testCLI(0.5, 0);
+    }
+
+    @Test
+    public void testCLI_025_000() throws Exception {
+        testCLI(0.25, 0);
+    }
+
+    @Test
+    public void testCLI_000_000() throws Exception {
+        testCLI(0, 0);
+    }
+
+    public void testCLI(double beta, double gamma) throws Exception {
+        System.out.println(String.format("testCLI(beta=%.2f, gamma=%.2f)",
+                                         beta, gamma));
+
+        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME
+                + String.format(".Weeds-beta%03d-gamma%03d",
+                                (int) (100 * beta), (int) (100 * gamma)));
         output.delete();
 
         try {
@@ -77,7 +117,9 @@ public class JaccardTest {
             Tools.main(new String[]{
                         "allpairs",
                         "--charset", "UTF-8",
-                        "--measure", "Jaccard",
+                        "--measure", "Weeds",
+                        "--crmi-beta", Double.toHexString(beta),
+                        "--crmi-gamma", Double.toHexString(gamma),
                         "--input", TEST_FRUIT_EVENTS.toString(),
                         "--input-features", TEST_FRUIT_FEATURES.toString(),
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
@@ -88,139 +130,9 @@ public class JaccardTest {
         }
 
 
+
         assertTrue("Output file " + output + " does not exist.", output.exists());
         assertTrue("Output file " + output + " is empty.", output.length() > 0);
-    }
-
-    /**
-     * http://people.revoledu.com/kardi/tutorial/Similarity/Jaccard.html
-     */
-    @Test
-    public void testJaccardExample1() {
-        System.out.println("testJaccardExample1");
-        double[] objectA = new double[]{1, 1, 1, 1};
-        double[] objectB = new double[]{0, 1, 0, 0};
-        int p = 1; // number of variables that positive for both objects
-        int q = 3; // number of variables that positive for the th objects and negative for the th object
-        int r = 0; // number of variables that negative for the th objects and positive for the th object
-        int s = 0; // number of variables that negative for both objects
-        int t = p + q + r + s; // total number of variables
-        double jaccardDistance = (double) (q + r) / (double) (p + q + r);
-        double jaccardCoef = (double) p / (double) (p + q + r);
-
-        SparseDoubleVector vecA = SparseDoubleVector.from(objectA);
-        SparseDoubleVector vecB = SparseDoubleVector.from(objectB);
-
-        double result = INSTANCE.combine(INSTANCE.shared(vecA, vecB),
-                                         INSTANCE.left(vecA),
-                                         INSTANCE.left(vecB));
-
-        assertEquals(jaccardCoef, result, 0.0001);
-    }
-
-    /**
-     * http://people.revoledu.com/kardi/tutorial/Similarity/Jaccard.html
-     */
-    @Test
-    public void testJaccardExample2() {
-        System.out.println("testJaccardExample2");
-        Set<Integer> A = new HashSet<Integer>();
-        A.addAll(Arrays.asList(7, 3, 2, 4, 1));
-
-        Set<Integer> B = new HashSet<Integer>();
-        B.addAll(Arrays.asList(4, 1, 9, 7, 5));
-
-        Set<Integer> union = new HashSet<Integer>();
-        union.addAll(A);
-        union.addAll(B);
-
-        Set<Integer> intersection = new HashSet<Integer>();
-        intersection.addAll(A);
-        intersection.retainAll(B);
-
-        double jaccardCoef = (double) intersection.size() / (double) union.size();
-
-
-        SparseDoubleVector vecA = new SparseDoubleVector(10);
-        for (int a : A) {
-            vecA.set(a, 1);
-        }
-        SparseDoubleVector vecB = new SparseDoubleVector(10);
-        for (int b : B) {
-            vecB.set(b, 1);
-        }
-
-        double result = INSTANCE.combine(INSTANCE.shared(vecA, vecB),
-                                         INSTANCE.left(vecA),
-                                         INSTANCE.left(vecB));
-
-        assertEquals(jaccardCoef, result, 0.0001);
-    }
-
-    /**
-     * Test of shared method, of class Jaccard.
-     */
-    @Test
-    public void testShared() {
-        System.out.println("testShared");
-        SparseDoubleVector Q = SparseDoubleVector.from(
-                new double[]{0, 1, 0, 1, 0, 1, 0, 1, 1, 1});
-        SparseDoubleVector R = SparseDoubleVector.from(
-                new double[]{1, 0, 1, 0, 1, 0, 1, 1, 1, 0});
-        double expResult = 2.0;
-        double result = INSTANCE.shared(Q, R);
-        assertEquals(expResult, result, 0.0);
-    }
-
-    /**
-     * Test of left method, of class Jaccard.
-     */
-    @Test
-    public void testLeft() {
-        System.out.println("testLeft");
-        SparseDoubleVector Q = SparseDoubleVector.from(
-                new double[]{0, 1, 0, 1, 0, 1, 0, 1, 1, 1});
-        double expResult = 6.0;
-        double result = INSTANCE.left(Q);
-        assertEquals(expResult, result, 0.0);
-    }
-
-    /**
-     * Test of right method, of class Jaccard.
-     */
-    @Test
-    public void testRight() {
-        System.out.println("testRight");
-        SparseDoubleVector R = SparseDoubleVector.from(
-                new double[]{0, 1, 0, 1, 0, 1, 0, 1, 1, 1});
-        double expResult = 6.0;
-        double result = INSTANCE.right(R);
-        assertEquals(expResult, result, 0.0);
-    }
-
-    /**
-     * Test of combine method, of class Jaccard.
-     */
-    @Test
-    public void testCombine() {
-        System.out.println("testCombine");
-        double shared = 7.0;
-        double left = 5.0;
-        double right = 3.0;
-        double expResult = shared / (left + right - shared);
-        double result = INSTANCE.combine(shared, left, right);
-        assertEquals(expResult, result, 0.0);
-    }
-
-    /**
-     * Test of isSymmetric method, of class Jaccard.
-     */
-    @Test
-    public void testIsSymmetric() {
-        System.out.println("testIsSymmetric");
-        boolean expResult = true;
-        boolean result = INSTANCE.isCommutative();
-        assertEquals(expResult, result);
     }
 
     @Test
@@ -299,6 +211,7 @@ public class JaccardTest {
         int size = 100;
         SparseDoubleVector A = new SparseDoubleVector(size, size);
         SparseDoubleVector B = new SparseDoubleVector(size, size);
+
         for (int i = 0; i < size; i++) {
             A.set(i, RANDOM.nextDouble());
             B.set(i, RANDOM.nextDouble());

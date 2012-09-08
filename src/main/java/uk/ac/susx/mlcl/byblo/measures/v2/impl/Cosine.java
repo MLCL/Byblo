@@ -80,7 +80,7 @@ public final class Cosine extends DecomposableMeasure implements Serializable {
 
     @Override
     public double getHeterogeneityBound() {
-        return -1.0;
+        return 0;
     }
 
     @Override

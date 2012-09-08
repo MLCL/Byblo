@@ -379,9 +379,9 @@ public final class FullBuild extends AbstractCommand {
         indexCmd.setDestinationFile(instancesEnumeratedFile);
         indexCmd.setCharset(getCharset());
 
-        indexCmd.getIndexDeligate().setEntryEnumeratorFile(entryEnumeratorFile);
-        indexCmd.getIndexDeligate().setFeatureEnumeratorFile(featureEnumeratorFile);
-        indexCmd.getIndexDeligate().setEnumeratorType(enumeratorType);
+        indexCmd.getIndexDelegate().setEntryEnumeratorFile(entryEnumeratorFile);
+        indexCmd.getIndexDelegate().setFeatureEnumeratorFile(featureEnumeratorFile);
+        indexCmd.getIndexDelegate().setEnumeratorType(enumeratorType);
 
         indexCmd.runCommand();
 
@@ -705,9 +705,9 @@ public final class FullBuild extends AbstractCommand {
         unindexCmd.setDestinationFile(neighboursStringsFile);
         unindexCmd.setCharset(getCharset());
 
-        unindexCmd.getIndexDeligate().setEnumeratedEntries(true);
-        unindexCmd.getIndexDeligate().setEntryEnumeratorFile(entryEnumeratorFile);
-        unindexCmd.getIndexDeligate().setEnumeratorType(enumeratorType);
+        unindexCmd.getIndexDelegate().setEnumeratedEntries(true);
+        unindexCmd.getIndexDelegate().setEntryEnumeratorFile(entryEnumeratorFile);
+        unindexCmd.getIndexDelegate().setEnumeratorType(enumeratorType);
 
         unindexCmd.runCommand();
 

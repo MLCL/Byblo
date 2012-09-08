@@ -38,8 +38,7 @@ import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- * Distance measure that computes similarity as the Jensen-Shannon
- * divergence.
+ * Distance measure that computes similarity as the Jensen-Shannon divergence.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -49,41 +48,38 @@ public final class JensenShannonDivergence implements Measure, Serializable {
 
     @Override
     public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
-        double divergence = 0.0;
+        double divergence = 0;
 
-        int i = 0;
-        int j = 0;
+        int i = 0, j = 0;
         while (i < A.size && j < B.size) {
             if (A.keys[i] < B.keys[j]) {
-                final double q = A.values[i] / A.sum;
-                divergence += 0.5 * q;
-                ++i;
+                divergence += A.values[i] / A.sum;
+                i++;
             } else if (A.keys[i] > B.keys[j]) {
-                final double r = B.values[j] / B.sum;
-                divergence += 0.5 * r;
-                ++j;
+                divergence += B.values[j] / B.sum;
+                j++;
             } else {
-                final double q = A.values[i] / A.sum;
-                final double r = B.values[j] / B.sum;
-                final double logAvg = log2(0.5 * (q + r));
-                divergence += 0.5 * q * (log2(q) - logAvg)
-                        + 0.5 * r * (log2(r) - logAvg);
-                ++i;
-                ++j;
+                final double pA = A.values[i] / A.sum;
+                final double pB = B.values[j] / B.sum;
+                final double lpAvg = log2(pA + pB) - 1.;
+                divergence += pA * (log2(pA) - lpAvg);
+                divergence += pB * (log2(pB) - lpAvg);
+                i++;
+                j++;
             }
         }
+
         while (i < A.size) {
-            final double q = A.values[i] / A.sum;
-            divergence += 0.5 * q;
+            divergence += A.values[i] / A.sum;
             i++;
         }
+
         while (j < B.size) {
-            final double r = B.values[j] / B.sum;
-            divergence += 0.5 * r;
+            divergence += B.values[j] / B.sum;
             j++;
         }
 
-        return divergence;
+        return divergence / 2.;
     }
 
     @Override
@@ -101,7 +97,7 @@ public final class JensenShannonDivergence implements Measure, Serializable {
         return Double.POSITIVE_INFINITY;
     }
 
-   @Override
+    @Override
     public Class<? extends Weighting> getExpectedWeighting() {
         return PositiveWeighting.class;
     }

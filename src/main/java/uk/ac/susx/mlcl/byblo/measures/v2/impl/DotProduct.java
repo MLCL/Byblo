@@ -59,12 +59,12 @@ public final class DotProduct implements Measure, Serializable {
 
     @Override
     public double getHomogeneityBound() {
-        return 0.0;
+        return Double.POSITIVE_INFINITY;
     }
 
     @Override
     public double getHeterogeneityBound() {
-        return Double.POSITIVE_INFINITY;
+        return Double.NEGATIVE_INFINITY;
     }
 
     @Override

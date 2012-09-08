@@ -74,8 +74,8 @@ public final class KnnSimsCommand extends SortEventsCommand {
             Comparators.reverse(Weighted.<TokenPair>weightOrder());
 
     public KnnSimsCommand(File sourceFile, File destinationFile, Charset charset,
-                          SingleEnumerating indexDeligate, int k) throws IOException {
-        super(sourceFile, destinationFile, charset, EnumeratingDelegates.toPair(indexDeligate));
+                          SingleEnumerating indexDelegate, int k) throws IOException {
+        super(sourceFile, destinationFile, charset, EnumeratingDelegates.toPair(indexDelegate));
         super.setComparator(Comparators.fallback(
                 classComparator, nearnessComparator));
         setK(k);

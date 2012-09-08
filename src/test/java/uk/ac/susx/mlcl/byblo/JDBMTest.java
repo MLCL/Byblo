@@ -46,6 +46,7 @@ import java.util.TreeMap;
 
 import org.apache.jdbm.DB;
 import org.apache.jdbm.DBMaker;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -144,6 +145,7 @@ public class JDBMTest {
 
 	@Test(expected = OutOfMemoryError.class)
 	@Category(SlowTestCategory.class)
+    @Ignore
 	public void fib() {
 
 		SortedMap<Integer, BigInteger> map = new TreeMap<Integer, BigInteger>();
@@ -163,6 +165,7 @@ public class JDBMTest {
 
 	@Test
 	@Category(SlowTestCategory.class)
+    @Ignore
 	public void fib2() throws IOException {
 
 		final String fileName = "jdbc-fib";

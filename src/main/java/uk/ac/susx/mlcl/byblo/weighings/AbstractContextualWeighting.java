@@ -41,59 +41,59 @@ public abstract class AbstractContextualWeighting
         extends AbstractElementwiseWeighting
         implements FeatureMarginalsCarrier {
 
-    private final FeatureMarginalsDeligate featureMarginalsDeligate =
-            new FeatureMarginalsDeligate();
+    private final FeatureMarginalsDelegate featureMarginalsDelegate =
+            new FeatureMarginalsDelegate();
 
     public AbstractContextualWeighting() {
     }
 
     @Override
     public final void setGrandTotal(double featureFrequencySum) {
-        featureMarginalsDeligate.setGrandTotal(featureFrequencySum);
+        featureMarginalsDelegate.setGrandTotal(featureFrequencySum);
     }
 
     @Override
     public final void setFeatureMarginals(double[] featureFrequencies) {
-        featureMarginalsDeligate.setFeatureMarginals(featureFrequencies);
+        featureMarginalsDelegate.setFeatureMarginals(featureFrequencies);
     }
 
     @Override
     public final void setFeatureCardinality(long occuringFeatureCount) {
-        featureMarginalsDeligate.setFeatureCardinality(occuringFeatureCount);
+        featureMarginalsDelegate.setFeatureCardinality(occuringFeatureCount);
     }
 
     @Override
     public final double getGrandTotal() {
-        return featureMarginalsDeligate.getGrandTotal();
+        return featureMarginalsDelegate.getGrandTotal();
     }
 
     @Override
     public final double[] getFeatureMarginals() {
-        return featureMarginalsDeligate.getFeatureMarginals();
+        return featureMarginalsDelegate.getFeatureMarginals();
     }
 
     @Override
     public final long getFeatureCardinality() {
-        return featureMarginalsDeligate.getFeatureCardinality();
+        return featureMarginalsDelegate.getFeatureCardinality();
     }
 
     public final int getFeatureCount() {
-        return featureMarginalsDeligate.getFeatureCount();
+        return featureMarginalsDelegate.getFeatureCount();
     }
 
     protected final double getFeaturePrior(int key) {
-        return featureMarginalsDeligate.getFeaturePrior(key);
+        return featureMarginalsDelegate.getFeaturePrior(key);
     }
 
     protected final double getFeatureMarginal(int key) {
-        return featureMarginalsDeligate.getFeatureMarginals(key);
+        return featureMarginalsDelegate.getFeatureMarginals(key);
     }
 
     protected boolean equals(AbstractContextualWeighting other) {
-        if (this.featureMarginalsDeligate != other.featureMarginalsDeligate
-                && (this.featureMarginalsDeligate == null
-                    || !this.featureMarginalsDeligate.equals(
-                    other.featureMarginalsDeligate)))
+        if (this.featureMarginalsDelegate != other.featureMarginalsDelegate
+                && (this.featureMarginalsDelegate == null
+                    || !this.featureMarginalsDelegate.equals(
+                    other.featureMarginalsDelegate)))
             return false;
         return true;
     }
@@ -109,7 +109,7 @@ public abstract class AbstractContextualWeighting
 
     @Override
     public int hashCode() {
-        return 89 * 7 + (this.featureMarginalsDeligate != null
-                         ? this.featureMarginalsDeligate.hashCode() : 0);
+        return 89 * 7 + (this.featureMarginalsDelegate != null
+                         ? this.featureMarginalsDelegate.hashCode() : 0);
     }
 }

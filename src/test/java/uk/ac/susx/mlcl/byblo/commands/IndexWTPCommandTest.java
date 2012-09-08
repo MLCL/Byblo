@@ -353,7 +353,7 @@ public class IndexWTPCommandTest extends
 		unindex.getFilesDelegate().setCharset(DEFAULT_CHARSET);
 		unindex.getFilesDelegate().setSourceFile(from);
 		unindex.getFilesDelegate().setDestinationFile(to);
-		unindex.setIndexDeligate(new DoubleEnumeratingDelegate(type, true,
+		unindex.setIndexDelegate(new DoubleEnumeratingDelegate(type, true,
 				true, index1, index2));
 		unindex.runCommand();
 
@@ -380,7 +380,7 @@ public class IndexWTPCommandTest extends
 		unindex.getFilesDelegate().setCharset(DEFAULT_CHARSET);
 		unindex.getFilesDelegate().setSourceFile(from);
 		unindex.getFilesDelegate().setDestinationFile(to);
-		unindex.setIndexDeligate(new DoubleEnumeratingDelegate(type, true,
+		unindex.setIndexDelegate(new DoubleEnumeratingDelegate(type, true,
 				true, index1, index2));
 		unindex.runCommand();
 

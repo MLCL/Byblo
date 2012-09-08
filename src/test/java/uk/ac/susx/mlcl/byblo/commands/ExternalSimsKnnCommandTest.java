@@ -151,6 +151,7 @@ public class ExternalSimsKnnCommandTest extends
 
     @Test
     @Category(SlowTestCategory.class)
+    @Ignore
     public void testRunOnGeneratedData() throws Exception {
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_SIMS);
 

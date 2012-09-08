@@ -221,7 +221,7 @@ public class IndexTPCommandTest extends
 		unindex.getFilesDelegate().setCharset(DEFAULT_CHARSET);
 		unindex.getFilesDelegate().setSourceFile(from);
 		unindex.getFilesDelegate().setDestinationFile(to);
-		unindex.setIndexDeligate(new DoubleEnumeratingDelegate(type, true,
+		unindex.setIndexDelegate(new DoubleEnumeratingDelegate(type, true,
 				true, index1, index2));
 		unindex.runCommand();
 
@@ -249,7 +249,7 @@ public class IndexTPCommandTest extends
 		unindex.getFilesDelegate().setSourceFile(from);
 		unindex.getFilesDelegate().setDestinationFile(to);
 
-		unindex.setIndexDeligate(new DoubleEnumeratingDelegate(type, true,
+		unindex.setIndexDelegate(new DoubleEnumeratingDelegate(type, true,
 				true, index1, index2));
 		unindex.runCommand();
 
@@ -296,7 +296,7 @@ public class IndexTPCommandTest extends
 		unindex.getFilesDelegate().setCharset(DEFAULT_CHARSET);
 		unindex.getFilesDelegate().setSourceFile(inFile);
 		unindex.getFilesDelegate().setDestinationFile(outFile);
-		unindex.setIndexDeligate(ded);
+		unindex.setIndexDelegate(ded);
 
 		unindex.addProgressListener(new InfoProgressListener());
 

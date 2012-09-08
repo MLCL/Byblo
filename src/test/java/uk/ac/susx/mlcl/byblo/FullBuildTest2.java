@@ -43,6 +43,7 @@ import static uk.ac.susx.mlcl.TestConstants.suffix;
 import java.io.File;
 import java.nio.charset.Charset;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
@@ -957,6 +958,7 @@ public class FullBuildTest2 {
 
 	@Test
 	@Category(SlowTestCategory.class)
+    @Ignore
 	public void BuildTestAll() throws Exception {
 		for (boolean serial : new boolean[] { true, false }) {
 			for (boolean preindexedEntries : new boolean[] { true, false }) {
@@ -1179,7 +1181,7 @@ public class FullBuildTest2 {
 	// unindex.getFilesDelegate().setSourceFile(from);
 	// unindex.getFilesDelegate().setDestinationFile(to);
 	// unindex.getFilesDelegate().setCompactFormatDisabled(false);
-	// unindex.setIndexDelegate(new EnumeratorPairBaringDeligate(
+	// unindex.setIndexDelegate(new EnumeratorPairBaringDelegate(
 	// true, true, index1, index2, skip1, skip2));
 	// unindex.runCommand();
 	//
@@ -1197,7 +1199,7 @@ public class FullBuildTest2 {
 	// unindex.getFilesDelegate().setSourceFile(from);
 	// unindex.getFilesDelegate().setDestinationFile(to);
 	// unindex.getFilesDelegate().setCompactFormatDisabled(false);
-	// unindex.setIndexDelegate(new EnumeratorSingleBaringDeligate(true, index,
+	// unindex.setIndexDelegate(new EnumeratorSingleBaringDelegate(true, index,
 	// null, skip1, skip2));
 	// unindex.runCommand();
 	//
@@ -1212,7 +1214,7 @@ public class FullBuildTest2 {
 		unindex.getFilesDelegate().setCharset(DEFAULT_CHARSET);
 		unindex.getFilesDelegate().setSourceFile(from);
 		unindex.getFilesDelegate().setDestinationFile(to);
-		unindex.setIndexDeligate(EnumeratingDelegates
+		unindex.setIndexDelegate(EnumeratingDelegates
 				.toPair(new SingleEnumeratingDelegate(type, true, index)));
 		unindex.runCommand();
 
@@ -1229,7 +1231,7 @@ public class FullBuildTest2 {
 		unindex.getFilesDelegate().setCharset(DEFAULT_CHARSET);
 		unindex.getFilesDelegate().setSourceFile(from);
 		unindex.getFilesDelegate().setDestinationFile(to);
-		unindex.setIndexDeligate(new DoubleEnumeratingDelegate(type, true,
+		unindex.setIndexDelegate(new DoubleEnumeratingDelegate(type, true,
 				true, index1, index2));
 		unindex.runCommand();
 
@@ -1246,7 +1248,7 @@ public class FullBuildTest2 {
 		unindex.getFilesDelegate().setCharset(DEFAULT_CHARSET);
 		unindex.getFilesDelegate().setSourceFile(from);
 		unindex.getFilesDelegate().setDestinationFile(to);
-		unindex.setIndexDeligate(new DoubleEnumeratingDelegate(type, true,
+		unindex.setIndexDelegate(new DoubleEnumeratingDelegate(type, true,
 				true, index1, index2));
 		unindex.runCommand();
 

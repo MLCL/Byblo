@@ -34,6 +34,7 @@ package uk.ac.susx.mlcl.byblo.tasks;
 import com.google.common.base.Predicate;
 import it.unimi.dsi.fastutil.ints.IntIterator;
 import junit.framework.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import uk.ac.susx.mlcl.TestConstants;
@@ -127,7 +128,7 @@ public abstract class AbstractAllPairsTaskTest<T extends NaiveApssTask> extends 
 
     @Test
     @Category(SlowTestCategory.class)
-//    @Ignore
+    @Ignore
     public void testWorstCaseFeatures() throws Exception {
 
         final int nEntries = 2;
@@ -138,7 +139,7 @@ public abstract class AbstractAllPairsTaskTest<T extends NaiveApssTask> extends 
 
     @Test
     @Category(SlowTestCategory.class)
-//    @Ignore
+    @Ignore
     public void testWorstCaseEntries() throws Exception {
 
         final int nEntries = 2000;
@@ -149,7 +150,7 @@ public abstract class AbstractAllPairsTaskTest<T extends NaiveApssTask> extends 
 
     @Test
     @Category(SlowTestCategory.class)
-//    @Ignore
+    @Ignore
     public void testWorstCase() throws Exception {
 
         final int nEntries = 200;
