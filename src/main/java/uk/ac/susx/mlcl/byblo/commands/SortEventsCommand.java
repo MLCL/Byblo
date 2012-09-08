@@ -38,7 +38,7 @@ import java.nio.charset.Charset;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
@@ -58,14 +58,14 @@ public class SortEventsCommand extends AbstractSortCommand<Weighted<TokenPair>> 
             SortEntriesCommand.class);
 
     @ParametersDelegate
-    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
+    private DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();
 
     public SortEventsCommand(
             File sourceFile, File destinationFile, Charset charset,
-            DoubleEnumerating indexDeligate) {
+            DoubleEnumerating indexDelegate) {
         super(sourceFile, destinationFile, charset,
               Weighted.recordOrder(TokenPair.indexOrder()));
-        setIndexDeligate(indexDeligate);
+        setIndexDelegate(indexDelegate);
     }
 
     public SortEventsCommand() {
@@ -74,55 +74,55 @@ public class SortEventsCommand extends AbstractSortCommand<Weighted<TokenPair>> 
     @Override
     public void runCommand() throws Exception {
         super.runCommand();
-        indexDeligate.saveEnumerator();
-        indexDeligate.closeEnumerator();
+        indexDelegate.saveEnumerator();
+        indexDelegate.closeEnumerator();
 
     }
 
-    public final DoubleEnumerating getIndexDeligate() {
-        return indexDeligate;
+    public final DoubleEnumerating getIndexDelegate() {
+        return indexDelegate;
     }
 
-    public final void setIndexDeligate(DoubleEnumerating indexDeligate) {
-        Checks.checkNotNull("indexDeligate", indexDeligate);
-        this.indexDeligate = indexDeligate;
+    public final void setIndexDelegate(DoubleEnumerating indexDelegate) {
+        Checks.checkNotNull("indexDelegate", indexDelegate);
+        this.indexDelegate = indexDelegate;
     }
 
     @Override
     protected ObjectSource<Weighted<TokenPair>> openSource(File file)
             throws FileNotFoundException, IOException {
-        return BybloIO.openEventsSource(file, getCharset(), indexDeligate);
+        return BybloIO.openEventsSource(file, getCharset(), indexDelegate);
     }
 
     @Override
     protected ObjectSink<Weighted<TokenPair>> openSink(File file)
             throws FileNotFoundException, IOException {
         return new WeightSumReducerObjectSink<TokenPair>(
-               BybloIO.openEventsSink(file, getCharset(), indexDeligate));
+               BybloIO.openEventsSink(file, getCharset(), indexDelegate));
     }
 
-    public EnumeratorType getEnuemratorType() {
-        return indexDeligate.getEnuemratorType();
+    public EnumeratorType getEnumeratorType() {
+        return indexDelegate.getEnumeratorType();
     }
 
     public void setEnumeratedFeatures(boolean enumeratedFeatures) {
-        indexDeligate.setEnumeratedFeatures(enumeratedFeatures);
+        indexDelegate.setEnumeratedFeatures(enumeratedFeatures);
     }
 
     public void setEnumeratedEntries(boolean enumeratedEntries) {
-        indexDeligate.setEnumeratedEntries(enumeratedEntries);
+        indexDelegate.setEnumeratedEntries(enumeratedEntries);
     }
 
     public boolean isEnumeratedFeatures() {
-        return indexDeligate.isEnumeratedFeatures();
+        return indexDelegate.isEnumeratedFeatures();
     }
 
     public boolean isEnumeratedEntries() {
-        return indexDeligate.isEnumeratedEntries();
+        return indexDelegate.isEnumeratedEntries();
     }
 
     public void setEnumeratorType(EnumeratorType type) {
-        indexDeligate.setEnumeratorType(type);
+        indexDelegate.setEnumeratorType(type);
     }
 
 }

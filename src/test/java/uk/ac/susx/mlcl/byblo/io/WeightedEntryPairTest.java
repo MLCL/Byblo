@@ -37,7 +37,8 @@ import java.io.IOException;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.byblo.enumerators.MemoryBasedStringEnumerator;
@@ -52,7 +53,7 @@ public class WeightedEntryPairTest {
     private void copyWEP(File a, File b, boolean compact) throws FileNotFoundException, IOException {
         Enumerator<String> idx = MemoryBasedStringEnumerator.newInstance();
 
-        DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+        DoubleEnumeratingDelegate del = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
 
         WeightedTokenPairSource aSrc = WeightedTokenPairSource.open(
@@ -83,7 +84,7 @@ public class WeightedEntryPairTest {
 
         assertTrue("Verbose copy is smaller that compact source.",
                    c.length() >= b.length());
-        assertTrue("Double converted file is not equal to origion.",
+        assertTrue("Double converted file is not equal to origin.",
                    Files.equal(a, c));
     }
 
@@ -95,7 +96,7 @@ public class WeightedEntryPairTest {
         File c = new File(TEST_OUTPUT_DIR,
                           TEST_FRUIT_SIMS.getName() + ".str");
 
-        DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+        DoubleEnumeratingDelegate del = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
 
 
@@ -122,7 +123,7 @@ public class WeightedEntryPairTest {
 
         assertTrue("Verbose copy is smaller that compact source.",
                    c.length() >= b.length());
-        assertTrue("Double converted file is not equal to origion.",
+        assertTrue("Double converted file is not equal to origin.",
                    Files.equal(a, c));
     }
 

@@ -87,8 +87,8 @@ public class MergeTaskTest {
 
         List<Integer> out = new ArrayList<Integer>();
 
-        ObjectSource<Integer> src1 = ObjectIO.asSource(in1);
-        ObjectSource<Integer> src2 = ObjectIO.asSource(in2);
+        ObjectSource<Integer> src1 = ObjectIO.asSource((Iterable<Integer>)in1);
+        ObjectSource<Integer> src2 = ObjectIO.asSource((Iterable<Integer>)in2);
         ObjectSink<Integer> sink = ObjectIO.asSink(out);
 
         Comparator<Integer> comparator = new Comparator<Integer>() {

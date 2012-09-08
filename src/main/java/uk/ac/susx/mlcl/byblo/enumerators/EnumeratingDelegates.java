@@ -38,9 +38,9 @@ import uk.ac.susx.mlcl.lib.Checks;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class EnumeratingDeligates {
+public final class EnumeratingDelegates {
 
-    private EnumeratingDeligates() {
+    private EnumeratingDelegates() {
     }
 
     public static SingleEnumerating toSingleEntries(
@@ -59,7 +59,7 @@ public final class EnumeratingDeligates {
 
     public static DoubleEnumerating decorateEnumerated(
             final DoubleEnumerating inner, final boolean enumerated) {
-        return new EnumeratingDeligates.DoubleToDoubleAdapter(inner) {
+        return new EnumeratingDelegates.DoubleToDoubleAdapter(inner) {
 
             @Override
             public boolean isEnumeratedEntries() {
@@ -76,7 +76,7 @@ public final class EnumeratingDeligates {
 
     public static SingleEnumerating decorateEnumerated(
             final SingleEnumerating inner, final boolean enumerated) {
-        return new EnumeratingDeligates.SingleToSingleAdapter(inner) {
+        return new EnumeratingDelegates.SingleToSingleAdapter(inner) {
 
             @Override
             public boolean isEnumerationEnabled() {
@@ -101,8 +101,8 @@ public final class EnumeratingDeligates {
         }
 
         @Override
-        public EnumeratorType getEnuemratorType() {
-            return inner.getEnuemratorType();
+        public EnumeratorType getEnumeratorType() {
+            return inner.getEnumeratorType();
         }
 
         @Override
@@ -261,12 +261,12 @@ public final class EnumeratingDeligates {
         }
 
         @Override
-        public SingleEnumerating getEntriesEnumeratorCarriar() {
+        public SingleEnumerating getEntriesEnumeratorCarrier() {
             return getInner();
         }
 
         @Override
-        public SingleEnumerating getFeaturesEnumeratorCarriar() {
+        public SingleEnumerating getFeaturesEnumeratorCarrier() {
             return getInner();
         }
 
@@ -336,7 +336,7 @@ public final class EnumeratingDeligates {
         }
 
         @Override
-        public DoubleEnumerating getEnumeratorPairCarriar() {
+        public DoubleEnumerating getEnumeratorPairCarrier() {
             return getInner();
         }
 
@@ -396,7 +396,7 @@ public final class EnumeratingDeligates {
         }
 
         @Override
-        public DoubleEnumerating getEnumeratorPairCarriar() {
+        public DoubleEnumerating getEnumeratorPairCarrier() {
             return getInner();
         }
 
@@ -456,7 +456,7 @@ public final class EnumeratingDeligates {
         }
 
         @Override
-        public DoubleEnumerating getEnumeratorPairCarriar() {
+        public DoubleEnumerating getEnumeratorPairCarrier() {
             return toPair(this);
         }
 
@@ -546,12 +546,12 @@ public final class EnumeratingDeligates {
         }
 
         @Override
-        public SingleEnumerating getEntriesEnumeratorCarriar() {
+        public SingleEnumerating getEntriesEnumeratorCarrier() {
             return toSingleEntries(this);
         }
 
         @Override
-        public SingleEnumerating getFeaturesEnumeratorCarriar() {
+        public SingleEnumerating getFeaturesEnumeratorCarrier() {
             return toSingleFeatures(this);
         }
 

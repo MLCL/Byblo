@@ -35,11 +35,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
-import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
-import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
+
+import uk.ac.susx.mlcl.byblo.enumerators.*;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
@@ -57,7 +54,7 @@ public abstract class IndexingCommands<T>
     extends AbstractCopyCommand<T> {
 
     @ParametersDelegate
-    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate(
+    private DoubleEnumerating indexDeligate = new DoubleEnumeratingDelegate(
             Enumerating.DEFAULT_TYPE, false, false, null, null);
 
     public IndexingCommands() {
@@ -95,11 +92,11 @@ public abstract class IndexingCommands<T>
     }
 
     protected DoubleEnumerating getSourceIndexDeligate() {
-        return EnumeratingDeligates.decorateEnumerated(indexDeligate, false);
+        return EnumeratingDelegates.decorateEnumerated(indexDeligate, false);
     }
 
     protected DoubleEnumerating getSinkIndexDeligate() {
-        return EnumeratingDeligates.decorateEnumerated(indexDeligate, true);
+        return EnumeratingDelegates.decorateEnumerated(indexDeligate, true);
     }
 
     public static class IndexEntries extends IndexingCommands<Weighted<Token>> {
@@ -107,7 +104,7 @@ public abstract class IndexingCommands<T>
         public IndexEntries(
                 File sourceFile, File destinationFile, Charset charset,
                 SingleEnumerating indexDeligate) {
-            super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(indexDeligate));
+            super(sourceFile, destinationFile, charset, EnumeratingDelegates.toPair(indexDeligate));
         }
 
         public IndexEntries() {
@@ -121,7 +118,7 @@ public abstract class IndexingCommands<T>
 
         @Override
         protected void checkState() throws Exception {
-            Checks.checkNotNull("indexFile", EnumeratingDeligates.toSingleEntries(getIndexDeligate()).getEnumeratorFile());
+            Checks.checkNotNull("indexFile", EnumeratingDelegates.toSingleEntries(getIndexDeligate()).getEnumeratorFile());
         }
 
         @Override
@@ -143,7 +140,7 @@ public abstract class IndexingCommands<T>
         public IndexFeatures(
                 File sourceFile, File destinationFile, Charset charset,
                 SingleEnumerating indexDeligate) {
-            super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(indexDeligate));
+            super(sourceFile, destinationFile, charset, EnumeratingDelegates.toPair(indexDeligate));
         }
 
         @Override
@@ -157,7 +154,7 @@ public abstract class IndexingCommands<T>
 
         @Override
         public void checkState() throws Exception {
-            Checks.checkNotNull("indexFile", EnumeratingDeligates.toSingleFeatures(getIndexDeligate()).getEnumeratorFile());
+            Checks.checkNotNull("indexFile", EnumeratingDelegates.toSingleFeatures(getIndexDeligate()).getEnumeratorFile());
         }
 
         @Override
@@ -253,7 +250,7 @@ public abstract class IndexingCommands<T>
         public IndexNeighbours(
                 File sourceFile, File destinationFile, Charset charset,
                 SingleEnumerating indexDeligate) {
-            super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(indexDeligate));
+            super(sourceFile, destinationFile, charset, EnumeratingDelegates.toPair(indexDeligate));
         }
 
         public IndexNeighbours() {
@@ -267,7 +264,7 @@ public abstract class IndexingCommands<T>
 
         @Override
         public void checkState() throws Exception {
-            Checks.checkNotNull("indexFile", EnumeratingDeligates.toSingleEntries(getIndexDeligate()).getEnumeratorFile());
+            Checks.checkNotNull("indexFile", EnumeratingDelegates.toSingleEntries(getIndexDeligate()).getEnumeratorFile());
         }
 
         @Override
@@ -289,7 +286,7 @@ public abstract class IndexingCommands<T>
         public IndexSims(
                 File sourceFile, File destinationFile, Charset charset,
                 SingleEnumerating indexDeligate) {
-            super(sourceFile, destinationFile, charset, EnumeratingDeligates.toPair(indexDeligate));
+            super(sourceFile, destinationFile, charset, EnumeratingDelegates.toPair(indexDeligate));
         }
 
         public IndexSims() {
@@ -303,7 +300,7 @@ public abstract class IndexingCommands<T>
 
         @Override
         public void checkState() throws Exception {
-            Checks.checkNotNull("indexFile", EnumeratingDeligates.toSingleEntries(getIndexDeligate()).getEnumeratorFile());
+            Checks.checkNotNull("indexFile", EnumeratingDelegates.toSingleEntries(getIndexDeligate()).getEnumeratorFile());
         }
 
         @Override

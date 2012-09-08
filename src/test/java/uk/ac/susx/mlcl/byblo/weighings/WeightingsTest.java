@@ -32,14 +32,11 @@ package uk.ac.susx.mlcl.byblo.weighings;
 
 import it.unimi.dsi.fastutil.ints.AbstractInt2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
-import java.util.*;
-import static org.junit.Assert.*;
 import org.junit.*;
-import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
-import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDelegates;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
@@ -47,9 +44,12 @@ import uk.ac.susx.mlcl.byblo.weighings.impl.*;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import java.util.*;
+
+import static org.junit.Assert.*;
+import static uk.ac.susx.mlcl.TestConstants.*;
+
 /**
- *
- *
  * @author hamish
  */
 public class WeightingsTest {
@@ -75,34 +75,34 @@ public class WeightingsTest {
 
     static Class<? extends Weighting>[] WEIGHT_CLASSES =
             (Class<? extends Weighting>[]) new Class<?>[]{
-                Constant.class,
-                Power.class,
-                Likelyhood.class,
-                LogProduct.class,
-                L2UnitVector.class,
-                Rank.class,
-                Step.class,
-                DiceWeighting.class,
-                TTest.class,
-                LLR.class,
-                PMI.class,
-                PositivePMI.class,
-                NormalisedPMI.class,
-                WeightedPMI.class,
-                SquaredPMI.class,
-                ChiSquared.class,
-                GeoMean.class};
+                    Constant.class,
+                    Power.class,
+                    Likelyhood.class,
+                    LogProduct.class,
+                    L2UnitVector.class,
+                    Rank.class,
+                    Step.class,
+                    DiceWeighting.class,
+                    TTest.class,
+                    LLR.class,
+                    PMI.class,
+                    PositivePMI.class,
+                    NormalisedPMI.class,
+                    WeightedPMI.class,
+                    SquaredPMI.class,
+                    ChiSquared.class,
+                    GeoMean.class};
 
     @Test
     public void testWeightingImpls() throws Exception {
         System.out.println("testWeightingImpls");
-        DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
+        DoubleEnumerating indexDeligate = new DoubleEnumeratingDelegate();
 
         // Load the feature contexts
 
         WeightedTokenSource featsSrc = BybloIO.openFeaturesSource(
                 TEST_FRUIT_FEATURES, DEFAULT_CHARSET,
-                EnumeratingDeligates.toSingleFeatures(indexDeligate));
+                EnumeratingDelegates.toSingleFeatures(indexDeligate));
 
         WeightedTokenSource.WTStatsSource featsStatSrc =
                 new WeightedTokenSource.WTStatsSource(featsSrc);
@@ -116,7 +116,7 @@ public class WeightingsTest {
 
         WeightedTokenSource entsSrc = BybloIO.openFeaturesSource(
                 TEST_FRUIT_ENTRIES, DEFAULT_CHARSET,
-                EnumeratingDeligates.toSingleFeatures(indexDeligate));
+                EnumeratingDelegates.toSingleFeatures(indexDeligate));
 
         WeightedTokenSource.WTStatsSource entsStatSrc =
                 new WeightedTokenSource.WTStatsSource(entsSrc);
@@ -127,7 +127,7 @@ public class WeightingsTest {
         int entsCard = featsStatSrc.getMaxId() + 1;
 
         assertEquals("marginal distributions totals differ",
-                     featsSum, entsSum, 0.000001);
+                featsSum, entsSum, 0.000001);
 
         // Load the events vectors
 
@@ -160,12 +160,11 @@ public class WeightingsTest {
 
         FastWeightedTokenPairVectorSource eventSrc =
                 BybloIO.openEventsVectorSource(
-                TEST_FRUIT_EVENTS, DEFAULT_CHARSET, indexDeligate);
+                        TEST_FRUIT_EVENTS, DEFAULT_CHARSET, indexDeligate);
 
         List<Indexed<SparseDoubleVector>> vecs = new ArrayList<Indexed<SparseDoubleVector>>();
         while (eventSrc.hasNext())
             vecs.add(eventSrc.read());
-
 
 
         int[][] mtot = new int[WEIGHT_CLASSES.length][WEIGHT_CLASSES.length];

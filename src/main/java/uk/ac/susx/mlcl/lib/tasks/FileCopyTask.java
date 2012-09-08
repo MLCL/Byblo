@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
-import uk.ac.susx.mlcl.lib.events.ProgressDeligate;
+import uk.ac.susx.mlcl.lib.events.ProgressDelegate;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import com.google.common.base.Objects;
@@ -48,11 +48,11 @@ import uk.ac.susx.mlcl.lib.Checks;
  */
 public class FileCopyTask extends AbstractTask implements ProgressReporting {
 
-    protected final ProgressDeligate progress = new ProgressDeligate(this, false);
+    protected final ProgressDelegate progress = new ProgressDelegate(this, false);
 
     private File sourceFile;
 
-    private File destFile;
+    private File destinationFile;
 
     public FileCopyTask(File sourceFile, File destinationFile) {
         setSrcFile(sourceFile);
@@ -98,10 +98,10 @@ public class FileCopyTask extends AbstractTask implements ProgressReporting {
         progress.endAdjusting();
 
         // Check the configuration state
-        if (sourceFile.equals(destFile))
+        if (sourceFile.equals(destinationFile))
             throw new IllegalStateException("sourceFile equals destinationFile");
 
-        copy(sourceFile, destFile);
+        copy(sourceFile, destinationFile);
 
         progress.setState(State.COMPLETED);
     }
@@ -111,7 +111,7 @@ public class FileCopyTask extends AbstractTask implements ProgressReporting {
     }
 
     public final File getDstFile() {
-        return destFile;
+        return destinationFile;
     }
 
     public final void setSrcFile(final File sourceFile) throws NullPointerException {
@@ -119,16 +119,16 @@ public class FileCopyTask extends AbstractTask implements ProgressReporting {
         this.sourceFile = sourceFile;
     }
 
-    public final void setDstFile(final File destFile) throws NullPointerException {
-        Checks.checkNotNull("destFile", destFile);
-        this.destFile = destFile;
+    public final void setDstFile(final File destinationFile) throws NullPointerException {
+        Checks.checkNotNull("destinationFile", destinationFile);
+        this.destinationFile = destinationFile;
     }
 
     @Override
     protected Objects.ToStringHelper toStringHelper() {
         return super.toStringHelper().
                 add("in", sourceFile).
-                add("out", destFile);
+                add("out", destinationFile);
     }
 
     @Override

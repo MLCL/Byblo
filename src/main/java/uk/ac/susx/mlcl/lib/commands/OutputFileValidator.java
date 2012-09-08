@@ -60,7 +60,7 @@ public final class OutputFileValidator implements IParameterValidator {
                 throw new ParameterException("Output file \"" + value + "\" exists but is not an ordinary file.");
             }
             if (!file.canWrite()) {
-                throw new ParameterException("Output file \"" + value + "\" is not writeable.");
+                throw new ParameterException("Output file \"" + value + "\" is not writable.");
             }
         } else {
             if (file.getParentFile() == null || !file.getParentFile().canWrite()) {

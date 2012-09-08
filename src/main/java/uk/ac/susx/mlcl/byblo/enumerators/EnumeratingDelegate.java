@@ -35,8 +35,7 @@ import com.google.common.base.Objects;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.FullBuild;
@@ -46,55 +45,27 @@ import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public abstract class EnumeratingDeligate
+public abstract class EnumeratingDelegate
         implements Serializable, Enumerating {
 
     private static final Log LOG = LogFactory.getLog(FullBuild.class);
 
     private static final long serialVersionUID = 1L;
-//
-//    @Parameter(names = {"-s1", "--skipindexed1"},
-//    description = "Whether indices will be encoded as deltas in the first column")
-//    private boolean skipIndexed1 = DEFAULT_SKIP_INDEXING;
-//
-//    @Parameter(names = {"-s2", "--skipindexed2"},
-//    description = "Whether indices will be encoded as deltas in the second column")
-//    private boolean skipIndexed2 = DEFAULT_SKIP_INDEXING;
 
     @Parameter(names = {"-et", "--enumerator-type"})
     private EnumeratorType type = DEFAULT_TYPE;
 
-    public EnumeratingDeligate(EnumeratorType type) {
+    public EnumeratingDelegate(EnumeratorType type) {
 
         this.type = type;
     }
 
-    public EnumeratingDeligate() {
+    public EnumeratingDelegate() {
         this(DEFAULT_TYPE);
     }
-//
-//    @Override
-//    public boolean isEnumeratorSkipIndexed1() {
-//        return skipIndexed1;
-//    }
-//
-//    @Override
-//    public boolean isEnumeratorSkipIndexed2() {
-//        return skipIndexed2;
-//    }
-//
-//    @Override
-//    public void setEnumeratorSkipIndexed1(boolean b) {
-//        skipIndexed1 = b;
-//    }
-//
-//    @Override
-//    public void setEnumeratorSkipIndexed2(boolean b) {
-//        skipIndexed2 = b;
-//    }
 
     @Override
-    public EnumeratorType getEnuemratorType() {
+    public EnumeratorType getEnumeratorType() {
         return type;
     }
 

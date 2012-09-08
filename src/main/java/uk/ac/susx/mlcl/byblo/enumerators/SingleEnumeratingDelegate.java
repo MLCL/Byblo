@@ -40,8 +40,8 @@ import java.io.Serializable;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class SingleEnumeratingDeligate
-        extends EnumeratingDeligate
+public final class SingleEnumeratingDelegate
+        extends EnumeratingDelegate
         implements Serializable, SingleEnumerating {
 
     private static final long serialVersionUID = 1L;
@@ -56,7 +56,7 @@ public final class SingleEnumeratingDeligate
 
     private Enumerator<String> enumerator = null;
 
-    public SingleEnumeratingDeligate(
+    public SingleEnumeratingDelegate(
             EnumeratorType type, boolean enumerated, File indexFile) {
         super(type);
         this.enumerationEnabled = enumerated;
@@ -64,7 +64,7 @@ public final class SingleEnumeratingDeligate
         this.enumerator = null;
     }
 
-    public SingleEnumeratingDeligate() {
+    public SingleEnumeratingDelegate() {
         this(DEFAULT_TYPE, DEFAULT_IS_ENUMERATED, null);
     }
 
@@ -125,8 +125,8 @@ public final class SingleEnumeratingDeligate
     }
 
     @Override
-    public DoubleEnumerating getEnumeratorPairCarriar() {
-        return EnumeratingDeligates.toPair(this);
+    public DoubleEnumerating getEnumeratorPairCarrier() {
+        return EnumeratingDelegates.toPair(this);
     }
 
 }

@@ -36,7 +36,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -50,13 +51,13 @@ import uk.ac.susx.mlcl.lib.io.ObjectSource;
 public class MergeInstancesCommand extends AbstractMergeCommand<TokenPair> {
 
     @ParametersDelegate
-    private DoubleEnumeratingDeligate indexDeligate = new DoubleEnumeratingDeligate();
+    private DoubleEnumeratingDelegate indexDelegate = new DoubleEnumeratingDelegate();
 
     public MergeInstancesCommand(
             File sourceFileA, File sourceFileB, File destinationFile,
-            Charset charset, DoubleEnumeratingDeligate indexDeligate) {
+            Charset charset, DoubleEnumeratingDelegate indexDelegate) {
         super(sourceFileA, sourceFileB, destinationFile, charset, TokenPair.indexOrder());
-        setIndexDeligate(indexDeligate);
+        setIndexDelegate(indexDelegate);
     }
 
     public MergeInstancesCommand() {
@@ -65,28 +66,28 @@ public class MergeInstancesCommand extends AbstractMergeCommand<TokenPair> {
     @Override
     public void runCommand() throws Exception {
         super.runCommand();
-        indexDeligate.saveEnumerator();
-        indexDeligate.closeEnumerator();
+        indexDelegate.saveEnumerator();
+        indexDelegate.closeEnumerator();
 
     }
 
-    public final DoubleEnumeratingDeligate getIndexDeligate() {
-        return indexDeligate;
+    public final DoubleEnumeratingDelegate getIndexDelegate() {
+        return indexDelegate;
     }
 
-    public final void setIndexDeligate(DoubleEnumeratingDeligate indexDeligate) {
-        Checks.checkNotNull("indexDeligate", indexDeligate);
-        this.indexDeligate = indexDeligate;
+    public final void setIndexDelegate(DoubleEnumeratingDelegate indexDelegate) {
+        Checks.checkNotNull("indexDelegate", indexDelegate);
+        this.indexDelegate = indexDelegate;
     }
 
     @Override
     protected ObjectSource<TokenPair> openSource(File file) throws FileNotFoundException, IOException {
-        return BybloIO.openInstancesSource(file, getFileDeligate().getCharset(), indexDeligate);
+        return BybloIO.openInstancesSource(file, getFileDelegate().getCharset(), indexDelegate);
     }
 
     @Override
     protected ObjectSink<TokenPair> openSink(File file) throws FileNotFoundException, IOException {
-        return BybloIO.openInstancesSink(file, getFileDeligate().getCharset(), indexDeligate);
+        return BybloIO.openInstancesSink(file, getFileDelegate().getCharset(), indexDelegate);
     }
 
     public static void main(String[] args) throws Exception {
@@ -95,7 +96,7 @@ public class MergeInstancesCommand extends AbstractMergeCommand<TokenPair> {
 
     @Override
     protected Objects.ToStringHelper toStringHelper() {
-        return super.toStringHelper().add("indexing", indexDeligate);
+        return super.toStringHelper().add("indexing", indexDelegate);
     }
 
 }

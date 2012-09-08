@@ -40,11 +40,8 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Ignore;
 import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
-import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
-import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumeratingDeligate;
+
+import uk.ac.susx.mlcl.byblo.enumerators.*;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
 
 /**
@@ -58,7 +55,7 @@ public class EventTest {
     public void testLMMedlineSample() throws FileNotFoundException, IOException {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-input-sample");
         Charset charset = Charset.forName("UTF-8");
-        DoubleEnumeratingDeligate del = new DoubleEnumeratingDeligate(
+        DoubleEnumeratingDelegate del = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
 
         TokenPairSource efSrc = TokenPairSource.open(
@@ -72,7 +69,7 @@ public class EventTest {
     }
 
     private void copyEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
-        DoubleEnumeratingDeligate idx = new DoubleEnumeratingDeligate(
+        DoubleEnumeratingDelegate idx = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
         TokenPairSource src = TokenPairSource.open(
                 a, DEFAULT_CHARSET, idx, false, false);
@@ -99,7 +96,7 @@ public class EventTest {
 
         assertTrue("Verbose copy is smaller that compact source.",
                    c.length() >= b.length());
-        assertTrue("Double converted file is not equal to origion.",
+        assertTrue("Double converted file is not equal to origin.",
                    Files.equal(a, c));
     }
 
@@ -114,10 +111,10 @@ public class EventTest {
                                 TEST_FRUIT_INPUT.getName() + ".index");
 
 
-        DoubleEnumerating indel = EnumeratingDeligates.toPair(
-                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, false, idxFile));
-        DoubleEnumerating outdel = EnumeratingDeligates.toPair(
-                new SingleEnumeratingDeligate(Enumerating.DEFAULT_TYPE, true, idxFile));
+        DoubleEnumerating indel = EnumeratingDelegates.toPair(
+                new SingleEnumeratingDelegate(Enumerating.DEFAULT_TYPE, false, idxFile));
+        DoubleEnumerating outdel = EnumeratingDelegates.toPair(
+                new SingleEnumeratingDelegate(Enumerating.DEFAULT_TYPE, true, idxFile));
 
         {
 
@@ -149,7 +146,7 @@ public class EventTest {
 
         assertTrue("Verbose copy is smaller that compact source.",
                    c.length() >= b.length());
-        assertTrue("Double converted file is not equal to origion.",
+        assertTrue("Double converted file is not equal to origin.",
                    Files.equal(a, c));
     }
 

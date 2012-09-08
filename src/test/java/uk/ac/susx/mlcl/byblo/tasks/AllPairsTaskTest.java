@@ -30,53 +30,31 @@
  */
 package uk.ac.susx.mlcl.byblo.tasks;
 
-import java.io.File;
-import org.junit.After;
-import org.junit.AfterClass;
-import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import uk.ac.susx.mlcl.TestConstants;
 import uk.ac.susx.mlcl.byblo.Tools;
 import uk.ac.susx.mlcl.lib.test.ExitTrapper;
 
+import java.io.File;
+
+import static org.junit.Assert.assertTrue;
+
 /**
+ * These are old test that are pretty much deprecated, but they are maintained because it's generally a bad idea to
+ * remove tests if you don't have to.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class AllPairsTaskTest {
 
-    public AllPairsTaskTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
     @Test
     public void testMainRun() throws Exception {
-        new File("testdata", "out").mkdir();
         try {
             ExitTrapper.enableExistTrapping();
             Tools.main(new String[]{"allpairs",
-                        "-i", TestConstants.TEST_FRUIT_EVENTS.toString(),
-                        "-if", TestConstants.TEST_FRUIT_FEATURES.toString(),
-                        "-o", new File(TestConstants.TEST_OUTPUT_DIR, "bnc-gramrels-fruit.out").toString(),
-                        "-C", "500"});
+                    "-i", TestConstants.TEST_FRUIT_EVENTS.toString(),
+                    "-if", TestConstants.TEST_FRUIT_FEATURES.toString(),
+                    "-o", new File(TestConstants.TEST_OUTPUT_DIR, "bnc-gramrels-fruit.out").toString()});
         } finally {
             ExitTrapper.disableExitTrapping();
         }
@@ -84,16 +62,14 @@ public class AllPairsTaskTest {
 
     @Test
     public void testMainRun_Indexed() throws Exception {
-        new File("testdata", "out").mkdir();
         try {
             ExitTrapper.enableExistTrapping();
             Tools.main(new String[]{"allpairs",
-                        "-i", TestConstants.TEST_FRUIT_SKIPINDEXED_EVENTS.toString(),
-                        "-if", TestConstants.TEST_FRUIT_SKIPINDEXED_FEATURES.toString(),
-                        "-o", new File(TestConstants.TEST_OUTPUT_DIR, "bnc-gramrels-fruit.indexed.out").toString(),
-                        "-C", "500",
-                        "--enumerated-entries",
-                        "--enumerated-features"});
+                    "-i", TestConstants.TEST_FRUIT_SKIP_INDEXED_EVENTS.toString(),
+                    "-if", TestConstants.TEST_FRUIT_SKIP_INDEXED_FEATURES.toString(),
+                    "-o", new File(TestConstants.TEST_OUTPUT_DIR, "bnc-gramrels-fruit.indexed.out").toString(),
+                    "--enumerated-entries",
+                    "--enumerated-features"});
         } finally {
             ExitTrapper.disableExitTrapping();
         }

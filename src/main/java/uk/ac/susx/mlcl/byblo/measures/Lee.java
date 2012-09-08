@@ -57,8 +57,7 @@ public class Lee extends AbstractProximity {
     public Lee() {
         this.alpha = DEFAULT_ALPHA;
         if (LOG.isWarnEnabled())
-            LOG.warn("The Lee proximity measure has been thoughoughly test and "
-                    + "is likely to contain bugs.");
+            LOG.warn("The Lee proximity measure has been thoroughly test and is likely to contain bugs.");
     }
 
     public double getAlpha() {

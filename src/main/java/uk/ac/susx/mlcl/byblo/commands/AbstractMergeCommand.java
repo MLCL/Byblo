@@ -66,7 +66,7 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
     private static final Log LOG = LogFactory.getLog(AbstractMergeCommand.class);
 
     @ParametersDelegate
-    private final FileMergeDelegate fileDeligate = new FileMergeDelegate();
+    private final FileMergeDelegate fileDelegate = new FileMergeDelegate();
 
     @Parameter(names = {"-r", "--reverse"},
     description = "Reverse the result of comparisons.")
@@ -76,18 +76,18 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
 
     public AbstractMergeCommand(File sourceFileA, File sourceFileB, File destination,
                                 Charset charset, Comparator<T> comparator) {
-        fileDeligate.setSourceFileA(sourceFileA);
-        fileDeligate.setSourceFileB(sourceFileB);
-        fileDeligate.setDestinationFile(destination);
-        fileDeligate.setCharset(charset);
+        fileDelegate.setSourceFileA(sourceFileA);
+        fileDelegate.setSourceFileB(sourceFileB);
+        fileDelegate.setDestinationFile(destination);
+        fileDelegate.setCharset(charset);
         setComparator(comparator);
     }
 
     public AbstractMergeCommand() {
     }
 
-    public FileMergeDelegate getFileDeligate() {
-        return fileDeligate;
+    public FileMergeDelegate getFileDelegate() {
+        return fileDelegate;
     }
 
     public final Comparator<T> getComparator() {
@@ -110,20 +110,20 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
     protected Objects.ToStringHelper toStringHelper() {
 
         return super.toStringHelper().
-                add("files", getFileDeligate()).
+                add("files", getFileDelegate()).
                 add("comparator", comparator);
     }
 
     @Override
     public void runCommand() throws Exception {
         if (LOG.isInfoEnabled())
-            LOG.info("Running merge from \"" + getFileDeligate().getSourceFileA()
-                    + "\" and \"" + getFileDeligate().getSourceFileB()
-                    + "\" to \"" + getFileDeligate().getDestinationFile() + "\".");
+            LOG.info("Running merge from \"" + getFileDelegate().getSourceFileA()
+                    + "\" and \"" + getFileDelegate().getSourceFileB()
+                    + "\" to \"" + getFileDelegate().getDestinationFile() + "\".");
 
-        ObjectSource<T> srcA = openSource(getFileDeligate().getSourceFileA());
-        ObjectSource<T> srcB = openSource(getFileDeligate().getSourceFileB());
-        ObjectSink<T> snk = openSink(getFileDeligate().getDestinationFile());
+        ObjectSource<T> srcA = openSource(getFileDelegate().getSourceFileA());
+        ObjectSource<T> srcB = openSource(getFileDelegate().getSourceFileB());
+        ObjectSink<T> snk = openSink(getFileDelegate().getDestinationFile());
 
         ObjectMergeTask<T> task = new ObjectMergeTask<T>(
                 srcA, srcB, snk, getComparator());

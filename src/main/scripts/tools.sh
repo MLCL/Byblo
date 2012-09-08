@@ -32,7 +32,7 @@
 
 
 # ===========================================
-# Options for Sun Grid Engine submition
+# Options for Sun Grid Engine submission
 # ============================================
 
 # Name of job
@@ -66,6 +66,6 @@
 readonly JAVA_ARGS="-Xmx2g -Xms1g"
 
 
-java $JAVA_ARGS -cp ./*:lib/* uk.ac.susx.mlcl.byblo.Tools "$@"
+java ${JAVA_ARGS} -cp ./*:lib/* uk.ac.susx.mlcl.byblo.Tools "$@"
 
 

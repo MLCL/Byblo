@@ -39,7 +39,7 @@
 
     <groupId>uk.ac.susx.mlcl</groupId>
     <artifactId>Byblo</artifactId>
-    <version>2.0.2-SNAPSHOT</version>
+    <version>2.1.0</version>
     <packaging>jar</packaging>
 
     <name>Byblo</name>
@@ -50,10 +50,14 @@
     </description>
     <url>https://github.com/MLCL/Byblo</url>
     <inceptionYear>2010</inceptionYear>
+    <organization>
+        <name>University of Sussex</name>
+        <url>http://www.sussex.ac.uk</url>
+    </organization>
 
     <scm>
         <connection>scm:git:git://github.com/MLCL/Byblo.git</connection>
-        <tag>HEAD</tag>
+        <tag>byblo-2.1.0</tag>
         <url>https://github.com/MLCL/Byblo</url>
     </scm>
 
@@ -123,7 +127,7 @@
         </dependency>
 
 
-        <!-- The following dependancies aren't on the central repository, but
+        <!-- The following dependencies aren't on the central repository, but
             are available at http://kungf.eu:8081/nexus/ -->
 
         <dependency>
@@ -135,10 +139,10 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>mlcl-lib</artifactId>
-            <version>0.3-SNAPSHOT</version>
+            <version>0.2.1</version>
         </dependency>
 
-        <!-- Testing scope dependancies -->
+        <!-- Testing scope dependencies -->
 
         <dependency>
             <groupId>junit</groupId>
@@ -172,18 +176,10 @@
 
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.12</version>
+                <version>2.12.2</version>
                 <configuration>
-                    <parallel>methods</parallel>
-                    <threadCount>10</threadCount>
+                    <argLine>-Xmx2g</argLine>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.maven.surefire</groupId>
-                        <artifactId>surefire-junit47</artifactId>
-                        <version>2.12</version>
-                    </dependency>
-                </dependencies>
             </plugin>
 
             <plugin>
@@ -224,57 +220,73 @@
                 </configuration>
             </plugin>
 
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>.</directory>
+                            <includes>
+                                <include>**/*.tmp</include>
+                                <include>**/*.log</include>
+                                <include>**/*.log.xml</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+
+            <!--
+            Goal for curating the licence headers in the source and associated resources:
+                * Perform a license check by running: mvn license:check
+                * Update the licenses by running: mvn license:format
+                * Remove the licenses by running: mvn license:remove
+            -->
+            <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <version>1.9.0</version>
+                <configuration>
+                    <strictCheck>true</strictCheck>
+                    <quiet>false</quiet>
+                    <header>src/license/license-header.txt</header>
+                    <includes>
+                        <include>src/**</include>
+                        <include>pom.xml</include>
+                        <include>LICENSE.txt</include>
+                    </includes>
+                    <useDefaultExcludes>false</useDefaultExcludes>
+                    <excludes>
+                        <exclude>src/test/resources/**</exclude>
+                        <exclude>**/.**</exclude>
+                    </excludes>
+                    <mapping>
+                        <java>SLASHSTAR_STYLE</java>
+                    </mapping>
+                    <properties>
+                        <inceptionYear>${project.inceptionYear}</inceptionYear>
+                        <currentYear>2012</currentYear>
+                        <copyrightHolder>${project.organization.name}</copyrightHolder>
+                        <organisation>${project.organization.name}</organisation>
+                    </properties>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
 
     </build>
 
 
     <profiles>
-
-        <!--
-        Profile for curating the licence headers in the source:
-         * Perform a license check by running: mvn -P license license:check
-         * Update the licenses by running: mvn -P license license:format
-         * Remove the licenses by running: mvn -P license license:remove
-        -->
-        <profile>
-            <id>license</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.mycila.maven-license-plugin</groupId>
-                        <artifactId>maven-license-plugin</artifactId>
-                        <version>1.9.0</version>
-                        <configuration>
-                            <strictCheck>true</strictCheck>
-                            <quiet>false</quiet>
-                            <header>src/license/license-header.txt</header>
-                            <includes>
-                                <include>src/**</include>
-                                <include>pom.xml</include>
-                            </includes>
-                            <useDefaultExcludes>false</useDefaultExcludes>
-                            <excludes>
-                                <exclude>src/test/resources/**</exclude>
-                                <exclude>**/.**</exclude>
-                            </excludes>
-                            <mapping>
-                                <java>SLASHSTAR_STYLE</java>
-                            </mapping>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>check</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                </plugins>
-            </build>
-        </profile>
-
 
         <!--
             Profile for producing a distribution:
@@ -401,7 +413,6 @@
 
         </profile>
     </profiles>
-
 
 
 </project>
