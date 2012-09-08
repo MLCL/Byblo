@@ -108,6 +108,6 @@ public final class JensenShannonDivergence implements Measure, Serializable {
 
     @Override
     public String toString() {
-        return "KL-Divergence";
+        return "JS-Divergence";
     }
 }

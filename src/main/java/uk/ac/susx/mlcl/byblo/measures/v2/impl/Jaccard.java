@@ -66,7 +66,8 @@ public final class Jaccard extends DecomposableMeasure implements Serializable {
 
     @Override
     public double combine(double shared, double left, double right) {
-        return shared / (left + right - shared);
+        return shared == 0 ? 0 
+                : shared / (left + right - shared);
     }
 
     @Override
@@ -76,12 +77,12 @@ public final class Jaccard extends DecomposableMeasure implements Serializable {
 
     @Override
     public double getHomogeneityBound() {
-        return 0.0;
+        return 1.0;
     }
 
     @Override
     public double getHeterogeneityBound() {
-        return 1.0;
+        return 0.0;
     }
 
     @Override

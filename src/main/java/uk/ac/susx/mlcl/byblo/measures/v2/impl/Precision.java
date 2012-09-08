@@ -81,7 +81,12 @@ public class Precision extends Recall implements Serializable {
     }
 
     @Override
+    public double combine(double shared, double left, double right) {
+        return shared == 0 ? 0 : shared / right;
+    }
+
+    @Override
     public String toString() {
-        return "WeedsPrecision";
+        return "Precision";
     }
 }

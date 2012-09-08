@@ -69,6 +69,10 @@ public final class LpSpaceDistance implements Measure, Serializable {
         setPower(DEFAULT_POWER);
     }
 
+    public LpSpaceDistance(double power) {
+        setPower(power);
+    }
+
     public final double getPower() {
         return power;
     }
@@ -330,26 +334,25 @@ public final class LpSpaceDistance implements Measure, Serializable {
             int i = 0, j = 0;
             while (i < A.size && j < B.size) {
                 if (A.keys[i] < B.keys[j]) {
-                    distance += max(distance, abs(A.values[i]));
+                    distance = max(distance, abs(A.values[i]));
                     i++;
                 } else if (A.keys[i] > B.keys[j]) {
-                    distance += max(distance, abs(B.values[j]));
+                    distance = max(distance, abs(B.values[j]));
                     j++;
                 } else {
-                    distance += max(distance, abs(A.values[i] - B.values[j]));
+                    distance = max(distance, abs(A.values[i] - B.values[j]));
                     i++;
                     j++;
                 }
             }
             while (i < A.size) {
-                distance += max(distance, abs(A.values[i]));
+                distance = max(distance, abs(A.values[i]));
                 i++;
             }
             while (j < B.size) {
-                distance += max(distance, abs(B.values[j]));
+                distance = max(distance, abs(B.values[j]));
                 j++;
             }
-
             return distance;
         }
     }
@@ -369,23 +372,23 @@ public final class LpSpaceDistance implements Measure, Serializable {
             int i = 0, j = 0;
             while (i < A.size && j < B.size) {
                 if (A.keys[i] < B.keys[j]) {
-                    distance += min(distance, abs(A.values[i]));
+                    distance = min(distance, abs(A.values[i]));
                     i++;
                 } else if (A.keys[i] > B.keys[j]) {
-                    distance += min(distance, abs(B.values[j]));
+                    distance = min(distance, abs(B.values[j]));
                     j++;
                 } else {
-                    distance += min(distance, abs(A.values[i] - B.values[j]));
+                    distance = min(distance, abs(A.values[i] - B.values[j]));
                     i++;
                     j++;
                 }
             }
             while (i < A.size) {
-                distance += min(distance, abs(A.values[i]));
+                distance = min(distance, abs(A.values[i]));
                 i++;
             }
             while (j < B.size) {
-                distance += min(distance, abs(B.values[j]));
+                distance = min(distance, abs(B.values[j]));
                 j++;
             }
 

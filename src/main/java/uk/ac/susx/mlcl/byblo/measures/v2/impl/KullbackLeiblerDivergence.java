@@ -50,7 +50,7 @@ public final class KullbackLeiblerDivergence implements Measure, Serializable {
     @Override
     public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
         assert A.cardinality == B.cardinality;
-        final int N = A.cardinality;
+        final int N = Math.max(A.cardinality, B.cardinality);
 
         final double sumA = A.sum + N;
         final double sumB = B.sum + N;

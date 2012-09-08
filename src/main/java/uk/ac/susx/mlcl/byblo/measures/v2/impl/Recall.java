@@ -107,7 +107,8 @@ public class Recall extends DecomposableMeasure implements Serializable {
 
     @Override
     public double combine(double shared, double left, double right) {
-        return shared / left;
+        return shared == 0 ? 0 
+                : shared / left;
     }
 
     @Override
@@ -132,6 +133,6 @@ public class Recall extends DecomposableMeasure implements Serializable {
 
     @Override
     public String toString() {
-        return "WeedsRecall";
+        return "Recall";
     }
 }
