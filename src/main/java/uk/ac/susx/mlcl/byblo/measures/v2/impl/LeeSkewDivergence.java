@@ -32,7 +32,7 @@ package uk.ac.susx.mlcl.byblo.measures.v2.impl;
 
 import java.io.Serializable;
 import java.text.MessageFormat;
-import uk.ac.susx.mlcl.byblo.measures.v2.Distance;
+import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
@@ -62,7 +62,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class LeeSkewDivergence implements Distance, Serializable {
+public final class LeeSkewDivergence implements Measure, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -90,7 +90,7 @@ public final class LeeSkewDivergence implements Distance, Serializable {
     }
 
     @Override
-    public double distance(SparseDoubleVector A, SparseDoubleVector B) {
+    public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
         double divergence = 0.0;
 
         int i = 0;

@@ -36,7 +36,6 @@ import java.text.MessageFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
-import uk.ac.susx.mlcl.byblo.measures.v2.Proximity;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
@@ -73,7 +72,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * 30 (1–2): 81–89."
  */
 public final class KendallsTau
-        implements Proximity, Serializable {
+        implements Measure, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -159,7 +158,7 @@ public final class KendallsTau
      * @return rank correlation of the feature vectors
      */
     @Override
-    public double proximity(
+    public double similarity(
             final SparseDoubleVector A,
             final SparseDoubleVector B) {
 

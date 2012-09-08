@@ -57,6 +57,8 @@ package uk.ac.susx.mlcl.byblo.measures.v2.impl;
  * Expected range: [0,1] (JE Weeds, 2003)
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @deprecated Not actually implemented
  */
+@Deprecated
 public class Confusion {
 }

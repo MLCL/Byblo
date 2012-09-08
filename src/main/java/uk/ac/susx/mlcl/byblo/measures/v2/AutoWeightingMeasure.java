@@ -30,13 +30,46 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.v2;
 
+import java.io.Serializable;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
+ * A
+ * <code>Measure</code> decorator, that will automatically apply the delegate
+ * measures expected weighting scheme.
+ *
+ * The weighting scheme to use is determined by calling
+ * {@link Measure#getExpectedWeighting() }.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public interface Distance extends Measure {
+public class AutoWeightingMeasure
+        extends ForwardingMeasure<Measure>
+        implements Serializable {
 
-    double distance(SparseDoubleVector A, SparseDoubleVector B);
+    private static final long serialVersionUID = 1L;
+
+    public AutoWeightingMeasure(Measure deligate) {
+        super(deligate);
+    }
+
+    @Override
+    public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
+        return getDelegate().similarity(
+                applyWeighting(A),
+                applyWeighting(B));
+    }
+
+    protected final SparseDoubleVector applyWeighting(
+            final SparseDoubleVector vector) {
+        return getDelegate().getExpectedWeighting().apply(vector);
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName()
+                + "{measure=" + getDelegate()
+                + ", weighting=" + getDelegate().getExpectedWeighting()
+                + '}';
+    }
 }
