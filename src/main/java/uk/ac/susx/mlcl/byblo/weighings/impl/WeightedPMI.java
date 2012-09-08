@@ -32,7 +32,6 @@ package uk.ac.susx.mlcl.byblo.weighings.impl;
 
 import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.weighings.AbstractContextualWeighting;
-import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
@@ -48,8 +47,8 @@ public final class WeightedPMI extends AbstractContextualWeighting
 
     @Override
     public double apply(SparseDoubleVector vector, int key, double value) {
-        final double logLikelihood = Weightings.log2(value / vector.sum);
-        final double logPrior = Weightings.log2(getFeaturePrior(key));
+        final double logLikelihood = LogProduct.log2(value / vector.sum);
+        final double logPrior = LogProduct.log2(getFeaturePrior(key));
         return (value / vector.sum) * (logLikelihood - logPrior);
     }
 

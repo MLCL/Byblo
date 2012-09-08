@@ -32,7 +32,6 @@ package uk.ac.susx.mlcl.byblo.weighings.impl;
 
 import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
-import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
@@ -48,7 +47,7 @@ public final class L2UnitVector implements Weighting, Serializable {
     @Override
     public final SparseDoubleVector apply(SparseDoubleVector from) {
         final SparseDoubleVector to = from.clone();
-        double lenSq = Weightings.lengthSquared(from);
+        double lenSq = lengthSquared(from);
         double sum = 0;
         for (int i = 0; i < from.size; i++) {
             to.values[i] = from.values[i] / lenSq;
@@ -72,5 +71,32 @@ public final class L2UnitVector implements Weighting, Serializable {
     @Override
     public String toString() {
         return this.getClass().getSimpleName();
+    }
+
+    /**
+     * The magnitude of the vector, i.e the L2 vector normal.
+     *
+     * TODO: Move to mlcl-lib/SparseDoubleVector
+     *
+     * @param vector
+     * @return magnitude of vector
+     */
+    public static double length(SparseDoubleVector vector) {
+        return Math.sqrt(lengthSquared(vector));
+    }
+
+    /**
+     * Calculate the square of the L@ norm of vector.
+     *
+     * TODO: Move to mlcl-lib/SparseDoubleVector
+     *
+     * @param vector
+     * @return magnitude squared of vector
+     */
+    public static double lengthSquared(SparseDoubleVector vector) {
+        double lengthSq = 0;
+        for (int i = 0; i < vector.size; i++)
+            lengthSq += vector.values[i] * vector.values[i];
+        return lengthSq;
     }
 }

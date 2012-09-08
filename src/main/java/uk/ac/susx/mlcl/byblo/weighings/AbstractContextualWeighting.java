@@ -88,4 +88,5 @@ public abstract class AbstractContextualWeighting
     protected final double getFeatureMarginal(int key) {
         return featureMarginalsDeligate.getFeatureMarginals(key);
     }
+
 }

@@ -32,22 +32,21 @@ package uk.ac.susx.mlcl.byblo.weighings.impl;
 
 import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.weighings.AbstractContextualWeighting;
-import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
  * Squared PMI.
- * 
- * \[ pmi^2(x,y) = \log( p(x,y)^2 / (p(x)p(y)) )  \]
- * 
- * Orientation of the scores is 0, log p(x,y), -infinity; for maximal positive 
+ *
+ * \[ pmi^2(x,y) = \log( p(x,y)^2 / (p(x)p(y)) ) \]
+ *
+ * Orientation of the scores is 0, log p(x,y), -infinity; for maximal positive
  * correlation, no correlation, and maximal negative correlation
- * 
- * 
- * Proposed in: Daille, B.: Approche mixte pour l'extraction automatique de 
- * terminologie: statistiquesicales et ltres linguistiques. PhD thesis, 
+ *
+ *
+ * Proposed in: Daille, B.: Approche mixte pour l'extraction automatique de
+ * terminologie: statistiquesicales et ltres linguistiques. PhD thesis,
  * Universite Paris 7
- * 
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class SquaredPMI extends AbstractContextualWeighting
@@ -57,9 +56,10 @@ public final class SquaredPMI extends AbstractContextualWeighting
 
     @Override
     public double apply(SparseDoubleVector vector, int key, double value) {
-        final double logProbability = Weightings.log2(value / getGrandTotal());
-        final double logFeaturePrior = Weightings.log2(getFeaturePrior(key));
-        final double logEntryPrior = Weightings.log2(vector.sum / getGrandTotal());
+        final double logProbability = LogProduct.log2(value / getGrandTotal());
+        final double logFeaturePrior = LogProduct.log2(getFeaturePrior(key));
+        final double logEntryPrior = LogProduct.log2(
+                vector.sum / getGrandTotal());
 
         return 2 * logProbability - (logEntryPrior + logFeaturePrior);
     }
@@ -73,7 +73,7 @@ public final class SquaredPMI extends AbstractContextualWeighting
     public double getUpperBound() {
         return 0;
     }
-    
+
     @Override
     public String toString() {
         return this.getClass().getSimpleName();
