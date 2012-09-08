@@ -33,13 +33,13 @@ package uk.ac.susx.mlcl.byblo.measures.v2.impl;
 import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
-import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
+import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- * {@link Distance} measure that computes similarity as the lambda divergence.
+ * Distance measure that computes similarity as the lambda divergence.
  *
  * The lambda weighted average of KL divergences of two distribution Q and R:
  *
@@ -138,8 +138,8 @@ public final class LambdaDivergence implements Measure, Serializable {
     }
 
     @Override
-    public Weighting getExpectedWeighting() {
-        return Weightings.positive();
+    public Class<? extends Weighting> getExpectedWeighting() {
+        return PositiveWeighting.class;
     }
 
     @Override

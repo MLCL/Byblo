@@ -47,10 +47,19 @@ import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDelegates;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource.WTStatsSource;
-import uk.ac.susx.mlcl.byblo.measures.*;
+import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
+import uk.ac.susx.mlcl.byblo.measures.v2.Measures;
+import uk.ac.susx.mlcl.byblo.measures.v2.impl.KendallsTau;
+import uk.ac.susx.mlcl.byblo.measures.v2.impl.LeeSkewDivergence;
+import uk.ac.susx.mlcl.byblo.measures.v2.impl.LpSpaceDistance;
+import uk.ac.susx.mlcl.byblo.measures.v2.impl.Weeds;
 import uk.ac.susx.mlcl.byblo.tasks.InvertedApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.NaiveApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.ThreadedApssTask;
+import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsCarrier;
+import uk.ac.susx.mlcl.byblo.weighings.Weighting;
+import uk.ac.susx.mlcl.byblo.weighings.Weightings;
+import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.commands.*;
 import uk.ac.susx.mlcl.lib.events.ProgressEvent;
@@ -66,7 +75,9 @@ import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
@@ -141,22 +152,24 @@ public class AllPairsCommand extends AbstractCommand {
     @Parameter(names = {"--lee-alpha"},
             description = "Alpha parameter to Lee's alpha-skew divergence measure.",
             converter = DoubleConverter.class)
-    private double leeAlpha = Lee.DEFAULT_ALPHA;
+    private double leeAlpha = LeeSkewDivergence.DEFAULT_ALPHA;
 
     @Parameter(names = {"--crmi-beta"},
-            description = "Beta parameter to Weed's CRMI measure.",
+            description = "Beta paramter to Weed's CRMI measure.",
             converter = DoubleConverter.class)
-    private double crmiBeta = CrMi.DEFAULT_BETA;
+    private double crmiBeta = Weeds.DEFAULT_BETA;
 
     @Parameter(names = {"--crmi-gamma"},
-            description = "Gamma parameter to Weed's CRMI measure.",
+            description = "Gamma paramter to Weed's CRMI measure.",
             converter = DoubleConverter.class)
-    private double crmiGamma = CrMi.DEFAULT_GAMMA;
+    private double crmiGamma = Weeds.DEFAULT_GAMMA;
 
     @Parameter(names = {"--mink-p"},
             description = "P parameter to Minkowski/Lp space measure.",
             converter = DoubleConverter.class)
-    private double minkP = Lp.DEFAULT_P;
+    private double minkP = LpSpaceDistance.DEFAULT_POWER;
+
+    private Weighting weighting = new NullWeighting();
 
     public enum Algorithm {
 
@@ -176,7 +189,6 @@ public class AllPairsCommand extends AbstractCommand {
         public NaiveApssTask newInstance() throws InstantiationException, IllegalAccessException {
             return getImplementation().newInstance();
         }
-
     }
 
     @Parameter(names = {"--algorithm"},
@@ -206,50 +218,92 @@ public class AllPairsCommand extends AbstractCommand {
             LOG.info("Running all-pairs similarity.");
         }
 
-        // Instantiate the denote proximity measure
-        Proximity proximity = getMeasureClass().newInstance();
+        // Instantiate the denote proxmity measure
+        Measure measure = getMeasureClass().newInstance();
 
         // Parameterise those measures that require them
-        if (proximity instanceof Lp) {
-            ((Lp) proximity).setP(getMinkP());
-        } else if (proximity instanceof Lee) {
-            ((Lee) proximity).setAlpha(getLeeAlpha());
-        } else if (proximity instanceof CrMi) {
-            ((CrMi) proximity).setBeta(getCrmiBeta());
-            ((CrMi) proximity).setGamma(getCrmiGamma());
+        if (measure instanceof LpSpaceDistance) {
+            ((LpSpaceDistance) measure).setPower(getMinkP());
+        } else if (measure instanceof LeeSkewDivergence) {
+            ((LeeSkewDivergence) measure).setAlpha(getLeeAlpha());
+        } else if (measure instanceof Weeds) {
+            ((Weeds) measure).setBeta(getCrmiBeta());
+            ((Weeds) measure).setGamma(getCrmiGamma());
         }
 
-        // Mutual Information based proximity measures require the frequencies
-        // of each feature, and other associate values
-        if (proximity instanceof AbstractMIProximity) {
-            if (LOG.isInfoEnabled()) {
-                LOG.info("Loading features file " + getFeaturesFile());
-            }
 
-            WTStatsSource features = new WTStatsSource(openFeaturesSource());
-
-            AbstractMIProximity bmip = ((AbstractMIProximity) proximity);
-            bmip.setFeatureFrequencies(readAllAsArray(features));
-            bmip.setFeatureFrequencySum(features.getWeightSum());
-            bmip.setOccurringFeatureCount(features.getMaxId() + 1);
-
-        } else if (proximity instanceof KendallTau) {
-            if (LOG.isInfoEnabled()) {
-                LOG.info("Loading entries file for KendalTau.numFeatures: " + getFeaturesFile());
-            }
-
-            WTStatsSource features = new WTStatsSource(openFeaturesSource());
-            ObjectIO.copy(features, ObjectIO.<Weighted<Token>>nullSink());
-            ((KendallTau) proximity).setNumFeatures(features.getMaxId() + 1);
+        if (weighting.getClass().equals(NullWeighting.class)) {
+            weighting = measure.getExpectedWeighting().newInstance();
+        } else {
+            weighting = Weightings.compose(
+                    weighting,
+                    measure.getExpectedWeighting().newInstance());
         }
-        //XXX This needs to be sorted out --- filter id must be read from the
-        // stored enumeration, for optimal robustness
-        proximity.setFilteredFeatureId(FilterCommand.FILTERED_ID);
+
+
+        // Some weightings schemes require additional context information, 
+        // specifically the feature marginal distribution. Also there is one
+        // measure (Confusion) that requires this information. The KendallsTau
+        // measure just needs the total number of features types.
+        if (measure instanceof FeatureMarginalsCarrier
+                || weighting instanceof FeatureMarginalsCarrier) {
+            try {
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("Loading features file " + getFeaturesFile());
+                }
+
+                WTStatsSource features = new WTStatsSource(openFeaturesSource());
+
+                final double[] featureMarginals = readAllAsArray(features);
+                final double grandTotal = features.getWeightSum();
+                final int featureCardinality = features.getMaxId() + 1;
+
+                if (measure instanceof FeatureMarginalsCarrier) {
+                    FeatureMarginalsCarrier fmc = ((FeatureMarginalsCarrier) measure);
+                    fmc.setFeatureMarginals(featureMarginals);
+                    fmc.setGrandTotal(grandTotal);
+                    fmc.setFeatureCardinality(featureCardinality);
+                }
+
+                if (weighting instanceof FeatureMarginalsCarrier) {
+                    FeatureMarginalsCarrier fmc = ((FeatureMarginalsCarrier) weighting);
+                    fmc.setFeatureMarginals(featureMarginals);
+                    fmc.setGrandTotal(grandTotal);
+                    fmc.setFeatureCardinality(featureCardinality);
+                }
+
+
+            } catch (IOException e) {
+                throw e;
+            }
+        } else if (measure instanceof KendallsTau) {
+            try {
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("Loading entries file for "
+                            + "KendallsTau.minCardinality: " + getFeaturesFile());
+                }
+
+                WTStatsSource features = new WTStatsSource(openFeaturesSource());
+                ObjectIO.copy(features, ObjectIO.<Weighted<Token>>nullSink());
+                ((KendallsTau) measure).setMinCardinality(
+                        features.getMaxId() + 1);
+
+            } catch (IOException e) {
+                throw e;
+            }
+        }
+//        //XXX This needs to be sorted out --- filter id must be read from the
+//        // stored enumeration, for optimal robustness
+//        measure.setFilteredFeatureId(FilterCommand.FILTERED_ID);
 
         // Swap the proximity measure inputs if required
         if (isMeasureReversed()) {
-            proximity = new ReversedProximity(proximity);
+            measure = Measures.reverse(measure);
         }
+
+        // XXX: Apply the weighing at similarity calculation time, 
+        // inefficient but simple for now.
+        measure = Measures.autoWeighted(measure, weighting);
 
 
         // Instantiate two vector source objects than can scan and read the
@@ -273,7 +327,7 @@ public class AllPairsCommand extends AbstractCommand {
         apss.setSourceA(sourceA);
         apss.setSourceB(sourceB);
         apss.setSink(sink);
-        apss.setMeasure(proximity);
+        apss.setMeasure(measure);
         apss.setProducatePair(getProductionFilter());
 
 
@@ -284,7 +338,6 @@ public class AllPairsCommand extends AbstractCommand {
                 LOG.info(progressEvent.getSource().getProgressReport());
 //                LOG.info(MiscUtil.memoryInfoString());
             }
-
         });
 
         apss.run();
@@ -346,7 +399,11 @@ public class AllPairsCommand extends AbstractCommand {
                 maxId = k;
         }
         double[] entryFreqs = new double[maxId + 1];
-        for (Int2DoubleMap.Entry entry : entityFrequenciesMap.int2DoubleEntrySet()) {
+        ObjectIterator<Int2DoubleMap.Entry> it = entityFrequenciesMap.
+                int2DoubleEntrySet().
+                iterator();
+        while (it.hasNext()) {
+            Int2DoubleMap.Entry entry = it.next();
             entryFreqs[entry.getIntKey()] = entry.getDoubleValue();
         }
         return entryFreqs;
@@ -411,42 +468,16 @@ public class AllPairsCommand extends AbstractCommand {
     }
 
     @SuppressWarnings("unchecked")
-    public final Class<? extends Proximity> getMeasureClass()
+    public final Class<? extends Measure> getMeasureClass()
             throws ClassNotFoundException {
-        final Map<String, Class<? extends Proximity>> classLookup =
-                buildMeasureClassLookupTable();
-        final String measureName = getMeasureName().toLowerCase().trim();
-        if (classLookup.containsKey(measureName)) {
-            return classLookup.get(measureName);
+        final Map<String, Class<? extends Measure>> classLookup =
+                Measures.loadMeasureAliasTable();
+        final String mname = getMeasureName().toLowerCase().trim();
+        if (classLookup.containsKey(mname)) {
+            return classLookup.get(mname);
         } else {
-            return (Class<? extends Proximity>) Class.forName(getMeasureName());
+            return (Class<? extends Measure>) Class.forName(getMeasureName());
         }
-    }
-
-    private Map<String, Class<? extends Proximity>> buildMeasureClassLookupTable()
-            throws ClassNotFoundException {
-
-        // Map that will store measure aliases to class
-        final Map<String, Class<? extends Proximity>> classLookup = new HashMap<String, Class<? extends Proximity>>();
-
-        final ResourceBundle res = ResourceBundle.getBundle(
-                uk.ac.susx.mlcl.byblo.measures.Lin.class.getPackage().getName() + ".measures");
-        final String[] measures = res.getString("measures").split(",");
-
-        for (String measure1 : measures) {
-            final String measure = measure1.trim();
-            final String className = res.getString("measure." + measure + ".class");
-            @SuppressWarnings("unchecked")
-            final Class<? extends Proximity> clazz = (Class<? extends Proximity>) Class.forName(className);
-            classLookup.put(measure.toLowerCase(), clazz);
-            if (res.containsKey("measure." + measure + ".aliases")) {
-                final String[] aliases = res.getString("measure." + measure + ".aliases").split(",");
-                for (String alias : aliases) {
-                    classLookup.put(alias.toLowerCase().trim(), clazz);
-                }
-            }
-        }
-        return classLookup;
     }
 
     @Override
@@ -639,5 +670,4 @@ public class AllPairsCommand extends AbstractCommand {
     public EnumeratorType getEnumeratorType() {
         return indexDelegate.getEnumeratorType();
     }
-
 }

@@ -31,7 +31,7 @@
 package uk.ac.susx.mlcl.byblo.measures.v2;
 
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
-import uk.ac.susx.mlcl.byblo.weighings.Weightings;
+import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
@@ -79,8 +79,8 @@ public abstract class ForwardingMeasure<T extends Measure>
     }
 
     @Override
-    public Weighting getExpectedWeighting() {
-        return Weightings.none();
+    public Class<? extends Weighting> getExpectedWeighting() {
+        return NullWeighting.class;
     }
 
     @Override

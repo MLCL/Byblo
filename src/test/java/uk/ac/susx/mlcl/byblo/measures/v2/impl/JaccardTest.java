@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo.measures;
+package uk.ac.susx.mlcl.byblo.measures.v2.impl;
 
 import java.io.File;
 import java.util.Arrays;
@@ -44,13 +44,12 @@ import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
 /**
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
- * @deprecated
  */
 public class JaccardTest {
 
     @Test
     public void testJaccardCLI() throws Exception {
-        System.out.println("Testing Jaccard from main method.");
+        System.out.println("testJaccardCLI");
 
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Jaccard");
         output.delete();
@@ -66,35 +65,6 @@ public class JaccardTest {
                         "--input-entries", TEST_FRUIT_ENTRIES.toString(),
                         "--output", output.toString()
                     });
-        } finally {
-            disableExitTrapping();
-        }
-
-
-        assertTrue("Output file " + output + " does not exist.", output.exists());
-        assertTrue("Output file " + output + " is empty.", output.length() > 0);
-    }
-
-    @Test
-    public void testJaccardMiCLI() throws Exception {
-        System.out.println("Testing JaccardMI from main method.");
-
-        File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".JaccardMI");
-        output.delete();
-
-        String[] args = new String[]{
-            "allpairs",
-            "--charset", "UTF-8",
-            "--measure", "JaccardMI",
-            "--input", TEST_FRUIT_EVENTS.toString(),
-            "--input-features", TEST_FRUIT_FEATURES.toString(),
-            "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-            "--output", output.toString()
-        };
-
-        try {
-            enableExistTrapping();
-            Tools.main(args);
         } finally {
             disableExitTrapping();
         }
@@ -238,89 +208,7 @@ public class JaccardTest {
         System.out.println("Testing isSymmetric()");
         boolean expResult = true;
         Jaccard instance = new Jaccard();
-        boolean result = instance.isSymmetric();
+        boolean result = instance.isCommutative();
         assertEquals(expResult, result);
-    }
-
-    @Test
-    public void testJaccard_Symmetry() throws Exception {
-        System.out.println("Testing Jaccard symmetry.");
-
-        File output1 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Jaccard-1");
-        File output2 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Jaccard-2");
-        output1.delete();
-        output2.delete();
-
-        try {
-            enableExistTrapping();
-            Tools.main(new String[]{
-                        "allpairs",
-                        "--charset", "UTF-8",
-                        "--measure", "Jaccard",
-                        "--input", TEST_FRUIT_EVENTS.toString(),
-                        "--input-features", TEST_FRUIT_FEATURES.toString(),
-                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                        "--output", output1.toString()
-                    });
-            Tools.main(new String[]{
-                        "allpairs",
-                        "--charset", "UTF-8",
-                        "--measure", "Jaccard",
-                        "--measure-reversed",
-                        "--input", TEST_FRUIT_EVENTS.toString(),
-                        "--input-features", TEST_FRUIT_FEATURES.toString(),
-                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                        "--output", output2.toString()
-                    });
-
-        } finally {
-            disableExitTrapping();
-        }
-
-//        assertTrue(WeightedTokenPairSource.equal(output1, output2,
-//                                                 DEFAULT_CHARSET, false, false));
-    }
-
-    @Test
-    public void testJaccardMi_Symmetry() throws Exception {
-        System.out.println("Testing symmetry.");
-
-        final String dataSet = "bnc-gramrels-fruit";
-
-        File output1 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".JaccardMI-1");
-        File output2 = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".JaccardMI-2");
-        output1.delete();
-        output2.delete();
-
-
-        try {
-            enableExistTrapping();
-            Tools.main(new String[]{
-                        "allpairs",
-                        "--charset", "UTF-8",
-                        "--measure", "JaccardMi",
-                        "--input", TEST_FRUIT_EVENTS.toString(),
-                        "--input-features", TEST_FRUIT_FEATURES.toString(),
-                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                        "--output", output1.toString()
-                    });
-            Tools.main(new String[]{
-                        "allpairs",
-                        "--charset", "UTF-8",
-                        "--measure", "JaccardMi",
-                        "--measure-reversed",
-                        "--input", TEST_FRUIT_EVENTS.toString(),
-                        "--input-features", TEST_FRUIT_FEATURES.toString(),
-                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                        "--output", output2.toString()
-                    });
-
-        } finally {
-            disableExitTrapping();
-        }
-
-
-//        assertTrue(WeightedTokenPairSource.equal(output1, output2,
-//                                                 DEFAULT_CHARSET, false, false));
     }
 }

@@ -30,44 +30,26 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.v2;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
 import org.junit.*;
-import static org.junit.Assert.*;
+import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
+import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDelegates;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.Cosine;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.Dice;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.DotProduct;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.Hindle;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.Jaccard;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.JensenShannonDivergence;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.KendallsTau;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.KullbackLeiblerDivergence;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.LambdaDivergence;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.LeeSkewDivergence;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.Lin;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.LpSpaceDistance;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.Overlap;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.Precision;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.Recall;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.Weeds;
-import uk.ac.susx.mlcl.lib.collect.Indexed;
-import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import static uk.ac.susx.mlcl.TestConstants.*;
-import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
-import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDeligates;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
-import uk.ac.susx.mlcl.byblo.measures.v2.impl.Confusion;
+import uk.ac.susx.mlcl.byblo.measures.v2.impl.*;
 import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsCarrier;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
+import uk.ac.susx.mlcl.lib.collect.Indexed;
+import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.*;
+
+import static org.junit.Assert.*;
+import static uk.ac.susx.mlcl.TestConstants.*;
 
 /**
  * Perform a set of tests on ALL measures.
@@ -82,34 +64,34 @@ public class MeasuresTest {
     static final double EPSILON = 0;
 
     static Measure[] MEASURES = new Measure[]{
-        new Confusion(),
-        new Cosine(),
-        new Dice(),
-        new DotProduct(),
-        new Hindle(),
-        new Jaccard(),
-        new JensenShannonDivergence(),
-        new KendallsTau(),
-        new KullbackLeiblerDivergence(),
-        new LambdaDivergence(LambdaDivergence.DEFAULT_LAMBDA),
-        new LeeSkewDivergence(LeeSkewDivergence.DEFAULT_ALPHA),
-        new Lin(),
-        new LpSpaceDistance(Double.NEGATIVE_INFINITY),
-        new LpSpaceDistance(0),
-        new LpSpaceDistance(1),
-        new LpSpaceDistance(2),
-        new LpSpaceDistance(3),
-        new LpSpaceDistance(Double.POSITIVE_INFINITY),
-        new Overlap(),
-        new Precision(),
-        new Recall(),
-        new Weeds(Weeds.DEFAULT_BETA, Weeds.DEFAULT_GAMMA),
-        new Weeds(0.00, 1),
-        new Weeds(1.00, 0),
-        new Weeds(0.75, 0),
-        new Weeds(0.50, 0),
-        new Weeds(0.25, 0),
-        new Weeds(0.00, 0)
+            new Confusion(),
+            new Cosine(),
+            new Dice(),
+            new DotProduct(),
+            new Hindle(),
+            new Jaccard(),
+            new JensenShannonDivergence(),
+            new KendallsTau(),
+            new KullbackLeiblerDivergence(),
+            new LambdaDivergence(LambdaDivergence.DEFAULT_LAMBDA),
+            new LeeSkewDivergence(LeeSkewDivergence.DEFAULT_ALPHA),
+            new Lin(),
+            new LpSpaceDistance(Double.NEGATIVE_INFINITY),
+            new LpSpaceDistance(0),
+            new LpSpaceDistance(1),
+            new LpSpaceDistance(2),
+            new LpSpaceDistance(3),
+            new LpSpaceDistance(Double.POSITIVE_INFINITY),
+            new Overlap(),
+            new Precision(),
+            new Recall(),
+            new Weeds(Weeds.DEFAULT_BETA, Weeds.DEFAULT_GAMMA),
+            new Weeds(0.00, 1),
+            new Weeds(1.00, 0),
+            new Weeds(0.75, 0),
+            new Weeds(0.50, 0),
+            new Weeds(0.25, 0),
+            new Weeds(0.00, 0)
     };
 
     static Map<Measure, Weighting> WEIGHTINGS;
@@ -125,15 +107,15 @@ public class MeasuresTest {
 
         WEIGHTINGS = new HashMap<Measure, Weighting>();
         for (Measure m : MEASURES) {
-            WEIGHTINGS.put(m, m.getExpectedWeighting());
+            WEIGHTINGS.put(m, m.getExpectedWeighting().newInstance());
         }
 
-        final DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
+        final DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();
 
         // Load events
         final FastWeightedTokenPairVectorSource eventSrc =
                 BybloIO.openEventsVectorSource(
-                TEST_FRUIT_EVENTS, DEFAULT_CHARSET, indexDeligate);
+                        TEST_FRUIT_EVENTS, DEFAULT_CHARSET, indexDelegate);
         FRUIT_EVENTS = new ArrayList<Indexed<SparseDoubleVector>>();
         int card = 0;
         while (eventSrc.hasNext()) {
@@ -157,7 +139,7 @@ public class MeasuresTest {
 
         WeightedTokenSource featsSrc = BybloIO.openFeaturesSource(
                 TEST_FRUIT_FEATURES, DEFAULT_CHARSET,
-                EnumeratingDeligates.toSingleFeatures(indexDeligate));
+                EnumeratingDelegates.toSingleFeatures(indexDelegate));
 
         WeightedTokenSource.WTStatsSource featsStatSrc =
                 new WeightedTokenSource.WTStatsSource(featsSrc);
@@ -251,8 +233,8 @@ public class MeasuresTest {
 //                                                   getHomogeneityBound()));
 
                 if (!(m instanceof Hindle
-                      || m instanceof Confusion
-                      || m instanceof DotProduct)) {
+                        || m instanceof Confusion
+                        || m instanceof DotProduct)) {
                     assertEquals(m.getHomogeneityBound(), result, EPSILON);
                 }
 
@@ -293,9 +275,9 @@ public class MeasuresTest {
                        SparseDoubleVector B) {
         final double val = instance.similarity(A, B);
         assertFalse("Similarity is NaN" + " with measure " + instance,
-                    Double.isNaN(val));
+                Double.isNaN(val));
         assertFalse("Similarity is " + val + " with measure " + instance,
-                    Double.isInfinite(val));
+                Double.isInfinite(val));
 
         final double min, max;
         if (instance.getHeterogeneityBound() < instance.getHomogeneityBound()) {
@@ -306,16 +288,16 @@ public class MeasuresTest {
             max = instance.getHeterogeneityBound();
         }
         assertTrue("expected similarity >= " + min + " but found " + val,
-                   val >= min);
+                val >= min);
         assertTrue("expected similarity <= " + max + " but found " + val,
-                   val <= max);
+                val <= max);
 
 
         if (instance.isCommutative()) {
             final double rev = instance.similarity(B, A);
             assertEquals("Measure is declared computative, but reversing "
                     + "operands results in a different score.", rev, val,
-                         EPSILON);
+                    EPSILON);
         }
 
         return val;

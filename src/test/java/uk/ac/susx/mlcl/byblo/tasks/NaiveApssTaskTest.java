@@ -42,4 +42,5 @@ public class NaiveApssTaskTest extends AbstractAllPairsTaskTest<NaiveApssTask> {
         return NaiveApssTask.class;
     }
 
+
 }

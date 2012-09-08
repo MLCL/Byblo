@@ -43,8 +43,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
-import uk.ac.susx.mlcl.byblo.measures.Jaccard;
-import uk.ac.susx.mlcl.byblo.measures.Proximity;
+import uk.ac.susx.mlcl.byblo.measures.v2.DecomposableMeasure;
+import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
+import uk.ac.susx.mlcl.byblo.measures.v2.impl.Jaccard;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
@@ -55,6 +56,10 @@ import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 import uk.ac.susx.mlcl.lib.events.ProgressDelegate;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.events.ProgressReporting;
+import uk.ac.susx.mlcl.lib.io.ObjectIO;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
+import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 
 /**
  * The most basic implementation of all-pairs similarity search. Will only
@@ -73,7 +78,7 @@ public class NaiveApssTask<P> extends AbstractTask
      * Set to Jaccard because it requires no parameterization; hence can be
      * instantiated quickly and easily.
      */
-    public static final Proximity DEFAULT_MEASURE = new Jaccard();
+    public static final Measure DEFAULT_MEASURE = new Jaccard();
 
     protected final ProgressDelegate progress = new ProgressDelegate(this, true);
 
@@ -81,14 +86,15 @@ public class NaiveApssTask<P> extends AbstractTask
 
     private SeekableObjectSource<Indexed<SparseDoubleVector>, P> sourceB;
 
-    private Proximity measure = DEFAULT_MEASURE;
+    private Measure measure = DEFAULT_MEASURE;
 
     private ObjectSink<Weighted<TokenPair>> sink;
 
     /**
      * Filters that determine which feature vectors are considered.
      */
-    private Predicate<Indexed<SparseDoubleVector>> processRecord = Predicates.alwaysTrue();
+    private Predicate<Indexed<SparseDoubleVector>> processRecord = Predicates.
+            alwaysTrue();
 
     /**
      * Filters that determine which resultant pairs are output
@@ -189,14 +195,12 @@ public class NaiveApssTask<P> extends AbstractTask
         return sourceB;
     }
 
-    public final Proximity getMeasure() {
+    public final Measure getMeasure() {
         return measure;
     }
 
-    public final void setMeasure(Proximity measure) {
-        if (measure == null) {
-            throw new NullPointerException("measure == null");
-        }
+    public final void setMeasure(Measure measure) {
+        Checks.checkNotNull("measure", measure);
         this.measure = measure;
     }
 
@@ -293,6 +297,8 @@ public class NaiveApssTask<P> extends AbstractTask
     /**
      * Confirm that the algorithm has been correctly parameterized such that it
      * is likely to run without error.
+     *
+     * @throws IOException if something goes wrong with input sources
      */
     protected void checkState() throws IOException {
         if (sourceA == null) {
@@ -327,11 +333,13 @@ public class NaiveApssTask<P> extends AbstractTask
     protected void buildPrecalcs() throws IOException {
         // Calculate the left and right hand components if they have not been
         // provided.
-        if (precalcA == null) {
-            precalcA = buildPrecalcA();
-        }
-        if (precalcB == null) {
-            precalcB = buildPrecalcB();
+        if (getMeasure() instanceof DecomposableMeasure) {
+            if (precalcA == null) {
+                precalcA = buildPrecalcA();
+            }
+            if (precalcB == null) {
+                precalcB = buildPrecalcB();
+            }
         }
 
     }
@@ -345,22 +353,32 @@ public class NaiveApssTask<P> extends AbstractTask
     }
 
     protected Int2DoubleMap buildPrecalcA() throws IOException {
+        if (!(getMeasure() instanceof DecomposableMeasure))
+            return null;
+
+        final DecomposableMeasure dm = (DecomposableMeasure) getMeasure();
+
         final P startA = sourceA.position();
         Int2DoubleOpenHashMap result = new Int2DoubleOpenHashMap();
         while (sourceA.hasNext()) {
             Indexed<SparseDoubleVector> p = sourceA.read();
-            result.put(p.key(), getMeasure().left(p.value()));
+            result.put(p.key(), dm.left(p.value()));
         }
         sourceA.position(startA);
         return result;
     }
 
     protected Int2DoubleMap buildPrecalcB() throws IOException {
+        if (!(getMeasure() instanceof DecomposableMeasure))
+            return null;
+
+        final DecomposableMeasure dm = (DecomposableMeasure) getMeasure();
+
         final P startB = sourceB.position();
         Int2DoubleOpenHashMap result = new Int2DoubleOpenHashMap();
         while (sourceB.hasNext()) {
             Indexed<SparseDoubleVector> p = sourceB.read();
-            result.put(p.key(), getMeasure().right(p.value()));
+            result.put(p.key(), dm.right(p.value()));
         }
         sourceB.position(startB);
         return result;
@@ -370,10 +388,18 @@ public class NaiveApssTask<P> extends AbstractTask
             final Indexed<SparseDoubleVector> a,
             final Indexed<SparseDoubleVector> b) {
         stats.incrementComparisonCount();
-        return measure.combine(
-                measure.shared(a.value(), b.value()),
-                precalcA.get(a.key()),
-                precalcB.get(b.key()));
+
+        // XXX: checking instanceof everytime will be a bit slow
+        if (measure instanceof DecomposableMeasure) {
+            final DecomposableMeasure dm =
+                    (DecomposableMeasure) getMeasure();
+            return dm.combine(
+                    dm.shared(a.value(), b.value()),
+                    precalcA.get(a.key()),
+                    precalcB.get(b.key()));
+        } else {
+            return measure.similarity(a.value(), b.value());
+        }
     }
 
     @Override
@@ -427,5 +453,4 @@ public class NaiveApssTask<P> extends AbstractTask
                 add("pruducePair", pruducePair).
                 add("stats", stats);
     }
-
 }

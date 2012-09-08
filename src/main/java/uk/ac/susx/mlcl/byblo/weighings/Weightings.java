@@ -50,47 +50,6 @@ public final class Weightings {
     }
 
     /**
-     * Hold singleton instances that will be instantiated lazily, and
-     * synchronously, the first time this name-space is accessed.
-     */
-    private static final class InstanceHolder {
-
-        private InstanceHolder() {
-        }
-
-        private static final Weighting NULL_WEIGHTING =
-                new NullWeighting();
-
-        private static final Weighting POSITIVE_WEIGHTING =
-                new Bound(0, Double.POSITIVE_INFINITY);
-
-        private static final Weighting NEGATIVE_WEIGHTING =
-                new Bound(Double.NEGATIVE_INFINITY, 0);
-
-    }
-
-    /**
-     * @return A weighting scheme leaves vectors intact
-     */
-    public static Weighting none() {
-        return InstanceHolder.NULL_WEIGHTING;
-    }
-
-    /**
-     * @return A weighting scheme that lower bounds all weightings to 0
-     */
-    public static Weighting positive() {
-        return InstanceHolder.POSITIVE_WEIGHTING;
-    }
-
-    /**
-     * @return A weighting scheme that upper bounds all weightings to 0
-     */
-    public static Weighting negative() {
-        return InstanceHolder.NEGATIVE_WEIGHTING;
-    }
-
-    /**
      * @param weightings weightings to compose
      * @return weighting scheme the runs the given weightings in sequence.
      */

@@ -41,7 +41,7 @@ import uk.ac.susx.mlcl.lib.Checks;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class Bound
+public class Bound
         extends AbstractSimpleWeighting
         implements Serializable {
 
@@ -66,12 +66,14 @@ public final class Bound
     }
 
     public void setLowerBound(final double lowerBound) {
-        Checks.checkNotNaN("lowerBound", lowerBound);
+        if(Double.isNaN(lowerBound))
+            throw new IllegalArgumentException("lowerBound");
         this.lowerBound = lowerBound;
     }
 
     public void setUpperBound(final double upperBound) {
-        Checks.checkNotNaN("upperBound", upperBound);
+        if(Double.isNaN(lowerBound))
+            throw new IllegalArgumentException("upperBound");
         this.upperBound = upperBound;
     }
 

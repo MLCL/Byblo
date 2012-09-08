@@ -42,15 +42,21 @@ import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.measures.Jaccard;
 import uk.ac.susx.mlcl.byblo.measures.Proximity;
+import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
 import uk.ac.susx.mlcl.lib.PoissonDistribution;
 import uk.ac.susx.mlcl.lib.events.ReportingProgressListener;
+import uk.ac.susx.mlcl.lib.io.ObjectIO;
+import uk.ac.susx.mlcl.lib.io.Tell;
 import uk.ac.susx.mlcl.testing.AbstractObjectTest;
 import uk.ac.susx.mlcl.testing.SlowTestCategory;
 
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+import static org.junit.Assert.assertTrue;
 import static uk.ac.susx.mlcl.TestConstants.DEFAULT_CHARSET;
 import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_EVENTS;
 
@@ -62,7 +68,7 @@ import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_EVENTS;
 public abstract class AbstractAllPairsTaskTest<T extends NaiveApssTask> extends AbstractObjectTest<T> {
 
 
-    private static final Proximity MEASURE = new Jaccard();
+    private static final Measure MEASURE = new uk.ac.susx.mlcl.byblo.measures.v2.impl.Jaccard();
 
     private static final Predicate<Weighted<TokenPair>> PAIR_FILTER =
             Weighted.greaterThanOrEqualTo(1E-10);

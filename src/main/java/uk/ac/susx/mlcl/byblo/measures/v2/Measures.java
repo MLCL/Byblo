@@ -31,9 +31,13 @@
 package uk.ac.susx.mlcl.byblo.measures.v2;
 
 import static java.lang.Math.min;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.weighings.Weightings;
+import uk.ac.susx.mlcl.byblo.weighings.Weighting;
+import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
@@ -168,12 +172,12 @@ public abstract class Measures {
                 : Math.sqrt(lengthSquared(vector));
     }
 
-    public static Measure autoWeighted(Measure measure) {
+    public static Measure autoWeighted(Measure measure, Weighting weighting) {
         Checks.checkNotNull("measure", measure);
-        if (measure.getExpectedWeighting().equals(Weightings.none())) {
+        if (weighting.getClass().equals(NullWeighting.class)) {
             return measure;
         } else {
-            return new AutoWeightingMeasure(measure);
+            return new AutoWeightingMeasure(measure, weighting);
         }
     }
 
@@ -209,5 +213,36 @@ public abstract class Measures {
      */
     public static double log2(final double v) {
         return Math.log(v) / LOG_2;
+    }
+
+    public static Map<String, Class<? extends Measure>> loadMeasureAliasTable()
+            throws ClassNotFoundException {
+
+        // Map that will store measure aliases to class
+        final Map<String, Class<? extends Measure>> classLookup =
+                new HashMap<String, Class<? extends Measure>>();
+
+        final ResourceBundle res = ResourceBundle.getBundle(
+                uk.ac.susx.mlcl.byblo.measures.v2.Measure.class.getPackage().
+                getName() + ".measures");
+        final String[] measures = res.getString("measures").split(",");
+
+        for (int i = 0; i < measures.length; i++) {
+            final String measure = measures[i].trim();
+            final String className = res.getString(
+                    "measure." + measure + ".class");
+            @SuppressWarnings("unchecked")
+            final Class<? extends Measure> clazz =
+                    (Class<? extends Measure>) Class.forName(className);
+            classLookup.put(measure.toLowerCase(), clazz);
+            if (res.containsKey("measure." + measure + ".aliases")) {
+                final String[] aliases = res.getString(
+                        "measure." + measure + ".aliases").split(",");
+                for (String alias : aliases) {
+                    classLookup.put(alias.toLowerCase().trim(), clazz);
+                }
+            }
+        }
+        return classLookup;
     }
 }

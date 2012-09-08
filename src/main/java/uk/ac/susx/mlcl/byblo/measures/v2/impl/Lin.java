@@ -84,7 +84,7 @@ public final class Lin extends DecomposableMeasure implements Serializable {
 
     @Override
     public double combine(double shared, double left, double right) {
-        return shared == 0 ? 0 
+        return shared == 0 ? 0
                 : shared / (left + right);
     }
 
@@ -104,8 +104,8 @@ public final class Lin extends DecomposableMeasure implements Serializable {
     }
 
     @Override
-    public Weighting getExpectedWeighting() {
-        return new PositivePMI();
+    public Class<? extends Weighting> getExpectedWeighting() {
+        return PositivePMI.class;
     }
 
     @Override

@@ -30,32 +30,33 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.v2.impl;
 
-import java.io.Serializable;
-import java.text.MessageFormat;
 import uk.ac.susx.mlcl.byblo.measures.v2.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
-import uk.ac.susx.mlcl.byblo.weighings.Weightings;
-import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
+import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import java.io.Serializable;
+import java.text.MessageFormat;
+
+import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
+
 /**
- * {@link Distance} measure that computes similarity using Lee's alpha-Skew
- * divergence.
- *
+ * Distance measure that computes similarity using Lee's alpha-Skew divergence.
+ * <p/>
  * Skew divergence is a variant of Kullback–Leibler (KL) divergence. KL
  * divergence is undefined for zero probabilities in the empirical distribution.
  * To resolve this problem divergence is measured from a mixed distribution;
  * computed as the weighted average of the two distributions. The alpha
  * parameter controls this weighting.
- *
+ * <p/>
  * Alpha takes a value in the range [0,1] exclusive, where 0 is entirely the
  * first distribution, 1 is entirely the second distribution, and 0.5 is the
  * average distribution. Note that alpha <em>must<em> not be exactly 0 or 1, or
  * it becomes undefined for zero estimates just like KL divergence.
- *
+ * <p/>
  * Not a true metric, but effectively a distance measure.
- *
+ * <p/>
  * Lillian Lee (2001) "On the Effectiveness of the Skew Divergence for
  * Statistical Language Analysis" Artificial Intelligence and Statistics 2001,
  * pp. 65--72, 2001
@@ -83,8 +84,8 @@ public final class LeeSkewDivergence implements Measure, Serializable {
     }
 
     public final void setAlpha(double alpha) {
-        Checks.checkNotNaN("alpha", alpha);
-        Checks.checkFinite("alpha", alpha);
+        if (Double.isNaN(alpha) || Double.isInfinite(alpha))
+            throw new IllegalArgumentException("alpha");
         Checks.checkRangeExcl("alpha", alpha, 0.0, 1.0);
         this.alpha = alpha;
     }
@@ -138,8 +139,8 @@ public final class LeeSkewDivergence implements Measure, Serializable {
     }
 
     @Override
-    public Weighting getExpectedWeighting() {
-        return Weightings.positive();
+    public Class<? extends Weighting> getExpectedWeighting() {
+        return PositiveWeighting.class;
     }
 
     @Override

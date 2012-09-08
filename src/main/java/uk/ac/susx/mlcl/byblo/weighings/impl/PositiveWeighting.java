@@ -28,68 +28,21 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo.measures.v2.impl;
+package uk.ac.susx.mlcl.byblo.weighings.impl;
 
 import java.io.Serializable;
-import uk.ac.susx.mlcl.byblo.measures.v2.DecomposableMeasure;
-import uk.ac.susx.mlcl.byblo.measures.v2.Measures;
-import uk.ac.susx.mlcl.byblo.weighings.Weighting;
-import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
-import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- * Proximity measure calculating proximity as the degree orthogonality between
- * vectors; the cosine of the angle between them.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class Cosine extends DecomposableMeasure implements Serializable {
+public final class PositiveWeighting
+        extends Bound
+        implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @Override
-    public double shared(SparseDoubleVector A, SparseDoubleVector B) {
-        return Measures.dotProduct(A, B);
-    }
-
-    @Override
-    public double left(SparseDoubleVector A) {
-        return Measures.lengthSquared(A);
-    }
-
-    @Override
-    public double right(SparseDoubleVector B) {
-        return Measures.lengthSquared(B);
-    }
-
-    @Override
-    public double combine(double shared, double left, double right) {
-        return (left == 0 || right == 0 || shared == 0) ? 0
-                : shared / Math.sqrt(left * right);
-    }
-
-    @Override
-    public boolean isCommutative() {
-        return true;
-    }
-
-    @Override
-    public double getHomogeneityBound() {
-        return 1.0;
-    }
-
-    @Override
-    public double getHeterogeneityBound() {
-        return -1.0;
-    }
-
-    @Override
-    public Class<? extends Weighting> getExpectedWeighting() {
-        return NullWeighting.class;
-    }
-
-    @Override
-    public String toString() {
-        return "Cosine";
+    public PositiveWeighting() {
+        super(0, Double.POSITIVE_INFINITY);
     }
 }

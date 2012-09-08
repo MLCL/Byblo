@@ -34,7 +34,7 @@ import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.measures.v2.DecomposableMeasure;
 import uk.ac.susx.mlcl.byblo.measures.v2.Measures;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
-import uk.ac.susx.mlcl.byblo.weighings.Weightings;
+import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
@@ -61,7 +61,7 @@ public final class Dice extends DecomposableMeasure implements Serializable {
 
     @Override
     public double combine(double shared, double left, double right) {
-        return shared == 0 ? 0 
+        return shared == 0 ? 0
                 : (2d * shared) / (left + right);
     }
 
@@ -81,8 +81,8 @@ public final class Dice extends DecomposableMeasure implements Serializable {
     }
 
     @Override
-    public Weighting getExpectedWeighting() {
-        return Weightings.positive();
+    public Class<? extends Weighting> getExpectedWeighting() {
+        return NullWeighting.class;
     }
 
     @Override

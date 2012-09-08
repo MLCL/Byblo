@@ -85,8 +85,8 @@ public final class Hindle implements Measure, Serializable {
     }
 
     @Override
-    public Weighting getExpectedWeighting() {
-        return new PositivePMI();
+    public Class<? extends Weighting> getExpectedWeighting() {
+        return PositivePMI.class;
     }
 
     @Override

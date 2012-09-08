@@ -40,7 +40,7 @@ import org.junit.*;
 import static uk.ac.susx.mlcl.TestConstants.DEFAULT_CHARSET;
 import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_EVENTS;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDeligate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
@@ -327,10 +327,10 @@ public class KendallsTauTest {
 
     static List<Indexed<SparseDoubleVector>> loadFruitVectors() throws IOException {
 
-        final DoubleEnumerating indexDeligate = new DoubleEnumeratingDeligate();
+        final DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();
         final FastWeightedTokenPairVectorSource eventSrc =
                 BybloIO.openEventsVectorSource(
-                TEST_FRUIT_EVENTS, DEFAULT_CHARSET, indexDeligate);
+                TEST_FRUIT_EVENTS, DEFAULT_CHARSET, indexDelegate);
         final List<Indexed<SparseDoubleVector>> vecs =
                 new ArrayList<Indexed<SparseDoubleVector>>();
         while (eventSrc.hasNext())
