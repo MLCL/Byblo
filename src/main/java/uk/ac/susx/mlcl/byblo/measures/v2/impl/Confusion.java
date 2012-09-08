@@ -28,10 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo.measures;
-
-import com.google.common.annotations.Beta;
-import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+package uk.ac.susx.mlcl.byblo.measures.v2.impl;
 
 /**
  * Proximity measure computing the confusion probability between the given
@@ -40,11 +37,15 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * Essen, Ute and Volker Steinbiss. 1992. Co-occurrence smoothing for stochastic
  * language modeling. In Proceed- ings of ICASSP, volume 1, pages 161{164.
  *
+ * Sugawara, K., M. Nishimura, K. Toshioka, M. Okochi, and T. Kaneko. 1985.
+ * Isolated word recognition using hid- den Markov models. In Proceedings of
+ * ICASSP, pages 1{4, Tampa, Florida. IEEE.
+ *
  * Grishman, Ralph and John Sterling. 1993. Smoothing of automatically generated
  * selectional constraints. In Hu- man Language Technology, pages 254{259, San
  * Fran- cisco, California. Advanced Research Projects Agency, Software and
  * Intelligent Systems Technology Oce, Morgan Kaufmann.
- * 
+ *
  *
  * Discussed in JE Weeds (2003) "Measures and Applications of Lexical
  * Distributional Similarity", which references (Sugawara, Nishimura, Toshioka,
@@ -57,60 +58,5 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-@Beta
-public final class Confusion extends AbstractMIProximity {
-
-    @Override
-    public double shared(final SparseDoubleVector a,
-                         final SparseDoubleVector b) {
-        double total = 0.0;
-
-        int i = 0, j = 0;
-        while (i < a.size && j < b.size) {
-            if (a.keys[i] < b.keys[j]) {
-                i++;
-            } else if (a.keys[i] > b.keys[j]) {
-                j++;
-            } else if (isFiltered(a.keys[i])) {
-                i++;
-                j++;
-            } else { // Q.keys[i] == R.keys[j]
-                total += prob(a, i) * prob(b, j)
-                        / featurePrior(a.keys[i]);
-
-                i++;
-                j++;
-            }
-        }
-        total *= entryPrior(a);
-
-        assert total >= 0.0 && total <= 1.0 : "Expecting output in the range 0 to 1";
-        return total;
-    }
-
-    @Override
-    public double left(final SparseDoubleVector a) {
-        return 0;
-    }
-
-    @Override
-    public double right(final SparseDoubleVector b) {
-        return 0;
-    }
-
-    @Override
-    public double combine(final double shared,
-                          final double left, final double right) {
-        return shared;
-    }
-
-    @Override
-    public boolean isSymmetric() {
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return "Confusion{}";
-    }
+public class Confusion {
 }

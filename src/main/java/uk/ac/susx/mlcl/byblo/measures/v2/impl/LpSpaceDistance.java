@@ -55,7 +55,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class LpSpace implements Distance, Serializable {
+public final class LpSpaceDistance implements Distance, Serializable {
 
     public static final double DEFAULT_POWER = 2;
 
@@ -65,7 +65,7 @@ public final class LpSpace implements Distance, Serializable {
 
     private Distance deligate = null;
 
-    public LpSpace() {
+    public LpSpaceDistance() {
         setPower(DEFAULT_POWER);
     }
 

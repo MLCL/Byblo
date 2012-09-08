@@ -32,7 +32,8 @@ package uk.ac.susx.mlcl.byblo.measures.v2;
 
 import static java.lang.Math.min;
 import java.text.MessageFormat;
-import uk.ac.susx.mlcl.byblo.weighings.Weighting;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
@@ -44,6 +45,8 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class Measures {
+
+    private static final Log LOG = LogFactory.getLog(Measures.class);
 
     /**
      * Static utility class should not be instantiated.
@@ -171,45 +174,10 @@ public abstract class Measures {
      * @param <T>
      */
     private static class AutoWeightingAdapter<T extends Measure>
-            implements Measure {
-
-        private final T innerMeasure;
+            extends AbstractForwardingMeasure<T> {
 
         private AutoWeightingAdapter(T innerMeasure) {
-            Checks.checkNotNull("innerMeasure", innerMeasure);
-            this.innerMeasure = innerMeasure;
-        }
-
-        public final T getInnerMeasure() {
-            return innerMeasure;
-        }
-
-        @Override
-        public double getHomogeneityBound() {
-            return innerMeasure.getHomogeneityBound();
-        }
-
-        @Override
-        public double getHeterogeneityBound() {
-            return innerMeasure.getHeterogeneityBound();
-        }
-
-        @Override
-        public Weighting getExpectedWeighting() {
-            return Weightings.none();
-        }
-
-        @Override
-        public boolean isCommutative() {
-            return innerMeasure.isCommutative();
-        }
-
-        public boolean equals(AutoWeightingAdapter<?> other) {
-            if (this.innerMeasure != other.innerMeasure
-                    && (this.innerMeasure == null
-                        || !this.innerMeasure.equals(other.innerMeasure)))
-                return false;
-            return true;
+            super(innerMeasure);
         }
 
         protected SparseDoubleVector weight(SparseDoubleVector vector) {
@@ -217,24 +185,9 @@ public abstract class Measures {
         }
 
         @Override
-        public boolean equals(Object obj) {
-            if (obj == this)
-                return true;
-            if (obj == null || getClass() != obj.getClass())
-                return false;
-            return equals((AutoWeightingAdapter) obj);
-        }
-
-        @Override
-        public int hashCode() {
-            return 79 * 5 + (this.innerMeasure != null
-                             ? this.innerMeasure.hashCode() : 0);
-        }
-
-        @Override
         public String toString() {
-            return "AutoWeighting{measure=" + innerMeasure
-                    + ", weighting=" + innerMeasure.getExpectedWeighting() + '}';
+            return "AutoWeighting{measure=" + getInnerMeasure()
+                    + ", weighting=" + getInnerMeasure().getExpectedWeighting() + '}';
         }
     }
 
@@ -296,6 +249,73 @@ public abstract class Measures {
             return autoWeighted((Distance) measure);
         } else if (measure instanceof Proximity) {
             return autoWeighted((Proximity) measure);
+        } else {
+            throw new IllegalArgumentException(MessageFormat.format(
+                    "Argument 'measure' expected to be of type Proximity or "
+                    + "Distance but found {0} of type {1}",
+                    measure, measure.getClass()));
+        }
+
+    }
+
+    private static class ReversedDistance
+            extends AbstractForwardingMeasure<Distance>
+            implements Distance {
+
+        private ReversedDistance(Distance innerMeasure) {
+            super(innerMeasure);
+        }
+
+        @Override
+        public double distance(SparseDoubleVector A, SparseDoubleVector B) {
+            return getInnerMeasure().distance(B, A);
+        }
+    }
+
+    private static class ReversedProximity
+            extends AbstractForwardingMeasure<Proximity>
+            implements Proximity {
+
+        private ReversedProximity(Proximity innerMeasure) {
+            super(innerMeasure);
+        }
+
+        @Override
+        public double proximity(SparseDoubleVector A, SparseDoubleVector B) {
+            return getInnerMeasure().proximity(B, A);
+        }
+    }
+
+    public static Distance reverse(Distance measure) {
+        Checks.checkNotNull("measure", measure);
+        if (measure.isCommutative()) {
+            if (LOG.isWarnEnabled())
+                LOG.warn("Attempting to reverse a commutative measure.");
+            return measure;
+        } else {
+            return new ReversedDistance(measure);
+        }
+
+    }
+
+    public static Proximity reverse(Proximity measure) {
+        Checks.checkNotNull("measure", measure);
+        if (measure.isCommutative()) {
+            if (LOG.isWarnEnabled())
+                LOG.warn("Attempting to reverse a commutative measure.");
+            return measure;
+        } else {
+            return new ReversedProximity(measure);
+        }
+
+    }
+
+    public static Measure reverse(Measure measure) {
+        Checks.checkNotNull("measure", measure);
+        if (measure instanceof Distance) {
+            return reverse((Distance) measure);
+        } else if (measure instanceof Proximity) {
+            return reverse((Proximity) measure);
         } else {
             throw new IllegalArgumentException(MessageFormat.format(
                     "Argument 'measure' expected to be of type Proximity or "

@@ -43,10 +43,10 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class JSDivergence implements Distance, Serializable {
+public final class JensenShannonDivergence implements Distance, Serializable {
 
     private static final long serialVersionUID = 1L;
-
+            
     @Override
     public double distance(SparseDoubleVector A, SparseDoubleVector B) {
         double divergence = 0.0;
