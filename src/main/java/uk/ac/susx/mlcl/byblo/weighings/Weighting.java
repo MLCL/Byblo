@@ -34,7 +34,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
  * Interface that defines a function mapping between features spaces.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public interface Weighting {
@@ -49,7 +49,7 @@ public interface Weighting {
      * to zero, the implementation should call
      * {@link SparseDoubleVector#compact() } on the output vector before
      * returning.
-     *
+     * <p/>
      * @param from vector to re-weight
      * @return Re-weighted vector.
      */
@@ -58,7 +58,7 @@ public interface Weighting {
     /**
      * Accessor to the minimum weighting this scheme will produce, assuming the
      * input vector contains only real valued positive values.
-     *
+     * <p/>
      * @return minimum possible weighting value
      */
     double getLowerBound();
@@ -66,7 +66,7 @@ public interface Weighting {
     /**
      * Accessor to the maximum weighting this scheme will produce, assuming the
      * input vector contains only real valued positive values.
-     *
+     * <p/>
      * @return maximum possible weighting value
      */
     double getUpperBound();

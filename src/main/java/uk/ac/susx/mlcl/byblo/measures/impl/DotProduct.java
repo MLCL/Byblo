@@ -41,7 +41,7 @@ import java.io.Serializable;
 /**
  * Proximity measure calculating proximity as the dot product of the vectors.
  * For unit vectors this is equivalent to {@link Cosine }.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class DotProduct implements Measure, Serializable {

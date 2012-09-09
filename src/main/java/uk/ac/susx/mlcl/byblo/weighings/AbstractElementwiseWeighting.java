@@ -38,7 +38,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * provided.
  * <p/>
  * It should be used when {@link SimpleWeighting} is insufficiently flexible.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class AbstractElementwiseWeighting implements Weighting {
@@ -69,7 +69,7 @@ public abstract class AbstractElementwiseWeighting implements Weighting {
      * Re-weighting the feature <tt>key</tt> with input weight <tt>value</tt>,
      * using contextual information provided by the whole feature
      * <tt>vector</tt> returning a new weighting
-     *
+     * <p/>
      * @param vector feature vector of a particular entry
      * @param key    enumerated feature index
      * @param value  feature input weighting

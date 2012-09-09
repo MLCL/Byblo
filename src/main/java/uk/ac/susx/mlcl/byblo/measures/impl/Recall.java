@@ -62,7 +62,7 @@ import java.io.Serializable;
  * <p/>
  * Note that recall(x,y) = precision(y,x) so the precision can be calculated by
  * wrapping an instance of RecallMi in the ReversedProximity decorator.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class Recall extends DecomposableMeasure implements Serializable {

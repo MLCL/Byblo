@@ -45,7 +45,7 @@ import java.nio.charset.Charset;
 /**
  * An <tt>WeightedTokenSource</tt> object is used to retrieve {@link Token}
  * objects from a flat file.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see WeightedTokenSink
  */
@@ -81,7 +81,8 @@ public class WeightedTokenSource
     }
 
     public static WeightedTokenSource open(
-            File file, Charset charset, SingleEnumerating idx, boolean skip1) throws IOException {
+            File file, Charset charset, SingleEnumerating idx, boolean skip1)
+            throws IOException {
         SeekableDataSource tsv = new TSV.Source(file, charset);
 
         if (skip1) {

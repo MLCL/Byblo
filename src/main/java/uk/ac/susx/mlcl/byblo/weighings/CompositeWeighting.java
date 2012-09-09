@@ -51,7 +51,7 @@ import java.util.List;
  * Therefore it is unsafe to have a contextual weighting (implementing
  * {@link FeatureMarginalsCarrier}) in a {@link CompositeWeighting } unless it
  * is the first element. A warning will be printed if this is detected.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class CompositeWeighting implements Weighting, Serializable {

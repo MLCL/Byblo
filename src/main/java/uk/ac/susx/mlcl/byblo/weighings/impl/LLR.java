@@ -51,7 +51,7 @@ import java.io.Serializable;
  * Described by Christopher D. Manningand and Hinrich Schutze (1999)
  * "Foundations of Statistical Natural Language Processing." MIT Press,
  * Cambridge, MA USA.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class LLR

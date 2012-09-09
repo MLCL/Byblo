@@ -60,7 +60,7 @@ import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
  * Lillian Lee (2001) "On the Effectiveness of the Skew Divergence for
  * Statistical Language Analysis" Artificial Intelligence and Statistics 2001,
  * pp. 65--72, 2001
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class LeeSkewDivergence implements Measure, Serializable {

@@ -37,7 +37,7 @@ import java.util.Collection;
 
 /**
  * Factory class from some derivative {@link Weighting} implementations.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class Weightings {
@@ -92,7 +92,7 @@ public final class Weightings {
      * Return the base 2 logarithm of the parameter v.
      * <p/>
      * TODO: Move to mlcl-lib/MathUtil
-     *
+     * <p/>
      * @param v some values
      * @return logarithm of the value
      */

@@ -56,7 +56,7 @@ import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
  * <p/>
  * For lambda = 0 and lambda = 1 the divergence is always 0, which is
  * meaningless. Hence, lambda must be in the range 0 &lt; lambda &lt; 1.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class LambdaDivergence implements Measure, Serializable {

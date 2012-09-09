@@ -43,7 +43,7 @@ import java.io.Serializable;
  * the union of feature sets. In the base of non-binary features (weights other
  * than zero and one) this measures takes a multi-set view of set operations:
  * intersection is the maximum and union is the minimum.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class Jaccard extends DecomposableMeasure implements Serializable {

@@ -41,7 +41,7 @@ import java.io.Serializable;
  * <p/>
  * Used when no re-weighting is required (i.e identity) or when some constant
  * scaFling is useful.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class Constant

@@ -38,7 +38,7 @@ public interface EntryMarginalsCarrier {
     /**
      *
      * @return @throws IllegalStateException if marginals are requested before
-     * they are set
+     *                                       they are set
      */
     MarginalDistribution getEntryMarginals() throws IllegalStateException;
 

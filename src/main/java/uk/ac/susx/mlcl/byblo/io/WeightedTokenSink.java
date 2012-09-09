@@ -68,7 +68,7 @@ import java.nio.charset.Charset;
  * <p/>
  * <p>Compact mode is the default behavior, since it can reduce file sizes by
  * approximately 50%, with corresponding reductions in I/O overhead.</p>
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class WeightedTokenSink implements ObjectSink<Weighted<Token>>, Closeable, Flushable {
@@ -100,7 +100,8 @@ public class WeightedTokenSink implements ObjectSink<Weighted<Token>>, Closeable
     }
 
     public static WeightedTokenSink open(
-            File f, Charset charset, SingleEnumerating idx, boolean skip1) throws IOException {
+            File f, Charset charset, SingleEnumerating idx, boolean skip1)
+            throws IOException {
         DataSink tsv = new TSV.Sink(f, charset);
 
         if (skip1) {

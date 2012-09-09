@@ -47,7 +47,7 @@ import java.io.Serializable;
  * This method is proposed in James Curran's PhD thesis "From Distributional to
  * Semantic Similarity." (2004) where it was shown to outperform other
  * weightings in a limited experiment.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class TTest

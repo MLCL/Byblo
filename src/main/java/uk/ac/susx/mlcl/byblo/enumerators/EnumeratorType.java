@@ -58,7 +58,8 @@ public enum EnumeratorType {
         public void close(Enumerator<String> enumerator) throws IOException {
             assert enumerator instanceof MemoryBasedStringEnumerator;
         }
-    }, JDBM {
+    },
+    JDBM {
         @Override
         public Enumerator<String> open(@Nullable File file) {
             if (file == null) {

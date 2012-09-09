@@ -54,7 +54,7 @@ import java.io.Serializable;
  * Seems to be mostly monotonic with {@link SquaredPMI} and {@link GeoMean}
  * weighting schemes, although there are a few exceptions. Not sure if this is
  * down a real difference or just floating point errors.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class ChiSquared

@@ -38,7 +38,7 @@ import java.io.Serializable;
 /**
  * {@link Weighting} that normalizes the feature vector by the total. This is
  * effectively the probability of each feature conditioned on the entry.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class Likelyhood

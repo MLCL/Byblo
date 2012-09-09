@@ -36,7 +36,7 @@ import javax.annotation.Nullable;
  * {@link AbstractContextualWeighting} is an abstract super class that combines
  * an {@link ElementwiseWeighting} scheme with the availability of feature
  * marginal scores via {@link FeatureMarginalsCarrier}.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class AbstractContextualWeighting

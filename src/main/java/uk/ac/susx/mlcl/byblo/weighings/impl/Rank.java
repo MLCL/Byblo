@@ -43,7 +43,7 @@ import java.util.List;
 /**
  * {@link Weighting} scheme the replaces each score with it's rank descending.
  * I.e smallest value will have rank 1, the next smallest rank 2, etc...
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class Rank

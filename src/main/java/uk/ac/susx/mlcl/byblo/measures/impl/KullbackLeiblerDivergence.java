@@ -43,7 +43,7 @@ import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
 /**
  * Distance measure that computes similarity as the Kullback–Leibler divergence,
  * with Laplace smoothing.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class KullbackLeiblerDivergence implements Measure, Serializable {
@@ -77,10 +77,10 @@ public final class KullbackLeiblerDivergence implements Measure, Serializable {
      * Construct new instance of {@link KullbackLeiblerDivergence } similarity
      * measure, initializing the expected dimensionality of vectors to
      * <tt>minCardinality</tt>.
-     *
+     * <p/>
      * @param minCardinality expected dimensionality of vectors
      * @throws IllegalArgumentException when <code>minCardinality</code> is
-     * negative
+     *                                  negative
      */
     public KullbackLeiblerDivergence(final int minCardinality)
             throws IllegalArgumentException {
@@ -89,7 +89,7 @@ public final class KullbackLeiblerDivergence implements Measure, Serializable {
 
     /**
      * Get the minimum (usually the actual) cardinality of vectors.
-     *
+     * <p/>
      * @return expected dimensionality of vectors
      */
     public final int getMinCardinality() {
@@ -101,10 +101,10 @@ public final class KullbackLeiblerDivergence implements Measure, Serializable {
      * <p/>
      * If the vector cardinality is known before hand, but is not set on the
      * vectors for some reason, then method can be used to set it globally.
-     *
+     * <p/>
      * @param minCardinality expected dimensionality of vectors
      * @throws IllegalArgumentException when <code>minCardinality</code> is
-     * negative
+     *                                  negative
      */
     public final void setMinCardinality(int minCardinality)
             throws IllegalArgumentException {

@@ -102,7 +102,8 @@ public final class MemoryBasedStringEnumerator extends BiMapEnumerator<String> {
             in.endOfRecord();
             instance.put(id, s);
         }
-        assert instance.indexOf(FilterCommand.FILTERED_STRING) == FilterCommand.FILTERED_ID;
+        assert instance.indexOf(FilterCommand.FILTERED_STRING)
+                == FilterCommand.FILTERED_ID;
         return instance;
     }
 

@@ -69,7 +69,7 @@ import java.nio.charset.Charset;
  * <p/>
  * <p>Compact mode is the default behavior, since it can reduce file sizes by
  * approximately 50%, with corresponding reductions in I/O overhead.</p>
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class TokenPairSink implements ObjectSink<TokenPair>, Closeable, Flushable {
@@ -127,7 +127,8 @@ public class TokenPairSink implements ObjectSink<TokenPair>, Closeable, Flushabl
 
         if (!idx.isEnumeratedEntries() || !idx.isEnumeratedFeatures()) {
             @SuppressWarnings("unchecked")
-            Enumerator<String>[] enumerators = (Enumerator<String>[]) new Enumerator[2];
+            Enumerator<String>[] enumerators =
+                    (Enumerator<String>[]) new Enumerator[2];
             if (!idx.isEnumeratedEntries())
                 enumerators[0] = idx.getEntryEnumerator();
             if (!idx.isEnumeratedFeatures())

@@ -51,7 +51,7 @@ import java.util.Set;
  * An all-pairs similarity search implementation that improves efficiency by
  * building a reverse index of one of the input sources. This allows candidate
  * pairs to be found relatively quickly given sufficient sparsity
- *
+ * <p/>
  * @param <S>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -142,7 +142,8 @@ public final class InvertedApssTask<S> extends NaiveApssTask<S> {
 
     Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> buildIndex()
             throws IOException {
-        SeekableObjectSource<? extends Indexed<SparseDoubleVector>, S> src = getSourceA();
+        SeekableObjectSource<? extends Indexed<SparseDoubleVector>, S> src =
+                getSourceA();
         final Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> result =
                 new Int2ObjectOpenHashMap<Set<Indexed<SparseDoubleVector>>>();
         final S startA = src.position();

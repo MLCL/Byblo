@@ -39,7 +39,7 @@ import java.io.File;
 
 /**
  * Copy a source file to a destination.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Parameters(commandDescription = "Copy a file.")

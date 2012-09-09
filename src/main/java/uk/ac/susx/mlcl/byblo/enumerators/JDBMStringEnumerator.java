@@ -121,7 +121,8 @@ public final class JDBMStringEnumerator extends BiMapEnumerator<String> {
             }
             assert backwards.containsKey(FilterCommand.FILTERED_STRING);
             assert forwards.containsKey(FilterCommand.FILTERED_ID);
-            assert backwards.get(FilterCommand.FILTERED_STRING) == FilterCommand.FILTERED_ID;
+            assert backwards.get(FilterCommand.FILTERED_STRING)
+                    == FilterCommand.FILTERED_ID;
             assert forwards.get(FilterCommand.FILTERED_ID).equals(
                     FilterCommand.FILTERED_STRING);
 
@@ -251,7 +252,8 @@ public final class JDBMStringEnumerator extends BiMapEnumerator<String> {
         if (this.file != other.file && (this.file == null || !this.file.
                 equals(other.file)))
             return false;
-        if (this.db != other.db && (this.db == null || !this.db.equals(other.db)))
+        if (this.db != other.db
+                && (this.db == null || !this.db.equals(other.db)))
             return false;
         if (this.modCount != other.modCount)
             return false;

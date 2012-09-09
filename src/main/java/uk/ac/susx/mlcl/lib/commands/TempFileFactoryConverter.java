@@ -43,7 +43,7 @@ import java.io.File;
  * An IStringConverter implementation for extending JCommander. Take a string
  * path and produces a TempFileFactory object for the production of temporary
  * files.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class TempFileFactoryConverter implements IStringConverter<TempFileFactory> {
@@ -60,7 +60,8 @@ public final class TempFileFactoryConverter implements IStringConverter<TempFile
             if (LOG.isDebugEnabled())
                 LOG.
                         debug(
-                        "Attempting to create temporary directory: \"" + tmpDir + "\"");
+                        "Attempting to create temporary directory: \"" + tmpDir
+                        + "\"");
             if (!tmpDir.mkdirs()) {
                 throw new ParameterException(
                         "Unable create temporary directory \"" + tmpDir + "\"");

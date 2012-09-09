@@ -44,7 +44,7 @@ import java.nio.charset.Charset;
 /**
  * An <tt>TokenPairSource</tt> object is used to retrieve {@link TokenPair}
  * objects from a flat file.
- *
+ * <p/>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see TokenPairSink
  */
@@ -118,7 +118,8 @@ public class TokenPairSource
 
         if (!idx.isEnumeratedEntries() || !idx.isEnumeratedFeatures()) {
             @SuppressWarnings("unchecked")
-            Enumerator<String>[] enumerators = (Enumerator<String>[]) new Enumerator[2];
+            Enumerator<String>[] enumerators =
+                    (Enumerator<String>[]) new Enumerator[2];
             if (!idx.isEnumeratedEntries())
                 enumerators[0] = idx.getEntryEnumerator();
             if (!idx.isEnumeratedFeatures())
