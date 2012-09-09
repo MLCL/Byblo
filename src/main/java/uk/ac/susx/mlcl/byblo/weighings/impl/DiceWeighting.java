@@ -30,16 +30,17 @@
  */
 package uk.ac.susx.mlcl.byblo.weighings.impl;
 
-import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.weighings.AbstractContextualWeighting;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+
+import java.io.Serializable;
 
 /**
  * {@link Weighting} using Dice's coefficient, that produces a score from the
  * entry/feature intersection (joint) probability over the sum of the prior
  * probabilities.
- *
+ * <p/>
  * Warning: There isn't really a good probabilistic rational for this weighting.
  * It is included out of completeness and because it has been discussed in the
  * literature; e.g. James Curran's PhD thesis "From Distributional to Semantic

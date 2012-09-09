@@ -31,6 +31,7 @@
 package uk.ac.susx.mlcl.byblo.tasks;
 
 import com.google.common.base.Objects;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -54,13 +55,13 @@ public final class ApssStats implements Serializable {
     /**
      * Dependency injection constructor.
      *
-     * @param candidates    Count of candidate pairs
-     * @param comparisons   Count of "slow" comparisons (e.g dot products).
-     * @param productions   Count of unique pairs found.
-     * @param srcReads      Count of records read.
+     * @param candidates  Count of candidate pairs
+     * @param comparisons Count of "slow" comparisons (e.g dot products).
+     * @param productions Count of unique pairs found.
+     * @param srcReads    Count of records read.
      */
     protected ApssStats(AtomicLong candidates, AtomicLong comparisons,
-            AtomicLong productions, AtomicLong srcReads) {
+                        AtomicLong productions, AtomicLong srcReads) {
         this.candidates = candidates;
         this.comparisons = comparisons;
         this.productions = productions;
@@ -146,7 +147,7 @@ public final class ApssStats implements Serializable {
         return toStringHelper().toString();
     }
 
-    protected Objects.ToStringHelper toStringHelper() {
+    Objects.ToStringHelper toStringHelper() {
         return Objects.toStringHelper(this).
                 add("candidates", candidates).
                 add("comparisons", comparisons).

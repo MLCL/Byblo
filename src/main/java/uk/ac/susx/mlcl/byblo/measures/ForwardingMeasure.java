@@ -39,8 +39,8 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * <code>ForwardingMeasure</code> is an abstract super-class to decorators of
  * <code>Measure</code> instances.
  *
- * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T> type of Measure being decorated
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class ForwardingMeasure<T extends Measure>
         implements Measure {
@@ -91,7 +91,7 @@ public abstract class ForwardingMeasure<T extends Measure>
     public boolean equals(ForwardingMeasure<?> other) {
         if (this.delegate != other.delegate
                 && (this.delegate == null
-                    || !this.delegate.equals(other.delegate)))
+                || !this.delegate.equals(other.delegate)))
             return false;
         return true;
     }

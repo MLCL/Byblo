@@ -30,27 +30,30 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
+import uk.ac.susx.mlcl.byblo.measures.Measures;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
-import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
 import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import java.io.Serializable;
+
+import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
+
 /**
  * Distance measure that computes similarity as the lambda divergence.
- *
+ * <p/>
  * The lambda weighted average of KL divergences of two distribution Q and R:
- *
+ * <p/>
  * lambdaD(Q||R) = lambda * D(Q||M) + (1 - lambda) * D(R||M)
- *
+ * <p/>
  * where M is the the mixed distribution:
- *
+ * <p/>
  * M = lambda * Q + (1 - lambda) * R:
- *
+ * <p/>
  * For lambda = 0.5 we have the Jensen-Shannon Divergence.
- *
+ * <p/>
  * For lambda = 0 and lambda = 1 the divergence is always 0, which is
  * meaningless. Hence, lambda must be in the range 0 &lt; lambda &lt; 1.
  *
@@ -115,18 +118,17 @@ public final class LambdaDivergence implements Measure, Serializable {
         while (j < B.size) {
             final double r = B.values[j] / B.sum;
             divergence += (1.0 - lambda) * r * (log2(r) - log2(
-                                                (1.0 - lambda) * r));
+                    (1.0 - lambda) * r));
             j++;
         }
 
-        
-        
+
         return divergence;
     }
 
     @Override
     public boolean isCommutative() {
-        return lambda == 0.5;
+        return Measures.epsilonEquals(lambda, 0.5);
     }
 
     @Override

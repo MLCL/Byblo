@@ -30,15 +30,8 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import uk.ac.susx.mlcl.byblo.measures.impl.Confusion;
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.Tools;
 import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
@@ -49,10 +42,19 @@ import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
+
+import java.io.Closeable;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import static org.junit.Assert.*;
+import static uk.ac.susx.mlcl.TestConstants.*;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.disableExitTrapping;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.enableExistTrapping;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class ConfusionTest {
@@ -75,7 +77,7 @@ public class ConfusionTest {
         // Load events
         final FastWeightedTokenPairVectorSource eventSrc =
                 BybloIO.openEventsVectorSource(
-                TEST_FRUIT_EVENTS, DEFAULT_CHARSET, indexDelegate);
+                        TEST_FRUIT_EVENTS, DEFAULT_CHARSET, indexDelegate);
         FRUIT_EVENTS = new ArrayList<Indexed<SparseDoubleVector>>();
         int card = 0;
         while (eventSrc.hasNext()) {
@@ -121,19 +123,20 @@ public class ConfusionTest {
         System.out.println("testCLI");
 
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".Confusion");
-        output.delete();
+
+        deleteIfExist(output);
 
         try {
             enableExistTrapping();
             Tools.main(new String[]{
-                        "allpairs",
-                        "--charset", "UTF-8",
-                        "--measure", "confusion",
-                        "--input", TEST_FRUIT_EVENTS.toString(),
-                        "--input-features", TEST_FRUIT_FEATURES.toString(),
-                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                        "--output", output.toString()
-                    });
+                    "allpairs",
+                    "--charset", "UTF-8",
+                    "--measure", "confusion",
+                    "--input", TEST_FRUIT_EVENTS.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                    "--output", output.toString()
+            });
         } finally {
             disableExitTrapping();
         }
@@ -184,7 +187,7 @@ public class ConfusionTest {
 //        assertEquals(expect, actual, EPSILON);
 //    }
 
-//    @Test
+    //    @Test
 //    public void testCardinalityOneVectors() throws Exception {
 //        System.out.println("testCardinalityOneVectors");
 //        SparseDoubleVector A = new SparseDoubleVector(1, 1);
@@ -196,7 +199,6 @@ public class ConfusionTest {
 //
 //        assertEquals(expect, actual, EPSILON);
 //    }
-
 //    @Test
 //    public void testSizeTwoVectors() throws Exception {
 //        System.out.println("testSizeTwoVectors");
@@ -214,7 +216,6 @@ public class ConfusionTest {
 //
 //        assertEquals(expect, actual, EPSILON);
 //    }
-
 //    @Test
 //    public void testCommutative() throws Exception {
 //        System.out.println("testCommutative");
@@ -230,7 +231,6 @@ public class ConfusionTest {
 //        double actual = test(B, A);
 //        assertEquals(expect, actual, EPSILON);
 //    }
-
 //    @Test
 //    public void testHomoginiety() throws Exception {
 //        System.out.println("testHomoginiety");
@@ -248,7 +248,6 @@ public class ConfusionTest {
 //
 //        assertEquals(expect, actual, EPSILON);
 //    }
-
     @Test
     public void testHeteroginiety() throws Exception {
         System.out.println("testHeteroginiety");
@@ -297,15 +296,15 @@ public class ConfusionTest {
             B.set(RANDOM.nextInt(size * 2), RANDOM.nextDouble());
         }
 
-        double expect = test(A, B);
+        test(A, B);
     }
 
     public static double test(SparseDoubleVector A, SparseDoubleVector B) {
         final double val = INSTANCE.similarity(A, B);
         assertFalse("Similarity is NaN" + " with measure " + INSTANCE,
-                    Double.isNaN(val));
+                Double.isNaN(val));
         assertFalse("Similarity is " + val + " with measure " + INSTANCE,
-                    Double.isInfinite(val));
+                Double.isInfinite(val));
 
         final double min, max;
         if (INSTANCE.getHeterogeneityBound() < INSTANCE.getHomogeneityBound()) {
@@ -316,16 +315,16 @@ public class ConfusionTest {
             max = INSTANCE.getHeterogeneityBound();
         }
         assertTrue("expected similarity >= " + min + " but found " + val,
-                   val >= min);
+                val >= min);
         assertTrue("expected similarity <= " + max + " but found " + val,
-                   val <= max);
+                val <= max);
 
 
         if (INSTANCE.isCommutative()) {
             final double rev = INSTANCE.similarity(B, A);
             assertEquals("Measure is declared computative, but reversing "
                     + "operands results in a different score.", rev, val,
-                         EPSILON);
+                    EPSILON);
         }
 
         return val;

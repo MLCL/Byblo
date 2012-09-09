@@ -31,10 +31,10 @@
 package uk.ac.susx.mlcl.lib.commands;
 
 import com.beust.jcommander.IStringConverter;
+
 import java.nio.charset.Charset;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class CharsetStringConverter implements IStringConverter<Charset> {

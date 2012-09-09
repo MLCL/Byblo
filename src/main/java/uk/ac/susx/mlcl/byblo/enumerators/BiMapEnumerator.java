@@ -32,19 +32,16 @@ package uk.ac.susx.mlcl.byblo.enumerators;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.Maps;
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.io.Serializable;
+import uk.ac.susx.mlcl.lib.Checks;
+import uk.ac.susx.mlcl.lib.collect.ForwardingBiMap;
+
+import java.io.*;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import uk.ac.susx.mlcl.lib.Checks;
-import uk.ac.susx.mlcl.lib.collect.ForwardingBiMap;
 
 /**
  * A simple enumerator that delegates to BiMap for enumeration storage, and
@@ -63,11 +60,11 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
 
     /**
      * Dependency injection constructor to be used by subclasses only.
-     *
+     * <p/>
      * Checks nextId with an assert only, so will accept invalid nextId's when
      * assertions are disabled.
      *
-     * @param map BiMap to delegate storage too.
+     * @param map    BiMap to delegate storage too.
      * @param nextId Integer value of key to assign to next added element.
      */
     protected BiMapEnumerator(
@@ -87,7 +84,8 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
         this(map, new AtomicInteger(max(map) + 1));
     }
 
-    protected BiMapEnumerator(Map<Integer, T> forwards, Map<T, Integer> backwards) {
+    protected BiMapEnumerator(Map<Integer, T> forwards,
+                              Map<T, Integer> backwards) {
         Checks.checkNotNull("forwards", forwards);
         Checks.checkNotNull("backwards", backwards);
         assert forwards.size() == backwards.size();
@@ -143,6 +141,8 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
 
     @Override
     public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
         return obj != null
                 && getClass() != obj.getClass()
                 && equals((BiMapEnumerator<?>) obj);
@@ -176,13 +176,13 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
         return new Serializer<T>(this);
     }
 
-    private static final class Serializer<T> implements Externalizable {
+    public static final class Serializer<T> implements Externalizable {
 
         private static final long serialVersionUID = 1;
 
         private BiMapEnumerator<T> instance;
 
-        Serializer() {
+        public Serializer() {
         }
 
         Serializer(final BiMapEnumerator<T> instance) {
@@ -212,7 +212,6 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
         final Object readResolve() {
             return instance;
         }
-
     }
 
     private static <T> int max(final Map<Integer, T> map) {
@@ -232,5 +231,4 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
             return max;
         }
     }
-
 }

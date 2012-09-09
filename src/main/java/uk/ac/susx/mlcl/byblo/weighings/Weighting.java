@@ -41,10 +41,10 @@ public interface Weighting {
 
     /**
      * Re-weight all the elements of feature vector <tt>from</tt>.
-     *
+     * <p/>
      * If the implementation makes any changes to the input vector it should
      * first take a copy by calling {@link SparseDoubleVector#clone() }.
-     *
+     * <p/>
      * If it is possible that any previously non-zero value has been re-weighted
      * to zero, the implementation should call
      * {@link SparseDoubleVector#compact() } on the output vector before

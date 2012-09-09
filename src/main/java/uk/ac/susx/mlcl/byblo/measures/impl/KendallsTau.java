@@ -30,9 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import java.io.Serializable;
-import static java.lang.Math.signum;
-import java.text.MessageFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
@@ -40,36 +37,42 @@ import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import java.io.Serializable;
+import java.text.MessageFormat;
+
+import static java.lang.Math.signum;
+import static uk.ac.susx.mlcl.byblo.measures.Measures.epsilonEquals;
+
 /**
  * Kendall's Tau Rank Correlation Coefficient measures the similarity of two
  * lists of ranked data as the proportion of pairs that are concordant between
  * the lists.
- *
+ * <p/>
  * <h4>Notes:</h4>
- *
+ * <p/>
  * <ul>
- *
+ * <p/>
  * <li>This implementation is the "Tau B" variant, which makes adjustments for
  * tied elements in a manner suitable for equal cardinality vectors. Identical
  * vectors will always produce a similarity of +1 irrespective of ties </li>
- *
+ * <p/>
  * <li> Vectors that contain only the same value (i.e no ranked data at all)
  * will be given a score of 0.</li>
- *
+ * <p/>
  * <li>The {@link KendallsTau } measure is extremely inefficient (quadratic in
  * the number of features). For large numbers of dense feature vectors it will
  * become prohibitively slow. There is a more efficient algorithm for this
  * measure but it's pretty complicated to implement for sparse vectors.</li>
- *
+ * <p/>
  * <li>Ideally the cardinality should be set correctly in vectors to get
  * accurate results, however this is not strictly required. In the event that
  * vector cardinalities differ, the larger value will be used.</li>
- *
+ * <p/>
  * </ul>
  *
  * @author Hamish I A Morgan <tt>&lt;hamish.morgan@sussex.ac.uk&gt;</tt>
  * @see "A New Measure of Rank Correlation." Maurice Kendall (1938). Biometrika
- * 30 (1–2): 81–89."
+ *      30 (1–2): 81–89."
  */
 public final class KendallsTau
         implements Measure, Serializable {
@@ -91,7 +94,7 @@ public final class KendallsTau
 
     /**
      * Construct a new instance of {@link KendallsTau } similarity measure.
-     *
+     * <p/>
      * The <tt>minCardinality</tt> field is initialized to
      * {@link KendallsTau#DEFAULT_MIN_CARDINALITY}, which is {@value
      * #DEFAULT_MIN_CARDINALITY}
@@ -106,8 +109,8 @@ public final class KendallsTau
      * <tt>minCardinality</tt>.
      *
      * @param minCardinality expected dimensionality of vectors
-     * @throws IllegalArgumentException when
-     * <code>minCardinality</code> is negative
+     * @throws IllegalArgumentException when <code>minCardinality</code> is
+     *                                  negative
      */
     public KendallsTau(final int minCardinality)
             throws IllegalArgumentException {
@@ -130,13 +133,13 @@ public final class KendallsTau
 
     /**
      * Set the minimum (usually the actual) cardinality of vectors.
-     *
+     * <p/>
      * If the vector cardinality is known before hand, but is not set on the
      * vectors for some reason, then method can be used to set it globally.
      *
      * @param minCardinality expected dimensionality of vectors
-     * @throws IllegalArgumentException when
-     * <code>minCardinality</code> is negative
+     * @throws IllegalArgumentException when <code>minCardinality</code> is
+     *                                  negative
      */
     public final void setMinCardinality(int minCardinality)
             throws IllegalArgumentException {
@@ -163,7 +166,7 @@ public final class KendallsTau
             final SparseDoubleVector B) {
 
         final int N = Math.max(minCardinality,
-                               Math.max(A.cardinality, B.cardinality));
+                Math.max(A.cardinality, B.cardinality));
 
         final int L = A.size;
         final int M = B.size;
@@ -189,7 +192,7 @@ public final class KendallsTau
                     if (aj < ai && (bj == bi || A.keys[aj] < B.keys[bj])) {
                         // A[j] = A.values[aj]
                         // B[j] = 0
-                        if (A.values[ai] == A.values[aj])
+                        if (epsilonEquals(A.values[ai], A.values[aj], 0))
                             ++aties;
                         ++aj;
                     } else if (bj < bi && (aj == ai || B.keys[bj] < A.keys[aj])) {
@@ -200,7 +203,7 @@ public final class KendallsTau
                     } else if (aj < ai && bj < bi) {
                         // A[j] = A.values[aj]
                         // B[j] = B.values[bj]
-                        if (A.values[ai] == A.values[aj])
+                        if (epsilonEquals(A.values[ai], A.values[aj], 0))
                             ++aties;
                         else
                             cordance += signum(A.values[ai] - A.values[aj])
@@ -225,13 +228,13 @@ public final class KendallsTau
                     } else if (bj < bi && (aj == ai || B.keys[bj] < A.keys[aj])) {
                         // A[j] = 0
                         // B[j] = B.values[bj]
-                        if (B.values[bi] == B.values[bj])
+                        if (epsilonEquals(B.values[bi], B.values[bj], 0))
                             ++bties;
                         ++bj;
                     } else if (aj < ai && bj < bi) {
                         // A[j] = A.values[aj]
                         // B[j] = B.values[bj]
-                        if (B.values[bi] == B.values[bj])
+                        if (epsilonEquals(B.values[bi], B.values[bj], 0))
                             ++bties;
                         else
                             cordance += signum(-A.values[aj])
@@ -251,7 +254,7 @@ public final class KendallsTau
                     if (aj < ai && (bj == bi || A.keys[aj] < B.keys[bj])) {
                         // A[j] = A.values[aj]
                         // B[j] = 0
-                        if (A.values[ai] == A.values[aj])
+                        if (epsilonEquals(A.values[ai], A.values[aj], 0))
                             ++aties;
                         else
                             cordance += signum(A.values[ai] - A.values[aj])
@@ -260,7 +263,7 @@ public final class KendallsTau
                     } else if (bj < bi && (aj == ai || B.keys[bj] < A.keys[aj])) {
                         // A[j] = 0
                         // B[j] = B.values[bj]
-                        if (B.values[bi] == B.values[bj])
+                        if (epsilonEquals(B.values[bi], B.values[bj], 0))
                             ++bties;
                         else
                             cordance += signum(A.values[ai])
@@ -269,11 +272,11 @@ public final class KendallsTau
                     } else if (aj < ai && bj < bi) {
                         // A[j] = A.values[aj]
                         // B[j] = B.values[bj]
-                        if (A.values[ai] == A.values[aj]) {
+                        if (epsilonEquals(A.values[ai], A.values[aj], 0)) {
                             ++aties;
-                            if (B.values[bi] == B.values[bj])
+                            if (epsilonEquals(B.values[bi], B.values[bj], 0))
                                 ++bties;
-                        } else if (B.values[bi] == B.values[bj]) {
+                        } else if (epsilonEquals(B.values[bi], B.values[bj], 0)) {
                             ++bties;
                         } else {
                             cordance += signum(A.values[ai] - A.values[aj])
@@ -328,7 +331,7 @@ public final class KendallsTau
         final double denom = Math.sqrt((n0 - d_aties) * (n0 - d_bties));
 
         // Avoid divide-by-0 errors for uniform vectors
-        final double sim = d_cordance != 0
+        final double sim = !epsilonEquals(d_cordance, 0)
                 ? d_cordance / denom
                 : 0;
 
@@ -354,11 +357,11 @@ public final class KendallsTau
      * The rank correlation score indicating approximate independence between
      * the vectors. Vectors generated from a uniform random distribution are
      * likely to have a score close to this value.
-     *
+     * <p/>
      * Considering pulling this up to the {@link Measure } interface.
      *
      * @return score indicating no positive or negative correlation has been
-     * found.
+     *         found.
      */
     public double getIndependenceBound() {
         return 0.0;

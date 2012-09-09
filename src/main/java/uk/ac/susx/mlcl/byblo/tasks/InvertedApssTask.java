@@ -33,11 +33,6 @@ package uk.ac.susx.mlcl.byblo.tasks;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
@@ -45,8 +40,12 @@ import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * An all-pairs similarity search implementation that improves efficiency by
@@ -127,7 +126,7 @@ public final class InvertedApssTask<S> extends NaiveApssTask<S> {
 
     }
 
-    protected Set<Indexed<SparseDoubleVector>> findCandidates(
+    Set<Indexed<SparseDoubleVector>> findCandidates(
             Indexed<SparseDoubleVector> b) {
 
         final Set<Indexed<SparseDoubleVector>> candidates =
@@ -141,7 +140,7 @@ public final class InvertedApssTask<S> extends NaiveApssTask<S> {
         return candidates;
     }
 
-    protected Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> buildIndex()
+    Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> buildIndex()
             throws IOException {
         SeekableObjectSource<? extends Indexed<SparseDoubleVector>, S> src = getSourceA();
         final Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> result =
@@ -152,7 +151,7 @@ public final class InvertedApssTask<S> extends NaiveApssTask<S> {
             for (int k : a.value().keys) {
                 if (!result.containsKey(k)) {
                     result.put(k,
-                               new ObjectOpenHashSet<Indexed<SparseDoubleVector>>());
+                            new ObjectOpenHashSet<Indexed<SparseDoubleVector>>());
                 }
                 result.get(k).add(a);
             }
@@ -161,12 +160,12 @@ public final class InvertedApssTask<S> extends NaiveApssTask<S> {
         return result;
     }
 
-    protected void setIndex(Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> index) {
+    void setIndex(Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> index) {
         Checks.checkNotNull("index is null", index);
         this.index = index;
     }
 
-    protected Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> getIndex() {
+    Int2ObjectMap<Set<Indexed<SparseDoubleVector>>> getIndex() {
         return index;
     }
 
@@ -174,5 +173,4 @@ public final class InvertedApssTask<S> extends NaiveApssTask<S> {
     public String getName() {
         return "inverted-allpairs";
     }
-
 }

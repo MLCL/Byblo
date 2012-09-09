@@ -31,12 +31,13 @@
 package uk.ac.susx.mlcl.lib.tasks;
 
 import com.google.common.base.Objects;
-import java.io.Serializable;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingDeque;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Checks;
+
+import java.io.Serializable;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingDeque;
 
 /**
  * Simple implementation of the ExceptionTrapping functionality, to be used as a
@@ -127,12 +128,13 @@ public final class ExceptionTrappingDelegate
             return false;
         final ExceptionTrappingDelegate that = (ExceptionTrappingDelegate) obj;
         return this.getExceptionQueue() == that.getExceptionQueue()
-                || (this.getExceptionQueue() != null && this.getExceptionQueue().equals(that.getExceptionQueue()));
+                || (this.getExceptionQueue() != null && this.getExceptionQueue().
+                equals(that.getExceptionQueue()));
     }
 
     @Override
     public int hashCode() {
-        return this.getExceptionQueue() != null ? this.getExceptionQueue().hashCode() : 0;
+        assert this.getExceptionQueue() != null;
+        return this.getExceptionQueue().hashCode();
     }
-
 }

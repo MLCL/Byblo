@@ -31,21 +31,21 @@
 package uk.ac.susx.mlcl.byblo.commands;
 
 import com.beust.jcommander.ParametersDelegate;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.MemoryUsage;
-import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class ExternalSortInstancesCommand extends AbstractExternalSortCommand<TokenPair> {
@@ -79,7 +79,7 @@ public class ExternalSortInstancesCommand extends AbstractExternalSortCommand<To
 
     @Override
     protected long getBytesPerObject() {
-        return new MemoryUsage().add(new TokenPair(1,1)).getInstanceSizeBytes();
+        return new MemoryUsage().add(new TokenPair(1, 1)).getInstanceSizeBytes();
     }
 
     @Override

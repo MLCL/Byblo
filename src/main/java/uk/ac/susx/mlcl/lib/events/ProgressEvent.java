@@ -33,7 +33,6 @@ package uk.ac.susx.mlcl.lib.events;
 import java.util.EventObject;
 
 /**
- *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class ProgressEvent extends EventObject {

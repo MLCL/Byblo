@@ -58,7 +58,7 @@ public class ProgressAggregate extends ProgressDelegate {
     /**
      * Listener that will be attached to every child progress reporter.
      */
-    private final ProgressListener childProgressListener =
+    private transient final ProgressListener childProgressListener =
             new ProgressListener() {
 
                 @Override

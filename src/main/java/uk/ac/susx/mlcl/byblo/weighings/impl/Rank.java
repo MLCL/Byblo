@@ -30,14 +30,15 @@
  */
 package uk.ac.susx.mlcl.byblo.weighings.impl;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import uk.ac.susx.mlcl.byblo.io.Token;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * {@link Weighting} scheme the replaces each score with it's rank descending.

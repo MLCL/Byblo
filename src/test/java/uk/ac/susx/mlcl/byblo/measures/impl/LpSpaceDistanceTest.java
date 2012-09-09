@@ -30,15 +30,8 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import uk.ac.susx.mlcl.byblo.measures.impl.LpSpaceDistance;
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.Tools;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
@@ -46,10 +39,20 @@ import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import static uk.ac.susx.mlcl.lib.test.ExitTrapper.*;
+
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import static org.junit.Assert.*;
+import static uk.ac.susx.mlcl.TestConstants.*;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.disableExitTrapping;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.enableExistTrapping;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class LpSpaceDistanceTest {
@@ -111,20 +114,20 @@ public class LpSpaceDistanceTest {
 
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME
                 + String.format(".L-%4.2f-Space", power));
-        output.delete();
+        deleteIfExist(output);
 
         try {
             enableExistTrapping();
             Tools.main(new String[]{
-                        "allpairs",
-                        "--charset", "UTF-8",
-                        "--measure", "lp",
-                        "--mink-p", Double.toString(power),
-                        "--input", TEST_FRUIT_EVENTS.toString(),
-                        "--input-features", TEST_FRUIT_FEATURES.toString(),
-                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                        "--output", output.toString()
-                    });
+                    "allpairs",
+                    "--charset", "UTF-8",
+                    "--measure", "lp",
+                    "--mink-p", Double.toString(power),
+                    "--input", TEST_FRUIT_EVENTS.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                    "--output", output.toString()
+            });
         } finally {
             disableExitTrapping();
         }
@@ -280,15 +283,15 @@ public class LpSpaceDistanceTest {
             B.set(RANDOM.nextInt(size * 2), RANDOM.nextDouble());
         }
 
-        double expect = test(A, B);
+        test(A, B);
     }
 
     public double test(SparseDoubleVector A, SparseDoubleVector B) {
         final double val = INSTANCE.similarity(A, B);
         assertFalse("Similarity is NaN" + " with measure " + INSTANCE,
-                    Double.isNaN(val));
+                Double.isNaN(val));
         assertFalse("Similarity is " + val + " with measure " + INSTANCE,
-                    Double.isInfinite(val));
+                Double.isInfinite(val));
 
         final double min, max;
         if (INSTANCE.getHeterogeneityBound() < INSTANCE.getHomogeneityBound()) {
@@ -299,16 +302,16 @@ public class LpSpaceDistanceTest {
             max = INSTANCE.getHeterogeneityBound();
         }
         assertTrue("expected similarity >= " + min + " but found " + val,
-                   val >= min);
+                val >= min);
         assertTrue("expected similarity <= " + max + " but found " + val,
-                   val <= max);
+                val <= max);
 
 
         if (INSTANCE.isCommutative()) {
             final double rev = INSTANCE.similarity(B, A);
             assertEquals("Measure is declared computative, but reversing "
                     + "operands results in a different score.", rev, val,
-                         EPSILON);
+                    EPSILON);
         }
 
         return val;
@@ -319,7 +322,7 @@ public class LpSpaceDistanceTest {
         final DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();
         final FastWeightedTokenPairVectorSource eventSrc =
                 BybloIO.openEventsVectorSource(
-                TEST_FRUIT_EVENTS, DEFAULT_CHARSET, indexDelegate);
+                        TEST_FRUIT_EVENTS, DEFAULT_CHARSET, indexDelegate);
         final List<Indexed<SparseDoubleVector>> vecs =
                 new ArrayList<Indexed<SparseDoubleVector>>();
         while (eventSrc.hasNext())

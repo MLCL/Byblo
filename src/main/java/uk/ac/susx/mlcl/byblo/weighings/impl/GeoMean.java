@@ -30,14 +30,15 @@
  */
 package uk.ac.susx.mlcl.byblo.weighings.impl;
 
-import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.weighings.AbstractContextualWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+
+import java.io.Serializable;
 
 /**
  * Weights features by normalizing by the geometric mean of it's marginal
  * frequencies.
- *
+ * <p/>
  * Monotonic with {@link SquaredPMI} and partially monotonic with
  * {@link ChiSquared}.
  *

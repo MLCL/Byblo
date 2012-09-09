@@ -197,7 +197,7 @@ public final class IntBitSet extends AbstractIntSortedSet implements
     // ========================================================
     //
 
-    public static IntBitSet allOfRange(int fromElement,int toElement) {
+    public static IntBitSet allOfRange(int fromElement, int toElement) {
         IntBitSet set = new IntBitSet(toElement);
         set.bits.set(fromElement, toElement);
         return set;

@@ -32,41 +32,36 @@ package uk.ac.susx.mlcl.lib;
 
 import com.beust.jcommander.Parameter;
 import com.google.common.base.Objects;
-import java.util.ArrayDeque;
-import java.util.Queue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.tasks.Task;
 
+import java.text.MessageFormat;
+import java.util.ArrayDeque;
+import java.util.Queue;
+import java.util.concurrent.*;
+
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @deprecated temporary class while command and task APIs are being separated
  */
 @Deprecated
 public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
 
-    private static final Log LOG = LogFactory.getLog(AbstractParallelCommandTask.class);
+    private static final Log LOG = LogFactory.
+            getLog(AbstractParallelCommandTask.class);
 
     protected static final int DEFAULT_NUM_THREADS =
             Runtime.getRuntime().availableProcessors();
 
     /**
-     * Number of tasks that will be loaded and queued, in addition to those 
+     * Number of tasks that will be loaded and queued, in addition to those
      * that can be running simultaneously (as defined by {@link #nThreads}.)
      */
     public static final int PRELOAD_SIZE = 1;
-    
+
     @Parameter(names = {"-t", "--threads"},
-    description = "Number of threads to use.")
+            description = "Number of threads to use.")
     private int nThreads = DEFAULT_NUM_THREADS;
 
     private ExecutorService executor = null;
@@ -78,22 +73,24 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
     public AbstractParallelCommandTask() {
     }
 
-    public void setNumThreads(int nThreads) {
+    public synchronized void setNumThreads(int nThreads) {
         if (nThreads < 1) {
             throw new IllegalArgumentException("nThreads < 1");
         }
 
         if (LOG.isWarnEnabled() && nThreads > Runtime.getRuntime().
                 availableProcessors()) {
-            LOG.warn("nThreads (" + nThreads + ") > availableProcessors (" + Runtime.getRuntime().
-                    availableProcessors() + ")");
+            LOG.
+                    warn("nThreads (" + nThreads + ") > availableProcessors (" + Runtime.
+                            getRuntime().
+                            availableProcessors() + ")");
         }
         if (nThreads != this.nThreads) {
             this.nThreads = nThreads;
         }
     }
 
-    public final int getNumThreads() {
+    public synchronized final int getNumThreads() {
         return nThreads;
     }
 
@@ -137,7 +134,6 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
 
         throttle.acquire();
         Runnable wrapper = new Runnable() {
-
             @Override
             public void run() {
                 try {
@@ -146,11 +142,14 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
                     throttle.release();
                 }
             }
-
         };
         try {
             Future<T> future = getExecutor().submit(wrapper, task);
-            getFutureQueue().offer(future);
+            if (!getFutureQueue().add(future))
+                throw new AssertionError(MessageFormat.format(
+                        "Failed to add future {0} to queue, "
+                                + "because it already existed in the queue.",
+                        future));
             return future;
         } catch (RejectedExecutionException e) {
             throttle.release();
@@ -165,8 +164,7 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
     protected Objects.ToStringHelper toStringHelper() {
         return super.toStringHelper().
                 add("threads", getNumThreads()).
-                add("executor", executor).
-                add("futureQueue", futureQueue);
+                add("executor", getExecutor()).
+                add("futureQueue", getFutureQueue());
     }
-
 }

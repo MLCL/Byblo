@@ -30,13 +30,14 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.byblo.BybloSettings;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDelegates;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * Static utility class that provides functions for opening the various file
@@ -89,14 +90,14 @@ public final class BybloIO {
     public static WeightedTokenSource openFeaturesSource(
             File file, Charset charset, DoubleEnumerating idx) throws IOException {
         return openFeaturesSource(file, charset,
-                                  EnumeratingDelegates.toSingleFeatures(idx));
+                EnumeratingDelegates.toSingleFeatures(idx));
     }
 
     public static WeightedTokenSink openFeaturesSink(
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
         return openFeaturesSink(file, charset,
-                                EnumeratingDelegates.toSingleFeatures(idx));
+                EnumeratingDelegates.toSingleFeatures(idx));
     }
 
     public static WeightedTokenSource openEntriesSource(
@@ -221,14 +222,14 @@ public final class BybloIO {
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
         return openNeighboursSource(file, charset,
-                                    EnumeratingDelegates.toSingleEntries(idx));
+                EnumeratingDelegates.toSingleEntries(idx));
     }
 
     public static WeightedTokenPairSink openNeighboursSink(
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
         return openNeighboursSink(file, charset,
-                                  EnumeratingDelegates.toSingleEntries(idx));
+                EnumeratingDelegates.toSingleEntries(idx));
     }
 
 }

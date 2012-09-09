@@ -30,18 +30,18 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static uk.ac.susx.mlcl.TestConstants.DEFAULT_CHARSET;
-import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_INPUT;
-import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_INPUT_INDEXED;
-import static uk.ac.susx.mlcl.TestConstants.TEST_OUTPUT_DIR;
-import static uk.ac.susx.mlcl.TestConstants.TEST_TMP_DIR;
-import static uk.ac.susx.mlcl.TestConstants.assertValidOutputFiles;
-import static uk.ac.susx.mlcl.TestConstants.assertValidPlaintextInputFiles;
-import static uk.ac.susx.mlcl.TestConstants.deleteIfExist;
-import static uk.ac.susx.mlcl.lib.test.ExitTrapper.disableExitTrapping;
-import static uk.ac.susx.mlcl.lib.test.ExitTrapper.enableExistTrapping;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import uk.ac.susx.mlcl.TestConstants;
+import uk.ac.susx.mlcl.TestConstants.InfoProgressListener;
+import uk.ac.susx.mlcl.byblo.Tools;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
+import uk.ac.susx.mlcl.lib.commands.AbstractCommandTest;
+import uk.ac.susx.mlcl.lib.io.TempFileFactory;
+import uk.ac.susx.mlcl.lib.test.ExitTrapper;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -49,350 +49,341 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import uk.ac.susx.mlcl.TestConstants;
-import uk.ac.susx.mlcl.TestConstants.InfoProgressListener;
-import uk.ac.susx.mlcl.byblo.Tools;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
-import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
-import uk.ac.susx.mlcl.lib.io.TempFileFactory;
-import uk.ac.susx.mlcl.lib.test.ExitTrapper;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.disableExitTrapping;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.enableExistTrapping;
 
 /**
- * 
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class ExternalCountCommandTest extends
-		AbstractCommandTest<ExternalCountCommand> {
+        AbstractCommandTest<ExternalCountCommand> {
 
-	@Override
-	public Class<? extends ExternalCountCommand> getImplementation() {
-		return ExternalCountCommand.class;
-	}
+    @Override
+    public Class<? extends ExternalCountCommand> getImplementation() {
+        return ExternalCountCommand.class;
+    }
 
-	@Override
-	@Before
-	public void setUp() throws Exception {
-		super.setUp();
-	}
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
 
-	@Override
-	@After
-	public void tearDown() throws Exception {
-		super.tearDown();
-	}
+    @Override
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
 
-	private static final String subject = ExternalCountCommand.class.getName();
+    private static final String subject = ExternalCountCommand.class.getName();
 
-	private void runWithAPI(File inInst, File outE, File outF, File outEF,
-			Charset charset, boolean preindexedEntries,
-			boolean preindexedFeatures) throws Exception {
-		final ExternalCountCommand countCmd = new ExternalCountCommand();
-		countCmd.setInstancesFile(inInst);
-		countCmd.setEntriesFile(outE);
-		countCmd.setFeaturesFile(outF);
-		countCmd.setEventsFile(outEF);
-		countCmd.getFileDelegate().setCharset(charset);
-		countCmd.setIndexDelegate(new DoubleEnumeratingDelegate(
+    private void runWithAPI(File inInst, File outE, File outF, File outEF,
+                            Charset charset, boolean preindexedEntries,
+                            boolean preindexedFeatures) throws Exception {
+        final ExternalCountCommand countCmd = new ExternalCountCommand();
+        countCmd.setInstancesFile(inInst);
+        countCmd.setEntriesFile(outE);
+        countCmd.setFeaturesFile(outF);
+        countCmd.setEventsFile(outEF);
+        countCmd.getFileDelegate().setCharset(charset);
+        countCmd.setIndexDelegate(new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, preindexedEntries,
                 preindexedFeatures, null, null));
-		countCmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
+        countCmd.setTempFileFactory(new TempFileFactory(TestConstants.TEST_TMP_DIR));
 
-		countCmd.runCommand();
+        countCmd.runCommand();
 
-		assertTrue("Output files not created: " + outE, outE.exists());
-		assertTrue("Output files not created: " + outF, outF.exists());
-		assertTrue("Output files not created: " + outEF, outEF.exists());
+        assertTrue("Output files not created: " + outE, outE.exists());
+        assertTrue("Output files not created: " + outF, outF.exists());
+        assertTrue("Output files not created: " + outEF, outEF.exists());
 
-		assertTrue("Empty output file found: " + outE, outE.length() > 0);
-		assertTrue("Empty output file found: " + outF, outF.length() > 0);
-		assertTrue("Empty output file found: " + outEF, outEF.length() > 0);
-	}
+        assertTrue("Empty output file found: " + outE, outE.length() > 0);
+        assertTrue("Empty output file found: " + outF, outF.length() > 0);
+        assertTrue("Empty output file found: " + outEF, outEF.length() > 0);
+    }
 
-	private void runWithCLI(File inInst, File outE, File outF, File outEF,
+    private void runWithCLI(File inInst, File outE, File outF, File outEF,
                             Charset charset, boolean preindexedEntries,
                             boolean preindexedFeatures) throws Exception {
 
-		String[] args = { "count", "--input", inInst.toString(),
-				"--output-entries", outE.toString(), "--output-features",
-				outF.toString(), "--output-entry-features", outEF.toString(),
-				"--charset", charset.name(), "--temporary-directory",
-				TEST_TMP_DIR.toString() };
+        String[] args = {"count", "--input", inInst.toString(),
+                "--output-entries", outE.toString(), "--output-features",
+                outF.toString(), "--output-entry-features", outEF.toString(),
+                "--charset", charset.name(), "--temporary-directory",
+                TestConstants.TEST_TMP_DIR.toString()};
 
-		if (preindexedEntries) {
-			List<String> tmp = new ArrayList<String>(Arrays.asList(args));
-			tmp.add("--enumerated-entries");
-			args = tmp.toArray(new String[tmp.size()]);
-		}
-		if (preindexedFeatures) {
-			List<String> tmp = new ArrayList<String>(Arrays.asList(args));
-			tmp.add("--enumerated-features");
-			args = tmp.toArray(new String[tmp.size()]);
-		}
+        if (preindexedEntries) {
+            List<String> tmp = new ArrayList<String>(Arrays.asList(args));
+            tmp.add("--enumerated-entries");
+            args = tmp.toArray(new String[tmp.size()]);
+        }
+        if (preindexedFeatures) {
+            List<String> tmp = new ArrayList<String>(Arrays.asList(args));
+            tmp.add("--enumerated-features");
+            args = tmp.toArray(new String[tmp.size()]);
+        }
 
-		try {
-			enableExistTrapping();
-			Tools.main(args);
-		} finally {
-			disableExitTrapping();
-		}
+        try {
+            enableExistTrapping();
+            Tools.main(args);
+        } finally {
+            disableExitTrapping();
+        }
 
-		assertTrue("Output files not created: " + outE, outE.exists());
-		assertTrue("Output files not created: " + outF, outF.exists());
-		assertTrue("Output files not created: " + outEF, outEF.exists());
+        assertTrue("Output files not created: " + outE, outE.exists());
+        assertTrue("Output files not created: " + outF, outF.exists());
+        assertTrue("Output files not created: " + outEF, outEF.exists());
 
-		assertTrue("Empty output file found: " + outE, outE.length() > 0);
-		assertTrue("Empty output file found: " + outF, outF.length() > 0);
-		assertTrue("Empty output file found: " + outEF, outEF.length() > 0);
-	}
+        assertTrue("Empty output file found: " + outE, outE.length() > 0);
+        assertTrue("Empty output file found: " + outF, outF.length() > 0);
+        assertTrue("Empty output file found: " + outEF, outEF.length() > 0);
+    }
 
-	private void runExpectingNullPointer(File inInst, File outE, File outF,
-			File outEF, Charset charset, boolean preindexedEntries,
-			boolean preindexedFeatures) throws Exception {
-		try {
-			runWithAPI(inInst, outE, outF, outEF, charset, preindexedEntries,
-					preindexedFeatures);
-			fail("NullPointerException should have been thrown.");
-		} catch (NullPointerException ex) {
-			// pass
-		}
-	}
+    private void runExpectingNullPointer(File inInst, File outE, File outF,
+                                         File outEF, Charset charset, boolean preindexedEntries,
+                                         boolean preindexedFeatures) throws Exception {
+        try {
+            runWithAPI(inInst, outE, outF, outEF, charset, preindexedEntries,
+                    preindexedFeatures);
+            fail("NullPointerException should have been thrown.");
+        } catch (NullPointerException ex) {
+            // pass
+        }
+    }
 
-	private void runExpectingIllegalState(File inInst, File outE, File outF,
-			File outEF, Charset charset, boolean preindexedEntries,
-			boolean preindexedFeatures) throws Exception {
-		try {
-			runWithAPI(inInst, outE, outF, outEF, charset, preindexedEntries,
-					preindexedFeatures);
-			fail("IllegalStateException should have been thrown.");
-		} catch (IllegalStateException ex) {
-			// pass
-		}
-	}
+    private void runExpectingIllegalState(File inInst, File outE, File outF,
+                                          File outEF, Charset charset, boolean preindexedEntries,
+                                          boolean preindexedFeatures) throws Exception {
+        try {
+            runWithAPI(inInst, outE, outF, outEF, charset, preindexedEntries,
+                    preindexedFeatures);
+            fail("IllegalStateException should have been thrown.");
+        } catch (IllegalStateException ex) {
+            // pass
+        }
+    }
 
-	@Test
-	public void testRunOnFruitAPI() throws Exception {
-		System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
+    @Test
+    public void testRunOnFruitAPI() throws Exception {
+        System.out.println("Testing " + subject + " on " + TestConstants.TEST_FRUIT_INPUT);
 
-		final String fruitPrefix = TEST_FRUIT_INPUT.getName();
-		final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
-		final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix
-				+ ".features");
-		final File efActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".events");
+        final String fruitPrefix = TestConstants.TEST_FRUIT_INPUT.getName();
+        final File eActual = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix + ".entries");
+        final File fActual = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix
+                + ".features");
+        final File efActual = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix + ".events");
 
-		eActual.delete();
-		fActual.delete();
-		efActual.delete();
+        eActual.delete();
+        fActual.delete();
+        efActual.delete();
 
-		runWithAPI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
-				DEFAULT_CHARSET, false, false);
+        runWithAPI(TestConstants.TEST_FRUIT_INPUT, eActual, fActual, efActual,
+                TestConstants.DEFAULT_CHARSET, false, false);
 
-	}
+    }
 
-	@Test
-	public void testRunOnFruitAPI_Indexed() throws Exception {
-		System.out.println("Testing " + subject + " on "
-				+ TEST_FRUIT_INPUT_INDEXED);
+    @Test
+    public void testRunOnFruitAPI_Indexed() throws Exception {
+        System.out.println("Testing " + subject + " on "
+                + TestConstants.TEST_FRUIT_INPUT_INDEXED);
 
-		final String fruitPrefix = TEST_FRUIT_INPUT_INDEXED.getName();
-		final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
-		final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix
-				+ ".features");
-		final File efActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".events");
+        final String fruitPrefix = TestConstants.TEST_FRUIT_INPUT_INDEXED.getName();
+        final File eActual = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix + ".entries");
+        final File fActual = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix
+                + ".features");
+        final File efActual = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix + ".events");
 
-		eActual.delete();
-		fActual.delete();
-		efActual.delete();
+        eActual.delete();
+        fActual.delete();
+        efActual.delete();
 
-		runWithAPI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
-				DEFAULT_CHARSET, true, true);
+        runWithAPI(TestConstants.TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
+                TestConstants.DEFAULT_CHARSET, true, true);
 
-	}
+    }
 
-	@Test
-	public void testRunOnFruitAPITinyChunk() throws Exception {
-		System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
+    @Test
+    public void testRunOnFruitAPITinyChunk() throws Exception {
+        System.out.println("Testing " + subject + " on " + TestConstants.TEST_FRUIT_INPUT);
 
-		final String fruitPrefix = TEST_FRUIT_INPUT.getName();
-		final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries"
-				+ ".tiny");
-		final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix
-				+ ".features" + ".tiny");
-		final File efActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".events"
-				+ ".tiny");
+        final String fruitPrefix = TestConstants.TEST_FRUIT_INPUT.getName();
+        final File eActual = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix + ".entries"
+                + ".tiny");
+        final File fActual = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix
+                + ".features" + ".tiny");
+        final File efActual = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix + ".events"
+                + ".tiny");
 
-		eActual.delete();
-		fActual.delete();
-		efActual.delete();
+        eActual.delete();
+        fActual.delete();
+        efActual.delete();
 
-		runWithAPI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
-				DEFAULT_CHARSET, false, false);
+        runWithAPI(TestConstants.TEST_FRUIT_INPUT, eActual, fActual, efActual,
+                TestConstants.DEFAULT_CHARSET, false, false);
 
-	}
+    }
 
-	@Test
-	public void testRunOnFruitAPITinyChunk_Indexed() throws Exception {
-		System.out.println("Testing " + subject + " on "
-				+ TEST_FRUIT_INPUT_INDEXED);
+    @Test
+    public void testRunOnFruitAPITinyChunk_Indexed() throws Exception {
+        System.out.println("Testing " + subject + " on "
+                + TestConstants.TEST_FRUIT_INPUT_INDEXED);
 
-		final String fruitPrefix = TEST_FRUIT_INPUT_INDEXED.getName();
-		final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries"
-				+ ".tiny");
-		final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix
-				+ ".features" + ".tiny");
-		final File efActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".events"
-				+ ".tiny");
+        final String fruitPrefix = TestConstants.TEST_FRUIT_INPUT_INDEXED.getName();
+        final File eActual = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix + ".entries"
+                + ".tiny");
+        final File fActual = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix
+                + ".features" + ".tiny");
+        final File efActual = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix + ".events"
+                + ".tiny");
 
-		eActual.delete();
-		fActual.delete();
-		efActual.delete();
+        eActual.delete();
+        fActual.delete();
+        efActual.delete();
 
-		runWithAPI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
-				DEFAULT_CHARSET, true, true);
+        runWithAPI(TestConstants.TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
+                TestConstants.DEFAULT_CHARSET, true, true);
 
-	}
+    }
 
-	@Test
-	public void testRunOnFruitCLI() throws Exception {
+    @Test
+    public void testRunOnFruitCLI() throws Exception {
 
-		System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
+        System.out.println("Testing " + subject + " on " + TestConstants.TEST_FRUIT_INPUT);
 
-		final String fruitPrefix = TEST_FRUIT_INPUT.getName();
-		final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
-		final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix
-				+ ".features");
-		final File efActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".events");
+        final String fruitPrefix = TestConstants.TEST_FRUIT_INPUT.getName();
+        final File eActual = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix + ".entries");
+        final File fActual = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix
+                + ".features");
+        final File efActual = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix + ".events");
 
-		eActual.delete();
-		fActual.delete();
-		efActual.delete();
+        eActual.delete();
+        fActual.delete();
+        efActual.delete();
 
-		runWithCLI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
-                DEFAULT_CHARSET, false, false);
+        runWithCLI(TestConstants.TEST_FRUIT_INPUT, eActual, fActual, efActual,
+                TestConstants.DEFAULT_CHARSET, false, false);
 
-	}
+    }
 
-	@Test
-	public void testRunOnFruitCLI_Indexed() throws Exception {
+    @Test
+    public void testRunOnFruitCLI_Indexed() throws Exception {
 
-		System.out.println("Testing " + subject + " on "
-				+ TEST_FRUIT_INPUT_INDEXED);
+        System.out.println("Testing " + subject + " on "
+                + TestConstants.TEST_FRUIT_INPUT_INDEXED);
 
-		final String fruitPrefix = TEST_FRUIT_INPUT_INDEXED.getName();
-		final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
-		final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix
-				+ ".features");
-		final File efActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".events");
+        final String fruitPrefix = TestConstants.TEST_FRUIT_INPUT_INDEXED.getName();
+        final File eActual = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix + ".entries");
+        final File fActual = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix
+                + ".features");
+        final File efActual = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix + ".events");
 
-		eActual.delete();
-		fActual.delete();
-		efActual.delete();
+        eActual.delete();
+        fActual.delete();
+        efActual.delete();
 
-		runWithCLI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
-                DEFAULT_CHARSET, true, true);
+        runWithCLI(TestConstants.TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
+                TestConstants.DEFAULT_CHARSET, true, true);
 
-	}
+    }
 
-	@Test
-	public void testMissingParameters() throws Exception {
-		System.out.println("Testing " + subject + " for bad parameterisation.");
+    @Test
+    public void testMissingParameters() throws Exception {
+        System.out.println("Testing " + subject + " for bad parameterisation.");
 
-		final File instIn = TEST_FRUIT_INPUT;
-		final String fruitPrefix = TEST_FRUIT_INPUT.getName();
-		final File eOut = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
-		final File fOut = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
-		final File efOut = new File(TEST_OUTPUT_DIR, fruitPrefix + ".events");
+        final File instIn = TestConstants.TEST_FRUIT_INPUT;
+        final String fruitPrefix = TestConstants.TEST_FRUIT_INPUT.getName();
+        final File eOut = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix + ".entries");
+        final File fOut = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix + ".features");
+        final File efOut = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix + ".events");
 
-		runExpectingNullPointer(null, eOut, fOut, efOut, DEFAULT_CHARSET,
-				false, false);
-		runExpectingNullPointer(instIn, null, fOut, efOut, DEFAULT_CHARSET,
-				false, false);
-		runExpectingNullPointer(instIn, eOut, null, efOut, DEFAULT_CHARSET,
-				false, false);
-		runExpectingNullPointer(instIn, eOut, fOut, null, DEFAULT_CHARSET,
-				false, false);
-		runExpectingNullPointer(instIn, eOut, fOut, efOut, null, false, false);
+        runExpectingNullPointer(null, eOut, fOut, efOut, TestConstants.DEFAULT_CHARSET,
+                false, false);
+        runExpectingNullPointer(instIn, null, fOut, efOut, TestConstants.DEFAULT_CHARSET,
+                false, false);
+        runExpectingNullPointer(instIn, eOut, null, efOut, TestConstants.DEFAULT_CHARSET,
+                false, false);
+        runExpectingNullPointer(instIn, eOut, fOut, null, TestConstants.DEFAULT_CHARSET,
+                false, false);
+        runExpectingNullPointer(instIn, eOut, fOut, efOut, null, false, false);
 
-		File dir = TEST_OUTPUT_DIR;
-		runExpectingIllegalState(dir, eOut, fOut, efOut, DEFAULT_CHARSET,
-				false, false);
-		runExpectingIllegalState(instIn, dir, fOut, efOut, DEFAULT_CHARSET,
-				false, false);
-		runExpectingIllegalState(instIn, eOut, dir, efOut, DEFAULT_CHARSET,
-				false, false);
-		runExpectingIllegalState(instIn, eOut, fOut, dir, DEFAULT_CHARSET,
-				false, false);
-	}
+        File dir = TestConstants.TEST_OUTPUT_DIR;
+        runExpectingIllegalState(dir, eOut, fOut, efOut, TestConstants.DEFAULT_CHARSET,
+                false, false);
+        runExpectingIllegalState(instIn, dir, fOut, efOut, TestConstants.DEFAULT_CHARSET,
+                false, false);
+        runExpectingIllegalState(instIn, eOut, dir, efOut, TestConstants.DEFAULT_CHARSET,
+                false, false);
+        runExpectingIllegalState(instIn, eOut, fOut, dir, TestConstants.DEFAULT_CHARSET,
+                false, false);
+    }
 
-	@Test
-	public void testExitStatus() throws Exception {
-		try {
-			ExitTrapper.enableExistTrapping();
-			Tools.main(new String[] { "count" });
-		} catch (ExitTrapper.ExitException ex) {
-			assertTrue("Expecting non-zero exit status.", ex.getStatus() != 0);
-		} finally {
-			ExitTrapper.disableExitTrapping();
-		}
-	}
+    @Test
+    public void testExitStatus() throws Exception {
+        try {
+            ExitTrapper.enableExistTrapping();
+            Tools.main(new String[]{"count"});
+        } catch (ExitTrapper.ExitException ex) {
+            assertTrue("Expecting non-zero exit status.", ex.getStatus() != 0);
+        } finally {
+            ExitTrapper.disableExitTrapping();
+        }
+    }
 
-	/**
-	 * Tests ExternalCountCommand on a large amount of data that has been
-	 * generated to conform to worst-case memory usage scenario.
-	 * 
-	 * @throws Exception
-	 */
-	@Test
-	@Ignore(value = "Takes a rather a long time.")
-	public void testExternalCountCommandOnLargeData() throws Exception {
-		System.out.println("testExternalCountCommand()");
+    /**
+     * Tests ExternalCountCommand on a large amount of data that has been
+     * generated to conform to worst-case memory usage scenario.
+     *
+     * @throws Exception
+     */
+    @Test
+    @Ignore(value = "Takes a rather a long time.")
+    public void testExternalCountCommandOnLargeData() throws Exception {
+        System.out.println("testExternalCountCommand()");
 
-		final int nEntries = 1 << 12;
-		final int nFeaturesPerEntry = 1 << 12;
-		final File instancesFile = new File(TEST_OUTPUT_DIR, String.format(
-				"testExternalCountCommand-%dx%d-instances", nEntries,
-				nFeaturesPerEntry));
-		final File entriesFile = new File(TEST_OUTPUT_DIR,
-				instancesFile.getName() + "-entries");
-		final File featuresFile = new File(TEST_OUTPUT_DIR,
-				instancesFile.getName() + "-features");
-		final File eventsFile = new File(TEST_OUTPUT_DIR,
-				instancesFile.getName() + "-events");
+        final int nEntries = 1 << 12;
+        final int nFeaturesPerEntry = 1 << 12;
+        final File instancesFile = new File(TestConstants.TEST_OUTPUT_DIR, String.format(
+                "testExternalCountCommand-%dx%d-instances", nEntries,
+                nFeaturesPerEntry));
+        final File entriesFile = new File(TestConstants.TEST_OUTPUT_DIR,
+                instancesFile.getName() + "-entries");
+        final File featuresFile = new File(TestConstants.TEST_OUTPUT_DIR,
+                instancesFile.getName() + "-features");
+        final File eventsFile = new File(TestConstants.TEST_OUTPUT_DIR,
+                instancesFile.getName() + "-events");
 
-		// Create the test data if necessary
-		if (!instancesFile.exists())
-			TestConstants.generateUniqueInstanceData(instancesFile, nEntries,
-					nFeaturesPerEntry);
+        // Create the test data if necessary
+        if (!instancesFile.exists())
+            TestConstants.generateUniqueInstanceData(instancesFile, nEntries,
+                    nFeaturesPerEntry);
 
-		assertValidPlaintextInputFiles(instancesFile);
-		assertValidOutputFiles(entriesFile, featuresFile, eventsFile);
+        TestConstants.assertValidPlaintextInputFiles(instancesFile);
+        TestConstants.assertValidOutputFiles(entriesFile, featuresFile, eventsFile);
 
-		deleteIfExist(entriesFile, featuresFile, eventsFile);
+        TestConstants.deleteIfExist(entriesFile, featuresFile, eventsFile);
 
-		// Instantiate and configure the command
-		final ExternalCountCommand countCmd = new ExternalCountCommand();
-		countCmd.setInstancesFile(instancesFile);
-		countCmd.setEntriesFile(entriesFile);
-		countCmd.setFeaturesFile(featuresFile);
-		countCmd.setEventsFile(eventsFile);
-		countCmd.getFileDelegate().setCharset(DEFAULT_CHARSET);
-		countCmd.setIndexDelegate(new DoubleEnumeratingDelegate(
+        // Instantiate and configure the command
+        final ExternalCountCommand countCmd = new ExternalCountCommand();
+        countCmd.setInstancesFile(instancesFile);
+        countCmd.setEntriesFile(entriesFile);
+        countCmd.setFeaturesFile(featuresFile);
+        countCmd.setEventsFile(eventsFile);
+        countCmd.getFileDelegate().setCharset(TestConstants.DEFAULT_CHARSET);
+        countCmd.setIndexDelegate(new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, true, true, null, null));
-		countCmd.setTempFileFactory(new TempFileFactory(TEST_TMP_DIR));
+        countCmd.setTempFileFactory(new TempFileFactory(TestConstants.TEST_TMP_DIR));
 
-		// The highest number of cores attempted so far.
-		// countCmd.setNumThreads(64);
+        // The highest number of cores attempted so far.
+        // countCmd.setNumThreads(64);
 
-		countCmd.addProgressListener(new InfoProgressListener());
+        countCmd.addProgressListener(new InfoProgressListener());
 
-		countCmd.runCommand();
+        countCmd.runCommand();
 
-		assertValidPlaintextInputFiles(entriesFile, featuresFile, eventsFile);
+        TestConstants.assertValidPlaintextInputFiles(entriesFile, featuresFile, eventsFile);
 
-	}
+    }
 
 }

@@ -30,23 +30,18 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
-import org.junit.After;
-import org.junit.AfterClass;
-import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 
+import java.io.Serializable;
+import java.util.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class MergeTaskTest {
@@ -87,18 +82,11 @@ public class MergeTaskTest {
 
         List<Integer> out = new ArrayList<Integer>();
 
-        ObjectSource<Integer> src1 = ObjectIO.asSource((Iterable<Integer>)in1);
-        ObjectSource<Integer> src2 = ObjectIO.asSource((Iterable<Integer>)in2);
+        ObjectSource<Integer> src1 = ObjectIO.asSource((Iterable<Integer>) in1);
+        ObjectSource<Integer> src2 = ObjectIO.asSource((Iterable<Integer>) in2);
         ObjectSink<Integer> sink = ObjectIO.asSink(out);
 
-        Comparator<Integer> comparator = new Comparator<Integer>() {
-
-            @Override
-            public int compare(Integer o1, Integer o2) {
-                return o1 - o2;
-            }
-
-        };
+        Comparator<Integer> comparator = new IntegerNaturalOrderComparator();
 
         ObjectMergeTask<Integer> instance = new ObjectMergeTask<Integer>();
         instance.setSourceA(src1);
@@ -108,9 +96,22 @@ public class MergeTaskTest {
 
         instance.run();
 
-        assertEquals(n * 2, out.size());
+        assertEquals(n * 2L, out.size());
         for (int i = 1; i < out.size(); i++)
             assertTrue(out.get(i - 1) <= out.get(i));
     }
 
+    protected static final class IntegerNaturalOrderComparator
+            implements Comparator<Integer>, Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        protected IntegerNaturalOrderComparator() {
+        }
+
+        @Override
+        public int compare(final Integer o1, final Integer o2) {
+            return o1 - o2;
+        }
+    }
 }

@@ -31,10 +31,12 @@
 package uk.ac.susx.mlcl.lib.tasks;
 
 import com.google.common.base.Objects;
-import static java.text.MessageFormat.format;
-import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.util.Properties;
+
+import static java.text.MessageFormat.format;
 
 /**
  * Abstract super class to all task objects, implementing common functionality.

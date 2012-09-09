@@ -36,7 +36,7 @@ import java.util.Map.Entry;
 
 /**
  * A stub implementation of an enumerator, used a placeholder.
- *
+ * <p/>
  * It should never be actually used, so functionality results in an
  * UnsupportedOperationException.
  *

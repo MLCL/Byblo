@@ -34,16 +34,6 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects.ToStringHelper;
-import java.io.Closeable;
-import java.io.File;
-import java.io.Flushable;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.Future;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.AbstractParallelCommandTask;
@@ -55,21 +45,21 @@ import uk.ac.susx.mlcl.lib.commands.TempFileFactoryConverter;
 import uk.ac.susx.mlcl.lib.events.ProgressAggregate;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.events.ProgressReporting;
-import uk.ac.susx.mlcl.lib.io.Chunk;
-import uk.ac.susx.mlcl.lib.io.Chunker;
-import uk.ac.susx.mlcl.lib.io.FileFactory;
-import uk.ac.susx.mlcl.lib.io.ObjectSink;
-import uk.ac.susx.mlcl.lib.io.ObjectSource;
-import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
-import uk.ac.susx.mlcl.lib.io.TempFileFactory;
-import uk.ac.susx.mlcl.lib.tasks.FileDeleteTask;
-import uk.ac.susx.mlcl.lib.tasks.FileMoveTask;
-import uk.ac.susx.mlcl.lib.tasks.ObjectMergeTask;
-import uk.ac.susx.mlcl.lib.tasks.ObjectSortTask;
-import uk.ac.susx.mlcl.lib.tasks.Task;
+import uk.ac.susx.mlcl.lib.io.*;
+import uk.ac.susx.mlcl.lib.tasks.*;
+
+import java.io.Closeable;
+import java.io.File;
+import java.io.Flushable;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.Future;
 
 /**
- *
  * @param <T>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -95,12 +85,12 @@ public abstract class AbstractExternalSortCommand<T>
     private final FilePipeDelegate fileDelegate = new FilePipeDelegate();
 
     @Parameter(names = {"-T", "--temporary-directory"},
-    description = "Directory which will be used for storing temporary files.",
-    converter = TempFileFactoryConverter.class)
+            description = "Directory which will be used for storing temporary files.",
+            converter = TempFileFactoryConverter.class)
     private FileFactory tempFileFactory = new TempFileFactory();
 
     @Parameter(names = {"-r", "--reverse"},
-    description = "Reverse the result of comparisons.")
+            description = "Reverse the result of comparisons.")
     private boolean reverse = false;
 
     private Comparator<T> comparator;
@@ -227,7 +217,7 @@ public abstract class AbstractExternalSortCommand<T>
         for (int i = 0; i < nextFileToMerge.length - 1; i++) {
             if (nextFileToMerge[i] == null) {
 
-               // nothing
+                // nothing
 
             } else if (nextFileToMerge[i + 1] == null) {
 
@@ -253,8 +243,15 @@ public abstract class AbstractExternalSortCommand<T>
                 if (mergeTask.getSourceB() instanceof Closeable)
                     ((Closeable) mergeTask.getSourceB()).close();
 
-                nextFileToMerge[i].delete();
-                nextFileToMerge[i + 1].delete();
+                if (!nextFileToMerge[i].delete() && LOG.isWarnEnabled())
+                    LOG.warn("Failed to delete input file 1 to completed merge: "
+                            + nextFileToMerge[i].getName());
+
+                if (!nextFileToMerge[i + 1].delete() && LOG.isWarnEnabled())
+                    LOG.warn("Failed to delete input file 2 to completed merge: "
+                            + nextFileToMerge[i + 1].getName());
+
+
                 nextFileToMerge[i] = null;
                 nextFileToMerge[i + 1] = tmp;
                 progress.endAdjusting();
@@ -319,7 +316,7 @@ public abstract class AbstractExternalSortCommand<T>
         } else {
             throw new AssertionError(
                     "Task type " + task.getClass()
-                    + " should not have been queued.");
+                            + " should not have been queued.");
         }
     }
 
@@ -471,7 +468,7 @@ public abstract class AbstractExternalSortCommand<T>
     /**
      * Calculate a conservative guess at the maximum chunk size we can get away
      * with given the available memory, and number of simultaneous threads.
-     *
+     * <p/>
      * History: In previous version the end user was expected to set this value,
      * which obviously was a total disaster. Most wouldn't both (because they
      * didn't know what it was) and result was usually either code running too
@@ -484,7 +481,7 @@ public abstract class AbstractExternalSortCommand<T>
         System.gc();
         final long bytesAvailable = MiscUtil.freeMaxMemory();
         final int numTasks = (getNumThreads() + PRELOAD_SIZE);
-        int chunkSize =  (int) (bytesAvailable / (getBytesPerObject() * numTasks));
+        int chunkSize = (int) (bytesAvailable / (getBytesPerObject() * numTasks));
 
         int maxChunkSize = 5000000;
         // In some system we might expect a very large amount of available
@@ -492,5 +489,4 @@ public abstract class AbstractExternalSortCommand<T>
         // will never parallelise.
         return Math.min(chunkSize, maxChunkSize);
     }
-
 }

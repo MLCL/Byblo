@@ -31,6 +31,7 @@
 package uk.ac.susx.mlcl.byblo;
 
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import org.apache.commons.logging.Log;
@@ -209,8 +210,13 @@ public final class FullBuild extends AbstractCommand {
     protected FullBuild() {
     }
 
-    public static void main(String[] args) throws Exception {
-        new FullBuild().runCommand(args);
+
+    public static void main(final String[] args) throws Exception {
+        try {
+            new FullBuild().runCommand(args);
+        } catch (ParameterException ex) {
+            System.exit(-1);
+        }
     }
 
     @Override

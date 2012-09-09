@@ -30,17 +30,8 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import uk.ac.susx.mlcl.byblo.measures.impl.Weeds;
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static uk.ac.susx.mlcl.TestConstants.*;
 import uk.ac.susx.mlcl.byblo.Tools;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
@@ -48,11 +39,20 @@ import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import static org.junit.Assert.*;
+import static uk.ac.susx.mlcl.TestConstants.*;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.disableExitTrapping;
 import static uk.ac.susx.mlcl.lib.test.ExitTrapper.enableExistTrapping;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class WeedsTest {
@@ -106,30 +106,29 @@ public class WeedsTest {
 
     public void testCLI(double beta, double gamma) throws Exception {
         System.out.println(String.format("testCLI(beta=%.2f, gamma=%.2f)",
-                                         beta, gamma));
+                beta, gamma));
 
         File output = new File(TEST_OUTPUT_DIR, FRUIT_NAME
                 + String.format(".Weeds-beta%03d-gamma%03d",
-                                (int) (100 * beta), (int) (100 * gamma)));
-        output.delete();
+                (int) (100 * beta), (int) (100 * gamma)));
+        deleteIfExist(output);
 
         try {
             enableExistTrapping();
             Tools.main(new String[]{
-                        "allpairs",
-                        "--charset", "UTF-8",
-                        "--measure", "Weeds",
-                        "--crmi-beta", Double.toHexString(beta),
-                        "--crmi-gamma", Double.toHexString(gamma),
-                        "--input", TEST_FRUIT_EVENTS.toString(),
-                        "--input-features", TEST_FRUIT_FEATURES.toString(),
-                        "--input-entries", TEST_FRUIT_ENTRIES.toString(),
-                        "--output", output.toString()
-                    });
+                    "allpairs",
+                    "--charset", "UTF-8",
+                    "--measure", "Weeds",
+                    "--crmi-beta", Double.toHexString(beta),
+                    "--crmi-gamma", Double.toHexString(gamma),
+                    "--input", TEST_FRUIT_EVENTS.toString(),
+                    "--input-features", TEST_FRUIT_FEATURES.toString(),
+                    "--input-entries", TEST_FRUIT_ENTRIES.toString(),
+                    "--output", output.toString()
+            });
         } finally {
             disableExitTrapping();
         }
-
 
 
         assertTrue("Output file " + output + " does not exist.", output.exists());
@@ -301,7 +300,7 @@ public class WeedsTest {
             B.set(RANDOM.nextInt(size * 2), RANDOM.nextDouble());
         }
 
-        double expect = test(A, B);
+        test(A, B);
     }
 
     public double test(SparseDoubleVector A, SparseDoubleVector B) {
@@ -318,7 +317,7 @@ public class WeedsTest {
         final DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();
         final FastWeightedTokenPairVectorSource eventSrc =
                 BybloIO.openEventsVectorSource(
-                TEST_FRUIT_EVENTS, DEFAULT_CHARSET, indexDelegate);
+                        TEST_FRUIT_EVENTS, DEFAULT_CHARSET, indexDelegate);
         final List<Indexed<SparseDoubleVector>> vecs =
                 new ArrayList<Indexed<SparseDoubleVector>>();
         while (eventSrc.hasNext())

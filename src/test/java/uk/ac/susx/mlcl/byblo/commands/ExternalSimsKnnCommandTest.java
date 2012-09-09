@@ -46,6 +46,7 @@ import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
 import uk.ac.susx.mlcl.lib.Comparators;
+import uk.ac.susx.mlcl.lib.commands.AbstractCommandTest;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import uk.ac.susx.mlcl.lib.test.ExitTrapper;
 import uk.ac.susx.mlcl.testing.SlowTestCategory;
@@ -160,11 +161,11 @@ public class ExternalSimsKnnCommandTest extends
                 "%s-%dx%d-sims", testName.getMethodName(), nEntries, nEntries));
         final File outNeighsFile = new File(TEST_OUTPUT_DIR, inSimsFile.getName() + "-neighbours");
 
-        if(!inSimsFile.exists()) {
+        if (!inSimsFile.exists()) {
             generateSimsData(inSimsFile, nEntries);
         }
 
-        if(outNeighsFile.exists()) {
+        if (outNeighsFile.exists()) {
             Assert.assertTrue(outNeighsFile.delete());
         }
 

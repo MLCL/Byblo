@@ -30,24 +30,16 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.Comparator;
-
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParameterException;
+import com.beust.jcommander.Parameters;
+import com.beust.jcommander.ParametersDelegate;
+import com.google.common.base.Objects;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
-import uk.ac.susx.mlcl.byblo.io.BybloIO;
-import uk.ac.susx.mlcl.byblo.io.Token;
-import uk.ac.susx.mlcl.byblo.io.TokenPair;
-import uk.ac.susx.mlcl.byblo.io.TokenPairSource;
-import uk.ac.susx.mlcl.byblo.io.Weighted;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSink;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenSink;
+import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.tasks.CountTask;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
@@ -57,10 +49,11 @@ import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.events.ReportingProgressListener;
 import uk.ac.susx.mlcl.lib.io.Files;
 
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
-import com.beust.jcommander.ParametersDelegate;
-import com.google.common.base.Objects;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.Comparator;
 
 /**
  * <p>Read in a raw feature instances file, to produce three frequency files:
@@ -69,7 +62,7 @@ import com.google.common.base.Objects;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Parameters(commandDescription = "Read in a raw feature instances file, to produce three "
-+ "frequency files: entries, contexts, and features.")
+        + "frequency files: entries, contexts, and features.")
 public class CountCommand extends AbstractCommand {
 
     private static final long serialVersionUID = 1L;
@@ -77,31 +70,31 @@ public class CountCommand extends AbstractCommand {
     private static final Log LOG = LogFactory.getLog(CountCommand.class);
 
     @Parameter(names = {"-i", "--input"},
-    required = true,
-    description = "Source instances file",
-    validateWith = InputFileValidator.class)
+            required = true,
+            description = "Source instances file",
+            validateWith = InputFileValidator.class)
     private File inputFile;
 
     @Parameter(names = {"-oef", "--output-entry-features"},
-    required = true,
-    description = "Entry-feature-pair frequencies destination file",
-    validateWith = OutputFileValidator.class)
+            required = true,
+            description = "Entry-feature-pair frequencies destination file",
+            validateWith = OutputFileValidator.class)
     private File eventsFile = null;
 
     @Parameter(names = {"-oe", "--output-entries"},
-    required = true,
-    description = "Entry frequencies destination file",
-    validateWith = OutputFileValidator.class)
+            required = true,
+            description = "Entry frequencies destination file",
+            validateWith = OutputFileValidator.class)
     private File entriesFile = null;
 
     @Parameter(names = {"-of", "--output-features"},
-    required = true,
-    description = "Feature frequencies destination file.",
-    validateWith = OutputFileValidator.class)
+            required = true,
+            description = "Feature frequencies destination file.",
+            validateWith = OutputFileValidator.class)
     private File featuresFile = null;
 
     @Parameter(names = {"-c", "--charset"},
-    description = "Character encoding to use for input and output.")
+            description = "Character encoding to use for input and output.")
     private Charset charset = Files.DEFAULT_CHARSET;
 
     @ParametersDelegate
@@ -111,11 +104,11 @@ public class CountCommand extends AbstractCommand {
      * Dependency injection constructor with all fields parameterised.
      *
      * @param instancesFile input file containing entry/context instances
-     * @param eventsFile output file for entry/context/frequency triples
-     * @param entriesFile output file for entry/frequency pairs
-     * @param featuresFile output file for context/frequency pairs
+     * @param eventsFile    output file for entry/context/frequency triples
+     * @param entriesFile   output file for entry/frequency pairs
+     * @param featuresFile  output file for context/frequency pairs
      * @param indexDelegate
-     * @param charset character set to use for all file I/O
+     * @param charset       character set to use for all file I/O
      * @throws NullPointerException if any argument is null
      */
     public CountCommand(final File instancesFile, final File eventsFile,
@@ -140,9 +133,9 @@ public class CountCommand extends AbstractCommand {
      * default from {@link Files#DEFAULT_CHARSET}.
      *
      * @param instancesFile input file containing entry/context instances
-     * @param eventsFile output file for entry/context/frequency triples
-     * @param entriesFile output file for entry/frequency pairs
-     * @param featuresFile output file for context/frequency pairs
+     * @param eventsFile    output file for entry/context/frequency triples
+     * @param entriesFile   output file for entry/frequency pairs
+     * @param featuresFile  output file for context/frequency pairs
      * @throws NullPointerException if any argument is null
      */
     public CountCommand(
@@ -223,20 +216,20 @@ public class CountCommand extends AbstractCommand {
 
     private Comparator<Weighted<Token>> getEntryOrder() throws IOException {
         return indexDelegate.isEnumeratedEntries()
-               ? Weighted.recordOrder(Token.indexOrder())
-               : Weighted.recordOrder(Token.stringOrder(indexDelegate.getEntriesEnumeratorCarrier()));
+                ? Weighted.recordOrder(Token.indexOrder())
+                : Weighted.recordOrder(Token.stringOrder(indexDelegate.getEntriesEnumeratorCarrier()));
     }
 
     private Comparator<Weighted<Token>> getFeatureOrder() throws IOException {
         return indexDelegate.isEnumeratedFeatures()
-               ? Weighted.recordOrder(Token.indexOrder())
-               : Weighted.recordOrder(Token.stringOrder(indexDelegate.getFeaturesEnumeratorCarrier()));
+                ? Weighted.recordOrder(Token.indexOrder())
+                : Weighted.recordOrder(Token.stringOrder(indexDelegate.getFeaturesEnumeratorCarrier()));
     }
 
     private Comparator<Weighted<TokenPair>> getEventOrder() throws IOException {
         return (indexDelegate.isEnumeratedEntries() && indexDelegate.isEnumeratedFeatures())
-               ? Weighted.recordOrder(TokenPair.indexOrder())
-               : Weighted.recordOrder(TokenPair.stringOrder(
+                ? Weighted.recordOrder(TokenPair.indexOrder())
+                : Weighted.recordOrder(TokenPair.stringOrder(
                 indexDelegate));
     }
 
@@ -349,7 +342,8 @@ public class CountCommand extends AbstractCommand {
 
         // For each output file, check that either it exists and it writable,
         // or that it does not exist but is creatable
-        if (entriesFile.exists() && (!entriesFile.isFile() || !entriesFile.canWrite())) {
+        if (entriesFile.exists() && (!entriesFile.isFile() || !entriesFile.
+                canWrite())) {
             throw new IllegalStateException(
                     "entries file exists but is not writable: " + entriesFile);
         }
@@ -359,7 +353,8 @@ public class CountCommand extends AbstractCommand {
             throw new IllegalStateException(
                     "entries file does not exists and can not be created: " + entriesFile);
         }
-        if (featuresFile.exists() && (!featuresFile.isFile() || !featuresFile.canWrite())) {
+        if (featuresFile.exists() && (!featuresFile.isFile() || !featuresFile.
+                canWrite())) {
             throw new IllegalStateException(
                     "features file exists but is not writable: " + featuresFile);
         }
@@ -369,7 +364,8 @@ public class CountCommand extends AbstractCommand {
             throw new IllegalStateException(
                     "features file does not exists and can not be created: " + featuresFile);
         }
-        if (eventsFile.exists() && (!eventsFile.isFile() || !eventsFile.canWrite())) {
+        if (eventsFile.exists() && (!eventsFile.isFile() || !eventsFile.
+                canWrite())) {
             throw new IllegalStateException(
                     "entry-features file exists but is not writable: " + eventsFile);
         }
@@ -391,8 +387,11 @@ public class CountCommand extends AbstractCommand {
                 add("charset", charset);
     }
 
-    public static void main(String[] args) throws Exception {
-        new CountCommand().runCommand(args);
+    public static void main(final String[] args) throws Exception {
+        try {
+            new CountCommand().runCommand(args);
+        } catch (ParameterException ex) {
+            System.exit(-1);
+        }
     }
-
 }

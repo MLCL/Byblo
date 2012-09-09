@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo.measures;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.BybloSettings;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -217,7 +218,46 @@ public abstract class Measures {
         return Math.log(v) / LOG_2;
     }
 
-    public static Map<String, Class<? extends Measure>> loadMeasureAliasTable() throws ClassNotFoundException {
+    /**
+     * Small value used to measure equality of double precision floating point
+     * numbers while avoiding floating point errors.
+     * <p/>
+     * TODO: Move to mlcl-lib
+     */
+    private static final double DEFAULT_EPSILON = 0.0000001;
+
+    /**
+     * Check that two floating point numbers are equal within error epsilon.
+     * <p/>
+     * TODO: Move to mlcl-lib
+     *
+     * @param a       first value
+     * @param b       second value
+     * @param epsilon maximum difference error
+     * @return true if operands are within <tt>epsilon</tt>.
+     */
+    public static boolean epsilonEquals(final double a, final double b,
+                                        final double epsilon) {
+        return Double.compare(a, b) == 0
+                || Math.abs(a - b) <= epsilon;
+    }
+
+    /**
+     * Check that two floating point numbers are equal within
+     * {@link #DEFAULT_EPSILON }.
+     * <p/>
+     * TODO: Move to mlcl-lib
+     *
+     * @param a first value
+     * @param b second value
+     * @return true if operands are within {@link #DEFAULT_EPSILON}.
+     */
+    public static boolean epsilonEquals(final double a, final double b) {
+        return epsilonEquals(a, b, DEFAULT_EPSILON);
+    }
+
+    public static Map<String, Class<? extends Measure>> loadMeasureAliasTable()
+            throws ClassNotFoundException {
 
         // Map that will store measure aliases to class
         final Map<String, Class<? extends Measure>> classLookup = new HashMap<String, Class<? extends Measure>>();
@@ -237,13 +277,13 @@ public abstract class Measures {
             }
 
             final Class<? extends Measure> clazz = (Class<? extends Measure>) Class.forName(className);
-            if (classLookup.put(measure.toLowerCase(), clazz) != null) {
+            if (classLookup.put(measure.toLowerCase(BybloSettings.getLocale()), clazz) != null) {
                 throw new IllegalStateException("Duplicate measure name: " + measure);
             }
 
             if (res.containsKey(aliasesKey)) {
                 for (String alias : res.getString(aliasesKey).split(",")) {
-                    alias = alias.toLowerCase().trim();
+                    alias = alias.toLowerCase(BybloSettings.getLocale()).trim();
                     final Class<? extends Measure> prevClass = classLookup.put(alias, clazz);
                     if (prevClass != null && prevClass != clazz) {
                         throw new IllegalStateException("Duplicate measure name \"" + measure

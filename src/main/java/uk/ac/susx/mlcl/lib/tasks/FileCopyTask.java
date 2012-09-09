@@ -30,20 +30,21 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
+import com.google.common.base.Objects;
+import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.events.ProgressDelegate;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.events.ProgressReporting;
-import com.google.common.base.Objects;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+
 import static java.text.MessageFormat.format;
-import uk.ac.susx.mlcl.lib.Checks;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class FileCopyTask extends AbstractTask implements ProgressReporting {
@@ -64,9 +65,6 @@ public class FileCopyTask extends AbstractTask implements ProgressReporting {
 
     protected static void copy(File from, File to) throws IOException {
 
-        if (!to.exists()) {
-            to.createNewFile();
-        }
         FileChannel source = null;
         FileChannel destination = null;
         try {
@@ -94,7 +92,7 @@ public class FileCopyTask extends AbstractTask implements ProgressReporting {
         progress.startAdjusting();
         progress.setState(State.RUNNING);
         progress.setMessage(format("Copying file from \"{0}\" to \"{1}\".",
-                                   getSrcFile(), getDstFile()));
+                getSrcFile(), getDstFile()));
         progress.endAdjusting();
 
         // Check the configuration state

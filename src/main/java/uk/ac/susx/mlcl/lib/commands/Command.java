@@ -31,7 +31,6 @@
 package uk.ac.susx.mlcl.lib.commands;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public interface Command {

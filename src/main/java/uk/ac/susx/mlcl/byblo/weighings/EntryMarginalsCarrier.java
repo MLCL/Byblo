@@ -33,7 +33,7 @@ package uk.ac.susx.mlcl.byblo.weighings;
 /**
  * {@link EntryMarginalsCarrier} denotes an implementation that requires the
  * entry marginal totals independent of feature.
- *
+ * <p/>
  * When implemented the marginals array will be provided by the software with
  * {@link EntryMarginalsCarrier#setEntryMarginals(double[])}.
  *
@@ -43,7 +43,7 @@ public interface EntryMarginalsCarrier extends MarginalsCarrier {
 
     /**
      * Accessor to an array containing a mapping from entry id to weighting.
-     *
+     * <p/>
      * Stored as a double because it may have been waited in a pre-processing
      * stage, and as an array because it's usually dense.
      *

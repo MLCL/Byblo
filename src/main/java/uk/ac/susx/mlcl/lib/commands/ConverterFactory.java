@@ -32,13 +32,13 @@ package uk.ac.susx.mlcl.lib.commands;
 
 import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.IStringConverterFactory;
+import uk.ac.susx.mlcl.lib.io.TempFileFactory;
+
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
-import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class ConverterFactory implements IStringConverterFactory {

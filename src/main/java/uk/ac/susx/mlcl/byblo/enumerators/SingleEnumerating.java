@@ -34,7 +34,6 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public interface SingleEnumerating extends Enumerating {

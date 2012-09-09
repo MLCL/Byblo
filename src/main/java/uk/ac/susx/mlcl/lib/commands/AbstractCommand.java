@@ -35,15 +35,15 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Checks;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Parameters()
@@ -52,7 +52,7 @@ public abstract class AbstractCommand implements Command {
     private static final Log LOG = LogFactory.getLog(AbstractCommand.class);
 
     @Parameter(names = {"-h", "--help"},
-    description = "Display this help message.")
+            description = "Display this help message.")
     private boolean usageRequested = false;
 
     private final Map<String, Class<? extends Command>> subCommands;
@@ -114,18 +114,18 @@ public abstract class AbstractCommand implements Command {
             if (LOG.isTraceEnabled())
                 LOG.trace("Parsing exception", ex);
 
-            System.err.println(ex.getMessage());
-            StringBuilder sb = new StringBuilder();
+            if (!isUsageRequested()) {
+                System.err.println(ex.getMessage());
+                StringBuilder sb = new StringBuilder();
 
-
-            if (jc.getParsedCommand() == null) {
-                jc.usage(sb);
-            } else {
-                jc.usage(jc.getParsedCommand(), sb);
+                if (jc.getParsedCommand() == null) {
+                    jc.usage(sb);
+                } else {
+                    jc.usage(jc.getParsedCommand(), sb);
+                }
+                System.err.println(sb);
+                throw ex;
             }
-
-            System.err.println(sb);
-            System.exit(-1);
         }
 
 
@@ -148,12 +148,14 @@ public abstract class AbstractCommand implements Command {
             StringBuilder sb = new StringBuilder();
             jc.usage(sb);
             System.err.println(sb);
-            System.exit(-1);
+
+            throw new ParameterException("Command reguired but not given.");
 
         } else {
 
             if (jc.getParsedCommand() != null) {
-                Command instance = subCommandInstances.get(jc.getParsedCommand());
+                Command instance = subCommandInstances.
+                        get(jc.getParsedCommand());
                 if (LOG.isTraceEnabled())
                     LOG.trace(
                             "Running sub-command " + jc.getParsedCommand() + ": " + instance);
@@ -176,5 +178,4 @@ public abstract class AbstractCommand implements Command {
                 add("help", isUsageRequested()).
                 add("subCommands", subCommands);
     }
-
 }

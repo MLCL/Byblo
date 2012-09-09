@@ -31,12 +31,6 @@
 package uk.ac.susx.mlcl.byblo.commands;
 
 import com.beust.jcommander.ParametersDelegate;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
@@ -48,14 +42,18 @@ import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.Charset;
+
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class SortEventsCommand extends AbstractSortCommand<Weighted<TokenPair>> {
-
-    private static final Log LOG = LogFactory.getLog(
-            SortEntriesCommand.class);
+//
+//    private static final Log LOG = LogFactory.getLog(
+//            SortEventsCommand.class);
 
     @ParametersDelegate
     private DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();
@@ -64,7 +62,7 @@ public class SortEventsCommand extends AbstractSortCommand<Weighted<TokenPair>> 
             File sourceFile, File destinationFile, Charset charset,
             DoubleEnumerating indexDelegate) {
         super(sourceFile, destinationFile, charset,
-              Weighted.recordOrder(TokenPair.indexOrder()));
+                Weighted.recordOrder(TokenPair.indexOrder()));
         setIndexDelegate(indexDelegate);
     }
 
@@ -98,7 +96,7 @@ public class SortEventsCommand extends AbstractSortCommand<Weighted<TokenPair>> 
     protected ObjectSink<Weighted<TokenPair>> openSink(File file)
             throws FileNotFoundException, IOException {
         return new WeightSumReducerObjectSink<TokenPair>(
-               BybloIO.openEventsSink(file, getCharset(), indexDelegate));
+                BybloIO.openEventsSink(file, getCharset(), indexDelegate));
     }
 
     public EnumeratorType getEnumeratorType() {

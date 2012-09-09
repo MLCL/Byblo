@@ -33,7 +33,6 @@ package uk.ac.susx.mlcl.lib.commands;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class DoubleConverter implements com.beust.jcommander.IStringConverter<Double> {

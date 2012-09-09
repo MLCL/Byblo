@@ -31,25 +31,17 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import com.google.common.base.Predicate;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.Flushable;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
-import uk.ac.susx.mlcl.lib.io.Compact;
-import uk.ac.susx.mlcl.lib.io.DataSink;
-import uk.ac.susx.mlcl.lib.io.Deltas;
-import uk.ac.susx.mlcl.lib.io.Enumerated;
-import uk.ac.susx.mlcl.lib.io.ObjectSink;
-import uk.ac.susx.mlcl.lib.io.TSV;
+import uk.ac.susx.mlcl.lib.io.*;
+
+import java.io.*;
+import java.nio.charset.Charset;
 
 /**
- * An <tt>TokenPairSink</tt> object is used to store
- * {@link TokenPair} objects in a flat file.
- *
+ * An <tt>TokenPairSink</tt> object is used to store {@link TokenPair} objects
+ * in a flat file.
+ * <p/>
  * <p>The basic file format is Tab-Separated-Values (TSV) where records are
  * delimited by new-lines, and values are delimited by tabs. Two variants are
  * supported: verbose and compact. In verbose mode each {@link TokenPair}
@@ -57,7 +49,7 @@ import uk.ac.susx.mlcl.lib.io.TSV;
  * entry and a feature. In compact mode each TSV record consists of a single
  * entry followed by the features from all sequentially written
  * {@link TokenPair} objects that share the same entry.</p>
- *
+ * <p/>
  * Verbose mode example:
  * <pre>
  *      entry1  feature1
@@ -67,14 +59,14 @@ import uk.ac.susx.mlcl.lib.io.TSV;
  *      entry3  feature4
  *      entry3  feature1
  * </pre>
- *
+ * <p/>
  * Equivalent compact mode example:
  * <pre>
  *      entry1  feature1 feature2
  *      entry2  feature3
  *      entry3  feature2 feature4 feature1
  * </pre>
- *
+ * <p/>
  * <p>Compact mode is the default behavior, since it can reduce file sizes by
  * approximately 50%, with corresponding reductions in I/O overhead.</p>
  *
@@ -109,27 +101,24 @@ public class TokenPairSink implements ObjectSink<TokenPair>, Closeable, Flushabl
     }
 
     public static TokenPairSink open(
-            File file, Charset charset, DoubleEnumerating idx, boolean skip1, boolean skip2, boolean compact)
+            File file, Charset charset, DoubleEnumerating idx, boolean skip1,
+            boolean skip2, boolean compact)
             throws IOException {
         DataSink tsv = new TSV.Sink(file, charset);
         if (skip1) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
-
                 @Override
                 public boolean apply(Integer column) {
-                    return column == 0;
+                    return column != null && column == 0;
                 }
-
             });
         }
         if (skip2) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
-
                 @Override
                 public boolean apply(Integer column) {
-                    return column > 0;
+                    return column != null && column > 0;
                 }
-
             });
         }
 
@@ -147,5 +136,4 @@ public class TokenPairSink implements ObjectSink<TokenPair>, Closeable, Flushabl
         }
         return new TokenPairSink(tsv);
     }
-
 }

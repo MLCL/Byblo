@@ -30,11 +30,12 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.measures.DecomposableMeasure;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+
+import java.io.Serializable;
 
 /**
  * This measure attempts to encapsulate, for each pair of feature vectors A and
@@ -42,7 +43,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * the features of A, also occur in B. Conversely a low similarity is returned
  * when fews of A's features occur in B. The resultant similarity will be in the
  * range 0 (completed different) to 1 (exactly the same).
- *
+ * <p/>
  * An intuitive analogy is that of the words "orange" and and "fig". "orange" is
  * a very common word and can have several difference senses, e.g: colour,
  * fruit, company name. On the other hand "fig" is relatively infrequent and is
@@ -51,14 +52,14 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * so recall("fig", "apple") will be high. Conversely "apple" is only partially
  * described by "fig", "fig" does not recall fully the senses of "apple", and
  * recall("apple","fig") will be low.
- *
+ * <p/>
  * One complication is that the measure does not just use raw frequencies, but
  * the positive information content of each feature. Intuitively, a feature is
  * set to occur if it's occurrence is significant w.r.t to some base-line
  * probabilities. This is calculated as the positive point-wise mutual
  * information content SI(x,y), where x is the feature vector and y is the
  * context frequencies taken from the whole corpus.
- *
+ * <p/>
  * Note that recall(x,y) = precision(y,x) so the precision can be calculated by
  * wrapping an instance of RecallMi in the ReversedProximity decorator.
  *

@@ -30,15 +30,15 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import java.io.Closeable;
-import java.io.Flushable;
-import java.io.IOException;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 
+import java.io.Closeable;
+import java.io.Flushable;
+import java.io.IOException;
+
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @deprecated
  */

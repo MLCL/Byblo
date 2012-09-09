@@ -30,8 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import java.io.Serializable;
-import java.text.MessageFormat;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;

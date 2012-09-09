@@ -31,10 +31,6 @@
 package uk.ac.susx.mlcl.lib.tasks;
 
 import com.google.common.base.Objects;
-import java.io.Flushable;
-import java.io.IOException;
-import java.io.Serializable;
-import java.text.MessageFormat;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.events.ProgressDelegate;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
@@ -42,12 +38,16 @@ import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 
+import java.io.Flushable;
+import java.io.IOException;
+import java.text.MessageFormat;
+
 /**
  * @param <T>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class ObjectPipeTask<T> extends AbstractTask
-        implements Serializable, ProgressReporting {
+        implements ProgressReporting {
 
     private static final long serialVersionUID = 1L;
 
@@ -87,8 +87,6 @@ public class ObjectPipeTask<T> extends AbstractTask
     protected void initialiseTask() throws Exception {
         Checks.checkNotNull("sink", sink);
         Checks.checkNotNull("source", source);
-        if (getSource().equals(getSink()))
-            throw new IllegalStateException("Source is the same as the sink.");
     }
 
     @Override
@@ -150,9 +148,9 @@ public class ObjectPipeTask<T> extends AbstractTask
     public int hashCode() {
         int hash = super.hashCode();
         hash = 37 * hash + (this.getSource() != null
-                            ? this.getSource().hashCode() : 0);
+                ? this.getSource().hashCode() : 0);
         hash = 37 * hash + (this.getSink() != null ? this.getSink().hashCode()
-                            : 0);
+                : 0);
         return hash;
     }
 

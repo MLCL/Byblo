@@ -32,15 +32,15 @@ package uk.ac.susx.mlcl.byblo.commands;
 
 import com.beust.jcommander.Parameter;
 import com.google.common.base.Objects;
-import java.io.File;
-import java.io.Serializable;
-import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.lib.commands.FileDelegate;
 import uk.ac.susx.mlcl.lib.commands.InputFileValidator;
 import uk.ac.susx.mlcl.lib.commands.OutputFileValidator;
 
+import java.io.File;
+import java.io.Serializable;
+import java.nio.charset.Charset;
+
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class FileMergeDelegate extends FileDelegate implements Serializable {
@@ -48,21 +48,21 @@ public final class FileMergeDelegate extends FileDelegate implements Serializabl
     private static final long serialVersionUID = 1L;
 
     @Parameter(names = {"-ifa", "--input-file-a"},
-    required = true,
-    description = "The first file to merge.",
-    validateWith = InputFileValidator.class)
+            required = true,
+            description = "The first file to merge.",
+            validateWith = InputFileValidator.class)
     private File sourceFileA;
 
     @Parameter(names = {"-ifb", "--input-file-b"},
-    required = true,
-    description = "The second file to merge.",
-    validateWith = InputFileValidator.class)
+            required = true,
+            description = "The second file to merge.",
+            validateWith = InputFileValidator.class)
     private File sourceFileB;
 
     @Parameter(names = {"-of", "--output-file"},
-    required = true,
-    description = "The output file to which both input will be merged.",
-    validateWith = OutputFileValidator.class)
+            required = true,
+            description = "The output file to which both input will be merged.",
+            validateWith = OutputFileValidator.class)
     private File destinationFile;
 
     public FileMergeDelegate(File sourceFileA, File sourceFileB, File destination, Charset charset) {

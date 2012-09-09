@@ -31,21 +31,21 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import com.google.common.io.Files;
+import org.junit.Ignore;
+import org.junit.Test;
+import uk.ac.susx.mlcl.byblo.enumerators.*;
+import uk.ac.susx.mlcl.lib.io.ObjectIO;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.junit.Ignore;
-import org.junit.Test;
 import static uk.ac.susx.mlcl.TestConstants.*;
 
-import uk.ac.susx.mlcl.byblo.enumerators.*;
-import uk.ac.susx.mlcl.lib.io.ObjectIO;
-
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class EventTest {
@@ -83,32 +83,32 @@ public class EventTest {
     public void testEvents_CompactConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_INPUT;
         File b = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_INPUT.getName() + ".compact");
+                TEST_FRUIT_INPUT.getName() + ".compact");
         File c = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_INPUT.getName() + ".verbose");
+                TEST_FRUIT_INPUT.getName() + ".verbose");
 
         copyEF(a, b, true);
 
         assertTrue("Compact copy is smaller that verbose source.",
-                   b.length() <= a.length());
+                b.length() <= a.length());
 
         copyEF(b, c, false);
 
         assertTrue("Verbose copy is smaller that compact source.",
-                   c.length() >= b.length());
+                c.length() >= b.length());
         assertTrue("Double converted file is not equal to origin.",
-                   Files.equal(a, c));
+                Files.equal(a, c));
     }
 
     @Test
     public void testEntryPair_EnumeratorConversion() throws FileNotFoundException, IOException, ClassNotFoundException {
         File a = TEST_FRUIT_INPUT;
         File b = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_INPUT.getName() + ".enum");
+                TEST_FRUIT_INPUT.getName() + ".enum");
         File c = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_INPUT.getName() + ".str");
+                TEST_FRUIT_INPUT.getName() + ".str");
         File idxFile = new File(TEST_OUTPUT_DIR,
-                                TEST_FRUIT_INPUT.getName() + ".index");
+                TEST_FRUIT_INPUT.getName() + ".index");
 
 
         DoubleEnumerating indel = EnumeratingDelegates.toPair(
@@ -132,7 +132,7 @@ public class EventTest {
         }
 
         assertTrue("Compact copy is smaller that verbose source.",
-                   b.length() <= a.length());
+                b.length() <= a.length());
 
         {
             TokenPairSource bSrc = TokenPairSource.open(
@@ -145,9 +145,9 @@ public class EventTest {
         }
 
         assertTrue("Verbose copy is smaller that compact source.",
-                   c.length() >= b.length());
+                c.length() >= b.length());
         assertTrue("Double converted file is not equal to origin.",
-                   Files.equal(a, c));
+                Files.equal(a, c));
     }
 
 }

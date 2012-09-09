@@ -34,7 +34,7 @@ package uk.ac.susx.mlcl.byblo.weighings;
  * {@link MarginalsCarrier} is the super interface for all marginal carriers,
  * providing the grant total (sum of all weightings across all entries and
  * features).
- *
+ * <p/>
  * When implemented the software will provide the grand total by calling
  * {@link MarginalsCarrier#setGrandTota(double)}
  *

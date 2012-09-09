@@ -189,22 +189,16 @@ public class MeasuresTest {
         for (int r = 0; r < repeats; r++) {
             int i = RANDOM.nextInt(FRUIT_EVENTS.size());
             int j = RANDOM.nextInt(FRUIT_EVENTS.size());
-//            System.out.println("repeat " + r + ": entries " + FRUIT_EVENTS.get(i).
-//                    key()
-//                    + " and " + FRUIT_EVENTS.get(j).key());
 
             SparseDoubleVector A = FRUIT_EVENTS.get(i).value();
             SparseDoubleVector B = FRUIT_EVENTS.get(j).value();
 
             for (Measure m : MEASURES) {
-//                System.out.print("\tmeasure " + m + ": ");
                 SparseDoubleVector wA = WEIGHTINGS.get(m).apply(A);
                 SparseDoubleVector wB = WEIGHTINGS.get(m).apply(B);
 
-                double result = test(m, wA, wB);
-//                System.out.println(result);
+                test(m, wA, wB);
             }
-
         }
     }
 
@@ -252,20 +246,15 @@ public class MeasuresTest {
         for (int r = 0; r < repeats; r++) {
             int i = FRUIT_EVENTS.size() - 1;
             int j = RANDOM.nextInt(FRUIT_EVENTS.size());
-//            System.out.println("repeat " + r + ": entries " + FRUIT_EVENTS.get(i).
-//                    key()
-//                    + " and " + FRUIT_EVENTS.get(j).key());
 
             SparseDoubleVector A = FRUIT_EVENTS.get(i).value();
             SparseDoubleVector B = FRUIT_EVENTS.get(j).value();
 
             for (Measure m : MEASURES) {
-//                System.out.print("\tmeasure " + m + ": ");
                 SparseDoubleVector wA = WEIGHTINGS.get(m).apply(A);
                 SparseDoubleVector wB = WEIGHTINGS.get(m).apply(B);
 
-                double result = test(m, wA, wB);
-//                System.out.println(result);
+                test(m, wA, wB);
             }
 
         }
@@ -304,5 +293,4 @@ public class MeasuresTest {
 
         return val;
     }
-
 }

@@ -31,32 +31,25 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import com.google.common.io.Files;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import static org.junit.Assert.*;
 import org.junit.Ignore;
 import org.junit.Test;
-import static uk.ac.susx.mlcl.TestConstants.*;
-
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
-import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
-import uk.ac.susx.mlcl.byblo.enumerators.MemoryBasedStringEnumerator;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.*;
+
+import static org.junit.Assert.*;
+import static uk.ac.susx.mlcl.TestConstants.*;
+
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class WeightedEventsTest {
@@ -80,13 +73,14 @@ public class WeightedEventsTest {
 
         WeightedTokenPairVectorSource aSrc = new WeightedTokenPairVectorSource(
                 WeightedTokenPairSource.open(
-                a, DEFAULT_CHARSET, del, false, false));
+                        a, DEFAULT_CHARSET, del, false, false));
 
         List<Indexed<SparseDoubleVector>> list = ObjectIO.readAll(aSrc);
         Collections.sort(list);
 
-        FastWeightedTokenPairVectorSink bSink = FastWeightedTokenPairVectorSink.open(
-                b, DEFAULT_CHARSET, del, false, false, compact);
+        FastWeightedTokenPairVectorSink bSink = FastWeightedTokenPairVectorSink.
+                open(
+                        b, DEFAULT_CHARSET, del, false, false, compact);
 
 //        WeightedTokenPairVectorSink bSink = new WeightedTokenPairVectorSink(
 //                tmp);
@@ -100,22 +94,22 @@ public class WeightedEventsTest {
     public void testWeightedEventsConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_EVENTS;
         File b = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_EVENTS.getName() + ".compact");
+                TEST_FRUIT_EVENTS.getName() + ".compact");
         File c = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_EVENTS.getName() + ".verbose");
+                TEST_FRUIT_EVENTS.getName() + ".verbose");
 
         copyWEF(a, b, true);
 
         assertTrue("Compact copy is smaller that verbose source.",
-                   b.length() <= a.length());
+                b.length() <= a.length());
 
         copyWEF(b, c, false);
 
 
         assertTrue("Verbose copy is smaller that compact source.",
-                   c.length() >= b.length());
+                c.length() >= b.length());
         assertTrue("Double converted file is not equal to origin.",
-                   Files.equal(a, c));
+                Files.equal(a, c));
     }
 
     @Test
@@ -123,26 +117,24 @@ public class WeightedEventsTest {
     public void testWeightedEventsVectorsConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_EVENTS;
         File b = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_EVENTS.getName() + ".vecs.compact");
+                TEST_FRUIT_EVENTS.getName() + ".vecs.compact");
         File c = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_EVENTS.getName() + ".vecs.verbose");
+                TEST_FRUIT_EVENTS.getName() + ".vecs.verbose");
 
         copyWEFV(a, b, true);
 
         assertTrue("Compact copy is smaller that verbose source.",
-                   b.length() <= a.length());
+                b.length() <= a.length());
 
         copyWEFV(b, c, false);
 
 
         assertTrue("Verbose copy is smaller that compact source.",
-                   c.length() >= b.length());
-
-
+                c.length() >= b.length());
 
 
         assertTrue("Double converted file is not equal to origin.",
-                   Files.equal(a, c));
+                Files.equal(a, c));
     }
 
     @Test
@@ -171,7 +163,7 @@ public class WeightedEventsTest {
 
         WeightedTokenPairSource src =
                 WeightedTokenPairSource.open(
-                file, DEFAULT_CHARSET, del,false,false);
+                        file, DEFAULT_CHARSET, del, false, false);
         {
             while (src.hasNext()) {
                 final Tell pos = src.position();
@@ -191,7 +183,8 @@ public class WeightedEventsTest {
 
                 System.out.println("expected tell: " + pos);
                 System.out.println(
-                        "expected: " + expected.record().toString(del.getEntryEnumerator(), del.getFeatureEnumerator()));
+                        "expected: " + expected.record().toString(del.
+                                getEntryEnumerator(), del.getFeatureEnumerator()));
 
                 src.position(pos);
 
@@ -201,8 +194,10 @@ public class WeightedEventsTest {
 
                 Weighted<TokenPair> actual = src.read();
                 System.out.println("actual tell: " + src.position());
-                System.out.println("actual: " + actual.record().toString(del.getEntryEnumerator(),
-                                                                         del.getFeatureEnumerator()));
+                System.out.println("actual: " + actual.record().toString(del.
+                        getEntryEnumerator(),
+                        del.
+                                getFeatureEnumerator()));
                 System.out.flush();
 
                 assertEquals(expected, actual);
@@ -219,9 +214,9 @@ public class WeightedEventsTest {
     public void testEventsPairEnumeratorConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_EVENTS;
         File b = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_EVENTS.getName() + ".enum");
+                TEST_FRUIT_EVENTS.getName() + ".enum");
         File c = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_EVENTS.getName() + ".str");
+                TEST_FRUIT_EVENTS.getName() + ".str");
 
         DoubleEnumeratingDelegate indel = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
@@ -240,7 +235,7 @@ public class WeightedEventsTest {
         }
 
         assertTrue("Compact copy is smaller that verbose source.",
-                   b.length() <= a.length());
+                b.length() <= a.length());
 
         {
             WeightedTokenPairSource bSrc = WeightedTokenPairSource.open(
@@ -253,7 +248,7 @@ public class WeightedEventsTest {
         }
 
         assertTrue("Verbose copy is smaller that compact source.",
-                   c.length() >= b.length());
+                c.length() >= b.length());
         assertTrue(
                 "Double converted file is not equal to origin: " + a + " => " + c,
                 Files.equal(a, c));
@@ -263,9 +258,9 @@ public class WeightedEventsTest {
     public void testEventsPairCompactEnumeratorConversion() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_EVENTS;
         File b = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_EVENTS.getName() + ".enum.compact");
+                TEST_FRUIT_EVENTS.getName() + ".enum.compact");
         File c = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_EVENTS.getName() + ".enum.compact.str");
+                TEST_FRUIT_EVENTS.getName() + ".enum.compact.str");
 
         DoubleEnumeratingDelegate indel = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
@@ -273,7 +268,7 @@ public class WeightedEventsTest {
                 Enumerating.DEFAULT_TYPE, true, true, null, null);
 
 
-        Enumerator<String> idx = MemoryBasedStringEnumerator.newInstance();
+//        Enumerator<String> idx = MemoryBasedStringEnumerator.newInstance();
 
         {
             WeightedTokenPairSource aSrc = WeightedTokenPairSource.open(
@@ -287,7 +282,7 @@ public class WeightedEventsTest {
         }
 
         assertTrue("Compact copy is smaller that verbose source.",
-                   b.length() <= a.length());
+                b.length() <= a.length());
 
         {
             WeightedTokenPairSource bSrc = WeightedTokenPairSource.open(
@@ -300,7 +295,7 @@ public class WeightedEventsTest {
         }
 
         assertTrue("Verbose copy is smaller that compact source.",
-                   c.length() >= b.length());
+                c.length() >= b.length());
         assertTrue(
                 "Double converted file is not equal to origin: " + a + " " + c,
                 Files.equal(a, c));
@@ -310,9 +305,9 @@ public class WeightedEventsTest {
     public void testEventsPairCompactEnumeratorConversion_SkipIndex() throws FileNotFoundException, IOException {
         File a = TEST_FRUIT_EVENTS;
         File b = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_EVENTS.getName() + ".enum.skip.compact");
+                TEST_FRUIT_EVENTS.getName() + ".enum.skip.compact");
         File c = new File(TEST_OUTPUT_DIR,
-                          TEST_FRUIT_EVENTS.getName() + ".enum.skip.compact.str");
+                TEST_FRUIT_EVENTS.getName() + ".enum.skip.compact.str");
 
         DoubleEnumeratingDelegate indel = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
@@ -325,17 +320,17 @@ public class WeightedEventsTest {
                     a, DEFAULT_CHARSET, indel, false, false);
 
             WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
-                    b, DEFAULT_CHARSET, outdel,true,true, true);
+                    b, DEFAULT_CHARSET, outdel, true, true, true);
             ObjectIO.copy(aSrc, bSink);
             bSink.close();
         }
 
         assertTrue("Compact copy is smaller that verbose source.",
-                   b.length() <= a.length());
+                b.length() <= a.length());
 
         {
             WeightedTokenPairSource bSrc = WeightedTokenPairSource.open(
-                    b, DEFAULT_CHARSET, outdel,true,true);
+                    b, DEFAULT_CHARSET, outdel, true, true);
             WeightedTokenPairSink cSink = WeightedTokenPairSink.open(
                     c, DEFAULT_CHARSET, indel, false, false,
                     false);
@@ -344,10 +339,9 @@ public class WeightedEventsTest {
         }
 
         assertTrue("Verbose copy is smaller that compact source.",
-                   c.length() >= b.length());
+                c.length() >= b.length());
         assertTrue(
                 "Double converted file is not equal to origin: " + a + " " + c,
                 Files.equal(a, c));
     }
-
 }

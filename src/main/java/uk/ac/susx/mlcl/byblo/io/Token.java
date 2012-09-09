@@ -31,18 +31,15 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import com.google.common.base.Objects;
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.io.Serializable;
-import java.util.Comparator;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 
+import java.io.*;
+import java.util.Comparator;
+
 /**
  * <tt>Token</tt> objects represent a single instance of an indexed string.
- *
+ * <p/>
  * <p>Instances of <tt>Token</tt> are immutable.<p>
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
@@ -69,15 +66,14 @@ public final class Token implements Serializable, Comparable<Token>, Cloneable {
 
     /**
      * Indicates whether some other object is "equal to" this one.
-     *
+     * <p/>
      * <p>Note that only the <tt>entryId</tt> field is used for equality. I.e
      * two objects with the same <tt>entryId</tt>, but differing weights
      * <em>will</em> be consider equal.</p>
      *
      * @param obj the reference object with which to compare.
-     * @return
-     * <code>true</code> if this object is the same as the obj argument;
-     * <code>false</code> otherwise.
+     * @return <code>true</code> if this object is the same as the obj argument;
+     *         <code>false</code> otherwise.
      */
     @Override
     public boolean equals(Object obj) {
@@ -119,11 +115,11 @@ public final class Token implements Serializable, Comparable<Token>, Cloneable {
         return new Token(this);
     }
 
-    protected final Object writeReplace() {
+    final Object writeReplace() {
         return new Serializer(this);
     }
 
-    private static final class Serializer
+    public static final class Serializer
             implements Externalizable {
 
         private static final long serialVersionUID = 1;
@@ -133,7 +129,7 @@ public final class Token implements Serializable, Comparable<Token>, Cloneable {
         public Serializer() {
         }
 
-        public Serializer(final Token token) {
+        Serializer(final Token token) {
             if (token == null)
                 throw new NullPointerException("token == null");
             this.token = token;
@@ -152,27 +148,23 @@ public final class Token implements Serializable, Comparable<Token>, Cloneable {
             token = new Token(id);
         }
 
-        protected final Object readResolve() {
+        final Object readResolve() {
             return token;
         }
-
     }
 
     public static Comparator<Token> indexOrder() {
         return new Comparator<Token>() {
-
             @Override
             public int compare(final Token a, final Token b) {
                 return a.id() - b.id();
             }
-
         };
     }
 
     public static Comparator<Token> stringOrder(
             final SingleEnumerating idx) {
         return new Comparator<Token>() {
-
             @Override
             public int compare(final Token a, final Token b) {
                 try {
@@ -186,8 +178,6 @@ public final class Token implements Serializable, Comparable<Token>, Cloneable {
                     throw new RuntimeException(ex);
                 }
             }
-
         };
     }
-
 }

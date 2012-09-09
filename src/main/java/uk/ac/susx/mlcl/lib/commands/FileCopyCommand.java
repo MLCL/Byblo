@@ -33,8 +33,9 @@ package uk.ac.susx.mlcl.lib.commands;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
-import java.io.File;
 import uk.ac.susx.mlcl.lib.tasks.FileCopyTask;
+
+import java.io.File;
 
 /**
  * Copy a source file to a destination.
@@ -59,7 +60,7 @@ public class FileCopyCommand extends AbstractCommand {
         filesDelegate.setSourceFile(sourceFile);
     }
 
-    public final void setDestinationFile(File destinationFile)  {
+    public final void setDestinationFile(File destinationFile) {
         filesDelegate.setDestinationFile(destinationFile);
     }
 

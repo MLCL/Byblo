@@ -31,19 +31,14 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import com.google.common.base.Predicate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.lib.io.*;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.lib.io.Compact;
-import uk.ac.susx.mlcl.lib.io.Deltas;
-import uk.ac.susx.mlcl.lib.io.Enumerated;
-import uk.ac.susx.mlcl.lib.io.SeekableDataSource;
-import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
-import uk.ac.susx.mlcl.lib.io.TSV;
-import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
  * A <tt>WeightedTokenPairSource</tt> object is used to retrieve
@@ -108,7 +103,7 @@ public class WeightedTokenPairSource
 
                 @Override
                 public boolean apply(Integer column) {
-                    return column == 0;
+                    return column != null && column == 0;
                 }
 
             });
@@ -118,33 +113,33 @@ public class WeightedTokenPairSource
 
                 @Override
                 public boolean apply(Integer column) {
-                    return (column + 1) % 2 == 0;
+                    return column != null && (column + 1) % 2 == 0;
                 }
 
             });
         }
         if (!idx.isEnumeratedEntries()) {
             tsv = Enumerated.enumerated(tsv, idx.getEntryEnumerator(),
-                                        new Predicate<Integer>() {
+                    new Predicate<Integer>() {
 
-                @Override
-                public boolean apply(Integer column) {
-                    return column == 0;
-                }
+                        @Override
+                        public boolean apply(Integer column) {
+                            return column != null && column == 0;
+                        }
 
-            });
+                    });
         }
 
         if (!idx.isEnumeratedFeatures()) {
             tsv = Enumerated.enumerated(tsv, idx.getFeatureEnumerator(),
-                                        new Predicate<Integer>() {
+                    new Predicate<Integer>() {
 
-                @Override
-                public boolean apply(Integer column) {
-                    return (column + 1) % 2 == 0;
-                }
+                        @Override
+                        public boolean apply(Integer column) {
+                            return column != null && (column + 1) % 2 == 0;
+                        }
 
-            });
+                    });
         }
 
         tsv = Compact.compact(tsv, 3);

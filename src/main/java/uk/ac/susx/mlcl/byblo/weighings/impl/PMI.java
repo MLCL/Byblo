@@ -30,13 +30,13 @@
  */
 package uk.ac.susx.mlcl.byblo.weighings.impl;
 
-import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.weighings.AbstractContextualWeighting;
 import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import java.io.Serializable;
+
 /**
- *
  * pmi(x,y) = log[p(x,y) / (p(x)p(y))] = log[p(x|y)/p(x)] = log p(x|y) - log
  * p(x)
  *

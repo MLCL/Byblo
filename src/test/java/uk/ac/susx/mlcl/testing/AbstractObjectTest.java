@@ -61,19 +61,13 @@
  */
 package uk.ac.susx.mlcl.testing;
 
+import org.junit.*;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 
 /**
@@ -81,153 +75,153 @@ import org.junit.Test;
  */
 public abstract class AbstractObjectTest<T> extends AbstractTest {
 
-	@Override
-	@Before
-	public void setUp() throws Exception {
-		super.setUp();
-	}
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
 
-	@Override
-	@After
-	public void tearDown() throws Exception {
-		super.tearDown();
-	}
+    @Override
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
 
-	@BeforeClass
-	public static void setUpClass() throws Exception {
-		AbstractTest.setUpClass();
-	}
+    @BeforeClass
+    public static void setUpClass() throws Exception {
+        AbstractTest.setUpClass();
+    }
 
-	@AfterClass
-	public static void tearDownClass() throws Exception {
-		AbstractTest.tearDownClass();
-	}
+    @AfterClass
+    public static void tearDownClass() throws Exception {
+        AbstractTest.tearDownClass();
+    }
 
-	public T newInstance() {
-		try {
-			return getImplementation().newInstance();
-		} catch (InstantiationException e) {
-			throw new AssertionError(e);
-		} catch (IllegalAccessException e) {
-			throw new AssertionError(e);
-		}
-	}
+    public T newInstance() {
+        try {
+            return getImplementation().newInstance();
+        } catch (InstantiationException e) {
+            throw new AssertionError(e);
+        } catch (IllegalAccessException e) {
+            throw new AssertionError(e);
+        }
+    }
 
-	public Constructor<? extends T> getConstructor(Class<?>... paramTypes) {
-		try {
-			return getImplementation().getConstructor(paramTypes);
-		} catch (NoSuchMethodException e) {
-			throw new AssertionError(e);
-		}
-	}
+    public Constructor<? extends T> getConstructor(Class<?>... paramTypes) {
+        try {
+            return getImplementation().getConstructor(paramTypes);
+        } catch (NoSuchMethodException e) {
+            throw new AssertionError(e);
+        }
+    }
 
-	public boolean hasConstructor(Class<?>... paramTypes) {
-		try {
-			getImplementation().getConstructor(paramTypes);
-			return true;
-		} catch (NoSuchMethodException e) {
-			return false;
-		}
-	}
+    public boolean hasConstructor(Class<?>... paramTypes) {
+        try {
+            getImplementation().getConstructor(paramTypes);
+            return true;
+        } catch (NoSuchMethodException e) {
+            return false;
+        }
+    }
 
-	public T newInstance(Class<?>[] types, Object[] params) {
-		try {
-			return getConstructor(types).newInstance(params);
-		} catch (InstantiationException e) {
-			throw new AssertionError(e);
-		} catch (IllegalAccessException e) {
-			throw new AssertionError(e);
-		} catch (InvocationTargetException e) {
-			throw new AssertionError(e);
-		}
-	}
+    public T newInstance(Class<?>[] types, Object[] params) {
+        try {
+            return getConstructor(types).newInstance(params);
+        } catch (InstantiationException e) {
+            throw new AssertionError(e);
+        } catch (IllegalAccessException e) {
+            throw new AssertionError(e);
+        } catch (InvocationTargetException e) {
+            throw new AssertionError(e);
+        }
+    }
 
-	public T newInstance(Class<?> type, Object param) {
-		try {
-			return getConstructor(type).newInstance(param);
-		} catch (InstantiationException e) {
-			throw new AssertionError(e);
-		} catch (IllegalAccessException e) {
-			throw new AssertionError(e);
-		} catch (InvocationTargetException e) {
-			throw new AssertionError(e);
-		}
-	}
+    public T newInstance(Class<?> type, Object param) {
+        try {
+            return getConstructor(type).newInstance(param);
+        } catch (InstantiationException e) {
+            throw new AssertionError(e);
+        } catch (IllegalAccessException e) {
+            throw new AssertionError(e);
+        } catch (InvocationTargetException e) {
+            throw new AssertionError(e);
+        }
+    }
 
-	public abstract Class<? extends T> getImplementation();
+    public abstract Class<? extends T> getImplementation();
 
-	/**
-	 * If the object has a default (zero parameter) constructor, then check it's
-	 * callable without exception.
-	 */
-	@Test
-	public void testDefaultConstructor() {
+    /**
+     * If the object has a default (zero parameter) constructor, then check it's
+     * callable without exception.
+     */
+    @Test
+    public void testDefaultConstructor() {
 
-		Assume.assumeTrue(hasConstructor());
-		T instance = newInstance();
+        Assume.assumeTrue(hasConstructor());
+        T instance = newInstance();
 
-		Assert.assertNotNull(instance);
-	}
+        Assert.assertNotNull(instance);
+    }
 
-	/**
-	 * If the object implements {@link Cloneable} interface, the clone method
-	 * should be overridden and public. All the constraints of
-	 * {@link #assertCloneEquals()} should hold.
-	 */
-	@Test
-	public void testObjectClone() {
-		Assume.assumeTrue(Cloneable.class.isAssignableFrom(getImplementation()));
-		Assume.assumeTrue(hasConstructor());
+    /**
+     * If the object implements {@link Cloneable} interface, the clone method
+     * should be overridden and public. All the constraints of
+     * {@link #assertCloneEquals()} should hold.
+     */
+    @Test
+    public void testObjectClone() {
+        Assume.assumeTrue(Cloneable.class.isAssignableFrom(getImplementation()));
+        Assume.assumeTrue(hasConstructor());
 
-		final T instance = newInstance();
-		final T copy = clone(instance);
+        final T instance = newInstance();
+        final T copy = clone(instance);
 
-		assertCloneEquals(instance, copy);
-	}
+        assertCloneEquals(instance, copy);
+    }
 
-	/**
-	 * If the object implements {@link Serializable} interface, then it should
-	 * be possible to serialize then de-serialize the object to receive an exact
-	 * deep copy. All the constraints of {@link #assertCloneEquals(Object, Object)} } should
-	 * hold.
-	 * 
-	 * @throws ClassNotFoundException
-	 * @throws IOException
-	 */
-	@Test
-	public void testObjectCloneWithSerialization() throws IOException,
-			ClassNotFoundException {
+    /**
+     * If the object implements {@link Serializable} interface, then it should
+     * be possible to serialize then de-serialize the object to receive an exact
+     * deep copy. All the constraints of {@link #assertCloneEquals(Object, Object)} } should
+     * hold.
+     *
+     * @throws ClassNotFoundException
+     * @throws IOException
+     */
+    @Test
+    public void testObjectCloneWithSerialization() throws IOException,
+            ClassNotFoundException {
 
-		Assume.assumeTrue(Serializable.class
-				.isAssignableFrom(getImplementation()));
-		Assume.assumeTrue(hasConstructor());
+        Assume.assumeTrue(Serializable.class
+                .isAssignableFrom(getImplementation()));
+        Assume.assumeTrue(hasConstructor());
 
-		final T instance = newInstance();
-		final T copy = assertCloneWithSerialization(instance);
+        final T instance = newInstance();
+        final T copy = assertCloneWithSerialization(instance);
 
-		assertCloneEquals(instance, copy);
-	}
+        assertCloneEquals(instance, copy);
+    }
 
-	/**
-	 * For a cloned object the following relations should hold:
-	 * 
-	 * <pre>
-	 * 		x.clone() != x
-	 *  	x.clone().getClass() == x.getClass()
-	 * 		x.clone().equals(x)
-	 * 		x.hashCode() == x.clone().hashCode()
-	 * </pre>
-	 */
-	private void assertCloneEquals(Object instance, Object copy) {
-		Assert.assertTrue("cloned object is the the same as the original",
-				instance != copy);
-		Assert.assertTrue(MessageFormat.format(
-				"Clone object class identity mismatch; "
-						+ "expecting {0} but found {1}", instance.getClass(),
-				copy.getClass()), copy.getClass() == instance.getClass());
-		Assert.assertEquals("cloned copy is not equal", instance, copy);
-		Assert.assertTrue("cloned object hash-code mismatch",
-				copy.hashCode() == instance.hashCode());
-	}
+    /**
+     * For a cloned object the following relations should hold:
+     * <p/>
+     * <pre>
+     * 		x.clone() != x
+     *  	x.clone().getClass() == x.getClass()
+     * 		x.clone().equals(x)
+     * 		x.hashCode() == x.clone().hashCode()
+     * </pre>
+     */
+    private void assertCloneEquals(Object instance, Object copy) {
+        Assert.assertTrue("cloned object is the the same as the original",
+                instance != copy);
+        Assert.assertTrue(MessageFormat.format(
+                "Clone object class identity mismatch; "
+                        + "expecting {0} but found {1}", instance.getClass(),
+                copy.getClass()), copy.getClass() == instance.getClass());
+        Assert.assertEquals("cloned copy is not equal", instance, copy);
+        Assert.assertTrue("cloned object hash-code mismatch",
+                copy.hashCode() == instance.hashCode());
+    }
 
 }

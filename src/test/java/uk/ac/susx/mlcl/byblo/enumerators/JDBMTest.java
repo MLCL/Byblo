@@ -30,15 +30,15 @@
  */
 package uk.ac.susx.mlcl.byblo.enumerators;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
 import org.apache.jdbm.DB;
 import org.apache.jdbm.DBMaker;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+
 /**
- *
  * @author hiam20
  */
 public class JDBMTest {

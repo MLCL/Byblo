@@ -30,11 +30,10 @@
  */
 package uk.ac.susx.mlcl.byblo.weighings;
 
+import uk.ac.susx.mlcl.lib.Checks;
+
 import java.util.Arrays;
 import java.util.Collection;
-import uk.ac.susx.mlcl.byblo.weighings.impl.Bound;
-import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
-import uk.ac.susx.mlcl.lib.Checks;
 
 /**
  * Factory class from some derivative {@link Weighting} implementations.
@@ -81,17 +80,17 @@ public final class Weightings {
 
     /**
      * Constant to aid conversion to base 2 logarithms.
-     *
+     * <p/>
      * Conceptually it doesn't really matter what base is used, but 2 is the
      * standard base for most information theoretic approaches.
-     *
+     * <p/>
      * TODO: Move to mlcl-lib/MathUtil
      */
     public static final double LOG_2 = Math.log(2.0);
 
     /**
      * Return the base 2 logarithm of the parameter v.
-     *
+     * <p/>
      * TODO: Move to mlcl-lib/MathUtil
      *
      * @param v some values

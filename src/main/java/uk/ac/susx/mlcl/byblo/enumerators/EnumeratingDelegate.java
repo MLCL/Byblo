@@ -32,17 +32,16 @@ package uk.ac.susx.mlcl.byblo.enumerators;
 
 import com.beust.jcommander.Parameter;
 import com.google.common.base.Objects;
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.FullBuild;
 import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class EnumeratingDelegate
@@ -69,6 +68,7 @@ public abstract class EnumeratingDelegate
         return type;
     }
 
+    @Override
     public void setEnumeratorType(EnumeratorType type) {
         this.type = type;
     }

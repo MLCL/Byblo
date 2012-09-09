@@ -30,12 +30,13 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.measures.DecomposableMeasure;
 import uk.ac.susx.mlcl.byblo.measures.Measures;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+
+import java.io.Serializable;
 
 /**
  * The {@link Jaccard} coefficient defines similarity as the intersection over

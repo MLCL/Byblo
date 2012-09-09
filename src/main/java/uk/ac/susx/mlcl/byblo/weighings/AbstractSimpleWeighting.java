@@ -33,9 +33,9 @@ package uk.ac.susx.mlcl.byblo.weighings;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
- *{@link SimpleWeighting} defines a function that maps element-wise from a
+ * {@link SimpleWeighting} defines a function that maps element-wise from a
  * single feature input weight to the output weight.
- *
+ * <p/>
  * This class can be extends to implement a {@link Weighting} when each elements
  * weighting is independent of everything else; for example a simple
  * thresholding scheme.
@@ -52,7 +52,7 @@ public abstract class AbstractSimpleWeighting implements Weighting {
 
     @Override
     public final SparseDoubleVector apply(final SparseDoubleVector from) {
-        if(from.size == 0)
+        if (from.size == 0)
             return new SparseDoubleVector(from.cardinality, 0);
         final SparseDoubleVector to = from.clone();
         double sum = 0;

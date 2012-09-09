@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.measures;
 
-import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
@@ -39,15 +38,14 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * A
  * <code>Measure</code> decorator, that will automatically apply the delegate
  * measures expected weighting scheme.
- *
+ * <p/>
  * The weighting scheme to use is determined by calling
  * {@link Measure#getExpectedWeighting() }.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class AutoWeightingMeasure
-        extends ForwardingMeasure<Measure>
-        implements Serializable {
+        extends ForwardingMeasure<Measure> {
 
     private static final long serialVersionUID = 1L;
 

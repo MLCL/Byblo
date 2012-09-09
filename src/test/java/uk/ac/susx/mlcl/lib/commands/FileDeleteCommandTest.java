@@ -31,16 +31,37 @@
 package uk.ac.susx.mlcl.lib.commands;
 
 import com.beust.jcommander.JCommander;
-import java.io.File;
-import java.io.IOException;
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.IOException;
+
+import static org.junit.Assert.*;
+
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class DeleteCommandTest {
+public class FileDeleteCommandTest  extends AbstractCommandTest<FileDeleteCommand> {
+
+    @Override
+    public Class<? extends FileDeleteCommand> getImplementation() {
+        return FileDeleteCommand.class;
+    }
+
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
+    @Override
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
+
 
     @Test
     public void testCLI() throws IOException, Exception {

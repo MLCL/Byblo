@@ -30,13 +30,15 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import java.io.Serializable;
-import java.text.MessageFormat;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
-import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
 import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+
+import java.io.Serializable;
+import java.text.MessageFormat;
+
+import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
 
 /**
  * Distance measure that computes similarity as the Kullback–Leibler divergence,
@@ -62,7 +64,7 @@ public final class KullbackLeiblerDivergence implements Measure, Serializable {
     /**
      * Construct a new instance of {@link KullbackLeiblerDivergence } similarity
      * measure.
-     *
+     * <p/>
      * The <tt>minCardinality</tt> field is initialized to
      * {@link KullbackLeiblerDivergence#DEFAULT_MIN_CARDINALITY}, which is
      * {@value #DEFAULT_MIN_CARDINALITY}
@@ -78,7 +80,7 @@ public final class KullbackLeiblerDivergence implements Measure, Serializable {
      *
      * @param minCardinality expected dimensionality of vectors
      * @throws IllegalArgumentException when
-     * <code>minCardinality</code> is negative
+     *                                  <code>minCardinality</code> is negative
      */
     public KullbackLeiblerDivergence(final int minCardinality)
             throws IllegalArgumentException {
@@ -96,13 +98,13 @@ public final class KullbackLeiblerDivergence implements Measure, Serializable {
 
     /**
      * Set the minimum (usually the actual) cardinality of vectors.
-     *
+     * <p/>
      * If the vector cardinality is known before hand, but is not set on the
      * vectors for some reason, then method can be used to set it globally.
      *
      * @param minCardinality expected dimensionality of vectors
      * @throws IllegalArgumentException when
-     * <code>minCardinality</code> is negative
+     *                                  <code>minCardinality</code> is negative
      */
     public final void setMinCardinality(int minCardinality)
             throws IllegalArgumentException {
@@ -116,7 +118,7 @@ public final class KullbackLeiblerDivergence implements Measure, Serializable {
     @Override
     public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
         final int N = Math.max(minCardinality,
-                               Math.max(A.cardinality, B.cardinality));
+                Math.max(A.cardinality, B.cardinality));
 
         final double sumA = A.sum + N;
         final double sumB = B.sum + N;

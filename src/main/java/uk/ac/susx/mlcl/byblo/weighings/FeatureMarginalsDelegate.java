@@ -33,7 +33,6 @@ package uk.ac.susx.mlcl.byblo.weighings;
 import java.util.Arrays;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class FeatureMarginalsDelegate implements FeatureMarginalsCarrier {

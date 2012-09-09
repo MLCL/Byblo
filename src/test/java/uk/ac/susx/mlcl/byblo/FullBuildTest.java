@@ -30,13 +30,15 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
-import java.io.File;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+
 import static uk.ac.susx.mlcl.TestConstants.*;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class FullBuildTest {
@@ -65,7 +67,8 @@ public class FullBuildTest {
     public void testRunCommand_Medtest100k() throws Exception {
         System.out.println("Test on fruit");
 
-        File input = new File(TEST_DATA_DIR, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample100k");
+        File input = new File(TEST_DATA_DIR,
+                "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample100k");
 
         FullBuild instance = new FullBuild();
         instance.setCharset(DEFAULT_CHARSET);
@@ -96,7 +99,8 @@ public class FullBuildTest {
     public static void testRunCommand_Medtest100k(
             String sampleName, boolean skip1, boolean skip2) throws Exception {
 
-        File input = new File(TEST_DATA_DIR, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample" + sampleName);
+        File input = new File(TEST_DATA_DIR,
+                "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample" + sampleName);
 
         String name = "medtest-" + sampleName;
         if (skip1 && skip2)
@@ -107,7 +111,8 @@ public class FullBuildTest {
             name += "-skip2";
 
         File out = new File(TEST_OUTPUT_DIR, name);
-        out.mkdir();
+        if (!out.exists() && !out.mkdir())
+            throw new IOException("Failed to create output dir: " + out);
 
         FullBuild instance = new FullBuild();
         instance.setCharset(DEFAULT_CHARSET);
@@ -130,7 +135,8 @@ public class FullBuildTest {
     public void testRunCommand_Medtest10m() throws Exception {
         System.out.println("Test on fruit");
 
-        File input = new File(TEST_DATA_DIR, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample10m");
+        File input = new File(TEST_DATA_DIR,
+                "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample10m");
 
         FullBuild instance = new FullBuild();
         instance.setCharset(DEFAULT_CHARSET);
@@ -145,7 +151,6 @@ public class FullBuildTest {
 
 
     }
-
 //    @Test
 //    @Ignore
 //    public void testRunCommand_Medtest10m() throws Exception {

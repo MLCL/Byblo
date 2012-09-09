@@ -92,15 +92,15 @@ public abstract class AbstractContextualWeighting
     protected boolean equals(AbstractContextualWeighting other) {
         if (this.featureMarginalsDelegate != other.featureMarginalsDelegate
                 && (this.featureMarginalsDelegate == null
-                    || !this.featureMarginalsDelegate.equals(
-                    other.featureMarginalsDelegate)))
+                || !this.featureMarginalsDelegate.equals(
+                other.featureMarginalsDelegate)))
             return false;
         return true;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if(obj == this)
+        if (obj == this)
             return true;
         if (obj == null || getClass() != obj.getClass())
             return false;
@@ -110,6 +110,6 @@ public abstract class AbstractContextualWeighting
     @Override
     public int hashCode() {
         return 89 * 7 + (this.featureMarginalsDelegate != null
-                         ? this.featureMarginalsDelegate.hashCode() : 0);
+                ? this.featureMarginalsDelegate.hashCode() : 0);
     }
 }

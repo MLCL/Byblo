@@ -34,12 +34,12 @@ package uk.ac.susx.mlcl.testing;
  * Marker interface denoting tests that are likely to take a long time. These
  * can then be disabled in situations where testing shouldn't take too long, for
  * example when a user compiles the software.
- * <p />
+ * <p/>
  * Tests can be disabled in a number of ways:
- * 
+ * <p/>
  * <ul>
  * <li>Using maven we can configure surefire to exclude annotated tests:
- * 
+ * <p/>
  * <pre>
  * <plugin>
  *     &lt;artifactId&gt;maven-surefire-plugin&lt;/artifactId&gt;
@@ -49,18 +49,18 @@ package uk.ac.susx.mlcl.testing;
  *     &lt;/configuration&gt;
  * </plugin>
  * </pre>
- * 
+ * <p/>
  * </li>
  * <li>Or invoking maven from the command line:
- * 
+ * <p/>
  * <pre>
  * $ mvn surefire:test -DexcludedGroups=uk.ac.susx.mlcl.SlowTestCategory
  * </pre>
- * 
+ * <p/>
  * </li>
- * 
+ * <p/>
  * <li>Finally, one can create a test suite that excludes specific categories:
- * 
+ * <p/>
  * <pre>
  * &#064;RunWith(Categories.class)
  * &#064;ExcludeCategory(SlowTestCategory.class)
@@ -68,15 +68,14 @@ package uk.ac.susx.mlcl.testing;
  * public class UnitTestSuite {
  * }
  * </pre>
- * 
+ * <p/>
  * </li>
  * </ul>
- * 
- * 
+ * <p/>
+ * <p/>
  * What defines a "slow" test, rather depends on the test. Generally we should
  * think slowness as ratio between the expectation of test failure with the time
  * it takes to run.
- * 
  */
 public interface SlowTestCategory {
 

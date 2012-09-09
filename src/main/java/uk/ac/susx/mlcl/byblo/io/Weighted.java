@@ -33,25 +33,26 @@ package uk.ac.susx.mlcl.byblo.io;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
+
 import java.io.Serializable;
 import java.util.Comparator;
 
 /**
  * <tt>Weighted</tt> objects represent a weighting or frequency applied to some
  * discrete record.
- *
+ * <p/>
  * <p>Instances of <tt>Weighted</tt> are immutable.<p>
  *
- * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T> Type of record being weighted
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
 
     private static final long serialVersionUID = 1L;
 
-     double weight;
+    double weight;
 
-     T record;
+    T record;
 
     public Weighted(final T record, final double weight) {
         this.weight = weight;
@@ -74,15 +75,14 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
 
     /**
      * Indicates whether some other object is "equal to" this one.
-     *
+     * <p/>
      * <p>Note that only the <tt>entryId</tt> field is used for equality. I.e
      * two objects with the same <tt>entryId</tt>, but differing weights
      * <em>will</em> be consider equal.</p>
      *
      * @param obj the reference object with which to compare.
-     * @return
-     * <code>true</code> if this object is the same as the obj argument;
-     * <code>false</code> otherwise.
+     * @return <code>true</code> if this object is the same as the obj argument;
+     *         <code>false</code> otherwise.
      */
     @Override
     public boolean equals(Object obj) {
@@ -120,122 +120,106 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
 
     public static <T> Predicate<Weighted<T>> greaterThan(final double weight) {
         return new Predicate<Weighted<T>>() {
-
             @Override
             public boolean apply(Weighted<T> pair) {
-                return (pair.weight() > weight);
+                return pair != null && (pair.weight() > weight);
             }
 
             @Override
             public String toString() {
                 return "weight>" + weight;
             }
-
         };
     }
 
     public static <T> Predicate<Weighted<T>> greaterThanOrEqualTo(
             final double weight) {
         return new Predicate<Weighted<T>>() {
-
             @Override
             public boolean apply(Weighted<T> pair) {
-                return (pair.weight() >= weight);
+                return pair != null && (pair.weight() >= weight);
             }
 
             @Override
             public String toString() {
                 return "weight>=" + weight;
             }
-
         };
     }
 
     public static <T> Predicate<Weighted<T>> equalTo(final double weight) {
         return new Predicate<Weighted<T>>() {
-
             @Override
             public boolean apply(Weighted<T> pair) {
-                return (pair.weight() == weight);
+                return pair != null && Math.abs(pair.weight() - weight) < 0.0000001;
             }
 
             @Override
             public String toString() {
                 return "weight==" + weight;
             }
-
         };
     }
 
     public static <T> Predicate<Weighted<T>> lessThanOrEqualTo(
             final double weight) {
         return new Predicate<Weighted<T>>() {
-
             @Override
             public boolean apply(Weighted<T> pair) {
-                return (pair.weight() <= weight);
+                return pair != null && (pair.weight() <= weight);
             }
 
             @Override
             public String toString() {
                 return "weight<=" + weight;
             }
-
         };
     }
 
     public static <T> Predicate<Weighted<T>> lessThan(final double weight) {
         return new Predicate<Weighted<T>>() {
-
             @Override
             public boolean apply(Weighted<T> pair) {
-                return (pair.weight() < weight);
+                return pair != null && (pair.weight() < weight);
             }
 
             @Override
             public String toString() {
                 return "weight<" + weight;
             }
-
         };
     }
 
     public static <T> Function<Weighted<T>, T> recordFunction() {
         return new Function<Weighted<T>, T>() {
-
             @Override
             public final T apply(final Weighted<T> input) {
-                return input.record();
+                return input == null ? null : input.record();
             }
 
             @Override
             public final String toString() {
                 return "Record";
             }
-
         };
     }
 
     public static <S> Comparator<Weighted<S>> weightOrder() {
         return new Comparator<Weighted<S>>() {
-
             @Override
             public int compare(Weighted<S> t, Weighted<S> t1) {
                 return Double.compare(t.weight(), t1.weight());
             }
-
         };
     }
 
-    public static <S> Comparator<Weighted<S>> recordOrder(final Comparator<S> inner) {
+    public static <S> Comparator<Weighted<S>> recordOrder(
+            final Comparator<S> inner) {
         return new Comparator<Weighted<S>>() {
-
             @Override
             public int compare(Weighted<S> t, Weighted<S> t1) {
                 return inner.compare(t.record(), t1.record());
             }
-
         };
     }
-
 }

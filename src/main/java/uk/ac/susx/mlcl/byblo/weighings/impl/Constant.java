@@ -30,14 +30,15 @@
  */
 package uk.ac.susx.mlcl.byblo.weighings.impl;
 
-import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.weighings.AbstractSimpleWeighting;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
+
+import java.io.Serializable;
 
 /**
  * {@link Weighting} that simply returns the value stored in the vector
  * parameter multiplied by some constant.
- *
+ * <p/>
  * Used when no re-weighting is required (i.e identity) or when some constant
  * scaFling is useful.
  *

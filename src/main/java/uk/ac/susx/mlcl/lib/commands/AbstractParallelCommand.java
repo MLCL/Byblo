@@ -36,7 +36,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class AbstractParallelCommand extends AbstractCommand {
@@ -48,7 +47,7 @@ public abstract class AbstractParallelCommand extends AbstractCommand {
             Runtime.getRuntime().availableProcessors();
 
     @Parameter(names = {"-t", "--threads"},
-               description = "Number of threads to use for parallel processing.")
+            description = "Number of threads to use for parallel processing.")
     private int nThreads = DEFAULT_NUM_THREADS;
 
     public AbstractParallelCommand() {

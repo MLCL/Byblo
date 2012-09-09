@@ -31,23 +31,18 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import com.google.common.base.Predicate;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.lib.collect.Indexed;
+import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+import uk.ac.susx.mlcl.lib.io.*;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.lib.collect.Indexed;
-import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.io.Compact;
-import uk.ac.susx.mlcl.lib.io.DataSink;
-import uk.ac.susx.mlcl.lib.io.Deltas;
-import uk.ac.susx.mlcl.lib.io.Enumerated;
-import uk.ac.susx.mlcl.lib.io.ObjectSink;
-import uk.ac.susx.mlcl.lib.io.TSV;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class FastWeightedTokenPairVectorSink
@@ -94,7 +89,7 @@ public class FastWeightedTokenPairVectorSink
 
                 @Override
                 public boolean apply(Integer column) {
-                    return column == 0;
+                    return column != null && column == 0;
                 }
 
             });
@@ -105,7 +100,7 @@ public class FastWeightedTokenPairVectorSink
 
                 @Override
                 public boolean apply(Integer column) {
-                    return (column + 1) % 2 == 0;
+                    return column != null && (column + 1) % 2 == 0;
                 }
 
             });
@@ -113,26 +108,26 @@ public class FastWeightedTokenPairVectorSink
 
         if (!idx.isEnumeratedEntries()) {
             tsv = Enumerated.enumerated(tsv, idx.getEntryEnumerator(),
-                                        new Predicate<Integer>() {
+                    new Predicate<Integer>() {
 
-                @Override
-                public boolean apply(Integer column) {
-                    return column == 0;
-                }
+                        @Override
+                        public boolean apply(Integer column) {
+                            return column != null && column == 0;
+                        }
 
-            });
+                    });
         }
 
         if (!idx.isEnumeratedFeatures()) {
             tsv = Enumerated.enumerated(tsv, idx.getFeatureEnumerator(),
-                                        new Predicate<Integer>() {
+                    new Predicate<Integer>() {
 
-                @Override
-                public boolean apply(Integer column) {
-                    return (column + 1) % 2 == 0;
-                }
+                        @Override
+                        public boolean apply(Integer column) {
+                            return column != null && (column + 1) % 2 == 0;
+                        }
 
-            });
+                    });
         }
 
         if (compact)

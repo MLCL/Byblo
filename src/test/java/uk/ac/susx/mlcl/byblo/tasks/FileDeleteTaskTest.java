@@ -30,15 +30,16 @@
  */
 package uk.ac.susx.mlcl.byblo.tasks;
 
-import java.io.File;
-import java.io.IOException;
-import static org.junit.Assert.*;
 import org.junit.Test;
 import uk.ac.susx.mlcl.lib.tasks.FileDeleteTask;
 import uk.ac.susx.mlcl.testing.AbstractObjectTest;
 
+import java.io.File;
+import java.io.IOException;
+
+import static org.junit.Assert.*;
+
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class FileDeleteTaskTest extends AbstractObjectTest<FileDeleteTask> {
@@ -62,7 +63,8 @@ public class FileDeleteTaskTest extends AbstractObjectTest<FileDeleteTask> {
     @Test(expected = IOException.class)
     public void testRunTask_failure() throws Exception {
         File tmp = File.createTempFile(getClass().getName(), "");
-        tmp.delete();
+        if (!tmp.delete())
+            throw new IOException("Failed to delete file: " + tmp);
         assertFalse(tmp.exists());
         FileDeleteTask instance = new FileDeleteTask(tmp);
         instance.run();
@@ -72,7 +74,8 @@ public class FileDeleteTaskTest extends AbstractObjectTest<FileDeleteTask> {
     @Test(expected = IOException.class)
     public void testRun_failure() throws Exception {
         File tmp = File.createTempFile(getClass().getName(), "");
-        tmp.delete();
+        if (!tmp.delete())
+            throw new IOException("Failed to delete file: " + tmp);
         assertFalse(tmp.exists());
         FileDeleteTask instance = new FileDeleteTask(tmp);
         instance.run();
@@ -88,7 +91,7 @@ public class FileDeleteTaskTest extends AbstractObjectTest<FileDeleteTask> {
         instance = new FileDeleteTask();
         instance.setFile(tmp);
         assertEquals(tmp, instance.getFile());
-        tmp.delete();
+        if (!tmp.delete())
+            throw new IOException("Failed to delete file: " + tmp);
     }
-
 }

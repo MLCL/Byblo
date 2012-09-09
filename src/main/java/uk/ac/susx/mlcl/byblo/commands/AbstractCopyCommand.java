@@ -33,25 +33,22 @@ package uk.ac.susx.mlcl.byblo.commands;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.Flushable;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.commands.FilePipeDelegate;
 import uk.ac.susx.mlcl.lib.events.ProgressDelegate;
+import uk.ac.susx.mlcl.lib.events.ProgressEvent;
+import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ProgressReporting;
 import uk.ac.susx.mlcl.lib.io.Files;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.tasks.ObjectPipeTask;
-import uk.ac.susx.mlcl.lib.events.ProgressEvent;
-import uk.ac.susx.mlcl.lib.events.ProgressListener;
-import uk.ac.susx.mlcl.lib.events.ProgressReporting;
+
+import java.io.*;
+import java.nio.charset.Charset;
 
 /**
  * Abstract super class for all tasks that require copying data from one file to
@@ -133,13 +130,11 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand
         task.setSink(snk);
 
         task.addProgressListener(new ProgressListener() {
-
             @Override
             public void progressChanged(ProgressEvent progressEvent) {
                 LOG.info(progressEvent.getSource().getProgressReport());
                 progress.setMessage(progressEvent.getSource().getProgressReport());
             }
-
         });
 
         task.run();
@@ -155,7 +150,6 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand
             ((Closeable) snk).close();
 
 
-
         progress.setState(State.COMPLETED);
 
         LOG.debug(MiscUtil.memoryInfoString());
@@ -163,38 +157,45 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand
 //            LOG.info(MessageFormat.format("Completed {0}.", getName()));
     }
 
+    @Override
     public String getName() {
         return "copy";
     }
 
+    @Override
     public void removeProgressListener(ProgressListener progressListener) {
         progress.removeProgressListener(progressListener);
     }
 
+    @Override
     public boolean isProgressPercentageSupported() {
         return progress.isProgressPercentageSupported();
     }
 
+    @Override
     public State getState() {
         return progress.getState();
     }
 
+    @Override
     public String getProgressReport() {
         return progress.getProgressReport();
     }
 
+    @Override
     public int getProgressPercent() {
         return progress.getProgressPercent();
     }
 
+    @Override
     public ProgressListener[] getProgressListeners() {
         return progress.getProgressListeners();
     }
 
+    @Override
     public void addProgressListener(ProgressListener progressListener) {
         progress.addProgressListener(progressListener);
     }
-
 
     @Override
     protected Objects.ToStringHelper toStringHelper() {
@@ -208,5 +209,4 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand
 
     protected abstract ObjectSink<T> openSink(File file)
             throws FileNotFoundException, IOException;
-
 }

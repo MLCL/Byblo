@@ -32,26 +32,23 @@ package uk.ac.susx.mlcl.byblo.enumerators;
 
 import com.beust.jcommander.Parameter;
 import com.google.common.base.Objects;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class SingleEnumeratingDelegate
-        extends EnumeratingDelegate
-        implements Serializable, SingleEnumerating {
+public final class SingleEnumeratingDelegate extends EnumeratingDelegate implements SingleEnumerating {
 
     private static final long serialVersionUID = 1L;
 
     @Parameter(names = {"-E", "--enumerated"},
-    description = "Whether tokens in the input file are enumerated.")
+            description = "Whether tokens in the input file are enumerated.")
     private boolean enumerationEnabled = DEFAULT_IS_ENUMERATED;
 
     @Parameter(names = {"-X", "--index-file"},
-    description = "Index for the string tokens.")
+            description = "Index for the string tokens.")
     private File enumeratorFile = null;
 
     private Enumerator<String> enumerator = null;

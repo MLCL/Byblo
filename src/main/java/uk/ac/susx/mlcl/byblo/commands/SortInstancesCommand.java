@@ -31,12 +31,6 @@
 package uk.ac.susx.mlcl.byblo.commands;
 
 import com.beust.jcommander.ParametersDelegate;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
@@ -44,14 +38,17 @@ import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.Charset;
+
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class SortInstancesCommand extends AbstractSortCommand<TokenPair> {
 
-    private static final Log LOG = LogFactory.getLog(SortEntriesCommand.class);
-
+    //    private static final Log LOG = LogFactory.getLog(SortInstancesCommand.class);
     @ParametersDelegate
     private DoubleEnumeratingDelegate indexDelegate = new DoubleEnumeratingDelegate();
 
@@ -90,5 +87,4 @@ public final class SortInstancesCommand extends AbstractSortCommand<TokenPair> {
         Checks.checkNotNull("indexDelegate", indexDelegate);
         this.indexDelegate = indexDelegate;
     }
-
 }

@@ -30,15 +30,14 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.measures.DecomposableMeasure;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.PositivePMI;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import java.io.Serializable;
+
 /**
- *
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class Lin extends DecomposableMeasure implements Serializable {

@@ -33,14 +33,14 @@ package uk.ac.susx.mlcl.lib.commands;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Parameters(commandDescription = "Delete a file.")
@@ -49,8 +49,8 @@ public class FileDeleteCommand extends AbstractCommand {
     private static final Log LOG = LogFactory.getLog(FileDeleteCommand.class);
 
     @Parameter(names = {"-f", "--file"},
-               description = "File to deleted",
-               validateWith = InputFileValidator.class, required=true)
+            description = "File to deleted",
+            validateWith = InputFileValidator.class, required = true)
     private File file = null;
 
     public FileDeleteCommand(File file) {
@@ -69,7 +69,7 @@ public class FileDeleteCommand extends AbstractCommand {
         if (!file.exists())
             throw new FileNotFoundException("Unable to delete file because it "
                     + "doesn't exist: \"" + file + "\"");
-        
+
         if (!file.delete())
             throw new IOException("Unable to delete file: \"" + file + "\"");
     }

@@ -31,25 +31,17 @@
 package uk.ac.susx.mlcl.lib.io;
 
 import com.google.common.base.CharMatcher;
-import java.io.BufferedWriter;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.Flushable;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.RandomAccessFile;
-import java.nio.charset.Charset;
-import java.text.DecimalFormat;
-import java.text.MessageFormat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 
+import java.io.*;
+import java.nio.charset.Charset;
+import java.text.DecimalFormat;
+import java.text.MessageFormat;
+
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class TSV {
@@ -62,7 +54,7 @@ public abstract class TSV {
 
     protected final Charset charset;
 
-//    protected long row;
+    //    protected long row;
     protected long column;
 
     protected TSV(File file, Charset charset) throws FileNotFoundException, IOException {
@@ -108,7 +100,7 @@ public abstract class TSV {
                 LOG.debug("Opening file \"" + file + "\" for writing.");
             out = new BufferedWriter(
                     new OutputStreamWriter(
-                    new FileOutputStream(file), charset));
+                            new FileOutputStream(file), charset));
         }
 
         @Override
@@ -190,7 +182,6 @@ public abstract class TSV {
             if (out instanceof Flushable)
                 ((Flushable) out).flush();
         }
-
     }
 
     /**
@@ -279,9 +270,10 @@ public abstract class TSV {
             try {
                 return Double.valueOf(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.format(
-                        "Caused by NumberFormatException parsing string \"{0}\"",
-                        str), nfe);
+                throw new DataFormatException(this, MessageFormat.
+                        format(
+                                "Caused by NumberFormatException parsing string \"{0}\"",
+                                str), nfe);
             }
         }
 
@@ -291,9 +283,10 @@ public abstract class TSV {
             try {
                 return Integer.parseInt(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.format(
-                        "Caused by NumberFormatException parsing string \"{0}\"",
-                        str), nfe);
+                throw new DataFormatException(this, MessageFormat.
+                        format(
+                                "Caused by NumberFormatException parsing string \"{0}\"",
+                                str), nfe);
             }
         }
 
@@ -307,7 +300,7 @@ public abstract class TSV {
         private void expectType(Lexer.Type expected, Lexer.Type actual) throws DataFormatException {
             if (expected != actual) {
                 throw new DataFormatException(this,
-                                              "Expecting type " + expected + " but found " + actual);
+                        "Expecting type " + expected + " but found " + actual);
             }
         }
 
@@ -339,9 +332,10 @@ public abstract class TSV {
             try {
                 return Short.parseShort(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.format(
-                        "Caused by NumberFormatException parsing string \"{0}\"",
-                        str), nfe);
+                throw new DataFormatException(this, MessageFormat.
+                        format(
+                                "Caused by NumberFormatException parsing string \"{0}\"",
+                                str), nfe);
             }
         }
 
@@ -351,9 +345,10 @@ public abstract class TSV {
             try {
                 return Long.parseLong(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.format(
-                        "Caused by NumberFormatException parsing string \"{0}\"",
-                        str), nfe);
+                throw new DataFormatException(this, MessageFormat.
+                        format(
+                                "Caused by NumberFormatException parsing string \"{0}\"",
+                                str), nfe);
             }
         }
 
@@ -363,16 +358,15 @@ public abstract class TSV {
             try {
                 return Float.parseFloat(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.format(
-                        "Caused by NumberFormatException parsing string \"{0}\"",
-                        str), nfe);
+                throw new DataFormatException(this, MessageFormat.
+                        format(
+                                "Caused by NumberFormatException parsing string \"{0}\"",
+                                str), nfe);
             }
         }
-
     }
 
     /**
-     *
      * @author Hamish Morgan &lg;hamish.morgan@sussex.ac.uk&gt;
      */
     public static class DataFormatException extends IOException {
@@ -386,11 +380,14 @@ public abstract class TSV {
 
         private final File file;
 
+        private final Charset charset;
+
         public DataFormatException(Source src,
                                    final String message) {
             super(message);
             offset = src.roughPosition();
             file = src.getFile();
+            charset = src.getCharset();
         }
 
         public DataFormatException(Source src,
@@ -399,6 +396,7 @@ public abstract class TSV {
             super(message, cause);
             offset = src.roughPosition();
             file = src.getFile();
+            charset = src.getCharset();
         }
 
         public DataFormatException(Source src) {
@@ -422,25 +420,34 @@ public abstract class TSV {
         public String getMessage() {
             String context;
             try {
-                context = context();
-            } catch (IOException e) {
-                context = null;
+                context = '\'' + context() + '\'';
+            } catch (final IOException ex) {
+                // Yes ex is a dead store, but I don't really care about that 
+                // exception since we are trying to produce a report for 
+                // diagnosing another one.
+                context = "";
             }
 
             return "Invalid format found when parsing TSV file " + getFile()
                     + " near byte offset " + getOffset() + ":"
-                    + (context == null ? "'" : "" + context + "'")
-                    + ": " + super.getMessage();
+                    + context + ": " + super.getMessage();
         }
 
         private String context() throws FileNotFoundException, IOException {
-            RandomAccessFile in = new RandomAccessFile(file, "r");
-            byte[] bytes = new byte[64];
-            in.seek(offset - 32);
-            in.read(bytes);
-            in.close();
-            return new String(bytes);
-        }
+            final long start_offset = Math.max(offset - 32, 0);
+            final int len = 64;
 
+            RandomAccessFile in = null;
+            try {
+                in = new RandomAccessFile(file, "r");
+                final byte[] bytes = new byte[len];
+                in.seek(start_offset);
+                final int nBytesRead = in.read(bytes);
+                return new String(bytes, 0, nBytesRead, charset);
+            } finally {
+                if (in != null)
+                    in.close();
+            }
+        }
     }
 }

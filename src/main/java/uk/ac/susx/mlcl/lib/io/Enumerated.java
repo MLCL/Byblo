@@ -31,16 +31,15 @@
 package uk.ac.susx.mlcl.lib.io;
 
 import com.google.common.base.Predicate;
-import java.io.Closeable;
-import java.io.IOException;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.lib.Checks;
 
+import java.io.IOException;
+
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final  class Enumerated {
+public final class Enumerated {
 
     private Enumerated() {
     }
@@ -65,7 +64,7 @@ public final  class Enumerated {
         assert !(inner instanceof ComplexDSink);
         assert !(inner instanceof SimpleDSink);
         return new ComplexSDSource2<SeekableDataSource>(inner, enumerator,
-                                                        enumColumn);
+                enumColumn);
     }
 
     public static DataSink enumerated(
@@ -134,8 +133,7 @@ public final  class Enumerated {
     }
 
     static class SimpleDSource
-            extends ForwardingDataSource<DataSource>
-            implements DataSource, Closeable {
+            extends ForwardingDataSource<DataSource> {
 
         final Enumerator<String> enumerator;
 
@@ -152,8 +150,7 @@ public final  class Enumerated {
     }
 
     static class SimpleSDSource<S extends SeekableDataSource>
-            extends ForwardingSeekableDataSource<S>
-            implements SeekableDataSource, Closeable {
+            extends ForwardingSeekableDataSource<S> {
 
         final Enumerator<String> enumerator;
 
@@ -190,8 +187,7 @@ public final  class Enumerated {
     }
 
     static class ComplexDSource<T extends DataSource>
-            extends ForwardingDataSource<T>
-            implements DataSource, Closeable {
+            extends ForwardingDataSource<T> {
 
         final Enumerator<String>[] enumerators;
 
@@ -233,8 +229,8 @@ public final  class Enumerated {
         public int readInt() throws IOException {
             final int val =
                     (column < enumerators.length && enumerators[column] != null)
-                    ? enumerators[column].indexOf(getInner().readString())
-                    : getInner().readInt();
+                            ? enumerators[column].indexOf(getInner().readString())
+                            : getInner().readInt();
             ++column;
             return val;
         }
@@ -358,8 +354,7 @@ public final  class Enumerated {
     }
 
     static class ComplexDSource2<T extends DataSource>
-            extends ForwardingDataSource<T>
-            implements DataSource, Closeable {
+            extends ForwardingDataSource<T> {
 
         final Enumerator<String> enumerator;
 
@@ -405,8 +400,8 @@ public final  class Enumerated {
         public int readInt() throws IOException {
             final int val =
                     enumColumn.apply(column)
-                    ? enumerator.indexOf(getInner().readString())
-                    : getInner().readInt();
+                            ? enumerator.indexOf(getInner().readString())
+                            : getInner().readInt();
             ++column;
             return val;
         }

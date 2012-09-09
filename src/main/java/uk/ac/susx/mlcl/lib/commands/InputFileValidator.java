@@ -33,11 +33,11 @@ package uk.ac.susx.mlcl.lib.commands;
 
 import com.beust.jcommander.IParameterValidator;
 import com.beust.jcommander.ParameterException;
+
 import java.io.File;
 import java.io.IOException;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class InputFileValidator implements IParameterValidator {

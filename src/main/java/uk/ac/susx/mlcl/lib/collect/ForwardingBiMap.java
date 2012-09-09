@@ -32,14 +32,11 @@ package uk.ac.susx.mlcl.lib.collect;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ForwardingMap;
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
-import java.io.Serializable;
+import uk.ac.susx.mlcl.lib.Checks;
+
+import java.io.*;
 import java.util.Map;
 import java.util.Set;
-import uk.ac.susx.mlcl.lib.Checks;
 
 /**
  * @param <K>
@@ -48,7 +45,7 @@ import uk.ac.susx.mlcl.lib.Checks;
  */
 public final class ForwardingBiMap<K, V>
         extends ForwardingMap<K, V>
-        implements Serializable, BiMap<K, V> {
+        implements BiMap<K, V>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -100,6 +97,12 @@ public final class ForwardingBiMap<K, V>
         return delegate.put(k, v);
     }
 
+    /**
+     * @param value
+     * @return
+     * @throws ClassCastException if value is an inappropriate type for this
+     *                            maps values
+     */
     @Override
     public boolean containsValue(Object value) {
         return inverse.delegate.containsKey(value);
@@ -138,13 +141,13 @@ public final class ForwardingBiMap<K, V>
         return new Serializer<K, V>(this);
     }
 
-    static final class Serializer<K, V> implements Externalizable {
+    public static final class Serializer<K, V> implements Externalizable {
 
         private static final long serialVersionUID = 1;
 
         private ForwardingBiMap<K, V> instance;
 
-        Serializer() {
+        public Serializer() {
         }
 
         Serializer(final ForwardingBiMap<K, V> se) {
@@ -174,6 +177,5 @@ public final class ForwardingBiMap<K, V>
         final Object readResolve() {
             return instance;
         }
-
     }
 }

@@ -33,10 +33,11 @@ package uk.ac.susx.mlcl.lib.commands;
 import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.converters.FileConverter;
-import java.io.File;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
+
+import java.io.File;
 
 /**
  * An IStringConverter implementation for extending JCommander. Take a string

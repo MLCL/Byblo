@@ -30,103 +30,96 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import static org.junit.Assert.assertTrue;
-import static uk.ac.susx.mlcl.TestConstants.DEFAULT_CHARSET;
-import static uk.ac.susx.mlcl.TestConstants.FRUIT_NAME;
-import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_INDEXED_SIMS;
-import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_INPUT;
-import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_INPUT_INDEXED;
-import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_SIMS;
-import static uk.ac.susx.mlcl.TestConstants.TEST_OUTPUT_DIR;
-
-import java.io.File;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.Weighted;
 import uk.ac.susx.mlcl.lib.Comparators;
+import uk.ac.susx.mlcl.lib.commands.AbstractCommandTest;
+
+import java.io.File;
+
+import static org.junit.Assert.assertTrue;
+import static uk.ac.susx.mlcl.TestConstants.*;
 
 /**
- * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class SimsKnnCommandTest extends AbstractCommandTest<KnnSimsCommand> {
 
-	@Override
-	public Class<? extends KnnSimsCommand> getImplementation() {
-		return KnnSimsCommand.class;
-	}
+    @Override
+    public Class<? extends KnnSimsCommand> getImplementation() {
+        return KnnSimsCommand.class;
+    }
 
-	@Override
-	@Before
-	public void setUp() throws Exception {
-		super.setUp();
-	}
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
 
-	@Override
-	@After
-	public void tearDown() throws Exception {
-		super.tearDown();
-	}
+    @Override
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
 
-	private static final String subject = ExternalKnnSimsCommand.class
-			.getName();
+    private static final String subject = ExternalKnnSimsCommand.class
+            .getName();
 
-	@Test
-	public void testRunOnFruit() throws Exception {
-		System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
+    @Test
+    public void testRunOnFruit() throws Exception {
+        System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
 
-		final File in = TEST_FRUIT_SIMS;
-		final File out = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".neighs");
+        final File in = TEST_FRUIT_SIMS;
+        final File out = new File(TEST_OUTPUT_DIR, FRUIT_NAME + ".neighs");
 
-		final KnnSimsCommand knnTask = new KnnSimsCommand();
-		knnTask.getFilesDelegate().setSourceFile(in);
-		knnTask.getFilesDelegate().setDestinationFile(out);
-		knnTask.getFilesDelegate().setCharset(DEFAULT_CHARSET);
-		knnTask.setK(100);
-		knnTask.setIndexDelegate(new DoubleEnumeratingDelegate(
+        final KnnSimsCommand knnTask = new KnnSimsCommand();
+        knnTask.getFilesDelegate().setSourceFile(in);
+        knnTask.getFilesDelegate().setDestinationFile(out);
+        knnTask.getFilesDelegate().setCharset(DEFAULT_CHARSET);
+        knnTask.setK(100);
+        knnTask.setIndexDelegate(new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null));
-		knnTask.setClassComparator(Weighted.recordOrder(TokenPair
-				.firstIndexOrder()));
-		knnTask.setNearnessComparator(Comparators.reverse(Weighted
-				.<TokenPair> weightOrder()));
+        knnTask.setClassComparator(Weighted.recordOrder(TokenPair
+                .firstIndexOrder()));
+        knnTask.setNearnessComparator(Comparators.reverse(Weighted
+                .<TokenPair>weightOrder()));
 
-		knnTask.runCommand();
+        knnTask.runCommand();
 
-		assertTrue("Output files not created.", out.exists());
-		assertTrue("Empty output file found.", out.length() > 0);
-	}
+        assertTrue("Output files not created.", out.exists());
+        assertTrue("Empty output file found.", out.length() > 0);
+    }
 
-	@Test
-	public void testRunOnFruit_Indexed() throws Exception {
-		System.out.println("Testing " + subject + " on "
-				+ TEST_FRUIT_INPUT_INDEXED);
+    @Test
+    public void testRunOnFruit_Indexed() throws Exception {
+        System.out.println("Testing " + subject + " on "
+                + TEST_FRUIT_INPUT_INDEXED);
 
-		final File in = TEST_FRUIT_INDEXED_SIMS;
-		final File out = new File(TEST_OUTPUT_DIR, FRUIT_NAME
-				+ ".indexed.neighs");
+        final File in = TEST_FRUIT_INDEXED_SIMS;
+        final File out = new File(TEST_OUTPUT_DIR, FRUIT_NAME
+                + ".indexed.neighs");
 
-		final KnnSimsCommand knnTask = new KnnSimsCommand();
-		knnTask.getFilesDelegate().setSourceFile(in);
-		knnTask.getFilesDelegate().setDestinationFile(out);
-		knnTask.getFilesDelegate().setCharset(DEFAULT_CHARSET);
-		knnTask.setK(100);
-		knnTask.setIndexDelegate(new DoubleEnumeratingDelegate(
+        final KnnSimsCommand knnTask = new KnnSimsCommand();
+        knnTask.getFilesDelegate().setSourceFile(in);
+        knnTask.getFilesDelegate().setDestinationFile(out);
+        knnTask.getFilesDelegate().setCharset(DEFAULT_CHARSET);
+        knnTask.setK(100);
+        knnTask.setIndexDelegate(new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null));
-		knnTask.setClassComparator(Weighted.recordOrder(TokenPair
-				.firstIndexOrder()));
-		knnTask.setNearnessComparator(Comparators.reverse(Weighted
-				.<TokenPair> weightOrder()));
+        knnTask.setClassComparator(Weighted.recordOrder(TokenPair
+                .firstIndexOrder()));
+        knnTask.setNearnessComparator(Comparators.reverse(Weighted
+                .<TokenPair>weightOrder()));
 
-		knnTask.runCommand();
+        knnTask.runCommand();
 
-		assertTrue("Output files not created.", out.exists());
-		assertTrue("Empty output file found.", out.length() > 0);
-	}
+        assertTrue("Output files not created.", out.exists());
+        assertTrue("Empty output file found.", out.length() > 0);
+    }
 
 }

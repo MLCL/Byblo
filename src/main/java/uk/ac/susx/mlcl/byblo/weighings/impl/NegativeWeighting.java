@@ -30,15 +30,11 @@
  */
 package uk.ac.susx.mlcl.byblo.weighings.impl;
 
-import java.io.Serializable;
-
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class NegativeWeighting
-        extends Bound
-        implements Serializable {
+        extends Bound {
 
     private static final long serialVersionUID = 1L;
 

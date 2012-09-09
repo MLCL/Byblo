@@ -31,23 +31,16 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import com.google.common.base.Predicate;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.Flushable;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
-import uk.ac.susx.mlcl.lib.io.DataSink;
-import uk.ac.susx.mlcl.lib.io.Deltas;
-import uk.ac.susx.mlcl.lib.io.Enumerated;
-import uk.ac.susx.mlcl.lib.io.ObjectSink;
-import uk.ac.susx.mlcl.lib.io.TSV;
+import uk.ac.susx.mlcl.lib.io.*;
+
+import java.io.*;
+import java.nio.charset.Charset;
 
 /**
  * An <tt>WeightedTokenSink</tt> object is used to store {@link Token} objects
  * in a flat file.
- *
+ * <p/>
  * <p>The basic file format is Tab-Separated-Values (TSV) where records are
  * delimited by new-lines, and values are delimited by tabs. Two variants are
  * supported: verbose and compact. In verbose mode each {@link Token}
@@ -55,7 +48,7 @@ import uk.ac.susx.mlcl.lib.io.TSV;
  * entry and it's weight. In compact mode each TSV record consists of a single
  * entry followed by the weights of all sequentially written {@link Token}
  * objects that share the same entry.</p>
- *
+ * <p/>
  * Verbose mode example:
  * <pre>
  *      entry1  weight1
@@ -65,14 +58,14 @@ import uk.ac.susx.mlcl.lib.io.TSV;
  *      entry3  weight5
  *      entry3  weight6
  * </pre>
- *
+ * <p/>
  * Equivalent compact mode example:
  * <pre>
  *      entry1  weight1 weight2
  *      entry2  weight3
  *      entry3  weight4 weight5 weight6
  * </pre>
- *
+ * <p/>
  * <p>Compact mode is the default behavior, since it can reduce file sizes by
  * approximately 50%, with corresponding reductions in I/O overhead.</p>
  *
@@ -115,7 +108,7 @@ public class WeightedTokenSink implements ObjectSink<Weighted<Token>>, Closeable
 
                 @Override
                 public boolean apply(Integer column) {
-                    return column == 0;
+                    return column != null && column == 0;
                 }
 
             });

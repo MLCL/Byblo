@@ -30,11 +30,11 @@
  */
 package uk.ac.susx.mlcl.byblo.weighings.impl;
 
-import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.weighings.AbstractSimpleWeighting;
 
+import java.io.Serializable;
+
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class Step

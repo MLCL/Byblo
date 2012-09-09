@@ -30,13 +30,13 @@
  */
 package uk.ac.susx.mlcl.lib.events;
 
-import java.io.Serializable;
-import java.text.MessageFormat;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Checks;
+
+import java.text.MessageFormat;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Implementation of ProgressReporting that can be used as a delegate by
@@ -44,7 +44,7 @@ import uk.ac.susx.mlcl.lib.Checks;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class ProgressDelegate implements ProgressReporting, Serializable {
+public class ProgressDelegate implements ProgressReporting {
 
     private static final long serialVersionUID = 1L;
 
@@ -116,7 +116,7 @@ public class ProgressDelegate implements ProgressReporting, Serializable {
     /**
      * Indicate the start of series of updates that should be considered a
      * single atomic transaction.
-     *
+     * <p/>
      * This method is used (in conjunction with {@link #endAdjusting() } to avoid
      * multiple events being fired during a sequence of state changes.
      *
@@ -132,7 +132,7 @@ public class ProgressDelegate implements ProgressReporting, Serializable {
     /**
      * Indicate the end of series of updates that should be considered a single
      * atomic transaction.
-     *
+     * <p/>
      * This method is used (in conjunction with {@link #startAdjusting() } to
      * avoid multiple events being fired during a sequence of state changes.
      *
@@ -191,7 +191,7 @@ public class ProgressDelegate implements ProgressReporting, Serializable {
 
     public void setMessage(String newMessage) {
         Checks.checkNotNull(newMessage);
-        if (this.message != newMessage && (this.message == null || !this.message.equals(newMessage))) {
+        if (this.message == null || !this.message.equals(newMessage)) {
             startAdjusting();
             this.message = newMessage;
             stateChangedSinceLastEvent = true;
@@ -210,7 +210,7 @@ public class ProgressDelegate implements ProgressReporting, Serializable {
         }
         sb.append("(");
         sb.append(isProgressPercentageSupported()
-                  ? getProgressPercent() : "unknown");
+                ? getProgressPercent() : "unknown");
         sb.append("% complete)");
         return sb.toString();
     }
@@ -261,10 +261,10 @@ public class ProgressDelegate implements ProgressReporting, Serializable {
         for (ProgressListener progressListener : progressListeners) {
             try {
                 progressListener.progressChanged(event);
-            } catch (Exception ex) {
-                LOG.error(MessageFormat.format(
-                        "Progress listener {0} threw exception while handing event {1}",
-                        progressListener, event), ex);
+            } catch (RuntimeException ex) {
+                LOG.error(MessageFormat.format("Progress listener {0} threw "
+                        + "RuntimeException while handing event {1}; removing "
+                        + "from observer pool.", progressListener, event), ex);
                 removeProgressListener(progressListener);
             }
         }
@@ -275,7 +275,8 @@ public class ProgressDelegate implements ProgressReporting, Serializable {
             return false;
         if (this.progressPercent != other.progressPercent)
             return false;
-        if (this.outer != other.outer && (this.outer == null || !this.outer.equals(other.outer)))
+        if (this.outer != other.outer && (this.outer == null || !this.outer.
+                equals(other.outer)))
             return false;
         return !(this.event != other.event && (this.event == null || !this.event.equals(other.event)));
     }
@@ -291,7 +292,7 @@ public class ProgressDelegate implements ProgressReporting, Serializable {
     public int hashCode() {
         int hash = 3;
         hash = 97 * hash + (this.progressListeners != null
-                            ? this.progressListeners.hashCode() : 0);
+                ? this.progressListeners.hashCode() : 0);
         hash = 97 * hash + this.progressPercent;
         hash = 97 * hash + (this.outer != null ? this.outer.hashCode() : 0);
         hash = 97 * hash + (this.event != null ? this.event.hashCode() : 0);
@@ -305,5 +306,4 @@ public class ProgressDelegate implements ProgressReporting, Serializable {
                 + ", progressPercent=" + progressPercent
                 + '}';
     }
-
 }

@@ -28,63 +28,23 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.lib.tasks;
+package uk.ac.susx.mlcl.lib.events;
 
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.io.File;
-import java.io.IOException;
-
-import static java.text.MessageFormat.format;
 
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class FileMoveTask extends FileCopyTask {
+public final class ReportLoggingProgressListener implements ProgressListener {
 
-    private static final Log LOG = LogFactory.getLog(FileMoveTask.class);
+    private final Log log;
 
-    public FileMoveTask(File sourceFile, File destinationFile) {
-        super(sourceFile, destinationFile);
-    }
-
-    public FileMoveTask() {
-        super();
-    }
-
-    protected static void move(File from, File to) throws IOException {
-
-
-        if (!from.renameTo(to)) {
-            if (LOG.isDebugEnabled())
-                LOG.debug("Cannot perform a fast rename; falling back to copy");
-
-            copy(from, to);
-
-            if (!from.delete())
-                throw new IOException(format("Unable to delete file {0}", from));
-        }
+    public ReportLoggingProgressListener(Log log) {
+        this.log = log;
     }
 
     @Override
-    protected void runTask() throws Exception {
-        progress.startAdjusting();
-        progress.setState(State.RUNNING);
-        progress.setMessage(format("Copying file from \"{0}\" to \"{1}\".",
-                getSrcFile(), getDstFile()));
-        progress.endAdjusting();
-
-
-        // Check the configuration state
-        if (getSrcFile().equals(getDstFile()))
-            throw new IllegalStateException("sourceFile equals destinationFile");
-
-        move(getSrcFile(), getDstFile());
-
-
-        progress.setState(State.COMPLETED);
-
+    public void progressChanged(ProgressEvent progressEvent) {
+        log.info(progressEvent.getSource().getProgressReport());
     }
-
 }

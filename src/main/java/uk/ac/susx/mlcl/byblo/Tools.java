@@ -30,21 +30,14 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import com.beust.jcommander.ParameterException;
+import uk.ac.susx.mlcl.byblo.commands.*;
+import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
+import uk.ac.susx.mlcl.lib.commands.Command;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
-import uk.ac.susx.mlcl.byblo.commands.ExternalCountCommand;
-import uk.ac.susx.mlcl.byblo.commands.ExternalKnnSimsCommand;
-import uk.ac.susx.mlcl.byblo.commands.ExternalSortEntriesCommand;
-import uk.ac.susx.mlcl.byblo.commands.ExternalSortEventsCommand;
-import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
-import uk.ac.susx.mlcl.byblo.commands.IndexingCommands;
-import uk.ac.susx.mlcl.byblo.commands.MergeEntriesCommand;
-import uk.ac.susx.mlcl.byblo.commands.MergeEventsCommand;
-import uk.ac.susx.mlcl.byblo.commands.MergeInstancesCommand;
-import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
-import uk.ac.susx.mlcl.lib.commands.Command;
 
 /**
  * Main method class for running various tools from the command line.
@@ -108,7 +101,10 @@ public final class Tools extends AbstractCommand {
      * @throws Exception when something goes awry.
      */
     public static void main(final String[] args) throws Exception {
-        new Tools().runCommand(args);
+        try {
+            new Tools().runCommand(args);
+        } catch (ParameterException ex) {
+            System.exit(-1);
+        }
     }
-
 }

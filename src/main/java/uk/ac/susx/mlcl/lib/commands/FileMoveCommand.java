@@ -33,12 +33,13 @@ package uk.ac.susx.mlcl.lib.commands;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
-import java.io.File;
 import uk.ac.susx.mlcl.lib.tasks.FileMoveTask;
+
+import java.io.File;
 
 /**
  * Move source file to a destination.
- *
+ * <p/>
  * Attempts to perform a fast rename if possible. Otherwise it falls back to
  * slower copy and delete.
  *

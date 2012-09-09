@@ -31,26 +31,21 @@
 package uk.ac.susx.mlcl.lib.io;
 
 import com.google.common.base.CharMatcher;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import com.google.common.io.Closeables;
+import com.google.common.io.Flushables;
+import org.junit.*;
+import uk.ac.susx.mlcl.TestConstants;
+import uk.ac.susx.mlcl.lib.io.Lexer.Type;
+
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import org.junit.After;
-import org.junit.AfterClass;
-import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import uk.ac.susx.mlcl.TestConstants;
-import uk.ac.susx.mlcl.lib.io.Lexer.Type;
+
+import static org.junit.Assert.assertEquals;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class LexerTest {
@@ -58,31 +53,31 @@ public class LexerTest {
     private static final String CFB = "come friendly bombs\nand fall on slough.";
 
     private static final int[] CFB_numbers = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-        11, 12, 13};
+            11, 12, 13};
 
     private static final Type[] CFB_types = {Type.Value, Type.Whitespace,
-        Type.Value, Type.Whitespace, Type.Value, Type.Whitespace, Type.Value,
-        Type.Whitespace, Type.Value, Type.Whitespace, Type.Value,
-        Type.Whitespace, Type.Value, Type.Delimiter};
+            Type.Value, Type.Whitespace, Type.Value, Type.Whitespace, Type.Value,
+            Type.Whitespace, Type.Value, Type.Whitespace, Type.Value,
+            Type.Whitespace, Type.Value, Type.Delimiter};
 
     private static final int[] CFB_starts = {0, 4, 5, 13, 14, 19, 20, 23, 24,
-        28, 29, 31, 32, 38};
+            28, 29, 31, 32, 38};
 
     private static final int[] CFB_ends = {4, 5, 13, 14, 19, 20, 23, 24, 28,
-        29, 31, 32, 38, 39};
+            29, 31, 32, 38, 39};
 
     private static final String[] CFB_values = new String[]{"come", " ",
-        "friendly", " ", "bombs", "\n", "and", " ", "fall", " ", "on", " ",
-        "slough", "."};
+            "friendly", " ", "bombs", "\n", "and", " ", "fall", " ", "on", " ",
+            "slough", "."};
 
     private static final int[] CFB_lines = {0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
-        1, 1};
+            1, 1};
 
     private static final int[] CFB_columns = {0, 4, 5, 13, 14, 19, 0, 3, 4, 8,
-        9, 11, 12, 18};
+            9, 11, 12, 18};
 
     private static final char[] CFB_charAt0 = {'c', ' ', 'f', ' ', 'b', '\n',
-        'a', ' ', 'f', ' ', 'o', ' ', 's', '.'};
+            'a', ' ', 'f', ' ', 'o', ' ', 's', '.'};
 
     public LexerTest() {
     }
@@ -104,15 +99,20 @@ public class LexerTest {
         System.out.println();
     }
 
-    private File makeTmpData(String str) throws IOException {
+    private File makeTmpData(String str, Charset charset) throws IOException {
         File tmp = File.createTempFile(this.getClass().getName() + ".", "");
         tmp.deleteOnExit();
 
-        OutputStream out = new FileOutputStream(tmp);
-        out.write(str.getBytes());
-        out.flush();
-        out.close();
-
+        OutputStream out = null;
+        try {
+            out = new FileOutputStream(tmp);
+            out.write(str.getBytes(charset));
+        } finally {
+            if (out != null) {
+                Flushables.flushQuietly(out);
+                Closeables.closeQuietly(out);
+            }
+        }
         return tmp;
     }
 
@@ -122,7 +122,7 @@ public class LexerTest {
 
 
         Charset charset = Files.DEFAULT_CHARSET;
-        File tmp = makeTmpData(CFB);
+        File tmp = makeTmpData(CFB, charset);
 
         Lexer lexer = new Lexer(tmp, charset);
         lexer.setDelimiterMatcher(CharMatcher.is('.'));
@@ -159,7 +159,7 @@ public class LexerTest {
         System.out.println("seekTest");
 
         Charset charset = Files.DEFAULT_CHARSET;
-        File tmp = makeTmpData(CFB);
+        File tmp = makeTmpData(CFB, charset);
 
         Lexer lexer = new Lexer(tmp, charset);
         lexer.setDelimiterMatcher(CharMatcher.is('.'));

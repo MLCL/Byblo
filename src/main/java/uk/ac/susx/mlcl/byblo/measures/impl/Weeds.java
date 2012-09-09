@@ -30,22 +30,23 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
+import uk.ac.susx.mlcl.byblo.measures.Measures;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.PositivePMI;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import java.io.Serializable;
+
 /**
- *
  * Parameters
- *
+ * <p/>
  * β γ Special Case
- *
+ * <p/>
  * - 1 harmonic mean of precision and recall (F-score) (DiceMi) β 0 weighted
  * arithmetic mean of precision and recall 1 0 precision 0 0 recall 0.5 0
  * unweighted arithmetic mean
- *
+ * <p/>
  * <ul> <li>Weeds, Julie, and David Weir. (December 2005) Co-occurrence
  * Retrieval: A Flexible Framework for Lexical Distributional Similarity.
  * Computational Linguistics 31, no. 4: 439-475.</li> </ul>
@@ -127,7 +128,8 @@ public class Weeds implements Measure, Serializable {
         // If gamma = 1.0 then only then harmonic component is used, hense the 
         // measure is symetric. Otherwise some portion of the arithimentic 
         // component is used which is symetric only when beta = 0.5.
-        return gamma == 1.0 || beta == 0.5;
+        return Measures.epsilonEquals(gamma, 1.0)
+                || Measures.epsilonEquals(beta, 0.5);
     }
 
     @Override
@@ -170,11 +172,11 @@ public class Weeds implements Measure, Serializable {
     public int hashCode() {
         int hash = 5;
         hash = 37 * hash + (int) (Double.doubleToLongBits(this.beta) ^ (Double.
-                                                                        doubleToLongBits(
-                                                                        this.beta) >>> 32));
+                doubleToLongBits(
+                        this.beta) >>> 32));
         hash = 37 * hash + (int) (Double.doubleToLongBits(this.gamma) ^ (Double.
-                                                                         doubleToLongBits(
-                                                                         this.gamma) >>> 32));
+                doubleToLongBits(
+                        this.gamma) >>> 32));
         return hash;
     }
 }

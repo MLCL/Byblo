@@ -74,7 +74,7 @@ public interface Measure {
      * Gets the {@link Weighting} scheme that should have been previously
      * applied to feature vectors before this {@link Measure} implementation is
      * used.
-     *
+     * <p/>
      * Some measures can operate on pretty much any kind of vector (for example
      * geometric distance measures). Others require the vectors to take a
      * particular form. Set theoretic measures {@link Dice} and {@link Jaccard}
@@ -83,20 +83,20 @@ public interface Measure {
      * measure expect PMI weighting.
      *
      * @return weighting scheme that should have been previously applied to
-     * vectors
+     *         vectors
      */
     Class<? extends Weighting> getExpectedWeighting();
 
     /**
      * Whether or not the operands can be reversed without changing the
      * resultant similarity score.
-     *
+     * <p/>
      * Traditionally, similarity measures define a symmetric space but this does
      * not have to be the case. Symmetric space must be defined by a commutative
      * similarity measure (where sim(x,y) = sim(y,x)). However, non-symmetric
      * spaces are possible. In these cases the measure should be marked as
      * non-commutative.
-     *
+     * <p/>
      * In the case of distance measures, a commutative kernel will define a
      * <em>true</em> metric, while a non-commutative kernel will not. For
      * example {@link KLDivergence} is a distance measure while the {@link LpSpace}

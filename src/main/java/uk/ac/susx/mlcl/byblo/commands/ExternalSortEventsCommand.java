@@ -31,27 +31,23 @@
 package uk.ac.susx.mlcl.byblo.commands;
 
 import com.beust.jcommander.ParametersDelegate;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratorType;
-import uk.ac.susx.mlcl.byblo.io.BybloIO;
-import uk.ac.susx.mlcl.byblo.io.TokenPair;
-import uk.ac.susx.mlcl.byblo.io.WeightSumReducerObjectSink;
-import uk.ac.susx.mlcl.byblo.io.Weighted;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenPairSource;
+import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.MemoryUsage;
-import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.events.ProgressEvent;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weighted<TokenPair>> {
@@ -98,7 +94,7 @@ public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weigh
 
     @Override
     protected long getBytesPerObject() {
-        return new MemoryUsage().add(new Weighted<TokenPair>(new TokenPair(1,1),1)).getInstanceSizeBytes();
+        return new MemoryUsage().add(new Weighted<TokenPair>(new TokenPair(1, 1), 1)).getInstanceSizeBytes();
     }
 
     @Override

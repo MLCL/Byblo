@@ -32,18 +32,39 @@ package uk.ac.susx.mlcl.lib.commands;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import uk.ac.susx.mlcl.lib.io.Files;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class CopyCommandTest {
+public class FileCopyCommandTest extends AbstractCommandTest<FileCopyCommand> {
+
+    @Override
+    public Class<? extends FileCopyCommand> getImplementation() {
+        return FileCopyCommand.class;
+    }
+
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
+
+    @Override
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
 
     @Test
     public void testGetSrcFile() {
@@ -82,23 +103,28 @@ public class CopyCommandTest {
         StringBuilder sb = new StringBuilder();
         Files.readAll(out, Files.DEFAULT_CHARSET, sb);
         assertEquals(str, sb.toString());
-        in.delete();
-        out.delete();
+        if (!in.delete())
+            throw new IOException("Failed to delete file: " + in);
+        if (!out.delete())
+            throw new IOException("Failed to delete file: " + out);
     }
 
     @Test(expected = FileNotFoundException.class)
     public void testRun_failure_noInput() throws Exception {
         System.out.println("Testing run() -- expecting failure (no input)");
         File in = File.createTempFile(getClass().getName(), "in");
-        in.delete();
+        if (!in.delete())
+            throw new IOException("Failed to delete file: " + in);
         File out = File.createTempFile(getClass().getName(), "out");
         FileCopyCommand instance = new FileCopyCommand(in, out);
         instance.runCommand();
-        in.delete();
-        out.delete();
+        if (!in.delete())
+            throw new IOException("Failed to delete file: " + in);
+        if (!out.delete())
+            throw new IOException("Failed to delete file: " + out);
     }
 
-    @Test(expected=ParameterException.class)
+    @Test(expected = ParameterException.class)
     public void testCLI() throws IOException {
         System.out.println("Testing command line usage.");
         File x = new File("x"), y = new File("y");

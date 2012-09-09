@@ -30,19 +30,20 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
+import com.beust.jcommander.Parameters;
+import com.google.common.base.Objects;
+import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.events.ProgressDelegate;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.events.ProgressReporting;
-import com.beust.jcommander.Parameters;
-import com.google.common.base.Objects;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
 import static java.text.MessageFormat.format;
-import uk.ac.susx.mlcl.lib.Checks;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Parameters(commandDescription = "Delete a file.")

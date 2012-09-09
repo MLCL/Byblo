@@ -35,7 +35,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 /**
  * <code>DecomposableMeasure</code> defines a Measure can be optimally extended
  * to break down internal operation into sub-functions.
- *
+ * <p/>
  * This abstract class has been expanded from {@link Measure} to allow for
  * pre-calculation of values that are dependant only on one vector.
  *
@@ -86,8 +86,8 @@ public abstract class DecomposableMeasure
      * Combine the the component results into a single similarity score.
      *
      * @param shared component derived from both vectors
-     * @param left component derived from first vector
-     * @param right component derived from second vector
+     * @param left   component derived from first vector
+     * @param right  component derived from second vector
      * @return combined result
      */
     public abstract double combine(double shared, double left, double right);

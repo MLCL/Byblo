@@ -31,21 +31,16 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import com.google.common.base.Predicate;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
+import uk.ac.susx.mlcl.lib.io.*;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
-import uk.ac.susx.mlcl.lib.io.Compact;
-import uk.ac.susx.mlcl.lib.io.Deltas;
-import uk.ac.susx.mlcl.lib.io.Enumerated;
-import uk.ac.susx.mlcl.lib.io.SeekableDataSource;
-import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
-import uk.ac.susx.mlcl.lib.io.TSV;
-import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
  * An <tt>WeightedTokenSource</tt> object is used to retrieve {@link Token}
@@ -94,7 +89,7 @@ public class WeightedTokenSource
 
                 @Override
                 public boolean apply(Integer column) {
-                    return column == 0;
+                    return column != null && column == 0;
                 }
 
             });

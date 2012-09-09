@@ -30,12 +30,12 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
-import java.io.IOException;
 import uk.ac.susx.mlcl.lib.io.CountingObjectSource;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 
+import java.io.IOException;
+
 /**
- *
  * @param <T>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */

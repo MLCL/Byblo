@@ -36,7 +36,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * {@linkElementwiseWeighting} maps element-wise from a single feature input
  * weight to the output weight, but with addition contextual information
  * provided.
- *
+ * <p/>
  * It should be used when {@link SimpleWeighting} is insufficiently flexible.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
@@ -51,13 +51,13 @@ public abstract class AbstractElementwiseWeighting implements Weighting {
 
     @Override
     public final SparseDoubleVector apply(final SparseDoubleVector from) {
-        if(from.size == 0)
+        if (from.size == 0)
             return new SparseDoubleVector(from.cardinality, 0);
         final SparseDoubleVector to = from.clone();
         double sum = 0;
         for (int i = 0; i < from.size; i++) {
             to.values[i] = apply(from, from.keys[i],
-                                 from.values[i]);
+                    from.values[i]);
             sum += to.values[i];
         }
         to.sum = sum;
@@ -71,8 +71,8 @@ public abstract class AbstractElementwiseWeighting implements Weighting {
      * <tt>vector</tt> returning a new weighting
      *
      * @param vector feature vector of a particular entry
-     * @param key enumerated feature index
-     * @param value feature input weighting
+     * @param key    enumerated feature index
+     * @param value  feature input weighting
      * @return feature output weighting
      */
     protected abstract double apply(SparseDoubleVector vector,
@@ -84,5 +84,5 @@ public abstract class AbstractElementwiseWeighting implements Weighting {
 
     @Override
     public abstract double getUpperBound();
-    
+
 }

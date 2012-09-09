@@ -32,16 +32,17 @@ package uk.ac.susx.mlcl.byblo.io;
 
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
+import uk.ac.susx.mlcl.lib.collect.Indexed;
+import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
+import uk.ac.susx.mlcl.lib.io.Tell;
+
 import java.io.IOException;
 import java.nio.charset.CharacterCodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import uk.ac.susx.mlcl.lib.collect.Indexed;
-import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
-import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
  * Wraps a {@link WeightedTokenPairVectorSource} to produce complete feature
@@ -142,7 +143,7 @@ public class WeightedTokenPairVectorSource
         }
 
         SparseDoubleVector vec = new SparseDoubleVector(keys, values,
-                                                        cardinality, keys.length);
+                cardinality, keys.length);
         vec.compact();
         return vec;
     }

@@ -30,12 +30,12 @@
  */
 package uk.ac.susx.mlcl.byblo.enumerators;
 
-import java.io.File;
-import java.io.IOException;
 import uk.ac.susx.mlcl.lib.Checks;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class EnumeratingDelegates {
@@ -122,7 +122,7 @@ public final class EnumeratingDelegates {
             return true;
         }
 
-//        @Override
+        //        @Override
 //        public boolean isEnumeratorSkipIndexed1() {
 //            return getInner().isEnumeratorSkipIndexed1();
 //        }
@@ -151,7 +151,7 @@ public final class EnumeratingDelegates {
             return getInner().isEnumeratorOpen();
         }
 
-//        @Override
+        //        @Override
 //        public void setEnumeratorSkipIndexed1(boolean b) {
 //            getInner().setEnumeratorSkipIndexed1(b);
 //        }

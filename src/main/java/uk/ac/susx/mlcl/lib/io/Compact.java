@@ -30,13 +30,13 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
+import uk.ac.susx.mlcl.lib.Checks;
+
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
-import uk.ac.susx.mlcl.lib.Checks;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class Compact {

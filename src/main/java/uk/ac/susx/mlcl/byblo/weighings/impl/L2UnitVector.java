@@ -30,9 +30,10 @@
  */
 package uk.ac.susx.mlcl.byblo.weighings.impl;
 
-import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+
+import java.io.Serializable;
 
 /**
  * {@link Weighting} that normalizes the feature vector to an L2 unit vector, by
@@ -76,7 +77,7 @@ public final class L2UnitVector
 
     /**
      * The magnitude of the vector, i.e the L2 vector normal.
-     *
+     * <p/>
      * TODO: Move to mlcl-lib/SparseDoubleVector
      *
      * @param vector
@@ -88,7 +89,7 @@ public final class L2UnitVector
 
     /**
      * Calculate the square of the L@ norm of vector.
-     *
+     * <p/>
      * TODO: Move to mlcl-lib/SparseDoubleVector
      *
      * @param vector

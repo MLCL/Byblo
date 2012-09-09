@@ -30,50 +30,47 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static uk.ac.susx.mlcl.TestConstants.DEFAULT_CHARSET;
-import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_INPUT;
-import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_INPUT_INDEXED;
-import static uk.ac.susx.mlcl.TestConstants.TEST_OUTPUT_DIR;
-import static uk.ac.susx.mlcl.lib.test.ExitTrapper.disableExitTrapping;
-import static uk.ac.susx.mlcl.lib.test.ExitTrapper.enableExistTrapping;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import uk.ac.susx.mlcl.TestConstants;
+import uk.ac.susx.mlcl.lib.commands.AbstractCommandTest;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
+import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
-import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
+import static org.junit.Assert.assertTrue;
+import static uk.ac.susx.mlcl.TestConstants.*;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.disableExitTrapping;
+import static uk.ac.susx.mlcl.lib.test.ExitTrapper.enableExistTrapping;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class CountCommandTest extends AbstractCommandTest<CountCommand> {
 
-	@Override
-	public Class<? extends CountCommand> getImplementation() {
-		return CountCommand.class;
-	}
+    @Override
+    public Class<? extends CountCommand> getImplementation() {
+        return CountCommand.class;
+    }
 
-	@Override
-	@Before
-	public void setUp() throws Exception {
-		super.setUp();
-	}
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+    }
 
-	@Override
-	@After
-	public void tearDown() throws Exception {
-		super.tearDown();
-	}
+    @Override
+    @After
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
 
     private static final String subject = CountCommand.class.getName();
 
@@ -107,11 +104,11 @@ public class CountCommandTest extends AbstractCommandTest<CountCommand> {
             throws Exception {
 
         String[] args = {
-            "--input", inInst.toString(),
-            "--output-entries", outE.toString(),
-            "--output-features", outF.toString(),
-            "--output-entry-features", outEF.toString(),
-            "--charset", charset.name()
+                "--input", inInst.toString(),
+                "--output-entries", outE.toString(),
+                "--output-features", outF.toString(),
+                "--output-entry-features", outEF.toString(),
+                "--charset", charset.name()
         };
 
         if (preindexedEntries) {
@@ -142,32 +139,6 @@ public class CountCommandTest extends AbstractCommandTest<CountCommand> {
         assertTrue("Empty output file found: " + outEF, outEF.length() > 0);
     }
 
-    private void runExpectingNullPointer(File inInst, File outE, File outF,
-                                         File outEF, Charset charset,
-                                         boolean preIndexEntries,
-                                         boolean preIndexFeatures) throws Exception {
-        try {
-            runWithAPI(inInst, outE, outF, outEF, charset, preIndexEntries,
-                       preIndexFeatures);
-            fail("NullPointerException should have been thrown.");
-        } catch (NullPointerException ex) {
-            // pass
-        }
-    }
-
-    private void runExpectingIllegalState(File inInst, File outE, File outF,
-                                          File outEF, Charset charset,
-                                          boolean preIndexEntries,
-                                          boolean preIndexFeatures) throws Exception {
-        try {
-            runWithAPI(inInst, outE, outF, outEF, charset, preIndexEntries,
-                       preIndexFeatures);
-            fail("IllegalStateException should have been thrown.");
-        } catch (IllegalStateException ex) {
-            // pass
-        }
-    }
-
     @Test
     public void testRunOnFruitAPI() throws Exception {
         System.out.println("Testing " + subject + " on " + TEST_FRUIT_INPUT);
@@ -176,14 +147,12 @@ public class CountCommandTest extends AbstractCommandTest<CountCommand> {
         final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
         final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
         final File efActual = new File(TEST_OUTPUT_DIR,
-                                       fruitPrefix + ".events");
+                fruitPrefix + ".events");
 
-        eActual.delete();
-        fActual.delete();
-        efActual.delete();
+        TestConstants.deleteIfExist(eActual, fActual, efActual);
 
         runWithAPI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
-                   DEFAULT_CHARSET, false, false);
+                DEFAULT_CHARSET, false, false);
 
     }
 
@@ -195,87 +164,103 @@ public class CountCommandTest extends AbstractCommandTest<CountCommand> {
         final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
         final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
         final File efActual = new File(TEST_OUTPUT_DIR,
-                                       fruitPrefix + ".events");
+                fruitPrefix + ".events");
 
-        eActual.delete();
-        fActual.delete();
-        efActual.delete();
+        TestConstants.deleteIfExist(eActual, fActual, efActual);
 
         runWithCLI(TEST_FRUIT_INPUT, eActual, fActual, efActual,
-                   DEFAULT_CHARSET, false, false);
+                DEFAULT_CHARSET, false, false);
 
     }
 
     @Test
     public void testRunOnFruitAPI_Indexed() throws Exception {
-        System.out.println(
-                "Testing " + subject + " on " + TEST_FRUIT_INPUT_INDEXED + " (Indexed)");
+        System.out.
+                println(
+                        "Testing " + subject + " on " + TEST_FRUIT_INPUT_INDEXED + " (Indexed)");
 
         final String fruitPrefix = TEST_FRUIT_INPUT_INDEXED.getName();
         final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
         final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
         final File efActual = new File(TEST_OUTPUT_DIR,
-                                       fruitPrefix + ".events");
+                fruitPrefix + ".events");
 
-        eActual.delete();
-        fActual.delete();
-        efActual.delete();
+        TestConstants.deleteIfExist(eActual, fActual, efActual);
 
         runWithAPI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
-                   DEFAULT_CHARSET, true, true);
+                DEFAULT_CHARSET, true, true);
 
     }
 
     @Test
     public void testRunOnFruitCLI_Indexed() throws Exception {
-        System.out.println(
-                "Testing " + subject + " on " + TEST_FRUIT_INPUT_INDEXED + " (Indexed)");
+        System.out.
+                println(
+                        "Testing " + subject + " on " + TEST_FRUIT_INPUT_INDEXED + " (Indexed)");
 
         final String fruitPrefix = TEST_FRUIT_INPUT_INDEXED.getName();
         final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
         final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
         final File efActual = new File(TEST_OUTPUT_DIR,
-                                       fruitPrefix + ".events");
+                fruitPrefix + ".events");
 
-        eActual.delete();
-        fActual.delete();
-        efActual.delete();
+        TestConstants.deleteIfExist(eActual, fActual, efActual);
 
         runWithCLI(TEST_FRUIT_INPUT_INDEXED, eActual, fActual, efActual,
-                   DEFAULT_CHARSET, true, true);
+                DEFAULT_CHARSET, true, true);
 
     }
 
-    @Test
-    public void testMissingParameters() throws Exception {
-        System.out.println("Testing " + subject + " for bad parameterisation.");
+    @Test(expected = IllegalStateException.class)
+    public void testIllegalState1() throws Exception {
+        runReplacingFile(0, TEST_OUTPUT_DIR);
+    }
 
+    @Test(expected = IllegalStateException.class)
+    public void testIllegalState2() throws Exception {
+        runReplacingFile(1, TEST_OUTPUT_DIR);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testIllegalState3() throws Exception {
+        runReplacingFile(2, TEST_OUTPUT_DIR);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testIllegalState4() throws Exception {
+        runReplacingFile(3, TEST_OUTPUT_DIR);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullParameter1() throws Exception {
+        runReplacingFile(0, null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullParameter2() throws Exception {
+        runReplacingFile(1, null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullParameter3() throws Exception {
+        runReplacingFile(2, null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullParameter4() throws Exception {
+        runReplacingFile(3, null);
+    }
+
+    void runReplacingFile(int repId, @Nullable File repFile)
+            throws Exception {
         final File instIn = TEST_FRUIT_INPUT;
         final String fruitPrefix = TEST_FRUIT_INPUT.getName();
         final File eOut = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
         final File fOut = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
-        final File efOut = new File(TEST_OUTPUT_DIR,
-                                    fruitPrefix + ".events");
-
-        runExpectingNullPointer(null, eOut, fOut, efOut, DEFAULT_CHARSET, false,
-                                false);
-        runExpectingNullPointer(instIn, null, fOut, efOut, DEFAULT_CHARSET,
-                                false, false);
-        runExpectingNullPointer(instIn, eOut, null, efOut, DEFAULT_CHARSET,
-                                false, false);
-        runExpectingNullPointer(instIn, eOut, fOut, null, DEFAULT_CHARSET, false,
-                                false);
-        runExpectingNullPointer(instIn, eOut, fOut, efOut, null, false, false);
-
-        File dir = TEST_OUTPUT_DIR;
-        runExpectingIllegalState(dir, eOut, fOut, efOut, DEFAULT_CHARSET, false,
-                                 false);
-        runExpectingIllegalState(instIn, dir, fOut, efOut, DEFAULT_CHARSET,
-                                 false, false);
-        runExpectingIllegalState(instIn, eOut, dir, efOut, DEFAULT_CHARSET,
-                                 false, false);
-        runExpectingIllegalState(instIn, eOut, fOut, dir, DEFAULT_CHARSET, false,
-                                 false);
+        final File efOut = new File(TEST_OUTPUT_DIR, fruitPrefix + ".events");
+        File[] files = new File[]{instIn, eOut, fOut, efOut};
+        files[repId] = repFile;
+        runWithAPI(files[0], files[1], files[2], files[3], DEFAULT_CHARSET,
+                false, false);
     }
-
 }

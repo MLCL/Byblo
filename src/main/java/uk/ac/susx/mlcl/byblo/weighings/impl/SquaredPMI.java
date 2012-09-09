@@ -30,20 +30,21 @@
  */
 package uk.ac.susx.mlcl.byblo.weighings.impl;
 
-import java.io.Serializable;
 import uk.ac.susx.mlcl.byblo.weighings.AbstractContextualWeighting;
 import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import java.io.Serializable;
+
 /**
  * Squared PMI.
- *
+ * <p/>
  * \[ pmi^2(x,y) = \log( p(x,y)^2 / (p(x)p(y)) ) \]
- *
+ * <p/>
  * Orientation of the scores is 0, log p(x,y), -infinity; for maximal positive
  * correlation, no correlation, and maximal negative correlation
- *
- *
+ * <p/>
+ * <p/>
  * Proposed in: Daille, B.: Approche mixte pour l'extraction automatique de
  * terminologie: statistiquesicales et ltres linguistiques. PhD thesis,
  * Universite Paris 7

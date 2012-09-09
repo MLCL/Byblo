@@ -30,12 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import uk.ac.susx.mlcl.byblo.measures.impl.LeeSkewDivergence;
-import uk.ac.susx.mlcl.byblo.measures.impl.LambdaDivergence;
-import uk.ac.susx.mlcl.byblo.measures.impl.KendallsTau;
-import uk.ac.susx.mlcl.byblo.measures.impl.LpSpaceDistance;
-import uk.ac.susx.mlcl.byblo.measures.impl.Weeds;
-import uk.ac.susx.mlcl.byblo.measures.impl.KullbackLeiblerDivergence;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
@@ -47,6 +41,7 @@ import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.byblo.BybloSettings;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDelegates;
@@ -55,6 +50,7 @@ import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource.WTStatsSource;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
 import uk.ac.susx.mlcl.byblo.measures.Measures;
+import uk.ac.susx.mlcl.byblo.measures.impl.*;
 import uk.ac.susx.mlcl.byblo.tasks.InvertedApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.NaiveApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.ThreadedApssTask;
@@ -64,16 +60,13 @@ import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.commands.*;
-import uk.ac.susx.mlcl.lib.events.ProgressEvent;
-import uk.ac.susx.mlcl.lib.events.ProgressListener;
+import uk.ac.susx.mlcl.lib.events.ReportLoggingProgressListener;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
-import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
 import java.io.Closeable;
 import java.io.File;
-import java.io.Flushable;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
@@ -172,8 +165,8 @@ public class AllPairsCommand extends AbstractCommand {
     private double minkP = LpSpaceDistance.DEFAULT_POWER;
 
     @Parameter(names = {"--lambda-lambda"},
-               description = "lambda parameter to Lambda-Divergence measure.",
-               converter = DoubleConverter.class)
+            description = "lambda parameter to Lambda-Divergence measure.",
+            converter = DoubleConverter.class)
     private double lambdaLambda = LambdaDivergence.DEFAULT_LAMBDA;
 
     private Weighting weighting = new NullWeighting();
@@ -295,8 +288,9 @@ public class AllPairsCommand extends AbstractCommand {
                 || measure instanceof KullbackLeiblerDivergence) {
             try {
                 if (LOG.isInfoEnabled()) {
-                    LOG.info("Loading entries file for "
-                            + "KendallsTau.minCardinality: " + getFeaturesFile());
+                    LOG.
+                            info("Loading entries file for "
+                                    + "KendallsTau.minCardinality: " + getFeaturesFile());
                 }
 
                 WTStatsSource features = new WTStatsSource(openFeaturesSource());
@@ -341,7 +335,8 @@ public class AllPairsCommand extends AbstractCommand {
         // Create a sink object that will act as a recipient for all pairs that
         // are produced by the algorithm.
 
-        final ObjectSink<Weighted<TokenPair>> sink = openSimsSink();
+        WeightedTokenPairSink sink = openSimsSink();
+
 
         final NaiveApssTask apss = newAlgorithmInstance();
 
@@ -354,21 +349,12 @@ public class AllPairsCommand extends AbstractCommand {
         apss.setProducatePair(getProductionFilter());
 
 
-        apss.addProgressListener(new ProgressListener() {
-
-            @Override
-            public void progressChanged(ProgressEvent progressEvent) {
-                LOG.info(progressEvent.getSource().getProgressReport());
-//                LOG.info(MiscUtil.memoryInfoString());
-            }
-        });
+        apss.addProgressListener(new ReportLoggingProgressListener(LOG));
 
         apss.run();
 
-        if (sink instanceof Flushable)
-            ((Flushable) sink).flush();
-        if (sink instanceof Closeable)
-            ((Closeable) sink).close();
+        sink.flush();
+        sink.close();
 
         if (sourceA instanceof Closeable)
             ((Closeable) sourceA).close();
@@ -495,7 +481,8 @@ public class AllPairsCommand extends AbstractCommand {
             throws ClassNotFoundException {
         final Map<String, Class<? extends Measure>> classLookup =
                 Measures.loadMeasureAliasTable();
-        final String mname = getMeasureName().toLowerCase().trim();
+
+        final String mname = getMeasureName().toLowerCase(BybloSettings.getLocale()).trim();
         if (classLookup.containsKey(mname)) {
             return classLookup.get(mname);
         } else {

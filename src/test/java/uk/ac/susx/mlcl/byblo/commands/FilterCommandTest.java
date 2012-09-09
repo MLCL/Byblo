@@ -44,6 +44,7 @@ import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.io.*;
 import uk.ac.susx.mlcl.lib.PoissonDistribution;
 import uk.ac.susx.mlcl.lib.ZipfianIntGenerator;
+import uk.ac.susx.mlcl.lib.commands.AbstractCommandTest;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import uk.ac.susx.mlcl.testing.SlowTestCategory;
 

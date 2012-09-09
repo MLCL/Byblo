@@ -66,7 +66,7 @@ public interface ProgressReporting {
     /**
      * Whether or not the ProgressReporting implementation supports progress
      * reporting as a percentage towards completion.
-     *
+     * <p/>
      * Not all ProgressReporting tasks can estimate the total progress towards
      * completion, for example because the task operates on a data stream of
      * unknown length. In this case the implementation should return false.
@@ -84,7 +84,6 @@ public interface ProgressReporting {
     State getState();
 
     /**
-     *
      * @return a human-readable string representing the current progress
      */
     String getProgressReport();
@@ -92,7 +91,7 @@ public interface ProgressReporting {
     /**
      * Attach a ProgressListener that will be notified when the progress changes
      * (presumably when it increases).
-     *
+     * <p/>
      * If the given progress listener is already attached then nothing will
      * change.
      *
@@ -102,7 +101,7 @@ public interface ProgressReporting {
 
     /**
      * Detach a ProgressListener from receiving progress change events.
-     *
+     * <p/>
      * If the listener is not already attached then nothing happens.
      *
      * @param progressListener listener to be removed

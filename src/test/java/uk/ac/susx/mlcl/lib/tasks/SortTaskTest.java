@@ -30,22 +30,21 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
+import org.junit.*;
+import uk.ac.susx.mlcl.lib.io.ObjectIO;
+import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.io.ObjectSource;
+import uk.ac.susx.mlcl.lib.tasks.MergeTaskTest.IntegerNaturalOrderComparator;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
-import org.junit.After;
-import org.junit.AfterClass;
-import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import uk.ac.susx.mlcl.lib.io.ObjectIO;
-import uk.ac.susx.mlcl.lib.io.ObjectSink;
-import uk.ac.susx.mlcl.lib.io.ObjectSource;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class SortTaskTest {
@@ -80,16 +79,10 @@ public class SortTaskTest {
 
         List<Integer> out = new ArrayList<Integer>();
 
-        ObjectSource<Integer> src = ObjectIO.asSource((Iterable<Integer>)in);
+        ObjectSource<Integer> src = ObjectIO.asSource((Iterable<Integer>) in);
         ObjectSink<Integer> sink = ObjectIO.asSink(out);
 
-        Comparator<Integer> comparator = new Comparator<Integer>() {
-
-            @Override
-            public int compare(Integer o1, Integer o2) {
-                return o1 - o2;
-            }
-        };
+        Comparator<Integer> comparator = new IntegerNaturalOrderComparator();
 
         ObjectSortTask<Integer> instance = new ObjectSortTask<Integer>();
         instance.setSource(src);

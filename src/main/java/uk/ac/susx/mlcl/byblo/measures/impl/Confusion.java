@@ -40,40 +40,36 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 /**
  * Proximity measure computing the confusion probability between the given
  * vector pair.
- *
+ * <p/>
  * <h4>Notes:</h4>
- *
+ * <p/>
  * <ul>
- *
+ * <p/>
  * <li>The implementation of this measure is rather strange because it requires
  * contextual information in a way totally unlike any other measure. Normally
  * when contextual information is required, it can be handled during
  * pre-weighting, but this measure is the exception.</li>
- *
+ * <p/>
  * <li>Unlikely all other measures, confusion has the property that an entry is
  * not necessarily the most similar entry to itself.</li>
- *
+ * <p/>
  * </ul>
  *
- * @see JE Weeds (2003) "Measures and Applications of Lexical Distributional
- * Similarity", which references (Sugawara, Nishimura, Toshioka, Okachi, &
- * Kaneko, 1985; Essen & Steinbiss, 1992; Grishman & Sterling, 1993; Dagan et
- * al., 1999; Lapata et al., 2001)
- *
- * @see Essen, Ute and Volker Steinbiss. 1992. Co-occurrence smoothing for
- * stochastic language modeling. In Proceedings of ICASSP, volume 1, pages
- * 161{164.
- *
- * @see Sugawara, K., M. Nishimura, K. Toshioka, M. Okochi, and T. Kaneko. 1985.
- * Isolated word recognition using hidden Markov models. In Proceedings of
- * ICASSP, pages 1--4, Tampa, Florida. IEEE.
- *
- * @see Grishman, Ralph and John Sterling. 1993. Smoothing of automatically
- * generated selectional constraints. In Human Language Technology, pages
- * 254{259, San Francisco, California. Advanced Research Projects Agency,
- * Software and Intelligent Systems Technology Oce, Morgan Kaufmann.
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @see JE Weeds (2003) "Measures and Applications of Lexical Distributional
+ *      Similarity", which references (Sugawara, Nishimura, Toshioka, Okachi, &
+ *      Kaneko, 1985; Essen & Steinbiss, 1992; Grishman & Sterling, 1993; Dagan et
+ *      al., 1999; Lapata et al., 2001)
+ * @see Essen, Ute and Volker Steinbiss. 1992. Co-occurrence smoothing for
+ *      stochastic language modeling. In Proceedings of ICASSP, volume 1, pages
+ *      161{164.
+ * @see Sugawara, K., M. Nishimura, K. Toshioka, M. Okochi, and T. Kaneko. 1985.
+ *      Isolated word recognition using hidden Markov models. In Proceedings of
+ *      ICASSP, pages 1--4, Tampa, Florida. IEEE.
+ * @see Grishman, Ralph and John Sterling. 1993. Smoothing of automatically
+ *      generated selectional constraints. In Human Language Technology, pages
+ *      254{259, San Francisco, California. Advanced Research Projects Agency,
+ *      Software and Intelligent Systems Technology Oce, Morgan Kaufmann.
  */
 public class Confusion implements Measure, FeatureMarginalsCarrier {
 

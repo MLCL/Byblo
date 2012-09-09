@@ -33,6 +33,7 @@ package uk.ac.susx.mlcl.byblo.measures;
 /*
  * Copyright (c) 2010, Hamish Morgan. All Rights Reserved.
  */
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -41,29 +42,28 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 /**
- *
  * @author hamish
  */
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    uk.ac.susx.mlcl.byblo.measures.MeasuresTest.class,
-    uk.ac.susx.mlcl.byblo.measures.impl.WeedsTest.class,
-    uk.ac.susx.mlcl.byblo.measures.impl.ConfusionTest.class,
-    uk.ac.susx.mlcl.byblo.measures.impl.DiceTest.class,
-    uk.ac.susx.mlcl.byblo.measures.impl.HindleTest.class,
-    uk.ac.susx.mlcl.byblo.measures.impl.KullbackLeiblerDivergenceTest.class,
-    uk.ac.susx.mlcl.byblo.measures.impl.JensenShannonDivergenceTest.class,
-    uk.ac.susx.mlcl.byblo.measures.impl.DotProductTest.class,
-    uk.ac.susx.mlcl.byblo.measures.impl.LpSpaceDistanceTest.class,
-    uk.ac.susx.mlcl.byblo.measures.impl.LinTest.class,
-    uk.ac.susx.mlcl.byblo.measures.impl.PrecisionTest.class,
-    uk.ac.susx.mlcl.byblo.measures.impl.JaccardTest.class,
-    uk.ac.susx.mlcl.byblo.measures.impl.RecallTest.class,
-    uk.ac.susx.mlcl.byblo.measures.impl.CosineTest.class,
-    uk.ac.susx.mlcl.byblo.measures.impl.LeeSkewDivergenceTest.class,
-    uk.ac.susx.mlcl.byblo.measures.impl.OverlapTest.class,
-    uk.ac.susx.mlcl.byblo.measures.impl.KendallsTauTest.class,
-    uk.ac.susx.mlcl.byblo.measures.impl.LambdaDivergenceTest.class})
+        uk.ac.susx.mlcl.byblo.measures.MeasuresTest.class,
+        uk.ac.susx.mlcl.byblo.measures.impl.WeedsTest.class,
+        uk.ac.susx.mlcl.byblo.measures.impl.ConfusionTest.class,
+        uk.ac.susx.mlcl.byblo.measures.impl.DiceTest.class,
+        uk.ac.susx.mlcl.byblo.measures.impl.HindleTest.class,
+        uk.ac.susx.mlcl.byblo.measures.impl.KullbackLeiblerDivergenceTest.class,
+        uk.ac.susx.mlcl.byblo.measures.impl.JensenShannonDivergenceTest.class,
+        uk.ac.susx.mlcl.byblo.measures.impl.DotProductTest.class,
+        uk.ac.susx.mlcl.byblo.measures.impl.LpSpaceDistanceTest.class,
+        uk.ac.susx.mlcl.byblo.measures.impl.LinTest.class,
+        uk.ac.susx.mlcl.byblo.measures.impl.PrecisionTest.class,
+        uk.ac.susx.mlcl.byblo.measures.impl.JaccardTest.class,
+        uk.ac.susx.mlcl.byblo.measures.impl.RecallTest.class,
+        uk.ac.susx.mlcl.byblo.measures.impl.CosineTest.class,
+        uk.ac.susx.mlcl.byblo.measures.impl.LeeSkewDivergenceTest.class,
+        uk.ac.susx.mlcl.byblo.measures.impl.OverlapTest.class,
+        uk.ac.susx.mlcl.byblo.measures.impl.KendallsTauTest.class,
+        uk.ac.susx.mlcl.byblo.measures.impl.LambdaDivergenceTest.class})
 public class MeasuresTestSuite {
 
     @BeforeClass

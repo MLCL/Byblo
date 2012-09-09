@@ -30,11 +30,11 @@
  */
 package uk.ac.susx.mlcl.byblo.weighings.impl;
 
-import java.io.Serializable;
-import java.text.MessageFormat;
 import uk.ac.susx.mlcl.byblo.weighings.AbstractSimpleWeighting;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
-import uk.ac.susx.mlcl.lib.Checks;
+
+import java.io.Serializable;
+import java.text.MessageFormat;
 
 /**
  * A {@link Weighting} bounds each feature weighting within a fixed range.
@@ -66,13 +66,13 @@ public class Bound
     }
 
     public void setLowerBound(final double lowerBound) {
-        if(Double.isNaN(lowerBound))
+        if (Double.isNaN(lowerBound))
             throw new IllegalArgumentException("lowerBound");
         this.lowerBound = lowerBound;
     }
 
     public void setUpperBound(final double upperBound) {
-        if(Double.isNaN(lowerBound))
+        if (Double.isNaN(lowerBound))
             throw new IllegalArgumentException("upperBound");
         this.upperBound = upperBound;
     }
@@ -99,7 +99,7 @@ public class Bound
     @Override
     public String toString() {
         return MessageFormat.format("Bound{{1},{2}}",
-                                    getLowerBound(), getUpperBound());
+                getLowerBound(), getUpperBound());
     }
 
     private boolean equals(Bound that) {

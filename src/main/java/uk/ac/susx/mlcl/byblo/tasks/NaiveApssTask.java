@@ -35,10 +35,6 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
@@ -49,10 +45,6 @@ import uk.ac.susx.mlcl.byblo.measures.impl.Jaccard;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.io.ObjectIO;
-import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
-import uk.ac.susx.mlcl.lib.io.ObjectSink;
-import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 import uk.ac.susx.mlcl.lib.events.ProgressDelegate;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.events.ProgressReporting;
@@ -61,13 +53,18 @@ import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * The most basic implementation of all-pairs similarity search. Will only
  * perform better than the inverted index approach {@link InvertedApssTask} with
  * very dense vectors.
  *
- * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <P> The generic-type for offset positions.
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class NaiveApssTask<P> extends AbstractTask
         implements ProgressReporting {

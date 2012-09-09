@@ -48,7 +48,7 @@ import uk.ac.susx.mlcl.lib.commands.*;
 import uk.ac.susx.mlcl.lib.events.ProgressAggregate;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.events.ProgressReporting;
-import uk.ac.susx.mlcl.lib.events.ReportingProgressListener;
+import uk.ac.susx.mlcl.lib.events.ReportLoggingProgressListener;
 import uk.ac.susx.mlcl.lib.io.*;
 import uk.ac.susx.mlcl.lib.tasks.FileDeleteTask;
 import uk.ac.susx.mlcl.lib.tasks.ObjectMergeTask;
@@ -241,9 +241,8 @@ public class ExternalCountCommand extends AbstractParallelCommandTask implements
     @Override
     protected void runTask() throws Exception {
 
+        progress.addProgressListener(new ReportLoggingProgressListener(LOG));
 
-        ProgressListener listener = new ReportingProgressListener();
-        progress.addProgressListener(listener);
 
         progress.startAdjusting();
         progress.setState(State.RUNNING);
@@ -264,7 +263,6 @@ public class ExternalCountCommand extends AbstractParallelCommandTask implements
 
         progress.setState(State.COMPLETED);
 
-        progress.removeProgressListener(listener);
     }
 
     void clearCompleted(boolean block) throws Exception {

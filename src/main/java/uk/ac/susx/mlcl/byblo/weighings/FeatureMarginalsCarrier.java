@@ -33,10 +33,10 @@ package uk.ac.susx.mlcl.byblo.weighings;
 /**
  * {@link FeatureMarginalsCarrier} denotes an implementation that requires the
  * feature marginal totals independent of entries.
- *
+ * <p/>
  * When implemented the marginals array will be provided by the software with
  * {@link FeatureMarginalsCarrier#setFeatureMarginals(double[])}.
- *
+ * <p/>
  * A relatively painless way to implement this interface is to create a field in
  * measure of type {@link FeatureMarginalsDelegate} class, then delegate
  * interface calls to this class.
@@ -46,8 +46,8 @@ package uk.ac.susx.mlcl.byblo.weighings;
 public interface FeatureMarginalsCarrier extends MarginalsCarrier {
 
     /**
-     * Accessor to an array containing a mapping from feature id to weighting.
-     *
+     * Get an array containing a mapping from feature id to weighting.
+     * <p/>
      * Stored as a double because it may have been waited in a pre-processing
      * stage, and as an array because it's usually dense.
      *

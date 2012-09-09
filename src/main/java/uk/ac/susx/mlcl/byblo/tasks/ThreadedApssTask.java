@@ -175,7 +175,8 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 task.setProcessRecord(getProcessRecord());
                 task.setSink(getSink());
                 task.setStats(getStats());
-                task.setProperty("chunkPair", MessageFormat.format("{0,number} and {1,number}", i, j));
+                task.setProperty("chunkPair", MessageFormat.format(
+                        "{0,number} and {1,number}", i, j));
                 queueTask(task);
                 ++queuedCount;
 
@@ -224,7 +225,8 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
                     completed.add(future);
 
                     progress.startAdjusting();
-                    progress.setMessage("Completed chunk pair " + t.getProperty("chunkPair"));
+                    progress.setMessage("Completed chunk pair " + t.getProperty(
+                            "chunkPair"));
                     updateProgress();
                     progress.endAdjusting();
                 }
@@ -244,7 +246,8 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 ++completedCount;
 
                 progress.startAdjusting();
-                progress.setMessage("Completed chunk pair " + t.getProperty("chunkPair"));
+                progress.setMessage("Completed chunk pair " + t.getProperty(
+                        "chunkPair"));
                 updateProgress();
                 progress.endAdjusting();
             }
@@ -269,12 +272,12 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
 
         throttle.acquire();
         final Runnable wrapper = new Runnable() {
-
             @Override
             public void run() {
                 try {
                     progress.startAdjusting();
-                    progress.setMessage("Starting chunk pair " + task.getProperty("chunkPair"));
+                    progress.setMessage("Starting chunk pair " + task.
+                            getProperty("chunkPair"));
                     updateProgress();
                     progress.endAdjusting();
 
@@ -283,12 +286,15 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
                     throttle.release();
                 }
             }
-
         };
 
         try {
             Future<T> future = getExecutor().submit(wrapper, task);
-            getFutureQueue().offer(future);
+            if (!getFutureQueue().add(future)) {
+                throw new AssertionError(MessageFormat.format(
+                        "Failed to add future {0} to futureQueue, "
+                                + "presumably because it already existed.", future));
+            }
         } catch (RejectedExecutionException e) {
             throttle.release();
             throw e;
@@ -302,11 +308,11 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
         return nThreads;
     }
 
-    protected synchronized final ExecutorService getExecutor() {
+    synchronized final ExecutorService getExecutor() {
         return executor;
     }
 
-    protected synchronized final Queue<Future<? extends Task>> getFutureQueue() {
+    synchronized final Queue<Future<? extends Task>> getFutureQueue() {
         return futureQueue;
     }
 
@@ -372,5 +378,4 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 add("futureQueue", futureQueue).
                 add("throttle", throttle);
     }
-
 }

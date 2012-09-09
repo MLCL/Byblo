@@ -33,6 +33,11 @@ package uk.ac.susx.mlcl.byblo.io;
 import com.google.common.base.Predicate;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
+import uk.ac.susx.mlcl.lib.collect.Indexed;
+import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+import uk.ac.susx.mlcl.lib.io.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.CharacterCodingException;
@@ -41,16 +46,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
-import uk.ac.susx.mlcl.lib.collect.Indexed;
-import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.io.Compact;
-import uk.ac.susx.mlcl.lib.io.Deltas;
-import uk.ac.susx.mlcl.lib.io.Enumerated;
-import uk.ac.susx.mlcl.lib.io.SeekableDataSource;
-import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
-import uk.ac.susx.mlcl.lib.io.TSV;
-import uk.ac.susx.mlcl.lib.io.Tell;
 
 /**
  * Wraps a (something) to produce complete feature
@@ -165,7 +160,7 @@ public class FastWeightedTokenPairVectorSource
         }
 
         SparseDoubleVector vec = new SparseDoubleVector(keys, values,
-                                                        cardinality, keys.length);
+                cardinality, keys.length);
         vec.compact();
         return vec;
     }
@@ -181,7 +176,7 @@ public class FastWeightedTokenPairVectorSource
 
                 @Override
                 public boolean apply(Integer column) {
-                    return column == 0;
+                    return column != null && column == 0;
                 }
 
             });
@@ -191,33 +186,33 @@ public class FastWeightedTokenPairVectorSource
 
                 @Override
                 public boolean apply(Integer column) {
-                    return (column + 1) % 2 == 0;
+                    return column != null && (column + 1) % 2 == 0;
                 }
 
             });
         }
         if (!idx.isEnumeratedEntries()) {
             tsv = Enumerated.enumerated(tsv, idx.getEntryEnumerator(),
-                                        new Predicate<Integer>() {
+                    new Predicate<Integer>() {
 
-                @Override
-                public boolean apply(Integer column) {
-                    return column == 0;
-                }
+                        @Override
+                        public boolean apply(Integer column) {
+                            return column != null && column == 0;
+                        }
 
-            });
+                    });
         }
 
         if (!idx.isEnumeratedFeatures()) {
             tsv = Enumerated.enumerated(tsv, idx.getFeatureEnumerator(),
-                                        new Predicate<Integer>() {
+                    new Predicate<Integer>() {
 
-                @Override
-                public boolean apply(Integer column) {
-                    return (column + 1) % 2 == 0;
-                }
+                        @Override
+                        public boolean apply(Integer column) {
+                            return column != null && (column + 1) % 2 == 0;
+                        }
 
-            });
+                    });
         }
 
         tsv = Compact.compact(tsv, 3);

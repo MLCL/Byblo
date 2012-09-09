@@ -34,10 +34,10 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public enum EnumeratorType {
+
     Memory {
         @Override
         public Enumerator<String> open(File file) throws IOException {
@@ -49,17 +49,19 @@ public enum EnumeratorType {
 
         @Override
         public void save(Enumerator<String> enumerator) throws IOException {
+            assert enumerator instanceof MemoryBasedStringEnumerator;
             ((MemoryBasedStringEnumerator) enumerator).save();
         }
 
         @Override
         public void close(Enumerator<String> enumerator) throws IOException {
+            assert enumerator instanceof MemoryBasedStringEnumerator;
         }
     }, JDBM {
         @Override
         public Enumerator<String> open(File file) {
             if (file == null) {
-                return JDBMStringEnumerator.newInstance(file);
+                return JDBMStringEnumerator.newInstance(null);
             } else if (!file.exists()) {
                 return JDBMStringEnumerator.newInstance(file);
             } else {
@@ -69,11 +71,13 @@ public enum EnumeratorType {
 
         @Override
         public void save(Enumerator<String> enumerator) throws IOException {
+            assert enumerator instanceof JDBMStringEnumerator;
             ((JDBMStringEnumerator) enumerator).save();
         }
 
         @Override
         public void close(Enumerator<String> enumerator) throws IOException {
+            assert enumerator instanceof JDBMStringEnumerator;
             ((JDBMStringEnumerator) enumerator).close();
         }
     };
@@ -83,5 +87,4 @@ public enum EnumeratorType {
     public abstract void save(Enumerator<String> enumerator) throws IOException;
 
     public abstract void close(Enumerator<String> enumerator) throws IOException;
-
 }

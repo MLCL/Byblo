@@ -31,20 +31,20 @@
 package uk.ac.susx.mlcl.lib.tasks;
 
 import com.google.common.base.Objects.ToStringHelper;
-import java.io.Closeable;
-import java.io.Flushable;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 
+import java.io.Closeable;
+import java.io.Flushable;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 /**
- *
  * @param <T>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -101,7 +101,7 @@ public final class ObjectSortTask<T> extends ObjectPipeTask<T> {
     public int hashCode() {
         int hash = super.hashCode();
         hash = 71 * hash + (this.comparator != null ? this.comparator.hashCode()
-                            : 0);
+                : 0);
         return hash;
     }
 

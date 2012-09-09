@@ -30,20 +30,21 @@
  */
 package uk.ac.susx.mlcl.byblo.weighings;
 
-import java.io.Serializable;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import java.io.Serializable;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 /**
  * A {@link Weighting} composed of one or more other weightings that will be
  * applied in sequence.
- *
+ * <p/>
  * Note that the weightings will only be applied to the feature vectors (the
  * conditional feature distributions), not on the marginal feature distribution.
  * This latter should be updated at the end of the sequence but not during.
@@ -71,16 +72,16 @@ public class CompositeWeighting implements Weighting, Serializable {
                     && LOG.isWarnEnabled()) {
                 LOG.warn(MessageFormat.format(
                         "Composite weighting sequence contains contextual "
-                        + "weighting ({0}) outside of the first position ({1})."
-                        + " This is unlikely to produce the correct result "
-                        + "because marginal distributions have not been updated.",
+                                + "weighting ({0}) outside of the first position ({1})."
+                                + " This is unlikely to produce the correct result "
+                                + "because marginal distributions have not been updated.",
                         this.childWeightings.get(i).toString(), 0));
             }
         }
     }
 
     public Weighting[] getChildWeightings() {
-        return childWeightings.toArray(new Weighting[0]);
+        return childWeightings.toArray(new Weighting[childWeightings.size()]);
     }
 
     @Override
@@ -121,7 +122,7 @@ public class CompositeWeighting implements Weighting, Serializable {
     protected boolean equals(CompositeWeighting that) {
         if (this.childWeightings != that.childWeightings
                 && (this.childWeightings == null
-                    || !this.childWeightings.equals(that.childWeightings)))
+                || !this.childWeightings.equals(that.childWeightings)))
             return false;
         return true;
     }
@@ -138,7 +139,7 @@ public class CompositeWeighting implements Weighting, Serializable {
     @Override
     public int hashCode() {
         return 73 * 79 + (this.childWeightings != null
-                          ? this.childWeightings.hashCode()
-                          : 0);
+                ? this.childWeightings.hashCode()
+                : 0);
     }
 }

@@ -34,13 +34,6 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.Flushable;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.Comparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
@@ -48,13 +41,17 @@ import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.tasks.ObjectMergeTask;
 
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.Comparator;
+
 /**
  * Merges the contents of two sorted source files, line by line, into a
  * destination file.
- *
+ * <p/>
  * The source files are assumed to already be ordered according to the
  * comparator.
- *
+ * <p/>
  * Any file denoted by the name string "-" is assumed to be standard-in in the
  * case of source files, and standard out in the case of destination files..
  *
@@ -69,7 +66,7 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
     private final FileMergeDelegate fileDelegate = new FileMergeDelegate();
 
     @Parameter(names = {"-r", "--reverse"},
-    description = "Reverse the result of comparisons.")
+            description = "Reverse the result of comparisons.")
     private boolean reverse = false;
 
     private Comparator<T> comparator;

@@ -33,13 +33,6 @@ package uk.ac.susx.mlcl.byblo.commands;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
-import java.io.Closeable;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.Flushable;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.Comparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -47,6 +40,10 @@ import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.tasks.ObjectSortTask;
+
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.Comparator;
 
 /**
  * Task that takes a single input file and sorts it according to some
@@ -61,7 +58,7 @@ public abstract class AbstractSortCommand<T> extends AbstractCopyCommand<T> {
     private static final Log LOG = LogFactory.getLog(AbstractSortCommand.class);
 
     @Parameter(names = {"-r", "--reverse"},
-    description = "Reverse the result of comparisons.")
+            description = "Reverse the result of comparisons.")
     private boolean reverse = false;
 
     private Comparator<T> comparator = null;
