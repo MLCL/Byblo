@@ -29,7 +29,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 /**
- * Common interfaces and abstract classes for measures of similarity, proximity,
- * and distance.
+ * Concrete implementations for measures of similarity, proximity, and distance.
  */
-package uk.ac.susx.mlcl.byblo.measures;
+package uk.ac.susx.mlcl.byblo.measures.impl;
