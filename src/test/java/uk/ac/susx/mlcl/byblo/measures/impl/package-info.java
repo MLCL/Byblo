@@ -28,12 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-/**
- * Contains classes related to the construction and maintenance of indexed
- * vocabularies of objects.
- */
-@ParametersAreNonnullByDefault 
-package uk.ac.susx.mlcl.byblo.enumerators;
+@ParametersAreNonnullByDefault
+package uk.ac.susx.mlcl.byblo.measures.impl;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-

@@ -31,4 +31,7 @@
 /**
  * Reusable collections functionality.
  */
+@ParametersAreNonnullByDefault
 package uk.ac.susx.mlcl.lib.collect;
+
+import javax.annotation.ParametersAreNonnullByDefault;

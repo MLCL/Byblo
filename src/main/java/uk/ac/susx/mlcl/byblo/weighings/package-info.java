@@ -35,9 +35,9 @@
  * <h3>Weighting Implementations</h3>
  *
  * There are currently four methods for implementing the {@link Weighting}
- * interface, to produce a re-weighting function. The reason for these
- * choices is that some methods are much simpler while others are allow for
- * greater flexibility:
+ * interface, to produce a re-weighting function. The reason for these choices
+ * is that some methods are much simpler while others are allow for greater
+ * flexibility:
  *
  * <ul>
  *
@@ -61,7 +61,8 @@
  *
  *
  * <li>{@link uk.ac.susx.mlcl.byblo.extras.weighings.AbstractContextualWeighting}
- * works in a mannar similar to {@link uk.ac.susx.mlcl.byblo.extras.weighings.AbstractElementwiseWeighting}
+ * works in a mannar similar to
+ * {@link uk.ac.susx.mlcl.byblo.extras.weighings.AbstractElementwiseWeighting}
  * but with even more information available through utility methods. For example
  * these class makes the marginal distributions available.
  *
@@ -99,4 +100,7 @@
  * <ul>
  *
  */
+@ParametersAreNonnullByDefault
 package uk.ac.susx.mlcl.byblo.weighings;
+
+import javax.annotation.ParametersAreNonnullByDefault;

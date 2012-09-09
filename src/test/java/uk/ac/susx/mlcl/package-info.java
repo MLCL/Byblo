@@ -29,11 +29,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 /**
- * Contains classes related to the construction and maintenance of indexed
- * vocabularies of objects.
+ * Top level test package contains general utilities to be used by the rest of
+ * the unit testing code-base.
  */
-@ParametersAreNonnullByDefault 
-package uk.ac.susx.mlcl.byblo.enumerators;
+@ParametersAreNonnullByDefault
+package uk.ac.susx.mlcl;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-

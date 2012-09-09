@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo.enumerators;
 
 import java.io.File;
 import java.io.IOException;
+import javax.annotation.Nullable;
 
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
@@ -40,7 +41,7 @@ public enum EnumeratorType {
 
     Memory {
         @Override
-        public Enumerator<String> open(File file) throws IOException {
+        public Enumerator<String> open(@Nullable File file) throws IOException {
             if (file != null && file.exists())
                 return MemoryBasedStringEnumerator.load(file);
             else
@@ -59,7 +60,7 @@ public enum EnumeratorType {
         }
     }, JDBM {
         @Override
-        public Enumerator<String> open(File file) {
+        public Enumerator<String> open(@Nullable File file) {
             if (file == null) {
                 return JDBMStringEnumerator.newInstance(null);
             } else if (!file.exists()) {

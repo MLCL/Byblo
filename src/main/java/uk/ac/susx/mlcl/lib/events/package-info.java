@@ -29,11 +29,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 /**
- * Contains classes related to the construction and maintenance of indexed
- * vocabularies of objects.
+ * Contains classes and interfaces from implementing the observer/observable
+ * pattern in various ways.
  */
-@ParametersAreNonnullByDefault 
-package uk.ac.susx.mlcl.byblo.enumerators;
+@ParametersAreNonnullByDefault
+package uk.ac.susx.mlcl.lib.events;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-

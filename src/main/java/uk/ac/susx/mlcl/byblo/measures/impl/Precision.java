@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
+import javax.annotation.concurrent.Immutable;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 /**
@@ -60,6 +61,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@Immutable
 public class Precision extends Recall {
 
     private static final long serialVersionUID = 1L;
