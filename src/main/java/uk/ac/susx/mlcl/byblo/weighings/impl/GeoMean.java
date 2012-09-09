@@ -53,7 +53,8 @@ public final class GeoMean
     @Override
     public double apply(final SparseDoubleVector vector,
                         final int key, final double value) {
-        return value / Math.sqrt(vector.sum * getFeatureMarginal(key));
+        return value / Math.sqrt(vector.sum * getFeatureMarginals().
+                getFrequency(key));
     }
 
     @Override

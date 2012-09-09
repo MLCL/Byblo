@@ -86,5 +86,4 @@ public class FileMoveTask extends FileCopyTask {
         progress.setState(State.COMPLETED);
 
     }
-
 }

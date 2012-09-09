@@ -95,5 +95,4 @@ public class ExternalSortInstancesCommand extends AbstractExternalSortCommand<To
         Checks.checkNotNull("indexDelegate", indexDelegate);
         this.indexDelegate = indexDelegate;
     }
-
 }

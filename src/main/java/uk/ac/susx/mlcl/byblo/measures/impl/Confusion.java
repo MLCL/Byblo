@@ -30,10 +30,11 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsCarrier;
-import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsDelegate;
+import uk.ac.susx.mlcl.byblo.weighings.MarginalDistribution;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
@@ -75,14 +76,34 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 @Immutable
 public class Confusion implements Measure, FeatureMarginalsCarrier {
 
-    private final FeatureMarginalsDelegate featureMarginals =
-            new FeatureMarginalsDelegate();
+    @Nullable
+    private MarginalDistribution featureMarginals = null;
 
     public Confusion() {
     }
 
     @Override
+    public MarginalDistribution getFeatureMarginals() {
+        if (featureMarginals == null)
+            throw new IllegalStateException(
+                    "marginals requested before they where set.");
+        return featureMarginals;
+    }
+
+    @Override
+    public void setFeatureMarginals(MarginalDistribution featureMarginals) {
+        this.featureMarginals = featureMarginals;
+    }
+
+    @Override
+    public boolean isFeatureMarginalsSet() {
+        return featureMarginals != null;
+    }
+
+    @Override
     public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
+        final double N = featureMarginals.getFrequencySum();
+
         double sum = 0.0;
 
         int i = 0;
@@ -95,8 +116,8 @@ public class Confusion implements Measure, FeatureMarginalsCarrier {
             } else {
                 final double pFEa = A.values[i] / A.sum;
                 final double pFEb = B.values[j] / B.sum;
-                final double pF = featureMarginals.getFeaturePrior(A.keys[i]);
-                final double pEa = A.sum / featureMarginals.getGrandTotal();
+                final double pF = featureMarginals.getPrior(A.keys[i]);
+                final double pEa = A.sum / N;
                 if (pFEa * pFEb * pEa * pF > 0)
                     sum += pFEa * pFEb * pEa / pF;
                 ++i;
@@ -125,36 +146,6 @@ public class Confusion implements Measure, FeatureMarginalsCarrier {
     @Override
     public boolean isCommutative() {
         return false;
-    }
-
-    @Override
-    public final double getGrandTotal() {
-        return featureMarginals.getGrandTotal();
-    }
-
-    @Override
-    public final double[] getFeatureMarginals() {
-        return featureMarginals.getFeatureMarginals();
-    }
-
-    @Override
-    public final long getFeatureCardinality() {
-        return featureMarginals.getFeatureCardinality();
-    }
-
-    @Override
-    public final void setGrandTotal(double featureFrequencySum) {
-        featureMarginals.setGrandTotal(featureFrequencySum);
-    }
-
-    @Override
-    public final void setFeatureMarginals(double[] featureFrequencies) {
-        featureMarginals.setFeatureMarginals(featureFrequencies);
-    }
-
-    @Override
-    public final void setFeatureCardinality(long occuringFeatureCount) {
-        featureMarginals.setFeatureCardinality(occuringFeatureCount);
     }
 
     @Override

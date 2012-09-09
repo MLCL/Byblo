@@ -70,7 +70,8 @@ public class CompositeWeighting implements Weighting, Serializable {
         for (int i = 1; i < this.childWeightings.size(); i++) {
             if (this.childWeightings.get(i) instanceof FeatureMarginalsCarrier
                     && LOG.isWarnEnabled()) {
-                LOG.warn(MessageFormat.format(
+                LOG.warn(MessageFormat.
+                        format(
                         "Composite weighting sequence contains contextual "
                                 + "weighting ({0}) outside of the first position ({1})."
                                 + " This is unlikely to produce the correct result "

@@ -59,13 +59,14 @@ public final class TTest
     @Override
     public double apply(SparseDoubleVector vector, int key, double value) {
         final double featureLikelihood = value / vector.sum;
-        final double entryPrior = vector.sum / getGrandTotal();
+        final double entryPrior = vector.sum / getFeatureMarginals().
+                getFrequencySum();
 
         // Ha: the joint distirbution
         final double jointDist = featureLikelihood * entryPrior;
 
         // H0: the product distirbution
-        final double prodDist = entryPrior * getFeaturePrior(key);
+        final double prodDist = entryPrior * getFeatureMarginals().getPrior(key);
 
         return (jointDist - prodDist) / Math.sqrt(prodDist);
     }

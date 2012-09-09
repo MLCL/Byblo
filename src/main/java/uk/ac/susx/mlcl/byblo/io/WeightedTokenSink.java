@@ -105,12 +105,10 @@ public class WeightedTokenSink implements ObjectSink<Weighted<Token>>, Closeable
 
         if (skip1) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
-
                 @Override
                 public boolean apply(Integer column) {
                     return column != null && column == 0;
                 }
-
             });
         }
 
@@ -118,5 +116,4 @@ public class WeightedTokenSink implements ObjectSink<Weighted<Token>>, Closeable
             tsv = Enumerated.enumerated(tsv, idx.getEnumerator());
         return new WeightedTokenSink(tsv);
     }
-
 }

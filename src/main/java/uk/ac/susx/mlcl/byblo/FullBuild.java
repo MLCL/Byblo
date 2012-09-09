@@ -419,7 +419,8 @@ public final class FullBuild extends AbstractCommand {
             sb.append("\nStats:\n");
             sb.append(MessageFormat.format(
                     " * End time: {0,time,full} {0,date,full}\n", endTime));
-            sb.append(
+            sb.
+                    append(
                     MessageFormat.format(" * Ellapsed time: {0}\n",
                             formatElapsedTime(endTime - startTime)));
             sb.append(MessageFormat.format(" * {0}\n",
@@ -491,7 +492,8 @@ public final class FullBuild extends AbstractCommand {
             sb.append("\nStats:\n");
             sb.append(MessageFormat.format(
                     " * End time: {0,time,full} {0,date,full}\n", endTime));
-            sb.append(
+            sb.
+                    append(
                     MessageFormat.format(" * Ellapsed time: {0}\n",
                             formatElapsedTime(endTime - startTime)));
 
@@ -609,7 +611,8 @@ public final class FullBuild extends AbstractCommand {
             sb.append("\nStats:\n");
             sb.append(MessageFormat.format(
                     " * End time: {0,time,full} {0,date,full}\n", endTime));
-            sb.append(
+            sb.
+                    append(
                     MessageFormat.format(" * Ellapsed time: {0}\n",
                             formatElapsedTime(endTime - startTime)));
             sb.append(MessageFormat.format(" * {0}\n",
@@ -689,7 +692,8 @@ public final class FullBuild extends AbstractCommand {
             sb.append("\nStats:\n");
             sb.append(MessageFormat.format(
                     " * End time: {0,time,full} {0,date,full}\n", endTime));
-            sb.append(
+            sb.
+                    append(
                     MessageFormat.format(" * Ellapsed time: {0}\n",
                             formatElapsedTime(endTime - startTime)));
             sb.append(MessageFormat.format(" * {0}\n",
@@ -748,7 +752,8 @@ public final class FullBuild extends AbstractCommand {
             sb.append("\nStats:\n");
             sb.append(MessageFormat.format(
                     " * End time: {0,time,full} {0,date,full}\n", endTime));
-            sb.append(
+            sb.
+                    append(
                     MessageFormat.format(" * Ellapsed time: {0}\n",
                             formatElapsedTime(endTime - startTime)));
             sb.append(MessageFormat.format(" * {0}\n",
@@ -805,7 +810,8 @@ public final class FullBuild extends AbstractCommand {
             sb.append("\nStats:\n");
             sb.append(MessageFormat.format(
                     " * End time: {0,time,full} {0,date,full}\n", endTime));
-            sb.append(
+            sb.
+                    append(
                     MessageFormat.format(" * Ellapsed time: {0}\n",
                             formatElapsedTime(endTime - startTime)));
             sb.append(MessageFormat.format(" * {0}\n",

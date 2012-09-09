@@ -83,5 +83,4 @@ public class FileDeleteCommandTest  extends AbstractCommandTest<FileDeleteComman
 
         jc.usage();
     }
-
 }

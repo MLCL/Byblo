@@ -79,8 +79,8 @@ public final class KullbackLeiblerDivergence implements Measure, Serializable {
      * <tt>minCardinality</tt>.
      *
      * @param minCardinality expected dimensionality of vectors
-     * @throws IllegalArgumentException when
-     *                                  <code>minCardinality</code> is negative
+     * @throws IllegalArgumentException when <code>minCardinality</code> is
+     * negative
      */
     public KullbackLeiblerDivergence(final int minCardinality)
             throws IllegalArgumentException {
@@ -103,8 +103,8 @@ public final class KullbackLeiblerDivergence implements Measure, Serializable {
      * vectors for some reason, then method can be used to set it globally.
      *
      * @param minCardinality expected dimensionality of vectors
-     * @throws IllegalArgumentException when
-     *                                  <code>minCardinality</code> is negative
+     * @throws IllegalArgumentException when <code>minCardinality</code> is
+     * negative
      */
     public final void setMinCardinality(int minCardinality)
             throws IllegalArgumentException {

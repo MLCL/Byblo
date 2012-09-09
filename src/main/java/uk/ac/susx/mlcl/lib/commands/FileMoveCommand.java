@@ -94,5 +94,4 @@ public final class FileMoveCommand extends AbstractCommand {
                 add("from", filesDelegate.getSourceFile()).
                 add("to", filesDelegate.getDestinationFile());
     }
-
 }

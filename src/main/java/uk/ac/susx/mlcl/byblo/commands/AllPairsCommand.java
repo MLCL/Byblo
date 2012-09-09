@@ -55,6 +55,7 @@ import uk.ac.susx.mlcl.byblo.tasks.InvertedApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.NaiveApssTask;
 import uk.ac.susx.mlcl.byblo.tasks.ThreadedApssTask;
 import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsCarrier;
+import uk.ac.susx.mlcl.byblo.weighings.MarginalDistribution;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
@@ -69,7 +70,6 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -113,7 +113,7 @@ public class AllPairsCommand extends AbstractCommand {
     private File outputFile;
 
     @Parameter(names = {"-t", "--threads"},
-            description = "Number of concurrent processing threads.")
+            description = "Number of conccurent processing threads.")
     private int numThreads = Runtime.getRuntime().availableProcessors() + 1;
 
     public static final double DEFAULT_MIN_SIMILARITY = Double.NEGATIVE_INFINITY;
@@ -126,7 +126,7 @@ public class AllPairsCommand extends AbstractCommand {
     private double minSimilarity = DEFAULT_MIN_SIMILARITY;
 
     @Parameter(names = {"-Smx", "--similarity-max"},
-            description = "Maximum similarity threshold.",
+            description = "Maximyum similarity threshold.",
             converter = DoubleConverter.class)
     private double maxSimilarity = DEFAULT_MAX_SIMILARITY;
 
@@ -260,24 +260,14 @@ public class AllPairsCommand extends AbstractCommand {
                     LOG.info("Loading features file " + getFeaturesFile());
                 }
 
-                WTStatsSource features = new WTStatsSource(openFeaturesSource());
-
-                final double[] featureMarginals = readAllAsArray(features);
-                final double grandTotal = features.getWeightSum();
-                final int featureCardinality = features.getMaxId() + 1;
+                final MarginalDistribution fmd = BybloIO.readMarginalDistribution(openFeaturesSource());
 
                 if (measure instanceof FeatureMarginalsCarrier) {
-                    FeatureMarginalsCarrier fmc = ((FeatureMarginalsCarrier) measure);
-                    fmc.setFeatureMarginals(featureMarginals);
-                    fmc.setGrandTotal(grandTotal);
-                    fmc.setFeatureCardinality(featureCardinality);
+                    ((FeatureMarginalsCarrier) measure).setFeatureMarginals(fmd);
                 }
 
                 if (weighting instanceof FeatureMarginalsCarrier) {
-                    FeatureMarginalsCarrier fmc = ((FeatureMarginalsCarrier) weighting);
-                    fmc.setFeatureMarginals(featureMarginals);
-                    fmc.setGrandTotal(grandTotal);
-                    fmc.setFeatureCardinality(featureCardinality);
+                    ((FeatureMarginalsCarrier) weighting).setFeatureMarginals(fmd);
                 }
 
 
@@ -325,8 +315,8 @@ public class AllPairsCommand extends AbstractCommand {
 
         // Instantiate two vector source objects than can scan and read the
         // main db. We need two because the algorithm takes all pairwise
-        // combinations of vectors, so will be looking at two different points
-        // in the file. Also this allows for the possibility of having different
+        // combinations of vectors, so will be looking at two differnt points
+        // in the file. Also this allows for the possibility of having differnt
         // files, e.g compare fruit words with cake words
         final FastWeightedTokenPairVectorSource sourceA = openEventsSource();
         final FastWeightedTokenPairVectorSource sourceB = openEventsSource();
@@ -392,9 +382,12 @@ public class AllPairsCommand extends AbstractCommand {
                 final double newFreq = oldFreq + entry.weight();
 
                 if (LOG.isWarnEnabled())
-                    LOG.warn(MessageFormat.format(
-                            "Found duplicate entry (id={0}); merging records. Frequency before: {1}, after: {2}.",
-                            entry.record().id(), oldFreq, newFreq));
+                    LOG.
+                            warn("Found duplicate Entry \""
+                                    + (entry.record().id())
+                                    + "\" (id=" + id
+                                    + ") in entries file. Merging records. Old frequency = "
+                                    + oldFreq + ", new frequency = " + newFreq + ".");
 
                 entityFrequenciesMap.put(id, newFreq);
             } else {
@@ -456,15 +449,19 @@ public class AllPairsCommand extends AbstractCommand {
                 new ArrayList<Predicate<Weighted<TokenPair>>>();
 
         if (getMinSimilarity() != Double.NEGATIVE_INFINITY) {
-            pairFilters.add(Weighted.<TokenPair>greaterThanOrEqualTo(getMinSimilarity()));
+            pairFilters.add(Weighted.<TokenPair>greaterThanOrEqualTo(
+                    getMinSimilarity()));
         }
 
         if (getMaxSimilarity() != Double.POSITIVE_INFINITY) {
-            pairFilters.add(Weighted.<TokenPair>lessThanOrEqualTo(getMaxSimilarity()));
+            pairFilters.add(Weighted.<TokenPair>lessThanOrEqualTo(
+                    getMaxSimilarity()));
         }
 
         if (!isOutputIdentityPairs()) {
-            pairFilters.add(Predicates.not(Predicates.compose(TokenPair.identity(), Weighted.<TokenPair>recordFunction())));
+            pairFilters.
+                    add(Predicates.not(Predicates.compose(
+                            TokenPair.identity(), Weighted.<TokenPair>recordFunction())));
         }
 
         if (pairFilters.size() == 1) {
@@ -586,7 +583,8 @@ public class AllPairsCommand extends AbstractCommand {
     }
 
     public final void setMaxSimilarity(double maxSimilarity) {
-        Checks.checkRangeIncl("maxSimilarity", maxSimilarity, 0, Double.POSITIVE_INFINITY);
+        Checks.checkRangeIncl("maxSimilarity", maxSimilarity, 0,
+                Double.POSITIVE_INFINITY);
         this.maxSimilarity = maxSimilarity;
     }
 

@@ -59,10 +59,12 @@ public final class SquaredPMI
 
     @Override
     public double apply(SparseDoubleVector vector, int key, double value) {
-        final double logProbability = Weightings.log2(value / getGrandTotal());
-        final double logFeaturePrior = Weightings.log2(getFeaturePrior(key));
+        final double N = getFeatureMarginals().getFrequencySum();
+        final double logProbability = Weightings.log2(value / N);
+        final double logFeaturePrior = Weightings.log2(getFeatureMarginals().
+                getPrior(key));
         final double logEntryPrior = Weightings.log2(
-                vector.sum / getGrandTotal());
+                vector.sum / N);
 
         return 2 * logProbability - (logEntryPrior + logFeaturePrior);
     }

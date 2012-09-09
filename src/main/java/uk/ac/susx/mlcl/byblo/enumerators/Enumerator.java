@@ -68,5 +68,4 @@ public interface Enumerator<T> extends Iterable<Entry<Integer, T>> {
      * @throws IllegalArgumentException when index is negative
      */
     T valueOf(final int index);
-
 }

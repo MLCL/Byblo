@@ -47,5 +47,4 @@ public interface ProgressListener extends EventListener {
      * @param progressEvent
      */
     void progressChanged(ProgressEvent progressEvent);
-
 }

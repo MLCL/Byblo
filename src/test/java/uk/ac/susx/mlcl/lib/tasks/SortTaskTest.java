@@ -96,5 +96,4 @@ public class SortTaskTest {
             assertTrue(out.get(i - 1) <= out.get(i));
 
     }
-
 }

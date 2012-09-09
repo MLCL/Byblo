@@ -31,47 +31,18 @@
 package uk.ac.susx.mlcl.byblo.weighings;
 
 /**
- * {@link EntryMarginalsCarrier} denotes an implementation that requires the
- * entry marginal totals independent of feature.
- * <p/>
- * When implemented the marginals array will be provided by the software with
- * {@link EntryMarginalsCarrier#setEntryMarginals(double[])}.
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public interface EntryMarginalsCarrier extends MarginalsCarrier {
+public interface EntryMarginalsCarrier {
 
     /**
-     * Accessor to an array containing a mapping from entry id to weighting.
-     * <p/>
-     * Stored as a double because it may have been waited in a pre-processing
-     * stage, and as an array because it's usually dense.
      *
-     * @return marginal scores for each entry
+     * @return @throws IllegalStateException if marginals are requested before
+     * they are set
      */
-    double[] getEntryMarginals();
+    MarginalDistribution getEntryMarginals() throws IllegalStateException;
 
-    /**
-     * Accessor to the number of entries that are actually occurring at least
-     * once. Due to pre-processing an entry may have been previously filtered,
-     * resulting in this value being less than t
-     *
-     * @return number of actually occurring entry types
-     */
-    long getEntryCardinality();
+    boolean isEntryMarginalsSet();
 
-    /**
-     * Mutator to an array containing a mapping from entry id to weighting.
-     *
-     * @param marginals marginal scores for each entry
-     */
-    void setEntryMarginals(double[] marginals);
-
-    /**
-     * Mutator to the number of entries that are actually occurring at least
-     * once.
-     *
-     * @param cardinality number of actually occurring entry types
-     */
-    void setEntryCardinality(long cardinality);
+    void setEntryMarginals(MarginalDistribution distribution);
 }

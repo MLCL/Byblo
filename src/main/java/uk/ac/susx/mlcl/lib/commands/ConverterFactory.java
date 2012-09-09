@@ -53,8 +53,8 @@ public final class ConverterFactory implements IStringConverterFactory {
 
     @SuppressWarnings(value = "unchecked")
     @Override
-    public <T> Class<? extends IStringConverter<T>> getConverter(Class<T> forType) {
+    public <T> Class<? extends IStringConverter<T>> getConverter(
+            Class<T> forType) {
         return (Class<? extends IStringConverter<T>>) conv.get(forType);
     }
-
 }

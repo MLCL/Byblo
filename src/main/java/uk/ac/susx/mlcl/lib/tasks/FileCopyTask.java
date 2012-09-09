@@ -168,5 +168,4 @@ public class FileCopyTask extends AbstractTask implements ProgressReporting {
     public void addProgressListener(ProgressListener progressListener) {
         progress.addProgressListener(progressListener);
     }
-
 }

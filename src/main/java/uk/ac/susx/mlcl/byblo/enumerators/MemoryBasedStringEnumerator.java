@@ -36,6 +36,7 @@ import uk.ac.susx.mlcl.lib.collect.ForwardingBiMap;
 import uk.ac.susx.mlcl.lib.io.Files;
 import uk.ac.susx.mlcl.lib.io.TSV;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -51,7 +52,9 @@ public final class MemoryBasedStringEnumerator extends BiMapEnumerator<String> {
 
     private static final long serialVersionUID = 1L;
 
-    private final File file;
+    private final
+    @Nullable
+    File file;
 
     public MemoryBasedStringEnumerator(File file) {
         super();
@@ -59,7 +62,8 @@ public final class MemoryBasedStringEnumerator extends BiMapEnumerator<String> {
     }
 
     public MemoryBasedStringEnumerator(
-            File file, BiMap<Integer, String> map, AtomicInteger nextId) {
+            @Nullable File file, BiMap<Integer, String> map,
+            AtomicInteger nextId) {
         super(map, nextId);
         this.file = file;
     }

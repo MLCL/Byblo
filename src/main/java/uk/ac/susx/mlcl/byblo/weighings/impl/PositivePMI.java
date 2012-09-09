@@ -48,7 +48,7 @@ public final class PositivePMI
     @Override
     public double apply(SparseDoubleVector vector, int key, double value) {
         double likelihood = value / vector.sum;
-        double prior = getFeaturePrior(key);
+        double prior = getFeatureMarginals().getPrior(key);
 
         if (likelihood > prior)
             return (Weightings.log2(likelihood) - Weightings.log2(prior));

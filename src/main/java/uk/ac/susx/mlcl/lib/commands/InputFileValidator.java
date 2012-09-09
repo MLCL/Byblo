@@ -28,7 +28,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-
 package uk.ac.susx.mlcl.lib.commands;
 
 import com.beust.jcommander.IParameterValidator;
@@ -51,17 +50,20 @@ public final class InputFileValidator implements IParameterValidator {
             throw new ParameterException(ex);
         }
         if (!file.exists()) {
-            throw new ParameterException("Input file \"" + value + "\" does not exist.");
+            throw new ParameterException(
+                    "Input file \"" + value + "\" does not exist.");
         }
         if (file.isDirectory()) {
-            throw new ParameterException("Input file \"" + value + "\" exists but is a directory.");
+            throw new ParameterException(
+                    "Input file \"" + value + "\" exists but is a directory.");
         }
         if (!file.isFile()) {
-            throw new ParameterException("Input file \"" + value + "\" is not an ordinary file.");
+            throw new ParameterException(
+                    "Input file \"" + value + "\" is not an ordinary file.");
         }
         if (!file.canRead()) {
-            throw new ParameterException("Input file \"" + value + "\" is not readble.");
+            throw new ParameterException(
+                    "Input file \"" + value + "\" is not readble.");
         }
     }
-
 }

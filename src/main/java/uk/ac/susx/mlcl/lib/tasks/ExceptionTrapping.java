@@ -69,5 +69,4 @@ public interface ExceptionTrapping {
      * @throws Exception the exception
      */
     void throwTrappedException() throws Exception;
-
 }

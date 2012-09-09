@@ -51,7 +51,8 @@ public final class PMI
     @Override
     public double apply(SparseDoubleVector vector, int key, double value) {
         final double logLikelihood = Weightings.log2(value / vector.sum);
-        final double logPrior = Weightings.log2(getFeaturePrior(key));
+        final double logPrior = Weightings.log2(getFeatureMarginals().getPrior(
+                key));
         return logLikelihood - logPrior;
     }
 

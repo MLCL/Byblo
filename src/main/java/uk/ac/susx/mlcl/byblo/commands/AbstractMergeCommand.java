@@ -71,7 +71,8 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
 
     private Comparator<T> comparator;
 
-    public AbstractMergeCommand(File sourceFileA, File sourceFileB, File destination,
+    public AbstractMergeCommand(File sourceFileA, File sourceFileB,
+                                File destination,
                                 Charset charset, Comparator<T> comparator) {
         fileDelegate.setSourceFileA(sourceFileA);
         fileDelegate.setSourceFileB(sourceFileB);
@@ -145,5 +146,4 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
     protected abstract ObjectSource<T> openSource(File file) throws FileNotFoundException, IOException;
 
     protected abstract ObjectSink<T> openSink(File file) throws FileNotFoundException, IOException;
-
 }

@@ -43,5 +43,4 @@ public final class CharsetStringConverter implements IStringConverter<Charset> {
     public Charset convert(String string) {
         return Charset.forName(string);
     }
-
 }

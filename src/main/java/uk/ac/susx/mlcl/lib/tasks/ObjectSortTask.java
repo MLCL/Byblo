@@ -54,7 +54,8 @@ public final class ObjectSortTask<T> extends ObjectPipeTask<T> {
 
     private Comparator<T> comparator;
 
-    public ObjectSortTask(ObjectSource<T> source, ObjectSink<T> sink, Comparator<T> comparator) {
+    public ObjectSortTask(ObjectSource<T> source, ObjectSink<T> sink,
+                          Comparator<T> comparator) {
         super(source, sink);
         setComparator(comparator);
     }
@@ -83,8 +84,8 @@ public final class ObjectSortTask<T> extends ObjectPipeTask<T> {
             return false;
         if (this.getComparator() != other.getComparator()
                 && (this.getComparator() == null
-                || !this.getComparator().
-                equals(other.getComparator())))
+                    || !this.getComparator().
+                    equals(other.getComparator())))
             return false;
         return true;
 
@@ -143,5 +144,4 @@ public final class ObjectSortTask<T> extends ObjectPipeTask<T> {
         return super.toStringHelper().
                 add("comparator", getComparator());
     }
-
 }

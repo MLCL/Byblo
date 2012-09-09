@@ -129,10 +129,12 @@ public class ObjectPipeTask<T> extends AbstractTask
         if (!super.equals((AbstractTask) that))
             return false;
         if (this.getSource() != that.getSource()
-                && (this.getSource() == null || !this.getSource().equals(that.getSource())))
+                && (this.getSource() == null || !this.getSource().equals(that.
+                    getSource())))
             return false;
         if (this.getSink() != that.getSink()
-                && (this.getSink() == null || !this.getSink().equals(that.getSink())))
+                && (this.getSink() == null || !this.getSink().equals(that.
+                    getSink())))
             return false;
         return true;
     }
@@ -193,5 +195,4 @@ public class ObjectPipeTask<T> extends AbstractTask
     public State getState() {
         return progress.getState();
     }
-
 }

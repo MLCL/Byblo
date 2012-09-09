@@ -58,7 +58,8 @@ public final class TempFileFactoryConverter implements IStringConverter<TempFile
         File tmpDir = inner.convert(value);
         if (!tmpDir.exists()) {
             if (LOG.isDebugEnabled())
-                LOG.debug(
+                LOG.
+                        debug(
                         "Attempting to create temporary directory: \"" + tmpDir + "\"");
             if (!tmpDir.mkdirs()) {
                 throw new ParameterException(

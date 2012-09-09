@@ -63,13 +63,15 @@ public abstract class AbstractSortCommand<T> extends AbstractCopyCommand<T> {
 
     private Comparator<T> comparator = null;
 
-    public AbstractSortCommand(File sourceFile, File destinationFile, Charset charset,
+    public AbstractSortCommand(File sourceFile, File destinationFile,
+                               Charset charset,
                                Comparator<T> comparator) {
         super(sourceFile, destinationFile, charset);
         this.comparator = comparator;
     }
 
-    public AbstractSortCommand(File sourceFile, File destinationFile, Charset charset) {
+    public AbstractSortCommand(File sourceFile, File destinationFile,
+                               Charset charset) {
         super(sourceFile, destinationFile, charset);
     }
 
@@ -149,5 +151,4 @@ public abstract class AbstractSortCommand<T> extends AbstractCopyCommand<T> {
     @Override
     protected abstract ObjectSink<T> openSink(File file)
             throws FileNotFoundException, IOException;
-
 }

@@ -182,7 +182,6 @@ public class HindleTest {
         assertEquals(expect, actual, EPSILON);
     }
 
-
     @Test
     public void testHeteroginiety() throws Exception {
         System.out.println("testHeteroginiety");

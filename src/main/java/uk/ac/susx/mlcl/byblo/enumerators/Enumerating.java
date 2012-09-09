@@ -55,5 +55,4 @@ public interface Enumerating {
     EnumeratorType getEnumeratorType();
 
     void setEnumeratorType(EnumeratorType type);
-
 }

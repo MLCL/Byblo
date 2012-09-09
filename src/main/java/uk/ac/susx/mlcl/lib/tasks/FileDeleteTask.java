@@ -143,5 +143,4 @@ public class FileDeleteTask extends AbstractTask
     protected Objects.ToStringHelper toStringHelper() {
         return super.toStringHelper().add("file", file);
     }
-
 }

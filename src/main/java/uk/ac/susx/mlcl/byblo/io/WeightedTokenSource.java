@@ -86,12 +86,10 @@ public class WeightedTokenSource
 
         if (skip1) {
             tsv = Deltas.deltaInt(tsv, new Predicate<Integer>() {
-
                 @Override
                 public boolean apply(Integer column) {
                     return column != null && column == 0;
                 }
-
             });
         }
 
@@ -139,6 +137,5 @@ public class WeightedTokenSource
             maxId = Math.max(maxId, wt.record().id());
             return wt;
         }
-
     }
 }

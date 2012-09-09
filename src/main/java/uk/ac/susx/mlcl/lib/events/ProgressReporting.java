@@ -112,5 +112,4 @@ public interface ProgressReporting {
      * @return array of currently attached listeners.
      */
     ProgressListener[] getProgressListeners();
-
 }

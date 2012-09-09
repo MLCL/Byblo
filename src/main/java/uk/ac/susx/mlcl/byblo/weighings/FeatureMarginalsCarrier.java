@@ -31,51 +31,18 @@
 package uk.ac.susx.mlcl.byblo.weighings;
 
 /**
- * {@link FeatureMarginalsCarrier} denotes an implementation that requires the
- * feature marginal totals independent of entries.
- * <p/>
- * When implemented the marginals array will be provided by the software with
- * {@link FeatureMarginalsCarrier#setFeatureMarginals(double[])}.
- * <p/>
- * A relatively painless way to implement this interface is to create a field in
- * measure of type {@link FeatureMarginalsDelegate} class, then delegate
- * interface calls to this class.
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public interface FeatureMarginalsCarrier extends MarginalsCarrier {
+public interface FeatureMarginalsCarrier {
 
     /**
-     * Get an array containing a mapping from feature id to weighting.
-     * <p/>
-     * Stored as a double because it may have been waited in a pre-processing
-     * stage, and as an array because it's usually dense.
      *
-     * @return marginal scores for each feature
+     * @return @throws IllegalStateException if marginals are requested before
+     * they are set
      */
-    double[] getFeatureMarginals();
+    MarginalDistribution getFeatureMarginals() throws IllegalStateException;
 
-    /**
-     * Accessor to the number of features that are actually occurring at least
-     * once. Due to pre-processing a feature may have been previously filtered,
-     * resulting in this value being less than t
-     *
-     * @return number of actually occurring feature types
-     */
-    long getFeatureCardinality();
+    boolean isFeatureMarginalsSet();
 
-    /**
-     * Mutator to an array containing a mapping from feature id to weighting.
-     *
-     * @param marginals marginal scores for each feature
-     */
-    void setFeatureMarginals(double[] marginals);
-
-    /**
-     * Mutator to the number of features that are actually occurring at least
-     * once.
-     *
-     * @param cardinality number of actually occurring feature types
-     */
-    void setFeatureCardinality(long cardinality);
+    void setFeatureMarginals(MarginalDistribution distribution);
 }

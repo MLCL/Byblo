@@ -31,7 +31,6 @@
 package uk.ac.susx.mlcl.byblo.measures;
 
 import org.junit.*;
-import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDelegates;
@@ -40,6 +39,7 @@ import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
 import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
 import uk.ac.susx.mlcl.byblo.measures.impl.*;
 import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsCarrier;
+import uk.ac.susx.mlcl.byblo.weighings.MarginalDistribution;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
@@ -141,28 +141,18 @@ public class MeasuresTest {
                 TEST_FRUIT_FEATURES, DEFAULT_CHARSET,
                 EnumeratingDelegates.toSingleFeatures(indexDelegate));
 
-        WeightedTokenSource.WTStatsSource featsStatSrc =
-                new WeightedTokenSource.WTStatsSource(featsSrc);
-
-
-        double[] feats = AllPairsCommand.readAllAsArray(featsStatSrc);
-        double featsSum = featsStatSrc.getWeightSum();
-        int featusCard = featsStatSrc.getMaxId() + 1;
+        final MarginalDistribution fmd = BybloIO.readMarginalDistribution(featsSrc);
 
         for (Measure m : MEASURES) {
 
             if (m instanceof FeatureMarginalsCarrier) {
-                ((FeatureMarginalsCarrier) m).setFeatureCardinality(featusCard);
-                ((FeatureMarginalsCarrier) m).setFeatureMarginals(feats);
-                ((FeatureMarginalsCarrier) m).setGrandTotal(featsSum);
+                ((FeatureMarginalsCarrier) m).setFeatureMarginals(fmd);
             }
 
             Weighting w = WEIGHTINGS.get(m);
 
             if (w instanceof FeatureMarginalsCarrier) {
-                ((FeatureMarginalsCarrier) w).setFeatureCardinality(featusCard);
-                ((FeatureMarginalsCarrier) w).setFeatureMarginals(feats);
-                ((FeatureMarginalsCarrier) w).setGrandTotal(featsSum);
+                ((FeatureMarginalsCarrier) w).setFeatureMarginals(fmd);
             }
         }
 

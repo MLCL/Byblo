@@ -65,7 +65,8 @@ public final class FileMergeDelegate extends FileDelegate implements Serializabl
             validateWith = OutputFileValidator.class)
     private File destinationFile;
 
-    public FileMergeDelegate(File sourceFileA, File sourceFileB, File destination, Charset charset) {
+    public FileMergeDelegate(File sourceFileA, File sourceFileB,
+                             File destination, Charset charset) {
         super(charset);
         setSourceFileA(sourceFileA);
         setSourceFileB(sourceFileB);
@@ -124,5 +125,4 @@ public final class FileMergeDelegate extends FileDelegate implements Serializabl
                 add("in2", getSourceFileB()).
                 add("out", getDestinationFile());
     }
-
 }

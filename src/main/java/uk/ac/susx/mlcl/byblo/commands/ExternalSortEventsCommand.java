@@ -70,12 +70,10 @@ public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weigh
     @Override
     public void runCommand() throws Exception {
         this.addProgressListener(new ProgressListener() {
-
             @Override
             public void progressChanged(ProgressEvent progressEvent) {
                 LOG.info(getProgressReport());
             }
-
         });
 
         super.runCommand();
@@ -134,5 +132,4 @@ public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weigh
     public boolean isEnumeratedEntries() {
         return indexDelegate.isEnumeratedEntries();
     }
-
 }

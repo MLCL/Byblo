@@ -30,10 +30,13 @@
  */
 package uk.ac.susx.mlcl.byblo.io;
 
+import com.google.common.io.Closeables;
 import uk.ac.susx.mlcl.byblo.BybloSettings;
+import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDelegates;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
+import uk.ac.susx.mlcl.byblo.weighings.MarginalDistribution;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,7 +56,8 @@ public final class BybloIO {
     public static TokenPairSource openInstancesSource(
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
-        return TokenPairSource.open(
+        return TokenPairSource.
+                open(
                 file, charset, idx,
                 BybloSettings.getInstance().isInstancesSkipIndexColumn1Enabled(),
                 BybloSettings.getInstance().isInstancesSkipIndexColumn2Enabled());
@@ -62,11 +66,54 @@ public final class BybloIO {
     public static TokenPairSink openInstancesSink(
             File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
-        return TokenPairSink.open(
+        return TokenPairSink.
+                open(
                 file, charset, idx,
                 BybloSettings.getInstance().isInstancesSkipIndexColumn1Enabled(),
                 BybloSettings.getInstance().isInstancesSkipIndexColumn1Enabled(),
                 BybloSettings.getInstance().isInstancesCompactEnabled());
+    }
+
+    public static MarginalDistribution readMarginalDistribution(
+            WeightedTokenSource src)
+            throws IOException {
+
+        final WeightedTokenSource.WTStatsSource statsSrc =
+                new WeightedTokenSource.WTStatsSource(src);
+
+        final double[] frequencies = AllPairsCommand.readAllAsArray(statsSrc);
+        final double frequencySum = statsSrc.getWeightSum();
+        final int nonZeroCardinality = statsSrc.getMaxId() + 1;
+
+        final MarginalDistribution md = new MarginalDistribution(
+                frequencies, frequencySum, nonZeroCardinality);
+        return md;
+    }
+
+    public static MarginalDistribution readEntriesMarginalDistribution(
+            final File file, final Charset charset, final SingleEnumerating idx)
+            throws IOException {
+        WeightedTokenSource src = null;
+        try {
+            src = openEntriesSource(file, charset, idx);
+            return readMarginalDistribution(src);
+        } finally {
+            if (src != null)
+                Closeables.closeQuietly(src);
+        }
+    }
+
+    public static MarginalDistribution readFeaturesMarginalDistribution(
+            final File file, final Charset charset, final SingleEnumerating idx)
+            throws IOException {
+        WeightedTokenSource src = null;
+        try {
+            src = openFeaturesSource(file, charset, idx);
+            return readMarginalDistribution(src);
+        } finally {
+            if (src != null)
+                Closeables.closeQuietly(src);
+        }
     }
 
     public static WeightedTokenSource openFeaturesSource(
@@ -231,5 +278,4 @@ public final class BybloIO {
         return openNeighboursSink(file, charset,
                 EnumeratingDelegates.toSingleEntries(idx));
     }
-
 }
