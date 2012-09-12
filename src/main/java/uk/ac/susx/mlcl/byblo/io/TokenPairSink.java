@@ -35,6 +35,7 @@ import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.lib.io.*;
 
+import javax.annotation.WillClose;
 import java.io.*;
 import java.nio.charset.Charset;
 
@@ -90,6 +91,7 @@ public class TokenPairSink implements ObjectSink<TokenPair>, Closeable, Flushabl
     }
 
     @Override
+    @WillClose
     public void close() throws IOException {
         if (inner instanceof Closeable)
             ((Closeable) inner).close();

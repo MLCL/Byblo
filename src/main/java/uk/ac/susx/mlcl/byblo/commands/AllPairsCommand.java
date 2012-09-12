@@ -67,7 +67,6 @@ import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
 import javax.annotation.CheckReturnValue;
-import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -339,11 +338,8 @@ public class AllPairsCommand extends AbstractCommand {
             sink.flush();
             sink.close();
 
-            if (sourceA instanceof Closeable)
-                ((Closeable) sourceA).close();
-
-            if (sourceB instanceof Closeable)
-                ((Closeable) sourceB).close();
+            sourceA.close();
+            sourceB.close();
 
             if (apss.isExceptionTrapped())
                 apss.throwTrappedException();

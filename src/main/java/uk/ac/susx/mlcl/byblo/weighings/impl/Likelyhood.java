@@ -33,6 +33,8 @@ package uk.ac.susx.mlcl.byblo.weighings.impl;
 import uk.ac.susx.mlcl.byblo.weighings.AbstractElementwiseWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 
 /**
@@ -42,6 +44,8 @@ import java.io.Serializable;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@Immutable
+@CheckReturnValue
 public final class Likelyhood
         extends AbstractElementwiseWeighting
         implements Serializable {

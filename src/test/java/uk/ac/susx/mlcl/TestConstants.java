@@ -32,12 +32,16 @@ package uk.ac.susx.mlcl;
 
 import com.google.common.io.Closeables;
 import com.google.common.io.Flushables;
+import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
+import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
 import uk.ac.susx.mlcl.byblo.io.TokenPair;
 import uk.ac.susx.mlcl.byblo.io.TokenPairSink;
 import uk.ac.susx.mlcl.lib.MiscUtil;
+import uk.ac.susx.mlcl.lib.collect.Indexed;
+import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.events.ProgressEvent;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.io.Files;
@@ -45,6 +49,8 @@ import uk.ac.susx.mlcl.lib.io.Files;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import static java.text.MessageFormat.format;
@@ -54,6 +60,19 @@ import static org.junit.Assert.*;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class TestConstants {
+
+    public static List<Indexed<SparseDoubleVector>> loadFruitVectors() throws IOException {
+        final DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();
+        final FastWeightedTokenPairVectorSource eventSrc =
+                BybloIO.openEventsVectorSource(TEST_FRUIT_EVENTS,
+                        DEFAULT_CHARSET, indexDelegate);
+        final List<Indexed<SparseDoubleVector>> vecs =
+                new ArrayList<Indexed<SparseDoubleVector>>();
+        while (eventSrc.hasNext())
+            vecs.add(eventSrc.read());
+        eventSrc.close();
+        return vecs;
+    }
 
     private TestConstants() {
     }

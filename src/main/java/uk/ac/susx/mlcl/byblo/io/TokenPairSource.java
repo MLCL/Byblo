@@ -35,6 +35,7 @@ import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.lib.io.*;
 
+import javax.annotation.WillClose;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -87,6 +88,7 @@ public class TokenPairSource
     }
 
     @Override
+    @WillClose
     public void close() throws IOException {
         if (inner instanceof Closeable)
             ((Closeable) inner).close();

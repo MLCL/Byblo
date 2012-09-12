@@ -33,6 +33,7 @@ package uk.ac.susx.mlcl.byblo.enumerators;
 import com.beust.jcommander.Parameter;
 import com.google.common.base.Objects;
 
+import javax.annotation.WillClose;
 import java.io.File;
 import java.io.IOException;
 
@@ -169,6 +170,7 @@ public final class DoubleEnumeratingDelegate extends EnumeratingDelegate impleme
     }
 
     @Override
+    @WillClose
     public void closeEnumerator() throws IOException {
         if (isFeaturesEnumeratorOpen())
             closeFeaturesEnumerator();

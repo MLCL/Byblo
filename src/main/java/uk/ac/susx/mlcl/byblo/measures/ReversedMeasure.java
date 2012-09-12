@@ -32,6 +32,9 @@ package uk.ac.susx.mlcl.byblo.measures;
 
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.concurrent.Immutable;
+
 /**
  * Decorate a
  * <code>Measure</code> by reversing the operands of similarity calculations.
@@ -39,6 +42,8 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@Immutable
+@CheckReturnValue
 public class ReversedMeasure
         extends ForwardingMeasure<Measure> {
 

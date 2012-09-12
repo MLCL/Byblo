@@ -35,6 +35,9 @@ import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.concurrent.Immutable;
+
 /**
  * <code>ForwardingMeasure</code> is an abstract super-class to decorators of
  * <code>Measure</code> instances.
@@ -42,6 +45,8 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * @param <T> type of Measure being decorated
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@Immutable
+@CheckReturnValue
 public abstract class ForwardingMeasure<T extends Measure>
         implements Measure {
 

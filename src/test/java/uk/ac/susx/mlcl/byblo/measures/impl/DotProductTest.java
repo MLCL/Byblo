@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo.measures.impl;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import uk.ac.susx.mlcl.TestConstants;
 import uk.ac.susx.mlcl.byblo.Tools;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
@@ -42,7 +43,6 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
 import java.io.Closeable;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -204,7 +204,7 @@ public class DotProductTest {
         System.out.println("testFruitData");
         int limit = 5;
 
-        List<Indexed<SparseDoubleVector>> vecs = loadFruitVectors();
+        List<Indexed<SparseDoubleVector>> vecs = TestConstants.loadFruitVectors();
 
         limit = Math.min(limit, vecs.size());
 
@@ -272,21 +272,4 @@ public class DotProductTest {
         return val;
     }
 
-    static List<Indexed<SparseDoubleVector>> loadFruitVectors() throws IOException {
-
-        final DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();
-        final FastWeightedTokenPairVectorSource eventSrc =
-                BybloIO.openEventsVectorSource(
-                        TEST_FRUIT_EVENTS, DEFAULT_CHARSET, indexDelegate);
-        final List<Indexed<SparseDoubleVector>> vecs =
-                new ArrayList<Indexed<SparseDoubleVector>>();
-        while (eventSrc.hasNext())
-            vecs.add(eventSrc.read());
-
-        if (eventSrc instanceof Closeable) {
-            ((Closeable) eventSrc).close();
-        }
-
-        return vecs;
-    }
 }

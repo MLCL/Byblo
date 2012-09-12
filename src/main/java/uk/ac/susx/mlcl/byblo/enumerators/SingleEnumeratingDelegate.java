@@ -33,6 +33,7 @@ package uk.ac.susx.mlcl.byblo.enumerators;
 import com.beust.jcommander.Parameter;
 import com.google.common.base.Objects;
 
+import javax.annotation.WillClose;
 import java.io.File;
 import java.io.IOException;
 
@@ -109,6 +110,7 @@ public final class SingleEnumeratingDelegate extends EnumeratingDelegate impleme
     }
 
     @Override
+    @WillClose
     public void closeEnumerator() throws IOException {
         close(enumerator);
         enumerator = null;

@@ -34,6 +34,7 @@ import com.google.common.base.Predicate;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.lib.io.*;
 
+import javax.annotation.WillClose;
 import java.io.Closeable;
 import java.io.File;
 import java.io.Flushable;
@@ -93,6 +94,7 @@ public class WeightedTokenPairSink
     }
 
     @Override
+    @WillClose
     public void close() throws IOException {
         if (inner instanceof Closeable)
             ((Closeable) inner).close();

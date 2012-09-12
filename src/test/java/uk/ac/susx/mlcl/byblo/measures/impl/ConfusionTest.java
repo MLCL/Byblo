@@ -42,7 +42,6 @@ import uk.ac.susx.mlcl.byblo.weighings.MarginalDistribution;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
-import java.io.Closeable;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -89,9 +88,7 @@ public class ConfusionTest {
         FRUIT_EVENTS.add(new Indexed<SparseDoubleVector>(
                 Integer.MAX_VALUE, new SparseDoubleVector(card, 0)));
 
-        if (eventSrc instanceof Closeable) {
-            ((Closeable) eventSrc).close();
-        }
+        eventSrc.close();
 
         for (Indexed<SparseDoubleVector> v : FRUIT_EVENTS) {
             v.value().cardinality = card;

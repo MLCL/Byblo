@@ -34,6 +34,7 @@ import com.google.common.base.CharMatcher;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import javax.annotation.WillClose;
 import java.io.*;
 import java.nio.BufferUnderflowException;
 import java.nio.CharBuffer;
@@ -562,6 +563,7 @@ public final class Lexer implements Seekable<Tell>, Closeable {
     }
 
     @Override
+    @WillClose
     public void close() throws IOException {
         channel.close();
     }

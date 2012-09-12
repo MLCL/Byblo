@@ -38,6 +38,8 @@ import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.concurrent.Immutable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -50,6 +52,8 @@ import static java.lang.Math.min;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@Immutable
+@CheckReturnValue
 public abstract class Measures {
 
     private static final Log LOG = LogFactory.getLog(Measures.class);

@@ -31,9 +31,12 @@
 package uk.ac.susx.mlcl.lib.collect;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import uk.ac.susx.mlcl.lib.MemoryUsage;
 import uk.ac.susx.mlcl.lib.MiscUtil;
+import uk.ac.susx.mlcl.testing.HighMemoryTestCategory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -49,6 +52,8 @@ public class IntBitSetTest extends AbstractIntSortedSetTest<IntBitSet> {
     }
 
     @Test
+    @Category(HighMemoryTestCategory.class)
+    @Ignore
     public void testPeekMemoryUsage() {
         System.out.println("testPeekMemoryUsage()");
 

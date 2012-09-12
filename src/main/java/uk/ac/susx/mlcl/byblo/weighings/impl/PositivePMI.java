@@ -34,11 +34,13 @@ import uk.ac.susx.mlcl.byblo.weighings.AbstractContextualWeighting;
 import uk.ac.susx.mlcl.byblo.weighings.Weightings;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import javax.annotation.CheckReturnValue;
 import java.io.Serializable;
 
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@CheckReturnValue
 public final class PositivePMI
         extends AbstractContextualWeighting
         implements Serializable {

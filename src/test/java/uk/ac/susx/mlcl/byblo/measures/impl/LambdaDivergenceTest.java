@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo.measures.impl;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import uk.ac.susx.mlcl.TestConstants;
 import uk.ac.susx.mlcl.byblo.Tools;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
@@ -236,7 +237,7 @@ public class LambdaDivergenceTest {
         System.out.println("testFruitData");
         int limit = 5;
 
-        List<Indexed<SparseDoubleVector>> vecs = loadFruitVectors();
+        List<Indexed<SparseDoubleVector>> vecs = TestConstants.loadFruitVectors();
 
         limit = Math.min(limit, vecs.size());
 

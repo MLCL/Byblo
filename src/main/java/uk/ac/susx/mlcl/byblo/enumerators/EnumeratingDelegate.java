@@ -37,6 +37,7 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.FullBuild;
 import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
 
+import javax.annotation.WillClose;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -90,6 +91,7 @@ public abstract class EnumeratingDelegate
             throw new AssertionError();
     }
 
+    @WillClose
     protected void close(Enumerator<String> enumerator) throws IOException {
         if (enumerator == null) {
             LOG.warn("Attempt made to close an enumerator that was not open.");

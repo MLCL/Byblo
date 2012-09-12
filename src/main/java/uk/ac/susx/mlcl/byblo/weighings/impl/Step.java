@@ -32,11 +32,13 @@ package uk.ac.susx.mlcl.byblo.weighings.impl;
 
 import uk.ac.susx.mlcl.byblo.weighings.AbstractSimpleWeighting;
 
+import javax.annotation.CheckReturnValue;
 import java.io.Serializable;
 
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@CheckReturnValue
 public final class Step
         extends AbstractSimpleWeighting
         implements Serializable {

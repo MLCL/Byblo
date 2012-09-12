@@ -36,8 +36,9 @@ package uk.ac.susx.mlcl.byblo.weighings;
 public interface FeatureMarginalsCarrier {
 
     /**
-     * @return @throws IllegalStateException if marginals are requested before
-     *         they are set
+     * @return x
+     * @throws IllegalStateException if marginals are requested before they are
+     *                               set
      */
     MarginalDistribution getFeatureMarginals() throws IllegalStateException;
 

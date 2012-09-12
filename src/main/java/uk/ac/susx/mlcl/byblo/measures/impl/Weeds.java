@@ -36,6 +36,8 @@ import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.PositivePMI;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnegative;
 import java.io.Serializable;
 
 /**
@@ -53,6 +55,7 @@ import java.io.Serializable;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@CheckReturnValue
 public class Weeds implements Measure, Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -61,41 +64,47 @@ public class Weeds implements Measure, Serializable {
 
     private static final Precision PRECISION = new Precision();
 
+    @Nonnegative
     public static final double DEFAULT_BETA = 0.5;
 
+    @Nonnegative
     public static final double DEFAULT_GAMMA = 0.5;
 
+    @Nonnegative
     private double beta;
 
+    @Nonnegative
     private double gamma;
 
     public Weeds() {
         this(DEFAULT_BETA, DEFAULT_GAMMA);
     }
 
-    public Weeds(final double beta, final double gamma) {
+    public Weeds(@Nonnegative final double beta, @Nonnegative final double gamma) {
         setBeta(beta);
         setGamma(gamma);
     }
 
-    public final void setBeta(final double beta) {
+    public final void setBeta(@Nonnegative final double beta) {
         if (beta < 0.0 || beta > 1.0)
             throw new IllegalArgumentException(
                     "beta parameter expected in range 0 to 1, but found " + beta);
         this.beta = beta;
     }
 
-    public final void setGamma(final double gamma) {
+    public final void setGamma(@Nonnegative final double gamma) {
         if (gamma < 0 || gamma > 1)
             throw new IllegalArgumentException(
                     "beta parameter expected in range 0 to 1, but found " + gamma);
         this.gamma = gamma;
     }
 
+    @Nonnegative
     public final double getBeta() {
         return beta;
     }
 
+    @Nonnegative
     public final double getGamma() {
         return gamma;
     }
@@ -171,12 +180,10 @@ public class Weeds implements Measure, Serializable {
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 37 * hash + (int) (Double.doubleToLongBits(this.beta) ^ (Double.
-                doubleToLongBits(
-                        this.beta) >>> 32));
-        hash = 37 * hash + (int) (Double.doubleToLongBits(this.gamma) ^ (Double.
-                doubleToLongBits(
-                        this.gamma) >>> 32));
+        final long betaBits = Double.doubleToLongBits(this.beta);
+        final long gammaBits = Double.doubleToLongBits(this.gamma);
+        hash = 37 * hash + (int) (betaBits ^ (betaBits >>> 32));
+        hash = 37 * hash + (int) (gammaBits ^ (gammaBits >>> 32));
         return hash;
     }
 }

@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.byblo.enumerators;
 
 import uk.ac.susx.mlcl.lib.Checks;
 
+import javax.annotation.WillClose;
 import java.io.File;
 import java.io.IOException;
 
@@ -122,16 +123,8 @@ public final class EnumeratingDelegates {
             return true;
         }
 
-        //        @Override
-//        public boolean isEnumeratorSkipIndexed1() {
-//            return getInner().isEnumeratorSkipIndexed1();
-//        }
-//
-//        @Override
-//        public boolean isEnumeratorSkipIndexed2() {
-//            return getInner().isEnumeratorSkipIndexed2();
-//        }
         @Override
+        @WillClose
         public void closeEnumerator() throws IOException {
             getInner().closeEnumerator();
         }
@@ -252,11 +245,13 @@ public final class EnumeratingDelegates {
         }
 
         @Override
+        @WillClose
         public void closeEntriesEnumerator() throws IOException {
             getInner().closeEnumerator();
         }
 
         @Override
+        @WillClose
         public void closeFeaturesEnumerator() throws IOException {
             getInner().closeEnumerator();
         }
@@ -332,6 +327,7 @@ public final class EnumeratingDelegates {
         }
 
         @Override
+        @WillClose
         public void closeEnumerator() throws IOException {
             getInner().closeFeaturesEnumerator();
         }
@@ -392,6 +388,7 @@ public final class EnumeratingDelegates {
         }
 
         @Override
+        @WillClose
         public void closeEnumerator() throws IOException {
             getInner().closeEntriesEnumerator();
         }
@@ -442,6 +439,7 @@ public final class EnumeratingDelegates {
         }
 
         @Override
+        @WillClose
         public void closeEnumerator() throws IOException {
             getInner().closeEnumerator();
         }
@@ -537,11 +535,13 @@ public final class EnumeratingDelegates {
         }
 
         @Override
+        @WillClose
         public void closeEntriesEnumerator() throws IOException {
             getInner().closeEntriesEnumerator();
         }
 
         @Override
+        @WillClose
         public void closeFeaturesEnumerator() throws IOException {
             getInner().closeFeaturesEnumerator();
         }

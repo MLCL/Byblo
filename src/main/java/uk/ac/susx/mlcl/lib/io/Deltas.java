@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.lib.io;
 
 import com.google.common.base.Predicate;
 
+import javax.annotation.WillClose;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
@@ -78,6 +79,7 @@ public final class Deltas {
         }
 
         @Override
+        @WillClose
         public void close() throws IOException {
             if (inner instanceof Closeable)
                 ((Closeable) inner).close();

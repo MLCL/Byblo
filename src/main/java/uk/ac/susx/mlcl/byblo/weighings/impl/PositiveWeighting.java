@@ -30,9 +30,12 @@
  */
 package uk.ac.susx.mlcl.byblo.weighings.impl;
 
+import javax.annotation.CheckReturnValue;
+
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@CheckReturnValue
 public final class PositiveWeighting
         extends Bound {
 

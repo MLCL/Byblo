@@ -35,6 +35,8 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -55,6 +57,8 @@ import java.util.List;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@Immutable
+@CheckReturnValue
 public class CompositeWeighting implements Weighting, Serializable {
 
     private static final long serialVersionUID = 1L;

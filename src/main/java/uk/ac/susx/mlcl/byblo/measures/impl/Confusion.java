@@ -37,8 +37,8 @@ import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * Proximity measure computing the confusion probability between the given
@@ -74,7 +74,7 @@ import javax.annotation.concurrent.Immutable;
  *      254{259, San Francisco, California. Advanced Research Projects Agency,
  *      Software and Intelligent Systems Technology Oce, Morgan Kaufmann.
  */
-@Immutable
+@CheckReturnValue
 public class Confusion implements Measure, FeatureMarginalsCarrier {
 
     @Nullable
@@ -102,6 +102,7 @@ public class Confusion implements Measure, FeatureMarginalsCarrier {
     }
 
     @Override
+    @CheckReturnValue
     public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
         final double N = featureMarginals.getFrequencySum();
 

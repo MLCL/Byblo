@@ -35,6 +35,8 @@ import uk.ac.susx.mlcl.byblo.measures.impl.Jaccard;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import javax.annotation.CheckReturnValue;
+
 /**
  * Measure is a common super-interface to various similarity measure types.
  * <p/>
@@ -51,6 +53,7 @@ public interface Measure {
      * @param B second feature vector
      * @return similarity of the feature vectors
      */
+    @CheckReturnValue
     double similarity(SparseDoubleVector A, SparseDoubleVector B);
 
     /**
@@ -61,6 +64,7 @@ public interface Measure {
      *
      * @return value indicating vectors are identical
      */
+    @CheckReturnValue
     double getHomogeneityBound();
 
     /**
@@ -72,6 +76,7 @@ public interface Measure {
      *
      * @return value indicating vectors are maximally dissimilar
      */
+    @CheckReturnValue
     double getHeterogeneityBound();
 
     /**
@@ -90,6 +95,7 @@ public interface Measure {
      * @return weighting scheme that should have been previously applied to
      *         vectors
      */
+    @CheckReturnValue
     Class<? extends Weighting> getExpectedWeighting();
 
     /**
@@ -110,5 +116,6 @@ public interface Measure {
      *
      * @return true if the measure defines a symmetric space, false otherwise
      */
+    @CheckReturnValue
     boolean isCommutative();
 }

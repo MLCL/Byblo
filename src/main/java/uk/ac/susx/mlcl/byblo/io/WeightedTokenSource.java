@@ -36,6 +36,7 @@ import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 import uk.ac.susx.mlcl.lib.io.*;
 
+import javax.annotation.WillClose;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -108,6 +109,7 @@ public class WeightedTokenSource
     }
 
     @Override
+    @WillClose
     public void close() throws IOException {
         if (inner instanceof Closeable)
             ((Closeable) inner).close();

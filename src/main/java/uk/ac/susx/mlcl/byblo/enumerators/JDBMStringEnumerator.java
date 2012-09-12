@@ -36,6 +36,7 @@ import org.apache.jdbm.DBMaker;
 import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
 import uk.ac.susx.mlcl.lib.collect.ForwardingBiMap;
 
+import javax.annotation.WillClose;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -226,6 +227,7 @@ public final class JDBMStringEnumerator extends BiMapEnumerator<String> {
         db.commit();
     }
 
+    @WillClose
     public void close() {
         if (db == null || db.isClosed()) {
             Logger.getLogger(JDBMStringEnumerator.class.getName()).log(

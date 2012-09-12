@@ -32,6 +32,9 @@ package uk.ac.susx.mlcl.byblo.weighings;
 
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.concurrent.Immutable;
+
 /**
  * {@link SimpleWeighting} defines a function that maps element-wise from a
  * single feature input weight to the output weight.
@@ -43,6 +46,8 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@Immutable
+@CheckReturnValue
 public abstract class AbstractSimpleWeighting implements Weighting {
 
     /**

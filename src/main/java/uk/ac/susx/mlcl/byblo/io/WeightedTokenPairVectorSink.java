@@ -34,6 +34,7 @@ import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 
+import javax.annotation.WillClose;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
@@ -67,6 +68,7 @@ public class WeightedTokenPairVectorSink
     }
 
     @Override
+    @WillClose
     public void close() throws IOException {
         inner.close();
     }

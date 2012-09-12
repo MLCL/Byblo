@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo.weighings;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
 /**
@@ -40,6 +41,7 @@ import javax.annotation.Nullable;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@CheckReturnValue
 public abstract class AbstractContextualWeighting
         extends AbstractElementwiseWeighting
         implements FeatureMarginalsCarrier {

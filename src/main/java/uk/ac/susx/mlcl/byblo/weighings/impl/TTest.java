@@ -34,6 +34,7 @@ import uk.ac.susx.mlcl.byblo.weighings.AbstractContextualWeighting;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import javax.annotation.CheckReturnValue;
 import java.io.Serializable;
 
 /**
@@ -51,6 +52,7 @@ import java.io.Serializable;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@CheckReturnValue
 public final class TTest
         extends AbstractContextualWeighting
         implements Serializable {

@@ -34,6 +34,7 @@ import com.google.common.base.Predicate;
 import uk.ac.susx.mlcl.byblo.enumerators.SingleEnumerating;
 import uk.ac.susx.mlcl.lib.io.*;
 
+import javax.annotation.WillClose;
 import java.io.*;
 import java.nio.charset.Charset;
 
@@ -95,6 +96,7 @@ public class WeightedTokenSink implements ObjectSink<Weighted<Token>>, Closeable
     }
 
     @Override
+    @WillClose
     public void close() throws IOException {
         if (inner instanceof Closeable)
             ((Closeable) inner).close();

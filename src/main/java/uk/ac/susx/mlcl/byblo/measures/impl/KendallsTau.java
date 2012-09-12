@@ -37,6 +37,8 @@ import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnegative;
 import java.io.Serializable;
 import java.text.MessageFormat;
 
@@ -75,6 +77,7 @@ import static uk.ac.susx.mlcl.byblo.measures.Measures.epsilonEquals;
  * @see "A New Measure of Rank Correlation." Maurice Kendall (1938). Biometrika
  *      30 (1–2): 81–89."
  */
+@CheckReturnValue
 public final class KendallsTau
         implements Measure, Serializable {
 
@@ -86,11 +89,13 @@ public final class KendallsTau
      * Default expected minimum dimensionality of vectors ({@value}) if not
      * explicitly set.
      */
+    @Nonnegative
     public static final int DEFAULT_MIN_CARDINALITY = 1;
 
     /**
      * Expected dimensionality of vectors.
      */
+    @Nonnegative
     private int minCardinality;
 
     /**
@@ -114,7 +119,8 @@ public final class KendallsTau
      * @throws IllegalArgumentException when <code>minCardinality</code> is
      *                                  negative
      */
-    public KendallsTau(final int minCardinality)
+    public KendallsTau(@Nonnegative
+                       final int minCardinality)
             throws IllegalArgumentException {
         setMinCardinality(minCardinality);
 
@@ -130,6 +136,7 @@ public final class KendallsTau
      *
      * @return expected dimensionality of vectors
      */
+    @Nonnegative
     public final int getMinCardinality() {
         return minCardinality;
     }
@@ -145,7 +152,7 @@ public final class KendallsTau
      * @throws IllegalArgumentException when <code>minCardinality</code> is
      *                                  negative
      */
-    public final void setMinCardinality(int minCardinality)
+    public final void setMinCardinality(@Nonnegative int minCardinality)
             throws IllegalArgumentException {
         if (minCardinality <= 0)
             throw new IllegalArgumentException(MessageFormat.format(

@@ -33,6 +33,9 @@ package uk.ac.susx.mlcl.byblo.weighings.impl;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnegative;
+import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 
 /**
@@ -42,6 +45,8 @@ import java.io.Serializable;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
+@Immutable
+@CheckReturnValue
 public final class L2UnitVector
         implements Weighting, Serializable {
 
@@ -85,6 +90,7 @@ public final class L2UnitVector
      * @param vector
      * @return magnitude of vector
      */
+    @Nonnegative
     public static double length(SparseDoubleVector vector) {
         return Math.sqrt(lengthSquared(vector));
     }
@@ -98,6 +104,7 @@ public final class L2UnitVector
      * @param vector
      * @return magnitude squared of vector
      */
+    @Nonnegative
     public static double lengthSquared(SparseDoubleVector vector) {
         double lengthSq = 0;
         for (int i = 0; i < vector.size; i++)
