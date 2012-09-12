@@ -55,6 +55,7 @@ import java.io.Serializable;
  * weighting schemes, although there are a few exceptions. Not sure if this is
  * down a real difference or just floating point errors.
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class ChiSquared

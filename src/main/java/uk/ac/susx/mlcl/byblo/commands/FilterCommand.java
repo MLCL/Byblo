@@ -52,12 +52,13 @@ import uk.ac.susx.mlcl.lib.Predicates2;
 import uk.ac.susx.mlcl.lib.collect.IntBitSet;
 import uk.ac.susx.mlcl.lib.commands.*;
 import uk.ac.susx.mlcl.lib.events.ProgressDelegate;
-import uk.ac.susx.mlcl.lib.events.ProgressEvent;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.events.ProgressReporting;
+import uk.ac.susx.mlcl.lib.events.ReportLoggingProgressListener;
 import uk.ac.susx.mlcl.lib.io.FileFactory;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 
+import javax.annotation.CheckReturnValue;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -227,163 +228,164 @@ public class FilterCommand extends AbstractCommand implements
     }
 
     @Override
-    public void runCommand() throws Exception {
+    @CheckReturnValue
+    public boolean runCommand() {
         if (LOG.isInfoEnabled())
             LOG.info("Running filtering.");
         if (LOG.isDebugEnabled())
             LOG.debug(this);
 
-        if (filterFeatureMinFreq > 0) {
-            addFeaturesMinimumFrequency(filterFeatureMinFreq);
-        }
-        if (filterFeaturePattern != null) {
-            addFeaturesPattern(filterFeaturePattern);
-        }
-        if (filterFeatureWhitelist != null) {
-            addFeaturesWhitelist(com.google.common.io.Files.readLines(
-                    filterFeatureWhitelist, getCharset()));
-        }
-
-        if (filterEntryMinFreq > 0) {
-            addEntryMinimumFrequency(filterEntryMinFreq);
-        }
-        if (filterEntryPattern != null) {
-            addEntryPattern(filterEntryPattern);
-        }
-        if (filterEntryWhitelist != null) {
-            addEntryWhitelist(com.google.common.io.Files.readLines(
-                    filterEntryWhitelist, getCharset()));
-        }
-
-        if (filterEventMinFreq > 0) {
-            addEventMinimumFrequency(filterEventMinFreq);
-        }
-
-        checkState();
-        activeEventsFile = inputEventsFile;
-        activeEntriesFile = inputEntriesFile;
-        activeFeaturesFile = inputFeaturesFile;
-
-        progress.addProgressListener(new ProgressListener() {
-
-            @Override
-            public void progressChanged(ProgressEvent progressEvent) {
-                LOG.info(progressEvent.getSource().getProgressReport());
+        try {
+            if (filterFeatureMinFreq > 0) {
+                addFeaturesMinimumFrequency(filterFeatureMinFreq);
+            }
+            if (filterFeaturePattern != null) {
+                addFeaturesPattern(filterFeaturePattern);
+            }
+            if (filterFeatureWhitelist != null) {
+                addFeaturesWhitelist(com.google.common.io.Files.readLines(
+                        filterFeatureWhitelist, getCharset()));
             }
 
-        });
-
-        progress.setState(State.RUNNING);
-        progress.setProgressPercent(0);
-
-        // Run the filters forwards then backwards. Each filtering step may
-        // introduce additionally filters for the other files, so continue
-        // looping until there is no work remaining. Depending on filters this
-        // very unlikely to take more than 3 passes
-
-        int passCount = 0;
-        int opCount = 0;
-
-        while (entryFilterRequired || eventFilterRequired
-                || featureFilterRequired) {
-
-            progress.setMessage("Running filtering pass (#" + (++passCount)
-                    + ").");
-
-            if (entryFilterRequired) {
-                filterEntries();
-                ++opCount;
-                progress.setProgressPercent(100
-                        * opCount
-                        / (opCount + 3 + (entryFilterRequired ? 1 : 0)
-                        + (eventFilterRequired ? 1 : 0) + (featureFilterRequired ? 1
-                        : 0)));
+            if (filterEntryMinFreq > 0) {
+                addEntryMinimumFrequency(filterEntryMinFreq);
+            }
+            if (filterEntryPattern != null) {
+                addEntryPattern(filterEntryPattern);
+            }
+            if (filterEntryWhitelist != null) {
+                addEntryWhitelist(com.google.common.io.Files.readLines(
+                        filterEntryWhitelist, getCharset()));
             }
 
-            if (eventFilterRequired) {
-                filterEvents();
-                ++opCount;
-                progress.setProgressPercent(100
-                        * opCount
-                        / (opCount + 3 + (entryFilterRequired ? 1 : 0)
-                        + (eventFilterRequired ? 1 : 0) + (featureFilterRequired ? 1
-                        : 0)));
+            if (filterEventMinFreq > 0) {
+                addEventMinimumFrequency(filterEventMinFreq);
             }
 
-            if (featureFilterRequired) {
-                filterFeatures();
-                ++opCount;
-                progress.setProgressPercent(100
-                        * opCount
-                        / (opCount + 3 + (entryFilterRequired ? 1 : 0)
-                        + (eventFilterRequired ? 1 : 0) + (featureFilterRequired ? 1
-                        : 0)));
+            checkState();
+            activeEventsFile = inputEventsFile;
+            activeEntriesFile = inputEntriesFile;
+            activeFeaturesFile = inputFeaturesFile;
+
+            progress.addProgressListener(new ReportLoggingProgressListener(LOG));
+
+            progress.setState(State.RUNNING);
+            progress.setProgressPercent(0);
+
+            // Run the filters forwards then backwards. Each filtering step may
+            // introduce additionally filters for the other files, so continue
+            // looping until there is no work remaining. Depending on filters this
+            // very unlikely to take more than 3 passes
+
+            int passCount = 0;
+            int opCount = 0;
+
+            while (entryFilterRequired || eventFilterRequired
+                    || featureFilterRequired) {
+
+                progress.setMessage("Running filtering pass (#" + (++passCount)
+                        + ").");
+
+                if (entryFilterRequired) {
+                    filterEntries();
+                    ++opCount;
+                    progress.setProgressPercent(100
+                            * opCount
+                            / (opCount + 3 + (entryFilterRequired ? 1 : 0)
+                            + (eventFilterRequired ? 1 : 0) + (featureFilterRequired ? 1
+                            : 0)));
+                }
+
+                if (eventFilterRequired) {
+                    filterEvents();
+                    ++opCount;
+                    progress.setProgressPercent(100
+                            * opCount
+                            / (opCount + 3 + (entryFilterRequired ? 1 : 0)
+                            + (eventFilterRequired ? 1 : 0) + (featureFilterRequired ? 1
+                            : 0)));
+                }
+
+                if (featureFilterRequired) {
+                    filterFeatures();
+                    ++opCount;
+                    progress.setProgressPercent(100
+                            * opCount
+                            / (opCount + 3 + (entryFilterRequired ? 1 : 0)
+                            + (eventFilterRequired ? 1 : 0) + (featureFilterRequired ? 1
+                            : 0)));
+                }
+
+                if (eventFilterRequired) {
+                    filterEvents();
+                    ++opCount;
+                    progress.setProgressPercent(100
+                            * opCount
+                            / (opCount + 3 + (entryFilterRequired ? 1 : 0)
+                            + (eventFilterRequired ? 1 : 0) + (featureFilterRequired ? 1
+                            : 0)));
+                }
+
+                if (entryFilterRequired) {
+                    filterEntries();
+                    ++opCount;
+                    progress.setProgressPercent(100
+                            * opCount
+                            / (opCount + 3 + (entryFilterRequired ? 1 : 0)
+                            + (eventFilterRequired ? 1 : 0) + (featureFilterRequired ? 1
+                            : 0)));
+                }
             }
 
-            if (eventFilterRequired) {
-                filterEvents();
-                ++opCount;
-                progress.setProgressPercent(100
-                        * opCount
-                        / (opCount + 3 + (entryFilterRequired ? 1 : 0)
-                        + (eventFilterRequired ? 1 : 0) + (featureFilterRequired ? 1
-                        : 0)));
+            // Finished filtering so copy the results files to the outputs.
+
+            progress.setMessage("Copying final entries file.");
+
+            finaliseFile(inputEntriesFile, activeEntriesFile, outputEntriesFile);
+            ++opCount;
+
+
+            progress.startAdjusting();
+            progress.setProgressPercent(100
+                    * opCount
+                    / (opCount + 2 + (entryFilterRequired ? 1 : 0)
+                    + (eventFilterRequired ? 1 : 0) + (featureFilterRequired ? 1
+                    : 0)));
+            progress.setMessage("Copying finally events file.");
+            progress.endAdjusting();
+
+            finaliseFile(inputEventsFile, activeEventsFile, outputEventsFile);
+            ++opCount;
+
+            progress.startAdjusting();
+            progress.setProgressPercent(100
+                    * opCount
+                    / (opCount + 1 + (entryFilterRequired ? 1 : 0)
+                    + (eventFilterRequired ? 1 : 0) + (featureFilterRequired ? 1
+                    : 0)));
+            progress.setMessage("Copying final features file.");
+            progress.endAdjusting();
+
+            finaliseFile(inputFeaturesFile, activeFeaturesFile, outputFeaturesFile);
+
+            ++opCount;
+            progress.setProgressPercent(100
+                    * opCount
+                    / (opCount + 0 + (entryFilterRequired ? 1 : 0)
+                    + (eventFilterRequired ? 1 : 0) + (featureFilterRequired ? 1
+                    : 0)));
+
+            if (indexDelegate.isEnumeratorOpen()) {
+                indexDelegate.saveEnumerator();
+                indexDelegate.closeEnumerator();
             }
 
-            if (entryFilterRequired) {
-                filterEntries();
-                ++opCount;
-                progress.setProgressPercent(100
-                        * opCount
-                        / (opCount + 3 + (entryFilterRequired ? 1 : 0)
-                        + (eventFilterRequired ? 1 : 0) + (featureFilterRequired ? 1
-                        : 0)));
-            }
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            progress.setState(State.COMPLETED);
         }
-
-        // Finished filtering so copy the results files to the outputs.
-
-        progress.setMessage("Copying final entries file.");
-
-        finaliseFile(inputEntriesFile, activeEntriesFile, outputEntriesFile);
-        ++opCount;
-
-        progress.startAdjusting();
-        progress.setProgressPercent(100
-                * opCount
-                / (opCount + 2 + (entryFilterRequired ? 1 : 0)
-                + (eventFilterRequired ? 1 : 0) + (featureFilterRequired ? 1
-                : 0)));
-        progress.setMessage("Copying finally events file.");
-        progress.endAdjusting();
-
-        finaliseFile(inputEventsFile, activeEventsFile, outputEventsFile);
-        ++opCount;
-
-        progress.startAdjusting();
-        progress.setProgressPercent(100
-                * opCount
-                / (opCount + 1 + (entryFilterRequired ? 1 : 0)
-                + (eventFilterRequired ? 1 : 0) + (featureFilterRequired ? 1
-                : 0)));
-        progress.setMessage("Copying final features file.");
-        progress.endAdjusting();
-
-        finaliseFile(inputFeaturesFile, activeFeaturesFile, outputFeaturesFile);
-
-        ++opCount;
-        progress.setProgressPercent(100
-                * opCount
-                / (opCount + 0 + (entryFilterRequired ? 1 : 0)
-                + (eventFilterRequired ? 1 : 0) + (featureFilterRequired ? 1
-                : 0)));
-
-        if (indexDelegate.isEnumeratorOpen()) {
-            indexDelegate.saveEnumerator();
-            indexDelegate.closeEnumerator();
-        }
-
-        progress.setState(State.COMPLETED);
     }
 
     private static void finaliseFile(File inputFile, File activeFile,

@@ -52,6 +52,7 @@ import java.util.List;
  * {@link FeatureMarginalsCarrier}) in a {@link CompositeWeighting } unless it
  * is the first element. A warning will be printed if this is detected.
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class CompositeWeighting implements Weighting, Serializable {
@@ -72,11 +73,11 @@ public class CompositeWeighting implements Weighting, Serializable {
                     && LOG.isWarnEnabled()) {
                 LOG.warn(MessageFormat.
                         format(
-                        "Composite weighting sequence contains contextual "
-                                + "weighting ({0}) outside of the first position ({1})."
-                                + " This is unlikely to produce the correct result "
-                                + "because marginal distributions have not been updated.",
-                        this.childWeightings.get(i).toString(), 0));
+                                "Composite weighting sequence contains contextual "
+                                        + "weighting ({0}) outside of the first position ({1})."
+                                        + " This is unlikely to produce the correct result "
+                                        + "because marginal distributions have not been updated.",
+                                this.childWeightings.get(i).toString(), 0));
             }
         }
     }

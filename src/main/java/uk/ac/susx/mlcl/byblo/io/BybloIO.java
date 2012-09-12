@@ -46,6 +46,7 @@ import java.nio.charset.Charset;
  * Static utility class that provides functions for opening the various file
  * types.
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class BybloIO {
@@ -58,9 +59,9 @@ public final class BybloIO {
             throws IOException {
         return TokenPairSource
                 .open(
-                file, charset, idx,
-                BybloSettings.getInstance().isInstancesSkipIndexColumn1Enabled(),
-                BybloSettings.getInstance().isInstancesSkipIndexColumn2Enabled());
+                        file, charset, idx,
+                        BybloSettings.getInstance().isInstancesSkipIndexColumn1Enabled(),
+                        BybloSettings.getInstance().isInstancesSkipIndexColumn2Enabled());
     }
 
     public static TokenPairSink openInstancesSink(
@@ -68,10 +69,10 @@ public final class BybloIO {
             throws IOException {
         return TokenPairSink
                 .open(
-                file, charset, idx,
-                BybloSettings.getInstance().isInstancesSkipIndexColumn1Enabled(),
-                BybloSettings.getInstance().isInstancesSkipIndexColumn1Enabled(),
-                BybloSettings.getInstance().isInstancesCompactEnabled());
+                        file, charset, idx,
+                        BybloSettings.getInstance().isInstancesSkipIndexColumn1Enabled(),
+                        BybloSettings.getInstance().isInstancesSkipIndexColumn1Enabled(),
+                        BybloSettings.getInstance().isInstancesCompactEnabled());
     }
 
     public static MarginalDistribution readMarginalDistribution(

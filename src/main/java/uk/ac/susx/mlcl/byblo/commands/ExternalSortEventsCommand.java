@@ -43,6 +43,7 @@ import uk.ac.susx.mlcl.lib.events.ProgressEvent;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 
+import javax.annotation.CheckReturnValue;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -68,7 +69,8 @@ public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weigh
     }
 
     @Override
-    public void runCommand() throws Exception {
+    @CheckReturnValue
+    public boolean runCommand() {
         this.addProgressListener(new ProgressListener() {
             @Override
             public void progressChanged(ProgressEvent progressEvent) {
@@ -76,12 +78,18 @@ public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weigh
             }
         });
 
-        super.runCommand();
+        boolean result = super.runCommand();
 
         if (indexDelegate.isEnumeratorOpen()) {
-            indexDelegate.saveEnumerator();
-            indexDelegate.closeEnumerator();
+            try {
+                indexDelegate.saveEnumerator();
+                indexDelegate.closeEnumerator();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         }
+
+        return result;
 
     }
 

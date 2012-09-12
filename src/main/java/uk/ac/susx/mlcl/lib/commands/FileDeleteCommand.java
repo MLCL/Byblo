@@ -36,6 +36,7 @@ import com.google.common.base.Objects;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import javax.annotation.CheckReturnValue;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -61,17 +62,20 @@ public class FileDeleteCommand extends AbstractCommand {
     }
 
     @Override
-    public void runCommand() throws Exception {
+    @CheckReturnValue
+    public boolean runCommand() {
         if (LOG.isInfoEnabled())
             LOG.info("Deleting file \"" + getFile() + "\".");
         if (file == null)
             throw new NullPointerException("file is null");
         if (!file.exists())
-            throw new FileNotFoundException("Unable to delete file because it "
-                    + "doesn't exist: \"" + file + "\"");
+            throw new RuntimeException(new FileNotFoundException("Unnable to delete file because it "
+                    + "doesn't exist: \"" + file + "\""));
 
         if (!file.delete())
-            throw new IOException("Unable to delete file: \"" + file + "\"");
+            throw new RuntimeException(new IOException("Unnable to delete file: \"" + file + "\""));
+
+        return true;
     }
 
     public final File getFile() {

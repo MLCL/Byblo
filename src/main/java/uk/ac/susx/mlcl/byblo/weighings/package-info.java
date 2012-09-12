@@ -100,7 +100,6 @@
  * <ul>
  * <p/>
  */
-@ParametersAreNonnullByDefault
-package uk.ac.susx.mlcl.byblo.weighings;
+@ParametersAreNonnullByDefault package uk.ac.susx.mlcl.byblo.weighings;
 
 import javax.annotation.ParametersAreNonnullByDefault;

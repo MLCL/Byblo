@@ -30,11 +30,11 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
-import com.beust.jcommander.ParameterException;
 import uk.ac.susx.mlcl.byblo.commands.*;
 import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
 import uk.ac.susx.mlcl.lib.commands.Command;
 
+import javax.annotation.CheckReturnValue;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +42,7 @@ import java.util.Map;
 /**
  * Main method class for running various tools from the command line.
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class Tools extends AbstractCommand {
@@ -90,21 +91,20 @@ public final class Tools extends AbstractCommand {
     }
 
     @Override
-    public void runCommand() throws Exception {
+    @CheckReturnValue
+    public boolean runCommand() {
         throw new UnsupportedOperationException("Not supported.");
     }
 
     /**
      * Main method.
      * <p/>
+     *
      * @param args command line argument
      * @throws Exception when something goes awry.
      */
     public static void main(final String[] args) throws Exception {
-        try {
-            new Tools().runCommand(args);
-        } catch (ParameterException ex) {
+        if (!new Tools().runCommand(args))
             System.exit(-1);
-        }
     }
 }

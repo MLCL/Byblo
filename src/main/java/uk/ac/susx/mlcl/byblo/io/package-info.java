@@ -31,7 +31,6 @@
 /**
  * Contains classes that handle project specific I/O.
  */
-@ParametersAreNonnullByDefault
-package uk.ac.susx.mlcl.byblo.io;
+@ParametersAreNonnullByDefault package uk.ac.susx.mlcl.byblo.io;
 
 import javax.annotation.ParametersAreNonnullByDefault;

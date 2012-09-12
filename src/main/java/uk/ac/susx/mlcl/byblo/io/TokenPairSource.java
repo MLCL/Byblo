@@ -45,6 +45,7 @@ import java.nio.charset.Charset;
  * An <tt>TokenPairSource</tt> object is used to retrieve {@link TokenPair}
  * objects from a flat file.
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see TokenPairSink
  */

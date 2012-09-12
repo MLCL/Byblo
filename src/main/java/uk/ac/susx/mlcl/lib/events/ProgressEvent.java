@@ -31,6 +31,7 @@
 package uk.ac.susx.mlcl.lib.events;
 
 import com.google.common.base.Preconditions;
+
 import java.util.EventObject;
 
 /**

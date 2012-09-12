@@ -31,7 +31,6 @@
 /**
  * Utilities library functionality, that may be reusable in other projects.
  */
-@ParametersAreNonnullByDefault
-package uk.ac.susx.mlcl.lib;
+@ParametersAreNonnullByDefault package uk.ac.susx.mlcl.lib;
 
 import javax.annotation.ParametersAreNonnullByDefault;

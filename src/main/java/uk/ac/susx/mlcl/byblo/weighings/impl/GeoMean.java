@@ -42,6 +42,7 @@ import java.io.Serializable;
  * Monotonic with {@link SquaredPMI} and partially monotonic with
  * {@link ChiSquared}.
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class GeoMean

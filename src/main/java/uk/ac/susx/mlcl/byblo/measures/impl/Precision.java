@@ -30,8 +30,9 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import javax.annotation.concurrent.Immutable;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+
+import javax.annotation.concurrent.Immutable;
 
 /**
  * This measure attempts to encapsulate, for each pair of feature vectors A and
@@ -59,6 +60,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * Note that recall(x,y) = precision(y,x) so the precision can be calculated by
  * wrapping an instance of RecallMi in the ReversedProximity decorator.
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Immutable

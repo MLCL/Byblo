@@ -31,7 +31,6 @@
 package uk.ac.susx.mlcl.byblo.commands;
 
 import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
@@ -49,6 +48,7 @@ import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.events.ReportingProgressListener;
 import uk.ac.susx.mlcl.lib.io.Files;
 
+import javax.annotation.CheckReturnValue;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -234,56 +234,72 @@ public class CountCommand extends AbstractCommand {
     }
 
     @Override
-    public void runCommand() throws Exception {
-        if (LOG.isInfoEnabled()) {
-            LOG.info("Running memory count on \"" + inputFile + "\".");
-        }
+    @CheckReturnValue
+    public boolean runCommand() {
+        try {
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Running memory count on \"" + inputFile + "\".");
+            }
 
-        checkState();
+            checkState();
 
-        final TokenPairSource instanceSource = BybloIO.openInstancesSource(inputFile, charset, indexDelegate);
+            final TokenPairSource instanceSource = BybloIO.openInstancesSource(inputFile, charset, indexDelegate);
 
-        WeightedTokenSink entrySink = BybloIO.openEntriesSink(entriesFile, charset, indexDelegate);
+            WeightedTokenSink entrySink = BybloIO.openEntriesSink(entriesFile, charset, indexDelegate);
 
-        WeightedTokenSink featureSink = BybloIO.openFeaturesSink(featuresFile, charset, indexDelegate);
-
-
-        WeightedTokenPairSink eventsSink = BybloIO.openEventsSink(eventsFile, charset, indexDelegate);
-
-        CountTask task = new CountTask(
-                instanceSource, eventsSink, entrySink, featureSink,
-                getEventOrder(), getEntryOrder(), getFeatureOrder());
+            WeightedTokenSink featureSink = BybloIO.openFeaturesSink(featuresFile, charset, indexDelegate);
 
 
-        final ProgressListener listener = new ReportingProgressListener();
-        task.addProgressListener(listener);
+            WeightedTokenPairSink eventsSink = BybloIO.openEventsSink(eventsFile, charset, indexDelegate);
 
-        task.run();
-
-
-        while (task.isExceptionTrapped())
-            task.throwTrappedException();
+            CountTask task = new CountTask(
+                    instanceSource, eventsSink, entrySink, featureSink,
+                    getEventOrder(), getEntryOrder(), getFeatureOrder());
 
 
-        task.removeProgressListener(listener);
-        assert task.getProgressListeners().length == 0;
+            final ProgressListener listener = new ReportingProgressListener();
+            task.addProgressListener(listener);
 
-        instanceSource.close();
-        entrySink.flush();
-        entrySink.close();
-        featureSink.flush();
-        featureSink.close();
-        eventsSink.flush();
-        eventsSink.close();
-
-        if (indexDelegate.isEnumeratorOpen()) {
-            indexDelegate.saveEnumerator();
-            indexDelegate.closeEnumerator();
-        }
+            task.run();
 
 
-        if (LOG.isInfoEnabled()) {
-            LOG.info("Completed memory count.");
+            while (task.isExceptionTrapped())
+                task.throwTrappedException();
+
+
+            task.removeProgressListener(listener);
+            assert task.getProgressListeners().length == 0;
+
+            instanceSource.close();
+            entrySink.flush();
+            entrySink.close();
+            featureSink.flush();
+            featureSink.close();
+            eventsSink.flush();
+            eventsSink.close();
+
+            if (indexDelegate.isEnumeratorOpen()) {
+                indexDelegate.saveEnumerator();
+                indexDelegate.closeEnumerator();
+            }
+
+
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Completed memory count.");
+            }
+
+            return true;
+
+        } catch (NullPointerException ex) {
+            throw ex;
+        } catch (IllegalStateException ex) {
+            throw new RuntimeException(ex);
+        } catch (FileNotFoundException ex) {
+            throw new RuntimeException(ex);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
 
@@ -385,13 +401,5 @@ public class CountCommand extends AbstractCommand {
                 add("featuresOut", featuresFile).
                 add("eventsOut", eventsFile).
                 add("charset", charset);
-    }
-
-    public static void main(final String[] args) throws Exception {
-        try {
-            new CountCommand().runCommand(args);
-        } catch (ParameterException ex) {
-            System.exit(-1);
-        }
     }
 }

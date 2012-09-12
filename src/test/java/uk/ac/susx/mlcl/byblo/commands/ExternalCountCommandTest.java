@@ -43,6 +43,7 @@ import uk.ac.susx.mlcl.lib.commands.AbstractCommandTest;
 import uk.ac.susx.mlcl.lib.io.TempFileFactory;
 import uk.ac.susx.mlcl.lib.test.ExitTrapper;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -157,8 +158,7 @@ public class ExternalCountCommandTest extends
                                           File outEF, Charset charset, boolean preindexedEntries,
                                           boolean preindexedFeatures) throws Exception {
         try {
-            runWithAPI(inInst, outE, outF, outEF, charset, preindexedEntries,
-                    preindexedFeatures);
+            runWithAPI(inInst, outE, outF, outEF, charset, preindexedEntries, preindexedFeatures);
             fail("IllegalStateException should have been thrown.");
         } catch (IllegalStateException ex) {
             // pass
@@ -288,35 +288,36 @@ public class ExternalCountCommandTest extends
 
     }
 
-    @Test
-    public void testMissingParameters() throws Exception {
-        System.out.println("Testing " + subject + " for bad parameterisation.");
+    @Test(expected = RuntimeException.class)
+    public void testIllegalState1() throws Exception {
+        runReplacingParameters(0, TestConstants.TEST_OUTPUT_DIR);
+    }
 
+    @Test(expected = RuntimeException.class)
+    public void testIllegalState2() throws Exception {
+        runReplacingParameters(1, TestConstants.TEST_OUTPUT_DIR);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testIllegalState3() throws Exception {
+        runReplacingParameters(2, TestConstants.TEST_OUTPUT_DIR);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testIllegalState4() throws Exception {
+        runReplacingParameters(3, TestConstants.TEST_OUTPUT_DIR);
+    }
+
+    public void runReplacingParameters(int id, @Nullable File repl) throws Exception {
         final File instIn = TestConstants.TEST_FRUIT_INPUT;
         final String fruitPrefix = TestConstants.TEST_FRUIT_INPUT.getName();
         final File eOut = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix + ".entries");
         final File fOut = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix + ".features");
-        final File efOut = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix + ".events");
-
-        runExpectingNullPointer(null, eOut, fOut, efOut, TestConstants.DEFAULT_CHARSET,
-                false, false);
-        runExpectingNullPointer(instIn, null, fOut, efOut, TestConstants.DEFAULT_CHARSET,
-                false, false);
-        runExpectingNullPointer(instIn, eOut, null, efOut, TestConstants.DEFAULT_CHARSET,
-                false, false);
-        runExpectingNullPointer(instIn, eOut, fOut, null, TestConstants.DEFAULT_CHARSET,
-                false, false);
-        runExpectingNullPointer(instIn, eOut, fOut, efOut, null, false, false);
-
-        File dir = TestConstants.TEST_OUTPUT_DIR;
-        runExpectingIllegalState(dir, eOut, fOut, efOut, TestConstants.DEFAULT_CHARSET,
-                false, false);
-        runExpectingIllegalState(instIn, dir, fOut, efOut, TestConstants.DEFAULT_CHARSET,
-                false, false);
-        runExpectingIllegalState(instIn, eOut, dir, efOut, TestConstants.DEFAULT_CHARSET,
-                false, false);
-        runExpectingIllegalState(instIn, eOut, fOut, dir, TestConstants.DEFAULT_CHARSET,
-                false, false);
+        final File vOut = new File(TestConstants.TEST_OUTPUT_DIR, fruitPrefix + ".events");
+        File[] files = new File[]{instIn, eOut, fOut, vOut};
+        files[id] = repl;
+        runWithAPI(files[0], files[1], files[2], files[3],
+                TestConstants.DEFAULT_CHARSET, false, false);
     }
 
     @Test

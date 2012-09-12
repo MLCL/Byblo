@@ -31,7 +31,6 @@
 /**
  * Contains classes related to running from the command line.
  */
-@ParametersAreNonnullByDefault
-package uk.ac.susx.mlcl.lib.commands;
+@ParametersAreNonnullByDefault package uk.ac.susx.mlcl.lib.commands;
 
 import javax.annotation.ParametersAreNonnullByDefault;

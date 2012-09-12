@@ -89,7 +89,7 @@ public class SimsKnnCommandTest extends AbstractCommandTest<KnnSimsCommand> {
         knnTask.setNearnessComparator(Comparators.reverse(Weighted
                 .<TokenPair>weightOrder()));
 
-        knnTask.runCommand();
+        assertTrue(knnTask.runCommand());
 
         assertTrue("Output files not created.", out.exists());
         assertTrue("Empty output file found.", out.length() > 0);
@@ -116,7 +116,7 @@ public class SimsKnnCommandTest extends AbstractCommandTest<KnnSimsCommand> {
         knnTask.setNearnessComparator(Comparators.reverse(Weighted
                 .<TokenPair>weightOrder()));
 
-        knnTask.runCommand();
+        assertTrue(knnTask.runCommand());
 
         assertTrue("Output files not created.", out.exists());
         assertTrue("Empty output file found.", out.length() > 0);

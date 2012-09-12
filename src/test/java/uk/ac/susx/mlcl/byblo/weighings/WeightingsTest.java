@@ -34,13 +34,11 @@ import it.unimi.dsi.fastutil.ints.AbstractInt2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap.Entry;
 import org.junit.*;
-import uk.ac.susx.mlcl.byblo.commands.AllPairsCommand;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDelegates;
 import uk.ac.susx.mlcl.byblo.io.BybloIO;
 import uk.ac.susx.mlcl.byblo.io.FastWeightedTokenPairVectorSource;
-import uk.ac.susx.mlcl.byblo.io.WeightedTokenSource;
 import uk.ac.susx.mlcl.byblo.weighings.impl.*;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
@@ -112,7 +110,7 @@ public class WeightingsTest {
                 EnumeratingDelegates.toSingleFeatures(indexDelegate));
 
         assertEquals("marginal distributions totals differ",
-                     fmd.getFrequencySum(), emd.getFrequencySum(), 0.000001);
+                fmd.getFrequencySum(), emd.getFrequencySum(), 0.000001);
 
         // Load the events vectors
 

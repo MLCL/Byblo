@@ -84,8 +84,8 @@ public final class ObjectSortTask<T> extends ObjectPipeTask<T> {
             return false;
         if (this.getComparator() != other.getComparator()
                 && (this.getComparator() == null
-                    || !this.getComparator().
-                    equals(other.getComparator())))
+                || !this.getComparator().
+                equals(other.getComparator())))
             return false;
         return true;
 

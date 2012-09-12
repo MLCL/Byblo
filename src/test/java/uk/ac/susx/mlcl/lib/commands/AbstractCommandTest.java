@@ -32,8 +32,6 @@ package uk.ac.susx.mlcl.lib.commands;
 
 import junit.framework.Assert;
 import org.junit.*;
-import uk.ac.susx.mlcl.lib.commands.AbstractCommand;
-import uk.ac.susx.mlcl.lib.commands.Command;
 import uk.ac.susx.mlcl.lib.test.ExitTrapper;
 import uk.ac.susx.mlcl.testing.AbstractObjectTest;
 

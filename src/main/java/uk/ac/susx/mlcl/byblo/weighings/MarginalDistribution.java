@@ -31,14 +31,15 @@
 package uk.ac.susx.mlcl.byblo.weighings;
 
 import com.google.common.base.Preconditions;
-import java.util.Arrays;
-import javax.annotation.Nonnegative;
-import javax.annotation.concurrent.Immutable;
 import uk.ac.susx.mlcl.byblo.measures.Measures;
 import uk.ac.susx.mlcl.lib.collect.ArrayMath;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnegative;
+import javax.annotation.concurrent.Immutable;
+import java.util.Arrays;
+
 /**
- *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Immutable
@@ -69,6 +70,7 @@ public final class MarginalDistribution {
     /**
      * Full dependency injection constructor.
      * <p/>
+     *
      * @param frequencies
      * @param frequencySum
      * @param nonZeroCardinality
@@ -91,12 +93,13 @@ public final class MarginalDistribution {
      * Constructor that automatically calculates the sum and non-zero
      * cardinality from the provided frequency array.
      * <p/>
+     *
      * @param frequencies
      */
     public MarginalDistribution(final double[] frequencies) {
         this(frequencies,
-             ArrayMath.sum(frequencies),
-             nonZeroCardinality(frequencies));
+                ArrayMath.sum(frequencies),
+                nonZeroCardinality(frequencies));
     }
 
     /**
@@ -104,11 +107,13 @@ public final class MarginalDistribution {
      * <p/>
      * TODO: Move to mlcl-lib
      * <p/>
+     *
      * @param frequencies
      * @return
      */
-    private static @Nonnegative
-    int nonZeroCardinality(final double[] frequencies) {
+    @Nonnegative
+    @CheckReturnValue
+    private static int nonZeroCardinality(final double[] frequencies) {
         int nonZeroCardinality = 0;
         for (double f : frequencies)
             if (!Measures.epsilonEquals(f, 0, 0))
@@ -128,6 +133,7 @@ public final class MarginalDistribution {
      *
      * @return marginal scores for each event marginal
      */
+    @CheckReturnValue
     public double[] getFrequencies() {
         return Arrays.copyOf(frequencies, frequencies.length);
     }
@@ -136,21 +142,23 @@ public final class MarginalDistribution {
      * Return the frequency of a particular event marginal, denoted by the index
      * <code>i</code>.
      * <p/>
+     *
      * @param index The event marginal id (dimension) to access
      * @return The frequency of that event marginal over the whole join
      *         distribution.
      */
-    public @Nonnegative
-    double getFrequency(@Nonnegative int index) {
+    @CheckReturnValue
+    @Nonnegative
+    public double getFrequency(@Nonnegative int index) {
         return frequencies[index];
     }
 
     /**
-     *
      * @return
      */
-    public @Nonnegative
-    double getFrequencySum() {
+    @CheckReturnValue
+    @Nonnegative
+    public double getFrequencySum() {
         return frequencySum;
     }
 
@@ -161,18 +169,21 @@ public final class MarginalDistribution {
      *
      * @return number of actually occurring feature types
      */
-    public @Nonnegative
-    int getNonZeroCardinality() {
+    @CheckReturnValue
+    @Nonnegative
+    public int getNonZeroCardinality() {
         return nonZeroCardinality;
     }
 
     /**
      * The number of unique features.
      * <p/>
+     *
      * @return number of unique featuress.
      */
-    public final @Nonnegative
-    int getCardinality() {
+    @CheckReturnValue
+    @Nonnegative
+    public final int getCardinality() {
         return frequencies.length;
     }
 
@@ -181,11 +192,13 @@ public final class MarginalDistribution {
      * calculated as the frequency of the marginal divided by the sum of all
      * frequencies in the distribution.
      * <p/>
+     *
      * @param index event marginal id (dimension)
      * @return independent prior probability of that event marginal occurring.
      */
-    public final @Nonnegative
-    double getPrior(@Nonnegative final int index) {
+    @CheckReturnValue
+    @Nonnegative
+    public final double getPrior(@Nonnegative final int index) {
         return frequencySum == 0 ? 0
                 : frequencies[index] / frequencySum;
     }

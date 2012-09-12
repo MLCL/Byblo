@@ -31,7 +31,6 @@
 /**
  * Contains classes for handling tasks; workers.
  */
-@ParametersAreNonnullByDefault
-package uk.ac.susx.mlcl.lib.tasks;
+@ParametersAreNonnullByDefault package uk.ac.susx.mlcl.lib.tasks;
 
 import javax.annotation.ParametersAreNonnullByDefault;

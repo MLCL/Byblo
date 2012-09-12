@@ -36,9 +36,8 @@ package uk.ac.susx.mlcl.byblo.weighings;
 public interface EntryMarginalsCarrier {
 
     /**
-     *
      * @return @throws IllegalStateException if marginals are requested before
-     *                                       they are set
+     *         they are set
      */
     MarginalDistribution getEntryMarginals() throws IllegalStateException;
 

@@ -70,6 +70,7 @@ import static uk.ac.susx.mlcl.byblo.measures.Measures.epsilonEquals;
  * <p/>
  * </ul>
  * <p/>
+ *
  * @author Hamish I A Morgan <tt>&lt;hamish.morgan@sussex.ac.uk&gt;</tt>
  * @see "A New Measure of Rank Correlation." Maurice Kendall (1938). Biometrika
  *      30 (1–2): 81–89."
@@ -108,6 +109,7 @@ public final class KendallsTau
      * initializing the expected dimensionality of vectors to
      * <tt>minCardinality</tt>.
      * <p/>
+     *
      * @param minCardinality expected dimensionality of vectors
      * @throws IllegalArgumentException when <code>minCardinality</code> is
      *                                  negative
@@ -125,6 +127,7 @@ public final class KendallsTau
     /**
      * Get the minimum (usually the actual) cardinality of vectors.
      * <p/>
+     *
      * @return expected dimensionality of vectors
      */
     public final int getMinCardinality() {
@@ -137,6 +140,7 @@ public final class KendallsTau
      * If the vector cardinality is known before hand, but is not set on the
      * vectors for some reason, then method can be used to set it globally.
      * <p/>
+     *
      * @param minCardinality expected dimensionality of vectors
      * @throws IllegalArgumentException when <code>minCardinality</code> is
      *                                  negative
@@ -156,6 +160,7 @@ public final class KendallsTau
      * orientation of this measure is: -1 indicating total disagreement, +1
      * indicating total agreement, and ~0 indicating independence.
      * <p/>
+     *
      * @param A first feature vector
      * @param B second feature vector
      * @return rank correlation of the feature vectors
@@ -360,6 +365,7 @@ public final class KendallsTau
      * <p/>
      * Considering pulling this up to the {@link Measure } interface.
      * <p/>
+     *
      * @return score indicating no positive or negative correlation has been
      *         found.
      */

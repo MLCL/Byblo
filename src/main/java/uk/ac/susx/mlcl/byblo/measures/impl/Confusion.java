@@ -30,14 +30,15 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsCarrier;
 import uk.ac.susx.mlcl.byblo.weighings.MarginalDistribution;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Proximity measure computing the confusion probability between the given

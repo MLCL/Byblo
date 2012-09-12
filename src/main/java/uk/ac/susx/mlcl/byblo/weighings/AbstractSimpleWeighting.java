@@ -40,6 +40,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * weighting is independent of everything else; for example a simple
  * thresholding scheme.
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class AbstractSimpleWeighting implements Weighting {
@@ -68,6 +69,7 @@ public abstract class AbstractSimpleWeighting implements Weighting {
     /**
      * Re-weight the given element value.
      * <p/>
+     *
      * @param value input weighting
      * @return output weighting
      */

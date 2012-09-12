@@ -40,6 +40,7 @@ import java.io.Serializable;
  * Variant of Pointwise-Mutual-Information where each score is re-weighted by
  * the probability of the event.
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class WeightedPMI

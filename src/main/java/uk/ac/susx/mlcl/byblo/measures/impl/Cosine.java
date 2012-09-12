@@ -42,6 +42,7 @@ import java.io.Serializable;
  * Proximity measure calculating proximity as the degree orthogonality between
  * vectors; the cosine of the angle between them.
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class Cosine extends DecomposableMeasure implements Serializable {

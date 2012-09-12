@@ -39,6 +39,7 @@ import java.io.Serializable;
  * {@link Weighting} that normalizes the feature vector to an L2 unit vector, by
  * dividing by the normal.
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class L2UnitVector
@@ -80,6 +81,7 @@ public final class L2UnitVector
      * <p/>
      * TODO: Move to mlcl-lib/SparseDoubleVector
      * <p/>
+     *
      * @param vector
      * @return magnitude of vector
      */
@@ -92,6 +94,7 @@ public final class L2UnitVector
      * <p/>
      * TODO: Move to mlcl-lib/SparseDoubleVector
      * <p/>
+     *
      * @param vector
      * @return magnitude squared of vector
      */

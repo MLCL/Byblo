@@ -40,6 +40,7 @@ import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 
+import javax.annotation.CheckReturnValue;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -67,12 +68,17 @@ public abstract class IndexingCommands<T>
     }
 
     @Override
-    public void runCommand() throws Exception {
-        checkState();
-        super.runCommand();
-
-        indexDelegate.saveEnumerator();
-        indexDelegate.closeEnumerator();
+    @CheckReturnValue
+    public boolean runCommand() {
+        try {
+            checkState();
+            boolean result = super.runCommand();
+            indexDelegate.saveEnumerator();
+            indexDelegate.closeEnumerator();
+            return true;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

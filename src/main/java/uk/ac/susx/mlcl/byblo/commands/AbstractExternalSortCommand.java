@@ -246,12 +246,12 @@ public abstract class AbstractExternalSortCommand<T>
                 if (!nextFileToMerge[i].delete() && LOG.isWarnEnabled())
                     LOG.
                             warn("Failed to delete input file 1 to completed merge: "
-                            + nextFileToMerge[i].getName());
+                                    + nextFileToMerge[i].getName());
 
                 if (!nextFileToMerge[i + 1].delete() && LOG.isWarnEnabled())
                     LOG.
                             warn("Failed to delete input file 2 to completed merge: "
-                            + nextFileToMerge[i + 1].getName());
+                                    + nextFileToMerge[i + 1].getName());
 
 
                 nextFileToMerge[i] = null;

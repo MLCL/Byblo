@@ -34,9 +34,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import uk.ac.susx.mlcl.TestConstants;
-import uk.ac.susx.mlcl.lib.commands.AbstractCommandTest;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerating;
+import uk.ac.susx.mlcl.lib.commands.AbstractCommandTest;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -85,9 +85,10 @@ public class CountCommandTest extends AbstractCommandTest<CountCommand> {
         countTask.setEventsFile(outEF);
         countTask.setCharset(charset);
         DoubleEnumeratingDelegate idx = new DoubleEnumeratingDelegate(
-                Enumerating.DEFAULT_TYPE, preIndexEntries, preIndexFeatures, null, null);
+                Enumerating.DEFAULT_TYPE, preIndexEntries, preIndexFeatures,
+                null, null);
         countTask.setIndexDelegate(idx);
-        countTask.runCommand();
+        assertTrue(countTask.runCommand());
 
         assertTrue("Output files not created: " + outE, outE.exists());
         assertTrue("Output files not created: " + outF, outF.exists());
@@ -124,7 +125,7 @@ public class CountCommandTest extends AbstractCommandTest<CountCommand> {
 
         try {
             enableExistTrapping();
-            CountCommand.main(args);
+            new CountCommand().runCommand(args);
         } finally {
             disableExitTrapping();
         }
@@ -211,22 +212,22 @@ public class CountCommandTest extends AbstractCommandTest<CountCommand> {
 
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = RuntimeException.class)
     public void testIllegalState1() throws Exception {
         runReplacingFile(0, TEST_OUTPUT_DIR);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = RuntimeException.class)
     public void testIllegalState2() throws Exception {
         runReplacingFile(1, TEST_OUTPUT_DIR);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = RuntimeException.class)
     public void testIllegalState3() throws Exception {
         runReplacingFile(2, TEST_OUTPUT_DIR);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = RuntimeException.class)
     public void testIllegalState4() throws Exception {
         runReplacingFile(3, TEST_OUTPUT_DIR);
     }

@@ -66,6 +66,7 @@ import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
+import javax.annotation.CheckReturnValue;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -211,51 +212,51 @@ public class AllPairsCommand extends AbstractCommand {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public void runCommand() throws Exception {
+    @CheckReturnValue
+    public boolean runCommand() {
+        try {
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Running all-pairs similarity.");
+            }
 
-        if (LOG.isInfoEnabled()) {
-            LOG.info("Running all-pairs similarity.");
-        }
+            // Instantiate the denote proxmity measure
+            Measure measure = getMeasureClass().newInstance();
 
-        // Instantiate the denote proxmity measure
-        Measure measure = getMeasureClass().newInstance();
-
-        // Parameterise those measures that require them
-        if (measure instanceof LpSpaceDistance) {
-            ((LpSpaceDistance) measure).setPower(getMinkP());
-        }
-        if (measure instanceof LeeSkewDivergence) {
-            ((LeeSkewDivergence) measure).setAlpha(getLeeAlpha());
-        }
-        if (measure instanceof Weeds) {
-            ((Weeds) measure).setBeta(getCrmiBeta());
-            ((Weeds) measure).setGamma(getCrmiGamma());
-        }
-        if (measure instanceof LambdaDivergence) {
-            ((LambdaDivergence) measure).setLambda(getLambdaLambda());
-        }
-
-
-        if (weighting.getClass().equals(NullWeighting.class)) {
-            weighting = measure.getExpectedWeighting().newInstance();
-        } else {
-            weighting = Weightings.compose(
-                    weighting,
-                    measure.getExpectedWeighting().newInstance());
-        }
+            // Parameterise those measures that require them
+            if (measure instanceof LpSpaceDistance) {
+                ((LpSpaceDistance) measure).setPower(getMinkP());
+            }
+            if (measure instanceof LeeSkewDivergence) {
+                ((LeeSkewDivergence) measure).setAlpha(getLeeAlpha());
+            }
+            if (measure instanceof Weeds) {
+                ((Weeds) measure).setBeta(getCrmiBeta());
+                ((Weeds) measure).setGamma(getCrmiGamma());
+            }
+            if (measure instanceof LambdaDivergence) {
+                ((LambdaDivergence) measure).setLambda(getLambdaLambda());
+            }
 
 
-        /*
-         * Some weightings schemes require additional context information,
-         * specifically the feature marginal distribution. Also there is one
-         * measure (Confusion) that requires this information. The KendallsTau
-         * and KullbackLeiblerDivergence measure just needs the total number of
-         * features types.
-         */
-        if (measure instanceof FeatureMarginalsCarrier
-                || weighting instanceof FeatureMarginalsCarrier) {
-            try {
+            if (weighting.getClass().equals(NullWeighting.class)) {
+                weighting = measure.getExpectedWeighting().newInstance();
+            } else {
+                weighting = Weightings.compose(
+                        weighting,
+                        measure.getExpectedWeighting().newInstance());
+
+            }
+
+
+            /*
+             * Some weightings schemes require additional context information,
+             * specifically the feature marginal distribution. Also there is one
+             * measure (Confusion) that requires this information. The
+             * KendallsTau and KullbackLeiblerDivergence measure just needs the
+             * total number of features types.
+             */
+            if (measure instanceof FeatureMarginalsCarrier
+                    || weighting instanceof FeatureMarginalsCarrier) {
                 if (LOG.isInfoEnabled()) {
                     LOG.info("Loading features file " + getFeaturesFile());
                 }
@@ -270,13 +271,8 @@ public class AllPairsCommand extends AbstractCommand {
                     ((FeatureMarginalsCarrier) weighting).setFeatureMarginals(fmd);
                 }
 
-
-            } catch (IOException e) {
-                throw e;
-            }
-        } else if (measure instanceof KendallsTau
-                || measure instanceof KullbackLeiblerDivergence) {
-            try {
+            } else if (measure instanceof KendallsTau
+                    || measure instanceof KullbackLeiblerDivergence) {
                 if (LOG.isInfoEnabled()) {
                     LOG.
                             info("Loading entries file for "
@@ -295,73 +291,83 @@ public class AllPairsCommand extends AbstractCommand {
                     ((KullbackLeiblerDivergence) measure).setMinCardinality(
                             cardinality);
 
-            } catch (IOException e) {
-                throw e;
             }
-        }
-//        //XXX This needs to be sorted out --- filter id must be read from the
-//        // stored enumeration, for optimal robustness
-//        measure.setFilteredFeatureId(FilterCommand.FILTERED_ID);
+            //        //XXX This needs to be sorted out --- filter id must be read from the
+            //        // stored enumeration, for optimal robustness
+            //        measure.setFilteredFeatureId(FilterCommand.FILTERED_ID);
 
-        // Swap the proximity measure inputs if required
-        if (isMeasureReversed()) {
-            measure = Measures.reverse(measure);
-        }
+            // Swap the proximity measure inputs if required
+            if (isMeasureReversed()) {
+                measure = Measures.reverse(measure);
+            }
 
-        // XXX: Apply the weighing at similarity calculation time, 
-        // inefficient but simple for now.
-        measure = Measures.autoWeighted(measure, weighting);
-
-
-        // Instantiate two vector source objects than can scan and read the
-        // main db. We need two because the algorithm takes all pairwise
-        // combinations of vectors, so will be looking at two differnt points
-        // in the file. Also this allows for the possibility of having differnt
-        // files, e.g compare fruit words with cake words
-        final FastWeightedTokenPairVectorSource sourceA = openEventsSource();
-        final FastWeightedTokenPairVectorSource sourceB = openEventsSource();
+            // XXX: Apply the weighing at similarity calculation time, 
+            // inefficient but simple for now.
+            measure = Measures.autoWeighted(measure, weighting);
 
 
-        // Create a sink object that will act as a recipient for all pairs that
-        // are produced by the algorithm.
-
-        WeightedTokenPairSink sink = openSimsSink();
-
-
-        final NaiveApssTask apss = newAlgorithmInstance();
-
-
-        // Parameterise the all-pairs algorithm
-        apss.setSourceA(sourceA);
-        apss.setSourceB(sourceB);
-        apss.setSink(sink);
-        apss.setMeasure(measure);
-        apss.setProducatePair(getProductionFilter());
+            // Instantiate two vector source objects than can scan and read the
+            // main db. We need two because the algorithm takes all pairwise
+            // combinations of vectors, so will be looking at two differnt points
+            // in the file. Also this allows for the possibility of having differnt
+            // files, e.g compare fruit words with cake words
+            final FastWeightedTokenPairVectorSource sourceA = openEventsSource();
+            final FastWeightedTokenPairVectorSource sourceB = openEventsSource();
 
 
-        apss.addProgressListener(new ReportLoggingProgressListener(LOG));
+            // Create a sink object that will act as a recipient for all pairs that
+            // are produced by the algorithm.
 
-        apss.run();
+            WeightedTokenPairSink sink = openSimsSink();
 
-        sink.flush();
-        sink.close();
 
-        if (sourceA instanceof Closeable)
-            ((Closeable) sourceA).close();
+            final NaiveApssTask apss = newAlgorithmInstance();
 
-        if (sourceB instanceof Closeable)
-            ((Closeable) sourceB).close();
 
-        if (apss.isExceptionTrapped())
-            apss.throwTrappedException();
+            // Parameterise the all-pairs algorithm
+            apss.setSourceA(sourceA);
+            apss.setSourceB(sourceB);
+            apss.setSink(sink);
+            apss.setMeasure(measure);
+            apss.setProducatePair(getProductionFilter());
 
-        if (indexDelegate.isEnumeratorOpen()) {
-            indexDelegate.saveEnumerator();
-            indexDelegate.closeEnumerator();
-        }
 
-        if (LOG.isInfoEnabled()) {
-            LOG.info("Completed all-pairs similarity search.");
+            apss.addProgressListener(new ReportLoggingProgressListener(LOG));
+
+            apss.run();
+
+            sink.flush();
+            sink.close();
+
+            if (sourceA instanceof Closeable)
+                ((Closeable) sourceA).close();
+
+            if (sourceB instanceof Closeable)
+                ((Closeable) sourceB).close();
+
+            if (apss.isExceptionTrapped())
+                apss.throwTrappedException();
+
+            if (indexDelegate.isEnumeratorOpen()) {
+                indexDelegate.saveEnumerator();
+                indexDelegate.closeEnumerator();
+            }
+
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Completed all-pairs similarity search.");
+            }
+
+            return true;
+        } catch (InstantiationException ex) {
+            throw new RuntimeException(ex);
+        } catch (IllegalAccessException ex) {
+            throw new RuntimeException(ex);
+        } catch (ClassNotFoundException ex) {
+            throw new RuntimeException(ex);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
         }
     }
 

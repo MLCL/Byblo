@@ -28,7 +28,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-@ParametersAreNonnullByDefault
-package uk.ac.susx.mlcl.byblo;
+@ParametersAreNonnullByDefault package uk.ac.susx.mlcl.byblo;
 
 import javax.annotation.ParametersAreNonnullByDefault;

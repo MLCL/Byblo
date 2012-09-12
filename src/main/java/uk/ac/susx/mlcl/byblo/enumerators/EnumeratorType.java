@@ -30,9 +30,9 @@
  */
 package uk.ac.susx.mlcl.byblo.enumerators;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
-import javax.annotation.Nullable;
 
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;

@@ -44,6 +44,7 @@ import java.nio.charset.Charset;
  * A <tt>WeightedTokenPairSource</tt> object is used to retrieve
  * {@link TokenPair} objects from a flat file.
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see WeightedTokenPairSink
  */

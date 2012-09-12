@@ -38,6 +38,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 /**
  * Measure is a common super-interface to various similarity measure types.
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public interface Measure {
@@ -45,6 +46,7 @@ public interface Measure {
     /**
      * Compute the similarity score between the vector operands.
      * <p/>
+     *
      * @param A first feature vector
      * @param B second feature vector
      * @return similarity of the feature vectors
@@ -56,6 +58,7 @@ public interface Measure {
      * two vectors are identical. In the case of proximity scores this value
      * should usually be 0. For distance metrics it is usually +infinity,
      * <p/>
+     *
      * @return value indicating vectors are identical
      */
     double getHomogeneityBound();
@@ -66,6 +69,7 @@ public interface Measure {
      * this value should usually be 1 or +infinity. For distance metrics it is
      * usually 0,
      * <p/>
+     *
      * @return value indicating vectors are maximally dissimilar
      */
     double getHeterogeneityBound();
@@ -82,6 +86,7 @@ public interface Measure {
      * expect since multi-set generalizations are implemented. Lin and Weeds
      * measure expect PMI weighting.
      * <p/>
+     *
      * @return weighting scheme that should have been previously applied to
      *         vectors
      */
@@ -102,6 +107,7 @@ public interface Measure {
      * example {@link KLDivergence} is a distance measure while the
      * {@link LpSpace} variants are true metrics.
      * <p/>
+     *
      * @return true if the measure defines a symmetric space, false otherwise
      */
     boolean isCommutative();

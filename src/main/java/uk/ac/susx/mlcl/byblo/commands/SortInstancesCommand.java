@@ -38,6 +38,7 @@ import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 
+import javax.annotation.CheckReturnValue;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -62,11 +63,16 @@ public final class SortInstancesCommand extends AbstractSortCommand<TokenPair> {
     }
 
     @Override
-    public void runCommand() throws Exception {
-        super.runCommand();
-        indexDelegate.saveEnumerator();
-        indexDelegate.closeEnumerator();
-
+    @CheckReturnValue
+    public boolean runCommand() {
+        try {
+            boolean result = super.runCommand();
+            indexDelegate.saveEnumerator();
+            indexDelegate.closeEnumerator();
+            return result;
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     @Override

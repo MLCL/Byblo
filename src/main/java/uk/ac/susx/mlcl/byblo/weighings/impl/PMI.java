@@ -40,6 +40,7 @@ import java.io.Serializable;
  * pmi(x,y) = log[p(x,y) / (p(x)p(y))] = log[p(x|y)/p(x)] = log p(x|y) - log
  * p(x)
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class PMI

@@ -46,6 +46,7 @@ import java.io.Serializable;
  * literature; e.g. James Curran's PhD thesis "From Distributional to Semantic
  * Similarity." (2004)
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class DiceWeighting

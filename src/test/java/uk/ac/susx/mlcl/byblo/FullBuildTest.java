@@ -36,6 +36,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 
+import static org.junit.Assert.assertTrue;
 import static uk.ac.susx.mlcl.TestConstants.*;
 
 /**
@@ -57,9 +58,8 @@ public class FullBuildTest {
         instance.setInstancesFile(TEST_FRUIT_INPUT);
         instance.setOutputDir(TEST_OUTPUT_DIR);
         instance.setTempBaseDir(TEST_OUTPUT_DIR);
-        instance.runCommand();
 
-
+        assertTrue(instance.runCommand());
     }
 
     @Test
@@ -79,9 +79,7 @@ public class FullBuildTest {
         instance.setFilterEntryMinFreq(2);
         instance.setFilterFeatureMinFreq(2);
         instance.setFilterEventMinFreq(2);
-        instance.runCommand();
-
-
+        assertTrue(instance.runCommand());
     }
 
     @Test
@@ -126,8 +124,7 @@ public class FullBuildTest {
         instance.setSkipIndex1(skip1);
         instance.setSkipIndex2(skip2);
 
-        instance.runCommand();
-
+        assertTrue(instance.runCommand());
     }
 
     @Test
@@ -147,29 +144,6 @@ public class FullBuildTest {
         instance.setFilterEntryMinFreq(160);
         instance.setFilterFeatureMinFreq(90);
         instance.setFilterEventMinFreq(40);
-        instance.runCommand();
-
-
+        assertTrue(instance.runCommand());
     }
-//    @Test
-//    @Ignore
-//    public void testRunCommand_Medtest10m() throws Exception {
-//        System.out.println("Test on fruit");
-//
-//        File medtestDir = new File(TEST_DATA_DIR, "medtest");
-//        File input = new File(medtestDir, "medtest-tb-cb-ng-nl-nr-vhl-vhrpl-pr-cw-55-sample10m");
-//
-//        FullBuild instance = new FullBuild();
-//        instance.setCharset(DEFAULT_CHARSET);
-//        instance.setInstancesFile(input);
-//        instance.setOutputDir(TEST_OUTPUT_DIR);
-//        instance.setTempBaseDir(TEST_OUTPUT_DIR);
-//        instance.setMinSimilarity(0.1);
-//        instance.setFilterEntryMinFreq(160);
-//        instance.setFilterFeatureMinFreq(90);
-//        instance.setFilterEventMinFreq(40);
-//        instance.runCommand();
-//
-//
-//    }
 }

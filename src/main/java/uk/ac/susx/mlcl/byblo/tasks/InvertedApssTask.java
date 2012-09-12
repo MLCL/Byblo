@@ -52,6 +52,7 @@ import java.util.Set;
  * building a reverse index of one of the input sources. This allows candidate
  * pairs to be found relatively quickly given sufficient sparsity
  * <p/>
+ *
  * @param <S>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */

@@ -31,7 +31,6 @@
 /**
  * Package contains a collection of feature re-weighting implementations.
  */
-@ParametersAreNonnullByDefault
-package uk.ac.susx.mlcl.byblo.weighings.impl;
+@ParametersAreNonnullByDefault package uk.ac.susx.mlcl.byblo.weighings.impl;
 
 import javax.annotation.ParametersAreNonnullByDefault;

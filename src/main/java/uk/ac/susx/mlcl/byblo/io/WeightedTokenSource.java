@@ -46,6 +46,7 @@ import java.nio.charset.Charset;
  * An <tt>WeightedTokenSource</tt> object is used to retrieve {@link Token}
  * objects from a flat file.
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see WeightedTokenSink
  */

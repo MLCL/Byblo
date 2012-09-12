@@ -69,6 +69,7 @@ import java.nio.charset.Charset;
  * <p>Compact mode is the default behavior, since it can reduce file sizes by
  * approximately 50%, with corresponding reductions in I/O overhead.</p>
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class WeightedTokenSink implements ObjectSink<Weighted<Token>>, Closeable, Flushable {

@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.byblo;
 
+import junit.framework.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -1035,7 +1036,7 @@ public class FullBuildTest2 {
             count.setEventsFile(events);
             count.setIndexDelegate(countIndex);
             count.setCharset(charet);
-            count.runCommand();
+            Assert.assertTrue(count.runCommand());
         } else {
             ExternalCountCommand count = new ExternalCountCommand();
             count.setInstancesFile(instances);
@@ -1044,7 +1045,7 @@ public class FullBuildTest2 {
             count.setEventsFile(events);
             count.setIndexDelegate(countIndex);
             count.getFileDelegate().setCharset(charet);
-            count.runCommand();
+            Assert.assertTrue(count.runCommand());
         }
 
         assertValidPlaintextInputFiles(entries, features, events);
@@ -1071,7 +1072,7 @@ public class FullBuildTest2 {
                 allpairsIndex);
         if (serial)
             allpairs.setNumThreads(1);
-        allpairs.runCommand();
+        Assert.assertTrue(allpairs.runCommand());
 
         assertValidPlaintextInputFiles(similarities);
         assertSizeGT(TEST_FRUIT_SIMS, similarities);
@@ -1116,9 +1117,9 @@ public class FullBuildTest2 {
         filter.setIndexDelegate(new DoubleEnumeratingDelegate(type,
                 preindexedEntries, preindexedFeatures, entryIndex, featureIndex));
         filter.addEventMinimumFrequency(2);
-        // filter.setTempFiles(new TempFileFactory(TestConstants.TEST_TMP_DIR));
+
         filter.setTempFiles(new TempFileFactory(TestConstants.TEST_TMP_DIR));
-        filter.runCommand();
+        Assert.assertTrue(filter.runCommand());
 
         assertValidPlaintextInputFiles(eventsFiltered, entriesFiltered,
                 featuresFiltered);
@@ -1133,7 +1134,7 @@ public class FullBuildTest2 {
 
         KnnSimsCommand knn = new KnnSimsCommand(from, to, DEFAULT_CHARSET,
                 new SingleEnumeratingDelegate(type, enumerated, null), 5);
-        knn.runCommand();
+        Assert.assertTrue(knn.runCommand());
 
         assertValidPlaintextInputFiles(to);
         assertSizeGT(from, to);
@@ -1146,7 +1147,7 @@ public class FullBuildTest2 {
         ExternalKnnSimsCommand knn = new ExternalKnnSimsCommand(from, to,
                 DEFAULT_CHARSET, new SingleEnumeratingDelegate(type,
                 enumerated, null), 5);
-        knn.runCommand();
+        Assert.assertTrue(knn.runCommand());
 
         assertValidPlaintextInputFiles(to);
         assertSizeGT(from, to);

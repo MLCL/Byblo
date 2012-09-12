@@ -38,7 +38,6 @@ import org.junit.Test;
 import uk.ac.susx.mlcl.lib.io.Files;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
@@ -96,7 +95,7 @@ public class FileCopyCommandTest extends AbstractCommandTest<FileCopyCommand> {
         Files.writeAll(in, Files.DEFAULT_CHARSET, str);
         File out = File.createTempFile(getClass().getName(), "out");
         FileCopyCommand instance = new FileCopyCommand(in, out);
-        instance.runCommand();
+        assertTrue(instance.runCommand());
         assertTrue(out.exists());
         assertEquals(in.length(), out.length());
 
@@ -109,15 +108,15 @@ public class FileCopyCommandTest extends AbstractCommandTest<FileCopyCommand> {
             throw new IOException("Failed to delete file: " + out);
     }
 
-    @Test(expected = FileNotFoundException.class)
-    public void testRun_failure_noInput() throws Exception {
+    @Test(expected = RuntimeException.class)
+    public void testRun_failure_noinput() throws Exception {
         System.out.println("Testing run() -- expecting failure (no input)");
         File in = File.createTempFile(getClass().getName(), "in");
         if (!in.delete())
             throw new IOException("Failed to delete file: " + in);
         File out = File.createTempFile(getClass().getName(), "out");
         FileCopyCommand instance = new FileCopyCommand(in, out);
-        instance.runCommand();
+        assertTrue(instance.runCommand());
         if (!in.delete())
             throw new IOException("Failed to delete file: " + in);
         if (!out.delete())

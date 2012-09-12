@@ -32,7 +32,6 @@
  * Classes related to concrete units of work that can be run independently from
  * the command line.
  */
-@ParametersAreNonnullByDefault
-package uk.ac.susx.mlcl.byblo.commands;
+@ParametersAreNonnullByDefault package uk.ac.susx.mlcl.byblo.commands;
 
 import javax.annotation.ParametersAreNonnullByDefault;

@@ -41,6 +41,7 @@ import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 
+import javax.annotation.CheckReturnValue;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -64,11 +65,18 @@ public class MergeEventsCommand extends AbstractMergeCommand<Weighted<TokenPair>
     public MergeEventsCommand() {
     }
 
+
     @Override
-    public void runCommand() throws Exception {
-        super.runCommand();
-        indexDelegate.saveEnumerator();
-        indexDelegate.closeEnumerator();
+    @CheckReturnValue
+    public boolean runCommand() {
+        try {
+            boolean result = super.runCommand();
+            indexDelegate.saveEnumerator();
+            indexDelegate.closeEnumerator();
+            return result;
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
 
     }
 
@@ -89,11 +97,8 @@ public class MergeEventsCommand extends AbstractMergeCommand<Weighted<TokenPair>
 
     @Override
     protected ObjectSink<Weighted<TokenPair>> openSink(File file) throws FileNotFoundException, IOException {
-        return new WeightSumReducerObjectSink<TokenPair>(BybloIO.openEventsSink(file, getFileDelegate().getCharset(), indexDelegate));
-    }
-
-    public static void main(String[] args) throws Exception {
-        new MergeEntriesCommand().runCommand(args);
+        return new WeightSumReducerObjectSink<TokenPair>(BybloIO.openEventsSink(
+                file, getFileDelegate().getCharset(), indexDelegate));
     }
 
     @Override

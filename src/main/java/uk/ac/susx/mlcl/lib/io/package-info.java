@@ -31,7 +31,6 @@
 /**
  * Contains data I/O functionality.
  */
-@ParametersAreNonnullByDefault
-package uk.ac.susx.mlcl.lib.io;
+@ParametersAreNonnullByDefault package uk.ac.susx.mlcl.lib.io;
 
 import javax.annotation.ParametersAreNonnullByDefault;

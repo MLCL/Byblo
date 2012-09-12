@@ -41,6 +41,8 @@ import uk.ac.susx.mlcl.lib.commands.Command;
 import uk.ac.susx.mlcl.lib.commands.ConverterFactory;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
 
+import javax.annotation.CheckReturnValue;
+
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @deprecated temporary class while command and task APIs are being separated
@@ -69,15 +71,17 @@ public abstract class AbstractCommandTask extends AbstractTask implements Comman
     }
 
     @Override
-    public void runCommand() throws Exception {
+    @CheckReturnValue
+    public boolean runCommand() {
         this.run();
         while (this.isExceptionTrapped())
-            this.throwTrappedException();
+            throw new RuntimeException(getTrappedException());
+        return true;
     }
 
     @Override
-    public void runCommand(String[] args)
-            throws InstantiationException, IllegalAccessException, Exception {
+    @CheckReturnValue
+    public boolean runCommand(String[] args) {
 
         Checks.checkNotNull("args", args);
 
@@ -100,16 +104,19 @@ public abstract class AbstractCommandTask extends AbstractTask implements Comman
             throw ex;
         }
 
-        if (LOG.isTraceEnabled())
-            LOG.trace("Running command " + this);
-
         if (this.isUsageRequested()) {
             jc.usage();
         } else {
-            this.runCommand();
+            if (LOG.isTraceEnabled())
+                LOG.trace("Running command " + this);
+
+            if (!this.runCommand())
+                return false;
+
+            if (LOG.isTraceEnabled())
+                LOG.trace("Completed command " + this);
         }
 
-        if (LOG.isTraceEnabled())
-            LOG.trace("Completed command " + this);
+        return true;
     }
 }

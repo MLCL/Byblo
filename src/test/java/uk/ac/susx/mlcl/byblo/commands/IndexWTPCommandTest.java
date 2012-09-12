@@ -344,7 +344,7 @@ public class IndexWTPCommandTest extends
         unindex.getFilesDelegate().setDestinationFile(to);
         unindex.setIndexDelegate(new DoubleEnumeratingDelegate(type, true,
                 true, index1, index2));
-        unindex.runCommand();
+        assertTrue(unindex.runCommand());
 
         assertValidPlaintextInputFiles(to);
         if (type == EnumeratorType.JDBM)
@@ -371,7 +371,7 @@ public class IndexWTPCommandTest extends
         unindex.getFilesDelegate().setDestinationFile(to);
         unindex.setIndexDelegate(new DoubleEnumeratingDelegate(type, true,
                 true, index1, index2));
-        unindex.runCommand();
+        assertTrue(unindex.runCommand());
 
         assertValidPlaintextInputFiles(to);
         assertSizeGT(to, from);

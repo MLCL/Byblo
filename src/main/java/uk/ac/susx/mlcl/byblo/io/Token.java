@@ -42,6 +42,7 @@ import java.util.Comparator;
  * <p/>
  * <p>Instances of <tt>Token</tt> are immutable.<p>
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class Token implements Serializable, Comparable<Token>, Cloneable {
@@ -71,6 +72,7 @@ public final class Token implements Serializable, Comparable<Token>, Cloneable {
      * two objects with the same <tt>entryId</tt>, but differing weights
      * <em>will</em> be consider equal.</p>
      * <p/>
+     *
      * @param obj the reference object with which to compare.
      * @return <code>true</code> if this object is the same as the obj argument;
      *         <code>false</code> otherwise.

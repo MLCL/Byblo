@@ -435,18 +435,26 @@ public class ExternalCountCommand extends AbstractParallelCommandTask implements
 
         finalMerge = mergeEntryQueue.poll();
         if (finalMerge == null)
-            throw new AssertionError("The entry merge queue is empty but final copy has not been completed.");
-        new FileMoveCommand(finalMerge, getEntriesFile()).runCommand();
+            throw new AssertionError(
+                    "The entry merge queue is empty but final copy has not been completed.");
+
+        if (!new FileMoveCommand(finalMerge, getEntriesFile()).runCommand())
+            throw new RuntimeException("file move failed");
 
         finalMerge = mergeEventQueue.poll();
         if (finalMerge == null)
-            throw new AssertionError("The entry/feature merge queue is empty but final copy has not been completed.");
-        new FileMoveCommand(finalMerge, getEventsFile()).runCommand();
+            throw new AssertionError(
+                    "The entry/feature merge queue is empty but final copy has not been completed.");
+        if (!new FileMoveCommand(finalMerge, getEventsFile()).runCommand())
+            throw new RuntimeException("file move failed");
 
         finalMerge = mergeFeaturesQueue.poll();
         if (finalMerge == null)
-            throw new AssertionError("The feature merge queue is empty but final copy has not been completed.");
-        new FileMoveCommand(finalMerge, getFeaturesFile()).runCommand();
+            throw new AssertionError(
+                    "The feature merge queue is empty but final copy has not been completed.");
+        if (!new FileMoveCommand(finalMerge, getFeaturesFile()).runCommand())
+            throw new RuntimeException("file move failed");
+
 
     }
 

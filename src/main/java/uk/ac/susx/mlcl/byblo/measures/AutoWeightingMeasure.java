@@ -30,7 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.measures;
 
-import javax.annotation.concurrent.Immutable;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
@@ -43,6 +42,7 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
  * The weighting scheme to use is determined by calling
  * {@link Measure#getExpectedWeighting() }.
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class AutoWeightingMeasure

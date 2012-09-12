@@ -335,7 +335,7 @@ public class IndexSimsCommandTest extends
 
         indexCommand.setIndexDelegate(EnumeratingDelegates
                 .toPair(new SingleEnumeratingDelegate(type, true, index)));
-        indexCommand.runCommand();
+        assertTrue(indexCommand.runCommand());
 
         assertValidPlaintextInputFiles(to);
         assertSizeGT(from, to);
@@ -363,7 +363,7 @@ public class IndexSimsCommandTest extends
         unindex.getFilesDelegate().setDestinationFile(to);
         unindex.setIndexDelegate(EnumeratingDelegates
                 .toPair(new SingleEnumeratingDelegate(type, true, index)));
-        unindex.runCommand();
+        assertTrue(unindex.runCommand());
 
         assertValidPlaintextInputFiles(to);
         // assertSizeGT(to, from);

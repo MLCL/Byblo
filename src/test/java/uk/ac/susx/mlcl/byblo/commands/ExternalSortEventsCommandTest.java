@@ -193,7 +193,7 @@ public class ExternalSortEventsCommandTest extends
         cmd.setIndexDelegate(idx);
         cmd.setComparator(comparator);
 
-        cmd.runCommand();
+        assertTrue(cmd.runCommand());
 
         assertTrue("Sorted file does not exist", sortedFile.exists());
         assertTrue("Sorted file is not a regular file", sortedFile.isFile());

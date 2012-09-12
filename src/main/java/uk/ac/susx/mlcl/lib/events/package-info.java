@@ -32,7 +32,6 @@
  * Contains classes and interfaces from implementing the observer/observable
  * pattern in various ways.
  */
-@ParametersAreNonnullByDefault
-package uk.ac.susx.mlcl.lib.events;
+@ParametersAreNonnullByDefault package uk.ac.susx.mlcl.lib.events;
 
 import javax.annotation.ParametersAreNonnullByDefault;

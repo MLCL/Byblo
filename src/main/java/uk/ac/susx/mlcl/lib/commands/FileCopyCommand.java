@@ -35,11 +35,13 @@ import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
 import uk.ac.susx.mlcl.lib.tasks.FileCopyTask;
 
+import javax.annotation.CheckReturnValue;
 import java.io.File;
 
 /**
  * Copy a source file to a destination.
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Parameters(commandDescription = "Copy a file.")
@@ -73,7 +75,8 @@ public class FileCopyCommand extends AbstractCommand {
     }
 
     @Override
-    public void runCommand() throws Exception {
+    @CheckReturnValue
+    public boolean runCommand() {
 
         FileCopyTask task = new FileCopyTask(
                 filesDelegate.getSourceFile(),
@@ -82,7 +85,9 @@ public class FileCopyCommand extends AbstractCommand {
         task.run();
 
         while (task.isExceptionTrapped())
-            task.throwTrappedException();
+            throw new RuntimeException(task.getTrappedException());
+
+        return true;
     }
 
     @Override

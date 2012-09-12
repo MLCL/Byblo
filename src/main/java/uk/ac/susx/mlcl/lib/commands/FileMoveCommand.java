@@ -35,6 +35,7 @@ import com.beust.jcommander.ParametersDelegate;
 import com.google.common.base.Objects;
 import uk.ac.susx.mlcl.lib.tasks.FileMoveTask;
 
+import javax.annotation.CheckReturnValue;
 import java.io.File;
 
 /**
@@ -43,6 +44,7 @@ import java.io.File;
  * Attempts to perform a fast rename if possible. Otherwise it falls back to
  * slower copy and delete.
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @Parameters(commandDescription = "Move a file.")
@@ -76,7 +78,8 @@ public final class FileMoveCommand extends AbstractCommand {
     }
 
     @Override
-    public void runCommand() throws Exception {
+    @CheckReturnValue
+    public boolean runCommand() {
 
         FileMoveTask task = new FileMoveTask(
                 filesDelegate.getSourceFile(),
@@ -85,7 +88,9 @@ public final class FileMoveCommand extends AbstractCommand {
         task.run();
 
         while (task.isExceptionTrapped())
-            task.throwTrappedException();
+            throw new RuntimeException(task.getTrappedException());
+
+        return true;
     }
 
     @Override

@@ -34,9 +34,9 @@ import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
 
+import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 import java.util.Comparator;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * <tt>Weighted</tt> objects represent a weighting or frequency applied to some

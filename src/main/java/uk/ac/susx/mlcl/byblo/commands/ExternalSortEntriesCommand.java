@@ -43,6 +43,7 @@ import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
+import javax.annotation.CheckReturnValue;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -68,10 +69,16 @@ public class ExternalSortEntriesCommand extends AbstractExternalSortCommand<Weig
     }
 
     @Override
-    public void runCommand() throws Exception {
-        super.runCommand();
-        indexDelegate.saveEnumerator();
-        indexDelegate.closeEnumerator();
+    @CheckReturnValue
+    public boolean runCommand() {
+        try {
+            boolean result = super.runCommand();
+            indexDelegate.saveEnumerator();
+            indexDelegate.closeEnumerator();
+            return result;
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
 
     }
 

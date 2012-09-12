@@ -57,6 +57,7 @@ import java.util.concurrent.*;
  * implementation. This is achieved by breaking the work down into chunks that
  * are run concurrently.
  * <p/>
+ *
  * @param <S> Type of "tell" object used to seek into the data source.
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -204,8 +205,8 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
     void updateProgress() {
         if (nChunks != 0) {
             double prog = (completedCount + queuedCount) / (double) (nChunks
-                                                                     * nChunks
-                                                                     * 2);
+                    * nChunks
+                    * 2);
             progress.setProgressPercent((int) (100 * prog));
         }
     }

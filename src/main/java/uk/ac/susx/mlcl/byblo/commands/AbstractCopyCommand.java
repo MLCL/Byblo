@@ -47,6 +47,7 @@ import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 import uk.ac.susx.mlcl.lib.tasks.ObjectPipeTask;
 
+import javax.annotation.CheckReturnValue;
 import java.io.*;
 import java.nio.charset.Charset;
 
@@ -54,6 +55,7 @@ import java.nio.charset.Charset;
  * Abstract super class for all tasks that require copying data from one file to
  * another.
  * <p/>
+ *
  * @param <T>
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -108,53 +110,51 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand
     }
 
     @Override
-    public void runCommand() throws Exception {
+    @CheckReturnValue
+    public boolean runCommand() {
+        try {
+            progress.setState(State.PENDING);
+            LOG.debug(MiscUtil.memoryInfoString());
 
+            ObjectSource<T> src = openSource(getFilesDelegate().getSourceFile());
+            ObjectSink<T> snk =
+                    openSink(getFilesDelegate().getDestinationFile());
 
-        progress.setState(State.PENDING);
+            ObjectPipeTask<T> task = new ObjectPipeTask<T>();
+            task.setSource(src);
+            task.setSink(snk);
 
+            task.addProgressListener(new ProgressListener() {
+                @Override
+                public void progressChanged(ProgressEvent progressEvent) {
+                    LOG.info(progressEvent.getSource().getProgressReport());
+                }
+            });
 
-//        if (LOG.isInfoEnabled())
-//            LOG.info(MessageFormat.format(
-//                    "Running {0} from \"{1}\" to \"{2}\".",
-//                    getName(),
-//                    getFilesDelegate().getSourceFile(),
-//                    getFilesDelegate().getDestinationFile()));
-        LOG.debug(MiscUtil.memoryInfoString());
+            task.run();
 
-        ObjectSource<T> src = openSource(getFilesDelegate().getSourceFile());
-        ObjectSink<T> snk = openSink(getFilesDelegate().getDestinationFile());
+            while (task.isExceptionTrapped())
+                task.throwTrappedException();
 
-        ObjectPipeTask<T> task = new ObjectPipeTask<T>();
-        task.setSource(src);
-        task.setSink(snk);
+            if (src instanceof Closeable)
+                ((Closeable) src).close();
+            if (snk instanceof Flushable)
+                ((Flushable) snk).flush();
+            if (snk instanceof Closeable)
+                ((Closeable) snk).close();
 
-        task.addProgressListener(new ProgressListener() {
-            @Override
-            public void progressChanged(ProgressEvent progressEvent) {
-                LOG.info(progressEvent.getSource().getProgressReport());
-                progress.setMessage(progressEvent.getSource().getProgressReport());
-            }
-        });
+            progress.setState(State.COMPLETED);
+            LOG.debug(MiscUtil.memoryInfoString());
 
-        task.run();
+            return true;
 
-        while (task.isExceptionTrapped())
-            task.throwTrappedException();
-
-        if (src instanceof Closeable)
-            ((Closeable) src).close();
-        if (snk instanceof Flushable)
-            ((Flushable) snk).flush();
-        if (snk instanceof Closeable)
-            ((Closeable) snk).close();
-
-
-        progress.setState(State.COMPLETED);
-
-        LOG.debug(MiscUtil.memoryInfoString());
-//        if (LOG.isInfoEnabled())
-//            LOG.info(MessageFormat.format("Completed {0}.", getName()));
+        } catch (FileNotFoundException ex) {
+            throw new RuntimeException(ex);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     @Override

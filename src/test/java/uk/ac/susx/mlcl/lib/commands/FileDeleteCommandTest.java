@@ -43,7 +43,7 @@ import static org.junit.Assert.*;
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class FileDeleteCommandTest  extends AbstractCommandTest<FileDeleteCommand> {
+public class FileDeleteCommandTest extends AbstractCommandTest<FileDeleteCommand> {
 
     @Override
     public Class<? extends FileDeleteCommand> getImplementation() {
@@ -76,7 +76,7 @@ public class FileDeleteCommandTest  extends AbstractCommandTest<FileDeleteComman
         assertTrue(tmp.exists());
         assertEquals(tmp, instance.getFile());
 
-        instance.runCommand();
+        assertTrue(instance.runCommand());
 
 
         assertFalse(tmp.exists());

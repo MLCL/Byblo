@@ -130,11 +130,11 @@ public class ObjectPipeTask<T> extends AbstractTask
             return false;
         if (this.getSource() != that.getSource()
                 && (this.getSource() == null || !this.getSource().equals(that.
-                    getSource())))
+                getSource())))
             return false;
         if (this.getSink() != that.getSink()
                 && (this.getSink() == null || !this.getSink().equals(that.
-                    getSink())))
+                getSink())))
             return false;
         return true;
     }

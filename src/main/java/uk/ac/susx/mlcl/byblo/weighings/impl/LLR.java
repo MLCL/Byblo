@@ -52,6 +52,7 @@ import java.io.Serializable;
  * "Foundations of Statistical Natural Language Processing." MIT Press,
  * Cambridge, MA USA.
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class LLR
@@ -64,7 +65,7 @@ public final class LLR
     public double apply(final SparseDoubleVector vector, int key, double value) {
         final double Ha = Weightings.log2(value / vector.sum);
         final double H0 = Weightings.log2((getFeatureMarginals().getFrequency(
-                                           key) - value)
+                key) - value)
                 / (getFeatureMarginals().getFrequencySum() - vector.sum));
         return 2 * (Ha - H0);
     }

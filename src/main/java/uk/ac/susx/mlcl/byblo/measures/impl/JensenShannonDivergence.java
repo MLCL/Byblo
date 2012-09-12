@@ -42,6 +42,7 @@ import static uk.ac.susx.mlcl.byblo.weighings.Weightings.log2;
 /**
  * Distance measure that computes similarity as the Jensen-Shannon divergence.
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public final class JensenShannonDivergence implements Measure, Serializable {

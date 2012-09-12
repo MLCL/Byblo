@@ -37,6 +37,7 @@ import javax.annotation.Nullable;
  * an {@link ElementwiseWeighting} scheme with the availability of feature
  * marginal scores via {@link FeatureMarginalsCarrier}.
  * <p/>
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class AbstractContextualWeighting
@@ -70,8 +71,8 @@ public abstract class AbstractContextualWeighting
     protected boolean equals(AbstractContextualWeighting other) {
         if (this.featureMarginals != other.featureMarginals
                 && (this.featureMarginals == null
-                    || !this.featureMarginals.equals(
-                    other.featureMarginals)))
+                || !this.featureMarginals.equals(
+                other.featureMarginals)))
             return false;
         return true;
     }
@@ -88,6 +89,6 @@ public abstract class AbstractContextualWeighting
     @Override
     public int hashCode() {
         return 89 * 7 + (this.featureMarginals != null
-                         ? this.featureMarginals.hashCode() : 0);
+                ? this.featureMarginals.hashCode() : 0);
     }
 }
