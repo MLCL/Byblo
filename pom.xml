@@ -292,6 +292,34 @@
 
 
     <profiles>
+        <!--
+        Profile for validating and cleaning-up of the code-base in various ways.
+        -->
+        <profile>
+            <id>inspect</id>
+            <build>
+                <plugins>
+                    
+                    <!-- 
+                    Perform static analysis of the codebase, for usage display
+                    help screen: mvn -P validate findbugs:help
+                    -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>findbugs-maven-plugin</artifactId>
+                        <version>2.5.1</version>
+                        <configuration>
+                            <threshold>Normal</threshold>
+                            <effort>Max</effort>
+                            <!--<excludeFilterFile>${basedir}/conf/findbugs-exclude-filter.xml</excludeFilterFile>-->
+                        </configuration>
+                    </plugin>
+                    
+                </plugins>
+                        
+            </build>
+        </profile>
+
 
         <!--
             Profile for producing a distribution:
@@ -382,6 +410,8 @@
                             </execution>
                         </executions>
                     </plugin>
+                    
+    
                 </plugins>
             </build>
 
@@ -389,6 +419,9 @@
 
         <!--
             Profile for producing the maven site (needs work).
+            
+            mvn -P site site:site
+
         -->
         <profile>
             <id>site</id>
@@ -402,6 +435,20 @@
                         <configuration>
                             <locales>en</locales>
                             <reportPlugins>
+                                
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-project-info-reports-plugin</artifactId>
+                                    <version>2.4</version>
+                                </plugin>                                
+                                
+                                
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-changelog-plugin</artifactId>
+                                    <version>2.2</version>
+                                </plugin>
+                    
                                 <plugin>
                                     <artifactId>maven-javadoc-plugin</artifactId>
                                     <version>2.8.1</version>
@@ -409,10 +456,59 @@
                                         <author>true</author>
                                     </configuration>
                                 </plugin>
+                                
+                                <plugin>
+                                    <groupId>org.codehaus.mojo</groupId>
+                                    <artifactId>findbugs-maven-plugin</artifactId>
+                                    <version>2.5.1</version>
+                                    <configuration>
+                                        <threshold>Normal</threshold>
+                                        <effort>Max</effort>
+                                    </configuration>
+                                </plugin>
+
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-checkstyle-plugin</artifactId>
+                                    <version>2.9.1</version>
+                                </plugin>  
+                                                  
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-jxr-plugin</artifactId>
+                                    <version>2.3</version>
+                                </plugin>
+                                
+                             
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-pmd-plugin</artifactId>
+                                    <version>2.7.1</version>
+                                    <configuration>
+                                        <linkXref>true</linkXref>
+                                        <sourceEncoding>utf-8</sourceEncoding>
+                                        <minimumTokens>100</minimumTokens>
+                                        <targetJdk>1.6</targetJdk>
+                                    </configuration>
+                                </plugin>
+
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-surefire-report-plugin</artifactId>
+                                    <version>2.12</version>
+                                </plugin>      
+                                
+                                <plugin>
+                                    <groupId>org.codehaus.mojo</groupId>
+                                    <artifactId>jdepend-maven-plugin</artifactId>
+                                    <version>2.0-beta-2</version>
+                                </plugin>
+      
                             </reportPlugins>
                         </configuration>
                     </plugin>
-
+               
+      
                 </plugins>
             </build>
 
