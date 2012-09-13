@@ -32,7 +32,7 @@ package uk.ac.susx.mlcl.lib;
 
 /**
  * Static utility class used for checking method arguments.
- * 
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public class Checks {
@@ -204,4 +204,52 @@ public class Checks {
                     "Argument '" + name + "' is null.");
     }
 
+    public static void checkNotNaN(final String name, final double v) {
+        if (Double.isNaN(v))
+            throw new IllegalArgumentException(
+                    "Argument '" + name + "' is NaN.");
+    }
+
+    public static void checkNotNaN(final double v) {
+        if (Double.isNaN(v))
+            throw new IllegalArgumentException(
+                    "Argumentis NaN.");
+    }
+
+    public static void checkFinite(final String name, final double v) {
+        if (Double.isNaN(v) || Double.isInfinite(v))
+            throw new IllegalArgumentException(
+                    "Argument '" + name + "' is not finite.");
+    }
+
+    public static void checkFinite(final double v) {
+        if (Double.isNaN(v) || Double.isInfinite(v))
+            throw new IllegalArgumentException(
+                    "Argument is not finite.");
+    }
+
+    public static void checkNotNaN(final String name, final float v) {
+        if (Float.isNaN(v))
+            throw new IllegalArgumentException(
+                    "Argument '" + name + "' is NaN.");
+    }
+
+    public static void checkNotNaN(final float v) {
+        if (Float.isNaN(v))
+            throw new IllegalArgumentException(
+                    "Argumentis NaN.");
+    }
+
+    public static void checkFinite(final String name, final float v) {
+        if (Float.isNaN(v) || Float.isInfinite(v))
+            throw new IllegalArgumentException(
+                    "Argument '" + name + "' is not finite.");
+    }
+
+    public static void checkFinite(final float v) {
+        if (Float.isNaN(v) || Float.isInfinite(v))
+            throw new IllegalArgumentException(
+                    "Argument is not finite.");
+    }
+    
 }
