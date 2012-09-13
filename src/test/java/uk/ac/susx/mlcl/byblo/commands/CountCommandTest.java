@@ -152,8 +152,7 @@ public class CountCommandTest extends AbstractCommandTest<CountCommand> {
         final String fruitPrefix = TEST_FRUIT_INPUT.getName();
         final File eActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");
         final File fActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".features");
-        final File efActual = new File(TEST_OUTPUT_DIR,
-                fruitPrefix + ".events");
+        final File efActual = new File(TEST_OUTPUT_DIR, fruitPrefix + ".events");
 
         TestConstants.deleteIfExist(eActual, fActual, efActual);
 
