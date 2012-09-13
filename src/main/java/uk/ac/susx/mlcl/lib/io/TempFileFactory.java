@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.lib.io;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * A file {@link FileFactory} implementation that creates temporary files using
@@ -40,7 +41,7 @@ import java.io.IOException;
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class TempFileFactory implements FileFactory {
+public class TempFileFactory implements FileFactory, Serializable {
 
     public static final String DEFAULT_PREFIX = "tmp-";
 
