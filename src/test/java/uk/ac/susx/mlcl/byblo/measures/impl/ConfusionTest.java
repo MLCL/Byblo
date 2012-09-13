@@ -49,17 +49,17 @@ import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_FEATURES;
 public class ConfusionTest extends AbstractMeasureTest<Confusion> {
 
     @Override
-    Class<? extends Confusion> getMeasureClass() {
+    public Class<? extends Confusion> getImplementation() {
         return Confusion.class;
     }
 
     @Override
-    String getMeasureName() {
+    public String getMeasureName() {
         return "confusion";
     }
 
     @Override
-    Confusion newInstance() {
+    public Confusion newInstance() {
         try {
             Confusion instance = super.newInstance();
             final DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();

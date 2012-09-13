@@ -38,12 +38,12 @@ package uk.ac.susx.mlcl.byblo.measures.impl;
 public class LinTest extends AbstractMeasureTest<Lin> {
 
 	@Override
-	Class<? extends Lin> getMeasureClass() {
+    public Class<? extends Lin> getImplementation() {
 		return Lin.class;
 	}
 
 	@Override
-	String getMeasureName() {
+    public String getMeasureName() {
 		return "lin";
 	}
 

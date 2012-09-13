@@ -43,12 +43,12 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 public class CosineTest extends AbstractMeasureTest<Cosine> {
 
 	@Override
-	Class<? extends Cosine> getMeasureClass() {
+    public Class<? extends Cosine> getImplementation() {
 		return Cosine.class;
 	}
 
 	@Override
-	String getMeasureName() {
+    public String getMeasureName() {
 		return "cosine";
 	}
 

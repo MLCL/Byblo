@@ -45,12 +45,12 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 public class LambdaDivergenceTest extends AbstractMeasureTest<LambdaDivergence> {
 
 	@Override
-	Class<? extends LambdaDivergence> getMeasureClass() {
+    public Class<? extends LambdaDivergence> getImplementation() {
 		return LambdaDivergence.class;
 	}
 
 	@Override
-	String getMeasureName() {
+    public String getMeasureName() {
 		return "lambda";
 	}
 

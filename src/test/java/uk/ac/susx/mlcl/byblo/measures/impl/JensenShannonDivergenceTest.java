@@ -46,12 +46,12 @@ public class JensenShannonDivergenceTest extends
 		AbstractMeasureTest<JensenShannonDivergence> {
 
 	@Override
-	Class<? extends JensenShannonDivergence> getMeasureClass() {
+    public Class<? extends JensenShannonDivergence> getImplementation() {
 		return JensenShannonDivergence.class;
 	}
 
 	@Override
-	String getMeasureName() {
+    public String getMeasureName() {
 		return "js";
 	}
 

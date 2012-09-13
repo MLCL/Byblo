@@ -38,12 +38,12 @@ package uk.ac.susx.mlcl.byblo.measures.impl;
 public class RecallTest extends AbstractMeasureTest<Recall> {
 
 	@Override
-	Class<? extends Recall> getMeasureClass() {
+    public Class<? extends Recall> getImplementation() {
 		return Recall.class;
 	}
 
 	@Override
-	String getMeasureName() {
+    public String getMeasureName() {
 		return "recall";
 	}
 

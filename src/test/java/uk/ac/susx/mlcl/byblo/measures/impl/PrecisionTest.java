@@ -38,12 +38,12 @@ package uk.ac.susx.mlcl.byblo.measures.impl;
 public class PrecisionTest extends AbstractMeasureTest<Precision> {
 
 	@Override
-	Class<? extends Precision> getMeasureClass() {
+    public Class<? extends Precision> getImplementation() {
 		return Precision.class;
 	}
 
 	@Override
-	String getMeasureName() {
+    public String getMeasureName() {
 		return "prec";
 	}
 

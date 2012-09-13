@@ -45,12 +45,12 @@ public class KullbackLeiblerDivergenceTest extends
 		AbstractMeasureTest<KullbackLeiblerDivergence> {
 
 	@Override
-	Class<? extends KullbackLeiblerDivergence> getMeasureClass() {
+    public Class<? extends KullbackLeiblerDivergence> getImplementation() {
 		return KullbackLeiblerDivergence.class;
 	}
 
 	@Override
-	String getMeasureName() {
+    public String getMeasureName() {
 		return "kl";
 	}
 

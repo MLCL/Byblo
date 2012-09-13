@@ -45,12 +45,12 @@ public class LeeSkewDivergenceTest extends
 		AbstractMeasureTest<LeeSkewDivergence> {
 
 	@Override
-	Class<? extends LeeSkewDivergence> getMeasureClass() {
+    public Class<? extends LeeSkewDivergence> getImplementation() {
 		return LeeSkewDivergence.class;
 	}
 
 	@Override
-	String getMeasureName() {
+    public String getMeasureName() {
 		return "lee";
 	}
 

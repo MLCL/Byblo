@@ -46,12 +46,12 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 public class DotProductTest extends AbstractMeasureTest<DotProduct> {
 
 	@Override
-	Class<? extends DotProduct> getMeasureClass() {
+    public Class<? extends DotProduct> getImplementation() {
 		return DotProduct.class;
 	}
 
 	@Override
-	String getMeasureName() {
+    public String getMeasureName() {
 		return "dp";
 	}
 

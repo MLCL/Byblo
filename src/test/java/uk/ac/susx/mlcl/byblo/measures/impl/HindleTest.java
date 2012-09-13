@@ -45,12 +45,12 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 public class HindleTest extends AbstractMeasureTest<Hindle> {
 
 	@Override
-	Class<? extends Hindle> getMeasureClass() {
+    public Class<? extends Hindle> getImplementation() {
 		return Hindle.class;
 	}
 
 	@Override
-	String getMeasureName() {
+    public String getMeasureName() {
 		return "hindle";
 	}
 

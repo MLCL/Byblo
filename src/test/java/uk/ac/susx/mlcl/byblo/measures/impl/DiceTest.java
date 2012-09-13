@@ -38,12 +38,12 @@ package uk.ac.susx.mlcl.byblo.measures.impl;
 public class DiceTest extends AbstractMeasureTest<Dice> {
 
 	@Override
-	Class<? extends Dice> getMeasureClass() {
+    public Class<? extends Dice> getImplementation() {
 		return Dice.class;
 	}
 
 	@Override
-	String getMeasureName() {
+    public String getMeasureName() {
 		return "dice";
 	}
 

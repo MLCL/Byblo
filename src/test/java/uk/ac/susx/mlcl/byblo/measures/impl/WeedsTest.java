@@ -39,12 +39,12 @@ import org.junit.Test;
 public class WeedsTest extends AbstractMeasureTest<Weeds> {
 
 	@Override
-	Class<? extends Weeds> getMeasureClass() {
+    public Class<? extends Weeds> getImplementation() {
 		return Weeds.class;
 	}
 
 	@Override
-	String getMeasureName() {
+    public String getMeasureName() {
 		return "weeds";
 	}
 

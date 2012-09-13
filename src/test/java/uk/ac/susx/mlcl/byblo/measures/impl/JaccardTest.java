@@ -47,12 +47,12 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 public class JaccardTest extends AbstractMeasureTest<Jaccard> {
 
 	@Override
-	Class<? extends Jaccard> getMeasureClass() {
+	public Class<? extends Jaccard> getImplementation() {
 		return Jaccard.class;
 	}
 
 	@Override
-	String getMeasureName() {
+    public String getMeasureName() {
 		return "jaccard";
 	}
 

@@ -37,12 +37,12 @@ package uk.ac.susx.mlcl.byblo.measures.impl;
 public class OverlapTest extends AbstractMeasureTest<Overlap> {
 
 	@Override
-	Class<? extends Overlap> getMeasureClass() {
+    public Class<? extends Overlap> getImplementation() {
 		return Overlap.class;
 	}
 
 	@Override
-	String getMeasureName() {
+    public String getMeasureName() {
 		return "overlap";
 	}
 

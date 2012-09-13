@@ -119,12 +119,16 @@ public abstract class AbstractIntSetTest<T extends IntSet> extends
 
     @Test
     public void testIntIterableCloneWithSerialization() {
-        T s = newInstance();
-        assertEquals(s, assertCloneWithSerialization(s));
-
-        s = newInstance(IntArrayList.wrap(new int[]{1, 10, 100, 1000}));
-        assertEquals(s, assertCloneWithSerialization(s));
-
+        {
+            T instance = newInstance();
+            T copy = cloneWithSerialization(instance);
+            assertCloneEquals(instance, copy);
+        }
+        {
+            T instance = newInstance(IntArrayList.wrap(new int[]{1, 10, 100, 1000}));
+            T copy = cloneWithSerialization(instance);
+            assertCloneEquals(instance, copy);
+        }
     }
 
     //

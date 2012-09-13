@@ -61,14 +61,21 @@
  */
 package uk.ac.susx.mlcl.testing;
 
+import junit.framework.*;
 import org.junit.*;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
@@ -163,15 +170,17 @@ public abstract class AbstractObjectTest<T> extends AbstractTest {
         Assert.assertNotNull(instance);
     }
 
+
     /**
      * If the object implements {@link Cloneable} interface, the clone method
      * should be overridden and public. All the constraints of
-     * {@link #assertCloneEquals()} should hold.
+     * {@link #assertCloneEquals(Object, Object)} should hold.
      */
     @Test
     public void testObjectClone() {
-        Assume.assumeTrue(Cloneable.class.isAssignableFrom(getImplementation()));
-        Assume.assumeTrue(hasConstructor());
+
+        assumeTrue(Cloneable.class.isAssignableFrom(getImplementation()));
+        assumeTrue(hasConstructor());
 
         final T instance = newInstance();
         final T copy = clone(instance);
@@ -189,15 +198,13 @@ public abstract class AbstractObjectTest<T> extends AbstractTest {
      * @throws IOException
      */
     @Test
-    public void testObjectCloneWithSerialization() throws IOException,
-            ClassNotFoundException {
+    public void testCloneWithSerialization() throws IOException, ClassNotFoundException {
 
-        Assume.assumeTrue(Serializable.class
-                .isAssignableFrom(getImplementation()));
-        Assume.assumeTrue(hasConstructor());
+        assumeTrue(Serializable.class.isAssignableFrom(getImplementation()));
+        assumeTrue(hasConstructor());
 
         final T instance = newInstance();
-        final T copy = assertCloneWithSerialization(instance);
+        final T copy = cloneWithSerialization(instance);
 
         assertCloneEquals(instance, copy);
     }
@@ -212,16 +219,35 @@ public abstract class AbstractObjectTest<T> extends AbstractTest {
      * 		x.hashCode() == x.clone().hashCode()
      * </pre>
      */
-    private void assertCloneEquals(Object instance, Object copy) {
-        Assert.assertTrue("cloned object is the the same as the original",
-                instance != copy);
-        Assert.assertTrue(MessageFormat.format(
-                "Clone object class identity mismatch; "
-                        + "expecting {0} but found {1}", instance.getClass(),
+    public static void assertCloneEquals(Object instance, Object copy) {
+        assertTrue("cloned object is the the same as the original", instance != copy);
+        assertTrue(MessageFormat.format("Clone object class identity mismatch; expecting {0} but found {1}", instance.getClass(),
                 copy.getClass()), copy.getClass() == instance.getClass());
-        Assert.assertEquals("cloned copy is not equal", instance, copy);
-        Assert.assertTrue("cloned object hash-code mismatch",
-                copy.hashCode() == instance.hashCode());
+        assertEquals("cloned copy is not equal", instance, copy);
+        assertTrue("cloned object hash-code mismatch", copy.hashCode() == instance.hashCode());
     }
 
+    /**
+     * Concatonate two or more arrays.
+     *
+     * This should really be in ArrayUtil
+     *
+     * @param arrs
+     * @param <T>
+     * @return
+     */
+    public static <T> T[] cat(final T[]... arrs) {
+        int n = 0;
+        for (int i = 0; i < arrs.length; i++)
+            n += arrs[i].length;
+        @SuppressWarnings("unchecked")
+        T[] result = (T[]) Array.newInstance(arrs.getClass().getComponentType()
+                .getComponentType(), n);
+        int offset = 0;
+        for (int i = 0; i < arrs.length; i++) {
+            System.arraycopy(arrs[i], 0, result, offset, arrs[i].length);
+            offset += arrs[i].length;
+        }
+        return result;
+    }
 }

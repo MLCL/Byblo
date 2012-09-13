@@ -40,12 +40,12 @@ import org.junit.Test;
 public class LpSpaceDistanceTest extends AbstractMeasureTest<LpSpaceDistance> {
 
 	@Override
-	Class<? extends LpSpaceDistance> getMeasureClass() {
+    public Class<? extends LpSpaceDistance> getImplementation() {
 		return LpSpaceDistance.class;
 	}
 
 	@Override
-	String getMeasureName() {
+    public String getMeasureName() {
 		return "lp";
 	}
 

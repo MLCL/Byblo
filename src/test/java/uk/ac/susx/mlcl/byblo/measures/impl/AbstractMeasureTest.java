@@ -33,17 +33,10 @@ package uk.ac.susx.mlcl.byblo.measures.impl;
 import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_EVENTS;
 import static uk.ac.susx.mlcl.TestConstants.TEST_FRUIT_FEATURES;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,16 +65,16 @@ import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsCarrier;
 import uk.ac.susx.mlcl.byblo.weighings.MarginalDistribution;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
-import uk.ac.susx.mlcl.lib.collect.ArrayUtil;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.test.ExitTrapper;
+import uk.ac.susx.mlcl.testing.AbstractObjectTest;
 
 /**
  * 
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public abstract class AbstractMeasureTest<T extends Measure> {
+public abstract class AbstractMeasureTest<T extends Measure> extends AbstractObjectTest<T> {
 
 	static final double EPSILON = 1E-10;
 
@@ -89,7 +82,7 @@ public abstract class AbstractMeasureTest<T extends Measure> {
 
 	static MarginalDistribution FRUIT_FEATURE_MARGINALS;
 
-	@BeforeClass
+    @BeforeClass
 	public static void setUpClass() throws Exception {
 
 		final DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();
@@ -122,19 +115,6 @@ public abstract class AbstractMeasureTest<T extends Measure> {
 
 	}
 
-	AbstractMeasureTest() {
-	}
-
-	T newInstance() {
-		try {
-			T instance = getMeasureClass().newInstance();
-			return instance;
-		} catch (InstantiationException e) {
-			throw new AssertionError(e);
-		} catch (IllegalAccessException e) {
-			throw new AssertionError(e);
-		}
-	}
 
 	Measure newConfiguredInstanceFor(SparseDoubleVector... data) {
 		return newConfiguredInstanceFor(Arrays.asList(data));
@@ -179,9 +159,7 @@ public abstract class AbstractMeasureTest<T extends Measure> {
 		}
 	}
 
-	abstract Class<? extends T> getMeasureClass();
-
-	abstract String getMeasureName();
+	public abstract String getMeasureName();
 
 	//
 	// ============================================================================
@@ -198,7 +176,7 @@ public abstract class AbstractMeasureTest<T extends Measure> {
 		System.out.println("testDefaultConstructor()");
 
 		try {
-			Class<? extends T> clazz = getMeasureClass();
+			Class<? extends T> clazz = getImplementation();
 			Assert.assertFalse("Measure is abstract",
 					Modifier.isAbstract(clazz.getModifiers()));
 			Assert.assertFalse("Measure is an interface",
@@ -222,46 +200,6 @@ public abstract class AbstractMeasureTest<T extends Measure> {
 		} catch (IllegalAccessException e) {
 			throw new AssertionError(e);
 		}
-	}
-
-	/**
-	 * It's not mandated that measures are Serializable, but if it's declared
-	 * then it should work. So pass if Serializable isn't implemented, otherwise
-	 * run the test.
-	 */
-	@Test
-	public void testSerialization() {
-		System.out.println("testSerialization()");
-		final T instance = newInstance();
-
-		// Skip if the class doesn't implement Serializable.
-		Assume.assumeTrue(instance instanceof Serializable);
-
-		final T copy = cloneWithSerialization(instance);
-
-		// objects must be equal but no the same instance
-		Assert.assertEquals("Instance is not equal to copy.", instance, copy);
-		Assert.assertTrue("Instance is the same object as copy.", instance != copy);
-	}
-
-	/**
-	 * It's not mandated that measures are Cloneable, but if it's declared then
-	 * it should work. So pass if Cloneable isn't implemented, otherwise run the
-	 * test.
-	 */
-	@Test
-	public void testClone() {
-		System.out.println("testClone()");
-		final T instance = newInstance();
-
-		// Skip if the class doens't implement Cloneable.
-		Assume.assumeTrue(instance instanceof Cloneable);
-
-		final T copy = clone(instance);
-
-		// objects must be equal but no the same instance
-		Assert.assertEquals(instance, copy);
-		Assert.assertTrue(instance != copy);
 	}
 
 	@Test
@@ -619,8 +557,8 @@ public abstract class AbstractMeasureTest<T extends Measure> {
 		System.out.println("testDecomposableMeasure()");
 
 		// Skip test if the measure isn't decomposable
-		Assume.assumeTrue(getMeasureClass().isInstance(
-				DecomposableMeasure.class));
+		Assume.assumeTrue(getImplementation().isInstance(
+                DecomposableMeasure.class));
 
 		final DecomposableMeasure instance = (DecomposableMeasure) newInstance();
 
@@ -704,74 +642,7 @@ public abstract class AbstractMeasureTest<T extends Measure> {
 		return vector;
 	}
 
-	/**
-	 * TODO: Probably useful enough to move to a general purpose library
-	 * 
-	 * @param obj
-	 * @return
-	 * @throws IOException
-	 * @throws ClassNotFoundException
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> T cloneWithSerialization(final T obj) {
 
-		ObjectOutputStream oos = null;
-		ObjectInputStream ois = null;
-		try {
-			try {
-				final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-				oos = new ObjectOutputStream(baos);
-
-				oos.writeObject(obj);
-				oos.flush();
-
-				final byte[] bytes = baos.toByteArray();
-
-				ois = new ObjectInputStream(new ByteArrayInputStream(bytes));
-
-				return (T) ois.readObject();
-			} finally {
-				if (oos != null)
-					oos.close();
-				if (ois != null)
-					ois.close();
-			}
-		} catch (ClassNotFoundException ex) {
-			throw new AssertionError(ex);
-		} catch (IOException ex) {
-			throw new AssertionError(ex);
-		}
-	}
-
-	public static <T> T clone(T obj) {
-		try {
-			Assert.assertTrue("doesn't implement Cloneable",
-					obj instanceof Cloneable);
-			final Method cloneMethod = obj.getClass().getMethod("clone");
-
-			Assert.assertTrue("clone() is not public",
-					Modifier.isPublic(cloneMethod.getModifiers()));
-			Assert.assertFalse("clone() is abstract",
-					Modifier.isAbstract(cloneMethod.getModifiers()));
-			Assert.assertFalse("clone() is static",
-					Modifier.isStatic(cloneMethod.getModifiers()));
-			final Object result = cloneMethod.invoke(obj);
-			Assert.assertEquals("cloned instance class differes",
-					result.getClass(), obj.getClass());
-			Assert.assertEquals("cloned object not equal to origional", obj,
-					result);
-			@SuppressWarnings("unchecked")
-			final T castResult = (T) result;
-			return castResult;
-		} catch (NoSuchMethodException e) {
-			throw new AssertionError(e);
-		} catch (IllegalAccessException e) {
-			throw new AssertionError(e);
-		} catch (InvocationTargetException e) {
-			throw new AssertionError(e);
-		}
-
-	}
 
 	static SparseDoubleVector ones(int cardinality, int size) {
 		SparseDoubleVector vec = new SparseDoubleVector(cardinality, size);
@@ -803,26 +674,4 @@ public abstract class AbstractMeasureTest<T extends Measure> {
 		return new MarginalDistribution(marginals, total, nonZeroCardinality);
 	}
 
-	public static Random newRandom() {
-		Random rand = new Random();
-		final int seed = rand.nextInt();
-		System.out.println(" > random seed = " + seed);
-		rand = new Random(seed);
-		return rand;
-	}
-
-	public static <T> T[] cat(final T[]... arrs) {
-		int n = 0;
-		for (int i = 0; i < arrs.length; i++)
-			n += arrs[i].length;
-		@SuppressWarnings("unchecked")
-		T[] result = (T[]) Array.newInstance(arrs.getClass().getComponentType()
-				.getComponentType(), n);
-		int offset = 0;
-		for (int i = 0; i < arrs.length; i++) {
-			System.arraycopy(arrs[i], 0, result, offset, arrs[i].length);
-			offset += arrs[i].length;
-		}
-		return result;
-	}
 }

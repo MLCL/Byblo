@@ -52,12 +52,12 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 public class KendallsTauTest extends AbstractMeasureTest<KendallsTau> {
 
 	@Override
-	Class<? extends KendallsTau> getMeasureClass() {
+    public Class<? extends KendallsTau> getImplementation() {
 		return KendallsTau.class;
 	}
 
 	@Override
-	String getMeasureName() {
+    public String getMeasureName() {
 		return "tau";
 	}
 
