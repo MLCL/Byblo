@@ -57,7 +57,7 @@ public abstract class ForwardingMeasure<T extends Measure>
      *
      * @param delegate The Measure being decorated.
      */
-    protected ForwardingMeasure(final T delegate) {
+    ForwardingMeasure(final T delegate) {
         Checks.checkNotNull("delegate", delegate);
         this.delegate = delegate;
     }
@@ -93,21 +93,13 @@ public abstract class ForwardingMeasure<T extends Measure>
         return delegate.isCommutative();
     }
 
-    public boolean equals(ForwardingMeasure<?> other) {
-        if (this.delegate != other.delegate
-                && (this.delegate == null
-                || !this.delegate.equals(other.delegate)))
-            return false;
-        return true;
+    boolean equals(ForwardingMeasure<?> other) {
+        return !(this.delegate != other.delegate && (this.delegate == null || !this.delegate.equals(other.delegate)));
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        return equals((ForwardingMeasure) obj);
+        return obj == this || !(obj == null || getClass() != obj.getClass()) && equals((ForwardingMeasure) obj);
     }
 
     @Override

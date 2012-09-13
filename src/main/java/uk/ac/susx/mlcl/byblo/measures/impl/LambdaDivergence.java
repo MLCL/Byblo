@@ -169,9 +169,8 @@ public final class LambdaDivergence implements Measure, Serializable {
 
         LambdaDivergence that = (LambdaDivergence) o;
 
-        if (Double.compare(that.lambda, lambda) != 0) return false;
+        return Double.compare(that.lambda, lambda) == 0;
 
-        return true;
     }
 
     @Override

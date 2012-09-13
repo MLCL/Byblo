@@ -50,7 +50,7 @@ import static org.junit.Assert.assertEquals;
 public class IntSetsTest extends AbstractTest {
 
     @SuppressWarnings("unchecked")
-    static Class<? extends IntSet>[] INTSET_IMPLS = new Class[]{
+    private static final Class<? extends IntSet>[] INT_SET_IMPLEMENTATIONS = new Class[]{
             IntBitSet.class,//
             IntOpenHashSet.class,//
             IntArraySet.class,//
@@ -69,12 +69,12 @@ public class IntSetsTest extends AbstractTest {
         int minValue = 1;
         int maxValue = 8000000;
         //
-        int populationSize = Integer.MAX_VALUE / 32;
-        double exponent = 2.0;
+//        int populationSize = Integer.MAX_VALUE / 32;
+//        double exponent = 2.0;
         final Stopwatch sw = new Stopwatch();
 
-        double[][] times = new double[INTSET_IMPLS.length][repeats];
-        double[][] mem = new double[INTSET_IMPLS.length][repeats];
+        double[][] times = new double[INT_SET_IMPLEMENTATIONS.length][repeats];
+        double[][] mem = new double[INT_SET_IMPLEMENTATIONS.length][repeats];
 
         for (int r = 0; r < repeats; r++) {
 
@@ -87,11 +87,11 @@ public class IntSetsTest extends AbstractTest {
 
             final int[] data = new IntOpenHashSet(gen).toIntArray();
 
-            IntSet[] sets = new IntSet[INTSET_IMPLS.length];
+            IntSet[] sets = new IntSet[INT_SET_IMPLEMENTATIONS.length];
 
             System.out.printf("Repeat %d of %d.%n", r, repeats);
-            for (int i = 0; i < INTSET_IMPLS.length; i++) {
-                final IntSet intSet = INTSET_IMPLS[i].newInstance();
+            for (int i = 0; i < INT_SET_IMPLEMENTATIONS.length; i++) {
+                final IntSet intSet = INT_SET_IMPLEMENTATIONS[i].newInstance();
 
                 sw.reset();
                 sw.start();
@@ -104,14 +104,13 @@ public class IntSetsTest extends AbstractTest {
                 attemptToTrim(intSet);
 
                 sets[i] = new IntOpenHashSet(intSet);
-                // System.out.println(intSet);
 
                 MemoryUsage mu = new MemoryUsage();
                 mu.add(intSet);
                 mem[i][r] = mu.getInstanceSizeBytes();
 
                 System.out.printf("%20s %6.2f seconds    %s%n",
-                        INTSET_IMPLS[i].getSimpleName(),
+                        INT_SET_IMPLEMENTATIONS[i].getSimpleName(),
                         sw.elapsedMillis() / 1000d,
                         MiscUtil.humanReadableBytes(mu.getInstanceSizeBytes()));
             }
@@ -121,7 +120,7 @@ public class IntSetsTest extends AbstractTest {
             }
         }
         System.out.printf("Results:%n");
-        for (int i = 0; i < INTSET_IMPLS.length; i++) {
+        for (int i = 0; i < INT_SET_IMPLEMENTATIONS.length; i++) {
 
             double avTime = ArrayMath.mean(times[i]) / 1000.0;
             double seTime = ArrayMath.sampleStddev(times[i]) / 1000.0;
@@ -130,7 +129,7 @@ public class IntSetsTest extends AbstractTest {
             long seMem = (long) ArrayMath.sampleStddev(mem[i]);
 
             System.out.printf("%20s %6.3f ~%-6.3f seconds    %-8s ~%-8s %n",
-                    INTSET_IMPLS[i].getSimpleName(), avTime, seTime,
+                    INT_SET_IMPLEMENTATIONS[i].getSimpleName(), avTime, seTime,
                     MiscUtil.humanReadableBytes(avMem),
                     MiscUtil.humanReadableBytes(seMem));
 
@@ -138,7 +137,7 @@ public class IntSetsTest extends AbstractTest {
 
     }
 
-    static void attemptToTrim(Object o) {
+    private static void attemptToTrim(Object o) {
         try {
             o.getClass().getMethod("trim").invoke(o);
         } catch (IllegalAccessException e) {

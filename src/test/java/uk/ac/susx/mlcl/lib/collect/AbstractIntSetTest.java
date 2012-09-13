@@ -48,15 +48,15 @@ import static org.junit.Assert.*;
 public abstract class AbstractIntSetTest<T extends IntSet> extends
         AbstractObjectTest<T> {
 
-    public T newInstance(IntCollection c) {
+    T newInstance(IntCollection c) {
         return newInstance(IntCollection.class, c);
     }
 
-    public T newInstance(Collection<? extends Integer> c) {
+    T newInstance(Collection<? extends Integer> c) {
         return newInstance(Collection.class, c);
     }
 
-    public T newInstance(int[] c) {
+    T newInstance(int[] c) {
         return newInstance(int[].class, c);
     }
 
@@ -151,7 +151,7 @@ public abstract class AbstractIntSetTest<T extends IntSet> extends
             assertFalse("contains " + element, set.contains(element));
     }
 
-    static void assertAddAllOf(IntCollection set, int... elements) {
+    private static void assertAddAllOf(IntCollection set, int... elements) {
         for (int element : elements)
             assertTrue("failed to add " + element, set.add(element));
     }

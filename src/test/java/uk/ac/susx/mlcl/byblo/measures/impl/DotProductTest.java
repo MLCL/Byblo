@@ -118,7 +118,7 @@ public class DotProductTest extends AbstractMeasureTest<DotProduct> {
 	@Test
 	@Ignore
 	@Override
-	public void testHomoginiety() {
+	public void testHomogeneity() {
 		throw new UnsupportedOperationException();
 	}
 	/**
@@ -128,7 +128,7 @@ public class DotProductTest extends AbstractMeasureTest<DotProduct> {
 	@Test
 	@Ignore
 	@Override
-	public void testHomoginiety2() {
+	public void testHomogeneity2() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -139,7 +139,7 @@ public class DotProductTest extends AbstractMeasureTest<DotProduct> {
 	@Test
 	@Ignore
 	@Override
-	public void testHeteroginiety() {
+	public void testHeterogeneity() {
 		throw new UnsupportedOperationException();
 	}
 

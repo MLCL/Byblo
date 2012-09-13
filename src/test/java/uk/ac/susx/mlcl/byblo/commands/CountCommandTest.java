@@ -60,24 +60,12 @@ public class CountCommandTest extends AbstractCommandTest<CountCommand> {
         return CountCommand.class;
     }
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     private static final String subject = CountCommand.class.getName();
 
     private void runWithAPI(File inInst, File outE, File outF, File outEF,
                             Charset charset, boolean preIndexEntries,
                             boolean preIndexFeatures)
-            throws Exception {
+             {
         final CountCommand countTask = new CountCommand();
         countTask.setInstancesFile(inInst);
         countTask.setEntriesFile(outE);
@@ -102,7 +90,7 @@ public class CountCommandTest extends AbstractCommandTest<CountCommand> {
     private void runWithCLI(
             File inInst, File outE, File outF, File outEF, Charset charset,
             boolean preindexedEntries, boolean preindexedFeatures)
-            throws Exception {
+             {
 
         String[] args = {
                 "--input", inInst.toString(),
@@ -252,8 +240,7 @@ public class CountCommandTest extends AbstractCommandTest<CountCommand> {
         runReplacingFile(3, null);
     }
 
-    void runReplacingFile(int repId, @Nullable File repFile)
-            throws Exception {
+    void runReplacingFile(int repId, @Nullable File repFile) {
         final File instIn = TEST_FRUIT_INPUT;
         final String fruitPrefix = TEST_FRUIT_INPUT.getName();
         final File eOut = new File(TEST_OUTPUT_DIR, fruitPrefix + ".entries");

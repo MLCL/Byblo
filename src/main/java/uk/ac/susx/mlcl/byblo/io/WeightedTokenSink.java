@@ -75,10 +75,9 @@ import java.nio.charset.Charset;
  */
 public class WeightedTokenSink implements ObjectSink<Weighted<Token>>, Closeable, Flushable {
 
-    private DataSink inner;
+    private final DataSink inner;
 
-    public WeightedTokenSink(DataSink inner)
-            throws FileNotFoundException, IOException {
+    private WeightedTokenSink(DataSink inner){
         this.inner = inner;
     }
 

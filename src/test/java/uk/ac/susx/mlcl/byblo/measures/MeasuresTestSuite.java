@@ -66,19 +66,5 @@ import org.junit.runners.Suite;
         uk.ac.susx.mlcl.byblo.measures.impl.LambdaDivergenceTest.class})
 public class MeasuresTestSuite {
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
 
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
 }

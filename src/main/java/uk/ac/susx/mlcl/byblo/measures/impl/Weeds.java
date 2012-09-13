@@ -134,9 +134,9 @@ public class Weeds implements Measure, Serializable {
 
     @Override
     public boolean isCommutative() {
-        // If gamma = 1.0 then only then harmonic component is used, hense the 
-        // measure is symetric. Otherwise some portion of the arithimentic 
-        // component is used which is symetric only when beta = 0.5.
+        // If gamma = 1.0 then only then harmonic component is used, hence the
+        // measure is symmetric. Otherwise some portion of the arithmetic
+        // component is used which is symmetric only when beta = 0.5.
         return Measures.epsilonEquals(gamma, 1.0)
                 || Measures.epsilonEquals(beta, 0.5);
     }
@@ -168,13 +168,7 @@ public class Weeds implements Measure, Serializable {
         if (getClass() != obj.getClass())
             return false;
         final Weeds other = (Weeds) obj;
-        if (Double.doubleToLongBits(this.beta) != Double.doubleToLongBits(
-                other.beta))
-            return false;
-        if (Double.doubleToLongBits(this.gamma) != Double.doubleToLongBits(
-                other.gamma))
-            return false;
-        return true;
+        return Double.doubleToLongBits(this.beta) == Double.doubleToLongBits(other.beta) && Double.doubleToLongBits(this.gamma) == Double.doubleToLongBits(other.gamma);
     }
 
     @Override

@@ -106,14 +106,9 @@ public final class ExceptionTrappingDelegate
     }
 
     @Override
-    public final Exception getTrappedException() {
-        return isExceptionTrapped() ? getExceptionQueue().poll() : null;
-    }
-
-    @Override
     public final void throwTrappedException() throws Exception {
         if (isExceptionTrapped())
-            throw getTrappedException();
+             throw exceptionQueue.poll();
     }
 
     @Override
@@ -134,7 +129,6 @@ public final class ExceptionTrappingDelegate
 
     @Override
     public int hashCode() {
-        assert this.getExceptionQueue() != null;
         return this.getExceptionQueue().hashCode();
     }
 }

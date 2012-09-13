@@ -11,7 +11,6 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -47,8 +46,6 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class BeansExperiment {
 
-    static final Log LOG = LogFactory.getLog(BeansExperiment.class);
-
     public static void main(String[] args) {
 
         try {
@@ -58,12 +55,12 @@ public class BeansExperiment {
         }
     }
 
-    static void run() throws ConfigurationException, ParserConfigurationException, SAXException {
+    private static void run() throws ConfigurationException, ParserConfigurationException, SAXException {
         ConvertUtils.register(new CharsetConverter(), Charset.class);
         ConvertUtils.register(new LocaleConverter(), Locale.class);
 
 
-        BeanHelper.setDefaultBeanFactory(new BakedBeanFactory());
+        BeanHelper.setDefaultBeanFactory(new DefaultBeanFactory());
 
         URL configUrl = ClassLoader.getSystemResource(
                 "uk/ac/susx/mlcl/byblo/measures/beans/bybloconfig.xml");
@@ -95,8 +92,8 @@ public class BeansExperiment {
 
         config.validate();
 
-        BeanDeclaration decl = new PrettyXMLBeanDecl(config, "config");
-        BybloConfig bybloConfig = (BybloConfig) BeanHelper.createBean(decl);
+        BeanDeclaration declaration = new PrettyXMLBeanDeclaration(config, "config");
+        BybloConfig bybloConfig = (BybloConfig) BeanHelper.createBean(declaration);
 
         System.out.println(bybloConfig);
 
@@ -104,7 +101,7 @@ public class BeansExperiment {
     }
 //
 //    /**
-//     * Schema Langauge key for the parser
+//     * Schema Language key for the parser
 //     */
 //    private static final String JAXP_SCHEMA_LANGUAGE =
 //            "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
@@ -115,7 +112,7 @@ public class BeansExperiment {
 //    private static final String W3C_XML_SCHEMA =
 //            "http://www.w3.org/2001/XMLSchema";
 
-    static DocumentBuilder createDocumentBuilder()
+    private static DocumentBuilder createDocumentBuilder()
             throws ParserConfigurationException, SAXException {
 
         SchemaFactory schemaFactory =
@@ -149,35 +146,7 @@ public class BeansExperiment {
 
     }
 
-    static class BakedBeanFactory extends DefaultBeanFactory {
-
-        @Override
-        public synchronized Object createBean(
-                Class beanClass, BeanDeclaration decl, Object param)
-                throws Exception {
-            return super.createBean(beanClass, decl, param);
-        }
-
-        @Override
-        public Class<?> getDefaultBeanClass() {
-            return super.getDefaultBeanClass();
-        }
-
-        @Override
-        protected Object createBeanInstance(
-                Class<?> beanClass, BeanDeclaration decl)
-                throws Exception {
-            return super.createBeanInstance(beanClass, decl);
-        }
-
-        @Override
-        protected void initBeanInstance(Object bean, BeanDeclaration decl)
-                throws Exception {
-            super.initBeanInstance(bean, decl);
-        }
-    }
-
-    public static class PrettyXMLBeanDecl implements BeanDeclaration {
+    public static class PrettyXMLBeanDeclaration implements BeanDeclaration {
 
         /**
          * Constant for the prefix of reserved attributes.
@@ -215,8 +184,8 @@ public class BeansExperiment {
          */
         private ConfigurationNode node;
 
-        public PrettyXMLBeanDecl(HierarchicalConfiguration config,
-                                 @Nullable String key) {
+        public PrettyXMLBeanDeclaration(HierarchicalConfiguration config,
+                                        @Nullable String key) {
             Preconditions.checkNotNull(config, "config");
 
             try {
@@ -234,14 +203,14 @@ public class BeansExperiment {
         }
 
         /**
-         * Creates a new instance of {@code PrettyXMLBeanDecl} and initializes
+         * Creates a new instance of {@code PrettyXMLBeanDeclaration} and initializes
          * it with the configuration node that contains the bean declaration.
          * <p/>
          * @param config the configuration
          * @param node   the node with the bean declaration.
          */
-        public PrettyXMLBeanDecl(SubnodeConfiguration config,
-                                 ConfigurationNode node) {
+        public PrettyXMLBeanDeclaration(SubnodeConfiguration config,
+                                        ConfigurationNode node) {
             Preconditions.checkNotNull(config, "config");
             Preconditions.checkNotNull(node, "node");
 
@@ -334,11 +303,7 @@ public class BeansExperiment {
         }
 
         boolean isSimpleNode(ConfigurationNode node) {
-            boolean s = node.getChildrenCount() == 0
-                    && node.getAttributeCount() == 0;
-//            System.out.println(node.getName() + " simple=" + s);
-//            return node.getAttributeCount(ATTR_PREFIX) == 0;
-            return s;
+            return node.getChildrenCount() == 0 && node.getAttributeCount() == 0;
         }
 
         /**
@@ -364,10 +329,7 @@ public class BeansExperiment {
                     if (obj instanceof List) {
 
                         // Safe because we created the lists ourselves.
-                        @SuppressWarnings("unchecked")
-                        List<BeanDeclaration> tmpList =
-                                (List<BeanDeclaration>) obj;
-                        list = tmpList;
+                        list = (List<BeanDeclaration>) obj;
 
                     } else {
 
@@ -392,20 +354,20 @@ public class BeansExperiment {
 
         /**
          * Performs interpolation for the specified value. This implementation
-         * will interpolate against the current subnode configuration's parent.
+         * will interpolate against the current sub-node configuration's parent.
          * If sub classes need a different interpolation mechanism, they should
          * override this method.
          * <p/>
          * @param value the value that is to be interpolated
          * @return the interpolated value
          */
-        protected Object interpolate(Object value) {
+        Object interpolate(Object value) {
 
             return PropertyConverter.interpolate(
                     value, getConfiguration().getParent());
         }
 
-        protected boolean isReservedNode(ConfigurationNode nd) {
+        boolean isReservedNode(ConfigurationNode nd) {
             return nd.getName().startsWith(RESERVED_PREFIX);
         }
 
@@ -415,7 +377,7 @@ public class BeansExperiment {
          * {@code getNestedBeanDeclarations()} for all complex sub properties
          * detected by this method. Derived classes can hook in if they need a
          * specific initialization. This base implementation creates a
-         * {@code PrettyXMLBeanDecl} that is properly initialized from the
+         * {@code PrettyXMLBeanDeclaration} that is properly initialized from the
          * passed in node.
          * <p/>
          * @param node the child node, for which a {@code BeanDeclaration} is to
@@ -423,23 +385,21 @@ public class BeansExperiment {
          * @return the {@code BeanDeclaration} for this child node
          * @since 1.6
          */
-        protected BeanDeclaration createBeanDeclaration(ConfigurationNode node) {
+        BeanDeclaration createBeanDeclaration(ConfigurationNode node) {
             List<? extends Configuration> list =
                     getConfiguration().configurationsAt(node.getName());
 
             if (list.size() == 1) {
 
-                return new PrettyXMLBeanDecl(
+                return new PrettyXMLBeanDeclaration(
                         (SubnodeConfiguration) list.get(0), node);
 
             } else {
 
-                Iterator<? extends Configuration> iter = list.iterator();
-                while (iter.hasNext()) {
-                    SubnodeConfiguration config =
-                            (SubnodeConfiguration) iter.next();
+                for (Configuration aList : list) {
+                    SubnodeConfiguration config = (SubnodeConfiguration) aList;
                     if (config.getRootNode().equals(node)) {
-                        return new PrettyXMLBeanDecl(config, node);
+                        return new PrettyXMLBeanDeclaration(config, node);
                     }
                 }
 
@@ -448,13 +408,13 @@ public class BeansExperiment {
             }
         }
 
-        private void initSubnodeConfiguration(SubnodeConfiguration conf) {
-            conf.setThrowExceptionOnMissing(false);
-            conf.setExpressionEngine(null);
+        private void initSubnodeConfiguration(SubnodeConfiguration config) {
+            config.setThrowExceptionOnMissing(false);
+            config.setExpressionEngine(null);
         }
     }
 
-    static void printFullStackTrace(Throwable t) {
+    private static void printFullStackTrace(Throwable t) {
         try {
             StringBuilder sb = new StringBuilder();
             fullStackTrace(t, sb);
@@ -465,7 +425,7 @@ public class BeansExperiment {
         }
     }
 
-    static void fullStackTrace(Throwable t, Appendable sb) throws IOException {
+    private static void fullStackTrace(Throwable t, Appendable sb) throws IOException {
         sb.append(t.toString());
         sb.append('\n');
         for (StackTraceElement e : t.getStackTrace()) {

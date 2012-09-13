@@ -75,7 +75,7 @@ public final class CountTask extends AbstractTask implements Serializable,
      * A very rough guess at the amount of memory required of each event read
      * from the source.
      */
-    public static long BYTES_REQUIRED_PER_EVENT = 268L;
+    public static final long BYTES_REQUIRED_PER_EVENT = 268L;
 
     private ObjectSource<TokenPair> source;
 
@@ -111,7 +111,7 @@ public final class CountTask extends AbstractTask implements Serializable,
         return entrySink;
     }
 
-    public final void setEntrySink(ObjectSink<Weighted<Token>> entrySink) {
+    final void setEntrySink(ObjectSink<Weighted<Token>> entrySink) {
         Checks.checkNotNull("entrySink", entrySink);
         this.entrySink = entrySink;
     }
@@ -120,7 +120,7 @@ public final class CountTask extends AbstractTask implements Serializable,
         return eventSink;
     }
 
-    public final void setEventSink(ObjectSink<Weighted<TokenPair>> eventSink) {
+    final void setEventSink(ObjectSink<Weighted<TokenPair>> eventSink) {
         Checks.checkNotNull("eventSink", eventSink);
         this.eventSink = eventSink;
     }
@@ -129,7 +129,7 @@ public final class CountTask extends AbstractTask implements Serializable,
         return featureSink;
     }
 
-    public final void setFeatureSink(ObjectSink<Weighted<Token>> featureSink) {
+    final void setFeatureSink(ObjectSink<Weighted<Token>> featureSink) {
         Checks.checkNotNull("featureSink", featureSink);
         this.featureSink = featureSink;
     }
@@ -138,42 +138,42 @@ public final class CountTask extends AbstractTask implements Serializable,
         return source;
     }
 
-    public final void setSource(ObjectSource<TokenPair> source) {
+    final void setSource(ObjectSource<TokenPair> source) {
         Checks.checkNotNull("source", source);
         this.source = source;
     }
 
-    public final Comparator<Weighted<Token>> getEntryComparator() {
+    final Comparator<Weighted<Token>> getEntryComparator() {
         return entryComparator;
     }
 
-    public final void setEntryComparator(
+    final void setEntryComparator(
             Comparator<Weighted<Token>> entryComparator) {
         Checks.checkNotNull("entryComparator", entryComparator);
         this.entryComparator = entryComparator;
     }
 
-    public final Comparator<Weighted<TokenPair>> getEventComparator() {
+    final Comparator<Weighted<TokenPair>> getEventComparator() {
         return eventComparator;
     }
 
-    public final void setEventComparator(
+    final void setEventComparator(
             Comparator<Weighted<TokenPair>> eventComparator) {
         Checks.checkNotNull("eventComparator", eventComparator);
         this.eventComparator = eventComparator;
     }
 
-    public final Comparator<Weighted<Token>> getFeatureComparator() {
+    final Comparator<Weighted<Token>> getFeatureComparator() {
         return featureComparator;
     }
 
-    public final void setFeatureComparator(
+    final void setFeatureComparator(
             Comparator<Weighted<Token>> featureComparator) {
         Checks.checkNotNull("featureComparator", featureComparator);
         this.featureComparator = featureComparator;
     }
 
-    protected void checkState() {
+    void checkState() {
         Checks.checkNotNull("source", source);
         Checks.checkNotNull("featureSink", featureSink);
         Checks.checkNotNull("eventSink", eventSink);
@@ -300,10 +300,6 @@ public final class CountTask extends AbstractTask implements Serializable,
         progress.setState(State.COMPLETED);
         progress.endAdjusting();
 
-    }
-
-    @Override
-    protected void finaliseTask() throws Exception {
     }
 
     private static List<Weighted<Token>> int2IntMapToWeightedTokens(

@@ -86,9 +86,7 @@ public final class BybloIO {
         final double frequencySum = statsSrc.getWeightSum();
         final int nonZeroCardinality = statsSrc.getMaxId() + 1;
 
-        final MarginalDistribution md = new MarginalDistribution(
-                frequencies, frequencySum, nonZeroCardinality);
-        return md;
+        return new MarginalDistribution(frequencies, frequencySum, nonZeroCardinality);
     }
 
     public static MarginalDistribution readEntriesMarginalDistribution(
@@ -126,7 +124,7 @@ public final class BybloIO {
 
     }
 
-    public static WeightedTokenSink openFeaturesSink(
+    private static WeightedTokenSink openFeaturesSink(
             File file, Charset charset, SingleEnumerating idx)
             throws IOException {
         return WeightedTokenSink.open(
@@ -216,7 +214,7 @@ public final class BybloIO {
                 BybloSettings.getInstance().isEventsCompactEnabled());
     }
 
-    public static WeightedTokenPairSource openSimsSource(
+    private static WeightedTokenPairSource openSimsSource(
             File file, Charset charset, SingleEnumerating idx)
             throws IOException {
         return WeightedTokenPairSource.open(
@@ -247,7 +245,7 @@ public final class BybloIO {
         return openSimsSink(file, charset, EnumeratingDelegates.toSingleEntries(idx));
     }
 
-    public static WeightedTokenPairSource openNeighboursSource(
+    private static WeightedTokenPairSource openNeighboursSource(
             File file, Charset charset, SingleEnumerating idx)
             throws IOException {
         return WeightedTokenPairSource.open(
@@ -256,7 +254,7 @@ public final class BybloIO {
                 BybloSettings.getInstance().isNeighboursSkipIndexColumn2Enabled());
     }
 
-    public static WeightedTokenPairSink openNeighboursSink(
+    private static WeightedTokenPairSink openNeighboursSink(
             File file, Charset charset, SingleEnumerating idx)
             throws IOException {
         return WeightedTokenPairSink.open(

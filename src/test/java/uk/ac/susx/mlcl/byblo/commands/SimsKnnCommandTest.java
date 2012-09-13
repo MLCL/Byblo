@@ -55,18 +55,6 @@ public class SimsKnnCommandTest extends AbstractCommandTest<KnnSimsCommand> {
         return KnnSimsCommand.class;
     }
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     private static final String subject = ExternalKnnSimsCommand.class
             .getName();
 

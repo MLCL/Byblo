@@ -46,9 +46,10 @@ import java.io.Serializable;
  * correlation, no correlation, and maximal negative correlation
  * <p/>
  * <p/>
- * Proposed in: Daille, B.: Approche mixte pour l'extraction automatique de
+ *
+ * @see "Daille, B.: Approche mixte pour l'extraction automatique de
  * terminologie: statistiquesicales et ltres linguistiques. PhD thesis,
- * Universite Paris 7
+ * Universite Paris 7"
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -88,11 +89,7 @@ public final class SquaredPMI
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        return super.equals((AbstractContextualWeighting) this);
+        return obj == this || !(obj == null || getClass() != obj.getClass()) && super.equals(this);
     }
 
     @Override

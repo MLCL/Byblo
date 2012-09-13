@@ -72,12 +72,12 @@ public class NaiveApssTask<P> extends AbstractTask
     private static final Log LOG = LogFactory.getLog(NaiveApssTask.class);
 
     /**
-     * Set to Jaccard because it requires no parameterization; hence can be
+     * Set to Jaccard because it requires no parameterisation; hence can be
      * instantiated quickly and easily.
      */
-    public static final Measure DEFAULT_MEASURE = new Jaccard();
+    private static final Measure DEFAULT_MEASURE = new Jaccard();
 
-    protected final ProgressDelegate progress = new ProgressDelegate(this, true);
+    final ProgressDelegate progress = new ProgressDelegate(this, true);
 
     private SeekableObjectSource<Indexed<SparseDoubleVector>, P> sourceA;
 
@@ -96,20 +96,20 @@ public class NaiveApssTask<P> extends AbstractTask
     /**
      * Filters that determine which resultant pairs are output
      */
-    private Predicate<Weighted<TokenPair>> pruducePair = Predicates.alwaysTrue();
+    private Predicate<Weighted<TokenPair>> producePair = Predicates.alwaysTrue();
     // Stat collection
 
     private ApssStats stats = new ApssStats();
     // Component of the similarity calculation that depends only on the sourceA
-    // feature vectorx - can be precalculated to save time during the
+    // feature vectors - can be pre-calculated to save time during the
     // quadratic part of the algorithm
 
-    private Int2DoubleMap precalcA = null;
+    private Int2DoubleMap preCalcA = null;
     // Component of the similarity calculation that depends only on the sourceB
-    // feature vectors - can be precalculated to save time during the
+    // feature vectors - can be pre0calculated to save time during the
     // quadratic part of the algorithm
 
-    private Int2DoubleMap precalcB = null;
+    private Int2DoubleMap preCalcB = null;
 
     /**
      * Constructor of minimal parameterisation, taking arguments that must be
@@ -119,7 +119,7 @@ public class NaiveApssTask<P> extends AbstractTask
      * @param R
      * @param sink
      */
-    public NaiveApssTask(
+    NaiveApssTask(
             SeekableObjectSource<Indexed<SparseDoubleVector>, P> Q,
             SeekableObjectSource<Indexed<SparseDoubleVector>, P> R,
             ObjectSink<Weighted<TokenPair>> sink) {
@@ -134,30 +134,30 @@ public class NaiveApssTask<P> extends AbstractTask
     public NaiveApssTask() {
     }
 
-    public Predicate<Weighted<TokenPair>> getProducatePair() {
-        return pruducePair;
+    Predicate<Weighted<TokenPair>> getProducePair() {
+        return producePair;
     }
 
-    public void setProducatePair(Predicate<Weighted<TokenPair>> pruducePair) {
-        Checks.checkNotNull("pruducePair");
-        this.pruducePair = pruducePair;
+    public void setProducePair(Predicate<Weighted<TokenPair>> producePair) {
+        Checks.checkNotNull("producePair");
+        this.producePair = producePair;
     }
 
-    public Predicate<Indexed<SparseDoubleVector>> getProcessRecord() {
+    Predicate<Indexed<SparseDoubleVector>> getProcessRecord() {
         return processRecord;
     }
 
-    public void setProcessRecord(
+    void setProcessRecord(
             Predicate<Indexed<SparseDoubleVector>> processRecord) {
         Checks.checkNotNull("processRecord");
         this.processRecord = processRecord;
     }
 
-    public final ApssStats getStats() {
+    final ApssStats getStats() {
         return stats;
     }
 
-    public final void setStats(ApssStats stats) {
+    final void setStats(ApssStats stats) {
         Checks.checkNotNull("stats");
         this.stats = stats;
     }
@@ -184,15 +184,15 @@ public class NaiveApssTask<P> extends AbstractTask
         this.sourceB = B;
     }
 
-    protected final SeekableObjectSource<Indexed<SparseDoubleVector>, P> getSourceA() {
+    final SeekableObjectSource<Indexed<SparseDoubleVector>, P> getSourceA() {
         return sourceA;
     }
 
-    protected final SeekableObjectSource<Indexed<SparseDoubleVector>, P> getSourceB() {
+    final SeekableObjectSource<Indexed<SparseDoubleVector>, P> getSourceB() {
         return sourceB;
     }
 
-    public final Measure getMeasure() {
+    final Measure getMeasure() {
         return measure;
     }
 
@@ -201,7 +201,7 @@ public class NaiveApssTask<P> extends AbstractTask
         this.measure = measure;
     }
 
-    public final ObjectSink<Weighted<TokenPair>> getSink() {
+    final ObjectSink<Weighted<TokenPair>> getSink() {
         return sink;
     }
 
@@ -215,12 +215,12 @@ public class NaiveApssTask<P> extends AbstractTask
     @Override
     protected void initialiseTask() throws Exception {
         checkState();
-        buildPrecalcs();
+        buildPreCalcs();
     }
 
-    protected final int PAIR_OUTPUT_BUFFER_SIZE = 100000;
+    final int PAIR_OUTPUT_BUFFER_SIZE = 100000;
 
-    protected void writeOutPairs(List<Weighted<TokenPair>> pairs) throws IOException {
+    void writeOutPairs(List<Weighted<TokenPair>> pairs) throws IOException {
         if (pairs.isEmpty())
             return;
         // Sorting the pairs reduces disk space usage due to compact format and
@@ -266,7 +266,7 @@ public class NaiveApssTask<P> extends AbstractTask
                 double sim = sim(a, b);
                 Weighted<TokenPair> pair = new Weighted<TokenPair>(
                         new TokenPair(b.key(), a.key()), sim);
-                if (pruducePair.apply(pair)) {
+                if (producePair.apply(pair)) {
                     pairBuffer.add(pair);
                     stats.incrementProductionCount();
                     if (pairBuffer.size() > PAIR_OUTPUT_BUFFER_SIZE) {
@@ -287,8 +287,8 @@ public class NaiveApssTask<P> extends AbstractTask
 
     @Override
     protected void finaliseTask() throws Exception {
-        precalcA = null;
-        precalcB = null;
+        preCalcA = null;
+        preCalcB = null;
     }
 
     /**
@@ -297,7 +297,7 @@ public class NaiveApssTask<P> extends AbstractTask
      *
      * @throws IOException if something goes wrong with input sources
      */
-    protected void checkState() throws IOException {
+    void checkState() throws IOException {
         if (sourceA == null) {
             throw new IllegalStateException("source A is not set");
         }
@@ -322,34 +322,34 @@ public class NaiveApssTask<P> extends AbstractTask
         if (processRecord == null) {
             throw new NullPointerException("recordFilter == null");
         }
-        if (pruducePair == null) {
+        if (producePair == null) {
             throw new NullPointerException("pairFilter == null");
         }
     }
 
-    protected void buildPrecalcs() throws IOException {
+    void buildPreCalcs() throws IOException {
         // Calculate the left and right hand components if they have not been
         // provided.
         if (getMeasure() instanceof DecomposableMeasure) {
-            if (precalcA == null) {
-                precalcA = buildPrecalcA();
+            if (preCalcA == null) {
+                preCalcA = buildPrecalcA();
             }
-            if (precalcB == null) {
-                precalcB = buildPrecalcB();
+            if (preCalcB == null) {
+                preCalcB = buildPrecalcB();
             }
         }
 
     }
 
-    protected Int2DoubleMap getPrecalcA() {
-        return precalcA;
+    protected Int2DoubleMap getPreCalcA() {
+        return preCalcA;
     }
 
-    protected Int2DoubleMap getPrecalcB() {
-        return precalcB;
+    protected Int2DoubleMap getPreCalcB() {
+        return preCalcB;
     }
 
-    protected Int2DoubleMap buildPrecalcA() throws IOException {
+    Int2DoubleMap buildPrecalcA() throws IOException {
         if (!(getMeasure() instanceof DecomposableMeasure))
             return null;
 
@@ -365,7 +365,7 @@ public class NaiveApssTask<P> extends AbstractTask
         return result;
     }
 
-    protected Int2DoubleMap buildPrecalcB() throws IOException {
+    Int2DoubleMap buildPrecalcB() throws IOException {
         if (!(getMeasure() instanceof DecomposableMeasure))
             return null;
 
@@ -381,19 +381,19 @@ public class NaiveApssTask<P> extends AbstractTask
         return result;
     }
 
-    protected final double sim(
+    final double sim(
             final Indexed<SparseDoubleVector> a,
             final Indexed<SparseDoubleVector> b) {
         stats.incrementComparisonCount();
 
-        // XXX: checking instanceof everytime will be a bit slow
+        // XXX: checking instanceof every time will be a bit slow
         if (measure instanceof DecomposableMeasure) {
             final DecomposableMeasure dm =
                     (DecomposableMeasure) getMeasure();
             return dm.combine(
                     dm.shared(a.value(), b.value()),
-                    precalcA.get(a.key()),
-                    precalcB.get(b.key()));
+                    preCalcA.get(a.key()),
+                    preCalcB.get(b.key()));
         } else {
             return measure.similarity(a.value(), b.value());
         }
@@ -447,7 +447,7 @@ public class NaiveApssTask<P> extends AbstractTask
                 add("measure", measure).
                 add("sink", sink).
                 add("processRecord", processRecord).
-                add("pruducePair", pruducePair).
+                add("producePair", producePair).
                 add("stats", stats);
     }
 }

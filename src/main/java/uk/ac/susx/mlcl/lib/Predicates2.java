@@ -41,7 +41,7 @@ import java.io.Serializable;
  */
 public final class Predicates2 {
 
-    public static Predicate<Double> lt(final double threshold) {
+    private static Predicate<Double> lt(final double threshold) {
         if (Double.isNaN(threshold))
             return Predicates.alwaysFalse();
         else if (threshold == Double.NEGATIVE_INFINITY)
@@ -66,7 +66,7 @@ public final class Predicates2 {
             return Predicates.not(gt(threshold));
     }
 
-    public static Predicate<Double> gt(final double threshold) {
+    private static Predicate<Double> gt(final double threshold) {
         if (Double.isNaN(threshold))
             return Predicates.alwaysFalse();
         else if (threshold == Double.POSITIVE_INFINITY)
@@ -119,13 +119,7 @@ public final class Predicates2 {
             if (getClass() != obj.getClass())
                 return false;
             final InRange other = (InRange) obj;
-            if (Double.doubleToLongBits(this.min) != Double.doubleToLongBits(
-                    other.min))
-                return false;
-            if (Double.doubleToLongBits(this.max) != Double.doubleToLongBits(
-                    other.max))
-                return false;
-            return true;
+            return Double.doubleToLongBits(this.min) == Double.doubleToLongBits(other.min) && Double.doubleToLongBits(this.max) == Double.doubleToLongBits(other.max);
         }
 
         @Override
@@ -169,9 +163,7 @@ public final class Predicates2 {
             if (getClass() != obj.getClass())
                 return false;
             final GreaterThan other = (GreaterThan) obj;
-            if (Double.doubleToLongBits(this.threshold) != Double.doubleToLongBits(other.threshold))
-                return false;
-            return true;
+            return Double.doubleToLongBits(this.threshold) == Double.doubleToLongBits(other.threshold);
         }
 
         @Override
@@ -212,9 +204,7 @@ public final class Predicates2 {
             if (getClass() != obj.getClass())
                 return false;
             final GreaterThan other = (GreaterThan) obj;
-            if (Double.doubleToLongBits(this.threshold) != Double.doubleToLongBits(other.threshold))
-                return false;
-            return true;
+            return Double.doubleToLongBits(this.threshold) == Double.doubleToLongBits(other.threshold);
         }
 
         @Override

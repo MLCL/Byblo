@@ -60,7 +60,7 @@ public class JDBMTest {
         /**
          * create (or open existing) database using builder pattern
          */
-        final String fileName = "jdbc-basicExample";
+        final String fileName = "jdbm-basicExample";
         File file = new File(TEST_OUTPUT_DIR, fileName);
 
         {
@@ -164,7 +164,7 @@ public class JDBMTest {
     @Ignore
     public void fib2() throws IOException {
 
-        final String fileName = "jdbc-fib";
+        final String fileName = "jdbm-fib";
         File file = new File(TEST_OUTPUT_DIR, fileName);
         deleteIfExist(file.getParentFile().listFiles(new FilenameFilter() {
 

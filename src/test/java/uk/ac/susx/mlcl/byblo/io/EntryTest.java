@@ -50,9 +50,8 @@ import static uk.ac.susx.mlcl.TestConstants.*;
  */
 public class EntryTest {
 
-    private void copyE(File a, File b, boolean enumIn,
-                       boolean enumOut)
-            throws FileNotFoundException, IOException {
+    private void copyE(File a, File b, boolean enumIn, boolean enumOut)
+            throws IOException {
 
         SingleEnumeratingDelegate idx = new SingleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, null);
@@ -74,7 +73,7 @@ public class EntryTest {
     }
 
     @Test
-    public void testEntriesCompactConversion() throws FileNotFoundException, IOException {
+    public void testEntriesCompactConversion() throws IOException {
         File a = TEST_FRUIT_ENTRIES;
         File b = new File(TEST_OUTPUT_DIR,
                 TEST_FRUIT_ENTRIES.getName() + ".compact");
@@ -96,24 +95,24 @@ public class EntryTest {
     }
 
     @Test
-    public void testEntriesEnumeratorConversion() throws FileNotFoundException, IOException {
+    public void testEntriesEnumeratorConversion() throws IOException {
         File a = TEST_FRUIT_ENTRIES;
         File b = new File(TEST_OUTPUT_DIR,
                 TEST_FRUIT_ENTRIES.getName() + ".enum");
         File c = new File(TEST_OUTPUT_DIR,
                 TEST_FRUIT_ENTRIES.getName() + ".str");
 
-        SingleEnumeratingDelegate indel = new SingleEnumeratingDelegate(
+        SingleEnumeratingDelegate inDelegate = new SingleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, null);
-        SingleEnumeratingDelegate outdel = new SingleEnumeratingDelegate(
+        SingleEnumeratingDelegate outDelegate = new SingleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, true, null);
 
 
         {
             WeightedTokenSource aSrc = WeightedTokenSource.open(
-                    a, DEFAULT_CHARSET, indel, false);
+                    a, DEFAULT_CHARSET, inDelegate, false);
             WeightedTokenSink bSink = WeightedTokenSink.open(
-                    b, DEFAULT_CHARSET, outdel, false);
+                    b, DEFAULT_CHARSET, outDelegate, false);
             ObjectIO.copy(aSrc, bSink);
             bSink.close();
         }
@@ -123,9 +122,9 @@ public class EntryTest {
 
         {
             WeightedTokenSource bSrc = WeightedTokenSource.open(
-                    b, DEFAULT_CHARSET, outdel, false);
+                    b, DEFAULT_CHARSET, outDelegate, false);
             WeightedTokenSink cSink = WeightedTokenSink.open(
-                    c, DEFAULT_CHARSET, indel, false);
+                    c, DEFAULT_CHARSET, inDelegate, false);
             ObjectIO.copy(bSrc, cSink);
             cSink.close();
         }
@@ -136,15 +135,15 @@ public class EntryTest {
                 Files.equal(a, c));
     }
 
-    public void testRandomAccess(File file) throws FileNotFoundException, IOException {
+    void testRandomAccess(File file) throws IOException {
         final Map<Tell, Weighted<Token>> hist =
                 new HashMap<Tell, Weighted<Token>>();
 
-        SingleEnumeratingDelegate indel = new SingleEnumeratingDelegate(
+        SingleEnumeratingDelegate inDelegate = new SingleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, null);
 
         WeightedTokenSource src = WeightedTokenSource.open(
-                file, DEFAULT_CHARSET, indel, false);
+                file, DEFAULT_CHARSET, inDelegate, false);
         {
             while (src.hasNext()) {
 
@@ -152,7 +151,7 @@ public class EntryTest {
                 final Weighted<Token> record = src.read();
 
                 System.out.println(pos.toString() + ": " + record.record().
-                        toString(indel.getEnumerator()));
+                        toString(inDelegate.getEnumerator()));
 
                 assertNotNull("Found null EntryRecord", record);
                 hist.put(pos, record);
@@ -169,7 +168,7 @@ public class EntryTest {
 
                 System.out.println("expected tell: " + pos);
                 System.out.println(
-                        "expected: " + expected.record().toString(indel.getEnumerator()));
+                        "expected: " + expected.record().toString(inDelegate.getEnumerator()));
 
                 src.position(pos);
 
@@ -178,7 +177,7 @@ public class EntryTest {
 
                 Weighted<Token> actual = src.read();
                 System.out.println("actual tell: " + src.position());
-                System.out.println("actual: " + actual.record().toString(indel.getEnumerator()));
+                System.out.println("actual: " + actual.record().toString(inDelegate.getEnumerator()));
 
                 assertEquals(expected, actual);
             }
@@ -187,7 +186,7 @@ public class EntryTest {
 
     @Test
     public void testRandomAccess()
-            throws FileNotFoundException, IOException {
+            throws IOException {
         testRandomAccess(TEST_FRUIT_ENTRIES);
     }
 

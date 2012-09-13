@@ -82,18 +82,18 @@ public class MergeInstancesCommand extends AbstractMergeCommand<TokenPair> {
         return indexDelegate;
     }
 
-    public final void setIndexDelegate(DoubleEnumeratingDelegate indexDelegate) {
+    final void setIndexDelegate(DoubleEnumeratingDelegate indexDelegate) {
         Checks.checkNotNull("indexDelegate", indexDelegate);
         this.indexDelegate = indexDelegate;
     }
 
     @Override
-    protected ObjectSource<TokenPair> openSource(File file) throws FileNotFoundException, IOException {
+    protected ObjectSource<TokenPair> openSource(File file) throws IOException {
         return BybloIO.openInstancesSource(file, getFileDelegate().getCharset(), indexDelegate);
     }
 
     @Override
-    protected ObjectSink<TokenPair> openSink(File file) throws FileNotFoundException, IOException {
+    protected ObjectSink<TokenPair> openSink(File file) throws IOException {
         return BybloIO.openInstancesSink(file, getFileDelegate().getCharset(),
                 indexDelegate);
     }

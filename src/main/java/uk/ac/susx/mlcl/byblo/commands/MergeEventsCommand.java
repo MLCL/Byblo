@@ -85,18 +85,18 @@ public class MergeEventsCommand extends AbstractMergeCommand<Weighted<TokenPair>
         return indexDelegate;
     }
 
-    public final void setIndexDelegate(DoubleEnumeratingDelegate indexDelegate) {
+    final void setIndexDelegate(DoubleEnumeratingDelegate indexDelegate) {
         Checks.checkNotNull("indexDelegate", indexDelegate);
         this.indexDelegate = indexDelegate;
     }
 
     @Override
-    protected ObjectSource<Weighted<TokenPair>> openSource(File file) throws FileNotFoundException, IOException {
+    protected ObjectSource<Weighted<TokenPair>> openSource(File file) throws IOException {
         return BybloIO.openEventsSource(file, getFileDelegate().getCharset(), indexDelegate);
     }
 
     @Override
-    protected ObjectSink<Weighted<TokenPair>> openSink(File file) throws FileNotFoundException, IOException {
+    protected ObjectSink<Weighted<TokenPair>> openSink(File file) throws IOException {
         return new WeightSumReducerObjectSink<TokenPair>(BybloIO.openEventsSink(
                 file, getFileDelegate().getCharset(), indexDelegate));
     }

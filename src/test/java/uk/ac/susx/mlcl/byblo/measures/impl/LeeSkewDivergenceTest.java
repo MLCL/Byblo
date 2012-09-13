@@ -78,7 +78,7 @@ public class LeeSkewDivergenceTest extends
 	@Test
 	@Ignore
 	@Override
-	public void testHeteroginiety() {
+	public void testHeterogeneity() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -108,7 +108,7 @@ public class LeeSkewDivergenceTest extends
 		testCLI(0.99);
 	}
 
-	public void testCLI(double alpha) throws Exception {
+	void testCLI(double alpha) throws Exception {
 		System.out.printf("testCLI(alpha=%.2f)%n", alpha);
 		runFromCommandLine("--lee-alpha", Double.toString(alpha));
 	}

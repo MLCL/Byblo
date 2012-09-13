@@ -79,14 +79,14 @@ public class ConfusionTest extends AbstractMeasureTest<Confusion> {
     @Test
     @Ignore
     @Override
-    public void testHomoginiety() {
+    public void testHomogeneity() {
         throw new UnsupportedOperationException();
     }
 
     @Test
     @Ignore
     @Override
-    public void testHomoginiety2() {
+    public void testHomogeneity2() {
         throw new UnsupportedOperationException();
     }
 
@@ -111,48 +111,6 @@ public class ConfusionTest extends AbstractMeasureTest<Confusion> {
         throw new UnsupportedOperationException();
     }
 
-    // @Test
-    // @Override
-    // public void testSizeOneVectors() {
-    // System.out.println("testSizeOneVectors");
-    // SparseDoubleVector A = ones(100, 1);
-    // SparseDoubleVector B = ones(100, 1);
-    // Confusion instance = newInstance();
-    // instance.setFeatureMarginals(featureMarginals(A, B));
-    // double expect = instance.getIndependenceBound();
-    // double actual = similarity(instance, A, B);
-    //
-    // Assert.assertEquals(expect, actual, EPSILON);
-    // }
-    //
-    // @Test
-    // @Override
-    // public void testSizeTwoVectors() {
-    // System.out.println("testSizeTwoVectors");
-    // SparseDoubleVector A = ones(100, 2);
-    // SparseDoubleVector B = ones(100, 2);
-    // Confusion instance = newInstance();
-    // instance.setFeatureMarginals(featureMarginals(A, B));
-    // double expect = instance.getIndependenceBound();
-    // double actual = similarity(instance, A, B);
-    //
-    // Assert.assertEquals(expect, actual, EPSILON);
-    // }
-    //
-    // @Test
-    // @Override
-    // public void testCardinalityOneVectors() {
-    // System.out.println("testCardinalityOneVectors");
-    // SparseDoubleVector A = ones(1, 1);
-    // SparseDoubleVector B = ones(1, 1);
-    // Confusion instance = newInstance();
-    // instance.setFeatureMarginals(featureMarginals(A, B));
-    // double expect = instance.getIndependenceBound();
-    // double actual = similarity(instance, A, B);
-    //
-    // Assert.assertEquals(expect, actual, EPSILON);
-    // }
-
     @Test
     @Override
     @Ignore
@@ -160,38 +118,5 @@ public class ConfusionTest extends AbstractMeasureTest<Confusion> {
         throw new UnsupportedOperationException();
     }
 
-    // @Test
-    // @Override
-    // public void testFruitData() throws IOException {
-    // System.out.println("testFruitData");
-    // int limit = 5;
-    //
-    // List<SparseDoubleVector> vecs = TestConstants.loadFruitVectors();
-    //
-    // limit = Math.min(limit, vecs.size());
-    //
-    // Confusion instance = newInstance();
-    // if (instance instanceof FeatureMarginalsCarrier)
-    // ((FeatureMarginalsCarrier) instance)
-    // .setFeatureMarginals(featureMarginals(vecs));
-    //
-    // final double[][] results = new double[limit][limit];
-    // for (int i = 0; i < limit; i++) {
-    // for (int j = 0; j < limit; j++) {
-    // SparseDoubleVector A = vecs.get(i);
-    // SparseDoubleVector B = vecs.get(j);
-    // results[i][j] = similarity(instance, A, B);
-    // }
-    // }
-    //
-    // if (instance.isCommutative()) {
-    // // triangular mirrors should be equal
-    // for (int i = 0; i < limit; i++) {
-    // for (int j = 0; j < limit; j++) {
-    // Assert.assertEquals(results[i][j], results[j][i], EPSILON);
-    // }
-    // }
-    // }
-    // }
 
 }

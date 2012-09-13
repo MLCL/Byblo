@@ -61,26 +61,26 @@ import static org.junit.Assert.*;
  */
 public class TestConstants {
 
-    public static List<Indexed<SparseDoubleVector>> loadIndexedFruitVectors()
+    private static List<Indexed<SparseDoubleVector>> loadIndexedFruitVectors()
             throws IOException {
         final DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();
         final FastWeightedTokenPairVectorSource eventSrc = BybloIO
                 .openEventsVectorSource(TEST_FRUIT_EVENTS, DEFAULT_CHARSET,
                         indexDelegate);
-        final List<Indexed<SparseDoubleVector>> vecs = new ArrayList<Indexed<SparseDoubleVector>>();
+        final List<Indexed<SparseDoubleVector>> vectors = new ArrayList<Indexed<SparseDoubleVector>>();
         int maxCard = 0;
         while (eventSrc.hasNext()) {
             Indexed<SparseDoubleVector> x = eventSrc.read();
             maxCard = Math.max(maxCard, x.value().cardinality);
-            vecs.add(x);
+            vectors.add(x);
         }
         eventSrc.close();
-        for (Indexed<SparseDoubleVector> x : vecs) {
+        for (Indexed<SparseDoubleVector> x : vectors) {
             x.value().cardinality = maxCard;
         }
 
 
-        return vecs;
+        return vectors;
     }
 
     public static List<SparseDoubleVector> loadFruitVectors()
@@ -99,7 +99,7 @@ public class TestConstants {
     public static final File TEST_DATA_DIR = new File(
             "src/test/resources/uk/ac/susx/mlcl/byblo");
 
-    public static final File TEST_FRUIT_DIR = TEST_DATA_DIR;
+    private static final File TEST_FRUIT_DIR = TEST_DATA_DIR;
 
     public static final String FRUIT_NAME = "bnc-gramrels-fruit";
 
@@ -145,19 +145,19 @@ public class TestConstants {
     public static final File TEST_FRUIT_INDEXED_ENTRIES = new File(
             TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.entries");
 
-    public static final File TEST_FRUIT_SKIPINDEXED_ENTRIES = new File(
+    public static final File TEST_FRUIT_SKIP_INDEXED_ENTRIES = new File(
             TEST_FRUIT_DIR, FRUIT_NAME + ".skipindexed.entries");
 
     public static final File TEST_FRUIT_INDEXED_FEATURES = new File(
             TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.features");
 
-    public static final File TEST_FRUIT_SKIPINDEXED_FEATURES = new File(
+    public static final File TEST_FRUIT_SKIP_INDEXED_FEATURES = new File(
             TEST_FRUIT_DIR, FRUIT_NAME + ".skipindexed.features");
 
     public static final File TEST_FRUIT_INDEXED_EVENTS = new File(
             TEST_FRUIT_DIR, FRUIT_NAME + ".indexed.events");
 
-    public static final File TEST_FRUIT_SKIPINDEXED_EVENTS = new File(
+    public static final File TEST_FRUIT_SKIP_INDEXED_EVENTS = new File(
             TEST_FRUIT_DIR, FRUIT_NAME + ".skipindexed.events");
 
     public static final File TEST_FRUIT_INDEXED_SIMS = new File(TEST_FRUIT_DIR,
@@ -172,8 +172,6 @@ public class TestConstants {
 
     public static final Charset DEFAULT_CHARSET = Files.DEFAULT_CHARSET;
 
-    ;
-
     static {
         if (!TEST_OUTPUT_DIR.exists() && !TEST_OUTPUT_DIR.mkdir())
             throw new AssertionError();
@@ -181,7 +179,7 @@ public class TestConstants {
             throw new AssertionError();
     }
 
-    static final Random RAND = new Random();
+    private static final Random RAND = new Random();
 
     public static File makeTempFile(int size) throws IOException {
         final File file = File.createTempFile(TestConstants.class.getName(),
@@ -207,19 +205,12 @@ public class TestConstants {
         return file;
     }
 
-    public static void assertValidInputFiles(File... files) throws IOException {
+    public static void assertValidInputFiles(File... files) {
         for (File file : files) {
             assertNotNull("File is null.", file);
-            assertTrue(format("Input file is null: \"{0}\"", file),
-                    file != null);
-            assertTrue(format("Input file does not exist: \"{0}\" ", file),
-                    file.exists());
-            assertTrue(
-                    format("Input file is not a regular file: \"{0}\" ", file),
-                    file.isFile());
-            assertTrue(format("Input file is empty: ", file) + file,
-                    file.length() > 0);
-
+            assertTrue(format("Input file does not exist: \"{0}\" ", file), file.exists());
+            assertTrue(format("Input file is not a regular file: \"{0}\" ", file), file.isFile());
+            assertTrue(format("Input file is empty: ", file) + file, file.length() > 0);
         }
     }
 
@@ -238,12 +229,9 @@ public class TestConstants {
         }
     }
 
-    public static void assertValidJDBMInputFiles(File... files)
-            throws IOException {
+    public static void assertValidJDBMInputFiles(File... files) {
         for (File file : files) {
             assertNotNull("File is null.", file);
-            assertTrue(format("Input file is null: \"{0}\"", file),
-                    file != null);
 
             File data = new File(file.getParentFile(), file.getName() + ".d.0");
             File index = new File(file.getParentFile(), file.getName() + ".i.0");
@@ -254,22 +242,17 @@ public class TestConstants {
         }
     }
 
-    public static void assertValidIndexInputFiles(File... files)
-            throws IOException {
+    public static void assertValidIndexInputFiles(File... files) {
         for (File file : files) {
             assertNotNull("File is null.", file);
-            assertTrue(format("Input file is null: \"{0}\"", file),
-                    file != null);
             File data = new File(file.getParentFile(), file.getName() + ".d.0");
             File index = new File(file.getParentFile(), file.getName() + ".i.0");
-            // File trans = new File(file.getParentFile(), file.getName() +
-            // ".t");
 
             assertValidInputFiles(data, index);
         }
     }
 
-    public static void assertValidOutputFiles(File... files) throws IOException {
+    public static void assertValidOutputFiles(File... files) {
         for (File file : files) {
             assertNotNull("File is null.", file);
             if (file.exists()) {
@@ -277,7 +260,7 @@ public class TestConstants {
                         format("Input file is not a regular: \"{0}\"", file),
                         file.isFile());
                 assertTrue(
-                        format("Input file is not writeable: \"{0}\"", file),
+                        format("Input file is not writable: \"{0}\"", file),
                         file.canWrite());
             } else {
                 assertTrue(format("Cannot be created: \"{0}\"", file), file
@@ -286,8 +269,7 @@ public class TestConstants {
         }
     }
 
-    public static void assertValidJDBMOutputFiles(File... files)
-            throws IOException {
+    public static void assertValidJDBMOutputFiles(File... files) {
         for (File file : files) {
             assertNotNull("File is null.", file);
             File data = new File(file.getParentFile(), file.getName() + ".d.0");

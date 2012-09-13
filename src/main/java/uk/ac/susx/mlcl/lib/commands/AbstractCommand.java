@@ -35,6 +35,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
+import com.sun.istack.internal.NotNull;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Checks;
@@ -58,7 +59,7 @@ public abstract class AbstractCommand implements Command {
 
     private final Map<String, Class<? extends Command>> subCommands;
 
-    public AbstractCommand(Map<String, Class<? extends Command>> subCommands) {
+    protected AbstractCommand(Map<String, Class<? extends Command>> subCommands) {
         this.subCommands = subCommands;
     }
 
@@ -66,7 +67,7 @@ public abstract class AbstractCommand implements Command {
         this.subCommands = Collections.emptyMap();
     }
 
-    public final boolean isUsageRequested() {
+    final boolean isUsageRequested() {
         return usageRequested;
     }
 
@@ -76,14 +77,14 @@ public abstract class AbstractCommand implements Command {
 
     @Override
     @CheckReturnValue
-    public boolean runCommand(final String[] args) {
+    public boolean runCommand(@NotNull final String[] args) {
         Checks.checkNotNull("args", args);
 
         if (LOG.isTraceEnabled())
             LOG.trace("Initialising command: " + this);
 
-        // Store the return status of this invokation.
-        boolean completedSuccesfully = true;
+        // Store the return status of this invocation.
+        boolean completedSuccessfully = true;
 
         final JCommander jc = new JCommander();
         jc.setProgramName(this.getClass().getSimpleName());
@@ -138,14 +139,14 @@ public abstract class AbstractCommand implements Command {
             } else if (!subCommands.isEmpty() && jc.getParsedCommand() == null) {
 
                 if (LOG.isTraceEnabled())
-                    LOG.trace("Command reguired but not given.");
+                    LOG.trace("Command required but not given.");
 
-                System.err.println("Command reguired but not given.");
+                System.err.println("Command required but not given.");
                 StringBuilder sb = new StringBuilder();
                 jc.usage(sb);
                 System.err.println(sb);
 
-                completedSuccesfully = false;
+                completedSuccessfully = false;
 
             } else {
 
@@ -155,22 +156,22 @@ public abstract class AbstractCommand implements Command {
                     if (LOG.isTraceEnabled())
                         LOG.
                                 trace(
-                                        "Running subcommand " + jc.getParsedCommand()
+                                        "Running sub-command " + jc.getParsedCommand()
                                                 + ": "
                                                 + instance);
-                    completedSuccesfully = instance.runCommand();
+                    completedSuccessfully = instance.runCommand();
 
                 } else {
 
                     LOG.trace("Running command: " + this);
 
-                    completedSuccesfully = this.runCommand();
+                    completedSuccessfully = this.runCommand();
                 }
             }
 
         } catch (ParameterException ex) {
             if (LOG.isTraceEnabled())
-                LOG.trace("Parsing exceoption", ex);
+                LOG.trace("Parsing exception", ex);
 
             System.err.println(ex.getMessage());
             StringBuilder sb = new StringBuilder();
@@ -183,12 +184,12 @@ public abstract class AbstractCommand implements Command {
             }
 
             System.err.println(sb);
-            completedSuccesfully = false;
+            completedSuccessfully = false;
         }
 
         LOG.trace("Completed command: " + this);
 
-        return completedSuccesfully;
+        return completedSuccessfully;
     }
 
     @Override

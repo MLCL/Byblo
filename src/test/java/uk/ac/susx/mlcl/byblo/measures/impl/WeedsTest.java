@@ -83,7 +83,7 @@ public class WeedsTest extends AbstractMeasureTest<Weeds> {
 		testCLI(0, 0);
 	}
 
-	public void testCLI(double beta, double gamma) throws Exception {
+	void testCLI(double beta, double gamma) throws Exception {
 		System.out.println(String.format("testCLI(beta=%.2f, gamma=%.2f)",
 				beta, gamma));
 

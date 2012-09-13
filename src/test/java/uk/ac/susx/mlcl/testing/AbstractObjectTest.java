@@ -61,9 +61,8 @@
  */
 package uk.ac.susx.mlcl.testing;
 
-import junit.framework.*;
-import org.junit.*;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -82,29 +81,8 @@ import static org.junit.Assume.assumeTrue;
  */
 public abstract class AbstractObjectTest<T> extends AbstractTest {
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
 
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        AbstractTest.setUpClass();
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-        AbstractTest.tearDownClass();
-    }
-
-    public T newInstance() {
+    protected T newInstance() {
         try {
             return getImplementation().newInstance();
         } catch (InstantiationException e) {
@@ -114,7 +92,7 @@ public abstract class AbstractObjectTest<T> extends AbstractTest {
         }
     }
 
-    public Constructor<? extends T> getConstructor(Class<?>... paramTypes) {
+    Constructor<? extends T> getConstructor(Class<?>... paramTypes) {
         try {
             return getImplementation().getConstructor(paramTypes);
         } catch (NoSuchMethodException e) {
@@ -122,7 +100,7 @@ public abstract class AbstractObjectTest<T> extends AbstractTest {
         }
     }
 
-    public boolean hasConstructor(Class<?>... paramTypes) {
+    boolean hasConstructor(Class<?>... paramTypes) {
         try {
             getImplementation().getConstructor(paramTypes);
             return true;
@@ -131,7 +109,7 @@ public abstract class AbstractObjectTest<T> extends AbstractTest {
         }
     }
 
-    public T newInstance(Class<?>[] types, Object[] params) {
+    protected T newInstance(Class<?>[] types, Object[] params) {
         try {
             return getConstructor(types).newInstance(params);
         } catch (InstantiationException e) {
@@ -143,7 +121,7 @@ public abstract class AbstractObjectTest<T> extends AbstractTest {
         }
     }
 
-    public T newInstance(Class<?> type, Object param) {
+    protected T newInstance(Class<?> type, Object param) {
         try {
             return getConstructor(type).newInstance(param);
         } catch (InstantiationException e) {
@@ -155,7 +133,7 @@ public abstract class AbstractObjectTest<T> extends AbstractTest {
         }
     }
 
-    public abstract Class<? extends T> getImplementation();
+    protected abstract Class<? extends T> getImplementation();
 
     /**
      * If the object has a default (zero parameter) constructor, then check it's
@@ -219,7 +197,7 @@ public abstract class AbstractObjectTest<T> extends AbstractTest {
      * 		x.hashCode() == x.clone().hashCode()
      * </pre>
      */
-    public static void assertCloneEquals(Object instance, Object copy) {
+    protected static void assertCloneEquals(Object instance, Object copy) {
         assertTrue("cloned object is the the same as the original", instance != copy);
         assertTrue(MessageFormat.format("Clone object class identity mismatch; expecting {0} but found {1}", instance.getClass(),
                 copy.getClass()), copy.getClass() == instance.getClass());
@@ -228,25 +206,24 @@ public abstract class AbstractObjectTest<T> extends AbstractTest {
     }
 
     /**
-     * Concatonate two or more arrays.
-     *
+     * Concatenate two or more arrays.
+     * <p/>
      * This should really be in ArrayUtil
      *
-     * @param arrs
+     * @param arrays
      * @param <T>
      * @return
      */
-    public static <T> T[] cat(final T[]... arrs) {
+    protected static <T> T[] cat(final T[]... arrays) {
         int n = 0;
-        for (int i = 0; i < arrs.length; i++)
-            n += arrs[i].length;
+        for (T[] arr : arrays) n += arr.length;
         @SuppressWarnings("unchecked")
-        T[] result = (T[]) Array.newInstance(arrs.getClass().getComponentType()
+        T[] result = (T[]) Array.newInstance(arrays.getClass().getComponentType()
                 .getComponentType(), n);
         int offset = 0;
-        for (int i = 0; i < arrs.length; i++) {
-            System.arraycopy(arrs[i], 0, result, offset, arrs[i].length);
-            offset += arrs[i].length;
+        for (T[] arr : arrays) {
+            System.arraycopy(arr, 0, result, offset, arr.length);
+            offset += arr.length;
         }
         return result;
     }

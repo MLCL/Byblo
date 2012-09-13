@@ -175,7 +175,7 @@ public final class MarginalDistribution {
      * The number of unique features.
      * <p/>
      *
-     * @return number of unique featuress.
+     * @return number of unique features.
      */
     @Nonnegative
     public final int getCardinality() {
@@ -200,21 +200,12 @@ public final class MarginalDistribution {
     boolean equals(MarginalDistribution other) {
         if (!Arrays.equals(this.frequencies, other.frequencies))
             return false;
-        if (Double.doubleToLongBits(this.frequencySum) != Double.
-                doubleToLongBits(other.frequencySum))
-            return false;
-        if (this.nonZeroCardinality != other.nonZeroCardinality)
-            return false;
-        return true;
+        return Double.doubleToLongBits(this.frequencySum) == Double.doubleToLongBits(other.frequencySum) && this.nonZeroCardinality == other.nonZeroCardinality;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        return equals((MarginalDistribution) obj);
+        return obj == this || !(obj == null || getClass() != obj.getClass()) && equals((MarginalDistribution) obj);
     }
 
     @Override

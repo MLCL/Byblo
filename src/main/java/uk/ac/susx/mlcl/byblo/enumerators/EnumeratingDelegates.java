@@ -97,7 +97,7 @@ public final class EnumeratingDelegates {
             this.inner = inner;
         }
 
-        protected final T getInner() {
+        final T getInner() {
             return inner;
         }
 
@@ -118,9 +118,7 @@ public final class EnumeratingDelegates {
             if (getClass() != obj.getClass())
                 return false;
             final AdapterBase<?> other = (AdapterBase<?>) obj;
-            if (this.inner != other.inner && (this.inner == null || !this.inner.equals(other.inner)))
-                return false;
-            return true;
+            return !(this.inner != other.inner && (this.inner == null || !this.inner.equals(other.inner)));
         }
 
         @Override

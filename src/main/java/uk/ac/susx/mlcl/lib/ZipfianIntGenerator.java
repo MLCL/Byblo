@@ -36,15 +36,14 @@ import java.util.NoSuchElementException;
 import java.util.Random;
 
 public class ZipfianIntGenerator extends AbstractIntIterator {
-    public static final int NO_LIMIT = -1;
+    private static final int NO_LIMIT = -1;
     private static final int DEFAULT_POPULATION_SIZE = Integer.MAX_VALUE;
     private static final double DEFAULT_EXPONENT = 2.0;
     private final ZipfianDistribution zd;
     private final int limit;
     private int count = 0;
 
-    public ZipfianIntGenerator(Random rand, int limit, int populationSize,
-                               double exponent) {
+    private ZipfianIntGenerator(Random rand, int limit, int populationSize, double exponent) {
         zd = new ZipfianDistribution(populationSize, exponent);
         zd.setRandom(rand);
         this.limit = limit;

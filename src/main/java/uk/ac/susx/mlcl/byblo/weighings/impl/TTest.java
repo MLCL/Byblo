@@ -65,10 +65,10 @@ public final class TTest
         final double entryPrior = vector.sum / getFeatureMarginals().
                 getFrequencySum();
 
-        // Ha: the joint distirbution
+        // Ha: the joint distribution
         final double jointDist = featureLikelihood * entryPrior;
 
-        // H0: the product distirbution
+        // H0: the product distribution
         final double prodDist = entryPrior * getFeatureMarginals().getPrior(key);
 
         return (jointDist - prodDist) / Math.sqrt(prodDist);
@@ -91,11 +91,7 @@ public final class TTest
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        return super.equals((AbstractContextualWeighting) this);
+        return obj == this || !(obj == null || getClass() != obj.getClass()) && super.equals(this);
     }
 
     @Override

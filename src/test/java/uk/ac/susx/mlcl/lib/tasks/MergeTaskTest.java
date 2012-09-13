@@ -46,24 +46,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class MergeTaskTest {
 
-    public MergeTaskTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
 
     @Test
     public void testSortTask() {
@@ -106,7 +88,7 @@ public class MergeTaskTest {
 
         private static final long serialVersionUID = 1L;
 
-        protected IntegerNaturalOrderComparator() {
+        IntegerNaturalOrderComparator() {
         }
 
         @Override

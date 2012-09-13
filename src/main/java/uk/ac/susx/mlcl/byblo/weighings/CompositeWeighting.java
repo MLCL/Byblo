@@ -125,21 +125,15 @@ public class CompositeWeighting implements Weighting, Serializable {
         return sb.toString();
     }
 
-    protected boolean equals(CompositeWeighting that) {
-        if (this.childWeightings != that.childWeightings
+    boolean equals(CompositeWeighting that) {
+        return !(this.childWeightings != that.childWeightings
                 && (this.childWeightings == null
-                || !this.childWeightings.equals(that.childWeightings)))
-            return false;
-        return true;
+                || !this.childWeightings.equals(that.childWeightings)));
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        return equals((CompositeWeighting) obj);
+        return obj == this || !(obj == null || getClass() != obj.getClass()) && equals((CompositeWeighting) obj);
     }
 
     @Override

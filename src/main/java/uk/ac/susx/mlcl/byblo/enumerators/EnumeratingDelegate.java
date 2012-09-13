@@ -55,12 +55,12 @@ public abstract class EnumeratingDelegate
     @Parameter(names = {"-et", "--enumerator-type"})
     private EnumeratorType type = DEFAULT_TYPE;
 
-    public EnumeratingDelegate(EnumeratorType type) {
+    EnumeratingDelegate(EnumeratorType type) {
 
         this.type = type;
     }
 
-    public EnumeratingDelegate() {
+    EnumeratingDelegate() {
         this(DEFAULT_TYPE);
     }
 
@@ -74,14 +74,14 @@ public abstract class EnumeratingDelegate
         this.type = type;
     }
 
-    protected Enumerator<String> open(File file) throws IOException {
+    Enumerator<String> open(File file) throws IOException {
         Enumerator<String> out = type.open(file);
         if (out.indexOf(FilterCommand.FILTERED_STRING) != FilterCommand.FILTERED_ID)
             throw new AssertionError();
         return out;
     }
 
-    protected void save(Enumerator<String> enumerator) throws IOException {
+    void save(Enumerator<String> enumerator) throws IOException {
         if (enumerator == null) {
             LOG.warn("Attempt made to save an enumerator that was not open.");
             return;
@@ -92,7 +92,7 @@ public abstract class EnumeratingDelegate
     }
 
     @WillClose
-    protected void close(Enumerator<String> enumerator) throws IOException {
+    void close(Enumerator<String> enumerator) {
         if (enumerator == null) {
             LOG.warn("Attempt made to close an enumerator that was not open.");
             return;
@@ -102,7 +102,7 @@ public abstract class EnumeratingDelegate
         type.close(enumerator);
     }
 
-    protected Objects.ToStringHelper toStringHelper() {
+    Objects.ToStringHelper toStringHelper() {
         return Objects.toStringHelper(this);
     }
 

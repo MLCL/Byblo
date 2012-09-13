@@ -84,7 +84,7 @@ public abstract class AbstractSortCommand<T> extends AbstractCopyCommand<T> {
         super();
     }
 
-    public final boolean isReverse() {
+    final boolean isReverse() {
         return reverse;
     }
 
@@ -92,7 +92,7 @@ public abstract class AbstractSortCommand<T> extends AbstractCopyCommand<T> {
         this.reverse = reverse;
     }
 
-    public Comparator<T> getComparator() {
+    Comparator<T> getComparator() {
         return isReverse() ? Comparators.reverse(comparator) : comparator;
     }
 
@@ -160,9 +160,9 @@ public abstract class AbstractSortCommand<T> extends AbstractCopyCommand<T> {
 
     @Override
     protected abstract ObjectSource<T> openSource(File file)
-            throws FileNotFoundException, IOException;
+            throws IOException;
 
     @Override
     protected abstract ObjectSink<T> openSink(File file)
-            throws FileNotFoundException, IOException;
+            throws IOException;
 }

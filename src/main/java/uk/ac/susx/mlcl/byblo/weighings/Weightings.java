@@ -91,7 +91,7 @@ public final class Weightings {
      * <p/>
      * TODO: Move to mlcl-lib/MathUtil
      */
-    public static final double LOG_2 = Math.log(2.0);
+    private static final double LOG_2 = Math.log(2.0);
 
     /**
      * Return the base 2 logarithm of the parameter v.

@@ -58,12 +58,12 @@ public final class TokenPair implements
     /**
      * Indexed identifier of the first entry.
      */
-    int id1;
+    private final int id1;
 
     /**
      * Indexed identifier of the second entry.
      */
-    int id2;
+    private final int id2;
 
     /**
      * Constructor used during cloning. Sub-classes should implement a similar
@@ -74,7 +74,7 @@ public final class TokenPair implements
      * @throws NullPointerException     if the argument is null
      * @throws IllegalArgumentException
      */
-    protected TokenPair(final TokenPair that)
+    private TokenPair(final TokenPair that)
             throws NullPointerException, IllegalArgumentException {
         Checks.checkNotNull("that", that);
         this.id1 = that.id1();

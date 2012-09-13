@@ -68,18 +68,10 @@ public class FilterCommandTest extends AbstractCommandTest<FilterCommand> {
     }
 
     @Override
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
-    @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        OUTPUT_ENTRIES.delete();
-        OUTPUT_FEATURES.delete();
-        OUTPUT_ENTRY_FEATURES.delete();
+        TestConstants.deleteIfExist(OUTPUT_ENTRIES, OUTPUT_FEATURES, OUTPUT_ENTRY_FEATURES);
     }
 
     private static final String SUBJECT = FilterCommand.class.getName();
@@ -344,9 +336,9 @@ public class FilterCommandTest extends AbstractCommandTest<FilterCommand> {
      *
      * @throws IOException
      */
-    public static void generateUniqueEventsData(final File entriesFile,
-                                                final File featuresFile, final File eventsFile, final int nEntries,
-                                                final int nFeatures) throws IOException {
+    private static void generateUniqueEventsData(final File entriesFile,
+                                                 final File featuresFile, final File eventsFile, final int nEntries,
+                                                 final int nFeatures) throws IOException {
         assert nEntries < Integer.MAX_VALUE / nFeatures : "number of events must be less than max_integer";
         final int nEvents = nEntries * nFeatures;
 
@@ -402,9 +394,9 @@ public class FilterCommandTest extends AbstractCommandTest<FilterCommand> {
      *
      * @throws IOException
      */
-    public static void generateEventsData(final File entriesFile,
-                                          final File featuresFile, final File eventsFile, final int nEntries,
-                                          final int nFeatures) throws IOException {
+    private static void generateEventsData(final File entriesFile,
+                                           final File featuresFile, final File eventsFile, final int nEntries,
+                                           final int nFeatures) throws IOException {
         assert nEntries < Integer.MAX_VALUE / nFeatures : "number of events must be less than max_integer";
         final int nEvents = nEntries * nFeatures;
 

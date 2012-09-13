@@ -50,9 +50,7 @@ import static uk.ac.susx.mlcl.TestConstants.*;
  */
 public class FeatureTest {
 
-    private void copyF(File a, File b) throws FileNotFoundException, IOException {
-        Enumerator<String> strEnum = MemoryBasedStringEnumerator.newInstance();
-
+    private void copyF(File a, File b) throws IOException {
         SingleEnumeratingDelegate del = new SingleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, null);
         WeightedTokenSource aSrc = WeightedTokenSource.open(
@@ -65,7 +63,7 @@ public class FeatureTest {
     }
 
     @Test
-    public void testFeaturesConversion() throws FileNotFoundException, IOException {
+    public void testFeaturesConversion() throws IOException {
         File a = TEST_FRUIT_FEATURES;
         File b = new File(TEST_OUTPUT_DIR,
                 TEST_FRUIT_FEATURES.getName() + ".compact");
@@ -87,24 +85,24 @@ public class FeatureTest {
     }
 
     @Test
-    public void testFeaturesEnumeratorConversion() throws FileNotFoundException, IOException {
+    public void testFeaturesEnumeratorConversion() throws IOException {
         File a = TEST_FRUIT_FEATURES;
         File b = new File(TEST_OUTPUT_DIR,
                 TEST_FRUIT_FEATURES.getName() + ".enum");
         File c = new File(TEST_OUTPUT_DIR,
                 TEST_FRUIT_FEATURES.getName() + ".str");
 
-        SingleEnumeratingDelegate indel = new SingleEnumeratingDelegate(
+        SingleEnumeratingDelegate inDelegate = new SingleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, null);
-        SingleEnumeratingDelegate outdel = new SingleEnumeratingDelegate(
+        SingleEnumeratingDelegate outDelegate = new SingleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, true, null);
 
 
         {
             WeightedTokenSource aSrc = WeightedTokenSource.open(
-                    a, DEFAULT_CHARSET, indel, false);
+                    a, DEFAULT_CHARSET, inDelegate, false);
             WeightedTokenSink bSink = WeightedTokenSink.open(
-                    b, DEFAULT_CHARSET, outdel, false);
+                    b, DEFAULT_CHARSET, outDelegate, false);
             ObjectIO.copy(aSrc, bSink);
             bSink.close();
         }
@@ -114,9 +112,9 @@ public class FeatureTest {
 
         {
             WeightedTokenSource bSrc = WeightedTokenSource.open(
-                    b, DEFAULT_CHARSET, outdel, false);
+                    b, DEFAULT_CHARSET, outDelegate, false);
             WeightedTokenSink cSink = WeightedTokenSink.open(
-                    c, DEFAULT_CHARSET, indel, false);
+                    c, DEFAULT_CHARSET, inDelegate, false);
             ObjectIO.copy(bSrc, cSink);
             cSink.close();
         }

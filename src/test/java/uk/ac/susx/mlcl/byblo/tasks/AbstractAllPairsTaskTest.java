@@ -76,14 +76,14 @@ public abstract class AbstractAllPairsTaskTest<T extends NaiveApssTask> extends 
         DoubleEnumeratingDelegate del = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
 
-        WeightedTokenPairSource mdbsa = WeightedTokenPairSource.open(
+        WeightedTokenPairSource tokenSourceA = WeightedTokenPairSource.open(
                 TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false);
-        WeightedTokenPairVectorSource vsa = mdbsa.getVectorSource();
+        WeightedTokenPairVectorSource vectorSourceA = tokenSourceA.getVectorSource();
 
-        WeightedTokenPairSource mdbsb = WeightedTokenPairSource.open(
+        WeightedTokenPairSource tokenSourceB = WeightedTokenPairSource.open(
                 TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false);
 
-        WeightedTokenPairVectorSource vsb = mdbsb.getVectorSource();
+        WeightedTokenPairVectorSource vectorSourceB = tokenSourceB.getVectorSource();
 
 
         final String outFileName = String.format("%s#%s-%s-sims",
@@ -94,19 +94,19 @@ public abstract class AbstractAllPairsTaskTest<T extends NaiveApssTask> extends 
 
         WeightedTokenPairSink result = BybloIO.openSimsSink(outSims, DEFAULT_CHARSET, del.getEntriesEnumeratorCarrier());
 
-        instance.setSourceA(vsa);
-        instance.setSourceB(vsb);
+        instance.setSourceA(vectorSourceA);
+        instance.setSourceB(vectorSourceB);
         instance.setSink(result);
         instance.setMeasure(MEASURE);
-        instance.setProducatePair(PAIR_FILTER);
+        instance.setProducePair(PAIR_FILTER);
 
         instance.run();
 
 
-        if (vsa instanceof Closeable)
-            ((Closeable) vsa).close();
-        if (vsb instanceof Closeable)
-            ((Closeable) vsb).close();
+        if (vectorSourceA instanceof Closeable)
+            ((Closeable) vectorSourceA).close();
+        if (vectorSourceB instanceof Closeable)
+            ((Closeable) vectorSourceB).close();
 
         result.flush();
         result.close();
@@ -152,7 +152,7 @@ public abstract class AbstractAllPairsTaskTest<T extends NaiveApssTask> extends 
         runOnGeneratedData(nEntries, nFeatures);
     }
 
-    public void runOnGeneratedData(int nEntries, int nFeatures) throws Exception {
+    void runOnGeneratedData(int nEntries, int nFeatures) throws Exception {
 
         final String inFileName = String.format("%s-%dx%d-events",
                 AbstractAllPairsTaskTest.class.getName(), nEntries, nFeatures);
@@ -185,7 +185,7 @@ public abstract class AbstractAllPairsTaskTest<T extends NaiveApssTask> extends 
         instance.setSourceB(vsb);
         instance.setSink(result);
         instance.setMeasure(MEASURE);
-        instance.setProducatePair(PAIR_FILTER);
+        instance.setProducePair(PAIR_FILTER);
 
         instance.addProgressListener(new ReportingProgressListener());
         instance.addProgressListener(new TestConstants.InfoProgressListener());
@@ -193,10 +193,8 @@ public abstract class AbstractAllPairsTaskTest<T extends NaiveApssTask> extends 
 
         instance.run();
 
-        if (vsa instanceof Closeable)
-            ((Closeable) vsa).close();
-        if (vsb instanceof Closeable)
-            ((Closeable) vsb).close();
+        vsa.close();
+        vsb.close();
 
         result.flush();
         result.close();
@@ -215,9 +213,9 @@ public abstract class AbstractAllPairsTaskTest<T extends NaiveApssTask> extends 
      *
      * @throws java.io.IOException
      */
-    public static void generateEventsData(final File eventsFile,
-                                          final int nEntries,
-                                          final int nFeatures)
+    private static void generateEventsData(final File eventsFile,
+                                           final int nEntries,
+                                           final int nFeatures)
             throws IOException {
         final int nEvents = nEntries * nFeatures;
 

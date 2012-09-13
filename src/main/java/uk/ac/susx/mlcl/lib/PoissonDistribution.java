@@ -56,7 +56,6 @@ public class PoissonDistribution {
     public PoissonDistribution(final double lambda) {
         if (lambda <= 0)
             throw new IllegalArgumentException("lambda <= 0");
-        ZipfianDistribution zd = new ZipfianDistribution(4);
         this.lambda = lambda;
         exp_neg_lambda = Math.exp(-lambda);
     }
@@ -115,7 +114,7 @@ public class PoissonDistribution {
     }
 
     @VisibleForTesting
-    protected static double factorial(final int n) {
+    static double factorial(final int n) {
         if (n < 0)
             throw new IllegalArgumentException("n < 0");
         if (n > 170)

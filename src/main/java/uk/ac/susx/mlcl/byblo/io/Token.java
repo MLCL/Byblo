@@ -57,7 +57,7 @@ public final class Token implements Serializable, Comparable<Token>, Cloneable {
         this.id = id;
     }
 
-    protected Token(final Token other) {
+    private Token(final Token other) {
         this.id = other.id();
     }
 
@@ -79,12 +79,10 @@ public final class Token implements Serializable, Comparable<Token>, Cloneable {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-        return !(obj == null || getClass() != obj.getClass()) && equals((Token) obj);
+        return obj == this || !(obj == null || getClass() != obj.getClass()) && equals((Token) obj);
     }
 
-    public boolean equals(Token other) {
+    boolean equals(Token other) {
         return this.id() == other.id();
     }
 

@@ -44,6 +44,7 @@ import uk.ac.susx.mlcl.lib.tasks.ObjectMergeTask;
 import javax.annotation.CheckReturnValue;
 import java.io.*;
 import java.nio.charset.Charset;
+import java.text.MessageFormat;
 import java.util.Comparator;
 
 /**
@@ -72,9 +73,9 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
 
     private Comparator<T> comparator;
 
-    public AbstractMergeCommand(File sourceFileA, File sourceFileB,
-                                File destination,
-                                Charset charset, Comparator<T> comparator) {
+    AbstractMergeCommand(File sourceFileA, File sourceFileB,
+                         File destination,
+                         Charset charset, Comparator<T> comparator) {
         fileDelegate.setSourceFileA(sourceFileA);
         fileDelegate.setSourceFileB(sourceFileB);
         fileDelegate.setDestinationFile(destination);
@@ -82,18 +83,18 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
         setComparator(comparator);
     }
 
-    public AbstractMergeCommand() {
+    AbstractMergeCommand() {
     }
 
-    public FileMergeDelegate getFileDelegate() {
+    FileMergeDelegate getFileDelegate() {
         return fileDelegate;
     }
 
-    public final Comparator<T> getComparator() {
+    final Comparator<T> getComparator() {
         return comparator;
     }
 
-    public final void setComparator(Comparator<T> comparator) {
+    final void setComparator(Comparator<T> comparator) {
         this.comparator = comparator;
     }
 
@@ -118,24 +119,19 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
     public boolean runCommand() {
         try {
             if (LOG.isInfoEnabled())
-                LOG.
-                        info(
-                                "Running merge from \"" + getFileDelegate()
-                                        .getSourceFileA()
-                                        + "\" and \"" + getFileDelegate().getSourceFileB()
-                                        + "\" to \"" + getFileDelegate().getDestinationFile()
-                                        + "\".");
+                LOG.info(MessageFormat.format("Running merge from \"{0}\" and \"{1}\" to \"{2}\".",
+                        getFileDelegate().getSourceFileA(), getFileDelegate().getSourceFileB(),
+                        getFileDelegate().getDestinationFile()));
 
-            ObjectSource<T> srcA =
-                    openSource(getFileDelegate().getSourceFileA());
-            ObjectSource<T> srcB =
-                    openSource(getFileDelegate().getSourceFileB());
+            ObjectSource<T> srcA = openSource(getFileDelegate().getSourceFileA());
+            ObjectSource<T> srcB = openSource(getFileDelegate().getSourceFileB());
             ObjectSink<T> snk = openSink(getFileDelegate().getDestinationFile());
 
-            ObjectMergeTask<T> task = new ObjectMergeTask<T>(
-                    srcA, srcB, snk, getComparator());
+            ObjectMergeTask<T> task = new ObjectMergeTask<T>(srcA, srcB, snk, getComparator());
+
             task.run();
-            while (task.isExceptionTrapped())
+
+            if (task.isExceptionTrapped())
                 task.throwTrappedException();
 
             if (snk instanceof Flushable)
@@ -161,7 +157,7 @@ public abstract class AbstractMergeCommand<T> extends AbstractCommand {
         }
     }
 
-    protected abstract ObjectSource<T> openSource(File file) throws FileNotFoundException, IOException;
+    protected abstract ObjectSource<T> openSource(File file) throws IOException;
 
-    protected abstract ObjectSink<T> openSink(File file) throws FileNotFoundException, IOException;
+    protected abstract ObjectSink<T> openSink(File file) throws IOException;
 }

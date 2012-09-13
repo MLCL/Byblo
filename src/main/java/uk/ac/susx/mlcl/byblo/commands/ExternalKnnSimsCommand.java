@@ -70,7 +70,7 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
     private Comparator<Weighted<TokenPair>> nearnessComparator = Comparators.reverse(Weighted.<TokenPair>weightOrder());
 
     public ExternalKnnSimsCommand(File sourceFile, File destinationFile, Charset charset,
-                                  SingleEnumerating indexDelegate, int k) throws IOException {
+                                  SingleEnumerating indexDelegate, int k)  {
         super(sourceFile, destinationFile, charset, EnumeratingDelegates.toPair(indexDelegate));
         setK(k);
     }
@@ -91,11 +91,11 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
         return getCombinedComparator();
     }
 
-    public Comparator<Weighted<TokenPair>> getCombinedComparator() {
+    Comparator<Weighted<TokenPair>> getCombinedComparator() {
         return Comparators.fallback(getClassComparator(), getNearnessComparator());
     }
 
-    public Comparator<Weighted<TokenPair>> getClassComparator() {
+    Comparator<Weighted<TokenPair>> getClassComparator() {
         return classComparator;
     }
 
@@ -103,7 +103,7 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
         this.classComparator = classComparator;
     }
 
-    public Comparator<Weighted<TokenPair>> getNearnessComparator() {
+    Comparator<Weighted<TokenPair>> getNearnessComparator() {
         return nearnessComparator;
     }
 
@@ -138,12 +138,12 @@ public class ExternalKnnSimsCommand extends ExternalSortEventsCommand {
 
     @Override
     protected WeightedTokenPairSource openSource(File file)
-            throws FileNotFoundException, IOException {
+            throws IOException {
         return BybloIO.openSimsSource(file, getCharset(), getIndexDelegate());
     }
 
     @Override
-    protected ObjectSink<Weighted<TokenPair>> openSink(File file) throws FileNotFoundException, IOException {
+    protected ObjectSink<Weighted<TokenPair>> openSink(File file) throws IOException {
         return new KFirstReducingObjectSink<Weighted<TokenPair>>(
                 new WeightSumReducerObjectSink<TokenPair>(
                         BybloIO.openNeighboursSink(file, getCharset(), getIndexDelegate())),

@@ -80,11 +80,7 @@ public final class NormalisedPMI
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        return super.equals((AbstractContextualWeighting) this);
+        return obj == this || !(obj == null || getClass() != obj.getClass()) && super.equals(this);
     }
 
     @Override

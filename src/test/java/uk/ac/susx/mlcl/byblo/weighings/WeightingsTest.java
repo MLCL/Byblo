@@ -33,7 +33,7 @@ package uk.ac.susx.mlcl.byblo.weighings;
 import it.unimi.dsi.fastutil.ints.AbstractInt2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap.Entry;
-import org.junit.*;
+import org.junit.Test;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumeratingDelegate;
 import uk.ac.susx.mlcl.byblo.enumerators.EnumeratingDelegates;
@@ -54,31 +54,12 @@ import static uk.ac.susx.mlcl.TestConstants.*;
  */
 public class WeightingsTest {
 
-    public WeightingsTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
-    static Class<? extends Weighting>[] WEIGHT_CLASSES =
+    private static final Class<? extends Weighting>[] WEIGHT_CLASSES =
             (Class<? extends Weighting>[]) new Class<?>[]{
                     NullWeighting.class,
                     Constant.class,
                     Power.class,
-                    Likelyhood.class,
+                    Likelihood.class,
                     LogProduct.class,
                     L2UnitVector.class,
                     Rank.class,
@@ -95,8 +76,7 @@ public class WeightingsTest {
                     GeoMean.class};
 
     @Test
-    public void testWeightingImpls() throws Exception {
-        System.out.println("testWeightingImpls");
+    public void testWeightingImplementations() throws Exception {
         DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();
 
         // Load the feature contexts
@@ -116,7 +96,7 @@ public class WeightingsTest {
 
         // Instantiate weighting objects
 
-        Weighting[] wgts = new Weighting[WEIGHT_CLASSES.length];
+        Weighting[] weightings = new Weighting[WEIGHT_CLASSES.length];
         for (int i = 0; i < WEIGHT_CLASSES.length; i++) {
             Weighting wgt = WEIGHT_CLASSES[i].newInstance();
 
@@ -126,32 +106,30 @@ public class WeightingsTest {
             if (wgt instanceof EntryMarginalsCarrier)
                 ((EntryMarginalsCarrier) wgt).setEntryMarginals(emd);
 
-            wgts[i] = wgt;
+            weightings[i] = wgt;
         }
 
         FastWeightedTokenPairVectorSource eventSrc =
                 BybloIO.openEventsVectorSource(
                         TEST_FRUIT_EVENTS, DEFAULT_CHARSET, indexDelegate);
 
-        List<Indexed<SparseDoubleVector>> vecs =
+        List<Indexed<SparseDoubleVector>> vectors =
                 new ArrayList<Indexed<SparseDoubleVector>>();
         while (eventSrc.hasNext())
-            vecs.add(eventSrc.read());
+            vectors.add(eventSrc.read());
 
 
         int[][] mtot = new int[WEIGHT_CLASSES.length][WEIGHT_CLASSES.length];
 
-        for (int vecIdx = 0; vecIdx < vecs.size(); vecIdx++) {
 
-            final int entryId = vecs.get(vecIdx).key();
-            final SparseDoubleVector vector = vecs.get(vecIdx).value();
+        for (Indexed<SparseDoubleVector> vec : vectors) {
 
-//            System.out.println(" > testing entry id " + entryId);
+            final int entryId = vec.key();
+            final SparseDoubleVector vector = vec.value();
 
             SparseDoubleVector[] reweighted = new SparseDoubleVector[WEIGHT_CLASSES.length];
             for (int wgtIdx = 0; wgtIdx < WEIGHT_CLASSES.length; wgtIdx++) {
-                Weighting weighting = wgts[wgtIdx];
-//                System.out.println("weighting: " + wgt);
+                Weighting weighting = weightings[wgtIdx];
 
                 SparseDoubleVector rew = weighting.apply(vector);
                 reweighted[wgtIdx] = rew;
@@ -184,11 +162,7 @@ public class WeightingsTest {
                     }
                 }
 
-
-//                System.out.println(rew.size);
-//                print(entryId, rew);
             }
-
 
             boolean[][] m = new boolean[WEIGHT_CLASSES.length][WEIGHT_CLASSES.length];
 //
@@ -204,7 +178,7 @@ public class WeightingsTest {
 
         System.out.println(String.format(
                 "Weighting schemes monotonicity (out of %d tests):",
-                vecs.size()));
+                vectors.size()));
         for (int i = 0; i < WEIGHT_CLASSES.length; i++) {
             System.out.printf("%20s ", WEIGHT_CLASSES[i].getSimpleName());
 
@@ -225,24 +199,22 @@ public class WeightingsTest {
 
         int[] keys = merge(a.keys, b.keys);
 
-        List<Int2DoubleMap.Entry> alist = new ArrayList<Int2DoubleMap.Entry>();
-        List<Int2DoubleMap.Entry> blist = new ArrayList<Int2DoubleMap.Entry>();
+        List<Int2DoubleMap.Entry> aList = new ArrayList<Int2DoubleMap.Entry>();
+        List<Int2DoubleMap.Entry> bList = new ArrayList<Int2DoubleMap.Entry>();
 
-        for (int i = 0; i < keys.length; i++) {
-            alist.add(new AbstractInt2DoubleMap.BasicEntry(keys[i], a.get(
-                    keys[i])));
-            blist.add(new AbstractInt2DoubleMap.BasicEntry(keys[i], b.get(
-                    keys[i])));
+        for (int key : keys) {
+            aList.add(new AbstractInt2DoubleMap.BasicEntry(key, a.get(key)));
+            bList.add(new AbstractInt2DoubleMap.BasicEntry(key, b.get(key)));
         }
 
         Comparator<Int2DoubleMap.Entry> cmp = new Int2DoubleEntryValueThenKeyComparator();
 
-        Collections.sort(alist, cmp);
-        Collections.sort(blist, cmp);
+        Collections.sort(aList, cmp);
+        Collections.sort(bList, cmp);
 
 
-        for (int i = 0; i < alist.size(); i++)
-            if (alist.get(i).getIntKey() != blist.get(i).getIntKey())
+        for (int i = 0; i < aList.size(); i++)
+            if (aList.get(i).getIntKey() != bList.get(i).getIntKey())
                 return false;
 
         return true;

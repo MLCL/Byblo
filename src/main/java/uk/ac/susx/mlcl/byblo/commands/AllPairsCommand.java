@@ -38,7 +38,6 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.BybloSettings;
@@ -86,9 +85,7 @@ public class AllPairsCommand extends AbstractCommand {
     private DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate();
 
     @ParametersDelegate
-    private FileDelegate fileDelegate = new FileDelegate();
-
-    public static final int DEFAULT_MINK_P = 2;
+    private final FileDelegate fileDelegate = new FileDelegate();
 
     @Parameter(names = {"-i", "--input"},
             description = "Event frequency vectors files.",
@@ -113,7 +110,7 @@ public class AllPairsCommand extends AbstractCommand {
     private File outputFile;
 
     @Parameter(names = {"-t", "--threads"},
-            description = "Number of conccurent processing threads.")
+            description = "Number of concurrent processing threads.")
     private int numThreads = Runtime.getRuntime().availableProcessors() + 1;
 
     public static final double DEFAULT_MIN_SIMILARITY = Double.NEGATIVE_INFINITY;
@@ -126,7 +123,7 @@ public class AllPairsCommand extends AbstractCommand {
     private double minSimilarity = DEFAULT_MIN_SIMILARITY;
 
     @Parameter(names = {"-Smx", "--similarity-max"},
-            description = "Maximyum similarity threshold.",
+            description = "Maximum similarity threshold.",
             converter = DoubleConverter.class)
     private double maxSimilarity = DEFAULT_MAX_SIMILARITY;
 
@@ -150,12 +147,12 @@ public class AllPairsCommand extends AbstractCommand {
     private double leeAlpha = LeeSkewDivergence.DEFAULT_ALPHA;
 
     @Parameter(names = {"--crmi-beta"},
-            description = "Beta paramter to Weed's CRMI measure.",
+            description = "Beta parameter to Weed's CRMI measure.",
             converter = DoubleConverter.class)
     private double crmiBeta = Weeds.DEFAULT_BETA;
 
     @Parameter(names = {"--crmi-gamma"},
-            description = "Gamma paramter to Weed's CRMI measure.",
+            description = "Gamma parameter to Weed's CRMI measure.",
             converter = DoubleConverter.class)
     private double crmiGamma = Weeds.DEFAULT_GAMMA;
 
@@ -176,7 +173,7 @@ public class AllPairsCommand extends AbstractCommand {
         Naive(NaiveApssTask.class),
         Inverted(InvertedApssTask.class);
 
-        private Class<? extends NaiveApssTask> implementation;
+        private final Class<? extends NaiveApssTask> implementation;
 
         private Algorithm(Class<? extends NaiveApssTask> imp) {
             this.implementation = imp;
@@ -218,7 +215,7 @@ public class AllPairsCommand extends AbstractCommand {
                 LOG.info("Running all-pairs similarity.");
             }
 
-            // Instantiate the denote proxmity measure
+            // Instantiate the denote proximity measure
             Measure measure = getMeasureClass().newInstance();
 
             // Parameterise those measures that require them
@@ -251,7 +248,7 @@ public class AllPairsCommand extends AbstractCommand {
              * Some weightings schemes require additional context information,
              * specifically the feature marginal distribution. Also there is one
              * measure (Confusion) that requires this information. The
-             * KendallsTau and KullbackLeiblerDivergence measure just needs the
+             * Kendall's Tau and Kullback-Leibler Divergence measure just needs the
              * total number of features types.
              */
             if (measure instanceof FeatureMarginalsCarrier
@@ -307,8 +304,8 @@ public class AllPairsCommand extends AbstractCommand {
 
             // Instantiate two vector source objects than can scan and read the
             // main db. We need two because the algorithm takes all pairwise
-            // combinations of vectors, so will be looking at two differnt points
-            // in the file. Also this allows for the possibility of having differnt
+            // combinations of vectors, so will be looking at two different points
+            // in the file. Also this allows for the possibility of having different
             // files, e.g compare fruit words with cake words
             final FastWeightedTokenPairVectorSource sourceA = openEventsSource();
             final FastWeightedTokenPairVectorSource sourceB = openEventsSource();
@@ -328,7 +325,7 @@ public class AllPairsCommand extends AbstractCommand {
             apss.setSourceB(sourceB);
             apss.setSink(sink);
             apss.setMeasure(measure);
-            apss.setProducatePair(getProductionFilter());
+            apss.setProducePair(getProductionFilter());
 
 
             apss.addProgressListener(new ReportLoggingProgressListener(LOG));
@@ -403,11 +400,7 @@ public class AllPairsCommand extends AbstractCommand {
                 maxId = k;
         }
         double[] entryFreqs = new double[maxId + 1];
-        ObjectIterator<Int2DoubleMap.Entry> it = entityFrequenciesMap.
-                int2DoubleEntrySet().
-                iterator();
-        while (it.hasNext()) {
-            Int2DoubleMap.Entry entry = it.next();
+        for (Int2DoubleMap.Entry entry : entityFrequenciesMap.int2DoubleEntrySet()) {
             entryFreqs[entry.getIntKey()] = entry.getDoubleValue();
         }
         return entryFreqs;
@@ -469,14 +462,14 @@ public class AllPairsCommand extends AbstractCommand {
         if (pairFilters.size() == 1) {
             return pairFilters.get(0);
         } else if (pairFilters.size() > 1) {
-            return Predicates.<Weighted<TokenPair>>and(pairFilters);
+            return Predicates.and(pairFilters);
         } else {
             return Predicates.alwaysTrue();
         }
     }
 
     @SuppressWarnings("unchecked")
-    public final Class<? extends Measure> getMeasureClass()
+    final Class<? extends Measure> getMeasureClass()
             throws ClassNotFoundException {
         final Map<String, Class<? extends Measure>> classLookup =
                 Measures.loadMeasureAliasTable();
@@ -509,7 +502,7 @@ public class AllPairsCommand extends AbstractCommand {
                 add("minkP", getMinkP());
     }
 
-    public Algorithm getAlgorithm() {
+    Algorithm getAlgorithm() {
         return algorithm;
     }
 
@@ -518,7 +511,7 @@ public class AllPairsCommand extends AbstractCommand {
         this.algorithm = algorithm;
     }
 
-    public final File getEventsFile() {
+    final File getEventsFile() {
         return eventsFile;
     }
 
@@ -527,7 +520,7 @@ public class AllPairsCommand extends AbstractCommand {
         this.eventsFile = eventsFile;
     }
 
-    public final File getFeaturesFile() {
+    final File getFeaturesFile() {
         return featuresFile;
     }
 
@@ -536,7 +529,7 @@ public class AllPairsCommand extends AbstractCommand {
         this.featuresFile = featuresFile;
     }
 
-    public File getEntriesFile() {
+    File getEntriesFile() {
         return entriesFile;
     }
 
@@ -545,7 +538,7 @@ public class AllPairsCommand extends AbstractCommand {
         this.entriesFile = entriesFile;
     }
 
-    public final File getOutputFile() {
+    final File getOutputFile() {
         return outputFile;
     }
 
@@ -554,7 +547,7 @@ public class AllPairsCommand extends AbstractCommand {
         this.outputFile = outputFile;
     }
 
-    public final Charset getCharset() {
+    final Charset getCharset() {
         return fileDelegate.getCharset();
     }
 
@@ -563,7 +556,7 @@ public class AllPairsCommand extends AbstractCommand {
         this.fileDelegate.setCharset(charset);
     }
 
-    public final int getNumThreads() {
+    final int getNumThreads() {
         return numThreads;
     }
 
@@ -572,7 +565,7 @@ public class AllPairsCommand extends AbstractCommand {
         this.numThreads = nThreads;
     }
 
-    public final double getMinSimilarity() {
+    final double getMinSimilarity() {
         return minSimilarity;
     }
 
@@ -580,7 +573,7 @@ public class AllPairsCommand extends AbstractCommand {
         this.minSimilarity = minSimilarity;
     }
 
-    public final double getMaxSimilarity() {
+    final double getMaxSimilarity() {
         return maxSimilarity;
     }
 
@@ -590,7 +583,7 @@ public class AllPairsCommand extends AbstractCommand {
         this.maxSimilarity = maxSimilarity;
     }
 
-    public final boolean isOutputIdentityPairs() {
+    final boolean isOutputIdentityPairs() {
         return outputIdentityPairs;
     }
 
@@ -598,7 +591,7 @@ public class AllPairsCommand extends AbstractCommand {
         this.outputIdentityPairs = outputIdentityPairs;
     }
 
-    public final String getMeasureName() {
+    final String getMeasureName() {
         return measureName;
     }
 
@@ -607,7 +600,7 @@ public class AllPairsCommand extends AbstractCommand {
         this.measureName = measureName;
     }
 
-    public final boolean isMeasureReversed() {
+    final boolean isMeasureReversed() {
         return measureReversed;
     }
 
@@ -615,7 +608,7 @@ public class AllPairsCommand extends AbstractCommand {
         this.measureReversed = measureReversed;
     }
 
-    public final double getLeeAlpha() {
+    final double getLeeAlpha() {
         return leeAlpha;
     }
 
@@ -624,7 +617,7 @@ public class AllPairsCommand extends AbstractCommand {
         this.leeAlpha = leeAlpha;
     }
 
-    public final double getCrmiBeta() {
+    final double getCrmiBeta() {
         return crmiBeta;
     }
 
@@ -632,7 +625,7 @@ public class AllPairsCommand extends AbstractCommand {
         this.crmiBeta = crmiBeta;
     }
 
-    public final double getCrmiGamma() {
+    final double getCrmiGamma() {
         return crmiGamma;
     }
 
@@ -640,7 +633,7 @@ public class AllPairsCommand extends AbstractCommand {
         this.crmiGamma = crmiGamma;
     }
 
-    public final double getMinkP() {
+    final double getMinkP() {
         return minkP;
     }
 
@@ -648,7 +641,7 @@ public class AllPairsCommand extends AbstractCommand {
         this.minkP = minkP;
     }
 
-    public double getLambdaLambda() {
+    double getLambdaLambda() {
         return lambdaLambda;
     }
 
@@ -656,7 +649,7 @@ public class AllPairsCommand extends AbstractCommand {
         this.lambdaLambda = lambdaLambda;
     }
 
-    public final DoubleEnumerating getIndexDelegate() {
+    final DoubleEnumerating getIndexDelegate() {
         return indexDelegate;
     }
 

@@ -52,7 +52,7 @@ public class EventTest {
 
     @Test
     @Ignore
-    public void testLMMedlineSample() throws FileNotFoundException, IOException {
+    public void testLMMedlineSample() throws IOException {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-input-sample");
         Charset charset = Charset.forName("UTF-8");
         DoubleEnumeratingDelegate del = new DoubleEnumeratingDelegate(
@@ -68,7 +68,7 @@ public class EventTest {
         }
     }
 
-    private void copyEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
+    private void copyEF(File a, File b, boolean compact) throws IOException {
         DoubleEnumeratingDelegate idx = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
         TokenPairSource src = TokenPairSource.open(
@@ -80,7 +80,7 @@ public class EventTest {
     }
 
     @Test
-    public void testEvents_CompactConversion() throws FileNotFoundException, IOException {
+    public void testEvents_CompactConversion() throws IOException {
         File a = TEST_FRUIT_INPUT;
         File b = new File(TEST_OUTPUT_DIR,
                 TEST_FRUIT_INPUT.getName() + ".compact");
@@ -101,7 +101,7 @@ public class EventTest {
     }
 
     @Test
-    public void testEntryPair_EnumeratorConversion() throws FileNotFoundException, IOException, ClassNotFoundException {
+    public void testEntryPair_EnumeratorConversion() throws IOException, ClassNotFoundException {
         File a = TEST_FRUIT_INPUT;
         File b = new File(TEST_OUTPUT_DIR,
                 TEST_FRUIT_INPUT.getName() + ".enum");
@@ -111,22 +111,22 @@ public class EventTest {
                 TEST_FRUIT_INPUT.getName() + ".index");
 
 
-        DoubleEnumerating indel = EnumeratingDelegates.toPair(
+        DoubleEnumerating inDelegate = EnumeratingDelegates.toPair(
                 new SingleEnumeratingDelegate(Enumerating.DEFAULT_TYPE, false, idxFile));
-        DoubleEnumerating outdel = EnumeratingDelegates.toPair(
+        DoubleEnumerating outDelegate = EnumeratingDelegates.toPair(
                 new SingleEnumeratingDelegate(Enumerating.DEFAULT_TYPE, true, idxFile));
 
         {
 
 
             TokenPairSource aSrc = TokenPairSource.open(
-                    a, DEFAULT_CHARSET, indel, false, false);
+                    a, DEFAULT_CHARSET, inDelegate, false, false);
 
             TokenPairSink bSink = TokenPairSink.open(
-                    b, DEFAULT_CHARSET, outdel, true, true, true);
+                    b, DEFAULT_CHARSET, outDelegate, true, true, true);
             ObjectIO.copy(aSrc, bSink);
 
-            indel.saveEntriesEnumerator();
+            inDelegate.saveEntriesEnumerator();
 
             bSink.close();
         }
@@ -136,9 +136,9 @@ public class EventTest {
 
         {
             TokenPairSource bSrc = TokenPairSource.open(
-                    b, DEFAULT_CHARSET, outdel, true, true);
+                    b, DEFAULT_CHARSET, outDelegate, true, true);
             TokenPairSink cSink = TokenPairSink.open(
-                    c, DEFAULT_CHARSET, indel,
+                    c, DEFAULT_CHARSET, inDelegate,
                     false, false, false);
             ObjectIO.copy(bSrc, cSink);
             cSink.close();

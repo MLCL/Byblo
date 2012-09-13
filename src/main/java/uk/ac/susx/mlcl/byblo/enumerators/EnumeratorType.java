@@ -55,7 +55,7 @@ public enum EnumeratorType {
         }
 
         @Override
-        public void close(Enumerator<String> enumerator) throws IOException {
+        public void close(Enumerator<String> enumerator) {
             assert enumerator instanceof MemoryBasedStringEnumerator;
         }
     },
@@ -72,13 +72,13 @@ public enum EnumeratorType {
         }
 
         @Override
-        public void save(Enumerator<String> enumerator) throws IOException {
+        public void save(Enumerator<String> enumerator)  {
             assert enumerator instanceof JDBMStringEnumerator;
             ((JDBMStringEnumerator) enumerator).save();
         }
 
         @Override
-        public void close(Enumerator<String> enumerator) throws IOException {
+        public void close(Enumerator<String> enumerator)  {
             assert enumerator instanceof JDBMStringEnumerator;
             ((JDBMStringEnumerator) enumerator).close();
         }
@@ -88,5 +88,5 @@ public enum EnumeratorType {
 
     public abstract void save(Enumerator<String> enumerator) throws IOException;
 
-    public abstract void close(Enumerator<String> enumerator) throws IOException;
+    public abstract void close(Enumerator<String> enumerator) ;
 }

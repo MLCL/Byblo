@@ -53,7 +53,7 @@ public final class ForwardingBiMap<K, V>
 
     private transient ForwardingBiMap<V, K> inverse;
 
-    protected ForwardingBiMap(
+    private ForwardingBiMap(
             Map<K, V> forwards,
             ForwardingBiMap<V, K> inverse) {
         this.delegate = forwards;
@@ -63,8 +63,7 @@ public final class ForwardingBiMap<K, V>
     public static <K, V> ForwardingBiMap<K, V> create(
             Map<K, V> forwards, Map<V, K> backwards) {
         ForwardingBiMap<K, V> x = new ForwardingBiMap<K, V>(forwards, null);
-        ForwardingBiMap<V, K> y = new ForwardingBiMap<V, K>(backwards, x);
-        x.inverse = y;
+        x.inverse = new ForwardingBiMap<V, K>(backwards, x);
         return x;
     }
 
@@ -171,7 +170,7 @@ public final class ForwardingBiMap<K, V>
             Map<K, V> forwards = (Map<K, V>) in.readObject();
             @SuppressWarnings("unchecked")
             Map<V, K> backwards = (Map<V, K>) in.readObject();
-            this.instance = ForwardingBiMap.<K, V>create(forwards, backwards);
+            this.instance = ForwardingBiMap.create(forwards, backwards);
         }
 
         final Object readResolve() {

@@ -80,6 +80,6 @@ abstract class AbstractCommonsImpl extends AbstractConfiguration {
 
     @Override
     protected void addPropertyDirect(String key, Object value) {
-        addPropertyDirect(key, value);
+        inner.addProperty(key, value);
     }
 }

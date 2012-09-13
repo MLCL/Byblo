@@ -125,7 +125,7 @@ public class ThreadedApssTaskTest extends AbstractAllPairsTaskTest<ThreadedApssT
 
         instance.setInnerAlgorithm(NaiveApssTask.class);
         instance.setMeasure(MEASURE);
-        instance.setProducatePair(PAIR_FILTER);
+        instance.setProducePair(PAIR_FILTER);
 
         instance.run();
 
@@ -162,7 +162,7 @@ public class ThreadedApssTaskTest extends AbstractAllPairsTaskTest<ThreadedApssT
 
         instance.setInnerAlgorithm(InvertedApssTask.class);
         instance.setMeasure(MEASURE);
-        instance.setProducatePair(PAIR_FILTER);
+        instance.setProducePair(PAIR_FILTER);
 
         instance.run();
         while (instance.isExceptionTrapped()) {
@@ -204,7 +204,7 @@ public class ThreadedApssTaskTest extends AbstractAllPairsTaskTest<ThreadedApssT
 
             instance.setInnerAlgorithm(NaiveApssTask.class);
             instance.setMeasure(MEASURE);
-            instance.setProducatePair(PAIR_FILTER);
+            instance.setProducePair(PAIR_FILTER);
 
             instance.run();
 
@@ -235,7 +235,7 @@ public class ThreadedApssTaskTest extends AbstractAllPairsTaskTest<ThreadedApssT
 
             instance.setInnerAlgorithm(InvertedApssTask.class);
             instance.setMeasure(MEASURE);
-            instance.setProducatePair(PAIR_FILTER);
+            instance.setProducePair(PAIR_FILTER);
 
             instance.run();
             while (instance.isExceptionTrapped()) {
@@ -281,7 +281,7 @@ public class ThreadedApssTaskTest extends AbstractAllPairsTaskTest<ThreadedApssT
 
             instance.setInnerAlgorithm(NaiveApssTask.class);
             instance.setMeasure(MEASURE);
-            instance.setProducatePair(PAIR_FILTER);
+            instance.setProducePair(PAIR_FILTER);
 
             instance.run();
 
@@ -310,7 +310,7 @@ public class ThreadedApssTaskTest extends AbstractAllPairsTaskTest<ThreadedApssT
             instance.setSourceB(vsb);
             instance.setSink(ObjectIO.asSink(nonThreadedResults));
             instance.setMeasure(MEASURE);
-            instance.setProducatePair(PAIR_FILTER);
+            instance.setProducePair(PAIR_FILTER);
 
             instance.run();
             while (instance.isExceptionTrapped()) {
@@ -353,7 +353,7 @@ public class ThreadedApssTaskTest extends AbstractAllPairsTaskTest<ThreadedApssT
 
             instance.setInnerAlgorithm(InvertedApssTask.class);
             instance.setMeasure(MEASURE);
-            instance.setProducatePair(PAIR_FILTER);
+            instance.setProducePair(PAIR_FILTER);
 
             instance.run();
 
@@ -382,7 +382,7 @@ public class ThreadedApssTaskTest extends AbstractAllPairsTaskTest<ThreadedApssT
             instance.setSourceB(vsb);
             instance.setSink(ObjectIO.asSink(nonThreadedResults));
             instance.setMeasure(MEASURE);
-            instance.setProducatePair(PAIR_FILTER);
+            instance.setProducePair(PAIR_FILTER);
 
             instance.run();
             while (instance.isExceptionTrapped()) {

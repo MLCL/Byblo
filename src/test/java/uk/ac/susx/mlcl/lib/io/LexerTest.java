@@ -82,23 +82,6 @@ public class LexerTest {
     public LexerTest() {
     }
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-        System.out.println();
-    }
-
     private File makeTmpData(String str, Charset charset) throws IOException {
         File tmp = File.createTempFile(this.getClass().getName() + ".", "");
         tmp.deleteOnExit();
@@ -117,7 +100,7 @@ public class LexerTest {
     }
 
     @Test
-    public void basicTest() throws FileNotFoundException, IOException {
+    public void basicTest() throws IOException {
         System.out.println("basicTest");
 
 
@@ -127,15 +110,9 @@ public class LexerTest {
         Lexer lexer = new Lexer(tmp, charset);
         lexer.setDelimiterMatcher(CharMatcher.is('.'));
 
-//        System.out.printf("%-6s %-12s %-6s %-6s %-15s (%s,%s)%n",
-//                          "num", "type", "start", "end", "value", "line",
-//                          "column");
         int i = 0;
         while (lexer.hasNext()) {
             lexer.advance();
-//            System.out.printf("%-12s %-6d %-6d %-15s%n",
-//                              lexer.type(), lexer.start(), lexer.end(),
-//                              Strings.escape(lexer.value()));
             assertEquals("type", CFB_types[i], lexer.type());
             assertEquals("start", CFB_starts[i], lexer.start());
             assertEquals("end", CFB_ends[i], lexer.end());
@@ -155,7 +132,7 @@ public class LexerTest {
     }
 
     @Test
-    public void seekTest() throws FileNotFoundException, IOException {
+    public void seekTest() throws IOException {
         System.out.println("seekTest");
 
         Charset charset = Files.DEFAULT_CHARSET;
@@ -177,17 +154,9 @@ public class LexerTest {
         // Now randomly seek into the lexer at various offsets, and check that
         // they are what they are supposed to be
         Random rand = new Random(1);
-//        System.out.printf("%-6s %-6s %-12s %-6s %-6s %-15s (%s,%s)%n",
-//                          "seek", "num", "type", "start", "end", "value", "line",
-//                          "column");
         for (int j = 0; j < 500; j++) {
             i = rand.nextInt(CFB_numbers.length);
             lexer.position(tells[i]);
-//            System.out.printf("%-6d %-6d %-12s %-6d %-6d %-15s (%d,%d)%n",
-//                              i, 0/*lexer.number()*/, lexer.type(),
-//                              lexer.start(), lexer.end(),
-//                              Strings.escape(lexer.value()), 0/*lexer.line()*/,
-//                              0/*lexer.column()*/);
             assertEquals("type[" + i + "]", CFB_types[i], lexer.type());
             assertEquals("value[" + i + "]", CFB_values[i], lexer.value().
                     toString());
@@ -197,32 +166,32 @@ public class LexerTest {
     }
 
     @Test
-    public void seekTestFruitEntries() throws FileNotFoundException, IOException {
+    public void seekTestFruitEntries() throws IOException {
         seekTest(TestConstants.TEST_FRUIT_ENTRIES);
     }
 
     @Test
-    public void seekTestFruitFeatures() throws FileNotFoundException, IOException {
+    public void seekTestFruitFeatures() throws IOException {
         seekTest(TestConstants.TEST_FRUIT_FEATURES);
 
     }
 
     @Test
-    public void seekTestFruitEvents() throws FileNotFoundException, IOException {
+    public void seekTestFruitEvents() throws IOException {
         seekTest(TestConstants.TEST_FRUIT_EVENTS);
     }
 
     @Test
-    public void seekTestFruitInput() throws FileNotFoundException, IOException {
+    public void seekTestFruitInput() throws IOException {
         seekTest(TestConstants.TEST_FRUIT_INPUT);
     }
 
     @Test
-    public void seekTestFruitSims() throws FileNotFoundException, IOException {
+    public void seekTestFruitSims() throws IOException {
         seekTest(TestConstants.TEST_FRUIT_SIMS);
     }
 
-    public void seekTest(File file) throws FileNotFoundException, IOException {
+    void seekTest(File file) throws IOException {
         System.out.println("Test Lexer seek with " + file.toString() + "");
 
         Charset charset = Files.DEFAULT_CHARSET;

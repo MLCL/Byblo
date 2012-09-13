@@ -62,7 +62,7 @@ public abstract class DecomposableMeasure
      * should be based entirely upon shared features, while independent features
      * can be pre-calculated using {@link #left(SparseDoubleVector)} and
      * {@link #right(SparseDoubleVector)}. All three values are combined using
-     * {@link Proximity#combine(double, double, double)}.
+     * {@link DecomposableMeasure#combine(double, double, double)}.
      * <p/>
      *
      * @param A the first feature vector

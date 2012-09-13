@@ -108,7 +108,7 @@ public class ExternalSortEventsCommand extends AbstractExternalSortCommand<Weigh
         return BybloIO.openEventsSource(file, getCharset(), indexDelegate);
     }
 
-    public final DoubleEnumerating getIndexDelegate() {
+    final DoubleEnumerating getIndexDelegate() {
         return indexDelegate;
     }
 

@@ -70,7 +70,7 @@ public final class ObjectSortTask<T> extends ObjectPipeTask<T> {
         setComparator(Comparators.<T>naturalOrderIfPossible());
     }
 
-    public final Comparator<T> getComparator() {
+    final Comparator<T> getComparator() {
         return comparator;
     }
 
@@ -79,15 +79,8 @@ public final class ObjectSortTask<T> extends ObjectPipeTask<T> {
         this.comparator = comparator;
     }
 
-    public boolean equals(ObjectSortTask<?> other) {
-        if (!super.equals(this))
-            return false;
-        if (this.getComparator() != other.getComparator()
-                && (this.getComparator() == null
-                || !this.getComparator().
-                equals(other.getComparator())))
-            return false;
-        return true;
+    boolean equals(ObjectSortTask<?> other) {
+        return super.equals(this) && !(this.getComparator() != other.getComparator() && (this.getComparator() == null || !this.getComparator().equals(other.getComparator())));
 
     }
 

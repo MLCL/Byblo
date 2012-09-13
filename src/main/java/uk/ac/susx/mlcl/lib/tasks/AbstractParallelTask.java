@@ -47,7 +47,7 @@ public abstract class AbstractParallelTask extends AbstractTask {
 
     private static final Log LOG = LogFactory.getLog(AbstractParallelTask.class);
 
-    protected static final int DEFAULT_NUM_THREADS =
+    private static final int DEFAULT_NUM_THREADS =
             Runtime.getRuntime().availableProcessors();
 
     private int numThreads = DEFAULT_NUM_THREADS;
@@ -58,7 +58,7 @@ public abstract class AbstractParallelTask extends AbstractTask {
 
     private Semaphore throttle;
 
-    public AbstractParallelTask() {
+    private AbstractParallelTask() {
     }
 
     public void setNumThreads(int numThreads) {
@@ -76,7 +76,7 @@ public abstract class AbstractParallelTask extends AbstractTask {
         }
     }
 
-    public final int getNumThreads() {
+    final int getNumThreads() {
         return numThreads;
     }
 
@@ -119,7 +119,7 @@ public abstract class AbstractParallelTask extends AbstractTask {
         }
     }
 
-    protected synchronized final Queue<Future<? extends Task>> getFutureQueue() {
+    synchronized final Queue<Future<? extends Task>> getFutureQueue() {
         if (futureQueue == null) {
             futureQueue = new ArrayDeque<Future<? extends Task>>();
         }
@@ -164,27 +164,17 @@ public abstract class AbstractParallelTask extends AbstractTask {
                 add("futureQueue", getFutureQueue());
     }
 
-    public boolean equals(AbstractParallelTask other) {
+    boolean equals(AbstractParallelTask other) {
         if (!super.equals(other))
             return false;
         if (this.getNumThreads() != other.getNumThreads())
             return false;
-        if (this.getExecutor() != other.getExecutor() && (this.getExecutor() == null || !this.
-                getExecutor().
-                equals(other.
-                        getExecutor())))
-            return false;
-        if (this.futureQueue != other.futureQueue && (this.futureQueue == null || !this.futureQueue.
-                equals(other.futureQueue)))
-            return false;
-        return true;
+        return !(this.getExecutor() != other.getExecutor() && (this.getExecutor() == null || !this.getExecutor().equals(other.getExecutor()))) && !(this.futureQueue != other.futureQueue && (this.futureQueue == null || !this.futureQueue.equals(other.futureQueue)));
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
-            return false;
-        return getClass() == obj.getClass() && equals((AbstractParallelTask) obj);
+        return obj != null && getClass() == obj.getClass() && equals((AbstractParallelTask) obj);
     }
 
     @Override

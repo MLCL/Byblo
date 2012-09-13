@@ -54,10 +54,6 @@ public class Temp {
 
         
 
-//        System.out.println(new Locale("en", "GB"));
-
-//        
-//        
 
         URL resUrl = FullBuild.class.getResource("defaults.xml");
         

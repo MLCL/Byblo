@@ -51,7 +51,7 @@ public class FastWeightedTokenPairVectorSink
 
     private final DataSink inner;
 
-    public FastWeightedTokenPairVectorSink(DataSink inner) {
+    private FastWeightedTokenPairVectorSink(DataSink inner) {
         this.inner = inner;
     }
 

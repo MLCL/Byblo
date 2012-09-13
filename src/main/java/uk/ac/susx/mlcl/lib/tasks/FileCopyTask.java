@@ -49,7 +49,7 @@ import static java.text.MessageFormat.format;
  */
 public class FileCopyTask extends AbstractTask implements ProgressReporting {
 
-    protected final ProgressDelegate progress = new ProgressDelegate(this, false);
+    final ProgressDelegate progress = new ProgressDelegate(this, false);
 
     private File sourceFile;
 
@@ -63,7 +63,7 @@ public class FileCopyTask extends AbstractTask implements ProgressReporting {
     public FileCopyTask() {
     }
 
-    protected static void copy(File from, File to) throws IOException {
+    static void copy(File from, File to) throws IOException {
 
         FileChannel source = null;
         FileChannel destination = null;
@@ -104,11 +104,11 @@ public class FileCopyTask extends AbstractTask implements ProgressReporting {
         progress.setState(State.COMPLETED);
     }
 
-    public final File getSrcFile() {
+    final File getSrcFile() {
         return sourceFile;
     }
 
-    public final File getDstFile() {
+    final File getDstFile() {
         return destinationFile;
     }
 

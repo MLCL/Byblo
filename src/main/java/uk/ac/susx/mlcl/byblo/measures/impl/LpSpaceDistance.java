@@ -63,8 +63,6 @@ public final class LpSpaceDistance implements Measure {
 
     public static final double DEFAULT_POWER = 2;
 
-    private static final long serialVersionUID = 1L;
-
     private double power = Double.NaN;
 
     private Measure delegate = null;
@@ -132,10 +130,8 @@ public final class LpSpaceDistance implements Measure {
 
         LpSpaceDistance that = (LpSpaceDistance) o;
 
-        if (Double.compare(that.power, power) != 0) return false;
-        if (delegate != null ? !delegate.equals(that.delegate) : that.delegate != null) return false;
+        return Double.compare(that.power, power) == 0 && !(delegate != null ? !delegate.equals(that.delegate) : that.delegate != null);
 
-        return true;
     }
 
     @Override
@@ -193,8 +189,6 @@ public final class LpSpaceDistance implements Measure {
     @CheckReturnValue
     private final class MinkowskiDistance extends LpSpaceDelegate {
 
-        private static final long serialVersionUID = 1L;
-
         @Override
         public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
             double distance = 0;
@@ -234,8 +228,6 @@ public final class LpSpaceDistance implements Measure {
     @Immutable
     @CheckReturnValue
     private static final class EuclideanDistance extends LpSpaceDelegate {
-
-        private static final long serialVersionUID = 1L;
 
         @Override
         public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
@@ -278,8 +270,6 @@ public final class LpSpaceDistance implements Measure {
     @CheckReturnValue
     private static final class ManhattanDistance extends LpSpaceDelegate {
 
-        private static final long serialVersionUID = 1L;
-
         @Override
         public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
             double distance = 0;
@@ -318,8 +308,6 @@ public final class LpSpaceDistance implements Measure {
     @Immutable
     @CheckReturnValue
     private static final class HammingDistance extends LpSpaceDelegate {
-
-        private static final long serialVersionUID = 1L;
 
         @Override
         public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
@@ -360,8 +348,6 @@ public final class LpSpaceDistance implements Measure {
     @CheckReturnValue
     private static final class MaxSpaceDistance extends LpSpaceDelegate {
 
-        private static final long serialVersionUID = 1L;
-
         @Override
         public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
             double distance = 0;
@@ -398,8 +384,6 @@ public final class LpSpaceDistance implements Measure {
     @Immutable
     @CheckReturnValue
     private static final class MinSpaceDistance extends LpSpaceDelegate {
-
-        private static final long serialVersionUID = 1L;
 
         @Override
         public double similarity(SparseDoubleVector A, SparseDoubleVector B) {

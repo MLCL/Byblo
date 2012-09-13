@@ -76,11 +76,7 @@ public final class NullWeighting
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        return true;
+        return obj == this || !(obj == null || getClass() != obj.getClass());
     }
 
     @Override

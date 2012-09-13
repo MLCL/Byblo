@@ -64,7 +64,7 @@ public class KullbackLeiblerDivergenceTest extends
 	@Test
 	@Override
 	@Ignore
-	public void testHeteroginiety() {
+	public void testHeterogeneity() {
 		throw new UnsupportedOperationException();
 	}
 

@@ -50,21 +50,8 @@ public class FileDeleteCommandTest extends AbstractCommandTest<FileDeleteCommand
         return FileDeleteCommand.class;
     }
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
-
     @Test
-    public void testCLI() throws IOException, Exception {
+    public void testCLI() throws Exception {
         System.out.println("Testing command line usage.");
         File tmp = File.createTempFile(getClass().getName(), "");
         FileDeleteCommand instance = new FileDeleteCommand();

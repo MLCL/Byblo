@@ -50,19 +50,18 @@ import java.nio.charset.Charset;
  * @param <T>
  * @author hiam20
  */
-public abstract class IndexingCommands<T>
-        extends AbstractCopyCommand<T> {
+public abstract class IndexingCommands<T> extends AbstractCopyCommand<T> {
 
     @ParametersDelegate
     private DoubleEnumerating indexDelegate = new DoubleEnumeratingDelegate(
             Enumerating.DEFAULT_TYPE, false, false, null, null);
 
-    public IndexingCommands() {
+    IndexingCommands() {
         super();
     }
 
-    public IndexingCommands(File sourceFile, File destinationFile,
-                            Charset charset, DoubleEnumerating indexDelegate) {
+    IndexingCommands(File sourceFile, File destinationFile,
+                     Charset charset, DoubleEnumerating indexDelegate) {
         super(sourceFile, destinationFile, charset);
         this.indexDelegate = indexDelegate;
     }
@@ -72,10 +71,10 @@ public abstract class IndexingCommands<T>
     public boolean runCommand() {
         try {
             checkState();
-            boolean result = super.runCommand();
+            final boolean result = super.runCommand();
             indexDelegate.saveEnumerator();
             indexDelegate.closeEnumerator();
-            return true;
+            return result;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -86,7 +85,7 @@ public abstract class IndexingCommands<T>
         return "enumeration";
     }
 
-    protected abstract void checkState() throws Exception;
+    protected abstract void checkState();
 
     public DoubleEnumerating getIndexDelegate() {
         return indexDelegate;
@@ -96,11 +95,11 @@ public abstract class IndexingCommands<T>
         this.indexDelegate = indexDelegate;
     }
 
-    protected DoubleEnumerating getSourceIndexDelegate() {
+    DoubleEnumerating getSourceIndexDelegate() {
         return EnumeratingDelegates.decorateEnumerated(indexDelegate, false);
     }
 
-    protected DoubleEnumerating getSinkIndexDelegate() {
+    DoubleEnumerating getSinkIndexDelegate() {
         return EnumeratingDelegates.decorateEnumerated(indexDelegate, true);
     }
 
@@ -122,19 +121,19 @@ public abstract class IndexingCommands<T>
         }
 
         @Override
-        protected void checkState() throws Exception {
+        protected void checkState() {
             Checks.checkNotNull("indexFile", EnumeratingDelegates.toSingleEntries(getIndexDelegate()).getEnumeratorFile());
         }
 
         @Override
         protected ObjectSource<Weighted<Token>> openSource(File file)
-                throws FileNotFoundException, IOException {
+                throws IOException {
             return BybloIO.openEntriesSource(file, getCharset(), getSourceIndexDelegate());
         }
 
         @Override
         protected ObjectSink<Weighted<Token>> openSink(File file)
-                throws FileNotFoundException, IOException {
+                throws IOException {
             return BybloIO.openEntriesSink(file, getCharset(), getSinkIndexDelegate());
         }
 
@@ -158,19 +157,19 @@ public abstract class IndexingCommands<T>
         }
 
         @Override
-        public void checkState() throws Exception {
+        public void checkState() {
             Checks.checkNotNull("indexFile", EnumeratingDelegates.toSingleFeatures(getIndexDelegate()).getEnumeratorFile());
         }
 
         @Override
         protected ObjectSource<Weighted<Token>> openSource(File file)
-                throws FileNotFoundException, IOException {
+                throws IOException {
             return BybloIO.openFeaturesSource(file, getCharset(), getSourceIndexDelegate());
         }
 
         @Override
         protected ObjectSink<Weighted<Token>> openSink(File file)
-                throws FileNotFoundException, IOException {
+                throws IOException {
             return BybloIO.openFeaturesSink(file, getCharset(), getSinkIndexDelegate());
         }
 
@@ -194,20 +193,20 @@ public abstract class IndexingCommands<T>
         }
 
         @Override
-        public void checkState() throws Exception {
+        public void checkState() {
             Checks.checkNotNull("indexFile1", getIndexDelegate().getEntryEnumeratorFile());
             Checks.checkNotNull("indexFile2", getIndexDelegate().getFeatureEnumeratorFile());
         }
 
         @Override
         protected ObjectSource<Weighted<TokenPair>> openSource(File file)
-                throws FileNotFoundException, IOException {
+                throws IOException {
             return BybloIO.openEventsSource(file, getCharset(), getSourceIndexDelegate());
         }
 
         @Override
         protected ObjectSink<Weighted<TokenPair>> openSink(File file)
-                throws FileNotFoundException, IOException {
+                throws IOException {
             return BybloIO.openEventsSink(file, getCharset(), getSinkIndexDelegate());
         }
 
@@ -231,20 +230,20 @@ public abstract class IndexingCommands<T>
         }
 
         @Override
-        public void checkState() throws Exception {
+        public void checkState() {
             Checks.checkNotNull("indexFile1", getIndexDelegate().getEntryEnumeratorFile());
             Checks.checkNotNull("indexFile2", getIndexDelegate().getFeatureEnumeratorFile());
         }
 
         @Override
         protected ObjectSource<TokenPair> openSource(File file)
-                throws FileNotFoundException, IOException {
+                throws IOException {
             return BybloIO.openInstancesSource(file, getCharset(), getSourceIndexDelegate());
         }
 
         @Override
         protected ObjectSink<TokenPair> openSink(File file)
-                throws FileNotFoundException, IOException {
+                throws IOException {
             return BybloIO.openInstancesSink(file, getCharset(), getSinkIndexDelegate());
         }
 
@@ -268,19 +267,19 @@ public abstract class IndexingCommands<T>
         }
 
         @Override
-        public void checkState() throws Exception {
+        public void checkState() {
             Checks.checkNotNull("indexFile", EnumeratingDelegates.toSingleEntries(getIndexDelegate()).getEnumeratorFile());
         }
 
         @Override
         protected ObjectSource<Weighted<TokenPair>> openSource(File file)
-                throws FileNotFoundException, IOException {
+                throws IOException {
             return BybloIO.openNeighboursSource(file, getCharset(), getSourceIndexDelegate());
         }
 
         @Override
         protected ObjectSink<Weighted<TokenPair>> openSink(File file)
-                throws FileNotFoundException, IOException {
+                throws IOException {
             return BybloIO.openNeighboursSink(file, getCharset(), getSinkIndexDelegate());
         }
 
@@ -304,19 +303,19 @@ public abstract class IndexingCommands<T>
         }
 
         @Override
-        public void checkState() throws Exception {
+        public void checkState() {
             Checks.checkNotNull("indexFile", EnumeratingDelegates.toSingleEntries(getIndexDelegate()).getEnumeratorFile());
         }
 
         @Override
         protected ObjectSource<Weighted<TokenPair>> openSource(File file)
-                throws FileNotFoundException, IOException {
+                throws IOException {
             return BybloIO.openSimsSource(file, getCharset(), getSourceIndexDelegate());
         }
 
         @Override
         protected ObjectSink<Weighted<TokenPair>> openSink(File file)
-                throws FileNotFoundException, IOException {
+                throws IOException {
             return BybloIO.openSimsSink(file, getCharset(), getSinkIndexDelegate());
         }
 
@@ -385,7 +384,7 @@ public abstract class IndexingCommands<T>
 
         @Override
         public String getName() {
-            return "instnaces unenumeration";
+            return "instances unenumeration";
         }
 
         @Override

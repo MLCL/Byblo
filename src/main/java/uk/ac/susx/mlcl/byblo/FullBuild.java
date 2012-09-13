@@ -71,10 +71,10 @@ public final class FullBuild extends AbstractCommand {
      * Whether or not some of the rarely used parameters should be hidden from
      * the help usage page.
      */
-    public static final boolean HIDE_UNCOMMON_PARAMETERS = false;
+    private static final boolean HIDE_UNCOMMON_PARAMETERS = false;
 
     @ParametersDelegate
-    private FileDelegate fileDelegate = new FileDelegate();
+    private final FileDelegate fileDelegate = new FileDelegate();
 
     @Parameter(names = {"-i", "--input"},
             description = "Input instances file",
@@ -103,7 +103,7 @@ public final class FullBuild extends AbstractCommand {
     private int numThreads = Runtime.getRuntime().availableProcessors();
 
     /*
-     * === FILTER PARAMATERISATION ===
+     * === FILTER PARAMETERISATION ===
      */
     @Parameter(names = {"-fef", "--filter-entry-freq"},
             description = "Minimum entry frequency threshold.",
@@ -140,7 +140,7 @@ public final class FullBuild extends AbstractCommand {
             description = "Regular expression that accepted features must match.")
     private String filterFeaturePattern;
     /*
-     * === ALL-PAIRS PARAMATERISATION ===
+     * === ALL-PAIRS PARAMETERISATION ===
      */
 
     @Parameter(names = {"-m", "--measure"},
@@ -153,19 +153,19 @@ public final class FullBuild extends AbstractCommand {
     private double minSimilarity = AllPairsCommand.DEFAULT_MIN_SIMILARITY;
 
     @Parameter(names = {"-Smx", "--similarity-max"},
-            description = "Maximyum similarity threshold.",
+            description = "Maximum similarity threshold.",
             hidden = HIDE_UNCOMMON_PARAMETERS,
             converter = DoubleConverter.class)
     private double maxSimilarity = AllPairsCommand.DEFAULT_MAX_SIMILARITY;
 
     @Parameter(names = {"--crmi-beta"},
-            description = "Beta paramter to CRMI measure.",
+            description = "Beta parameter to CRMI measure.",
             hidden = HIDE_UNCOMMON_PARAMETERS,
             converter = DoubleConverter.class)
     private double crmiBeta = Weeds.DEFAULT_BETA;
 
     @Parameter(names = {"--crmi-gamma"},
-            description = "Gamma paramter to CRMI measure.",
+            description = "Gamma parameter to CRMI measure.",
             hidden = HIDE_UNCOMMON_PARAMETERS,
             converter = DoubleConverter.class)
     private double crmiGamma = Weeds.DEFAULT_GAMMA;
@@ -198,7 +198,7 @@ public final class FullBuild extends AbstractCommand {
     private boolean outputIdentityPairs = false;
 
     /*
-     * === K-NEAREST-NEIGHBOURS PARAMATERISATION ===
+     * === K-NEAREST-NEIGHBOURS PARAMETERISATION ===
      */
 
     @Parameter(names = {"-k"},
@@ -233,7 +233,7 @@ public final class FullBuild extends AbstractCommand {
             checkValidOutputDir("Output dir", outputDir);
 
             if (tempBaseDir == null)
-                tempBaseDir = createTempSubdirDir(outputDir);
+                tempBaseDir = createTempSubDir(outputDir);
 
 
             final long startTime = System.currentTimeMillis();
@@ -363,7 +363,7 @@ public final class FullBuild extends AbstractCommand {
                         " * End time: {0,time,full} {0,date,full}\n", endTime));
                 sb
                         .append(
-                                MessageFormat.format(" * Ellapsed time: {0}\n",
+                                MessageFormat.format(" * Elapsed time: {0}\n",
                                         formatElapsedTime(endTime
                                                 - startTime)));
                 sb.append(MessageFormat.format(" * {0}\n",
@@ -379,7 +379,7 @@ public final class FullBuild extends AbstractCommand {
 
     }
 
-    static String formatElapsedTime(long timeMillis) {
+    private static String formatElapsedTime(long timeMillis) {
         long remaining = timeMillis;
         double seconds = (remaining % 60000) / 1000.0;
         remaining /= 60000;
@@ -428,7 +428,7 @@ public final class FullBuild extends AbstractCommand {
 
 
         if (!indexCmd.runCommand())
-            throw new RuntimeException("Indexing comamnd failed.");
+            throw new RuntimeException("Indexing command failed.");
 
         checkValidInputFile("Enumerated instances file",
                 instancesEnumeratedFile);
@@ -441,7 +441,7 @@ public final class FullBuild extends AbstractCommand {
                     " * End time: {0,time,full} {0,date,full}\n", endTime));
             sb.
                     append(
-                            MessageFormat.format(" * Ellapsed time: {0}\n",
+                            MessageFormat.format(" * Elapsed time: {0}\n",
                                     formatElapsedTime(endTime - startTime)));
             sb.append(MessageFormat.format(" * {0}\n",
                     MiscUtil.memoryInfoString()));
@@ -459,7 +459,7 @@ public final class FullBuild extends AbstractCommand {
         checkValidOutputFile("Features file", featuresFile);
         checkValidOutputFile("Events file", eventsFile);
 
-        File countTempDir = createTempSubdirDir(tempBaseDir);
+        File countTempDir = createTempSubDir(tempBaseDir);
         FileFactory countTmpFact = new TempFileFactory(countTempDir);
 
 
@@ -500,7 +500,7 @@ public final class FullBuild extends AbstractCommand {
 
 
         if (!countCmd.runCommand())
-            throw new RuntimeException("Count comamnd failed.");
+            throw new RuntimeException("Count command failed.");
 
         checkValidInputFile("Entries file", entriesFile);
         checkValidInputFile("Features file", featuresFile);
@@ -516,7 +516,7 @@ public final class FullBuild extends AbstractCommand {
                     " * End time: {0,time,full} {0,date,full}\n", endTime));
             sb.
                     append(
-                            MessageFormat.format(" * Ellapsed time: {0}\n",
+                            MessageFormat.format(" * Elapsed time: {0}\n",
                                     formatElapsedTime(endTime - startTime)));
 
             sb.append(MessageFormat.format(" * {0}\n",
@@ -526,7 +526,7 @@ public final class FullBuild extends AbstractCommand {
         }
     }
 
-    static void deleteTempDir(File tempDir, String taskName) {
+    private static void deleteTempDir(File tempDir, String taskName) {
         if (!tempDir.delete()) {
             LOG.warn(format(
                     "Unable to delete temporary directory for task {1}: {0}",
@@ -554,7 +554,7 @@ public final class FullBuild extends AbstractCommand {
         checkValidOutputFile("Filtered features file", featuresFilteredFile);
         checkValidOutputFile("Filtered events file", eventsFilteredFile);
 
-        File filterTempDir = createTempSubdirDir(tempBaseDir);
+        File filterTempDir = createTempSubDir(tempBaseDir);
         FileFactory filterTmpFact = new TempFileFactory(filterTempDir);
 
         final long startTime = System.currentTimeMillis();
@@ -620,7 +620,7 @@ public final class FullBuild extends AbstractCommand {
         filterCmd.setEnumeratorType(enumeratorType);
 
         if (!filterCmd.runCommand())
-            throw new RuntimeException("Filter comamnd failed.");
+            throw new RuntimeException("Filter command failed.");
 
 
         checkValidInputFile("Filtered entries file", entriesFilteredFile);
@@ -637,7 +637,7 @@ public final class FullBuild extends AbstractCommand {
                     " * End time: {0,time,full} {0,date,full}\n", endTime));
             sb.
                     append(
-                            MessageFormat.format(" * Ellapsed time: {0}\n",
+                            MessageFormat.format(" * Elapsed time: {0}\n",
                                     formatElapsedTime(endTime - startTime)));
             sb.append(MessageFormat.format(" * {0}\n",
                     MiscUtil.memoryInfoString()));
@@ -666,7 +666,7 @@ public final class FullBuild extends AbstractCommand {
             sb.append(MessageFormat.format(" * Input events file: {0}\n",
                     eventsFilteredFile));
             sb.append(
-                    MessageFormat.format(" * Ouput sims file: {0}\n", simsFile));
+                    MessageFormat.format(" * Output sims file: {0}\n", simsFile));
             sb.append(MessageFormat.format(" * Measure: {0}{1}\n", measureName,
                     measureReversed ? "(reversed)" : ""));
             sb.append(MessageFormat.format(" * Accept sims range: {0} to {1}\n",
@@ -706,7 +706,7 @@ public final class FullBuild extends AbstractCommand {
         allPairsCmd.setEnumeratorType(enumeratorType);
 
         if (!allPairsCmd.runCommand())
-            throw new RuntimeException("All-Pairs comamnd failed.");
+            throw new RuntimeException("All-Pairs command failed.");
 
         checkValidInputFile("Sims file", simsFile);
 
@@ -718,7 +718,7 @@ public final class FullBuild extends AbstractCommand {
                     " * End time: {0,time,full} {0,date,full}\n", endTime));
             sb.
                     append(
-                            MessageFormat.format(" * Ellapsed time: {0}\n",
+                            MessageFormat.format(" * Elapsed time: {0}\n",
                                     formatElapsedTime(endTime - startTime)));
             sb.append(MessageFormat.format(" * {0}\n",
                     MiscUtil.memoryInfoString()));
@@ -731,7 +731,7 @@ public final class FullBuild extends AbstractCommand {
         checkValidInputFile("Sims file", simsFile);
         checkValidOutputFile("Neighbours file", neighboursFile);
 
-        File knnTempDir = createTempSubdirDir(tempBaseDir);
+        File knnTempDir = createTempSubDir(tempBaseDir);
         FileFactory knnTmpFact = new TempFileFactory(knnTempDir);
 
         final long startTime = System.currentTimeMillis();
@@ -740,7 +740,7 @@ public final class FullBuild extends AbstractCommand {
             sb.append("\nConfiguration:\n");
             sb.append(
                     MessageFormat.format(" * Input sims file: {0}\n", simsFile));
-            sb.append(MessageFormat.format(" * Ouput neighbours file: {0}\n",
+            sb.append(MessageFormat.format(" * Output neighbours file: {0}\n",
                     neighboursFile));
             sb.append(MessageFormat.format(" * K: {0}\n", k));
             sb.append(MessageFormat.format(
@@ -765,7 +765,7 @@ public final class FullBuild extends AbstractCommand {
         knnCmd.setK(k);
 
         if (!knnCmd.runCommand())
-            throw new RuntimeException("KNN comamnd failed.");
+            throw new RuntimeException("KNN command failed.");
 
         checkValidInputFile("Neighbours file", neighboursFile);
 
@@ -779,7 +779,7 @@ public final class FullBuild extends AbstractCommand {
                     " * End time: {0,time,full} {0,date,full}\n", endTime));
             sb.
                     append(
-                            MessageFormat.format(" * Ellapsed time: {0}\n",
+                            MessageFormat.format(" * Elapsed time: {0}\n",
                                     formatElapsedTime(endTime - startTime)));
             sb.append(MessageFormat.format(" * {0}\n",
                     MiscUtil.memoryInfoString()));
@@ -801,9 +801,9 @@ public final class FullBuild extends AbstractCommand {
             StringBuilder sb = new StringBuilder();
             sb.append("\nConfiguration:\n");
             sb.append(MessageFormat.format(
-                    " * Input enuemrated neighbours neighboursFile: {0}\n",
+                    " * Input enumerated neighbours neighboursFile: {0}\n",
                     neighboursFile));
-            sb.append(MessageFormat.format(" * Ouput neighbours file: {0}\n",
+            sb.append(MessageFormat.format(" * Output neighbours file: {0}\n",
                     neighboursStringsFile));
             sb.append(MessageFormat.format(
                     " * Start time: {0,time,full} {0,date,full}\n", startTime));
@@ -823,7 +823,7 @@ public final class FullBuild extends AbstractCommand {
         unindexCmd.getIndexDelegate().setEnumeratorType(enumeratorType);
 
         if (!unindexCmd.runCommand())
-            throw new RuntimeException("Unindexing comamnd failed.");
+            throw new RuntimeException("Unindexing command failed.");
 
         checkValidInputFile("Neighbours strings file",
                 neighboursStringsFile);
@@ -837,7 +837,7 @@ public final class FullBuild extends AbstractCommand {
                     " * End time: {0,time,full} {0,date,full}\n", endTime));
             sb.
                     append(
-                            MessageFormat.format(" * Ellapsed time: {0}\n",
+                            MessageFormat.format(" * Elapsed time: {0}\n",
                                     formatElapsedTime(endTime - startTime)));
             sb.append(MessageFormat.format(" * {0}\n",
                     MiscUtil.memoryInfoString()));
@@ -847,10 +847,10 @@ public final class FullBuild extends AbstractCommand {
 
     }
 
-    private static File createTempSubdirDir(File base) throws IOException {
+    private static File createTempSubDir(File base) throws IOException {
         checkValidOutputDir("Temporary base directory", base);
         FileFactory tmp = new TempFileFactory(base);
-        File tempDir = tmp.createFile("tempdir", "");
+        File tempDir = tmp.createFile("tempDir", "");
         LOG.debug(format("Creating temporary directory {0}", tempDir));
         if (!tempDir.delete() || !tempDir.mkdir()) {
             throw new IOException(format(
@@ -868,7 +868,7 @@ public final class FullBuild extends AbstractCommand {
         checkValidInputFile("Input file", file);
     }
 
-    public static void checkValidInputFile(String name, File file) {
+    private static void checkValidInputFile(String name, File file) {
         Checks.checkNotNull(name, file);
         if (!file.exists()) {
             throw new IllegalArgumentException(format(
@@ -889,7 +889,7 @@ public final class FullBuild extends AbstractCommand {
         checkValidOutputFile("Output file", file);
     }
 
-    public static void checkValidOutputFile(String name, File file) {
+    private static void checkValidOutputFile(String name, File file) {
         Checks.checkNotNull(name, file);
         if (file.exists()) {
             if (!file.isFile()) {
@@ -915,7 +915,7 @@ public final class FullBuild extends AbstractCommand {
         checkValidOutputDir("Output directory", dir);
     }
 
-    public static void checkValidOutputDir(String name, File file) {
+    private static void checkValidOutputDir(String name, File file) {
         Checks.checkNotNull(name, file);
         if (!file.exists()) {
             throw new IllegalArgumentException(format(
@@ -1044,7 +1044,7 @@ public final class FullBuild extends AbstractCommand {
         fileDelegate.setCharset(charset);
     }
 
-    public Charset getCharset() {
+    Charset getCharset() {
         return fileDelegate.getCharset();
     }
 

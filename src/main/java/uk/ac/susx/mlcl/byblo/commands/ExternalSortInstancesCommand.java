@@ -99,7 +99,7 @@ public class ExternalSortInstancesCommand extends AbstractExternalSortCommand<To
         return indexDelegate;
     }
 
-    public final void setIndexDelegate(DoubleEnumerating indexDelegate) {
+    final void setIndexDelegate(DoubleEnumerating indexDelegate) {
         Checks.checkNotNull("indexDelegate", indexDelegate);
         this.indexDelegate = indexDelegate;
     }

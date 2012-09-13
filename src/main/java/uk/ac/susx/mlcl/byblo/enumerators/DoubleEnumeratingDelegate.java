@@ -64,7 +64,7 @@ public final class DoubleEnumeratingDelegate extends EnumeratingDelegate impleme
 
     private Enumerator<String> featureEnumerator = null;
 
-    protected DoubleEnumeratingDelegate(
+    private DoubleEnumeratingDelegate(
             EnumeratorType type, boolean enumeratedEntries, boolean enumeratedFeatures,
             File entryIndexFile, File featureIndexFile,
             Enumerator<String> entryEnumerator, Enumerator<String> featureEnumerator) {

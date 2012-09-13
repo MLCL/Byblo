@@ -51,11 +51,11 @@ public final class Constant
         extends AbstractSimpleWeighting
         implements Serializable {
 
-    public static final double DEFAULT_FACTOR = 1;
+    private static final double DEFAULT_FACTOR = 1;
 
     private static final long serialVersionUID = 1L;
 
-    public double factor;
+    private double factor;
 
     public Constant(final double factor) {
         setFactor(factor);
@@ -69,7 +69,7 @@ public final class Constant
         return factor;
     }
 
-    public final void setFactor(double factor) {
+    final void setFactor(double factor) {
         this.factor = factor;
     }
 
@@ -94,19 +94,12 @@ public final class Constant
     }
 
     private boolean equals(Constant that) {
-        if (Double.doubleToLongBits(this.factor)
-                != Double.doubleToLongBits(that.factor))
-            return false;
-        return true;
+        return Double.doubleToLongBits(this.factor) == Double.doubleToLongBits(that.factor);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        return equals((Constant) obj);
+        return obj == this || !(obj == null || getClass() != obj.getClass()) && equals((Constant) obj);
     }
 
     @Override

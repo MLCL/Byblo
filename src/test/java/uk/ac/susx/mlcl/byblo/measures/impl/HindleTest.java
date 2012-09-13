@@ -116,7 +116,7 @@ public class HindleTest extends AbstractMeasureTest<Hindle> {
 	@Test
 	@Ignore
 	@Override
-	public void testHomoginiety() {
+	public void testHomogeneity() {
 		throw new UnsupportedOperationException();
 	}
 	/**
@@ -126,7 +126,7 @@ public class HindleTest extends AbstractMeasureTest<Hindle> {
 	@Test
 	@Ignore
 	@Override
-	public void testHomoginiety2() {
+	public void testHomogeneity2() {
 		throw new UnsupportedOperationException();
 	}
 

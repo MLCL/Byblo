@@ -79,9 +79,9 @@ import java.nio.charset.Charset;
 public class WeightedTokenPairSink
         implements ObjectSink<Weighted<TokenPair>>, Closeable, Flushable {
 
-    private DataSink inner;
+    private final DataSink inner;
 
-    public WeightedTokenPairSink(DataSink inner) {
+    private WeightedTokenPairSink(DataSink inner) {
         this.inner = inner;
     }
 

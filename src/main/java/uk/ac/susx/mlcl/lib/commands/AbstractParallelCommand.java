@@ -43,14 +43,14 @@ public abstract class AbstractParallelCommand extends AbstractCommand {
     private static final Log LOG = LogFactory.getLog(
             AbstractParallelCommand.class);
 
-    protected static final int DEFAULT_NUM_THREADS =
+    private static final int DEFAULT_NUM_THREADS =
             Runtime.getRuntime().availableProcessors();
 
     @Parameter(names = {"-t", "--threads"},
             description = "Number of threads to use for parallel processing.")
     private int nThreads = DEFAULT_NUM_THREADS;
 
-    public AbstractParallelCommand() {
+    private AbstractParallelCommand() {
     }
 
     public void setNumThreads(int nThreads) {
@@ -71,7 +71,7 @@ public abstract class AbstractParallelCommand extends AbstractCommand {
         }
     }
 
-    public final int getNumThreads() {
+    final int getNumThreads() {
         return nThreads;
     }
 

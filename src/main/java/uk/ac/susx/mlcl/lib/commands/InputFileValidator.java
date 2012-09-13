@@ -63,7 +63,7 @@ public final class InputFileValidator implements IParameterValidator {
         }
         if (!file.canRead()) {
             throw new ParameterException(
-                    "Input file \"" + value + "\" is not readble.");
+                    "Input file \"" + value + "\" is not readable.");
         }
     }
 }

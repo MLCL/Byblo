@@ -78,9 +78,9 @@ public abstract class AbstractMeasureTest<T extends Measure> extends AbstractObj
 
 	static final double EPSILON = 1E-10;
 
-	static List<Indexed<SparseDoubleVector>> FRUIT_EVENTS;
+	private static List<Indexed<SparseDoubleVector>> FRUIT_EVENTS;
 
-	static MarginalDistribution FRUIT_FEATURE_MARGINALS;
+	private static MarginalDistribution FRUIT_FEATURE_MARGINALS;
 
     @BeforeClass
 	public static void setUpClass() throws Exception {
@@ -159,7 +159,7 @@ public abstract class AbstractMeasureTest<T extends Measure> extends AbstractObj
 		}
 	}
 
-	public abstract String getMeasureName();
+	protected abstract String getMeasureName();
 
 	//
 	// ============================================================================
@@ -258,7 +258,7 @@ public abstract class AbstractMeasureTest<T extends Measure> extends AbstractObj
 		runFromCommandLine();
 	}
 
-	public void runFromCommandLine(String... extraArgs) throws Exception {
+	void runFromCommandLine(String... extraArgs) throws Exception {
 		StringBuilder name = new StringBuilder();
 		name.append(getMeasureName());
 		for (String arg : extraArgs)
@@ -367,8 +367,7 @@ public abstract class AbstractMeasureTest<T extends Measure> extends AbstractObj
 	//
 
 	@Test
-	public void testHomoginiety() {
-		System.out.println("testHomoginiety");
+	public void testHomogeneity() {
 		int size = 1000;
 		int count = 100;
 		SparseDoubleVector vec = randomVector(newRandom(), size);
@@ -381,8 +380,7 @@ public abstract class AbstractMeasureTest<T extends Measure> extends AbstractObj
 	}
 
 	@Test
-	public void testHeteroginiety() {
-		System.out.println("testHeteroginiety");
+	public void testHeterogeneity() {
 		int size = 1000;
 		SparseDoubleVector A = ones(size, size);
 		SparseDoubleVector B = ones(size, size);
@@ -402,75 +400,24 @@ public abstract class AbstractMeasureTest<T extends Measure> extends AbstractObj
 	}
 
 	@Test
-	public void testHomoginiety2() {
-		System.out.println("testHomoginiety");
+	public void testHomogeneity2() {
 		int size = 1000;
 		int count = 100;
-		List<SparseDoubleVector> vecs = randomVectors(newRandom(), size, count);
-		Measure instance = newConfiguredInstanceFor(vecs);
+		List<SparseDoubleVector> vectors = randomVectors(newRandom(), size, count);
+		Measure instance = newConfiguredInstanceFor(vectors);
 		double expect = newInstance().getHomogeneityBound();
-		double actual = similarity(instance, vecs.get(0), vecs.get(0));
+		double actual = similarity(instance, vectors.get(0), vectors.get(0));
 
 		Assert.assertEquals(expect, actual, 0.01);
 	}
-//
-//	@Test
-//	public void testHeteroginiety2() {
-//		System.out.println("testHeteroginiety");
-//		int size = 1000;
-//		int count = 100;
-//		List<SparseDoubleVector> vecs = randomVectors(newRandom(), size, count);
-//		Measure instance = newConfiguredInstanceFor(vecs);
-//		double expect = newInstance().getHeterogeneityBound();
-//		double actual = similarity(instance, vecs.get(0), vecs.get(1));
-//
-//		Assert.assertEquals(expect, actual, 0.01);
-//
-//		//
-//		// int size = 100;
-//		// SparseDoubleVector A = new SparseDoubleVector(size, size);
-//		// SparseDoubleVector B = new SparseDoubleVector(size, size);
-//		// for (int i = 0; i < size / 2; i++) {
-//		// A.set(i * 2, i);
-//		// B.set(i * 2 + 1, i);
-//		// }
-//		//
-//		// double expect = newInstance().getHeterogeneityBound();
-//		// double actual = similarity(newInstance(), A, B);
-//		//
-//		// Assert.assertEquals(expect, actual, EPSILON);
-//	}
 
-	// /**
-	// * Independence should correspond roughly to to IID random vectors.
-	// *
-	// * @throws IllegalAccessException
-	// * @throws InstantiationException
-	// */
-	// @Test
-	// public void testIndependence() throws InstantiationException,
-	// IllegalAccessException {
-	// System.out.println("testIndependence");
-	// int size = 1000;
-	// Random RANDOM = newRandom();
-	// List<SparseDoubleVector> vecs = randomVectors(RANDOM, size);
-	// SparseDoubleVector A = vecs.get(0);
-	// SparseDoubleVector B = vecs.get(1);
-	//
-	// Measure instance = newConfiguredInstanceFor(vecs);
-	//
-	// double expect = instance.getIndependenceBound();
-	// double actual = similarity(instance, A, B);
-	// Assert.assertEquals(expect, actual, 0.1);
-	// }
-
-	static List<SparseDoubleVector> randomVectors(Random RANDOM, int size,
-			int count) {
-		List<SparseDoubleVector> vecs = new ArrayList<SparseDoubleVector>();
+	private static List<SparseDoubleVector> randomVectors(Random RANDOM, int size,
+                                                          int count) {
+		List<SparseDoubleVector> vectors = new ArrayList<SparseDoubleVector>();
 		for (int i = 0; i < count; i++) {
-			vecs.add(randomVector(RANDOM, size));
+			vectors.add(randomVector(RANDOM, size));
 		}
-		return vecs;
+		return vectors;
 	}
 
 	static boolean isFeatureMarginalsRequire(Measure measure) {
@@ -481,29 +428,25 @@ public abstract class AbstractMeasureTest<T extends Measure> extends AbstractObj
 						.isInstance(FeatureMarginalsCarrier.class));
 	}
 
-	static void setMarginals(Measure measure) {
-
-	}
-
 	@Test
 	public void testFruitData() throws IOException {
 		System.out.println("testFruitData");
 		int limit = 5;
 
-		List<SparseDoubleVector> vecs = TestConstants.loadFruitVectors();
+		List<SparseDoubleVector> vectors = TestConstants.loadFruitVectors();
 
-		limit = Math.min(limit, vecs.size());
+		limit = Math.min(limit, vectors.size());
 
 		Measure instance = newInstance();
 		if (instance instanceof FeatureMarginalsCarrier)
 			((FeatureMarginalsCarrier) instance)
-					.setFeatureMarginals(featureMarginals(vecs));
+					.setFeatureMarginals(featureMarginals(vectors));
 
 		final double[][] results = new double[limit][limit];
 		for (int i = 0; i < limit; i++) {
 			for (int j = 0; j < limit; j++) {
-				SparseDoubleVector A = vecs.get(i);
-				SparseDoubleVector B = vecs.get(j);
+				SparseDoubleVector A = vectors.get(i);
+				SparseDoubleVector B = vectors.get(j);
 				results[i][j] = similarity(instance, A, B);
 			}
 		}
@@ -523,12 +466,12 @@ public abstract class AbstractMeasureTest<T extends Measure> extends AbstractObj
 		System.out.println("testFruitIdentity");
 		int limit = 5;
 
-		List<SparseDoubleVector> vecs = TestConstants.loadFruitVectors();
+		List<SparseDoubleVector> vectors = TestConstants.loadFruitVectors();
 
-		limit = Math.min(limit, vecs.size());
+		limit = Math.min(limit, vectors.size());
 
 		T instance = newInstance();
-		for (SparseDoubleVector vec : vecs) {
+		for (SparseDoubleVector vec : vectors) {
 			final double result = similarity(instance, vec, vec);
 			Assert.assertEquals(newInstance().getHomogeneityBound(), result,
 					EPSILON);
@@ -633,7 +576,7 @@ public abstract class AbstractMeasureTest<T extends Measure> extends AbstractObj
 		return val;
 	}
 
-	static SparseDoubleVector randomVector(Random rand, int card) {
+	private static SparseDoubleVector randomVector(Random rand, int card) {
 		final SparseDoubleVector vector = new SparseDoubleVector(card, card);
 		for (int i = 0; i < card; i++) {
 			if (rand.nextDouble() > 0.75)
@@ -644,7 +587,7 @@ public abstract class AbstractMeasureTest<T extends Measure> extends AbstractObj
 
 
 
-	static SparseDoubleVector ones(int cardinality, int size) {
+	private static SparseDoubleVector ones(int cardinality, int size) {
 		SparseDoubleVector vec = new SparseDoubleVector(cardinality, size);
 		for (int i = 0; i < size; i++)
 			vec.set(i, 1);
@@ -655,15 +598,15 @@ public abstract class AbstractMeasureTest<T extends Measure> extends AbstractObj
 		return new SparseDoubleVector(cardinality, 0);
 	}
 
-	static MarginalDistribution featureMarginals(SparseDoubleVector... vecs) {
-		return featureMarginals(Arrays.asList(vecs));
+	static MarginalDistribution featureMarginals(SparseDoubleVector... vectors) {
+		return featureMarginals(Arrays.asList(vectors));
 	}
 
-	static MarginalDistribution featureMarginals(List<SparseDoubleVector> vecs) {
-		double[] marginals = new double[vecs.get(0).cardinality];
+	private static MarginalDistribution featureMarginals(List<SparseDoubleVector> vectors) {
+		double[] marginals = new double[vectors.get(0).cardinality];
 		int nonZeroCardinality = 0;
 		double total = 0;
-		for (SparseDoubleVector vec : vecs) {
+		for (SparseDoubleVector vec : vectors) {
 			for (int i = 0; i < vec.keys.length; i++) {
 				if (marginals[vec.keys[i]] == 0)
 					++nonZeroCardinality;

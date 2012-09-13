@@ -90,7 +90,7 @@ import java.util.NoSuchElementException;
  * <h4>ToDo</h4> <ul> <li>Implement configurable lexeme types. Each type should
  * be defined by a name and a character matcher. The character matcher is a
  * function that takes a character as it's argument and returns whether or
- * lamnda not that character is in some set. The class can provide default
+ * lambda not that character is in some set. The class can provide default
  * implementations of common character matchers, such as for whitespace, but the
  * user can define them as required.</li>
  * <p/>
@@ -207,7 +207,7 @@ public final class Lexer implements Seekable<Tell>, Closeable {
      * @param channel The channel to read from
      * @throws NullPointerException if buffer or charset are null
      */
-    public Lexer(CharFileChannel channel) throws NullPointerException {
+    private Lexer(CharFileChannel channel) throws NullPointerException {
         this.channel = channel;
 
         if (LOG.isTraceEnabled()) {
@@ -222,7 +222,7 @@ public final class Lexer implements Seekable<Tell>, Closeable {
         channelRestartOffset = 0;
     }
 
-    public Lexer(File file, Charset charset) throws FileNotFoundException, NullPointerException, IOException {
+    public Lexer(File file, Charset charset) throws NullPointerException, IOException {
         this(new CharFileChannel(new FileInputStream(file).getChannel(),
                 Files.DEFAULT_CHARSET));
     }
@@ -259,8 +259,8 @@ public final class Lexer implements Seekable<Tell>, Closeable {
      * @throws ClosedChannelException
      * @throws IOException
      */
-    public final boolean hasNext() throws CharacterCodingException,
-            ClosedChannelException, IOException {
+    public final boolean hasNext() throws
+            IOException {
         return cbuf.hasRemaining() || channel.hasBytesRemaining();
     }
 
@@ -271,21 +271,21 @@ public final class Lexer implements Seekable<Tell>, Closeable {
      * @throws ClosedChannelException
      * @throws IOException
      */
-    public final void advance() throws CharacterCodingException,
-            ClosedChannelException, IOException {
+    public final void advance() throws
+            IOException {
         if (!hasNext())
             throw new NoSuchElementException("iteration has no more elements.");
         advance0();
     }
 
-    public final void advanceIfPossible() throws CharacterCodingException,
-            ClosedChannelException, IOException {
+    public final void advanceIfPossible() throws
+            IOException {
         if (hasNext())
             advance0();
     }
 
-    private void advance0() throws CharacterCodingException,
-            ClosedChannelException, IOException {
+    private void advance0() throws
+            IOException {
         pos.channelOffset = channelRestartOffset;
         pos.bufferOffset = cbuf.position() - charBufferRestartOffset;
 
@@ -403,7 +403,7 @@ public final class Lexer implements Seekable<Tell>, Closeable {
      * @param builder StringBuilder to write the lexeme characters to
      * @throws IllegalStateException when any consistency check fails
      */
-    public final void value(final StringBuilder builder) throws IllegalStateException {
+    final void value(final StringBuilder builder) throws IllegalStateException {
         for (int i = start; i < end; i++) {
             builder.append(cbuf.get(i));
         }
@@ -457,7 +457,7 @@ public final class Lexer implements Seekable<Tell>, Closeable {
      * @param required
      * @throws CharacterCodingException
      */
-    private void insureRemaining(final int required) throws CharacterCodingException, ClosedChannelException, IOException {
+    private void insureRemaining(final int required) throws IOException {
         if (required <= cbuf.remaining()
                 || !channel.hasBytesRemaining())
             return;
@@ -470,7 +470,7 @@ public final class Lexer implements Seekable<Tell>, Closeable {
 
         cbuf.position(start);
         if (available < required) {
-            // The buffer must grow to accomodate the token and extra data. Copy
+            // The buffer must grow to accommodate the token and extra data. Copy
             // the contents of the current buffer from the start of the current
             // lexeme to a new buffer.
             final int newCapacity = Math.max(cbuf.capacity() * 2 + 1,
@@ -495,7 +495,7 @@ public final class Lexer implements Seekable<Tell>, Closeable {
         channel.read(cbuf);
 
         // Whatever the decode result, put the buffer in a defined state so
-        // recovery can be attempted - then throw the exception if one occured
+        // recovery can be attempted - then throw the exception if one occurred
         cbuf.flip();
         end = (end - start);
         cbufOffset += start;
@@ -543,7 +543,7 @@ public final class Lexer implements Seekable<Tell>, Closeable {
      */
     @Override
     public void position(final Tell offset)
-            throws IOException, CharacterCodingException {
+            throws IOException {
         this.pos = offset.value(Position.class).clone();
 
         channel.position(pos.channelOffset);

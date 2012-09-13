@@ -51,7 +51,7 @@ import java.io.File;
 public final class FileMoveCommand extends AbstractCommand {
 
     @ParametersDelegate
-    protected final FilePipeDelegate filesDelegate = new FilePipeDelegate();
+    private final FilePipeDelegate filesDelegate = new FilePipeDelegate();
 
     public FileMoveCommand(File sourceFile, File destinationFile) {
         filesDelegate.setSourceFile(sourceFile);
@@ -87,10 +87,14 @@ public final class FileMoveCommand extends AbstractCommand {
 
         task.run();
 
-        while (task.isExceptionTrapped())
-            throw new RuntimeException(task.getTrappedException());
-
-        return true;
+        try {
+            if (task.isExceptionTrapped())
+                task.throwTrappedException();
+            return true;
+        } catch (Exception e) {
+            System.err.print(e);
+            return false;
+        }
     }
 
     @Override

@@ -61,14 +61,14 @@ public final class MemoryBasedStringEnumerator extends BiMapEnumerator<String> {
         this.file = null;
     }
 
-    public MemoryBasedStringEnumerator(
+    private MemoryBasedStringEnumerator(
             @Nullable File file, BiMap<Integer, String> map,
             AtomicInteger nextId) {
         super(map, nextId);
         this.file = file;
     }
 
-    public File getFile() {
+    public @Nullable File getFile() {
         return file;
     }
 
@@ -81,10 +81,9 @@ public final class MemoryBasedStringEnumerator extends BiMapEnumerator<String> {
     }
 
     public static MemoryBasedStringEnumerator newInstance(File file) {
-        ForwardingBiMap<Integer, String> map = ForwardingBiMap.
-                <Integer, String>create(
-                        new HashMap<Integer, String>(),
-                        new HashMap<String, Integer>());
+        ForwardingBiMap<Integer, String> map = ForwardingBiMap.create(
+                new HashMap<Integer, String>(),
+                new HashMap<String, Integer>());
 
         MemoryBasedStringEnumerator instance = new MemoryBasedStringEnumerator(
                 file, map, new AtomicInteger(0));
@@ -127,11 +126,8 @@ public final class MemoryBasedStringEnumerator extends BiMapEnumerator<String> {
         out.close();
     }
 
-    public boolean equals(MemoryBasedStringEnumerator other) {
-        if (this.file != other.file && (this.file == null || !this.file.
-                equals(other.file)))
-            return false;
-        return super.equals(other);
+    boolean equals(MemoryBasedStringEnumerator other) {
+        return !(this.file != other.file && (this.file == null || !this.file.equals(other.file))) && super.equals(other);
     }
 
     @Override
@@ -145,10 +141,6 @@ public final class MemoryBasedStringEnumerator extends BiMapEnumerator<String> {
     public boolean equals(Object obj) {
         if (obj == this)
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        return this.equals((MemoryBasedStringEnumerator) obj);
+        return obj != null && getClass() == obj.getClass() && this.equals((MemoryBasedStringEnumerator) obj);
     }
 }

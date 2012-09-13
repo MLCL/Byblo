@@ -164,7 +164,7 @@
     </dependencies>
 
     <build>
-        <scriptSourceDirectory>${project.basedir}/src/main/scripts</scriptSourceDirectory>
+        <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
 
         <resources>
             <resource>

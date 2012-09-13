@@ -80,7 +80,7 @@ public final class ObjectMergeTask<T> extends AbstractTask implements ProgressRe
         setComparator(Comparators.<T>naturalOrderIfPossible());
     }
 
-    public final Comparator<T> getComparator() {
+    final Comparator<T> getComparator() {
         return comparator;
     }
 
@@ -116,7 +116,7 @@ public final class ObjectMergeTask<T> extends AbstractTask implements ProgressRe
         this.sourceB = sourceB;
     }
 
-    public boolean equals(ObjectMergeTask<?> other) {
+    boolean equals(ObjectMergeTask<?> other) {
         if (!super.equals(other))
             return false;
         if (this.getSourceA() != other.getSourceA()
@@ -127,22 +127,12 @@ public final class ObjectMergeTask<T> extends AbstractTask implements ProgressRe
                 && (this.getSourceB() == null || !this.getSourceB().
                 equals(other.getSourceB())))
             return false;
-        if (this.getSink() != other.getSink() && (this.getSink() == null || !this.
-                getSink().equals(
-                other.getSink())))
-            return false;
-        if (this.getComparator() != other.getComparator()
-                && (this.getComparator() == null || !this.getComparator().
-                equals(other.getComparator())))
-            return false;
-        return true;
+        return !(this.getSink() != other.getSink() && (this.getSink() == null || !this.getSink().equals(other.getSink()))) && !(this.getComparator() != other.getComparator() && (this.getComparator() == null || !this.getComparator().equals(other.getComparator())));
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
-            return false;
-        return getClass() == obj.getClass() && equals((ObjectMergeTask<?>) obj);
+        return obj != null && getClass() == obj.getClass() && equals((ObjectMergeTask<?>) obj);
     }
 
     @Override
@@ -225,10 +215,6 @@ public final class ObjectMergeTask<T> extends AbstractTask implements ProgressRe
 
         if (sink instanceof Flushable)
             ((Flushable) sink).flush();
-    }
-
-    @Override
-    protected void finaliseTask() throws Exception {
     }
 
     @Override

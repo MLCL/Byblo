@@ -78,8 +78,7 @@ public class TokenPairSink implements ObjectSink<TokenPair>, Closeable, Flushabl
 
     private final DataSink inner;
 
-    public TokenPairSink(DataSink inner)
-            throws FileNotFoundException, IOException {
+    private TokenPairSink(DataSink inner) {
         this.inner = inner;
     }
 

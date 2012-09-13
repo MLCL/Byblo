@@ -214,19 +214,19 @@ public class CountCommand extends AbstractCommand {
         this.charset = charset;
     }
 
-    private Comparator<Weighted<Token>> getEntryOrder() throws IOException {
+    private Comparator<Weighted<Token>> getEntryOrder()  {
         return indexDelegate.isEnumeratedEntries()
                 ? Weighted.recordOrder(Token.indexOrder())
                 : Weighted.recordOrder(Token.stringOrder(indexDelegate.getEntriesEnumeratorCarrier()));
     }
 
-    private Comparator<Weighted<Token>> getFeatureOrder() throws IOException {
+    private Comparator<Weighted<Token>> getFeatureOrder()  {
         return indexDelegate.isEnumeratedFeatures()
                 ? Weighted.recordOrder(Token.indexOrder())
                 : Weighted.recordOrder(Token.stringOrder(indexDelegate.getFeaturesEnumeratorCarrier()));
     }
 
-    private Comparator<Weighted<TokenPair>> getEventOrder() throws IOException {
+    private Comparator<Weighted<TokenPair>> getEventOrder()  {
         return (indexDelegate.isEnumeratedEntries() && indexDelegate.isEnumeratedFeatures())
                 ? Weighted.recordOrder(TokenPair.indexOrder())
                 : Weighted.recordOrder(TokenPair.stringOrder(

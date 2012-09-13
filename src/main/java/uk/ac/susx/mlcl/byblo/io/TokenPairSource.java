@@ -55,8 +55,7 @@ public class TokenPairSource
 
     private final SeekableDataSource inner;
 
-    public TokenPairSource(SeekableDataSource inner)
-            throws FileNotFoundException, IOException {
+    private TokenPairSource(SeekableDataSource inner) {
         this.inner = inner;
     }
 

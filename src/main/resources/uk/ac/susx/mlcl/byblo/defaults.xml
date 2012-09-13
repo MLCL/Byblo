@@ -34,7 +34,7 @@
 <configuration xmlns="http://byblo.org"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                xsi:schemaLocation="http://byblo.org defaults.xsd">
-    
+
     <measure>lin</measure>
     <charset>UTF-8</charset>
     <locale>en-GB</locale>
@@ -49,21 +49,21 @@
             </skipIndex>
             <compact>true</compact>
         </fileFormat>
-        
+
         <fileFormat>
             <name>entries</name>
             <skipIndex>
                 <column>true</column>
             </skipIndex>
-        </fileFormat>   
-        
+        </fileFormat>
+
         <fileFormat>
             <name>features</name>
             <skipIndex>
                 <column>true</column>
             </skipIndex>
-        </fileFormat>   
-        
+        </fileFormat>
+
         <fileFormat>
             <name>events</name>
             <skipIndex>
@@ -71,8 +71,8 @@
                 <column>true</column>
             </skipIndex>
             <compact>true</compact>
-        </fileFormat>        
-        
+        </fileFormat>
+
         <fileFormat>
             <name>sims</name>
             <skipIndex>
@@ -80,8 +80,8 @@
                 <column>false</column>
             </skipIndex>
             <compact>true</compact>
-        </fileFormat>        
-        
+        </fileFormat>
+
         <fileFormat>
             <name>neighbours</name>
             <skipIndex>
@@ -90,7 +90,7 @@
             </skipIndex>
             <compact>true</compact>
         </fileFormat>
-        
+
     </fileFormats>
 
 
@@ -117,7 +117,7 @@
             </aliases>
             <class>uk.ac.susx.mlcl.byblo.measures.impl.Cosine</class>
         </measure>
-        
+
         <measure>
             <name>dice</name>
             <description>Dice's Co-efficient</description>
@@ -126,11 +126,11 @@
             </aliases>
             <class>uk.ac.susx.mlcl.byblo.measures.impl.Dice</class>
         </measure>
-    
+
         <measure>
             <name>dotproduct</name>
-            <description>Inner-Product: Proximity measure calculating 
-                similarity as the dot product of the vectors. For unit vectors 
+            <description>Inner-Product: Proximity measure calculating
+                similarity as the dot product of the vectors. For unit vectors
                 this is equivalent to Cosine.
             </description>
             <aliases>
@@ -140,7 +140,7 @@
             </aliases>
             <class>uk.ac.susx.mlcl.byblo.measures.impl.DotProduct</class>
         </measure>
-        
+
         <measure>
             <name>hindle</name>
             <description>Hindle</description>
@@ -149,8 +149,8 @@
             </aliases>
             <class>uk.ac.susx.mlcl.byblo.measures.impl.Hindle</class>
         </measure>
-        
-        
+
+
         <measure>
             <name>jaccard</name>
             <description>Jaccard Index</description>
@@ -161,7 +161,7 @@
             </aliases>
             <class>uk.ac.susx.mlcl.byblo.measures.impl.Jaccard</class>
         </measure>
-        
+
         <measure>
             <name>js</name>
             <description>Jensen-Shannon Divergence</description>
@@ -174,7 +174,7 @@
             </aliases>
             <class>uk.ac.susx.mlcl.byblo.measures.impl.JensenShannonDivergence</class>
         </measure>
-        
+
         <measure>
             <name>kendaltau</name>
             <description>Kendall's Tau Rank Correlation Coefficient</description>
@@ -186,7 +186,7 @@
             </aliases>
             <class>uk.ac.susx.mlcl.byblo.measures.impl.KendallsTau</class>
         </measure>
-        
+
         <measure>
             <name>kl</name>
             <description>Kullback–Leibler Divergence</description>
@@ -199,8 +199,8 @@
             </aliases>
             <class>uk.ac.susx.mlcl.byblo.measures.impl.KullbackLeiblerDivergence</class>
         </measure>
-        
-        
+
+
         <measure>
             <name>lambda</name>
             <description>Lambda Divergence</description>
@@ -219,8 +219,8 @@
                 </parameter>
             </parameters>
         </measure>
-      
-        
+
+
         <measure>
             <name>lin</name>
             <description>Lin</description>
@@ -229,9 +229,9 @@
                 <alias>lin98</alias>
             </aliases>
             <class>uk.ac.susx.mlcl.byblo.measures.impl.Lin</class>
-            
+
         </measure>
-        
+
         <measure>
             <name>lee</name>
             <description>Lee Alpha-Skew Divergence</description>
@@ -245,14 +245,13 @@
             <parameters>
                 <parameter>
                     <name>alpha</name>
-                    <description></description>
                     <type>double</type>
                     <defaultValue>0.99</defaultValue>
                     <required>false</required>
                 </parameter>
             </parameters>
         </measure>
-          
+
         <measure>
             <name>lp</name>
             <description>Lp-Space Distance</description>
@@ -269,9 +268,9 @@
                     <defaultValue>2</defaultValue>
                     <required>false</required>
                 </parameter>
-            </parameters>            
+            </parameters>
         </measure>
-         
+
         <measure>
             <name>overlap</name>
             <description>Overlap</description>
@@ -279,8 +278,8 @@
                 <alias>overlap</alias>
             </aliases>
             <class>uk.ac.susx.mlcl.byblo.measures.impl.Overlap</class>
-        </measure>  
-         
+        </measure>
+
         <measure>
             <name>precision</name>
             <description>Precision</description>
@@ -291,8 +290,8 @@
                 <alias>p</alias>
             </aliases>
             <class>uk.ac.susx.mlcl.byblo.measures.impl.Precision</class>
-        </measure>  
-         
+        </measure>
+
         <measure>
             <name>recall</name>
             <description>Recall</description>
@@ -303,9 +302,9 @@
                 <alias>r</alias>
             </aliases>
             <class>uk.ac.susx.mlcl.byblo.measures.impl.Recall</class>
-        </measure>  
-        
-         
+        </measure>
+
+
         <measure>
             <name>weeds</name>
             <description>Weed's Mutual Information Measure</description>
@@ -319,27 +318,25 @@
             <parameters>
                 <parameter>
                     <name>beta</name>
-                    <description></description>
                     <type>double</type>
                     <defaultValue>0.5</defaultValue>
                     <required>false</required>
                 </parameter>
                 <parameter>
                     <name>gamma</name>
-                    <description></description>
                     <type>double</type>
                     <defaultValue>0.5</defaultValue>
                     <required>false</required>
                 </parameter>
-            </parameters>            
-            
-        </measure>  
-        
+            </parameters>
+
+        </measure>
+
     </measures>
 
 
     <weightings>
-        <weighting>            
+        <weighting>
             <name>chi2</name>
             <description>Chi Squared</description>
             <class>uk.ac.susx.mlcl.byblo.weightings.impl.ChiSquared</class>
@@ -348,7 +345,7 @@
             </aliases>
         </weighting>
 
-        <weighting>            
+        <weighting>
             <name>constant</name>
             <description>Constant</description>
             <class>uk.ac.susx.mlcl.byblo.weightings.impl.Constant</class>
@@ -358,134 +355,130 @@
             <parameters>
                 <parameter>
                     <name>constant</name>
-                    <description></description>
                     <type>double</type>
                     <defaultValue>1</defaultValue>
                     <required>false</required>
                 </parameter>
             </parameters>
         </weighting>
-        
-        <weighting>            
+
+        <weighting>
             <name>dice</name>
             <description>Dice</description>
             <class>uk.ac.susx.mlcl.byblo.weightings.impl.DiceWeighting</class>
         </weighting>
-        
-        <weighting>            
+
+        <weighting>
             <name>unit</name>
             <description>Unit Vector</description>
             <class>uk.ac.susx.mlcl.byblo.weightings.impl.L2UnitVector</class>
         </weighting>
-        
-        
-        <weighting>            
+
+
+        <weighting>
             <name>llr</name>
             <description>Log-Likelihood-Ratio</description>
             <class>uk.ac.susx.mlcl.byblo.weightings.impl.LLR</class>
         </weighting>
-           
-        
-        <weighting>            
+
+
+        <weighting>
             <name>likelihood</name>
             <description>Likelihood</description>
             <class>uk.ac.susx.mlcl.byblo.weightings.impl.Likelihood</class>
-        </weighting>           
-        
-        <weighting>            
+        </weighting>
+
+        <weighting>
             <name>logprod</name>
             <description>Log-Product</description>
             <class>uk.ac.susx.mlcl.byblo.weightings.impl.LogProduct</class>
         </weighting>
-        
-        <weighting>            
+
+        <weighting>
             <name>pmi</name>
             <description>Pointwise-Mutual-Information</description>
             <class>uk.ac.susx.mlcl.byblo.weightings.impl.PMI</class>
         </weighting>
-        
-        <weighting>            
+
+        <weighting>
             <name>npmi</name>
             <description>Normalised Pointwise-Mutual-Information</description>
             <class>uk.ac.susx.mlcl.byblo.weightings.impl.NormalisedPMI</class>
         </weighting>
-        
-        
-        <weighting>            
+
+
+        <weighting>
             <name>wpmi</name>
             <description>Weighted Pointwise-Mutual-Information</description>
             <class>uk.ac.susx.mlcl.byblo.weightings.impl.WeightedPMI</class>
         </weighting>
-              
-        
-        <weighting>            
+
+
+        <weighting>
             <name>ppmi</name>
             <description>Positive Pointwise-Mutual-Information</description>
             <class>uk.ac.susx.mlcl.byblo.weightings.impl.PositivePMI</class>
         </weighting>
-                   
-        
-        <weighting>            
+
+
+        <weighting>
             <name>power</name>
             <description>Power</description>
             <class>uk.ac.susx.mlcl.byblo.weightings.impl.Power</class>
             <parameters>
                 <parameter>
                     <name>power</name>
-                    <description></description>
                     <type>double</type>
                     <defaultValue>2</defaultValue>
                     <required>false</required>
                 </parameter>
             </parameters>
         </weighting>
-            
-        <weighting>            
+
+        <weighting>
             <name>step</name>
             <description>Step</description>
             <class>uk.ac.susx.mlcl.byblo.weightings.impl.Step</class>
             <parameters>
                 <parameter>
                     <name>boundary</name>
-                    <description></description>
                     <type>double</type>
                     <defaultValue>0</defaultValue>
                     <required>false</required>
                 </parameter>
-            </parameters>        
+            </parameters>
         </weighting>
-           
-        
-        <weighting>            
+
+
+        <weighting>
             <name>ttest</name>
             <description>T-Test</description>
             <class>uk.ac.susx.mlcl.byblo.weightings.impl.TTest</class>
         </weighting>
-                   
-               
-        <weighting>            
+
+
+        <weighting>
             <name>geomean</name>
             <description>Geometric Mean</description>
             <class>uk.ac.susx.mlcl.byblo.weightings.impl.GeoMean</class>
         </weighting>
-                      
-               
-        <weighting>            
+
+
+        <weighting>
             <name>rank</name>
             <description>Rank</description>
             <class>uk.ac.susx.mlcl.byblo.weightings.impl.Rank</class>
         </weighting>
-                       
-        <weighting>            
+
+        <weighting>
             <name>sqpmi</name>
             <description>Squared Pointwise Mutual Information</description>
             <class>uk.ac.susx.mlcl.byblo.weightings.impl.SquaredPMI</class>
         </weighting>
-                   
-              
-    </weightings>
-    
 
-    
+
+    </weightings>
+
+
 </configuration>
 

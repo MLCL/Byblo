@@ -78,8 +78,8 @@ public class IntBitSetTest extends AbstractIntSortedSetTest<IntBitSet> {
                 / (8 * 1024 * 1024);
         final double actualSizeMB = (double) mu.getInstanceSizeBytes()
                 / (1024 * 1024);
-        final double allowedeErrorMB = 1.0 / 1024;// Allow +/- 1KiB
-        Assert.assertEquals(expectedSizeMB, actualSizeMB, allowedeErrorMB);
+        final double allowedErrorMB = 1.0 / 1024;// Allow +/- 1KiB
+        Assert.assertEquals(expectedSizeMB, actualSizeMB, allowedErrorMB);
 
     }
 

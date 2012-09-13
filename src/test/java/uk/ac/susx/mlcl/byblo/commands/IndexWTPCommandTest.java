@@ -30,8 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import uk.ac.susx.mlcl.TestConstants;
@@ -67,116 +65,104 @@ public class IndexWTPCommandTest extends
         return IndexingCommands.IndexEvents.class;
     }
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     @Test
-    public void testRunOnFruitAPI_noskip_compact() throws Exception {
-        testRunOnFruitAPI("compact-noskip-", EnumeratorType.Memory, false,
+    public void testRunOnFruitAPI_noSkip_compact() throws Exception {
+        testRunOnFruitAPI("compact-noSkip-", EnumeratorType.Memory, false,
                 false, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipboth_compact() throws Exception {
-        testRunOnFruitAPI("compact-skipboth-", EnumeratorType.Memory, true,
+    public void testRunOnFruitAPI_skipBoth_compact() throws Exception {
+        testRunOnFruitAPI("compact-skipBoth-", EnumeratorType.Memory, true,
                 true, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipleft_compact() throws Exception {
-        testRunOnFruitAPI("compact-skipleft-", EnumeratorType.Memory, true,
+    public void testRunOnFruitAPI_skipLeft_compact() throws Exception {
+        testRunOnFruitAPI("compact-skipLeft-", EnumeratorType.Memory, true,
                 false, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipright_compact() throws Exception {
-        testRunOnFruitAPI("compact-skipright-", EnumeratorType.Memory, false,
+    public void testRunOnFruitAPI_skipRight_compact() throws Exception {
+        testRunOnFruitAPI("compact-skipRight-", EnumeratorType.Memory, false,
                 true, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_noskip_verbose() throws Exception {
-        testRunOnFruitAPI("verbose-noskip-", EnumeratorType.Memory, false,
+    public void testRunOnFruitAPI_noSkip_verbose() throws Exception {
+        testRunOnFruitAPI("verbose-noSkip-", EnumeratorType.Memory, false,
                 false, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipboth_verbose() throws Exception {
-        testRunOnFruitAPI("verbose-skipboth-", EnumeratorType.Memory, true,
+    public void testRunOnFruitAPI_skipBoth_verbose() throws Exception {
+        testRunOnFruitAPI("verbose-skipBoth-", EnumeratorType.Memory, true,
                 true, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipleft_verbose() throws Exception {
-        testRunOnFruitAPI("verbose-skipleft-", EnumeratorType.Memory, true,
+    public void testRunOnFruitAPI_skipLeft_verbose() throws Exception {
+        testRunOnFruitAPI("verbose-skipLeft-", EnumeratorType.Memory, true,
                 false, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipright_verbose() throws Exception {
-        testRunOnFruitAPI("verbose-skipright-", EnumeratorType.Memory, false,
+    public void testRunOnFruitAPI_skipRight_verbose() throws Exception {
+        testRunOnFruitAPI("verbose-skipRight-", EnumeratorType.Memory, false,
                 true, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_noskip_compact_jdbc() throws Exception {
-        testRunOnFruitAPI("compact-noskip-jdbc-", EnumeratorType.JDBM, false,
+    public void testRunOnFruitAPI_noSkip_compact_jdbm() throws Exception {
+        testRunOnFruitAPI("compact-noSkip-jdbm-", EnumeratorType.JDBM, false,
                 false, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipboth_compact_jdbc() throws Exception {
-        testRunOnFruitAPI("compact-skipboth-jdbc-", EnumeratorType.JDBM, true,
+    public void testRunOnFruitAPI_skipBoth_compact_jdbm() throws Exception {
+        testRunOnFruitAPI("compact-skipBoth-jdbm-", EnumeratorType.JDBM, true,
                 true, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipleft_compact_jdbc() throws Exception {
-        testRunOnFruitAPI("compact-skipleft-jdbc-", EnumeratorType.JDBM, true,
+    public void testRunOnFruitAPI_skipLeft_compact_jdbm() throws Exception {
+        testRunOnFruitAPI("compact-skipLeft-jdbm-", EnumeratorType.JDBM, true,
                 false, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipright_compact_jdbc() throws Exception {
-        testRunOnFruitAPI("compact-skipright-jdbc-", EnumeratorType.JDBM,
+    public void testRunOnFruitAPI_skipRight_compact_jdbm() throws Exception {
+        testRunOnFruitAPI("compact-skipRight-jdbm-", EnumeratorType.JDBM,
                 false, true, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_noskip_verbose_jdbc() throws Exception {
-        testRunOnFruitAPI("verbose-noskip-jdbc-", EnumeratorType.JDBM, false,
+    public void testRunOnFruitAPI_noSkip_verbose_jdbm() throws Exception {
+        testRunOnFruitAPI("verbose-noSkip-jdbm-", EnumeratorType.JDBM, false,
                 false, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipboth_verbose_jdbc() throws Exception {
-        testRunOnFruitAPI("verbose-skipboth-jdbc-", EnumeratorType.JDBM, true,
+    public void testRunOnFruitAPI_skipBoth_verbose_jdbm() throws Exception {
+        testRunOnFruitAPI("verbose-skipBoth-jdbm-", EnumeratorType.JDBM, true,
                 true, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipleft_verbose_jdbc() throws Exception {
-        testRunOnFruitAPI("verbose-skipleft-jdbc-", EnumeratorType.JDBM, true,
+    public void testRunOnFruitAPI_skipLeft_verbose_jdbm() throws Exception {
+        testRunOnFruitAPI("verbose-skipLeft-jdbm-", EnumeratorType.JDBM, true,
                 false, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipright_verbose_jdbc() throws Exception {
-        testRunOnFruitAPI("verbose-skipright-jdbc-", EnumeratorType.JDBM,
+    public void testRunOnFruitAPI_skipRight_verbose_jdbm() throws Exception {
+        testRunOnFruitAPI("verbose-skipRight-jdbm-", EnumeratorType.JDBM,
                 false, true, false);
     }
 
-    public void testRunOnFruitAPI(String prefix, EnumeratorType type,
-                                  boolean skip1, boolean skip2, boolean compact) throws Exception {
+    void testRunOnFruitAPI(String prefix, EnumeratorType type,
+                           boolean skip1, boolean skip2, boolean compact) throws Exception {
         System.out.println("Testing " + IndexWTPCommandTest.class.getName()
                 + " on " + TEST_FRUIT_EVENTS);
 
@@ -200,45 +186,41 @@ public class IndexWTPCommandTest extends
 
     @Test
     @Ignore
-    public void testCompareSkipVsNoSkip() throws Exception {
+    public void testCompareSkipVsnoSkip() throws Exception {
         System.out.println("Testing " + IndexWTPCommandTest.class.getName()
                 + " on " + TEST_FRUIT_EVENTS);
 
         final String name = TEST_FRUIT_EVENTS.getName();
-        String prefixa = "wtp-noskip-";
-        String prefixb = "wtp-skip-";
+        String prefixA = "wtp-noSkip-";
+        String prefixB = "wtp-skip-";
 
-        final File outa = new File(TEST_OUTPUT_DIR, prefixa + name + ".indexed");
-        final File outb = new File(TEST_OUTPUT_DIR, prefixb + name + ".indexed");
+        final File outA = new File(TEST_OUTPUT_DIR, prefixA + name + ".indexed");
+        final File outB = new File(TEST_OUTPUT_DIR, prefixB + name + ".indexed");
 
-        final File idx1a = new File(TEST_OUTPUT_DIR, prefixa + name
-                + ".entry-index");
-        final File idx2a = new File(TEST_OUTPUT_DIR, prefixa + name
-                + ".feature-index");
-        final File idx1b = new File(TEST_OUTPUT_DIR, prefixb + name
-                + ".entry-index");
-        final File idx2b = new File(TEST_OUTPUT_DIR, prefixb + name
-                + ".feature-index");
+        final File idx1A = new File(TEST_OUTPUT_DIR, prefixA + name + ".entry-index");
+        final File idx2A = new File(TEST_OUTPUT_DIR, prefixA + name + ".feature-index");
+        final File idx1B = new File(TEST_OUTPUT_DIR, prefixB + name + ".entry-index");
+        final File idx2B = new File(TEST_OUTPUT_DIR, prefixB + name + ".feature-index");
 
         boolean skip1a = false;
         boolean skip2a = false;
         boolean skip1b = true;
         boolean skip2b = true;
 
-        deleteIfExist(outa, idx1a, idx2a, outb, idx1b, idx2b);
+        deleteIfExist(outA, idx1A, idx2A, outB, idx1B, idx2B);
 
-        indexWTP(TEST_FRUIT_EVENTS, outa, idx1a, idx2a, EnumeratorType.Memory,
+        indexWTP(TEST_FRUIT_EVENTS, outA, idx1A, idx2A, EnumeratorType.Memory,
                 skip1a, skip2a, true);
-        indexWTP(TEST_FRUIT_EVENTS, outb, idx1b, idx2b, EnumeratorType.Memory,
+        indexWTP(TEST_FRUIT_EVENTS, outB, idx1B, idx2B, EnumeratorType.Memory,
                 skip1b, skip2b, true);
 
         // Read back the data checking it's identical
         {
-            WeightedTokenPairSource wtpsa = WeightedTokenPairSource.open(outa,
+            WeightedTokenPairSource tokenSourceA = WeightedTokenPairSource.open(outA,
                     DEFAULT_CHARSET, new DoubleEnumeratingDelegate(
                     Enumerating.DEFAULT_TYPE, true, true, null, null),
                     skip1a, skip2a);
-            WeightedTokenPairSource wtpsb = WeightedTokenPairSource.open(outb,
+            WeightedTokenPairSource tokenSourceB = WeightedTokenPairSource.open(outB,
                     DEFAULT_CHARSET, new DoubleEnumeratingDelegate(
                     Enumerating.DEFAULT_TYPE, true, true, null, null),
                     skip1b, skip2b);
@@ -248,26 +230,26 @@ public class IndexWTPCommandTest extends
             List<Weighted<TokenPair>> vb = new ArrayList<Weighted<TokenPair>>();
 
             // sequential
-            while (wtpsa.hasNext() && wtpsb.hasNext()) {
-                pa.add(wtpsa.position());
-                pb.add(wtpsb.position());
-                Weighted<TokenPair> a = wtpsa.read();
-                Weighted<TokenPair> b = wtpsb.read();
+            while (tokenSourceA.hasNext() && tokenSourceB.hasNext()) {
+                pa.add(tokenSourceA.position());
+                pb.add(tokenSourceB.position());
+                Weighted<TokenPair> a = tokenSourceA.read();
+                Weighted<TokenPair> b = tokenSourceB.read();
                 va.add(a);
                 vb.add(b);
                 assertEquals(a, b);
             }
-            assertTrue(!wtpsa.hasNext());
-            assertTrue(!wtpsb.hasNext());
+            assertTrue(!tokenSourceA.hasNext());
+            assertTrue(!tokenSourceB.hasNext());
 
             // random
             Random rand = new Random(0);
             for (int i = 0; i < 1000; i++) {
                 int j = rand.nextInt(pa.size());
-                wtpsa.position(pa.get(j));
-                wtpsb.position(pb.get(j));
-                Weighted<TokenPair> a = wtpsa.read();
-                Weighted<TokenPair> b = wtpsb.read();
+                tokenSourceA.position(pa.get(j));
+                tokenSourceB.position(pb.get(j));
+                Weighted<TokenPair> a = tokenSourceA.read();
+                Weighted<TokenPair> b = tokenSourceB.read();
 
                 assertEquals(va.get(j), a);
                 assertEquals(vb.get(j), b);
@@ -277,14 +259,14 @@ public class IndexWTPCommandTest extends
 
         // Read back the data again, this time as vectors
         {
-            WeightedTokenPairVectorSource wtpsa = WeightedTokenPairSource.open(
-                    outa,
+            WeightedTokenPairVectorSource vectorSourceA = WeightedTokenPairSource.open(
+                    outA,
                     DEFAULT_CHARSET,
                     new DoubleEnumeratingDelegate(Enumerating.DEFAULT_TYPE,
                             true, true, null, null), skip1a, skip2a)
                     .getVectorSource();
-            WeightedTokenPairVectorSource wtpsb = WeightedTokenPairSource.open(
-                    outb,
+            WeightedTokenPairVectorSource vectorSourceB = WeightedTokenPairSource.open(
+                    outB,
                     DEFAULT_CHARSET,
                     new DoubleEnumeratingDelegate(Enumerating.DEFAULT_TYPE,
                             true, true, null, null), skip1b, skip2b)
@@ -296,27 +278,27 @@ public class IndexWTPCommandTest extends
             List<Indexed<SparseDoubleVector>> vb = new ArrayList<Indexed<SparseDoubleVector>>();
 
             // sequential
-            while (wtpsa.hasNext() && wtpsb.hasNext()) {
-                pa.add(wtpsa.position());
-                pb.add(wtpsb.position());
+            while (vectorSourceA.hasNext() && vectorSourceB.hasNext()) {
+                pa.add(vectorSourceA.position());
+                pb.add(vectorSourceB.position());
 
-                Indexed<SparseDoubleVector> a = wtpsa.read();
-                Indexed<SparseDoubleVector> b = wtpsb.read();
+                Indexed<SparseDoubleVector> a = vectorSourceA.read();
+                Indexed<SparseDoubleVector> b = vectorSourceB.read();
                 va.add(a);
                 vb.add(b);
                 assertEquals(a, b);
             }
-            assertTrue(!wtpsa.hasNext());
-            assertTrue(!wtpsb.hasNext());
+            assertTrue(!vectorSourceA.hasNext());
+            assertTrue(!vectorSourceB.hasNext());
 
             // random
             Random rand = new Random(0);
             for (int i = 0; i < 1000; i++) {
                 int j = rand.nextInt(pa.size());
-                wtpsa.position(pa.get(j));
-                wtpsb.position(pb.get(j));
-                Indexed<SparseDoubleVector> a = wtpsa.read();
-                Indexed<SparseDoubleVector> b = wtpsb.read();
+                vectorSourceA.position(pa.get(j));
+                vectorSourceB.position(pb.get(j));
+                Indexed<SparseDoubleVector> a = vectorSourceA.read();
+                Indexed<SparseDoubleVector> b = vectorSourceB.read();
 
                 assertEquals(va.get(j), a);
                 assertEquals(va.get(j).value(), a.value());
@@ -328,8 +310,8 @@ public class IndexWTPCommandTest extends
         }
     }
 
-    public static void indexWTP(File from, File to, File index1, File index2,
-                                EnumeratorType type, boolean skip1, boolean skip2, boolean compact)
+    private static void indexWTP(File from, File to, File index1, File index2,
+                                 EnumeratorType type, boolean skip1, boolean skip2, boolean compact)
             throws Exception {
         assertValidPlaintextInputFiles(from);
         assertValidOutputFiles(to);
@@ -354,8 +336,8 @@ public class IndexWTPCommandTest extends
         assertSizeGT(from, to);
     }
 
-    public static void unindexWTP(File from, File to, File index1, File index2,
-                                  EnumeratorType type, boolean skip1, boolean skip2, boolean compact)
+    private static void unindexWTP(File from, File to, File index1, File index2,
+                                   EnumeratorType type, boolean skip1, boolean skip2, boolean compact)
             throws Exception {
         assertValidPlaintextInputFiles(from);
 

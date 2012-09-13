@@ -105,7 +105,7 @@ public final class L2UnitVector
      * @return magnitude squared of vector
      */
     @Nonnegative
-    public static double lengthSquared(SparseDoubleVector vector) {
+    private static double lengthSquared(SparseDoubleVector vector) {
         double lengthSq = 0;
         for (int i = 0; i < vector.size; i++)
             lengthSq += vector.values[i] * vector.values[i];
@@ -114,11 +114,7 @@ public final class L2UnitVector
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        return true;
+        return obj == this || !(obj == null || getClass() != obj.getClass());
     }
 
     @Override

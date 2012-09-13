@@ -33,7 +33,7 @@ import org.apache.commons.configuration.ConversionException;
  */
 @ThreadSafe
 @CheckReturnValue
-public class LocaleConverter implements Converter {
+class LocaleConverter implements Converter {
 
     private static final boolean DEFAULT_VALIDATION_ENABLED = true;
 
@@ -41,11 +41,11 @@ public class LocaleConverter implements Converter {
 
     private Set<String> languages = null;
 
-    private Set<String> contries = null;
+    private Set<String> countries = null;
 
     private Set<Locale> availableLocales = null;
 
-    public LocaleConverter(boolean validationEnabled) {
+    private LocaleConverter(boolean validationEnabled) {
         this.validationEnabled = validationEnabled;
     }
 
@@ -120,9 +120,9 @@ public class LocaleConverter implements Converter {
             for (String language : Locale.getISOLanguages())
                 languages.add(language.toLowerCase(Locale.getDefault()));
 
-            contries = new HashSet<String>(Locale.getISOCountries().length);
+            countries = new HashSet<String>(Locale.getISOCountries().length);
             for (String country : Locale.getISOCountries())
-                contries.add(country.toLowerCase(Locale.getDefault()));
+                countries.add(country.toLowerCase(Locale.getDefault()));
 
             availableLocales = new HashSet<Locale>(
                     Locale.getAvailableLocales().length);
@@ -137,7 +137,7 @@ public class LocaleConverter implements Converter {
             throw new ConversionException(MessageFormat.format(
                     "Unknown language code \"{0}\" in locale \"{1}\"",
                     loc.getLanguage(), loc));
-        if (!contries
+        if (!countries
                 .contains(loc.getCountry().toLowerCase(Locale.getDefault())))
             throw new ConversionException(MessageFormat.format(
                     "Unknown country code \"{0}\" in locale \"{1}\"",

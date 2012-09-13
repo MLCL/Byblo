@@ -69,11 +69,11 @@ public class FileDeleteCommand extends AbstractCommand {
         if (file == null)
             throw new NullPointerException("file is null");
         if (!file.exists())
-            throw new RuntimeException(new FileNotFoundException("Unnable to delete file because it "
+            throw new RuntimeException(new FileNotFoundException("Unable to delete file because it "
                     + "doesn't exist: \"" + file + "\""));
 
         if (!file.delete())
-            throw new RuntimeException(new IOException("Unnable to delete file: \"" + file + "\""));
+            throw new RuntimeException(new IOException("Unable to delete file: \"" + file + "\""));
 
         return true;
     }
@@ -82,7 +82,7 @@ public class FileDeleteCommand extends AbstractCommand {
         return file;
     }
 
-    public final void setFile(final File file)
+    final void setFile(final File file)
             throws NullPointerException {
         if (file == null)
             throw new NullPointerException("file is null");

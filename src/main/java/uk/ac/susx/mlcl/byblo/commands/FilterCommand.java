@@ -133,7 +133,7 @@ public class FilterCommand extends AbstractCommand implements
     private final FileDelegate fileDelegate = new FileDelegate();
 
     /*
-      * === FILTER PARAMATERISATION ===
+      * === FILTER PARAMETERISATION ===
       */
     @Parameter(names = {"-fef", "--filter-entry-freq"},
             description = "Minimum entry pair frequency threshold.", converter = DoubleConverter.class)
@@ -219,7 +219,7 @@ public class FilterCommand extends AbstractCommand implements
         setOutputEntriesFile(outputEntriesFile);
     }
 
-    public final DoubleEnumerating getIndexDelegate() {
+    final DoubleEnumerating getIndexDelegate() {
         return indexDelegate;
     }
 
@@ -426,7 +426,7 @@ public class FilterCommand extends AbstractCommand implements
     // are written out to the output file while rejected entries are stored
     // for filtering the AllPairsTask.
 
-    private void filterEntries() throws FileNotFoundException, IOException {
+    private void filterEntries() throws IOException {
 
         WeightedTokenSource entriesSource = BybloIO.openEntriesSource(
                 activeEntriesFile, getCharset(), getIndexDelegate());
@@ -476,7 +476,8 @@ public class FilterCommand extends AbstractCommand implements
         entriesSink.close();
 
         if (!activeEntriesFile.equals(inputEntriesFile)) {
-            activeEntriesFile.delete();
+            if (!activeEntriesFile.delete())
+                throw new IOException("Failed to delete active file: " + activeEntriesFile);
         }
 
         entryFilterRequired = false;
@@ -488,7 +489,7 @@ public class FilterCommand extends AbstractCommand implements
     // Filter the AllPairsTask file, rejecting all events that contain entries
     // dropped in the entries file filter pass. Store a list of features that
     // only appear in filtered entries to filter the features file.
-    private void filterEvents() throws FileNotFoundException, IOException {
+    private void filterEvents() throws IOException {
 
         // We wish to know which entries where *always* rejected, but this
         // information is not available locally because we are streaming the
@@ -612,7 +613,8 @@ public class FilterCommand extends AbstractCommand implements
         efSink.close();
 
         if (!activeEventsFile.equals(inputEventsFile)) {
-            activeEventsFile.delete();
+            if (!activeEventsFile.delete())
+                throw new IOException("Failed to delete active file: " + activeEventsFile);
         }
 
         eventFilterRequired = false;
@@ -634,7 +636,7 @@ public class FilterCommand extends AbstractCommand implements
 
     // Filter the AllPairsTask file, rejecting all entries that where found to
     // be only used by filtered entries.
-    private void filterFeatures() throws FileNotFoundException, IOException {
+    private void filterFeatures() throws IOException {
 
         WeightedTokenSource featureSource = BybloIO.openFeaturesSource(
                 activeFeaturesFile, getCharset(), indexDelegate);
@@ -685,7 +687,8 @@ public class FilterCommand extends AbstractCommand implements
         featureSink.close();
 
         if (!activeFeaturesFile.equals(inputFeaturesFile)) {
-            activeFeaturesFile.delete();
+            if (!activeFeaturesFile.delete())
+                throw new IOException("Failed to delete active file: " + activeFeaturesFile);
         }
 
         featureFilterRequired = false;
@@ -740,7 +743,7 @@ public class FilterCommand extends AbstractCommand implements
         this.outputEntriesFile = checkNotNull(outputEntriesFile);
     }
 
-    public Predicate<Weighted<Token>> getAcceptFeatures() {
+    Predicate<Weighted<Token>> getAcceptFeatures() {
         return acceptFeatures;
     }
 
@@ -751,7 +754,7 @@ public class FilterCommand extends AbstractCommand implements
         }
     }
 
-    public void addFeaturesMinimumFrequency(double threshold) {
+    void addFeaturesMinimumFrequency(double threshold) {
         setAcceptFeatures(Predicates.<Weighted<Token>>and(getAcceptFeatures(), compose(Predicates2.gte(threshold), this.<Token>weight())));
     }
 
@@ -763,11 +766,11 @@ public class FilterCommand extends AbstractCommand implements
         setAcceptFeatures(Predicates.<Weighted<Token>>and(getAcceptFeatures(), compose(Predicates2.inRange(min, max), this.<Token>weight())));
     }
 
-    public void addFeaturesPattern(String pattern) {
+    void addFeaturesPattern(String pattern) {
         setAcceptFeatures(Predicates.<Weighted<Token>>and(getAcceptFeatures(), compose(Predicates.containsPattern(pattern), featureString())));
     }
 
-    public void addFeaturesWhitelist(List<String> strings) throws IOException {
+    void addFeaturesWhitelist(List<String> strings) throws IOException {
         IntSet featureIdSet = toEnumeratedIntSet(strings, getIndexDelegate()
                 .getFeatureEnumerator());
         setAcceptFeatures(Predicates.<Weighted<Token>>and(getAcceptFeatures(), compose(in(featureIdSet), id())));
@@ -779,7 +782,7 @@ public class FilterCommand extends AbstractCommand implements
         featureBlacklist.addAll(featureIdSet);
     }
 
-    public Predicate<Weighted<TokenPair>> getAcceptEvent() {
+    Predicate<Weighted<TokenPair>> getAcceptEvent() {
         return acceptEvents;
     }
 
@@ -802,7 +805,7 @@ public class FilterCommand extends AbstractCommand implements
         setAcceptEvent(Predicates.<Weighted<TokenPair>>and(getAcceptEvent(), compose(Predicates2.inRange(min, max), this.<TokenPair>weight())));
     }
 
-    public Predicate<Weighted<Token>> getAcceptEntries() {
+    Predicate<Weighted<Token>> getAcceptEntries() {
         return acceptEntries;
     }
 
@@ -813,7 +816,7 @@ public class FilterCommand extends AbstractCommand implements
         }
     }
 
-    public void addEntryMinimumFrequency(double threshold) {
+    void addEntryMinimumFrequency(double threshold) {
         setAcceptEntries(Predicates.<Weighted<Token>>and(getAcceptEntries(), compose(Predicates2.gte(threshold), this.<Token>weight())));
     }
 
@@ -825,11 +828,11 @@ public class FilterCommand extends AbstractCommand implements
         setAcceptEntries(Predicates.<Weighted<Token>>and(getAcceptEntries(), compose(Predicates2.inRange(min, max), this.<Token>weight())));
     }
 
-    public void addEntryPattern(String pattern) {
+    void addEntryPattern(String pattern) {
         setAcceptEntries(Predicates.<Weighted<Token>>and(getAcceptEntries(), compose(Predicates.containsPattern(pattern), entryString())));
     }
 
-    public void addEntryWhitelist(List<String> strings) throws IOException {
+    void addEntryWhitelist(List<String> strings) throws IOException {
         IntSet entryIdSet = toEnumeratedIntSet(strings, getIndexDelegate()
                 .getEntryEnumerator());
         setAcceptEntries(Predicates.<Weighted<Token>>and(getAcceptEntries(), compose(in(entryIdSet), id())));
@@ -849,8 +852,8 @@ public class FilterCommand extends AbstractCommand implements
      * @param idx
      * @return
      */
-    static IntSet toEnumeratedIntSet(final Collection<String> strings,
-                                     final Enumerator<String> idx) {
+    private static IntSet toEnumeratedIntSet(final Collection<String> strings,
+                                             final Enumerator<String> idx) {
         final IntSet intSet = newIntSet(1 << 16);
         for (String string : strings) {
             intSet.add(idx.indexOf(string));
@@ -864,7 +867,7 @@ public class FilterCommand extends AbstractCommand implements
      *
      * @return
      */
-    static IntSortedSet newIntSet(final int largestElementHint) {
+    private static IntSortedSet newIntSet(final int largestElementHint) {
         return new IntBitSet(largestElementHint);
     }
 
@@ -1193,7 +1196,7 @@ public class FilterCommand extends AbstractCommand implements
         fileDelegate.setCharset(charset);
     }
 
-    public final Charset getCharset() {
+    final Charset getCharset() {
         return fileDelegate.getCharset();
     }
 

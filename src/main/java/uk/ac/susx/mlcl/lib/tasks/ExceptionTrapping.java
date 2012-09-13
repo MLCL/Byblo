@@ -48,18 +48,6 @@ public interface ExceptionTrapping {
     boolean isExceptionTrapped();
 
     /**
-     * Return the oldest exception that was previously caught, clearing it
-     * internally.
-     * <p/>
-     * Repeated calls to this method may return addition exceptions; in a
-     * first-in/first-out order. When no exception remain this method returns
-     * null.
-     *
-     * @return the exception, or null if no exception is caught
-     */
-    Exception getTrappedException();
-
-    /**
      * Throws the oldest exception that was previously caught.
      * <p/>
      * Repeated calls to this method may throw addition exceptions; in a

@@ -95,7 +95,7 @@ public class PoissonDistributionTest extends AbstractTest {
         for (long i = 171; i < Integer.MAX_VALUE; i = (long) ((i * 1.5) + 1)) {
             try {
                 double actual = PoissonDistribution.factorial((int) i);
-                Assert.fail("factorial can not be calcualted for i > 170");
+                Assert.fail("factorial can not be calculated for i > 170");
             } catch (IllegalArgumentException ex) {
                 // Pass
             }
@@ -137,7 +137,6 @@ public class PoissonDistributionTest extends AbstractTest {
                 }
 
             });
-            // System.out.println(Arrays.toString(countArray));
 
             double mean = 0;
             int n = 0;
@@ -153,10 +152,6 @@ public class PoissonDistributionTest extends AbstractTest {
                         * e.getIntValue();
             }
             variance /= n;
-            //
-            // System.out.println("lambda = " + lambda + ", mean = " + mean
-            // + ", variance = " + variance);
-            //
 
             Assert.assertEquals(MessageFormat.format(
                     "Mean and variance should be approximately equal, but "

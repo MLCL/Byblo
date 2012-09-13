@@ -47,7 +47,7 @@ public class ProgressAggregate extends ProgressDelegate {
     /**
      * Thread safe list of child progress reporters.
      */
-    private CopyOnWriteArrayList<ProgressReporting> children = new CopyOnWriteArrayList<ProgressReporting>();
+    private final CopyOnWriteArrayList<ProgressReporting> children = new CopyOnWriteArrayList<ProgressReporting>();
 
     /**
      * Once a child has completed it will be removed from the listener list to
@@ -96,7 +96,7 @@ public class ProgressAggregate extends ProgressDelegate {
      * <p/>
      * If there are no children, then progress is always 0%.
      */
-    protected void updateProgress() {
+    void updateProgress() {
         startAdjusting();
 
         if (!hasChildProgressReporters())
@@ -199,7 +199,7 @@ public class ProgressAggregate extends ProgressDelegate {
         return children.toArray(new ProgressReporting[children.size()]);
     }
 
-    public boolean hasChildProgressReporters() {
+    boolean hasChildProgressReporters() {
         return !children.isEmpty();
     }
 

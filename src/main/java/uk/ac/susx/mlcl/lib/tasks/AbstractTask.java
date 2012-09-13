@@ -110,22 +110,13 @@ public abstract class AbstractTask implements Task {
                 add("properties", properties);
     }
 
-    protected boolean equals(AbstractTask other) {
-        if (this.properties != other.properties
-                && (this.properties == null || !this.properties.equals(
-                other.properties)))
-            return false;
-        if (this.exceptionDelegate != other.exceptionDelegate
-                && (this.exceptionDelegate == null || !this.exceptionDelegate.equals(other.exceptionDelegate)))
-            return false;
-        return true;
+    boolean equals(AbstractTask other) {
+        return !(this.properties != other.properties && (this.properties == null || !this.properties.equals(other.properties))) && !(this.exceptionDelegate != other.exceptionDelegate && (this.exceptionDelegate == null || !this.exceptionDelegate.equals(other.exceptionDelegate)));
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
-            return false;
-        return getClass() == obj.getClass() && equals((AbstractTask) obj);
+        return obj != null && getClass() == obj.getClass() && equals((AbstractTask) obj);
     }
 
     @Override
@@ -146,12 +137,8 @@ public abstract class AbstractTask implements Task {
         properties.setProperty(key, value);
     }
 
-    protected ExceptionTrappingDelegate getExceptionDelegate() {
+    ExceptionTrappingDelegate getExceptionDelegate() {
         return exceptionDelegate;
-    }
-
-    protected final void trapException(Exception exception) {
-        exceptionDelegate.trapException(exception);
     }
 
     @Override
@@ -162,11 +149,6 @@ public abstract class AbstractTask implements Task {
     @Override
     public final synchronized boolean isExceptionTrapped() {
         return exceptionDelegate.isExceptionTrapped();
-    }
-
-    @Override
-    public final synchronized Exception getTrappedException() {
-        return exceptionDelegate.getTrappedException();
     }
 
 }

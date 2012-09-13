@@ -90,7 +90,7 @@ public final class KendallsTau
      * explicitly set.
      */
     @Nonnegative
-    public static final int DEFAULT_MIN_CARDINALITY = 1;
+    private static final int DEFAULT_MIN_CARDINALITY = 1;
 
     /**
      * Expected dimensionality of vectors.
@@ -395,17 +395,13 @@ public final class KendallsTau
         return "Kendalls-Tau{minCardinality=" + minCardinality + '}';
     }
 
-    public boolean equals(final KendallsTau other) {
+    boolean equals(final KendallsTau other) {
         return this.minCardinality == other.minCardinality;
     }
 
     @Override
     public boolean equals(final Object obj) {
-        if (obj == this)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        return equals((KendallsTau) obj);
+        return obj == this || !(obj == null || getClass() != obj.getClass()) && equals((KendallsTau) obj);
     }
 
     @Override

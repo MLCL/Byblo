@@ -30,8 +30,6 @@
  */
 package uk.ac.susx.mlcl.byblo.commands;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import uk.ac.susx.mlcl.TestConstants;
@@ -65,116 +63,104 @@ public class IndexSimsCommandTest extends
         return IndexingCommands.IndexSims.class;
     }
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     @Test
-    public void testRunOnFruitAPI_noskip_compact() throws Exception {
-        testRunOnFruitAPI("compact-noskip-", EnumeratorType.Memory, false,
+    public void testRunOnFruitAPI_noSkip_compact() throws Exception {
+        testRunOnFruitAPI("compact-noSkip-", EnumeratorType.Memory, false,
                 false, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipboth_compact() throws Exception {
-        testRunOnFruitAPI("compact-skipboth-", EnumeratorType.Memory, true,
+    public void testRunOnFruitAPI_skipBoth_compact() throws Exception {
+        testRunOnFruitAPI("compact-skipBoth-", EnumeratorType.Memory, true,
                 true, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipleft_compact() throws Exception {
-        testRunOnFruitAPI("compact-skipleft-", EnumeratorType.Memory, true,
+    public void testRunOnFruitAPI_skipLeft_compact() throws Exception {
+        testRunOnFruitAPI("compact-skipLeft-", EnumeratorType.Memory, true,
                 false, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipright_compact() throws Exception {
-        testRunOnFruitAPI("compact-skipright-", EnumeratorType.Memory, false,
+    public void testRunOnFruitAPI_skipRight_compact() throws Exception {
+        testRunOnFruitAPI("compact-skipRight-", EnumeratorType.Memory, false,
                 true, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_noskip_verbose() throws Exception {
-        testRunOnFruitAPI("verbose-noskip-", EnumeratorType.Memory, false,
+    public void testRunOnFruitAPI_noSkip_verbose() throws Exception {
+        testRunOnFruitAPI("verbose-noSkip-", EnumeratorType.Memory, false,
                 false, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipboth_verbose() throws Exception {
-        testRunOnFruitAPI("verbose-skipboth-", EnumeratorType.Memory, true,
+    public void testRunOnFruitAPI_skipBoth_verbose() throws Exception {
+        testRunOnFruitAPI("verbose-skipBoth-", EnumeratorType.Memory, true,
                 true, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipleft_verbose() throws Exception {
-        testRunOnFruitAPI("verbose-skipleft-", EnumeratorType.Memory, true,
+    public void testRunOnFruitAPI_skipLeft_verbose() throws Exception {
+        testRunOnFruitAPI("verbose-skipLeft-", EnumeratorType.Memory, true,
                 false, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipright_verbose() throws Exception {
-        testRunOnFruitAPI("verbose-skipright-", EnumeratorType.Memory, false,
+    public void testRunOnFruitAPI_skipRight_verbose() throws Exception {
+        testRunOnFruitAPI("verbose-skipRight-", EnumeratorType.Memory, false,
                 true, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_noskip_compact_JDBC() throws Exception {
-        testRunOnFruitAPI("compact-noskip-jdbc-", EnumeratorType.JDBM, false,
+    public void testRunOnFruitAPI_noSkip_compact_JDBM() throws Exception {
+        testRunOnFruitAPI("compact-noSkip-jdbm-", EnumeratorType.JDBM, false,
                 false, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipboth_compact_JDBC() throws Exception {
-        testRunOnFruitAPI("compact-skipboth-jdbc-", EnumeratorType.JDBM, true,
+    public void testRunOnFruitAPI_skipBoth_compact_JDBM() throws Exception {
+        testRunOnFruitAPI("compact-skipBoth-jdbm-", EnumeratorType.JDBM, true,
                 true, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipleft_compact_JDBC() throws Exception {
-        testRunOnFruitAPI("compact-skipleft-jdbc-", EnumeratorType.JDBM, true,
+    public void testRunOnFruitAPI_skipLeft_compact_JDBM() throws Exception {
+        testRunOnFruitAPI("compact-skipLeft-jdbm-", EnumeratorType.JDBM, true,
                 false, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipright_compact_JDBC() throws Exception {
-        testRunOnFruitAPI("compact-skipright-jdbc-", EnumeratorType.JDBM,
+    public void testRunOnFruitAPI_skipRight_compact_JDBM() throws Exception {
+        testRunOnFruitAPI("compact-skipRight-jdbm-", EnumeratorType.JDBM,
                 false, true, true);
     }
 
     @Test
-    public void testRunOnFruitAPI_noskip_verbose_JDBC() throws Exception {
-        testRunOnFruitAPI("verbose-noskip-jdbc-", EnumeratorType.JDBM, false,
+    public void testRunOnFruitAPI_noSkip_verbose_JDBM() throws Exception {
+        testRunOnFruitAPI("verbose-noSkip-jdbm-", EnumeratorType.JDBM, false,
                 false, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipboth_verbose_JDBC() throws Exception {
-        testRunOnFruitAPI("verbose-skipboth-jdbc-", EnumeratorType.JDBM, true,
+    public void testRunOnFruitAPI_skipBoth_verbose_JDBM() throws Exception {
+        testRunOnFruitAPI("verbose-skipBoth-jdbm-", EnumeratorType.JDBM, true,
                 true, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipleft_verbose_JDBC() throws Exception {
-        testRunOnFruitAPI("verbose-skipleft-jdbc-", EnumeratorType.JDBM, true,
+    public void testRunOnFruitAPI_skipLeft_verbose_JDBM() throws Exception {
+        testRunOnFruitAPI("verbose-skipLeft-jdbm-", EnumeratorType.JDBM, true,
                 false, false);
     }
 
     @Test
-    public void testRunOnFruitAPI_skipright_verbose_JDBC() throws Exception {
-        testRunOnFruitAPI("verbose-skipright-jdbc-", EnumeratorType.JDBM,
+    public void testRunOnFruitAPI_skipRight_verbose_JDBM() throws Exception {
+        testRunOnFruitAPI("verbose-skipRight-jdbm-", EnumeratorType.JDBM,
                 false, true, false);
     }
 
-    public void testRunOnFruitAPI(String prefix, EnumeratorType type,
-                                  boolean skip1, boolean skip2, boolean compact) throws Exception {
+    void testRunOnFruitAPI(String prefix, EnumeratorType type,
+                           boolean skip1, boolean skip2, boolean compact) throws Exception {
         System.out.println("Testing " + IndexSimsCommandTest.class.getName()
                 + " on " + TEST_FRUIT_SIMS_100NN);
 
@@ -193,41 +179,39 @@ public class IndexSimsCommandTest extends
 
     @Test
     @Ignore
-    public void testCompareSkipVsNoSkip() throws Exception {
+    public void testCompareSkipVsnoSkip() throws Exception {
         System.out.println("Testing " + IndexWTPCommandTest.class.getName()
                 + " on " + TEST_FRUIT_SIMS);
 
         final String name = TEST_FRUIT_SIMS.getName();
-        String prefixa = "wtp-noskip-";
-        String prefixb = "wtp-skip-";
+        String prefixA = "wtp-noSkip-";
+        String prefixB = "wtp-skip-";
 
-        final File outa = new File(TEST_OUTPUT_DIR, prefixa + name + ".indexed");
-        final File outb = new File(TEST_OUTPUT_DIR, prefixb + name + ".indexed");
+        final File outA = new File(TEST_OUTPUT_DIR, prefixA + name + ".indexed");
+        final File outB = new File(TEST_OUTPUT_DIR, prefixB + name + ".indexed");
 
-        final File idxa = new File(TEST_OUTPUT_DIR, prefixa + name
-                + ".entry-index");
-        final File idxb = new File(TEST_OUTPUT_DIR, prefixb + name
-                + ".entry-index");
+        final File idxA = new File(TEST_OUTPUT_DIR, prefixA + name + ".entry-index");
+        final File idxB = new File(TEST_OUTPUT_DIR, prefixB + name + ".entry-index");
 
         boolean skip1a = false;
         boolean skip2a = false;
         boolean skip1b = true;
         boolean skip2b = true;
 
-        deleteIfExist(outa, idxa, outb, idxb);
+        deleteIfExist(outA, idxA, outB, idxB);
 
-        indexSims(TEST_FRUIT_SIMS, outa, idxa, EnumeratorType.Memory, skip1a,
+        indexSims(TEST_FRUIT_SIMS, outA, idxA, EnumeratorType.Memory, skip1a,
                 skip2a, true);
-        indexSims(TEST_FRUIT_SIMS, outb, idxb, EnumeratorType.Memory, skip1b,
+        indexSims(TEST_FRUIT_SIMS, outB, idxB, EnumeratorType.Memory, skip1b,
                 skip2b, true);
 
         // Read back the data checking it's identical
         {
-            WeightedTokenPairSource wtpsa = WeightedTokenPairSource.open(outa,
+            WeightedTokenPairSource wtpsa = WeightedTokenPairSource.open(outA,
                     DEFAULT_CHARSET, new DoubleEnumeratingDelegate(
                     Enumerating.DEFAULT_TYPE, true, true, null, null),
                     skip1a, skip2a);
-            WeightedTokenPairSource wtpsb = WeightedTokenPairSource.open(outb,
+            WeightedTokenPairSource wtpsb = WeightedTokenPairSource.open(outB,
                     DEFAULT_CHARSET, new DoubleEnumeratingDelegate(
                     Enumerating.DEFAULT_TYPE, true, true, null, null),
                     skip1a, skip2a);
@@ -267,13 +251,13 @@ public class IndexSimsCommandTest extends
         // Read back the data again, this time as vectors
         {
             WeightedTokenPairVectorSource wtpsa = WeightedTokenPairSource.open(
-                    outa,
+                    outA,
                     DEFAULT_CHARSET,
                     new DoubleEnumeratingDelegate(Enumerating.DEFAULT_TYPE,
                             true, true, null, null), skip1a, skip2a)
                     .getVectorSource();
             WeightedTokenPairVectorSource wtpsb = WeightedTokenPairSource.open(
-                    outb,
+                    outB,
                     DEFAULT_CHARSET,
                     new DoubleEnumeratingDelegate(Enumerating.DEFAULT_TYPE,
                             true, true, null, null), skip1b, skip2b)
@@ -317,8 +301,8 @@ public class IndexSimsCommandTest extends
         }
     }
 
-    public static void indexSims(File from, File to, File index,
-                                 EnumeratorType type, boolean skip1, boolean skip2, boolean compact)
+    private static void indexSims(File from, File to, File index,
+                                  EnumeratorType type, boolean skip1, boolean skip2, boolean compact)
             throws Exception {
         assertValidPlaintextInputFiles(from);
         assertValidOutputFiles(to);

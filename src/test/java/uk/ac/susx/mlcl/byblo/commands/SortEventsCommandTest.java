@@ -63,20 +63,8 @@ public class SortEventsCommandTest extends
         return SortEntriesCommand.class;
     }
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     @Test
-    public void testSortWeightedTokenPairCommand() throws IOException,
+    public void testSortWeightedTokenPairCommand() throws
             Exception {
         System.out.println("Testing SortWeightedTokenPairCommand");
 
@@ -109,7 +97,7 @@ public class SortEventsCommandTest extends
 
     @Test
     @Ignore
-    public void testSortWeightedTokenPairCommand_Indexed() throws IOException,
+    public void testSortWeightedTokenPairCommand_Indexed() throws
             Exception {
         System.out.println("Testing SortWeightedTokenPairCommand (Indexed)");
 
@@ -143,7 +131,7 @@ public class SortEventsCommandTest extends
     private void testSortWeightedTokenPairCommand(File inputFile,
                                                   File randomisedFile, File sortedFile,
                                                   DoubleEnumeratingDelegate idx,
-                                                  Comparator<Weighted<TokenPair>> comparator) throws IOException,
+                                                  Comparator<Weighted<TokenPair>> comparator) throws
             Exception {
 
         assertTrue("Input file does not exist", inputFile.exists());

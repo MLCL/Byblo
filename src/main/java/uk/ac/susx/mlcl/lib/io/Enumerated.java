@@ -191,7 +191,7 @@ public final class Enumerated {
 
         final Enumerator<String>[] enumerators;
 
-        protected int column;
+        int column;
 
         private ComplexDSource(
                 T inner,
@@ -286,7 +286,7 @@ public final class Enumerated {
 
         final Enumerator<String>[] enumerators;
 
-        protected int column;
+        int column;
 
         private ComplexDSink(
                 S inner,
@@ -360,7 +360,7 @@ public final class Enumerated {
 
         final Predicate<Integer> enumColumn;
 
-        protected int column;
+        int column;
 
         private ComplexDSource2(
                 T inner,
@@ -460,7 +460,7 @@ public final class Enumerated {
 
         final Predicate<Integer> enumColumn;
 
-        protected int column;
+        int column;
 
         private ComplexDSink2(
                 S inner,

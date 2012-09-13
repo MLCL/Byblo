@@ -38,7 +38,7 @@ import javax.annotation.concurrent.Immutable;
 import java.io.Serializable;
 
 /**
- * {@link Weighting} that normalizes the feature vector by the total. This is
+ * <code>Weighting</code> that normalizes the feature vector by the total. This is
  * effectively the probability of each feature conditioned on the entry.
  * <p/>
  *
@@ -46,7 +46,7 @@ import java.io.Serializable;
  */
 @Immutable
 @CheckReturnValue
-public final class Likelyhood
+public final class Likelihood
         extends AbstractElementwiseWeighting
         implements Serializable {
 
@@ -74,11 +74,7 @@ public final class Likelyhood
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        return true;
+        return obj == this || !(obj == null || getClass() != obj.getClass());
     }
 
     @Override

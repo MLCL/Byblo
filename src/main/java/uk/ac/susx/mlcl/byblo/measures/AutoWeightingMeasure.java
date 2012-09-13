@@ -56,9 +56,7 @@ import javax.annotation.concurrent.Immutable;
 @CheckReturnValue
 public final class AutoWeightingMeasure extends ForwardingMeasure<Measure> {
 
-	private static final long serialVersionUID = 1L;
-
-	private final Weighting weighting;
+    private final Weighting weighting;
 
     public AutoWeightingMeasure(Measure delegate, Weighting weighting) {
         super(delegate);

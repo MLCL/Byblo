@@ -47,27 +47,26 @@ import java.text.MessageFormat;
  */
 public abstract class TSV {
 
-    protected static final char RECORD_DELIM = '\n';
+    private static final char RECORD_DELIMITER = '\n';
 
-    protected static final char VALUE_DELIM = '\t';
+    private static final char VALUE_DELIMITER = '\t';
 
-    protected final File file;
+    private final File file;
 
-    protected final Charset charset;
+    private final Charset charset;
 
     //    protected long row;
-    protected long column;
+    long column;
 
-    protected TSV(File file, Charset charset) throws FileNotFoundException, IOException {
+    TSV(File file, Charset charset)  {
         Checks.checkNotNull("file", file);
         Checks.checkNotNull("charset", charset);
         this.file = file;
         this.charset = charset;
-//        row = 0;
         column = 0;
     }
 
-    public Charset getCharset() {
+    Charset getCharset() {
         return charset;
     }
 
@@ -75,13 +74,9 @@ public abstract class TSV {
         return column;
     }
 
-    public File getFile() {
+    File getFile() {
         return file;
     }
-//
-//    public long getRow() {
-//        return row;
-//    }
 
     /**
      * Class that holds functionality to read a Tab Separated Values file.
@@ -94,6 +89,7 @@ public abstract class TSV {
 
         private final Appendable out;
 
+        @SuppressWarnings("DuplicateThrows")
         public Sink(File file, Charset charset)
                 throws FileNotFoundException, IOException {
             super(file, charset);
@@ -110,20 +106,20 @@ public abstract class TSV {
         }
 
         private void writeRecordDelimiter() throws IOException {
-            out.append(RECORD_DELIM);
+            out.append(RECORD_DELIMITER);
             column = 0;
         }
 
         private void writeValueDelimiter() throws IOException {
-            out.append(VALUE_DELIM);
+            out.append(VALUE_DELIMITER);
         }
 
         @Override
         public void writeString(String str) throws IOException {
             Checks.checkNotNull("str", str);
 
-            assert str.indexOf(VALUE_DELIM) == -1;
-            assert str.indexOf(RECORD_DELIM) == -1;
+            assert str.indexOf(VALUE_DELIMITER) == -1;
+            assert str.indexOf(RECORD_DELIMITER) == -1;
             if (column > 0)
                 writeValueDelimiter();
             out.append(str);
@@ -195,7 +191,7 @@ public abstract class TSV {
 
         private final Lexer lexer;
 
-        public Source(File file, Charset charset) throws FileNotFoundException, IOException {
+        public Source(File file, Charset charset) throws IOException {
             super(file, charset);
             if (!file.exists())
                 throw new FileNotFoundException(
@@ -240,25 +236,24 @@ public abstract class TSV {
 
         @Override
         public boolean isEndOfRecordNext() throws IOException {
-            return isDelimiterNext() && lexer.charAt(0) == RECORD_DELIM;
+            return isDelimiterNext() && lexer.charAt(0) == RECORD_DELIMITER;
         }
 
-        private boolean isDelimiterNext() throws IOException {
+        private boolean isDelimiterNext()  {
             return lexer.type() == Lexer.Type.Delimiter;
         }
 
         @Override
         public void endOfRecord() throws IOException {
-            parseDelimiter(RECORD_DELIM);
+            parseDelimiter(RECORD_DELIMITER);
             column = 0;
         }
 
         @Override
         public String readString() throws IOException {
             if (column > 0)
-                parseDelimiter(VALUE_DELIM);
+                parseDelimiter(VALUE_DELIMITER);
 
-//            skipWhitespace();
             expectType(Lexer.Type.Value, lexer.type());
             final String str = lexer.value().toString();
             lexer.advanceIfPossible();
@@ -292,10 +287,10 @@ public abstract class TSV {
             }
         }
 
-        private void parseDelimiter(char delim) throws IOException {
+        private void parseDelimiter(char delimiter) throws IOException {
 //            skipWhitespace();
             expectType(Lexer.Type.Delimiter, lexer.type());
-            expectDelim(delim, lexer.charAt(0));
+            expectDelim(delimiter, lexer.charAt(0));
             lexer.advanceIfPossible();
         }
 
@@ -436,7 +431,7 @@ public abstract class TSV {
                     + context + ": " + super.getMessage();
         }
 
-        private String context() throws FileNotFoundException, IOException {
+        private String context() throws IOException {
             final long start_offset = Math.max(offset - 32, 0);
             final int len = 64;
 

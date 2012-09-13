@@ -40,8 +40,6 @@ import javax.annotation.concurrent.Immutable;
  * weight to the output weight, but with addition contextual information
  * provided.
  * <p/>
- * It should be used when {@link SimpleWeighting} is insufficiently flexible.
- * <p/>
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -52,7 +50,7 @@ public abstract class AbstractElementwiseWeighting implements Weighting {
     /**
      * Construct a new instance of {@link AbstractContextualWeighting}
      */
-    public AbstractElementwiseWeighting() {
+    protected AbstractElementwiseWeighting() {
     }
 
     @Override

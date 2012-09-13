@@ -75,7 +75,7 @@ public final class KnnSimsCommand extends SortEventsCommand {
             Comparators.reverse(Weighted.<TokenPair>weightOrder());
 
     public KnnSimsCommand(File sourceFile, File destinationFile, Charset charset,
-                          SingleEnumerating indexDelegate, int k) throws IOException {
+                          SingleEnumerating indexDelegate, int k) {
         super(sourceFile, destinationFile, charset, EnumeratingDelegates.toPair(indexDelegate));
         super.setComparator(Comparators.fallback(
                 classComparator, nearnessComparator));
@@ -86,7 +86,7 @@ public final class KnnSimsCommand extends SortEventsCommand {
         setK(100);
     }
 
-    public Comparator<Weighted<TokenPair>> getCombinedComparator() {
+    Comparator<Weighted<TokenPair>> getCombinedComparator() {
         return Comparators.fallback(getClassComparator(), getNearnessComparator());
     }
 
@@ -104,7 +104,7 @@ public final class KnnSimsCommand extends SortEventsCommand {
                 "Class and nearness comparators should be set instead.");
     }
 
-    public Comparator<Weighted<TokenPair>> getClassComparator() {
+    Comparator<Weighted<TokenPair>> getClassComparator() {
         return classComparator;
     }
 
@@ -113,7 +113,7 @@ public final class KnnSimsCommand extends SortEventsCommand {
         this.classComparator = classComparator;
     }
 
-    public Comparator<Weighted<TokenPair>> getNearnessComparator() {
+    Comparator<Weighted<TokenPair>> getNearnessComparator() {
         return nearnessComparator;
     }
 
@@ -136,7 +136,7 @@ public final class KnnSimsCommand extends SortEventsCommand {
 
     @Override
     protected ObjectSource<Weighted<TokenPair>> openSource(File file)
-            throws FileNotFoundException, IOException {
+            throws IOException {
         final ObjectSource<Weighted<TokenPair>> src =
                 first
                         ? BybloIO.openSimsSource(file, getCharset(), getIndexDelegate())
@@ -147,7 +147,7 @@ public final class KnnSimsCommand extends SortEventsCommand {
 
     @Override
     protected ObjectSink<Weighted<TokenPair>> openSink(File file)
-            throws FileNotFoundException, IOException {
+            throws IOException {
         return new KFirstReducingObjectSink<Weighted<TokenPair>>(
                 new WeightSumReducerObjectSink<TokenPair>(
                         BybloIO.openNeighboursSink(file, getCharset(), getIndexDelegate())),

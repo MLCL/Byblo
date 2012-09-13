@@ -65,7 +65,7 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand
 
     private static final Log LOG = LogFactory.getLog(AbstractCopyCommand.class);
 
-    protected final ProgressDelegate progress = new ProgressDelegate(this, true);
+    private final ProgressDelegate progress = new ProgressDelegate(this, true);
 
     @ParametersDelegate
     private FilePipeDelegate filesDelegate = new FilePipeDelegate();
@@ -89,7 +89,7 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand
         filesDelegate.setCharset(charset);
     }
 
-    public final Charset getCharset() {
+    final Charset getCharset() {
         return filesDelegate.getCharset();
     }
 
@@ -204,9 +204,21 @@ public abstract class AbstractCopyCommand<T> extends AbstractCommand
                 add("files", getFilesDelegate());
     }
 
-    protected abstract ObjectSource<T> openSource(File file)
-            throws FileNotFoundException, IOException;
+    /**
+     *
+     * @param file
+     * @return
+     * @throws FileNotFoundException if the specified file did not exist
+     * @throws IOException
+     */
+    protected abstract ObjectSource<T> openSource(File file) throws IOException;
 
-    protected abstract ObjectSink<T> openSink(File file)
-            throws FileNotFoundException, IOException;
+    /**
+     *
+     * @param file
+     * @return
+     * @throws FileNotFoundException if the specified file did not exist
+     * @throws IOException
+     */
+    protected abstract ObjectSink<T> openSink(File file) throws IOException;
 }

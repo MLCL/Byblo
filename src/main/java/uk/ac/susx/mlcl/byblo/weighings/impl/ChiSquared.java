@@ -48,7 +48,7 @@ import java.io.Serializable;
  * a little hard to know exactly what was done here, especially since there are
  * numerous Chi-squared distribution based hypothesis tests.
  * <p/>
- * Described by Christopher D. Manningand and Hinrich Schutze (1999)
+ * Described by Christopher D. Manning and and Hinrich Schutze (1999)
  * "Foundations of Statistical Natural Language Processing." MIT Press,
  * Cambridge, MA USA.
  * <p/>
@@ -73,8 +73,9 @@ public final class ChiSquared
         // The following are the value in contingency table:
 
         // weighting for the entry with the feature 
+        @SuppressWarnings("UnnecessaryLocalVariable")
         final double O11 = value;
-        // weighting for the entry without the feature 
+        // weighting for the entry without the feature
         final double O12 = vector.sum - value;
         // weighting for all other entries with the feature 
         final double O21 = getFeatureMarginals().getFrequency(key) - value;
@@ -102,11 +103,7 @@ public final class ChiSquared
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        return super.equals((AbstractContextualWeighting) this);
+        return obj == this || !(obj == null || getClass() != obj.getClass()) && super.equals(this);
     }
 
     @Override

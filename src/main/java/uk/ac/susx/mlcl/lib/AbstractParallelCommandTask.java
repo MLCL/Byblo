@@ -51,14 +51,14 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
     private static final Log LOG = LogFactory.
             getLog(AbstractParallelCommandTask.class);
 
-    protected static final int DEFAULT_NUM_THREADS =
+    private static final int DEFAULT_NUM_THREADS =
             Runtime.getRuntime().availableProcessors();
 
     /**
      * Number of tasks that will be loaded and queued, in addition to those
      * that can be running simultaneously (as defined by {@link #nThreads}.)
      */
-    public static final int PRELOAD_SIZE = 1;
+    protected static final int PRELOAD_SIZE = 1;
 
     @Parameter(names = {"-t", "--threads"},
             description = "Number of threads to use.")
@@ -90,7 +90,7 @@ public abstract class AbstractParallelCommandTask extends AbstractCommandTask {
         }
     }
 
-    public synchronized final int getNumThreads() {
+    protected synchronized final int getNumThreads() {
         return nThreads;
     }
 

@@ -47,7 +47,7 @@ public final class Step
 
     public static final double DEFAULT_BOUNDARY = 0;
 
-    double boundary;
+    private double boundary;
 
     public Step() {
     }
@@ -81,19 +81,12 @@ public final class Step
     }
 
     private boolean equals(Step that) {
-        if (Double.doubleToLongBits(this.boundary)
-                != Double.doubleToLongBits(that.boundary))
-            return false;
-        return true;
+        return Double.doubleToLongBits(this.boundary) == Double.doubleToLongBits(that.boundary);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        return equals((Step) obj);
+        return obj == this || !(obj == null || getClass() != obj.getClass()) && equals((Step) obj);
     }
 
     @Override

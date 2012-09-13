@@ -45,9 +45,9 @@ public final class Power
 
     private static final long serialVersionUID = 1L;
 
-    public static final double DEFAULT_POWER = 2;
+    private static final double DEFAULT_POWER = 2;
 
-    double power;
+    private double power;
 
     public Power() {
         setPower(DEFAULT_POWER);
@@ -57,7 +57,7 @@ public final class Power
         setPower(power);
     }
 
-    public final void setPower(double power) {
+    final void setPower(double power) {
         this.power = power;
     }
 
@@ -86,19 +86,12 @@ public final class Power
     }
 
     private boolean equals(Power that) {
-        if (Double.doubleToLongBits(this.power)
-                != Double.doubleToLongBits(that.power))
-            return false;
-        return true;
+        return Double.doubleToLongBits(this.power) == Double.doubleToLongBits(that.power);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        return equals((Power) obj);
+        return obj == this || !(obj == null || getClass() != obj.getClass()) && equals((Power) obj);
     }
 
     @Override

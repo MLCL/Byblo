@@ -39,7 +39,7 @@ import java.io.IOException;
  * @param <T>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightStatsObjectSource<T> extends CountingObjectSource<ObjectSource<Weighted<T>>, Weighted<T>> {
+class WeightStatsObjectSource<T> extends CountingObjectSource<ObjectSource<Weighted<T>>, Weighted<T>> {
 
     private double weightMin = Double.POSITIVE_INFINITY;
 
@@ -55,11 +55,11 @@ public class WeightStatsObjectSource<T> extends CountingObjectSource<ObjectSourc
         return weightSum;
     }
 
-    public double getWeightMax() {
+    double getWeightMax() {
         return weightMax;
     }
 
-    public double getWeightMin() {
+    double getWeightMin() {
         return weightMin;
     }
 

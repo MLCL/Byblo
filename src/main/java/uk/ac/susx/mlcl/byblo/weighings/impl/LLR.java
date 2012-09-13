@@ -49,7 +49,7 @@ import java.io.Serializable;
  * Ha: That the entry and feature are positively correlated, measured as the
  * conditional probability of the feature in the context of the entry.
  * <p/>
- * Described by Christopher D. Manningand and Hinrich Schutze (1999)
+ * Described by Christopher D. Manning and and Hinrich Schutze (1999)
  * "Foundations of Statistical Natural Language Processing." MIT Press,
  * Cambridge, MA USA.
  * <p/>
@@ -89,11 +89,7 @@ public final class LLR
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        return super.equals((AbstractContextualWeighting) this);
+        return obj == this || !(obj == null || getClass() != obj.getClass()) && super.equals(this);
     }
 
     @Override

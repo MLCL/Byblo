@@ -54,7 +54,7 @@ import static uk.ac.susx.mlcl.TestConstants.*;
  */
 public class WeightedEventsTest {
 
-    private void copyWEF(File a, File b, boolean compact) throws FileNotFoundException, IOException {
+    private void copyWEF(File a, File b, boolean compact) throws IOException {
         DoubleEnumeratingDelegate del = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
 
@@ -67,7 +67,7 @@ public class WeightedEventsTest {
         bSink.close();
     }
 
-    private void copyWEFV(File a, File b, boolean compact) throws FileNotFoundException, IOException {
+    private void copyWEFV(File a, File b, boolean compact) throws IOException {
         DoubleEnumeratingDelegate del = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
 
@@ -91,7 +91,7 @@ public class WeightedEventsTest {
     }
 
     @Test
-    public void testWeightedEventsConversion() throws FileNotFoundException, IOException {
+    public void testWeightedEventsConversion() throws IOException {
         File a = TEST_FRUIT_EVENTS;
         File b = new File(TEST_OUTPUT_DIR,
                 TEST_FRUIT_EVENTS.getName() + ".compact");
@@ -114,7 +114,7 @@ public class WeightedEventsTest {
 
     @Test
     @Ignore
-    public void testWeightedEventsVectorsConversion() throws FileNotFoundException, IOException {
+    public void testWeightedEventsVectorsConversion() throws IOException {
         File a = TEST_FRUIT_EVENTS;
         File b = new File(TEST_OUTPUT_DIR,
                 TEST_FRUIT_EVENTS.getName() + ".vecs.compact");
@@ -138,7 +138,7 @@ public class WeightedEventsTest {
     }
 
     @Test
-    public void testLMSample() throws FileNotFoundException, IOException {
+    public void testLMSample() throws IOException {
         File testSample = new File(TEST_DATA_DIR, "lm-medline-ef-sample");
         Charset charset = Charset.forName("UTF-8");
         DoubleEnumeratingDelegate del = new DoubleEnumeratingDelegate(
@@ -154,7 +154,7 @@ public class WeightedEventsTest {
         }
     }
 
-    public void testRandomAccess(File file) throws FileNotFoundException, IOException {
+    void testRandomAccess(File file) throws IOException {
         final Map<Tell, Weighted<TokenPair>> hist =
                 new HashMap<Tell, Weighted<TokenPair>>();
 
@@ -206,29 +206,29 @@ public class WeightedEventsTest {
     }
 
     @Test
-    public void testRandomAccess() throws FileNotFoundException, IOException {
+    public void testRandomAccess() throws IOException {
         testRandomAccess(TEST_FRUIT_EVENTS);
     }
 
     @Test
-    public void testEventsPairEnumeratorConversion() throws FileNotFoundException, IOException {
+    public void testEventsPairEnumeratorConversion() throws IOException {
         File a = TEST_FRUIT_EVENTS;
         File b = new File(TEST_OUTPUT_DIR,
                 TEST_FRUIT_EVENTS.getName() + ".enum");
         File c = new File(TEST_OUTPUT_DIR,
                 TEST_FRUIT_EVENTS.getName() + ".str");
 
-        DoubleEnumeratingDelegate indel = new DoubleEnumeratingDelegate(
+        DoubleEnumeratingDelegate inDelegate = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
-        DoubleEnumeratingDelegate outdel = new DoubleEnumeratingDelegate(
+        DoubleEnumeratingDelegate outDelegate = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, true, true, null, null);
 
 
         {
             WeightedTokenPairSource aSrc = WeightedTokenPairSource.open(
-                    a, DEFAULT_CHARSET, indel, false, false);
+                    a, DEFAULT_CHARSET, inDelegate, false, false);
             WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
-                    b, DEFAULT_CHARSET, outdel, false, false, false);
+                    b, DEFAULT_CHARSET, outDelegate, false, false, false);
 //            bSink.setCompactFormatEnabled(false);
             ObjectIO.copy(aSrc, bSink);
             bSink.close();
@@ -239,9 +239,9 @@ public class WeightedEventsTest {
 
         {
             WeightedTokenPairSource bSrc = WeightedTokenPairSource.open(
-                    b, DEFAULT_CHARSET, outdel, false, false);
+                    b, DEFAULT_CHARSET, outDelegate, false, false);
             WeightedTokenPairSink cSink = WeightedTokenPairSink.open(
-                    c, DEFAULT_CHARSET, indel, false, false, false);
+                    c, DEFAULT_CHARSET, inDelegate, false, false, false);
 //            cSink.setCompactFormatEnabled(false);
             ObjectIO.copy(bSrc, cSink);
             cSink.close();
@@ -255,16 +255,16 @@ public class WeightedEventsTest {
     }
 
     @Test
-    public void testEventsPairCompactEnumeratorConversion() throws FileNotFoundException, IOException {
+    public void testEventsPairCompactEnumeratorConversion() throws IOException {
         File a = TEST_FRUIT_EVENTS;
         File b = new File(TEST_OUTPUT_DIR,
                 TEST_FRUIT_EVENTS.getName() + ".enum.compact");
         File c = new File(TEST_OUTPUT_DIR,
                 TEST_FRUIT_EVENTS.getName() + ".enum.compact.str");
 
-        DoubleEnumeratingDelegate indel = new DoubleEnumeratingDelegate(
+        DoubleEnumeratingDelegate inDelegate = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
-        DoubleEnumeratingDelegate outdel = new DoubleEnumeratingDelegate(
+        DoubleEnumeratingDelegate outDelegate = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, true, true, null, null);
 
 
@@ -272,10 +272,10 @@ public class WeightedEventsTest {
 
         {
             WeightedTokenPairSource aSrc = WeightedTokenPairSource.open(
-                    a, DEFAULT_CHARSET, indel, false, false);
+                    a, DEFAULT_CHARSET, inDelegate, false, false);
 
             WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
-                    b, DEFAULT_CHARSET, outdel, false, false, true);
+                    b, DEFAULT_CHARSET, outDelegate, false, false, true);
 //            bSink.setCompactFormatEnabled(true);
             ObjectIO.copy(aSrc, bSink);
             bSink.close();
@@ -286,9 +286,9 @@ public class WeightedEventsTest {
 
         {
             WeightedTokenPairSource bSrc = WeightedTokenPairSource.open(
-                    b, DEFAULT_CHARSET, outdel, false, false);
+                    b, DEFAULT_CHARSET, outDelegate, false, false);
             WeightedTokenPairSink cSink = WeightedTokenPairSink.open(
-                    c, DEFAULT_CHARSET, indel, false, false, false);
+                    c, DEFAULT_CHARSET, inDelegate, false, false, false);
 //            cSink.setCompactFormatEnabled(false);
             ObjectIO.copy(bSrc, cSink);
             cSink.close();
@@ -302,25 +302,25 @@ public class WeightedEventsTest {
     }
 
     @Test
-    public void testEventsPairCompactEnumeratorConversion_SkipIndex() throws FileNotFoundException, IOException {
+    public void testEventsPairCompactEnumeratorConversion_SkipIndex() throws IOException {
         File a = TEST_FRUIT_EVENTS;
         File b = new File(TEST_OUTPUT_DIR,
                 TEST_FRUIT_EVENTS.getName() + ".enum.skip.compact");
         File c = new File(TEST_OUTPUT_DIR,
                 TEST_FRUIT_EVENTS.getName() + ".enum.skip.compact.str");
 
-        DoubleEnumeratingDelegate indel = new DoubleEnumeratingDelegate(
+        DoubleEnumeratingDelegate inDelegate = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, false, false, null, null);
-        DoubleEnumeratingDelegate outdel = new DoubleEnumeratingDelegate(
+        DoubleEnumeratingDelegate outDelegate = new DoubleEnumeratingDelegate(
                 Enumerating.DEFAULT_TYPE, true, true, null, null);
 
 
         {
             WeightedTokenPairSource aSrc = WeightedTokenPairSource.open(
-                    a, DEFAULT_CHARSET, indel, false, false);
+                    a, DEFAULT_CHARSET, inDelegate, false, false);
 
             WeightedTokenPairSink bSink = WeightedTokenPairSink.open(
-                    b, DEFAULT_CHARSET, outdel, true, true, true);
+                    b, DEFAULT_CHARSET, outDelegate, true, true, true);
             ObjectIO.copy(aSrc, bSink);
             bSink.close();
         }
@@ -330,9 +330,9 @@ public class WeightedEventsTest {
 
         {
             WeightedTokenPairSource bSrc = WeightedTokenPairSource.open(
-                    b, DEFAULT_CHARSET, outdel, true, true);
+                    b, DEFAULT_CHARSET, outDelegate, true, true);
             WeightedTokenPairSink cSink = WeightedTokenPairSink.open(
-                    c, DEFAULT_CHARSET, indel, false, false,
+                    c, DEFAULT_CHARSET, inDelegate, false, false,
                     false);
             ObjectIO.copy(bSrc, cSink);
             cSink.close();

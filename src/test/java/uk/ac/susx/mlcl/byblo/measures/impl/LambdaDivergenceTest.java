@@ -110,7 +110,7 @@ public class LambdaDivergenceTest extends AbstractMeasureTest<LambdaDivergence> 
 		runFromCommandLine(0.99);
 	}
 
-	public void runFromCommandLine(final double lambda) throws Exception {
+	void runFromCommandLine(final double lambda) throws Exception {
 		System.out.printf("testRunFromCommandLine(lambda=%.2f)%n", lambda);
 
 		String[] extraArgs = new String[] { "--lambda-lambda",

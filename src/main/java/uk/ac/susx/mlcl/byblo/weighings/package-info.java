@@ -61,7 +61,7 @@
  * <p/>
  *
  * <li>{@link uk.ac.susx.mlcl.byblo.extras.weighings.AbstractContextualWeighting}
- * works in a mannar similar to
+ * works in a manner similar to
  * {@link uk.ac.susx.mlcl.byblo.extras.weighings.AbstractElementwiseWeighting}
  * but with even more information available through utility methods. For example
  * these class makes the marginal distributions available.

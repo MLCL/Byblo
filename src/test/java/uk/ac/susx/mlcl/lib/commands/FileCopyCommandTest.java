@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.lib.commands;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+import junit.framework.Assert;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,25 +54,12 @@ public class FileCopyCommandTest extends AbstractCommandTest<FileCopyCommand> {
         return FileCopyCommand.class;
     }
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     @Test
     public void testGetSrcFile() {
         System.out.println("Testing getSrcFile() and setSrcFile()");
-        File x = new File("x");
+        File expResult = new File("x");
         FileCopyCommand instance = new FileCopyCommand();
-        instance.filesDelegate.setSourceFile(x);
-        File expResult = x;
+        instance.filesDelegate.setSourceFile(expResult);
         File result = instance.filesDelegate.getSourceFile();
         assertEquals(expResult, result);
     }
@@ -79,19 +67,18 @@ public class FileCopyCommandTest extends AbstractCommandTest<FileCopyCommand> {
     @Test
     public void testGetDstFile() {
         System.out.println("Testing getDstFile() and setDstFile()");
-        File x = new File("x");
+        final File expected = new File("x");
         FileCopyCommand instance = new FileCopyCommand();
-        instance.filesDelegate.setDestinationFile(x);
-        File expResult = x;
-        File result = instance.filesDelegate.getDestinationFile();
-        assertEquals(expResult, result);
+        instance.filesDelegate.setDestinationFile(expected);
+        final File actual = instance.filesDelegate.getDestinationFile();
+        assertEquals(expected, actual);
     }
 
     @Test
     public void testRun_success() throws Exception {
         System.out.println("Testing run() -- expecting success");
         File in = File.createTempFile(getClass().getName(), "in");
-        String str = "blah blah yackaty schmackaty";
+        String str = "blah blah yakety schmackity";
         Files.writeAll(in, Files.DEFAULT_CHARSET, str);
         File out = File.createTempFile(getClass().getName(), "out");
         FileCopyCommand instance = new FileCopyCommand(in, out);
@@ -108,15 +95,14 @@ public class FileCopyCommandTest extends AbstractCommandTest<FileCopyCommand> {
             throw new IOException("Failed to delete file: " + out);
     }
 
-    @Test(expected = RuntimeException.class)
-    public void testRun_failure_noinput() throws Exception {
+    public void testRun_failure_noInput() throws Exception {
         System.out.println("Testing run() -- expecting failure (no input)");
         File in = File.createTempFile(getClass().getName(), "in");
         if (!in.delete())
             throw new IOException("Failed to delete file: " + in);
         File out = File.createTempFile(getClass().getName(), "out");
         FileCopyCommand instance = new FileCopyCommand(in, out);
-        assertTrue(instance.runCommand());
+        Assert.assertFalse(instance.runCommand());
         if (!in.delete())
             throw new IOException("Failed to delete file: " + in);
         if (!out.delete())

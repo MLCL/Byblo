@@ -59,7 +59,7 @@ public final class KullbackLeiblerDivergence implements Measure, Serializable {
      * explicitly set.
      */
     @Nonnegative
-    public static final int DEFAULT_MIN_CARDINALITY = 1;
+    private static final int DEFAULT_MIN_CARDINALITY = 1;
 
     /**
      * Expected dimensionality of vectors.
@@ -134,7 +134,7 @@ public final class KullbackLeiblerDivergence implements Measure, Serializable {
         final double sumA = A.sum + N;
         final double sumB = B.sum + N;
 
-        // The smoothed likelyhoods for zero frequency features
+        // The smoothed likelihoods for zero frequency features
         final double q0 = 1.0 / (A.sum + N);
         final double r0 = 1.0 / (B.sum + N);
         final double log_q0 = log2(q0);
@@ -209,9 +209,8 @@ public final class KullbackLeiblerDivergence implements Measure, Serializable {
 
         KullbackLeiblerDivergence that = (KullbackLeiblerDivergence) o;
 
-        if (minCardinality != that.minCardinality) return false;
+        return minCardinality == that.minCardinality;
 
-        return true;
     }
 
     @Override

@@ -101,7 +101,7 @@ public class ExternalSortEntriesCommand extends AbstractExternalSortCommand<Weig
         return indexDelegate;
     }
 
-    public final void setIndexDelegate(SingleEnumerating indexDelegate) {
+    final void setIndexDelegate(SingleEnumerating indexDelegate) {
         Checks.checkNotNull("indexDelegate", indexDelegate);
         this.indexDelegate = indexDelegate;
     }

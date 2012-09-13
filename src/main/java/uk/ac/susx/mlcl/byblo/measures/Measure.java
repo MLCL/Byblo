@@ -110,8 +110,8 @@ public interface Measure {
      * <p/>
      * In the case of distance measures, a commutative kernel will define a
      * <em>true</em> metric, while a non-commutative kernel will not. For
-     * example {@link KLDivergence} is a distance measure while the
-     * {@link LpSpace} variants are true metrics.
+     * example {@link uk.ac.susx.mlcl.byblo.measures.impl.KullbackLeiblerDivergence} is a distance measure while the
+     * {@link uk.ac.susx.mlcl.byblo.measures.impl.LpSpaceDistance} variants are true metrics.
      * <p/>
      *
      * @return true if the measure defines a symmetric space, false otherwise

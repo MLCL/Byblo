@@ -157,9 +157,8 @@ public final class LeeSkewDivergence implements Measure, Serializable {
 
         LeeSkewDivergence that = (LeeSkewDivergence) o;
 
-        if (Double.compare(that.alpha, alpha) != 0) return false;
+        return Double.compare(that.alpha, alpha) == 0;
 
-        return true;
     }
 
     @Override

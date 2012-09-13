@@ -77,7 +77,7 @@ public class JDBMTest {
         DB db = maker.make();
 
 
-        Map<String, String> map = db.<String, String>createHashMap("hashmap");
+        Map<String, String> map = db.createHashMap("hashmap");
 
         for (int i = 0; i < size; i++) {
             String s1 = Double.toString(Math.random());

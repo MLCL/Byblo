@@ -57,7 +57,7 @@ import static java.lang.Math.min;
  * The main performance problems occur with sequential iteration such as seeking
  * a next or previous element. In the worst case a seek operation is linear in
  * the size of the range being traversed (for example finding the next element
- * greater than 10 could take up to MAXINT-10 time). Backwards iteration is
+ * greater than 10 could take up to <code>{@link Integer#MAX_VALUE} - 10</code> time). Backwards iteration is
  * particularly bad but it can not be optimized as thoroughly due to limitations
  * of underlying BitSet public interface. Due to this limitation the following
  * operations should be used sparingly and with care: {@link #iterator() },
@@ -113,7 +113,7 @@ public final class IntBitSet extends AbstractIntSortedSet implements
     /**
      * Constant used to indicate a null element.
      */
-    public static final int NO_ELEMENT = -1;
+    private static final int NO_ELEMENT = -1;
     /**
      * Backing BitSet
      */
@@ -232,7 +232,7 @@ public final class IntBitSet extends AbstractIntSortedSet implements
     /**
      * Check that the set contains every element of <code>other</code>.
      *
-     * @param other bitset to be checked
+     * @param other BitSet to be checked
      * @return true if the set contains every element, false otherwise
      */
     public boolean containsAll(IntBitSet other) {
@@ -277,7 +277,7 @@ public final class IntBitSet extends AbstractIntSortedSet implements
     /**
      * Add the contents of <code>other</code> to the set.
      *
-     * @param other bitset to be added
+     * @param other BitSet to be added
      * @return true if the set changed due to this operation, false otherwise
      */
     public boolean addAll(IntBitSet other) {
@@ -531,7 +531,7 @@ public final class IntBitSet extends AbstractIntSortedSet implements
         /*
            * Find starting point for backwards search. Either the specified 'end',
            * or the BitSet length. Public health warning: BitSet.length() returns
-           * the NEGATIVE value maxint+1 (-2147483648) when the last (maxint) bit
+           * the NEGATIVE value {@link Integer#MAX_VALUE}+1 (-2147483648) when the last (Integer#MAX_VALUE) bit
            * is set; causing all kinds of fun.
            */
 
@@ -599,7 +599,7 @@ public final class IntBitSet extends AbstractIntSortedSet implements
                 throw new IllegalArgumentException("toElement < fromElement");
             if (fromElement == NO_ELEMENT && toElement == NO_ELEMENT)
                 throw new IllegalArgumentException(
-                        "Meaningless attempt to create a subset without range delibmeters.");
+                        "Meaningless attempt to create a subset without range delimiters.");
 
             this.fromElement = fromElement;
             this.toElement = toElement;
@@ -615,9 +615,7 @@ public final class IntBitSet extends AbstractIntSortedSet implements
 
         @Override
         public boolean contains(int k) {
-            if (isFromElementSet && k < fromElement)
-                return false;
-            return !(isToElementSet && k >= toElement) && IntBitSet.this.contains(k);
+            return !(isFromElementSet && k < fromElement) && !(isToElementSet && k >= toElement) && IntBitSet.this.contains(k);
         }
 
         @Override
@@ -625,7 +623,7 @@ public final class IntBitSet extends AbstractIntSortedSet implements
         public IntSortedSet subSet(final int fromElement, final int toElement) {
             if (fromElement == NO_ELEMENT && toElement == NO_ELEMENT)
                 throw new IllegalArgumentException(
-                        "Meaningless attempt to create a subset without range delibmeters.");
+                        "Meaningless attempt to create a subset without range delimiters.");
             return new SubSet(Math.max(this.fromElement, fromElement), min(
                     this.toElement, toElement));
         }
@@ -635,7 +633,7 @@ public final class IntBitSet extends AbstractIntSortedSet implements
         public IntSortedSet headSet(final int toElement) {
             if (toElement == NO_ELEMENT)
                 throw new IllegalArgumentException(
-                        "Meaningless attempt to create a headset without end delibmeter.");
+                        "Meaningless attempt to create a headset without end delimiters.");
             final int to = !isToElementSet ? toElement : min(this.toElement,
                     toElement);
             return new SubSet(fromElement, to);
@@ -646,7 +644,7 @@ public final class IntBitSet extends AbstractIntSortedSet implements
         public IntSortedSet tailSet(final int fromElement) {
             if (fromElement == NO_ELEMENT)
                 throw new IllegalArgumentException(
-                        "Meaningless attempt to create a tailset without start delibmeter.");
+                        "Meaningless attempt to create a tail-set without start delimiters.");
             final int from = !isFromElementSet ? fromElement : Math.max(
                     this.fromElement, fromElement);
             return new SubSet(from, toElement);

@@ -30,12 +30,15 @@
  */
 package uk.ac.susx.mlcl.byblo.weighings;
 
+import com.google.common.base.Preconditions;
+import com.sun.istack.internal.NotNull;
+
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nullable;
 
 /**
  * {@link AbstractContextualWeighting} is an abstract super class that combines
- * an {@link ElementwiseWeighting} scheme with the availability of feature
+ * an {@link AbstractElementwiseWeighting} scheme with the availability of feature
  * marginal scores via {@link FeatureMarginalsCarrier}.
  * <p/>
  *
@@ -49,7 +52,7 @@ public abstract class AbstractContextualWeighting
     @Nullable
     private MarginalDistribution featureMarginals = null;
 
-    public AbstractContextualWeighting() {
+    protected AbstractContextualWeighting() {
     }
 
     @Override
@@ -61,7 +64,8 @@ public abstract class AbstractContextualWeighting
     }
 
     @Override
-    public void setFeatureMarginals(MarginalDistribution featureMarginals) {
+    public void setFeatureMarginals(@NotNull MarginalDistribution featureMarginals) {
+        Preconditions.checkNotNull(featureMarginals, "featureMarginals");
         this.featureMarginals = featureMarginals;
     }
 
@@ -71,21 +75,15 @@ public abstract class AbstractContextualWeighting
     }
 
     protected boolean equals(AbstractContextualWeighting other) {
-        if (this.featureMarginals != other.featureMarginals
+        return !(this.featureMarginals != other.featureMarginals
                 && (this.featureMarginals == null
                 || !this.featureMarginals.equals(
-                other.featureMarginals)))
-            return false;
-        return true;
+                other.featureMarginals)));
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        return equals((AbstractContextualWeighting) obj);
+        return obj == this || !(obj == null || getClass() != obj.getClass()) && equals((AbstractContextualWeighting) obj);
     }
 
     @Override

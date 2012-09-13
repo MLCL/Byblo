@@ -48,7 +48,7 @@ public class FileDelegate {
             description = "The character set encoding to use for both reading input and writing output files.")
     private Charset charset = Files.DEFAULT_CHARSET;
 
-    public FileDelegate(Charset charset) {
+    protected FileDelegate(Charset charset) {
         setCharset(charset);
     }
 

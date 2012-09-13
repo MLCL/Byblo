@@ -53,7 +53,7 @@ public class FileMoveTask extends FileCopyTask {
         super();
     }
 
-    protected static void move(File from, File to) throws IOException {
+    private static void move(File from, File to) throws IOException {
 
 
         if (!from.renameTo(to)) {

@@ -65,20 +65,8 @@ public class ExternalSortEventsCommandTest extends
         return ExternalSortEventsCommand.class;
     }
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     @Test
-    public void testSortWeightedTokenPairCommand() throws IOException,
+    public void testSortWeightedTokenPairCommand() throws
             Exception {
         System.out.println("Testing SortWeightedTokenPairCommand");
 
@@ -110,7 +98,7 @@ public class ExternalSortEventsCommandTest extends
 
     @Test
     @Ignore
-    public void testSortWeightedTokenPairCommand_Indexed() throws IOException,
+    public void testSortWeightedTokenPairCommand_Indexed() throws
             Exception {
         System.out.println("Testing SortWeightedTokenPairCommand (Indexed)");
 
@@ -142,7 +130,7 @@ public class ExternalSortEventsCommandTest extends
 
     private void testSortWeightedTokenPairCommand(File inputFile,
                                                   File randomisedFile, File sortedFile, DoubleEnumerating idx,
-                                                  Comparator<Weighted<TokenPair>> comparator) throws IOException,
+                                                  Comparator<Weighted<TokenPair>> comparator) throws
             Exception {
 
         assertTrue("Input file does not exist", inputFile.exists());
@@ -249,8 +237,7 @@ public class ExternalSortEventsCommandTest extends
             swap(list, i, rand.nextInt(list.size()));
     }
 
-    private static WeightedTokenPairSource openSource(File file,
-                                                      DoubleEnumerating idx, boolean skip1, boolean skip2)
+    private static WeightedTokenPairSource openSource(File file, DoubleEnumerating idx, boolean skip1, boolean skip2)
             throws IOException {
         return WeightedTokenPairSource.open(file, DEFAULT_CHARSET, idx, skip1,
                 skip2);

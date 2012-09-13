@@ -85,8 +85,7 @@ public class WeightedTokenPairVectorSource
             // XXX position() should not need to be called every iteration
             tell = inner.position();
             readNext();
-        } while (next != null && next.record().id1() == start.record().
-                id1());
+        } while (next != null && next.record().id1() == start.record().id1());
 
         SparseDoubleVector v = toDoubleVector(features, cardinality);
 
@@ -114,8 +113,8 @@ public class WeightedTokenPairVectorSource
         }
     }
 
-    public static SparseDoubleVector toDoubleVector(Int2DoubleMap map,
-                                                    int cardinality) {
+    private static SparseDoubleVector toDoubleVector(Int2DoubleMap map,
+                                                     int cardinality) {
         if (map == null) {
             throw new NullPointerException();
         }

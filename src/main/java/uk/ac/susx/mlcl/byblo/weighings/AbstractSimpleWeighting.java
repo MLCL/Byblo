@@ -36,7 +36,7 @@ import javax.annotation.CheckReturnValue;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * {@link SimpleWeighting} defines a function that maps element-wise from a
+ * <code>AbstractSimpleWeighting</code> defines a function that maps element-wise from a
  * single feature input weight to the output weight.
  * <p/>
  * This class can be extends to implement a {@link Weighting} when each elements
@@ -53,7 +53,7 @@ public abstract class AbstractSimpleWeighting implements Weighting {
     /**
      * Construct a new instance of {@link AbstractSimpleWeighting}
      */
-    public AbstractSimpleWeighting() {
+    protected AbstractSimpleWeighting() {
     }
 
     @Override

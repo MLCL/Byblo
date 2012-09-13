@@ -36,7 +36,7 @@ import java.util.NoSuchElementException;
 import java.util.Random;
 
 public class UniformIntGenerator extends AbstractIntIterator {
-    public static final int NO_LIMIT = -1;
+    private static final int NO_LIMIT = -1;
     private static final int DEFAULT_MIN_VALUE = 0;
     private static final int DEFAULT_MAX_VALUE = Integer.MAX_VALUE;
     private final Random rand;

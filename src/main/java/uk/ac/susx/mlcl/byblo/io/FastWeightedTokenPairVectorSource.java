@@ -69,7 +69,7 @@ public class FastWeightedTokenPairVectorSource
 
     private Tell tell;
 
-    public FastWeightedTokenPairVectorSource(
+    private FastWeightedTokenPairVectorSource(
             SeekableDataSource inner) throws IOException {
         this.inner = inner;
         tell = inner.position();
@@ -141,8 +141,8 @@ public class FastWeightedTokenPairVectorSource
             ((Closeable) inner).close();
     }
 
-    public static SparseDoubleVector toDoubleVector(Int2DoubleMap map,
-                                                    int cardinality) {
+    private static SparseDoubleVector toDoubleVector(Int2DoubleMap map,
+                                                     int cardinality) {
         if (map == null) {
             throw new NullPointerException();
         }

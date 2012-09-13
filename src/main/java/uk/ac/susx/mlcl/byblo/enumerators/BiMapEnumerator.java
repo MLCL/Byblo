@@ -67,7 +67,7 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
      * @param map    BiMap to delegate storage too.
      * @param nextId Integer value of key to assign to next added element.
      */
-    protected BiMapEnumerator(
+    BiMapEnumerator(
             final BiMap<Integer, T> map,
             final AtomicInteger nextId) {
         Checks.checkNotNull("map", map);
@@ -84,23 +84,23 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
         this(map, new AtomicInteger(max(map) + 1));
     }
 
-    protected BiMapEnumerator(Map<Integer, T> forwards,
-                              Map<T, Integer> backwards) {
+    private BiMapEnumerator(Map<Integer, T> forwards,
+                            Map<T, Integer> backwards) {
         Checks.checkNotNull("forwards", forwards);
         Checks.checkNotNull("backwards", backwards);
         assert forwards.size() == backwards.size();
         assert forwards.keySet().containsAll(backwards.values());
         assert backwards.keySet().containsAll(forwards.values());
 
-        map = ForwardingBiMap.<Integer, T>create(forwards, backwards);
+        map = ForwardingBiMap.create(forwards, backwards);
         nextId = new AtomicInteger(max(forwards));
     }
 
-    public BiMapEnumerator() {
+    BiMapEnumerator() {
         this(new HashMap<Integer, T>(), new HashMap<T, Integer>());
     }
 
-    public int getNextId() {
+    int getNextId() {
         return nextId.get();
     }
 
@@ -133,7 +133,7 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
         return value;
     }
 
-    protected void put(final int id, final T obj) {
+    void put(final int id, final T obj) {
         map.put(id, obj);
         if (nextId.get() <= id)
             nextId.set(id + 1);
@@ -141,19 +141,11 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-        return obj != null
-                && getClass() != obj.getClass()
-                && equals((BiMapEnumerator<?>) obj);
+        return obj == this || obj != null && getClass() != obj.getClass() && equals((BiMapEnumerator<?>) obj);
     }
 
-    public boolean equals(BiMapEnumerator<?> other) {
-        if (!nextId.equals(other.nextId) && (nextId == null || !nextId.equals(other.nextId)))
-            return false;
-        if (map != other.map && (map == null || !map.equals(other.map)))
-            return false;
-        return true;
+    boolean equals(BiMapEnumerator<?> other) {
+        return !(!nextId.equals(other.nextId) && (!nextId.equals(other.nextId))) && !(map != other.map && (map == null || !map.equals(other.map)));
     }
 
     @Override
@@ -181,9 +173,6 @@ public class BiMapEnumerator<T> implements Serializable, Enumerator<T> {
         private static final long serialVersionUID = 1;
 
         private BiMapEnumerator<T> instance;
-
-        public Serializer() {
-        }
 
         Serializer(final BiMapEnumerator<T> instance) {
             if (instance == null) {

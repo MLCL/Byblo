@@ -84,17 +84,17 @@ public class FullBuildTest {
 
     @Test
     @Ignore
-    public void testRunCommand_Medtest100k_skipboth() throws Exception {
+    public void testRunCommand_Medtest100k_skipBoth() throws Exception {
         testRunCommand_Medtest100k("100k", true, true);
     }
 
     @Test
     @Ignore
-    public void testRunCommand_Medtest1m_skipboth() throws Exception {
+    public void testRunCommand_Medtest1m_skipBoth() throws Exception {
         testRunCommand_Medtest100k("1m", true, true);
     }
 
-    public static void testRunCommand_Medtest100k(
+    private static void testRunCommand_Medtest100k(
             String sampleName, boolean skip1, boolean skip2) throws Exception {
 
         File input = new File(TEST_DATA_DIR,
@@ -102,7 +102,7 @@ public class FullBuildTest {
 
         String name = "medtest-" + sampleName;
         if (skip1 && skip2)
-            name += "-skipboth";
+            name += "-skipBoth";
         else if (skip1)
             name += "-skip1";
         else if (skip2)

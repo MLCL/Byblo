@@ -71,13 +71,13 @@ public abstract class AbstractExternalSortCommand<T>
     private static final Log LOG = LogFactory.getLog(
             AbstractExternalSortCommand.class);
 
-    protected static final String KEY_SRC_FILE = "sort.src.file";
+    private static final String KEY_SRC_FILE = "sort.src.file";
 
-    protected static final String KEY_SRC_FILE_A = "sort.src.file.a";
+    private static final String KEY_SRC_FILE_A = "sort.src.file.a";
 
-    protected static final String KEY_SRC_FILE_B = "sort.src.file.b";
+    private static final String KEY_SRC_FILE_B = "sort.src.file.b";
 
-    protected static final String KEY_DST_FILE = "sort.dst.file";
+    private static final String KEY_DST_FILE = "sort.dst.file";
 
     private static final boolean DEBUG = false;
 
@@ -118,7 +118,7 @@ public abstract class AbstractExternalSortCommand<T>
         return fileDelegate;
     }
 
-    public FileFactory getTempFileFactory() {
+    FileFactory getTempFileFactory() {
         return tempFileFactory;
     }
 
@@ -127,7 +127,7 @@ public abstract class AbstractExternalSortCommand<T>
         this.tempFileFactory = tempFileFactory;
     }
 
-    public final boolean isReverse() {
+    final boolean isReverse() {
         return reverse;
     }
 
@@ -135,7 +135,7 @@ public abstract class AbstractExternalSortCommand<T>
         this.reverse = reverse;
     }
 
-    public Comparator<T> getComparator() {
+    Comparator<T> getComparator() {
         return isReverse() ? Comparators.reverse(comparator) : comparator;
     }
 
@@ -272,7 +272,7 @@ public abstract class AbstractExternalSortCommand<T>
 
     }
 
-    protected void handleCompletedTask(Task task) throws Exception {
+    void handleCompletedTask(Task task) throws Exception {
         Checks.checkNotNull("task", task);
         task.throwTrappedException();
 
@@ -327,7 +327,7 @@ public abstract class AbstractExternalSortCommand<T>
         return super.submitTask(task);
     }
 
-    protected void queueMergeTask(File file, int depth) throws IOException, Exception {
+    void queueMergeTask(File file, int depth) throws Exception {
         Checks.checkNotNull("file", file);
 
         if (nextFileToMerge[depth] == null) {
@@ -338,9 +338,8 @@ public abstract class AbstractExternalSortCommand<T>
 
             File srcA = nextFileToMerge[depth];
             nextFileToMerge[depth] = null;
-            File srcB = file;
             File dst = getTempFileFactory().createFile();
-            ObjectMergeTask<T> mergeTask = createMergeTask(srcA, srcB, dst);
+            ObjectMergeTask<T> mergeTask = createMergeTask(srcA, file, dst);
             mergeTask.setProperty("depth", Integer.toString(depth));
             submitTask(mergeTask);
 
@@ -348,13 +347,13 @@ public abstract class AbstractExternalSortCommand<T>
         }
     }
 
-    protected FileDeleteTask createDeleteTask(File file) {
+    FileDeleteTask createDeleteTask(File file) {
         FileDeleteTask task = new FileDeleteTask(file);
         progress.addChildProgressReporter(task);
         return task;
     }
 
-    protected ObjectSortTask<T> createSortTask(Chunk<T> chunk, File dst) throws IOException {
+    ObjectSortTask<T> createSortTask(Chunk<T> chunk, File dst) throws IOException {
         ObjectSink<T> sink = openSink(dst);
         ObjectSortTask<T> task = new ObjectSortTask<T>();
         task.setSource(chunk);
@@ -370,7 +369,7 @@ public abstract class AbstractExternalSortCommand<T>
         return task;
     }
 
-    protected ObjectMergeTask<T> createMergeTask(File srcA, File srcB, File dst) throws IOException {
+    ObjectMergeTask<T> createMergeTask(File srcA, File srcB, File dst) throws IOException {
         ObjectSource<T> source1 = openSource(srcA);
         ObjectSource<T> source2 = openSource(srcB);
         ObjectSink<T> sink = openSink(dst);
@@ -401,7 +400,7 @@ public abstract class AbstractExternalSortCommand<T>
         fileDelegate.setCharset(charset);
     }
 
-    public final Charset getCharset() {
+    final Charset getCharset() {
         return fileDelegate.getCharset();
     }
 

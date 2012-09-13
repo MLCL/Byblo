@@ -69,17 +69,6 @@ public class ExternalSimsKnnCommandTest extends
         return ExternalKnnSimsCommand.class;
     }
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
 
     private static final String subject = ExternalKnnSimsCommand.class
             .getName();
@@ -133,11 +122,10 @@ public class ExternalSimsKnnCommandTest extends
     @Ignore
     public void testEmptyInputFile() throws Exception {
         try {
-            File in = new File(TestConstants.TEST_OUTPUT_DIR,
-                    "extknn-test-empty.in");
-            in.createNewFile();
-            File out = new File(TestConstants.TEST_OUTPUT_DIR,
-                    "extknn-test-empty.out");
+            File in = new File(TestConstants.TEST_OUTPUT_DIR, "extknn-test-empty.in");
+            if(!in.createNewFile())
+                throw new AssertionError("Failed to create file: " + in);
+            File out = new File(TestConstants.TEST_OUTPUT_DIR, "extknn-test-empty.out");
 
             ExitTrapper.enableExistTrapping();
             Tools.main(new String[]{"knn", "-i", in.toString(), "-o",
@@ -205,7 +193,7 @@ public class ExternalSimsKnnCommandTest extends
      *
      * @throws java.io.IOException
      */
-    public static void generateSimsData(
+    private static void generateSimsData(
             final File outFile, final int nEntries) throws IOException {
 
         System.out.printf("Generating sims data for KnnTask (nEntries=%d)...%n", nEntries);

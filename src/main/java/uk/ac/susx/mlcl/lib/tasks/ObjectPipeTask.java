@@ -51,13 +51,13 @@ public class ObjectPipeTask<T> extends AbstractTask
 
     private static final long serialVersionUID = 1L;
 
-    protected final ProgressDelegate progress = new ProgressDelegate(this, false);
+    final ProgressDelegate progress = new ProgressDelegate(this, false);
 
     private ObjectSource<T> source;
 
     private ObjectSink<T> sink;
 
-    public ObjectPipeTask(ObjectSource<T> source, ObjectSink<T> sink) {
+    ObjectPipeTask(ObjectSource<T> source, ObjectSink<T> sink) {
         setSource(source);
         setSink(sink);
     }
@@ -114,36 +114,21 @@ public class ObjectPipeTask<T> extends AbstractTask
     }
 
     @Override
-    protected void finaliseTask() throws Exception {
-        // nothing to do
-    }
-
-    @Override
     protected Objects.ToStringHelper toStringHelper() {
         return super.toStringHelper().
                 add("source", getSource()).
                 add("sink", getSink());
     }
 
-    public boolean equals(ObjectPipeTask<?> that) {
-        if (!super.equals((AbstractTask) that))
+    boolean equals(ObjectPipeTask<?> that) {
+        if (!super.equals(that))
             return false;
-        if (this.getSource() != that.getSource()
-                && (this.getSource() == null || !this.getSource().equals(that.
-                getSource())))
-            return false;
-        if (this.getSink() != that.getSink()
-                && (this.getSink() == null || !this.getSink().equals(that.
-                getSink())))
-            return false;
-        return true;
+        return !(this.getSource() != that.getSource() && (this.getSource() == null || !this.getSource().equals(that.getSource()))) && !(this.getSink() != that.getSink() && (this.getSink() == null || !this.getSink().equals(that.getSink())));
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
-            return false;
-        return getClass() == obj.getClass() && equals((ObjectPipeTask<?>) obj);
+        return obj != null && getClass() == obj.getClass() && equals((ObjectPipeTask<?>) obj);
     }
 
     @Override

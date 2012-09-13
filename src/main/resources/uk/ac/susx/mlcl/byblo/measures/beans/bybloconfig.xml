@@ -24,7 +24,6 @@ All Rights Reserved.
             <measure c-class="uk.ac.susx.mlcl.byblo.config.beans.MeasureInfo">
                 <name>cosine</name>
                 <type>uk.ac.susx.mlcl.byblo.measures.impl.Cosine</type>
-                <description></description>
             </measure>
             
             <measure c-class="uk.ac.susx.mlcl.byblo.config.beans.MeasureInfo">

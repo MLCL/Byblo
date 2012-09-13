@@ -52,9 +52,9 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
 
     private static final long serialVersionUID = 1L;
 
-    double weight;
+    private double weight;
 
-    T record;
+    private T record;
 
     public Weighted(final T record, final double weight) {
         this.weight = weight;
@@ -88,13 +88,10 @@ public class Weighted<T> implements Serializable, Comparable<Weighted<T>> {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        return !(obj == null || getClass() != obj.getClass()) && equals((Weighted<?>) obj);
+        return obj == this || !(obj == null || getClass() != obj.getClass()) && equals((Weighted<?>) obj);
     }
 
-    public boolean equals(Weighted<?> other) {
+    boolean equals(Weighted<?> other) {
         return record.equals(other.record());
     }
 

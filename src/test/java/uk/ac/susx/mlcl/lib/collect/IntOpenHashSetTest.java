@@ -73,19 +73,19 @@ public class IntOpenHashSetTest {
 
         // Initialize both implementations with the same data
         IntOpenHashSet instance = new IntOpenHashSet(initialElements);
-        IntRBTreeSet refenceInstance = new IntRBTreeSet(initialElements);
+        IntRBTreeSet referenceInstance = new IntRBTreeSet(initialElements);
 
         instance.retainAll(retainElements);
-        refenceInstance.retainAll(retainElements);
+        referenceInstance.retainAll(retainElements);
 
         // print the correct result {586}
-        System.out.println("ref: " + refenceInstance);
+        System.out.println("ref: " + referenceInstance);
 
         // prints {586, 7379}, which is clearly wrong
         System.out.println("ohm: " + instance);
 
         // Fails
-        assertEquals(instance, refenceInstance);
+        assertEquals(instance, referenceInstance);
     }
 
 }

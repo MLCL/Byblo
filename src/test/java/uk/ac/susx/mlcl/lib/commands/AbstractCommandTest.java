@@ -43,29 +43,7 @@ import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractCommandTest<T extends Command> extends AbstractObjectTest<T> {
 
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-        AbstractObjectTest.setUpClass();
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-        AbstractObjectTest.tearDownClass();
-    }
-
-    public boolean hasMethod(String name, Class<?>... parameterTypes) {
+    boolean hasMethod(String name, Class<?>... parameterTypes) {
         try {
             getImplementation().getMethod(name, parameterTypes);
             return true;

@@ -50,31 +50,31 @@ public class Bound
 
     private static final long serialVersionUID = 1L;
 
-    public static final double DEFAULT_LOWER_BOUND = Double.NEGATIVE_INFINITY;
+    private static final double DEFAULT_LOWER_BOUND = Double.NEGATIVE_INFINITY;
 
-    public static final double DEFAULT_UPPER_BOUND = Double.POSITIVE_INFINITY;
+    private static final double DEFAULT_UPPER_BOUND = Double.POSITIVE_INFINITY;
 
-    public double lowerBound;
+    private double lowerBound;
 
-    public double upperBound;
+    private double upperBound;
 
-    public Bound() {
+    Bound() {
         setLowerBound(DEFAULT_LOWER_BOUND);
         setUpperBound(DEFAULT_UPPER_BOUND);
     }
 
-    public Bound(double lowerBound, double upperBound) {
+    Bound(double lowerBound, double upperBound) {
         setLowerBound(lowerBound);
         setUpperBound(upperBound);
     }
 
-    public void setLowerBound(final double lowerBound) {
+    void setLowerBound(final double lowerBound) {
         if (Double.isNaN(lowerBound))
             throw new IllegalArgumentException("lowerBound");
         this.lowerBound = lowerBound;
     }
 
-    public void setUpperBound(final double upperBound) {
+    void setUpperBound(final double upperBound) {
         if (Double.isNaN(lowerBound))
             throw new IllegalArgumentException("upperBound");
         this.upperBound = upperBound;
@@ -106,22 +106,12 @@ public class Bound
     }
 
     private boolean equals(Bound that) {
-        if (Double.doubleToLongBits(this.lowerBound)
-                != Double.doubleToLongBits(that.lowerBound))
-            return false;
-        if (Double.doubleToLongBits(this.upperBound)
-                != Double.doubleToLongBits(that.upperBound))
-            return false;
-        return true;
+        return Double.doubleToLongBits(this.lowerBound) == Double.doubleToLongBits(that.lowerBound) && Double.doubleToLongBits(this.upperBound) == Double.doubleToLongBits(that.upperBound);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == this)
-            return true;
-        if (obj == null || getClass() != obj.getClass())
-            return false;
-        return equals((Bound) obj);
+        return obj == this || !(obj == null || getClass() != obj.getClass()) && equals((Bound) obj);
     }
 
     @Override

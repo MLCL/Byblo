@@ -54,8 +54,7 @@ public class WeightedTokenPairSource
 
     private final SeekableDataSource inner;
 
-    public WeightedTokenPairSource(SeekableDataSource inner)
-            throws FileNotFoundException, IOException {
+    private WeightedTokenPairSource(SeekableDataSource inner) {
 
         this.inner = inner;
     }

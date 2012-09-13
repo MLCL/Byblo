@@ -44,7 +44,7 @@ import java.io.IOException;
  * @deprecated
  */
 @Deprecated
-public class WeightedTokenPairVectorSink
+class WeightedTokenPairVectorSink
         implements ObjectSink<Indexed<SparseDoubleVector>>, Flushable, Closeable {
 
     private final WeightedTokenPairSink inner;

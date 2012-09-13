@@ -67,7 +67,7 @@ public class SortEventsCommand extends AbstractSortCommand<Weighted<TokenPair>> 
         setIndexDelegate(indexDelegate);
     }
 
-    public SortEventsCommand() {
+    SortEventsCommand() {
     }
 
     @Override
@@ -84,7 +84,7 @@ public class SortEventsCommand extends AbstractSortCommand<Weighted<TokenPair>> 
 
     }
 
-    public final DoubleEnumerating getIndexDelegate() {
+    final DoubleEnumerating getIndexDelegate() {
         return indexDelegate;
     }
 
@@ -95,13 +95,13 @@ public class SortEventsCommand extends AbstractSortCommand<Weighted<TokenPair>> 
 
     @Override
     protected ObjectSource<Weighted<TokenPair>> openSource(File file)
-            throws FileNotFoundException, IOException {
+            throws IOException {
         return BybloIO.openEventsSource(file, getCharset(), indexDelegate);
     }
 
     @Override
     protected ObjectSink<Weighted<TokenPair>> openSink(File file)
-            throws FileNotFoundException, IOException {
+            throws IOException {
         return new WeightSumReducerObjectSink<TokenPair>(
                 BybloIO.openEventsSink(file, getCharset(), indexDelegate));
     }

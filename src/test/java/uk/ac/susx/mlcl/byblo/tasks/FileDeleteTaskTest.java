@@ -84,14 +84,13 @@ public class FileDeleteTaskTest extends AbstractObjectTest<FileDeleteTask> {
 
     @Test
     public void testGetSetFile() throws IOException {
-        File tmp = File.createTempFile(getClass().getName(), "");
-        FileDeleteTask instance = new FileDeleteTask(tmp);
-        File expResult = tmp;
-        assertEquals(expResult, instance.getFile());
+        File expected = File.createTempFile(getClass().getName(), "");
+        FileDeleteTask instance = new FileDeleteTask(expected);
+        assertEquals(expected, instance.getFile());
         instance = new FileDeleteTask();
-        instance.setFile(tmp);
-        assertEquals(tmp, instance.getFile());
-        if (!tmp.delete())
-            throw new IOException("Failed to delete file: " + tmp);
+        instance.setFile(expected);
+        assertEquals(expected, instance.getFile());
+        if (!expected.delete())
+            throw new IOException("Failed to delete file: " + expected);
     }
 }

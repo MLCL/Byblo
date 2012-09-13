@@ -30,6 +30,8 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
+import com.google.common.base.Preconditions;
+import com.sun.istack.internal.NotNull;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsCarrier;
 import uk.ac.susx.mlcl.byblo.weighings.MarginalDistribution;
@@ -59,20 +61,20 @@ import javax.annotation.Nullable;
  * </ul>
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
- * @see JE Weeds (2003) "Measures and Applications of Lexical Distributional
+ * @see "JE Weeds (2003) "Measures and Applications of Lexical Distributional
  *      Similarity", which references (Sugawara, Nishimura, Toshioka, Okachi, &
  *      Kaneko, 1985; Essen & Steinbiss, 1992; Grishman & Sterling, 1993; Dagan et
- *      al., 1999; Lapata et al., 2001)
- * @see Essen, Ute and Volker Steinbiss. 1992. Co-occurrence smoothing for
+ *      al., 1999; Lapata et al., 2001)"
+ * @see "Essen, Ute and Volker Steinbiss. 1992. Co-occurrence smoothing for
  *      stochastic language modeling. In Proceedings of ICASSP, volume 1, pages
- *      161{164.
- * @see Sugawara, K., M. Nishimura, K. Toshioka, M. Okochi, and T. Kaneko. 1985.
+ *      161{164."
+ * @see "Sugawara, K., M. Nishimura, K. Toshioka, M. Okochi, and T. Kaneko. 1985.
  *      Isolated word recognition using hidden Markov models. In Proceedings of
- *      ICASSP, pages 1--4, Tampa, Florida. IEEE.
- * @see Grishman, Ralph and John Sterling. 1993. Smoothing of automatically
+ *      ICASSP, pages 1--4, Tampa, Florida. IEEE."
+ * @see "Grishman, Ralph and John Sterling. 1993. Smoothing of automatically
  *      generated selectional constraints. In Human Language Technology, pages
  *      254{259, San Francisco, California. Advanced Research Projects Agency,
- *      Software and Intelligent Systems Technology Oce, Morgan Kaufmann.
+ *      Software and Intelligent Systems Technology Oce, Morgan Kaufmann."
  */
 @CheckReturnValue
 public class Confusion implements Measure, FeatureMarginalsCarrier {
@@ -92,7 +94,8 @@ public class Confusion implements Measure, FeatureMarginalsCarrier {
     }
 
     @Override
-    public void setFeatureMarginals(MarginalDistribution featureMarginals) {
+    public void setFeatureMarginals(@NotNull MarginalDistribution featureMarginals) {
+        Preconditions.checkNotNull(featureMarginals, "featureMarginals");
         this.featureMarginals = featureMarginals;
     }
 
@@ -103,7 +106,8 @@ public class Confusion implements Measure, FeatureMarginalsCarrier {
 
     @Override
     @CheckReturnValue
-    public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
+    public double similarity(@NotNull SparseDoubleVector A, @NotNull SparseDoubleVector B) {
+        assert featureMarginals != null;
         final double N = featureMarginals.getFrequencySum();
 
         double sum = 0.0;

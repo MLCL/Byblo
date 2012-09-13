@@ -43,18 +43,18 @@ import java.util.Map;
  */
 public final class ConverterFactory implements IStringConverterFactory {
 
-    private final Map<Class<?>, Class<? extends IStringConverter<?>>> conv;
+    private final Map<Class<?>, Class<? extends IStringConverter<?>>> converter;
 
     public ConverterFactory() {
-        conv = new HashMap<Class<?>, Class<? extends IStringConverter<?>>>();
-        conv.put(Charset.class, CharsetStringConverter.class);
-        conv.put(TempFileFactory.class, TempFileFactoryConverter.class);
+        converter = new HashMap<Class<?>, Class<? extends IStringConverter<?>>>();
+        converter.put(Charset.class, CharsetStringConverter.class);
+        converter.put(TempFileFactory.class, TempFileFactoryConverter.class);
     }
 
     @SuppressWarnings(value = "unchecked")
     @Override
     public <T> Class<? extends IStringConverter<T>> getConverter(
             Class<T> forType) {
-        return (Class<? extends IStringConverter<T>>) conv.get(forType);
+        return (Class<? extends IStringConverter<T>>) converter.get(forType);
     }
 }

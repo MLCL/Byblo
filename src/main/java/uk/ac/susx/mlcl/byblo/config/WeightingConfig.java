@@ -40,7 +40,7 @@ public interface WeightingConfig {
 
     String getName();
 
-    Class<? extends Measure> getClazz() throws ClassNotFoundException;
+    Class<? extends Measure> getClazz();
 
     String getDescription();
 

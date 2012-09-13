@@ -48,7 +48,7 @@ import java.io.File;
 public class FileCopyCommand extends AbstractCommand {
 
     @ParametersDelegate
-    protected final FilePipeDelegate filesDelegate = new FilePipeDelegate();
+    final FilePipeDelegate filesDelegate = new FilePipeDelegate();
 
     public FileCopyCommand(File sourceFile, File destinationFile) {
         filesDelegate.setSourceFile(sourceFile);
@@ -84,10 +84,15 @@ public class FileCopyCommand extends AbstractCommand {
 
         task.run();
 
-        while (task.isExceptionTrapped())
-            throw new RuntimeException(task.getTrappedException());
 
-        return true;
+        try {
+            if (task.isExceptionTrapped())
+                task.throwTrappedException();
+            return true;
+        } catch (Exception e) {
+            System.err.print(e);
+            return false;
+        }
     }
 
     @Override

@@ -50,7 +50,7 @@ public class ProgressDelegate implements ProgressReporting {
 
     private static final Log LOG = LogFactory.getLog(ProgressDelegate.class);
 
-    private CopyOnWriteArrayList<ProgressListener> progressListeners =
+    private final CopyOnWriteArrayList<ProgressListener> progressListeners =
             new CopyOnWriteArrayList<ProgressListener>();
 
     private final ProgressReporting outer;
@@ -67,7 +67,7 @@ public class ProgressDelegate implements ProgressReporting {
 
     private boolean stateChangedSinceLastEvent = false;
 
-    private AtomicInteger adjustingCount = new AtomicInteger(0);
+    private final AtomicInteger adjustingCount = new AtomicInteger(0);
 
     public ProgressDelegate(ProgressReporting outer, boolean progressPercentageSupported) {
         if (outer == this)
@@ -97,11 +97,11 @@ public class ProgressDelegate implements ProgressReporting {
         return stateChangedSinceLastEvent;
     }
 
-    public void setStateChangedSinceLastEvent() {
+    void setStateChangedSinceLastEvent() {
         this.stateChangedSinceLastEvent = true;
     }
 
-    public ProgressReporting getOuter() {
+    ProgressReporting getOuter() {
         return outer;
     }
 
@@ -250,7 +250,7 @@ public class ProgressDelegate implements ProgressReporting {
         return progressListeners.toArray(new ProgressListener[progressListeners.size()]);
     }
 
-    protected void fireProgressChangedEvent() {
+    void fireProgressChangedEvent() {
         if (!stateChangedSinceLastEvent)
             return;
         stateChangedSinceLastEvent = false;
@@ -270,22 +270,15 @@ public class ProgressDelegate implements ProgressReporting {
         }
     }
 
-    public boolean equals(ProgressDelegate other) {
+    boolean equals(ProgressDelegate other) {
         if (this.progressListeners != other.progressListeners && (this.progressListeners == null || !this.progressListeners.equals(other.progressListeners)))
             return false;
-        if (this.progressPercent != other.progressPercent)
-            return false;
-        if (this.outer != other.outer && (this.outer == null || !this.outer.
-                equals(other.outer)))
-            return false;
-        return !(this.event != other.event && (this.event == null || !this.event.equals(other.event)));
+        return this.progressPercent == other.progressPercent && !(this.outer != other.outer && (this.outer == null || !this.outer.equals(other.outer))) && !(this.event != other.event && (this.event == null || !this.event.equals(other.event)));
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
-            return false;
-        return getClass() == obj.getClass() && equals((ProgressDelegate) obj);
+        return obj != null && getClass() == obj.getClass() && equals((ProgressDelegate) obj);
     }
 
     @Override

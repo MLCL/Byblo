@@ -90,7 +90,7 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
     }
 
     @Override
-    protected void buildPrecalcs() throws IOException {
+    protected void buildPreCalcs() throws IOException {
         // The super class runs this in during initialization, but we don't want
         // do to it here.
     }
@@ -113,11 +113,11 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
         throttle = new Semaphore(getThrottleSize());
     }
 
-    int nChunks = 0;
+    private int nChunks = 0;
 
-    int queuedCount = 0;
+    private int queuedCount = 0;
 
-    int completedCount = 0;
+    private int completedCount = 0;
 
     @Override
     protected void runTask() throws Exception {
@@ -173,7 +173,7 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 task.setSourceA(chunkA.clone());
                 task.setSourceB(chunkB);
                 task.setMeasure(getMeasure());
-                task.setProducatePair(getProducatePair());
+                task.setProducePair(getProducePair());
                 task.setProcessRecord(getProcessRecord());
                 task.setSink(getSink());
                 task.setStats(getStats());
@@ -204,14 +204,14 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
 
     void updateProgress() {
         if (nChunks != 0) {
-            double prog = (completedCount + queuedCount) / (double) (nChunks
+            double progress = (completedCount + queuedCount) / (double) (nChunks
                     * nChunks
                     * 2);
-            progress.setProgressPercent((int) (100 * prog));
+            this.progress.setProgressPercent((int) (100 * progress));
         }
     }
 
-    void clearCompleted(boolean block) throws InterruptedException, ExecutionException, Exception {
+    void clearCompleted(boolean block) throws Exception {
 
         if (!block) {
 
@@ -269,7 +269,7 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
         super.finaliseTask();
     }
 
-    protected <T extends Task> void queueTask(final T task) throws InterruptedException {
+    <T extends Task> void queueTask(final T task) throws InterruptedException {
         if (task == null) {
             throw new NullPointerException("task is null");
         }
@@ -308,7 +308,7 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
         }
     }
 
-    public final int getNumThreads() {
+    final int getNumThreads() {
         return nThreads;
     }
 

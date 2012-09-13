@@ -31,7 +31,8 @@
 package uk.ac.susx.mlcl.testing;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.rules.TestName;
 
 import java.io.*;
@@ -59,18 +60,6 @@ public class AbstractTest {
                 this.getClass().getName(), testName.getMethodName()));
     }
 
-    @After
-    public void tearDown() throws Exception {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
 
     /**
      * TODO: Probably useful enough to move to a general purpose library
@@ -81,26 +70,26 @@ public class AbstractTest {
      * @throws ClassNotFoundException
      */
     @SuppressWarnings("unchecked")
-    public static <T> T cloneWithSerialization(final T obj) {
+    protected static <T> T cloneWithSerialization(final T obj) {
 
-        ObjectOutputStream oos = null;
+        ObjectOutputStream objectsOut = null;
         ObjectInputStream ois = null;
         try {
             try {
-                final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                oos = new ObjectOutputStream(baos);
+                final ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
+                objectsOut = new ObjectOutputStream(bytesOut);
 
-                oos.writeObject(obj);
-                oos.flush();
+                objectsOut.writeObject(obj);
+                objectsOut.flush();
 
-                final byte[] bytes = baos.toByteArray();
+                final byte[] bytes = bytesOut.toByteArray();
 
                 ois = new ObjectInputStream(new ByteArrayInputStream(bytes));
 
                 return (T) ois.readObject();
             } finally {
-                if (oos != null)
-                    oos.close();
+                if (objectsOut != null)
+                    objectsOut.close();
                 if (ois != null)
                     ois.close();
             }
@@ -112,7 +101,7 @@ public class AbstractTest {
     }
 
 
-    public static <T> T clone(T obj) {
+    protected static <T> T clone(T obj) {
         try {
 
             assertTrue("doesn't implement Cloneable", obj instanceof Cloneable);
@@ -140,7 +129,7 @@ public class AbstractTest {
 
     }
 
-    public static void assertExhaustedIterator(Iterator<?> it) {
+    protected static void assertExhaustedIterator(Iterator<?> it) {
         try {
             it.next();
             fail("Expected iterator to be exhausted by next() succeeded.");
@@ -150,7 +139,7 @@ public class AbstractTest {
     }
 
 
-    public static Random newRandom() {
+    protected static Random newRandom() {
         Random rand = new Random();
         final int seed = rand.nextInt();
         System.out.println(" > random seed = " + seed);
@@ -158,13 +147,13 @@ public class AbstractTest {
         return rand;
     }
 
-    public static IntArrayList randomIntArrayList(Random rand, int maxValue,
-                                                  int size) {
+    protected static IntArrayList randomIntArrayList(Random rand, int maxValue,
+                                                     int size) {
         return IntArrayList.wrap(randomIntArray(rand, maxValue, size));
 
     }
 
-    public static int[] randomIntArray(Random rand, int maxValue, int size) {
+    private static int[] randomIntArray(Random rand, int maxValue, int size) {
         final int[] arr = new int[size];
         for (int i = 0; i < size; i++)
             arr[i] = rand.nextInt(maxValue);

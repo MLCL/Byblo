@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.lib;
 
-public class NumberOverflowException extends RuntimeException {
+class NumberOverflowException extends RuntimeException {
 
     public NumberOverflowException() {
         super();

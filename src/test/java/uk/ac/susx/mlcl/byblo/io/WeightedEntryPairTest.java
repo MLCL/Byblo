@@ -48,7 +48,7 @@ import static uk.ac.susx.mlcl.TestConstants.*;
  */
 public class WeightedEntryPairTest {
 
-    private void copyWEP(File a, File b, boolean compact) throws FileNotFoundException, IOException {
+    private void copyWEP(File a, File b, boolean compact) throws IOException {
 //        Enumerator<String> idx = MemoryBasedStringEnumerator.newInstance();
 
         DoubleEnumeratingDelegate del = new DoubleEnumeratingDelegate(
@@ -65,7 +65,7 @@ public class WeightedEntryPairTest {
     }
 
     @Test
-    public void testWeightedEventsConversion() throws FileNotFoundException, IOException {
+    public void testWeightedEventsConversion() throws IOException {
         File a = TEST_FRUIT_SIMS;
         File b = new File(TEST_OUTPUT_DIR,
                 TEST_FRUIT_SIMS.getName() + ".compact");
@@ -87,7 +87,7 @@ public class WeightedEntryPairTest {
     }
 
     @Test
-    public void testEntryPairEnumeratorConversion() throws FileNotFoundException, IOException {
+    public void testEntryPairEnumeratorConversion() throws IOException {
         File a = TEST_FRUIT_SIMS;
         File b = new File(TEST_OUTPUT_DIR,
                 TEST_FRUIT_SIMS.getName() + ".enum");

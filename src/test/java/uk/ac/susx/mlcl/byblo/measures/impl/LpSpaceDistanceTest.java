@@ -59,17 +59,17 @@ public class LpSpaceDistanceTest extends AbstractMeasureTest<LpSpaceDistance> {
 	@Test
 	@Override
 	@Ignore
-	public void testHeteroginiety() {
+	public void testHeterogeneity() {
 		throw new UnsupportedOperationException();
 	}
 
 	@Test
-	public void testCLI_neginf() throws Exception {
+	public void testCLI_negInf() throws Exception {
 		testCLI(Double.NEGATIVE_INFINITY);
 	}
 
 	@Test
-	public void testCLI_posinf() throws Exception {
+	public void testCLI_posInf() throws Exception {
 		testCLI(Double.POSITIVE_INFINITY);
 	}
 
@@ -103,7 +103,7 @@ public class LpSpaceDistanceTest extends AbstractMeasureTest<LpSpaceDistance> {
 		testCLI(Math.E);
 	}
 
-	public void testCLI(double power) throws Exception {
+	void testCLI(double power) throws Exception {
 		System.out.printf("testCLI(power=%f)%n", power);
 		runFromCommandLine("--mink-p", Double.toString(power));
 	}

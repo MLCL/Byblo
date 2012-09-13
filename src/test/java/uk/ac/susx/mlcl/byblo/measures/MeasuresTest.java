@@ -61,9 +61,9 @@ public class MeasuresTest {
     public MeasuresTest() {
     }
 
-    static final double EPSILON = 0.0000000000001;
+    private static final double EPSILON = 0.0000000000001;
 
-    static Measure[] MEASURES = new Measure[]{
+    private static final Measure[] MEASURES = new Measure[]{
             new Confusion(),
             new Cosine(),
             new Dice(),
@@ -94,11 +94,11 @@ public class MeasuresTest {
             new Weeds(0.00, 0)
     };
 
-    static Map<Measure, Weighting> WEIGHTINGS;
+    private static Map<Measure, Weighting> WEIGHTINGS;
 
-    static Random RANDOM;
+    private static Random RANDOM;
 
-    static List<Indexed<SparseDoubleVector>> FRUIT_EVENTS;
+    private static List<Indexed<SparseDoubleVector>> FRUIT_EVENTS;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -156,18 +156,6 @@ public class MeasuresTest {
 
     }
 
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
     @Test
     public void testFruitEverything() throws IOException {
         System.out.println("testFruitEverything");
@@ -191,28 +179,21 @@ public class MeasuresTest {
     }
 
     @Test
-    public void testFruitHomoginiety() throws IOException {
-        System.out.println("testFruitHomoginiety");
+    public void testFruitHomogeneity() throws IOException {
 
         int repeats = 10;
 
         for (int r = 0; r < repeats; r++) {
             int i = RANDOM.nextInt(FRUIT_EVENTS.size());
-//            System.out.println("repeat " + r + ": entries " + FRUIT_EVENTS.get(i).
-//                    key() + " and " + FRUIT_EVENTS.get(i).key());
-//
+
             SparseDoubleVector A = FRUIT_EVENTS.get(i).value();
             SparseDoubleVector B = FRUIT_EVENTS.get(i).value();
 
             for (Measure m : MEASURES) {
-//                System.out.print("\tmeasure " + m + ": ");
                 SparseDoubleVector wA = WEIGHTINGS.get(m).apply(A);
                 SparseDoubleVector wB = WEIGHTINGS.get(m).apply(B);
 
                 double result = test(m, wA, wB);
-
-//                System.out.println(result + " " + (result == m.
-//                                                   getHomogeneityBound()));
 
                 if (!(m instanceof Hindle
                         || m instanceof Confusion
@@ -248,8 +229,8 @@ public class MeasuresTest {
         }
     }
 
-    public double test(Measure instance, SparseDoubleVector A,
-                       SparseDoubleVector B) {
+    double test(Measure instance, SparseDoubleVector A,
+                SparseDoubleVector B) {
         final double val = instance.similarity(A, B);
         assertFalse("Similarity is NaN" + " with measure " + instance,
                 Double.isNaN(val));
@@ -276,7 +257,7 @@ public class MeasuresTest {
 
         if (instance.isCommutative()) {
             final double rev = instance.similarity(B, A);
-            assertEquals("Measure is declared computative, but reversing "
+            assertEquals("Measure is declared commutative, but reversing "
                     + "operands results in a different score.", rev, val,
                     EPSILON);
         }

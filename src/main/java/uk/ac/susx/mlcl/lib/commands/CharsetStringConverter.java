@@ -37,7 +37,7 @@ import java.nio.charset.Charset;
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class CharsetStringConverter implements IStringConverter<Charset> {
+final class CharsetStringConverter implements IStringConverter<Charset> {
 
     @Override
     public Charset convert(String string) {

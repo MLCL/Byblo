@@ -62,9 +62,9 @@ public final class JDBMStringEnumerator extends BiMapEnumerator<String> {
 
     private static final int TRANSACTION_LIMIT = 1000;
 
-    private File file;
+    private final File file;
 
-    private DB db;
+    private final DB db;
 
     private long modCount = 0;
 
@@ -73,8 +73,8 @@ public final class JDBMStringEnumerator extends BiMapEnumerator<String> {
         this.db = db;
     }
 
-    public JDBMStringEnumerator(DB db, File file, BiMap<Integer, String> map,
-                                AtomicInteger nextId) {
+    private JDBMStringEnumerator(DB db, File file, BiMap<Integer, String> map,
+                                 AtomicInteger nextId) {
         super(map, nextId);
         this.file = file;
         this.db = db;
@@ -112,13 +112,13 @@ public final class JDBMStringEnumerator extends BiMapEnumerator<String> {
             assert collections.contains(COLLECTION_PROPERTIES);
 
             if (MAP_TYPE_HASH) {
-                forwards = db.<Integer, String>getHashMap(COLLECTION_FORWARDS);
-                backwards = db.<String, Integer>getHashMap(COLLECTION_BACKWARDS);
-                props = db.<String, String>getHashMap(COLLECTION_PROPERTIES);
+                forwards = db.getHashMap(COLLECTION_FORWARDS);
+                backwards = db.getHashMap(COLLECTION_BACKWARDS);
+                props = db.getHashMap(COLLECTION_PROPERTIES);
             } else {
-                forwards = db.<Integer, String>getTreeMap(COLLECTION_FORWARDS);
-                backwards = db.<String, Integer>getTreeMap(COLLECTION_BACKWARDS);
-                props = db.<String, String>getTreeMap(COLLECTION_PROPERTIES);
+                forwards = db.getTreeMap(COLLECTION_FORWARDS);
+                backwards = db.getTreeMap(COLLECTION_BACKWARDS);
+                props = db.getTreeMap(COLLECTION_PROPERTIES);
             }
             assert backwards.containsKey(FilterCommand.FILTERED_STRING);
             assert forwards.containsKey(FilterCommand.FILTERED_ID);
@@ -134,33 +134,24 @@ public final class JDBMStringEnumerator extends BiMapEnumerator<String> {
         } else {
 
             if (MAP_TYPE_HASH) {
-                forwards = db.
-                        <Integer, String>createHashMap(COLLECTION_FORWARDS);
-                backwards = db.<String, Integer>createHashMap(
-                        COLLECTION_BACKWARDS);
-                props = db.<String, String>createHashMap(COLLECTION_PROPERTIES);
+                forwards = db.createHashMap(COLLECTION_FORWARDS);
+                backwards = db.createHashMap(COLLECTION_BACKWARDS);
+                props = db.createHashMap(COLLECTION_PROPERTIES);
             } else {
-                forwards = db.
-                        <Integer, String>createTreeMap(COLLECTION_FORWARDS);
-                backwards = db.<String, Integer>createTreeMap(
-                        COLLECTION_BACKWARDS);
-                props = db.<String, String>createTreeMap(COLLECTION_PROPERTIES);
+                forwards = db.createTreeMap(COLLECTION_FORWARDS);
+                backwards = db.createTreeMap(COLLECTION_BACKWARDS);
+                props = db.createTreeMap(COLLECTION_PROPERTIES);
             }
-            forwards.put(FilterCommand.FILTERED_ID,
-                    FilterCommand.FILTERED_STRING);
-            backwards.put(FilterCommand.FILTERED_STRING,
-                    FilterCommand.FILTERED_ID);
+            forwards.put(FilterCommand.FILTERED_ID, FilterCommand.FILTERED_STRING);
+            backwards.put(FilterCommand.FILTERED_STRING, FilterCommand.FILTERED_ID);
             nextId = new AtomicInteger(FilterCommand.FILTERED_ID + 1);
             props.put(COLLECTION_NEXT_ID, Integer.toString(0));
             db.commit();
         }
 
 
-        ForwardingBiMap<Integer, String> map = ForwardingBiMap.
-                <Integer, String>create(
-                        forwards, backwards);
-        JDBMStringEnumerator instance = new JDBMStringEnumerator(
-                db, file, map, nextId);
+        ForwardingBiMap<Integer, String> map = ForwardingBiMap.create(forwards, backwards);
+        JDBMStringEnumerator instance = new JDBMStringEnumerator(db, file, map, nextId);
 
         instance.indexOf(FilterCommand.FILTERED_STRING);
 
@@ -236,7 +227,6 @@ public final class JDBMStringEnumerator extends BiMapEnumerator<String> {
             return;
         }
 
-//        db.defrag(false);
         save();
         db.close();
     }
@@ -250,24 +240,15 @@ public final class JDBMStringEnumerator extends BiMapEnumerator<String> {
         return hash;
     }
 
-    public boolean equals(JDBMStringEnumerator other) {
+    boolean equals(JDBMStringEnumerator other) {
         if (this.file != other.file && (this.file == null || !this.file.
                 equals(other.file)))
             return false;
-        if (this.db != other.db
-                && (this.db == null || !this.db.equals(other.db)))
-            return false;
-        if (this.modCount != other.modCount)
-            return false;
-        return super.equals(other);
+        return !(this.db != other.db && (this.db == null || !this.db.equals(other.db))) && this.modCount == other.modCount && super.equals(other);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        return equals((JDBMStringEnumerator) obj);
+        return obj != null && getClass() == obj.getClass() && equals((JDBMStringEnumerator) obj);
     }
 }
