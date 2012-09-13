@@ -28,8 +28,39 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-/**
- * Classes for input and output operations such as using files, databases, or
- * abstract data streams.
- */
 package uk.ac.susx.mlcl.lib.io;
+
+import java.io.IOException;
+import java.nio.CharBuffer;
+import java.nio.channels.AsynchronousCloseException;
+import java.nio.channels.Channel;
+import java.nio.channels.ClosedByInterruptException;
+import java.nio.channels.ClosedChannelException;
+import java.nio.channels.NonWritableChannelException;
+
+/**
+ * A channel that can write chars.
+ * 
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ */
+public interface WritableCharChannel extends Channel {
+
+    /**
+     * Writes a sequence of chars to this channel from the given buffer.
+     * 
+     * @param src buffer from which bytes are to be retrieved
+     * @return number of bytes written, possibly zero
+     * @throws java.nio.channels.NonWritableChannelException - If this channel was not opened for writing
+     * @throws java.nio.channels.ClosedChannelException - If this channel is closed
+     * @throws java.nio.channels.AsynchronousCloseException - If another thread closes this
+     *                  channel while the write operation is in progress
+     * @throws java.nio.channels.ClosedByInterruptException - If another thread interrupts the
+     *     current thread while the write operation is in progress, thereby 
+     *     closing the channel and setting the current thread's interrupt status
+     * @throws java.io.IOException - If some other I/O error occurs
+     */
+    int write(CharBuffer src) throws NonWritableChannelException,
+            ClosedChannelException, AsynchronousCloseException,
+            ClosedByInterruptException, IOException;
+
+}

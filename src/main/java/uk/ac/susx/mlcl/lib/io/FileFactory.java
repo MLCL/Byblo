@@ -28,8 +28,34 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+package uk.ac.susx.mlcl.lib.io;
+
+import java.io.File;
+import java.io.IOException;
+
 /**
- * A library of miscellaneous Java code, likely to be useful for many of the 
- * MLCL Lab projects.
+ * Define a factory method for the creation of files.
+ *
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-package uk.ac.susx.mlcl.lib;
+public interface FileFactory {
+
+    /**
+     * Create a new file and return a reference to it.
+     *
+     * @return the File object representing the newly created file
+     * @throws java.io.IOException if some I/O error occurs
+     */
+    public File createFile() throws IOException;
+
+    /**
+     * Create a new file and return a reference to it. The file name should
+     * include the given prefix and suffix strings.
+     *
+     * @param pref Prefix to be inserted at the beginning of the file name
+     * @param suff Suffix to be inserted at the end of the file name
+     * @return the File object representing the newly created file
+     * @throws java.io.IOException if some I/O error occurs
+     */
+    public File createFile(String pref, String suff) throws IOException;
+}

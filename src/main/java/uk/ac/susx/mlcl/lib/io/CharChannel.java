@@ -32,7 +32,7 @@ package uk.ac.susx.mlcl.lib.io;
 
 /**
  * A channel that can read and write bytes. This interface simply unifies 
- * {@link ReadableCharChannel } and {@link WritableCharChannel }; it does not 
+ * {@link uk.ac.susx.mlcl.lib.io.ReadableCharChannel } and {@link uk.ac.susx.mlcl.lib.io.WritableCharChannel }; it does not
  * specify any new operations.
  * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;

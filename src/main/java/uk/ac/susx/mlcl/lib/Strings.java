@@ -77,7 +77,7 @@ public class Strings {
      *
      * @param ch character to escape
      * @param dst destination to write escaped character sequence
-     * @throws IOException if {@link Appendable#append(java.lang.CharSequence)}
+     * @throws java.io.IOException if {@link Appendable#append(CharSequence)}
      *                  throws an IOException.
      */
     public static void escape(final char ch, final Appendable dst)
@@ -166,7 +166,7 @@ public class Strings {
      *
      * @param src character sequence to read
      * @param dst appendable to which escaped characters are written
-     * @throws IOException if {@link Appendable#append(java.lang.CharSequence)}
+     * @throws java.io.IOException if {@link Appendable#append(CharSequence)}
      *                  throws an IOException.
      */
     public static void escape(final CharSequence src, final Appendable dst)
@@ -183,7 +183,7 @@ public class Strings {
      * @param src character sequence to read
      * @param fromIndex index of first character to read (inclusive)
      * @param dst appendable to which escaped characters are written
-     * @throws IOException if {@link Appendable#append(java.lang.CharSequence)}
+     * @throws java.io.IOException if {@link Appendable#append(CharSequence)}
      *                  throws an IOException.
      */
     public static void escape(final CharSequence src, final int fromIndex, final Appendable dst)
@@ -202,7 +202,7 @@ public class Strings {
      * @param fromIndex index of first character to read (inclusive)
      * @param toIndex  index of last character to read (exclusive)
      * @param dst appendable to which escaped characters are written
-     * @throws IOException if {@link Appendable#append(java.lang.CharSequence)}
+     * @throws java.io.IOException if {@link Appendable#append(CharSequence)}
      *                  throws an IOException.
      */
     public static void escape(final CharSequence src, final int fromIndex,
@@ -265,7 +265,7 @@ public class Strings {
      *
      * @param src source sequence to read characters from
      * @param dst destination to write unescaped character sequence
-     * @throws IOException if {@link Appendable#append(java.lang.CharSequence)}
+     * @throws java.io.IOException if {@link Appendable#append(CharSequence)}
      *                  throws an IOException.
      */
     public static void unescape(final CharSequence src, final Appendable dst)
@@ -278,7 +278,7 @@ public class Strings {
      * @param src source sequence to read characters from
      * @param fromIndex index of first character to unescape (inclusive)
      * @param dst destination to write unescaped character sequence
-     * @throws IOException if {@link Appendable#append(java.lang.CharSequence)}
+     * @throws java.io.IOException if {@link Appendable#append(CharSequence)}
      *                  throws an IOException.
      */
     public static void unescape(final CharSequence src, final int fromIndex, final Appendable dst)
@@ -292,7 +292,7 @@ public class Strings {
      * @param fromIndex index of first character to unescape (inclusive)
      * @param toIndex index of last character to unescape (exclusive)
      * @param dst destination to write unescaped character sequence
-     * @throws IOException if {@link Appendable#append(java.lang.CharSequence)}
+     * @throws java.io.IOException if {@link Appendable#append(CharSequence)}
      *                  throws an IOException.
      */
     public static void unescape(final CharSequence src, final int fromIndex,

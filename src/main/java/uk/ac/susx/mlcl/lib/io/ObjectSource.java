@@ -31,37 +31,33 @@
 package uk.ac.susx.mlcl.lib.io;
 
 import java.io.IOException;
-import java.nio.CharBuffer;
-import java.nio.channels.AsynchronousCloseException;
-import java.nio.channels.Channel;
-import java.nio.channels.ClosedByInterruptException;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.NonReadableChannelException;
 
 /**
- * A channel that can read chars.
- * 
+ * <p>Defines a source of objects of some type {@code T} data.</p>
+ *
+ * The interface allows data to be iterated in an undefined but deterministic
+ * order. It is entirely agnostic in terms of actual source of data. Differs
+ * from Iterator in that it can throw IOException.
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @param <T> The type of object that the implementing class will provide.
  */
-public interface ReadableCharChannel extends Channel {
+public interface ObjectSource<T> {
 
     /**
-     * Reads a sequence of chars from this channel into the given buffer.
-     * 
-     * @param  dst The buffer into which chars are to be transferred
-     * @return The number of chars read, possibly zero, or -1 if the channel
-     *      has reached end-of-stream
-     * @throws NonReadableChannelException - If this channel was not opened for reading
-     * @throws ClosedChannelException - If this channel is closed
-     * @throws AsynchronousCloseException - If another thread closes this 
-     *              channel while the read operation is in progress
-     * @throws ClosedByInterruptException - If another thread interrupts the 
-     *          current thread while the read operation is in progress, thereby 
-     *          closing the channel and setting the current thread's interrupt status
-     * @throws IOException - If some other I/O error occurs
+     * Retrieval the next available record.
+     *
+     * @return The next record or null if there is nothing available to read
+     * @throws java.io.IOException something has gone wrong with the underlying store
      */
-    int read(CharBuffer dst) throws NonReadableChannelException,
-            ClosedChannelException, AsynchronousCloseException,
-            ClosedByInterruptException, IOException;
+    T read() throws IOException;
+
+    /**
+     * Whether or not another record can be read.
+     *
+     * @return true if a record and be read, false otherwise.
+     * @throws java.io.IOException something has gone wrong with the underlying store
+     */
+    boolean hasNext() throws IOException;
 
 }

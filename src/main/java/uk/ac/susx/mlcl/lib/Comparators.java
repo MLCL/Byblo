@@ -70,7 +70,7 @@ public final class Comparators {
      * sort from ascending, to descending.</p>
      *
      * <p>Serialization is supported if, and only i, the encapsulated
-     * {@link Comparator} is also serializable.</p>
+     * {@link java.util.Comparator} is also serializable.</p>
      *
      * @param <T>
      * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;

@@ -35,8 +35,8 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- * A file {@link FileFactory} implementation that creates temporary files using
- * {@link File#createTempFile(java.lang.String, java.lang.String)} to produce
+ * A file {@link uk.ac.susx.mlcl.lib.io.FileFactory} implementation that creates temporary files using
+ * {@link java.io.File#createTempFile(String, String)} to produce
  * new files.
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
@@ -59,7 +59,7 @@ public class TempFileFactory implements FileFactory, Serializable {
      * provided <tt>prefix</tt> and <tt>suffix</tt>.
      *
      * Note that the constraints for <tt>suffix</tt> and <tt>prefix</tt> are
-     * inherited from {@link File#createTempFile(java.lang.String, java.lang.String)};
+     * inherited from {@link java.io.File#createTempFile(String, String)};
      * i.e that the <tt>prefix</tt> must be non-null and at least 3 characters
      * long, but that <tt>suffix</tt> can be anything. If <tt>suffix</tt> is
      * null then <tt>.tmp</tt> is used.

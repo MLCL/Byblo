@@ -86,16 +86,16 @@ public class Checks {
     }
 
     public static void checkReal(final String name, final double num) {
-        if (java.lang.Double.isNaN(num)
-                || java.lang.Double.isInfinite(num))
+        if (Double.isNaN(num)
+                || Double.isInfinite(num))
             throw new IllegalArgumentException(
                     "Expecting argument '" + name
                     + "' to be areal number but found " + num);
     }
 
     public static void checkReal(final double num) {
-        if (java.lang.Double.isNaN(num)
-                || java.lang.Double.isInfinite(num))
+        if (Double.isNaN(num)
+                || Double.isInfinite(num))
             throw new IllegalArgumentException(
                     "Expecting argument to be a real number but found " + num);
     }

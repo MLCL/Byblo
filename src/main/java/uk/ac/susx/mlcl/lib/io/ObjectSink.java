@@ -28,13 +28,25 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-/**
- * Classes for the construction and manipulation of collections and abstract 
- * data types. 
- * 
- * <p>Here the word "collection" is used in the broader sense of any
- * data set encapsulation. This includes computation structures such as arrays, 
- * and mathematic structure such as sets, lists and tuples.</p>
- */
-package uk.ac.susx.mlcl.lib.collect;
+package uk.ac.susx.mlcl.lib.io;
 
+import java.io.IOException;
+
+/**
+ * Interface defining the acceptance of objects of the given type
+ * {@code T}.
+ *
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
+ * @param <T> The type of object that the implementing class will provide.
+ */
+public interface ObjectSink<T> {
+
+    /**
+     * Take given {@code record} and do something with it. Presumably store to
+     * disk, but this is undefined.
+     *
+     * @param record The object to be consumed.
+     * @throws java.io.IOException something has gone wrong with the underlying store
+     */
+    void write(final T record) throws IOException;
+}

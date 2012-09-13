@@ -30,32 +30,38 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.CharBuffer;
+import java.nio.channels.AsynchronousCloseException;
+import java.nio.channels.Channel;
+import java.nio.channels.ClosedByInterruptException;
+import java.nio.channels.ClosedChannelException;
+import java.nio.channels.NonReadableChannelException;
 
 /**
- * Define a factory method for the creation of files.
- *
+ * A channel that can read chars.
+ * 
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public interface FileFactory {
+public interface ReadableCharChannel extends Channel {
 
     /**
-     * Create a new file and return a reference to it.
-     *
-     * @return the File object representing the newly created file
-     * @throws IOException if some I/O error occurs
+     * Reads a sequence of chars from this channel into the given buffer.
+     * 
+     * @param  dst The buffer into which chars are to be transferred
+     * @return The number of chars read, possibly zero, or -1 if the channel
+     *      has reached end-of-stream
+     * @throws java.nio.channels.NonReadableChannelException - If this channel was not opened for reading
+     * @throws java.nio.channels.ClosedChannelException - If this channel is closed
+     * @throws java.nio.channels.AsynchronousCloseException - If another thread closes this
+     *              channel while the read operation is in progress
+     * @throws java.nio.channels.ClosedByInterruptException - If another thread interrupts the
+     *          current thread while the read operation is in progress, thereby 
+     *          closing the channel and setting the current thread's interrupt status
+     * @throws java.io.IOException - If some other I/O error occurs
      */
-    public File createFile() throws IOException;
+    int read(CharBuffer dst) throws NonReadableChannelException,
+            ClosedChannelException, AsynchronousCloseException,
+            ClosedByInterruptException, IOException;
 
-    /**
-     * Create a new file and return a reference to it. The file name should
-     * include the given prefix and suffix strings.
-     *
-     * @param pref Prefix to be inserted at the beginning of the file name
-     * @param suff Suffix to be inserted at the end of the file name
-     * @return the File object representing the newly created file
-     * @throws IOException if some I/O error occurs
-     */
-    public File createFile(String pref, String suff) throws IOException;
 }

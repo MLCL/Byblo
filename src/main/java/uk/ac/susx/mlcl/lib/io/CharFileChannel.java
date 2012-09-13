@@ -113,7 +113,7 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
     private long fileSize = -1;
 
     /**
-     * Construct a new {@link CharFileChannel} object from the given 
+     * Construct a new {@link uk.ac.susx.mlcl.lib.io.CharFileChannel} object from the given
      * {@link java.nio.channels.FileChannel} and 
      * {@link java.nio.charset.CharsetDecoder}
      *
@@ -140,7 +140,7 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
     }
 
     /**
-     * Construct a new {@link CharFileChannel} object from the given 
+     * Construct a new {@link uk.ac.susx.mlcl.lib.io.CharFileChannel} object from the given
      * {@link java.nio.channels.FileChannel} and {@link java.nio.charset.Charset}
      *
      * @param fileChannel   byte based FileChannel to encapsulate
@@ -153,7 +153,7 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
     }
 
     /**
-     * Construct a new {@link CharFileChannel} object from the given
+     * Construct a new {@link uk.ac.susx.mlcl.lib.io.CharFileChannel} object from the given
      * {@link java.nio.channels.FileChannel}. The charset will be set to the 
      * default for this Java Virtual Machine.
      *
@@ -206,8 +206,8 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
      * {@link java.nio.channels.FileChannel}.
      *
      * @return file size in bytes
-     * @throws ClosedChannelException If this channel is closed
-     * @throws IOException If some other I/O error occurs
+     * @throws java.nio.channels.ClosedChannelException If this channel is closed
+     * @throws java.io.IOException If some other I/O error occurs
      */
     public long size() throws ClosedChannelException, IOException {
         return (fileSize == -1) ? (fileSize = fileChannel.size()) : fileSize;
@@ -260,7 +260,7 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
      * Close the encapsulated file channel, and release buffering resources to
      * garbage collection.
      *
-     * @throws IOException If an I/O error occurs
+     * @throws java.io.IOException If an I/O error occurs
      */
     @Override
     public void close() throws IOException {
@@ -276,15 +276,15 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
      * 
      * @param dst destination buffer
      * @return number of characters put in {@code dst}
-     * @throws ClosedChannelException If this channel is closed
-     * @throws NonReadableChannelException If the mode is READ_ONLY but this
+     * @throws java.nio.channels.ClosedChannelException If this channel is closed
+     * @throws java.nio.channels.NonReadableChannelException If the mode is READ_ONLY but this
      *          channel was not opened for reading
-     * @throws NonWritableChannelException If the mode is READ_WRITE or PRIVATE
+     * @throws java.nio.channels.NonWritableChannelException If the mode is READ_WRITE or PRIVATE
      *          but this channel was not opened for both reading and writing
-     * @throws UnmappableCharacterException
-     * @throws CharacterCodingException
-     * @throws MalformedInputException
-     * @throws IOException If some other I/O error occurs
+     * @throws java.nio.charset.UnmappableCharacterException
+     * @throws java.nio.charset.CharacterCodingException
+     * @throws java.nio.charset.MalformedInputException
+     * @throws java.io.IOException If some other I/O error occurs
      */
     @Override
     public final int read(final CharBuffer dst) throws MalformedInputException,
@@ -339,8 +339,8 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
      * within the mapped region.
      * 
      * @return number of bytes remaining
-     * @throws ClosedChannelException If this channel is closed
-     * @throws IOException If some other I/O error occurs
+     * @throws java.nio.channels.ClosedChannelException If this channel is closed
+     * @throws java.io.IOException If some other I/O error occurs
      */
     public long bytesRemaining() throws IOException, ClosedChannelException {
         return size() - bufferOffset - (buffer == null ? 0 : buffer.position());
@@ -349,8 +349,8 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
     /**
      *
      * @return true if there are bytes remaining
-     * @throws ClosedChannelException If this channel is closed
-     * @throws IOException If some other I/O error occurs
+     * @throws java.nio.channels.ClosedChannelException If this channel is closed
+     * @throws java.io.IOException If some other I/O error occurs
      */
     public boolean hasBytesRemaining() throws IOException, ClosedChannelException {
         return bytesRemaining() > 0;
@@ -367,12 +367,12 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
      * testing purposes only.</p>
      *
      * @param requiredBytes
-     * @throws NonReadableChannelException If the mode is READ_ONLY but this
+     * @throws java.nio.channels.NonReadableChannelException If the mode is READ_ONLY but this
      *          channel was not opened for reading
-     * @throws NonWritableChannelException If the mode is READ_WRITE or PRIVATE
+     * @throws java.nio.channels.NonWritableChannelException If the mode is READ_WRITE or PRIVATE
      *          but this channel was not opened for both reading and writing
-     * @throws ClosedChannelException If this channel is closed
-     * @throws IOException If some other I/O error occurs
+     * @throws java.nio.channels.ClosedChannelException If this channel is closed
+     * @throws java.io.IOException If some other I/O error occurs
      */
     void insureMapped(int requiredBytes)
             throws ClosedChannelException, IOException {

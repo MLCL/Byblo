@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
- * The {@link C14nCache} (canonicalisation cache) is used to reduce the number
+ * The {@link uk.ac.susx.mlcl.lib.C14nCache} (canonicalisation cache) is used to reduce the number
  * of redundant copies of identical objects in memory.
  * <p>
  * It cases where many objects are being produced and stored, and there is high
@@ -46,7 +46,7 @@ import java.util.WeakHashMap;
  * to cut down on memory usage by producing the same instance again, rather than
  * and equal copy.
  * </p><p>
- * Object passed as a parameter to the {@link C14nCache#cached(java.lang.Object)
+ * Object passed as a parameter to the {@link uk.ac.susx.mlcl.lib.C14nCache#cached(Object)
  * cached()} method are either stored and returned, or, if an identical object
  * has been seen before, the second is discarded and the original is returned.
  * </p><p>
@@ -61,10 +61,10 @@ import java.util.WeakHashMap;
  * to add() or remove() will result in an UnsupportedOperationException.
  * </p><p>
  * This object is not thread safe. In particular calls to {@link
- * C14nCache#cached(java.lang.Object) cached()} must be synchronised externally
+ * uk.ac.susx.mlcl.lib.C14nCache#cached(Object) cached()} must be synchronised externally
  * or the behaviour will be undefined. Concurrent use of the Set interface
  * functionality is fail-fast and will result in a
- * {@link ConcurrentModificationException}.
+ * {@link java.util.ConcurrentModificationException}.
  * </p>
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
@@ -89,7 +89,7 @@ public class C14nCache<T> extends AbstractSet<T> {
     private long cacheMissCount;
 
     /**
-     * Construct a new instance of {@link C14nCache}.
+     * Construct a new instance of {@link uk.ac.susx.mlcl.lib.C14nCache}.
      */
     public C14nCache() {
         inner = new WeakHashMap<T, WeakReference<T>>();

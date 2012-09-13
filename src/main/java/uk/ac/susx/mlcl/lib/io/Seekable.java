@@ -37,7 +37,7 @@ import java.io.IOException;
  * extent.</p>
  *
  * <p>Generally this is combined with an enumeration interface such as
- * {@link ObjectSource} to allow positions to re-visited.</p>
+ * {@link uk.ac.susx.mlcl.lib.io.ObjectSource} to allow positions to re-visited.</p>
  *
  * <p>Random access is used by some AllPairs implementations so they can record
  * read-offsets at certain times, then return to those offsets later. It allows
@@ -56,7 +56,7 @@ public interface Seekable<P> {
      * be an array index, or it could be byte offset in a file.
      *
      * @param offset location to seek to
-     * @throws IOException something has gone wrong with the underlying store
+     * @throws java.io.IOException something has gone wrong with the underlying store
      */
     void position(P offset) throws IOException;
 
@@ -68,7 +68,7 @@ public interface Seekable<P> {
      * such that the source will restart from the current position.</p>
      *
      * @return some current data store offset
-     * @throws IOException something has gone wrong with the underlying store
+     * @throws java.io.IOException something has gone wrong with the underlying store
      */
     P position() throws IOException;
 }

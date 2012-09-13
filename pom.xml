@@ -142,12 +142,6 @@
             <version>3.0-alpha3</version>
         </dependency>
 
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>mlcl-lib</artifactId>
-            <version>0.2.2-SNAPSHOT</version>
-        </dependency>
-
         <!-- Testing scope dependencies -->
 
         <dependency>

@@ -68,7 +68,7 @@ public class ExitTrapperTest {
     /**
      * Test of enableExistTrapping method, of class ExitTrapper.
      */
-    @Test(expected = uk.ac.susx.mlcl.lib.test.ExitTrapper.ExitException.class)
+    @Test(expected = ExitTrapper.ExitException.class)
     public void testEnableExistTrapping() {
         System.out.println("enableExistTrapping");
         ExitTrapper.enableExistTrapping();
@@ -91,7 +91,7 @@ public class ExitTrapperTest {
     /**
      * Test of toggleExitTrapping method, of class ExitTrapper.
      */
-    @Test(expected = uk.ac.susx.mlcl.lib.test.ExitTrapper.ExitException.class)
+    @Test(expected = ExitTrapper.ExitException.class)
     public void testToggleExitTrapping() {
         System.out.println("toggleExitTrapping");
         ExitTrapper.toggleExitTrapping();
