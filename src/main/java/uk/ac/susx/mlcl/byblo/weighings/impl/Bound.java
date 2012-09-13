@@ -58,12 +58,12 @@ public class Bound
 
     private double upperBound;
 
-    Bound() {
+    public Bound() {
         setLowerBound(DEFAULT_LOWER_BOUND);
         setUpperBound(DEFAULT_UPPER_BOUND);
     }
 
-    Bound(double lowerBound, double upperBound) {
+    public Bound(double lowerBound, double upperBound) {
         setLowerBound(lowerBound);
         setUpperBound(upperBound);
     }

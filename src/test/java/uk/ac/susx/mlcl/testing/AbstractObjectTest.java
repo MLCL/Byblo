@@ -156,7 +156,6 @@ public abstract class AbstractObjectTest<T> extends AbstractTest {
      */
     @Test
     public void testObjectClone() {
-
         assumeTrue(Cloneable.class.isAssignableFrom(getImplementation()));
         assumeTrue(hasConstructor());
 
