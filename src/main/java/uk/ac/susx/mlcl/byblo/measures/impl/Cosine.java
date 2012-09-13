@@ -94,6 +94,14 @@ public final class Cosine extends DecomposableMeasure implements Serializable {
         return NullWeighting.class;
     }
 
+    public boolean equals(Object obj) {
+        return obj != null && obj.getClass() == this.getClass();
+    }
+
+    public int hashCode() {
+        return this.getClass().hashCode();
+    }
+
     @Override
     public String toString() {
         return "Cosine";

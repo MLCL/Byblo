@@ -67,6 +67,8 @@ public final class LambdaDivergence implements Measure, Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private static final double EPSILON = 1E-15;
+
     @Nonnegative
     public static final double DEFAULT_LAMBDA = 0.5;
 
@@ -129,6 +131,13 @@ public final class LambdaDivergence implements Measure, Serializable {
             j++;
         }
 
+        // The algorithm introduces a small amount of floating point error, which can lead to result slightly outside
+        // the expected bounds. To correct for this we clamp results to the bound when they are within some small value.
+        if(Math.abs(divergence - getHeterogeneityBound()) < EPSILON)
+            divergence = getHeterogeneityBound();
+        if(Math.abs(divergence - getHomogeneityBound()) < EPSILON)
+            divergence = getHomogeneityBound();
+
 
         return divergence;
     }
@@ -151,6 +160,24 @@ public final class LambdaDivergence implements Measure, Serializable {
     @Override
     public Class<? extends Weighting> getExpectedWeighting() {
         return PositiveWeighting.class;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        LambdaDivergence that = (LambdaDivergence) o;
+
+        if (Double.compare(that.lambda, lambda) != 0) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        long temp = lambda != +0.0d ? Double.doubleToLongBits(lambda) : 0L;
+        return (int) (temp ^ (temp >>> 32));
     }
 
     @Override

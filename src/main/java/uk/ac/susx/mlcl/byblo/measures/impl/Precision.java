@@ -90,6 +90,14 @@ public class Precision extends Recall {
         return shared == 0 ? 0 : shared / right;
     }
 
+    public boolean equals(Object obj) {
+        return obj != null && obj.getClass() == this.getClass();
+    }
+
+    public int hashCode() {
+        return this.getClass().hashCode();
+    }
+
     @Override
     public String toString() {
         return "Precision";

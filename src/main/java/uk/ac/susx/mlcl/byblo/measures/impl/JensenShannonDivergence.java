@@ -53,6 +53,8 @@ public final class JensenShannonDivergence implements Measure, Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private static final double EPSILON = 1E-15;
+
     @Override
     public double similarity(SparseDoubleVector A, SparseDoubleVector B) {
         double divergence = 0;
@@ -86,7 +88,17 @@ public final class JensenShannonDivergence implements Measure, Serializable {
             j++;
         }
 
-        return divergence / 2.;
+
+        divergence = divergence / 2.;
+
+        // The algorithm introduces a small amount of floating point error, which can lead to result slightly outside
+        // the expected bounds. To correct for this we clamp results to the bound when they are within some small value.
+        if(Math.abs(divergence - getHeterogeneityBound()) < EPSILON)
+            divergence = getHeterogeneityBound();
+        if(Math.abs(divergence - getHomogeneityBound()) < EPSILON)
+            divergence = getHomogeneityBound();
+
+        return divergence;
     }
 
     @Override
@@ -107,6 +119,14 @@ public final class JensenShannonDivergence implements Measure, Serializable {
     @Override
     public Class<? extends Weighting> getExpectedWeighting() {
         return PositiveWeighting.class;
+    }
+
+    public boolean equals(Object obj) {
+        return obj != null && obj.getClass() == this.getClass();
+    }
+
+    public int hashCode() {
+        return this.getClass().hashCode();
     }
 
     @Override

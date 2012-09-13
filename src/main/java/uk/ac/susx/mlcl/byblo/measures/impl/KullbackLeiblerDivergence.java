@@ -203,6 +203,23 @@ public final class KullbackLeiblerDivergence implements Measure, Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        KullbackLeiblerDivergence that = (KullbackLeiblerDivergence) o;
+
+        if (minCardinality != that.minCardinality) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return minCardinality;
+    }
+
+    @Override
     public String toString() {
         return "KL-Divergence";
     }

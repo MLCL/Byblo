@@ -151,6 +151,24 @@ public final class LeeSkewDivergence implements Measure, Serializable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        LeeSkewDivergence that = (LeeSkewDivergence) o;
+
+        if (Double.compare(that.alpha, alpha) != 0) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        long temp = alpha != +0.0d ? Double.doubleToLongBits(alpha) : 0L;
+        return (int) (temp ^ (temp >>> 32));
+    }
+
+    @Override
     public String toString() {
         return MessageFormat.format("LeeSkewDivergence[alpha={0}]", alpha);
     }

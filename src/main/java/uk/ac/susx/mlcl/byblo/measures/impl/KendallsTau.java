@@ -412,4 +412,5 @@ public final class KendallsTau
     public int hashCode() {
         return 79 * 5 + this.minCardinality;
     }
+
 }

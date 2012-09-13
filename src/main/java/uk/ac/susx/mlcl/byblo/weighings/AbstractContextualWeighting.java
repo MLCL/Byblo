@@ -93,4 +93,16 @@ public abstract class AbstractContextualWeighting
         return 89 * 7 + (this.featureMarginals != null
                 ? this.featureMarginals.hashCode() : 0);
     }
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[featureMarginals="
+				+ getFeatureMarginals() + ", bounds=("
+				+ getLowerBound() + ", " + getUpperBound()
+				+ ")]";
+	}
+    
+    
+    
+   
 }

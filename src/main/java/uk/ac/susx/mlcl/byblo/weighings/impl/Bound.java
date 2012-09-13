@@ -101,7 +101,7 @@ public class Bound
 
     @Override
     public String toString() {
-        return MessageFormat.format("Bound{{1},{2}}",
+        return MessageFormat.format("Bound[{1},{2}]",
                 getLowerBound(), getUpperBound());
     }
 

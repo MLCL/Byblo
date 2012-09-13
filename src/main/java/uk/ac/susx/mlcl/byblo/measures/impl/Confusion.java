@@ -150,6 +150,14 @@ public class Confusion implements Measure, FeatureMarginalsCarrier {
         return false;
     }
 
+    public boolean equals(Object obj) {
+        return obj != null && obj.getClass() == this.getClass();
+    }
+
+    public int hashCode() {
+        return this.getClass().hashCode();
+    }
+
     @Override
     public String toString() {
         return "Confusion";

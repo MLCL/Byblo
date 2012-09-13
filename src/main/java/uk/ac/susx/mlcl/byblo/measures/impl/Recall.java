@@ -137,6 +137,14 @@ public class Recall extends DecomposableMeasure implements Serializable {
         return PositiveWeighting.class;
     }
 
+    public boolean equals(Object obj) {
+        return obj != null && obj.getClass() == this.getClass();
+    }
+
+    public int hashCode() {
+        return this.getClass().hashCode();
+    }
+
     @Override
     public String toString() {
         return "Recall";
