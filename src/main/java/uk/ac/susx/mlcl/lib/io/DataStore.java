@@ -28,32 +28,29 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
 package uk.ac.susx.mlcl.lib.io;
 
-import java.io.IOException;
-
 /**
- * A SeekableDataSource adapter that forwards all method invocations to some
- * encapsulated inner class.
- *
- * @param <S> type of the encapsulated instance
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public abstract class ForwardingSeekableDataSource<S extends SeekableDataSource>
-        extends ForwardingDataSource<S>
-        implements SeekableDataSource {
+public interface DataStore extends Store {
 
-    public ForwardingSeekableDataSource(S inner) {
-        super(inner);
-    }
+    DataSource openDataSource();
 
-    @Override
-    public void position(Tell offset) throws IOException {
-        getInner().position(offset);
-    }
+    DataSink openDataSink();
 
-    @Override
-    public Tell position() throws IOException {
-        return getInner().position();
-    }
+    SeekableDataSource openSeekableDataSource();
+
+    /**
+     * Get whether or not underlying resource supports limited random access capabilities.
+     * <p/>
+     * In general it allow for positions with the underlying structure to be reported on demand, and should allow return
+     * to any such position when requested. For example it might have a source/sink factory methods that produce object
+     * which implement the {@link Seekable} interface.
+     *
+     * @return true if the resource is seekable, false otherwise
+     */
+    boolean isSeekable();
+
 }

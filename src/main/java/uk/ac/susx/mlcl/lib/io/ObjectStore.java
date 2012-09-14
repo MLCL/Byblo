@@ -28,32 +28,28 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
 package uk.ac.susx.mlcl.lib.io;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
- * A SeekableDataSource adapter that forwards all method invocations to some
- * encapsulated inner class.
- *
- * @param <S> type of the encapsulated instance
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public abstract class ForwardingSeekableDataSource<S extends SeekableDataSource>
-        extends ForwardingDataSource<S>
-        implements SeekableDataSource {
+public interface ObjectStore<T, P> extends Store {
 
-    public ForwardingSeekableDataSource(S inner) {
-        super(inner);
-    }
+    ObjectSource<T> openObjectSource() throws IOException;
 
-    @Override
-    public void position(Tell offset) throws IOException {
-        getInner().position(offset);
-    }
+    ObjectSink<T> openObjectSink() throws IOException;
 
-    @Override
-    public Tell position() throws IOException {
-        return getInner().position();
-    }
+    SeekableObjectSource<T, P> openSeekableObjectSource() throws IOException;
+
+    /**
+     * Get whether or not underlying resource supports a limited random access capability. In general it should support
+     *
+     * @return true if the store is seekable, false otherwise
+     */
+    boolean isSeekable();
+
 }

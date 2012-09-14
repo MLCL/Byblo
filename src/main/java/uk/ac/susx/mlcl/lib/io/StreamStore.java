@@ -28,32 +28,19 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
 package uk.ac.susx.mlcl.lib.io;
 
-import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
- * A SeekableDataSource adapter that forwards all method invocations to some
- * encapsulated inner class.
- *
- * @param <S> type of the encapsulated instance
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public abstract class ForwardingSeekableDataSource<S extends SeekableDataSource>
-        extends ForwardingDataSource<S>
-        implements SeekableDataSource {
+public interface StreamStore extends Store {
 
-    public ForwardingSeekableDataSource(S inner) {
-        super(inner);
-    }
+    InputStream openInputStream();
 
-    @Override
-    public void position(Tell offset) throws IOException {
-        getInner().position(offset);
-    }
+    OutputStream openOutputStream();
 
-    @Override
-    public Tell position() throws IOException {
-        return getInner().position();
-    }
 }
