@@ -47,6 +47,13 @@ public abstract class AbstractParallelTask extends AbstractTask {
 
     private static final Log LOG = LogFactory.getLog(AbstractParallelTask.class);
 
+
+    /**
+     * Number of tasks that will be loaded and queued, in addition to those
+     * that can be running simultaneously (as defined by {@link #numThreads}.)
+     */
+    protected static final int PRELOAD_SIZE = 1;
+
     private static final int DEFAULT_NUM_THREADS =
             Runtime.getRuntime().availableProcessors();
 
@@ -58,18 +65,15 @@ public abstract class AbstractParallelTask extends AbstractTask {
 
     private Semaphore throttle;
 
-    private AbstractParallelTask() {
+    protected AbstractParallelTask() {
     }
 
     public void setNumThreads(int numThreads) {
         Checks.checkRangeIncl(numThreads, 1, Integer.MAX_VALUE);
 
-        if (LOG.isWarnEnabled() && numThreads
-                > Runtime.getRuntime().availableProcessors()) {
-            LOG.
-                    warn("numThreads (" + numThreads + ") > availableProcessors (" + Runtime.
-                            getRuntime().
-                            availableProcessors() + ")");
+        if (LOG.isWarnEnabled() && numThreads > Runtime.getRuntime().availableProcessors()) {
+            LOG.warn("numThreads (" + numThreads + ") > availableProcessors ("
+                    + Runtime.getRuntime().availableProcessors() + ")");
         }
         if (numThreads != this.numThreads) {
             this.numThreads = numThreads;
@@ -89,8 +93,7 @@ public abstract class AbstractParallelTask extends AbstractTask {
                     1L, TimeUnit.MINUTES,
                     new LinkedBlockingQueue<Runnable>());
 
-            tpe.setRejectedExecutionHandler(
-                    new ThreadPoolExecutor.AbortPolicy());
+            tpe.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
 
             this.executor = Executors.unconfigurableExecutorService(tpe);
         }
@@ -100,7 +103,7 @@ public abstract class AbstractParallelTask extends AbstractTask {
     @Override
     protected void initialiseTask() throws Exception {
         getExecutor();
-        throttle = new Semaphore((int) (getNumThreads() * 1.5) + 1);
+        throttle = new Semaphore(getNumThreads() + PRELOAD_SIZE);
     }
 
     @Override
