@@ -38,33 +38,28 @@ import uk.ac.susx.mlcl.lib.io.*;
 import javax.annotation.WillClose;
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
- * An <tt>TokenPairSource</tt> object is used to retrieve {@link TokenPair}
- * objects from a flat file.
+ * An <tt>TokenPairSource</tt> object is used to retrieve {@link TokenPair} objects from a flat file.
  * <p/>
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see TokenPairSink
  */
-public class TokenPairSource
-        implements SeekableObjectSource<TokenPair, Tell>, Closeable {
-
-    private final SeekableDataSource inner;
+public class TokenPairSource extends ForwardingChannel<SeekableDataSource> implements SeekableObjectSource<TokenPair, Tell> {
 
     private TokenPairSource(SeekableDataSource inner) {
-        this.inner = inner;
+        super(inner);
     }
 
     @Override
     public TokenPair read() throws IOException {
         try {
-            final int id1 = inner.readInt();
-            final int id2 = inner.readInt();
-            inner.endOfRecord();
+            final int id1 = getInner().readInt();
+            final int id2 = getInner().readInt();
+            getInner().endOfRecord();
             return new TokenPair(id1, id2);
         } catch (Throwable ex) {
             throw new IOException("Error at position " + position(), ex);
@@ -73,24 +68,17 @@ public class TokenPairSource
 
     @Override
     public boolean hasNext() throws IOException {
-        return inner.canRead();
+        return getInner().canRead();
     }
 
     @Override
     public void position(Tell p) throws IOException {
-        inner.position(p);
+        getInner().position(p);
     }
 
     @Override
     public Tell position() throws IOException {
-        return inner.position();
-    }
-
-    @Override
-    @WillClose
-    public void close() throws IOException {
-        if (inner instanceof Closeable)
-            ((Closeable) inner).close();
+        return getInner().position();
     }
 
     public static TokenPairSource open(

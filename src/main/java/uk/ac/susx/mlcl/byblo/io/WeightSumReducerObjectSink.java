@@ -40,8 +40,7 @@ import java.io.IOException;
  * @param <T>
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightSumReducerObjectSink<T>
-        extends ForwardingObjectSink<ObjectSink<Weighted<T>>, Weighted<T>> {
+public class WeightSumReducerObjectSink<T> extends ForwardingObjectSink<ObjectSink<Weighted<T>>, Weighted<T>> {
 
     private T currentRecord = null;
 

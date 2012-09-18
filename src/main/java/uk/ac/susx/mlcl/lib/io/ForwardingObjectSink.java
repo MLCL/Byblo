@@ -30,75 +30,25 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
-import java.io.Closeable;
-import java.io.Flushable;
 import java.io.IOException;
-import uk.ac.susx.mlcl.lib.Checks;
 
 /**
- * ObjectSink adapter that forwards all method invocations to some
- * encapsulated instance.
+ * ObjectSink adapter that forwards all method invocations to some encapsulated instance.
  *
  * @param <S> type of the ObjectSink encapsulated
  * @param <T> type of object consumed
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class ForwardingObjectSink<S extends ObjectSink<T>, T>
-        implements ObjectSink<T>, Closeable, Flushable {
-
-    private final S inner;
+        extends ForwardingChannel<S> implements ObjectSink<T> {
 
     public ForwardingObjectSink(S inner) {
-        Checks.checkNotNull("inner", inner);
-        this.inner = inner;
-    }
-
-    public S getInner() {
-        return inner;
+        super(inner);
     }
 
     @Override
     public void write(T record) throws IOException {
-        inner.write(record);
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (inner instanceof Closeable)
-            ((Closeable) inner).close();
-    }
-
-    @Override
-    public void flush() throws IOException {
-        if (inner instanceof Flushable)
-            ((Flushable) inner).flush();
-    }
-
-    public boolean equals(ForwardingObjectSink<?, ?> other) {
-        if (this.inner != other.inner && (this.inner == null || !this.inner.equals(other.inner)))
-            return false;
-        return true;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        return equals((ForwardingObjectSink<?, ?>) obj);
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 97 * hash + (this.inner != null ? this.inner.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public String toString() {
-        return this.getClass().getSimpleName() + "{" + "inner=" + inner + '}';
+        getInner().write(record);
     }
 
 }

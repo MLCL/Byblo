@@ -259,18 +259,16 @@ public class IndexWTPCommandTest extends
 
         // Read back the data again, this time as vectors
         {
-            WeightedTokenPairVectorSource vectorSourceA = WeightedTokenPairSource.open(
+            WeightedTokenPairVectorSource vectorSourceA = new WeightedTokenPairVectorSource(WeightedTokenPairSource.open(
                     outA,
                     DEFAULT_CHARSET,
                     new DoubleEnumeratingDelegate(Enumerating.DEFAULT_TYPE,
-                            true, true, null, null), skip1a, skip2a)
-                    .getVectorSource();
-            WeightedTokenPairVectorSource vectorSourceB = WeightedTokenPairSource.open(
+                            true, true, null, null), skip1a, skip2a));
+            WeightedTokenPairVectorSource vectorSourceB = new WeightedTokenPairVectorSource(WeightedTokenPairSource.open(
                     outB,
                     DEFAULT_CHARSET,
                     new DoubleEnumeratingDelegate(Enumerating.DEFAULT_TYPE,
-                            true, true, null, null), skip1b, skip2b)
-                    .getVectorSource();
+                            true, true, null, null), skip1b, skip2b));
 
             List<Tell> pa = new ArrayList<Tell>();
             List<Tell> pb = new ArrayList<Tell>();

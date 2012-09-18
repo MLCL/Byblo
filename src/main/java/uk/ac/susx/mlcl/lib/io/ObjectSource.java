@@ -31,18 +31,18 @@
 package uk.ac.susx.mlcl.lib.io;
 
 import java.io.IOException;
+import java.nio.channels.Channel;
 
 /**
  * <p>Defines a source of objects of some type {@code T} data.</p>
  *
- * The interface allows data to be iterated in an undefined but deterministic
- * order. It is entirely agnostic in terms of actual source of data. Differs
- * from Iterator in that it can throw IOException.
+ * The interface allows data to be iterated in an undefined but deterministic order. It is entirely agnostic in terms of
+ * actual source of data. Differs from Iterator in that it can throw IOException.
  *
- * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T> The type of object that the implementing class will provide.
+ * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public interface ObjectSource<T> {
+public interface ObjectSource<T> extends Channel {
 
     /**
      * Retrieval the next available record.

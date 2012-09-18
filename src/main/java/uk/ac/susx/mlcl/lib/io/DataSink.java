@@ -31,10 +31,11 @@
 package uk.ac.susx.mlcl.lib.io;
 
 import java.io.IOException;
+import java.nio.channels.Channel;
 
 /**
  * Interface that is implemented by classes which consume arbitrary data and a
- * semi structured mannar.
+ * semi structured manner.
  *
  * Similar to the DataOutput interface, but less cluttered and without the
  * assumption of the underlying stream being binary. In fact this interface was
@@ -43,7 +44,7 @@ import java.io.IOException;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public interface DataSink {
+public interface DataSink extends Channel {
 
     void endOfRecord() throws IOException;
 

@@ -42,8 +42,7 @@ import java.util.Comparator;
  * @param <T> type of ObjectSink being encapsulated
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class KFirstReducingObjectSink<T>
-        extends ForwardingObjectSink<ObjectSink<T>, T> {
+public final class KFirstReducingObjectSink<T> extends ForwardingObjectSink<ObjectSink<T>, T> {
 
     private Comparator<T> comparator = null;
 

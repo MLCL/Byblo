@@ -39,26 +39,23 @@ import uk.ac.susx.mlcl.lib.io.*;
 import javax.annotation.WillClose;
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
- * An <tt>WeightedTokenSource</tt> object is used to retrieve {@link Token}
- * objects from a flat file.
+ * An <tt>WeightedTokenSource</tt> object is used to retrieve {@link Token} objects from a flat file.
  * <p/>
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see WeightedTokenSink
  */
-public class WeightedTokenSource
-        implements SeekableObjectSource<Weighted<Token>, Tell>, Closeable {
+public class WeightedTokenSource implements SeekableObjectSource<Weighted<Token>, Tell> {
 
     private static final Log LOG = LogFactory.getLog(WeightedTokenSource.class);
 
     private final SeekableDataSource inner;
 
-    private WeightedTokenSource(SeekableDataSource inner){
+    private WeightedTokenSource(SeekableDataSource inner) {
         this.inner = inner;
     }
 
@@ -108,10 +105,14 @@ public class WeightedTokenSource
     }
 
     @Override
+    public boolean isOpen() {
+        return inner.isOpen();
+    }
+
+    @Override
     @WillClose
     public void close() throws IOException {
-        if (inner instanceof Closeable)
-            ((Closeable) inner).close();
+        inner.close();
     }
 
     public static class WTStatsSource

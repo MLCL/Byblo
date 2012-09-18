@@ -30,21 +30,20 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
-import java.io.Closeable;
+import uk.ac.susx.mlcl.lib.Checks;
+
 import java.io.IOException;
 import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
-import uk.ac.susx.mlcl.lib.Checks;
 
 /**
- * Chunk is a type of collections that implement ObjectSource.
+ * Chunk is a type of collections that implements ObjectSource.
  *
- * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T> The atomic type of items in this chunk
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public final class Chunk<T> extends AbstractList<T>
-        implements SeekableObjectSource<T, Integer>, Cloneable, Closeable {
+public final class Chunk<T> extends AbstractList<T> implements SeekableObjectSource<T, Integer> {
 
     private String name;
 
@@ -61,11 +60,11 @@ public final class Chunk<T> extends AbstractList<T>
     }
 
     /**
-     * Protected constructor for cloning only.
+     *  constructor for cloning only.
      *
      * @param other Chunk to clone (using a shallow copy).
      */
-    protected Chunk(Chunk<T> other) {
+    public Chunk(Chunk<T> other) {
         this.name = other.name;
         this.items = other.items;
         nextIndex = other.nextIndex;
@@ -115,19 +114,19 @@ public final class Chunk<T> extends AbstractList<T>
     }
 
     @Override
-    public Chunk<T> clone() {
-        return new Chunk<T>(this);
+    public boolean isOpen() {
+        return items != null;
     }
-    
+
     @Override
     public void close() throws IOException {
-    	nextIndex = null;
-    	items = null;
+        nextIndex = null;
+        items = null;
     }
 
     @Override
     public String toString() {
-        return "Chunk{" + "name=" + name + '}';
+        return this.getClass().getSimpleName() + "[name=" + name + ']';
     }
 
 }

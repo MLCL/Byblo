@@ -30,111 +30,133 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Map;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.io.File;
+import junit.framework.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import uk.ac.susx.mlcl.TestConstants;
+import uk.ac.susx.mlcl.testing.AbstractObjectTest;
+import uk.ac.susx.mlcl.testing.SlowTestCategory;
+
+import java.io.*;
 import java.nio.CharBuffer;
 import java.nio.channels.ClosedChannelException;
-import java.util.HashMap;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.Map.Entry;
+
 import static org.junit.Assert.*;
 
 /**
  * Test cases for the CharFileChannel class.
- * 
+ *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class CharFileChannelTest {
+public class CharFileChannelTest extends AbstractObjectTest<CharFileChannel> {
+
+    @Override
+    protected Class<? extends CharFileChannel> getImplementation() {
+        return CharFileChannel.class;
+    }
 
     public static File makeTempFile(int size) throws IOException {
-        final File file = File.createTempFile(CharFileChannelTest.class.getName(),
-                                              ".tmp");
-        final OutputStream out = new BufferedOutputStream(
-                new FileOutputStream(file));
-        byte[] data = new byte[1024];
-        new Random().nextBytes(data);
-        int i = 0;
-        while (i < size) {
-            out.write(data, 0, Math.min(data.length, size - i));
-            i += data.length;
+        final File file = new File(TestConstants.TEST_OUTPUT_DIR, CharFileChannelTest.class.getName() + ".small-sample");
+        if (!file.exists()) {
+            System.out.println(" > Creating data file: " + file);
+            OutputStream out = null;
+            try {
+                out = new BufferedOutputStream(new FileOutputStream(file));
+                byte[] data = new byte[1024];
+                newRandom().nextBytes(data);
+                int i = 0;
+                while (i < size) {
+                    out.write(data, 0, Math.min(data.length, size - i));
+                    i += data.length;
+                }
+                out.flush();
+            } finally {
+                if (out != null)
+                    out.close();
+            }
         }
-        out.flush();
-        out.close();
         return file;
     }
 
     private static int SMALL_SAMPLE_SIZE = 1024 * 1024;
 
-    private static File SMALL_SAMPLE_FILE;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        SMALL_SAMPLE_FILE = makeTempFile(SMALL_SAMPLE_SIZE);
-        SMALL_SAMPLE_FILE.deleteOnExit();
     }
 
     @Test
-    public void testRead() throws Exception {
-        System.out.println("Testing read(CharBuffer)");
-
-        CharFileChannel instance = new CharFileChannel(
-                new FileInputStream(SMALL_SAMPLE_FILE).getChannel(), Charset.defaultCharset());
-
-        CharBuffer dst = CharBuffer.allocate(777773);
-
-        long charsRead = 0;
-        long n;
-        long pos = instance.position();
-        while ((n = instance.read(dst)) != 0) {
-            pos = instance.position();
-            charsRead += n;
-            dst.flip();
-            dst.clear();
-        }
-        // For all file system this should hold
-        assertTrue(charsRead <= SMALL_SAMPLE_FILE.length());
-
-        // However the following is system dependant
-//        assertEquals(charsRead, SMALL_SAMPLE_FILE.length());
+    public void testReadLargeBuffer() throws Exception {
+        testReadSmallBuffer(SMALL_SAMPLE_SIZE / 3 | 1);
     }
+
 
     @Test
     public void testReadSmallBuffer() throws Exception {
-        System.out.println("Testing read(CharBuffer) with small buffer");
+        testReadSmallBuffer(15);
+    }
 
-        CharFileChannel instance = new CharFileChannel(
-                new FileInputStream(SMALL_SAMPLE_FILE).getChannel(), Charset.defaultCharset());
+    @Test
+    public void testReadSizeOneBuffer() throws Exception {
+        testReadSmallBuffer(1);
+    }
 
-        CharBuffer dst = CharBuffer.allocate(1 << 4);
+    static void testReadSmallBuffer(int bufferSize) throws Exception {
 
-        long charsRead = 0;
-        long n;
-        long pos = instance.position();
-        while ((n = instance.read(dst)) != 0) {
-            pos = instance.position();
-            charsRead += n;
-            dst.clear();
+        File smallSampleFile = makeTempFile(SMALL_SAMPLE_SIZE);
+//        FileInputStream inputStream = null;
+        RandomAccessFile raf = null;
+
+        FileChannel fileChannel = null;
+        CharFileChannel instance = null;
+
+        try {
+            raf = new RandomAccessFile(smallSampleFile, "rw");
+            fileChannel = raf.getChannel();
+            instance = new CharFileChannel(fileChannel, Charset.defaultCharset());
+
+            final CharBuffer dst = CharBuffer.allocate(bufferSize);
+//            final CharBuffer dst = CharBuffer.wrap(new char[bufferSize]);
+
+            long charsRead = 0;
+            long n;
+            long pos = instance.position();
+            while ((n = instance.read(dst)) != 0) {
+//            System.out.printf(" > read=%d, pos=%d, size=%d, remaining=%d, more=%s%n",
+//                    n, instance.position(), instance.size(), instance.bytesRemaining(), instance.hasBytesRemaining());
+
+                assert instance.position() > pos;
+                assert instance.position() <= instance.size();
+
+                pos = instance.position();
+                charsRead += n;
+                dst.flip();
+                dst.clear();
+            }
+
+            Assert.assertFalse(instance.hasBytesRemaining());
+            Assert.assertEquals(0, instance.bytesRemaining());
+            Assert.assertEquals(instance.size(), (long) instance.position());
+
+
+            // For all file system this should hold
+            assertTrue(charsRead <= smallSampleFile.length());
+
+        } finally {
+            if (instance != null)
+                instance.close();
+            if (fileChannel != null)
+                fileChannel.close();
+            if (raf != null) {
+                raf.close();
+            }
         }
-        System.out.println(charsRead + " chars read");
-
-        // For all file system this should hold
-        assertTrue(charsRead <= SMALL_SAMPLE_FILE.length());
-
-        // However the following is system dependant
-//        assertEquals(charsRead, SMALL_SAMPLE_FILE.length());
+        assertClosed(instance);
     }
 
     @Test
@@ -142,9 +164,10 @@ public class CharFileChannelTest {
 
         System.out.println("Testing position() and position(long)");
 
+        File smallSampleFile = makeTempFile(SMALL_SAMPLE_SIZE);
 
         CharFileChannel instance = new CharFileChannel(
-                new FileInputStream(SMALL_SAMPLE_FILE).getChannel(), Charset.defaultCharset());
+                new FileInputStream(smallSampleFile).getChannel(), Charset.defaultCharset());
 
         int charbuffersize = 1001;
 
@@ -161,7 +184,7 @@ public class CharFileChannelTest {
             charsRead += n;
         }
         // For all file system this should hold
-        assertTrue(charsRead <= SMALL_SAMPLE_FILE.length());
+        assertTrue(charsRead <= smallSampleFile.length());
 
         // However the following is system dependant
 //        assertEquals(charsRead, SMALL_SAMPLE_FILE.length());
@@ -185,70 +208,88 @@ public class CharFileChannelTest {
             assertEquals(expectedResult, result);
 
         }
+
+        instance.close();
+        assertClosed(instance);
     }
 
     @Test
     public void testIsOpen() throws FileNotFoundException, IOException {
         System.out.println("Testing isOpen() and close()");
 
+        File smallSampleFile = makeTempFile(SMALL_SAMPLE_SIZE);
 
         CharFileChannel instance = new CharFileChannel(
-                new FileInputStream(SMALL_SAMPLE_FILE).getChannel(),
+                new FileInputStream(smallSampleFile).getChannel(),
                 Files.DEFAULT_CHARSET);
 
         assertEquals(true, instance.isOpen());
         instance.close();
-        assertEquals(false, instance.isOpen());
 
-        try {
-            CharBuffer dst = CharBuffer.allocate(777773);
-            instance.read(dst);
-            fail("Exception should have been thrown.");
-        } catch (ClosedChannelException ex) {
-            // Yay (this is supposed to happen)
-        }
+        assertClosed(instance);
     }
 
     @Test
-    @Ignore(value = "Test creates a massive (over 2 GB) file to test address "
-    + "outside of 32bits. Hense it is not suitable for all users to "
-    + "run.")
+//    @Ignore(value = "Test creates a massive (over 2 GB) file to test address "
+//            + "outside of 32bits. Hense it is not suitable for all users to "
+//            + "run.")
+    @Category(SlowTestCategory.class)
     public void testOpenVeryLargeFile() throws Exception {
         System.out.println("Testing very large file mapping.");
 
-        // Create a file that is too big for a single map
-        File tmp = File.createTempFile(this.getClass().getName() + "-", "");
-        System.out.println(" + Creating temporary file: " + tmp);
-        tmp.deleteOnExit();
+        File hugeSampleFile = new File(TestConstants.TEST_OUTPUT_DIR, getClass().getName() + ".huge-sample");
 
+        if (!hugeSampleFile.exists()) {
+            // Create a file that is too big for a single map
+            System.out.println(" + Creating temporary file: " + hugeSampleFile);
 
-        System.out.println(
-                " + Truncating temporary file to " + ((1L << 31L) + 1) + " bytes.");
-        RandomAccessFile raf = new RandomAccessFile(tmp, "rw");
-        raf.seek(((1L << 31L) + 1));
-        raf.writeUTF("THE END");
-        raf.close();
+            System.out.println(
+                    " + Truncating temporary file to " + ((1L << 31L) + 1) + " bytes.");
+            RandomAccessFile raf = new RandomAccessFile(hugeSampleFile, "rw");
+            raf.seek(((1L << 31L) + 1));
+            raf.writeUTF("THE END");
+            raf.close();
+        }
 
         System.out.println(" + Testing CharFileChannel");
 
-        CharFileChannel instance = new CharFileChannel(
-                new FileInputStream(tmp).getChannel(),
-                Files.DEFAULT_CHARSET);
+        CharFileChannel instance = new CharFileChannel(new FileInputStream(hugeSampleFile).getChannel(), Files.DEFAULT_CHARSET);
         instance.setMaxMappedBytes(1000000);
 
         assertEquals(true, instance.isOpen());
-        instance.insureMapped(10000);
+        instance.insureMapped(10000, 0);
 
         instance.close();
-        assertEquals(false, instance.isOpen());
 
+        assertClosed(instance);
+    }
+
+
+    @Test
+    public void testWrite() throws IOException {
+        File file = new File(TestConstants.TEST_OUTPUT_DIR, "blahblahblah");
+
+        RandomAccessFile raf = new RandomAccessFile(file, "rw");
+        FileChannel fileChannel = raf.getChannel();
+        CharFileChannel charChannel = new CharFileChannel(fileChannel);
+
+        CharBuffer buf = CharBuffer.wrap("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut at nunc eu massa hendrerit porta eu in dui.");
+        charChannel.write(buf);
+
+        charChannel.close();
+        fileChannel.close();
+        raf.close();
+
+    }
+
+    static void assertClosed(CharFileChannel channel) throws IOException {
+        Assert.assertFalse(channel.isOpen());
         try {
-            CharBuffer dst = CharBuffer.allocate(777773);
-            instance.read(dst);
-            fail("Exception should have been thrown.");
+            CharBuffer dst = CharBuffer.allocate(100);
+            channel.read(dst);
+            fail("ClosedChannelException should have been thrown.");
         } catch (ClosedChannelException ex) {
             // Yay (this is supposed to happen)
         }
     }
-
 }

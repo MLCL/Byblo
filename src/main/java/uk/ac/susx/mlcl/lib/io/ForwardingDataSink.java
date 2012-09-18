@@ -33,90 +33,63 @@ package uk.ac.susx.mlcl.lib.io;
 import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
-import uk.ac.susx.mlcl.lib.Checks;
 
 /**
- * A DataSink adapter that forwards all events to an encapsulated inner
- * instance.
+ * A DataSink adapter that forwards all events to an encapsulated inner instance.
  *
  * @param <T> the type of DataSink being encapsulated
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class ForwardingDataSink<T extends DataSink>
-        implements DataSink, Closeable, Flushable {
-
-    private final T inner;
+        extends ForwardingChannel<T> implements DataSink, Closeable, Flushable {
 
     public ForwardingDataSink(T inner) {
-        Checks.checkNotNull("inner", inner);
-        this.inner = inner;
-    }
-
-    public final T getInner() {
-        return inner;
+        super(inner);
     }
 
     @Override
     public void endOfRecord() throws IOException {
-        inner.endOfRecord();
+        getInner().endOfRecord();
     }
 
     @Override
     public void writeByte(byte val) throws IOException {
-        inner.writeByte(val);
+        getInner().writeByte(val);
     }
 
     @Override
     public void writeChar(char val) throws IOException {
-        inner.writeChar(val);
+        getInner().writeChar(val);
     }
 
     @Override
     public void writeShort(short val) throws IOException {
-        inner.writeShort(val);
+        getInner().writeShort(val);
     }
 
     @Override
     public void writeInt(int val) throws IOException {
-        inner.writeInt(val);
+        getInner().writeInt(val);
     }
 
     @Override
     public void writeLong(long val) throws IOException {
-        inner.writeLong(val);
+        getInner().writeLong(val);
     }
 
     @Override
     public void writeDouble(double val) throws IOException {
-        inner.writeDouble(val);
+        getInner().writeDouble(val);
     }
 
     @Override
     public void writeFloat(float val) throws IOException {
-        inner.writeFloat(val);
+        getInner().writeFloat(val);
     }
 
     @Override
     public void writeString(String str) throws IOException {
-        inner.writeString(str);
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (inner instanceof Closeable)
-            ((Closeable) inner).close();
-    }
-
-    @Override
-    public void flush() throws IOException {
-        if (inner instanceof Flushable)
-            ((Flushable) inner).flush();
-    }
-
-    public boolean equals(ForwardingDataSink<?> other) {
-        if (this.inner != other.inner && (this.inner == null || !this.inner.equals(other.inner)))
-            return false;
-        return true;
+        getInner().writeString(str);
     }
 
     @Override
@@ -126,16 +99,6 @@ public abstract class ForwardingDataSink<T extends DataSink>
         if (getClass() != obj.getClass())
             return false;
         return equals((ForwardingDataSink) obj);
-    }
-
-    @Override
-    public int hashCode() {
-        return 89 * 7 + (this.inner != null ? this.inner.hashCode() : 0);
-    }
-
-    @Override
-    public String toString() {
-        return this.getClass().getSimpleName() + "{" + "inner=" + inner + '}';
     }
 
 }

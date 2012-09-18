@@ -30,6 +30,49 @@
  */
 /**
  * Contains data I/O functionality.
+ *
+ * <h2>IO Notes</h2>
+ *
+ *
+ *
+ * There exists a conceptual hierarchy of random access capabilities for data storage resources, from pure sequential
+ * access up to full random access. Each level extends the functionality of the previous. The hierarchy is as
+ * follows:<p/>
+ *
+ * <dl>
+ *
+ * <dt>Sequential access</dt> <dd>Data can be read or written in order with no ability change position. A input resource
+ * would be expected to implement a very simply interface such as {@link java.util.Iterator} or {@link DataSource}</dd>
+ *
+ * <dt>Limited mark/reset</dt> <dd>The resource contains some buffer capabilities such a single position can be marked
+ * and then returned at a later point within some limit.</dd>
+ *
+ * <dt>Unlimited mark/reset</dt> <dd>The single marked position can be returned to after an arbitrary number of
+ * access.</dd>
+ *
+ * <dt>Seekable</dt> <dd>The resource can be queried for it's current position, returning a value which can be used to
+ * return to that position at any point. Any number of positions can be produced and stored externally, and they will
+ * remain valid as long as the resource is open. The {@link Seekable} interface implements this behaviour.</dd>
+ *
+ * <dt>Full random access</dt> <dt>Every data access method is can be parameterised with a position that will operate on
+ * the associated location. The key difference between full random access and seekable that the latter supports seeking
+ * at any time (cf. seekable positions are only required to be valid after the position has been reached and the
+ * position accessor has been called.)</dt>
+ *
+ * </dl>
+ *
+ * In addition a resource may support a number of other capabilities. These include:
+ *
+ * <dl>
+ *
+ * <dt>Bidirectionality</dt>
+ *
+ * <dt>Closeable</dt>
+ *
+ * <dt>Flushable</dt>
+ *
+ * </dl>
+ *
  */
 @ParametersAreNonnullByDefault package uk.ac.susx.mlcl.lib.io;
 

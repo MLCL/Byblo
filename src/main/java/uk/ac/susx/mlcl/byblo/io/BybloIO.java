@@ -43,8 +43,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
- * Static utility class that provides functions for opening the various file
- * types.
+ * Static utility class that provides functions for opening the various file types.
  * <p/>
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
@@ -54,30 +53,22 @@ public final class BybloIO {
     private BybloIO() {
     }
 
-    public static TokenPairSource openInstancesSource(
-            File file, Charset charset, DoubleEnumerating idx)
+    public static TokenPairSource openInstancesSource(File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
-        return TokenPairSource
-                .open(
-                        file, charset, idx,
-                        BybloSettings.getInstance().isInstancesSkipIndexColumn1Enabled(),
-                        BybloSettings.getInstance().isInstancesSkipIndexColumn2Enabled());
+        return TokenPairSource.open(file, charset, idx,
+                BybloSettings.getInstance().isInstancesSkipIndexColumn1Enabled(),
+                BybloSettings.getInstance().isInstancesSkipIndexColumn2Enabled());
     }
 
-    public static TokenPairSink openInstancesSink(
-            File file, Charset charset, DoubleEnumerating idx)
+    public static TokenPairSink openInstancesSink(File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
-        return TokenPairSink
-                .open(
-                        file, charset, idx,
-                        BybloSettings.getInstance().isInstancesSkipIndexColumn1Enabled(),
-                        BybloSettings.getInstance().isInstancesSkipIndexColumn1Enabled(),
-                        BybloSettings.getInstance().isInstancesCompactEnabled());
+        return TokenPairSink.open(file, charset, idx,
+                BybloSettings.getInstance().isInstancesSkipIndexColumn1Enabled(),
+                BybloSettings.getInstance().isInstancesSkipIndexColumn1Enabled(),
+                BybloSettings.getInstance().isInstancesCompactEnabled());
     }
 
-    public static MarginalDistribution readMarginalDistribution(
-            WeightedTokenSource src)
-            throws IOException {
+    public static MarginalDistribution readMarginalDistribution(WeightedTokenSource src) throws IOException {
 
         final WeightedTokenSource.WTStatsSource statsSrc =
                 new WeightedTokenSource.WTStatsSource(src);
@@ -90,8 +81,7 @@ public final class BybloIO {
     }
 
     public static MarginalDistribution readEntriesMarginalDistribution(
-            final File file, final Charset charset, final SingleEnumerating idx)
-            throws IOException {
+            final File file, final Charset charset, final SingleEnumerating idx) throws IOException {
         WeightedTokenSource src = null;
         try {
             src = openEntriesSource(file, charset, idx);
@@ -264,8 +254,7 @@ public final class BybloIO {
                 BybloSettings.getInstance().isNeighboursCompactEnabled());
     }
 
-    public static WeightedTokenPairSource openNeighboursSource(
-            File file, Charset charset, DoubleEnumerating idx)
+    public static WeightedTokenPairSource openNeighboursSource(File file, Charset charset, DoubleEnumerating idx)
             throws IOException {
         return openNeighboursSource(file, charset,
                 EnumeratingDelegates.toSingleEntries(idx));

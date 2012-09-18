@@ -35,23 +35,18 @@ import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.lib.io.*;
 
-import javax.annotation.WillClose;
-import java.io.*;
+import java.io.File;
+import java.io.Flushable;
+import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
- * An <tt>TokenPairSink</tt> object is used to store {@link TokenPair} objects
- * in a flat file.
- * <p/>
- * <p>The basic file format is Tab-Separated-Values (TSV) where records are
- * delimited by new-lines, and values are delimited by tabs. Two variants are
- * supported: verbose and compact. In verbose mode each {@link TokenPair}
- * corresponds to a single TSV record; i.e one line per object consisting of an
- * entry and a feature. In compact mode each TSV record consists of a single
- * entry followed by the features from all sequentially written
- * {@link TokenPair} objects that share the same entry.</p>
- * <p/>
- * Verbose mode example:
+ * An <tt>TokenPairSink</tt> object is used to store {@link TokenPair} objects in a flat file. <p/> <p>The basic file
+ * format is Tab-Separated-Values (TSV) where records are delimited by new-lines, and values are delimited by tabs. Two
+ * variants are supported: verbose and compact. In verbose mode each {@link TokenPair} corresponds to a single TSV
+ * record; i.e one line per object consisting of an entry and a feature. In compact mode each TSV record consists of a
+ * single entry followed by the features from all sequentially written {@link TokenPair} objects that share the same
+ * entry.</p> <p/> Verbose mode example:
  * <pre>
  *      entry1  feature1
  *      entry1  feature2
@@ -60,46 +55,29 @@ import java.nio.charset.Charset;
  *      entry3  feature4
  *      entry3  feature1
  * </pre>
- * <p/>
- * Equivalent compact mode example:
+ * <p/> Equivalent compact mode example:
  * <pre>
  *      entry1  feature1 feature2
  *      entry2  feature3
  *      entry3  feature2 feature4 feature1
  * </pre>
- * <p/>
- * <p>Compact mode is the default behavior, since it can reduce file sizes by
- * approximately 50%, with corresponding reductions in I/O overhead.</p>
+ * <p/> <p>Compact mode is the default behavior, since it can reduce file sizes by approximately 50%, with corresponding
+ * reductions in I/O overhead.</p>
  * <p/>
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class TokenPairSink implements ObjectSink<TokenPair>, Closeable, Flushable {
-
-    private final DataSink inner;
+public class TokenPairSink extends ForwardingChannel<DataSink> implements ObjectSink<TokenPair>, Flushable {
 
     private TokenPairSink(DataSink inner) {
-        this.inner = inner;
+        super(inner);
     }
 
     @Override
     public void write(final TokenPair record) throws IOException {
-        inner.writeInt(record.id1());
-        inner.writeInt(record.id2());
-        inner.endOfRecord();
-    }
-
-    @Override
-    @WillClose
-    public void close() throws IOException {
-        if (inner instanceof Closeable)
-            ((Closeable) inner).close();
-    }
-
-    @Override
-    public void flush() throws IOException {
-        if (inner instanceof Flushable)
-            ((Flushable) inner).flush();
+        getInner().writeInt(record.id1());
+        getInner().writeInt(record.id2());
+        getInner().endOfRecord();
     }
 
     public static TokenPairSink open(

@@ -30,28 +30,25 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
-import java.io.Serializable;
 import uk.ac.susx.mlcl.lib.Checks;
 
+import javax.annotation.Nullable;
+import java.io.Serializable;
+
 /**
- * Class used to store information about a position in randomly accessible
- * source, such that the source can return to that position given only the
- * data stored in Tell.
- *
- * this can be rather complex process since a particular Seekable Source may
- * consist of a hierarchy of objects each contributing some portion of the
- * reading process. For example the base level may be FileChannel, which is
- * buffered into ByteBuffers, which needs to be decoded into characters, which
- * tokenized by a lexer, follewed by parsing, filtering, other processing. At
- * each stage some information must be stored to return to some stored position.
- *
- * This implementation solves this by implementing an extremely light weight
- * stack of data, which can be pushed to as the Tell is passed up the hierarchy,
- * then can be popped again as the position is passed back down.
- *
- *
- * Note that the class type of each object pushed is also stored to introduce a
- * modicum of type safety.
+ * Class used to store information about a position in randomly accessible source, such that the source can return to
+ * that position given only the data stored in Tell.
+ * <p/>
+ * this can be rather complex process since a particular Seekable Source may consist of a hierarchy of objects each
+ * contributing some portion of the reading process. For example the base level may be FileChannel, which is buffered
+ * into ByteBuffers, which needs to be decoded into characters, which tokenized by a lexer, follewed by parsing,
+ * filtering, other processing. At each stage some information must be stored to return to some stored position.
+ * <p/>
+ * This implementation solves this by implementing an extremely light weight stack of data, which can be pushed to as
+ * the Tell is passed up the hierarchy, then can be popped again as the position is passed back down.
+ * <p/>
+ * <p/>
+ * Note that the class type of each object pushed is also stored to introduce a modicum of type safety.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
@@ -63,9 +60,10 @@ public final class Tell implements Serializable {
 
     private final Object value;
 
+    @Nullable
     private final Tell next;
 
-    private Tell(Class<?> type, Object value, Tell next) {
+    private Tell(Class<?> type, Object value, @Nullable Tell next) {
         Checks.checkNotNull(type);
         this.type = type;
         this.value = value;
@@ -74,6 +72,16 @@ public final class Tell implements Serializable {
 
     public Tell(Class<?> type, Object value) {
         this(type, value, null);
+    }
+
+    /**
+     * Cloning constructor, produces a shallow copy of the parameterised <code>Tell</code>.
+     *
+     * @param other object to clone
+     */
+    public Tell(Tell other) {
+        this(other.type, other.value, other.next);
+
     }
 
     public final Tell next() {

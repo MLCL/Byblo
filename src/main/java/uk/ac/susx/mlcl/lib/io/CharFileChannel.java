@@ -38,40 +38,30 @@ import java.nio.CharBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.NonReadableChannelException;
-import java.nio.channels.NonWritableChannelException;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CoderResult;
-import java.nio.charset.MalformedInputException;
-import java.nio.charset.UnmappableCharacterException;
+import java.nio.charset.*;
 
 /**
- * <p>A class that gets round the problem of very large, seekable character files
- * (greater than 2^31-1 bytes) by borrowing API from the 
- * {@link java.nio.channels.FileChannel} and from Java 7's NIO improvements.</p>
+ * <p>A class that gets round the problem of very large, seekable character files (greater than 2^31-1 bytes) by
+ * borrowing API from the {@link java.nio.channels.FileChannel} and from Java 7's NIO improvements.
  *
- * <p>All the positional accessors (such as {@code size()} and 
- * {@code position()}return offsets in bytes not characters. This may seem
- * confusing but there is simply no efficient way to determine these values in
- * characters.</p>
+ * All the positional accessors (such as {@code size()} and {@code position()}return offsets in bytes not characters.
+ * This may seem confusing but there is simply no efficient way to determine these values in characters.
  *
- * <p>This is not a complete implementation. The following additional functions
- * would be required to be entirely compatible with the
- * {@link java.nio.channels.FileChannel} API:</p>
- * 
+ * This is not a complete implementation. The following additional functions would be required to be entirely compatible
+ * with the {@link java.nio.channels.FileChannel} API:
+ *
  * <ul>
- *  <li>Implementation of the WriteableCharChannel interface and
- *      write(CharBuffer) method. </li>
- *  <li>Locking methods. These could probably be simply encapsulated from the
- *      inner FileChannel object.</li>
- *  <li>Other miscellaneous methods including: {@code size()},
- *      {@code truncate()}, and {@code force(boolean)}.</li>
+ *
+ * <li>Implementation of the WritableCharChannel interface and write(CharBuffer) method. </li>
+ *
+ * <li>Locking methods. These could probably be delegated to the inner FileChannel object.</li>
+ *
+ * <li>Other miscellaneous methods including: {@code size()}, {@code truncate()}, and {@code force(boolean)}.</li>
+ *
  * </ul>
  *
- * <p>If this code is ever ported to Java 7 then it will work for any Channel
- * that also implements java.nio.channels.SeekableByteChannel, not just
- * {@link java.nio.channels.FileChannel}.</p>
+ * If this code is ever ported to Java 7 then it will work for any Channel that also implements
+ * java.nio.channels.SeekableByteChannel, not just {@link java.nio.channels.FileChannel}.
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
@@ -80,14 +70,12 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
     private static final long DEFAULT_MAX_MAPPED_BYTES = Integer.MAX_VALUE;
 
     /**
-     * Size in bytes of the mapped region of the file. Should between 1 and 
-     * Integer.MAX_VALUE.
+     * Size in bytes of the mapped region of the file. Should between 1 and Integer.MAX_VALUE.
      */
     private long maxMappedBytes = DEFAULT_MAX_MAPPED_BYTES;
 
     /**
-     * The inner file change from which bytes will be read and decoded into
-     * characters.
+     * The inner file change from which bytes will be read and decoded into characters.
      */
     private final FileChannel fileChannel;
 
@@ -95,6 +83,11 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
      * Character set decoding.
      */
     private final CharsetDecoder decoder;
+
+    /**
+     * Character set encoder.
+     */
+    private final CharsetEncoder encoder;
 
     /**
      * ByteBuffer over the currently mapped region of the file.
@@ -107,61 +100,57 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
     private long bufferOffset = 0;
 
     /**
-     * Cache the file size because calls to FileChannel.size() take an 
-     * excessively long time.
+     * Cache the file size because calls to FileChannel.size() take an excessively long time.
      */
     private long fileSize = -1;
 
     /**
-     * Construct a new {@link uk.ac.susx.mlcl.lib.io.CharFileChannel} object from the given
-     * {@link java.nio.channels.FileChannel} and 
-     * {@link java.nio.charset.CharsetDecoder}
+     * Construct a new {@link uk.ac.susx.mlcl.lib.io.CharFileChannel} object from the given {@link
+     * java.nio.channels.FileChannel} and {@link java.nio.charset.CharsetDecoder}
      *
-     * The FileChannel must have been opened from a stream with the desired
-     * read/write mode.
+     * The FileChannel must have been opened from a stream with the desired read/write mode.
      *
-     * @param fileChannel   byte based FileChannel to encapsulate
-     * @param decoder       desired character set decoder
+     * @param fileChannel byte based FileChannel to encapsulate
+     * @param decoder     desired character set decoder
      * @throws NullPointerException if either fileChannel or decoder are null
      */
-    public CharFileChannel(FileChannel fileChannel, CharsetDecoder decoder)
-            throws NullPointerException {
-        if (!fileChannel.isOpen())
-            throw new IllegalArgumentException("fileChannel is already closed");
+    public CharFileChannel(FileChannel fileChannel, CharsetDecoder decoder, CharsetEncoder encoder) throws NullPointerException {
         if (fileChannel == null)
             throw new NullPointerException("byteChannel is null");
+        if (!fileChannel.isOpen())
+            throw new IllegalArgumentException("fileChannel is already closed");
+        if (encoder == null)
+            throw new NullPointerException("encoder is null");
         if (decoder == null)
             throw new NullPointerException("decoder is null");
 
         this.fileChannel = fileChannel;
         this.decoder = decoder;
+        this.encoder = encoder;
         this.buffer = null;
         this.bufferOffset = 0;
     }
 
     /**
-     * Construct a new {@link uk.ac.susx.mlcl.lib.io.CharFileChannel} object from the given
-     * {@link java.nio.channels.FileChannel} and {@link java.nio.charset.Charset}
+     * Construct a new {@link uk.ac.susx.mlcl.lib.io.CharFileChannel} object from the given {@link
+     * java.nio.channels.FileChannel} and {@link java.nio.charset.Charset}
      *
-     * @param fileChannel   byte based FileChannel to encapsulate
-     * @param charset       desired character set to decode into
+     * @param fileChannel byte based FileChannel to encapsulate
+     * @param charset     desired character set to decode into
      * @throws NullPointerException if either fileChannel or charset are null
      */
-    public CharFileChannel(FileChannel fileChannel, Charset charset)
-            throws NullPointerException {
-        this(fileChannel, Files.decoderFor(charset));
+    public CharFileChannel(FileChannel fileChannel, Charset charset) throws NullPointerException {
+        this(fileChannel, Files.decoderFor(charset), Files.encoderFor(charset));
     }
 
     /**
-     * Construct a new {@link uk.ac.susx.mlcl.lib.io.CharFileChannel} object from the given
-     * {@link java.nio.channels.FileChannel}. The charset will be set to the 
-     * default for this Java Virtual Machine.
+     * Construct a new {@link uk.ac.susx.mlcl.lib.io.CharFileChannel} object from the given {@link
+     * java.nio.channels.FileChannel}. The charset will be set to the default for this Java Virtual Machine.
      *
      * @param fileChannel byte based FileChannel to encapsulate
      * @throws NullPointerException if fileChannel is null
      */
-    public CharFileChannel(FileChannel fileChannel)
-            throws NullPointerException {
+    public CharFileChannel(FileChannel fileChannel) throws NullPointerException {
         this(fileChannel, Files.DEFAULT_CHARSET);
     }
 
@@ -175,9 +164,8 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
     }
 
     /**
-     * Return the size in bytes of the mapped region of the file. Should 
-     * between 1 and Integer.MAX_VALUE.
-     * 
+     * Return the size in bytes of the mapped region of the file. Should between 1 and Integer.MAX_VALUE.
+     *
      * @return size in bytes of the mapped region of the file
      */
     public long getMaxMappedBytes() {
@@ -185,12 +173,10 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
     }
 
     /**
-     * Set the size in bytes of the mapped region of the file Should 
-     * between 1 and Integer.MAX_VALUE.
-     * 
-     * @param maxMappedBytes  new mapped region size
-     * @throws IllegalArgumentException if maxMappedBytes &lt; 1 or 
-     *                  maxMappedBytes &gt; Integer.MAX_VALUE
+     * Set the size in bytes of the mapped region of the file Should between 1 and Integer.MAX_VALUE.
+     *
+     * @param maxMappedBytes new mapped region size
+     * @throws IllegalArgumentException if maxMappedBytes &lt; 1 or maxMappedBytes &gt; Integer.MAX_VALUE
      */
     public void setMaxMappedBytes(long maxMappedBytes) {
         if (maxMappedBytes < 1)
@@ -202,20 +188,19 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
     }
 
     /**
-     * Return the size in byte of the encapsulated
-     * {@link java.nio.channels.FileChannel}.
+     * Return the size in byte of the encapsulated {@link java.nio.channels.FileChannel}.
      *
      * @return file size in bytes
-     * @throws java.nio.channels.ClosedChannelException If this channel is closed
+     * @throws java.nio.channels.ClosedChannelException
+     *                             If this channel is closed
      * @throws java.io.IOException If some other I/O error occurs
      */
-    public long size() throws ClosedChannelException, IOException {
+    public long size() throws IOException {
         return (fileSize == -1) ? (fileSize = fileChannel.size()) : fileSize;
     }
 
     /**
-     * <p>Return the offset of the next byte to be read form the
-     * {@link java.nio.channels.FileChannel}.</p>
+     * Return the offset of the next byte to be read form the {@link java.nio.channels.FileChannel}.</p>
      *
      * @return file byte offset of next read
      */
@@ -228,7 +213,7 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
      * Set the byte offset for the next read.
      *
      * @param pos the file byte offset to move to
-     * @throws IllegalArgumentException if pos &lt; 0 
+     * @throws IllegalArgumentException if pos &lt; 0
      */
     @Override
     public void position(Long pos) {
@@ -246,10 +231,9 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
     }
 
     /**
-     * Return whether or not the encapsulated {@link java.nio.channels.FileChannel}
-     * is still open.
+     * Return whether or not the encapsulated {@link java.nio.channels.FileChannel} is still open.
      *
-     * @return  true if the channel is open, false otherwise
+     * @return true if the channel is open, false otherwise
      */
     @Override
     public boolean isOpen() {
@@ -257,8 +241,7 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
     }
 
     /**
-     * Close the encapsulated file channel, and release buffering resources to
-     * garbage collection.
+     * Close the encapsulated file channel, and release buffering resources to garbage collection.
      *
      * @throws java.io.IOException If an I/O error occurs
      */
@@ -269,27 +252,30 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
     }
 
     /**
-     * <p>Read a sequence of bytes from the encapsulated
-     * {@link java.nio.channels.FileChannel}, decode into characters and put
-     * them in the destination buffer. Returns the number of characters that
-     * have been added to the destination buffer.</p>
-     * 
+     * Read a sequence of bytes from the encapsulated {@link java.nio.channels.FileChannel}, decode into characters and
+     * put them in the destination buffer. Returns the number of characters that have been added to the destination
+     * buffer.
+     *
      * @param dst destination buffer
      * @return number of characters put in {@code dst}
-     * @throws java.nio.channels.ClosedChannelException If this channel is closed
-     * @throws java.nio.channels.NonReadableChannelException If the mode is READ_ONLY but this
-     *          channel was not opened for reading
-     * @throws java.nio.channels.NonWritableChannelException If the mode is READ_WRITE or PRIVATE
-     *          but this channel was not opened for both reading and writing
+     * @throws java.nio.channels.ClosedChannelException
+     *                             If this channel is closed
+     * @throws java.nio.channels.NonReadableChannelException
+     *                             If the mode is READ_ONLY but this channel was not opened for reading
+     * @throws java.nio.channels.NonWritableChannelException
+     *                             If the mode is READ_WRITE or PRIVATE but this channel was not opened for both reading
+     *                             and writing
      * @throws java.nio.charset.UnmappableCharacterException
+     *
      * @throws java.nio.charset.CharacterCodingException
+     *
      * @throws java.nio.charset.MalformedInputException
+     *
      * @throws java.io.IOException If some other I/O error occurs
      */
     @Override
-    public final int read(final CharBuffer dst) throws MalformedInputException,
-            UnmappableCharacterException, ClosedChannelException,
-            CharacterCodingException, NonReadableChannelException,
+    public final int read(final CharBuffer dst) throws
+            NonReadableChannelException,
             IOException {
 
         // sanity check the state
@@ -305,83 +291,74 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
 
         // reference the results of each decode here
         CoderResult coderResult;
+        decoder.reset();
 
         // Repeat reading until the destination buffer is full, or the source
         // buffer is empty
         do {
-            // Attempt to insure sufficient are available for reading in the
-            // mapped portion of the source channel (Not guaranteed to succeed)
-            // (It would be nice if java had the method decoder.maxPerByteChars()
-            // but since it doesn't - guess we will need up to 4 byes per char.)
-            insureMapped((int) Math.ceil(dst.remaining() * 4));
+            // Attempt to insure sufficient is data available for reading in the  mapped portion of the source channel,
+            // which is not guaranteed to succeed.
+            insureMapped((int) Math.ceil(dst.remaining() * encoder.maxBytesPerChar()), 0);
 
             coderResult = decoder.decode(buffer, dst, false);
+            checkCoderResult(coderResult);
 
-            if (coderResult.isError())
-                try {
-                    coderResult.throwException();
-                } catch (BufferOverflowException ex) {
-                    throw new AssertionError(ex);
-                } catch (BufferUnderflowException ex) {
-                    throw new AssertionError(ex);
-                }
+        } while (hasBytesRemaining() && coderResult.isUnderflow());
 
-
-        } while (hasBytesRemaining()
-                && coderResult.isUnderflow());
+        checkCoderResult(decoder.decode(buffer, dst, true));
+        checkCoderResult(decoder.flush(dst));
 
         return dst.position() - startChar;
     }
 
     /**
-     * Return the number of bytes available for reading. Calculated as the file 
-     * size, minus the offset of the mapped region, minus the read position 
-     * within the mapped region.
-     * 
+     * Return the number of bytes available for reading. Calculated as the file size, minus the offset of the mapped
+     * region, minus the read position within the mapped region.
+     *
      * @return number of bytes remaining
-     * @throws java.nio.channels.ClosedChannelException If this channel is closed
+     * @throws java.nio.channels.ClosedChannelException
+     *                             If this channel is closed
      * @throws java.io.IOException If some other I/O error occurs
      */
-    public long bytesRemaining() throws IOException, ClosedChannelException {
+    public long bytesRemaining() throws IOException {
         return size() - bufferOffset - (buffer == null ? 0 : buffer.position());
     }
 
     /**
-     *
      * @return true if there are bytes remaining
-     * @throws java.nio.channels.ClosedChannelException If this channel is closed
+     * @throws java.nio.channels.ClosedChannelException
+     *                             If this channel is closed
      * @throws java.io.IOException If some other I/O error occurs
      */
-    public boolean hasBytesRemaining() throws IOException, ClosedChannelException {
+    public boolean hasBytesRemaining() throws IOException {
         return bytesRemaining() > 0;
     }
 
     /**
-     * <p>Attempt to insure that the the required number of bytes
-     * ({@code requiredBytes}) is available for reading in the buffer. If there
-     * is sufficient bytes available on the encapsulated
-     * {@link java.nio.channels.FileChannel}, and no exception occurs, then this
-     * operation is guaranteed to succeed.</p>
+     * Attempt to insure that the the required number of bytes ({@code requiredBytes}) is available for reading in the
+     * buffer. If there is sufficient bytes available on the encapsulated {@link java.nio.channels.FileChannel}, and no
+     * exception occurs, then this operation is guaranteed to succeed.
      *
-     * <p>Note that this method has package protected accessibility for unit
-     * testing purposes only.</p>
+     * Note that this method has package protected accessibility for unit testing purposes only.
      *
-     * @param requiredBytes
-     * @throws java.nio.channels.NonReadableChannelException If the mode is READ_ONLY but this
-     *          channel was not opened for reading
-     * @throws java.nio.channels.NonWritableChannelException If the mode is READ_WRITE or PRIVATE
-     *          but this channel was not opened for both reading and writing
-     * @throws java.nio.channels.ClosedChannelException If this channel is closed
+     * @param requiredReadBytes minimum number of bytes to be mapped when this method returns
+     * @throws java.nio.channels.NonReadableChannelException
+     *                             If the mode is READ_ONLY but this channel was not opened for reading
+     * @throws java.nio.channels.NonWritableChannelException
+     *                             If the mode is READ_WRITE or PRIVATE but this channel was not opened for both reading
+     *                             and writing
+     * @throws java.nio.channels.ClosedChannelException
+     *                             If this channel is closed
      * @throws java.io.IOException If some other I/O error occurs
      */
-    void insureMapped(int requiredBytes)
-            throws ClosedChannelException, IOException {
+    void insureMapped(int requiredReadBytes, int requireWriteBytes)
+            throws IOException {
 
         final boolean mappingRequired;
 
         if (buffer == null) {
             mappingRequired = true;
-        } else if (hasBytesRemaining() && buffer.remaining() < requiredBytes) {
+        } else if (hasBytesRemaining() && buffer.remaining() < Math.max(requiredReadBytes, requireWriteBytes)) {
             bufferOffset += buffer.position();
             mappingRequired = true;
         } else {
@@ -389,31 +366,82 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
         }
 
         if (mappingRequired) {
-            // Ignore the buffer ammount since we will map as much as possible
+            // Ignore the buffer amount since we will map as much as possible
             // and let the operating system sort out the efficiency
-            long length = Math.max(Math.min(
-                    size() - bufferOffset,
-                    maxMappedBytes), 0);
+//            long length = Math.max(Math.min(size() - bufferOffset, maxMappedBytes), 0);
+
+            // Attempt to buffer as much of the remaining file as possible, up the the maxMappedBytes limit
+            long length = size() - bufferOffset;
+            if (length > maxMappedBytes)
+                length = maxMappedBytes;
+
+            if (length < requireWriteBytes)
+                length = requireWriteBytes;
+
+//            if(length < requireWriteBytes)
+//                length = requireWriteBytes;
+
             if (length == 0) {
                 buffer = ByteBuffer.allocateDirect(0);
                 return;
             }
 
-            buffer = fileChannel.map(
-                    FileChannel.MapMode.READ_ONLY, bufferOffset, length);
+            buffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, bufferOffset, length);
         }
     }
 
     /**
-     * <p><strong>Not yet implemented.</strong></p>
      *
-     * @param src
+     *
+     * @param src buffer from which bytes are to be retrieved
      * @return nothing
      * @throws UnsupportedOperationException always
      */
     @Override
-    public int write(CharBuffer src) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("Not implemented yet.");
+    public int write(CharBuffer src) throws IOException {
+
+        // sanity check the state
+        if (!isOpen())
+            throw new ClosedChannelException();
+        if (src == null)
+            throw new NullPointerException("src is null");
+
+        // record the start offset so we can calculate how much has been read
+        final int startChar = src.position();
+
+        // reference the results of each decode here
+        CoderResult coderResult;
+        encoder.reset();
+
+        // Repeat reading until the destination buffer is full, or the source
+        // buffer is empty
+        do {
+
+            // Attempt to insure sufficient is data available for reading in the  mapped portion of the source channel,
+            // which is not guaranteed to succeed.
+            insureMapped(0, (int) Math.ceil(src.remaining() * encoder.maxBytesPerChar()));
+
+            coderResult = encoder.encode(src, buffer, !src.hasRemaining());
+            checkCoderResult(coderResult);
+
+        } while (src.hasRemaining());
+
+        checkCoderResult(encoder.encode(src, buffer, !src.hasRemaining()));
+        checkCoderResult(encoder.flush(buffer));
+
+        return src.position() - startChar;
+    }
+
+    static void checkCoderResult(CoderResult coderResult) throws CharacterCodingException {
+        if (coderResult.isError()) {
+            try {
+                coderResult.throwException();
+            } catch (BufferOverflowException ex) {
+                throw new AssertionError(ex);
+            } catch (BufferUnderflowException ex) {
+                throw new AssertionError(ex);
+            }
+        }
     }
 
 }

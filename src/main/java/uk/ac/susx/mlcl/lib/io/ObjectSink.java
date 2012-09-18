@@ -31,6 +31,7 @@
 package uk.ac.susx.mlcl.lib.io;
 
 import java.io.IOException;
+import java.nio.channels.Channel;
 
 /**
  * Interface defining the acceptance of objects of the given type
@@ -39,7 +40,7 @@ import java.io.IOException;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T> The type of object that the implementing class will provide.
  */
-public interface ObjectSink<T> {
+public interface ObjectSink<T> extends Channel {
 
     /**
      * Take given {@code record} and do something with it. Presumably store to

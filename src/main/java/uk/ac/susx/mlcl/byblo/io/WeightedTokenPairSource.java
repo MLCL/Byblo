@@ -37,20 +37,17 @@ import uk.ac.susx.mlcl.lib.io.*;
 import javax.annotation.WillClose;
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
- * A <tt>WeightedTokenPairSource</tt> object is used to retrieve
- * {@link TokenPair} objects from a flat file.
+ * A <tt>WeightedTokenPairSource</tt> object is used to retrieve {@link TokenPair} objects from a flat file.
  * <p/>
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @see WeightedTokenPairSink
  */
-public class WeightedTokenPairSource
-        implements SeekableObjectSource<Weighted<TokenPair>, Tell>, Closeable {
+public class WeightedTokenPairSource implements SeekableObjectSource<Weighted<TokenPair>, Tell> {
 
     private final SeekableDataSource inner;
 
@@ -66,10 +63,6 @@ public class WeightedTokenPairSource
         final double weight = inner.readDouble();
         inner.endOfRecord();
         return new Weighted<TokenPair>(new TokenPair(id1, id2), weight);
-    }
-
-    public WeightedTokenPairVectorSource getVectorSource() throws IOException {
-        return new WeightedTokenPairVectorSource(this);
     }
 
     @Override
@@ -88,10 +81,14 @@ public class WeightedTokenPairSource
     }
 
     @Override
+    public boolean isOpen() {
+        return inner.isOpen();
+    }
+
+    @Override
     @WillClose
     public void close() throws IOException {
-        if (inner instanceof Closeable)
-            ((Closeable) inner).close();
+        inner.close();
     }
 
     public static WeightedTokenPairSource open(

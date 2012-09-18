@@ -30,112 +30,73 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
-import java.io.Closeable;
 import java.io.IOException;
-import uk.ac.susx.mlcl.lib.Checks;
 
 /**
- * A DataSource adapter that forwards all method invocations to some
- * encapsulated DataSource,
+ * A DataSource adapter that forwards all method invocations to some encapsulated DataSource,
  *
  * @param <T> type of the encapsulated DataSource
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public abstract class ForwardingDataSource<T extends DataSource>
-        implements DataSource, Closeable {
-
-    private final T inner;
+public abstract class ForwardingDataSource<T extends DataSource> extends ForwardingChannel<T> implements DataSource {
 
     public ForwardingDataSource(T inner) {
-        Checks.checkNotNull("inner", inner);
-        this.inner = inner;
-    }
-
-    public final T getInner() {
-        return inner;
+        super(inner);
     }
 
     @Override
     public void endOfRecord() throws IOException {
-        inner.endOfRecord();
+        getInner().endOfRecord();
     }
 
     @Override
     public boolean isEndOfRecordNext() throws IOException {
-        return inner.isEndOfRecordNext();
+        return getInner().isEndOfRecordNext();
     }
 
     @Override
     public byte readByte() throws IOException {
-        return inner.readByte();
+        return getInner().readByte();
     }
 
     @Override
     public char readChar() throws IOException {
-        return inner.readChar();
+        return getInner().readChar();
     }
 
     @Override
     public short readShort() throws IOException {
-        return inner.readShort();
+        return getInner().readShort();
     }
 
     @Override
     public int readInt() throws IOException {
-        return inner.readInt();
+        return getInner().readInt();
     }
 
     @Override
     public long readLong() throws IOException {
-        return inner.readLong();
+        return getInner().readLong();
     }
 
     @Override
     public float readFloat() throws IOException {
-        return inner.readFloat();
+        return getInner().readFloat();
     }
 
     @Override
     public double readDouble() throws IOException {
-        return inner.readDouble();
+        return getInner().readDouble();
     }
 
     @Override
     public String readString() throws IOException {
-        return inner.readString();
+        return getInner().readString();
     }
 
     @Override
     public boolean canRead() throws IOException {
-        return inner.canRead();
-    }
-
-    @Override
-    public void close() throws IOException {
-        if (inner instanceof Closeable)
-            ((Closeable) inner).close();
-    }
-
-    public boolean equals(ForwardingDataSource<?> other) {
-        return this.inner == other.inner
-                || (this.inner != null && this.inner.equals(other.inner));
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return this == obj || (obj != null
-                && getClass() == obj.getClass()
-                && equals((ForwardingDataSource) obj));
-    }
-
-    @Override
-    public int hashCode() {
-        return 67 * 3 + (this.inner != null ? this.inner.hashCode() : 0);
-    }
-
-    @Override
-    public String toString() {
-        return this.getClass().getSimpleName() + "{" + "inner=" + inner + '}';
+        return getInner().canRead();
     }
 
 }

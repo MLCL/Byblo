@@ -30,73 +30,29 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
-import java.io.Closeable;
 import java.io.IOException;
-import uk.ac.susx.mlcl.lib.Checks;
 
 /**
- * An ObjectSource adapter that forwards all method invocations to an
- * encapsulated inner instance.
+ * An ObjectSource adapter that forwards all method invocations to an encapsulated inner instance.
  *
  * @param <S> type of the encapsulated instance
  * @param <T> type of the object consumed
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public abstract class ForwardingObjectSource<S extends ObjectSource<T>, T>
-        implements ObjectSource<T>, Closeable {
-
-    private final S inner;
+public abstract class ForwardingObjectSource<S extends ObjectSource<T>, T> extends ForwardingChannel<S> implements ObjectSource<T> {
 
     public ForwardingObjectSource(S inner) {
-        Checks.checkNotNull("inner", inner);
-        this.inner = inner;
-    }
-
-    public S getInner() {
-        return inner;
+        super(inner);
     }
 
     @Override
     public T read() throws IOException {
-        return inner.read();
+        return getInner().read();
     }
 
     @Override
     public boolean hasNext() throws IOException {
-        return inner.hasNext();
+        return getInner().hasNext();
     }
 
-    @Override
-    public void close() throws IOException {
-        if (inner instanceof Closeable)
-            ((Closeable) inner).close();
-    }
-
-    public boolean equals(ForwardingObjectSource<?, ?> other) {
-        if (this.inner != other.inner && (this.inner == null || !this.inner.
-                                          equals(other.inner)))
-            return false;
-        return true;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        return equals((ForwardingObjectSource<?, ?>) obj);
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 59 * hash + (this.inner != null ? this.inner.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public String toString() {
-        return this.getClass().getSimpleName() +  "{" + "inner=" + inner + '}';
-    }
 }

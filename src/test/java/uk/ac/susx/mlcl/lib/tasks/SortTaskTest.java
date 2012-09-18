@@ -60,7 +60,7 @@ public class SortTaskTest {
 
         List<Integer> out = new ArrayList<Integer>();
 
-        ObjectSource<Integer> src = ObjectIO.asSource((Iterable<Integer>) in);
+        ObjectSource<Integer> src = ObjectIO.asSource(in);
         ObjectSink<Integer> sink = ObjectIO.asSink(out);
 
         Comparator<Integer> comparator = new IntegerNaturalOrderComparator();

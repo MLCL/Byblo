@@ -30,22 +30,20 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
-import java.io.Closeable;
+import uk.ac.susx.mlcl.lib.Checks;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import uk.ac.susx.mlcl.lib.Checks;
 
 /**
- * Chunker is an ObjectSource adapter that buffers objects into fixed size
- * chunks.
+ * Chunker is an ObjectSource adapter that buffers objects into fixed size chunks.
  *
- * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  * @param <T> The atomic data type
  * @param <S> Type of encapsulated ObjectSource
+ * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class Chunker<T, S extends ObjectSource<T>>
-        implements ObjectSource<Chunk<T>>, Closeable {
+public class Chunker<T, S extends ObjectSource<T>> implements ObjectSource<Chunk<T>> {
 
     private static final int DEFAULT_MAX_CHUNK_SIZE = 1000;
 
@@ -58,8 +56,7 @@ public class Chunker<T, S extends ObjectSource<T>>
         this.maxChunkSize = maxChunkSize;
     }
 
-    public static <T> ObjectSource<Chunk<T>> newInstance(
-            ObjectSource<T> source, int maxChunkSize) {
+    public static <T> ObjectSource<Chunk<T>> newInstance(ObjectSource<T> source, int maxChunkSize) {
         return new Chunker<T, ObjectSource<T>>(source, maxChunkSize);
     }
 
@@ -99,19 +96,22 @@ public class Chunker<T, S extends ObjectSource<T>>
     }
 
     @Override
+    public boolean isOpen() {
+        return inner.isOpen();
+    }
+
+    @Override
     public void close() throws IOException {
-        if (inner instanceof Closeable)
-            ((Closeable) inner).close();
+        inner.close();
     }
 
     @Override
     public String toString() {
-        return "Chunker{" + "maxChunkSize=" + maxChunkSize + ", inner=" + inner + '}';
+        return this.getClass().getSimpleName() + "[" + "maxChunkSize=" + maxChunkSize + ", inner=" + inner + ']';
     }
 
     private static class SeekableChunker<T, P, S extends SeekableObjectSource<T, P>>
-            extends Chunker<T, S>
-            implements SeekableObjectSource<Chunk<T>, P> {
+            extends Chunker<T, S> implements SeekableObjectSource<Chunk<T>, P> {
 
         private SeekableChunker(S inner, int maxChunkSize) {
             super(inner, maxChunkSize);

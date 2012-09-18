@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2012, University of Sussex
+ * Copyright (c) 2011-2012, University of Sussex
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,34 +28,72 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package uk.ac.susx.mlcl.byblo.io;
+package uk.ac.susx.mlcl.lib.io;
 
-import uk.ac.susx.mlcl.lib.collect.Indexed;
-import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-import uk.ac.susx.mlcl.lib.io.ForwardingChannel;
-import uk.ac.susx.mlcl.lib.io.ObjectSink;
+import uk.ac.susx.mlcl.lib.Checks;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.WillClose;
 import java.io.Flushable;
 import java.io.IOException;
+import java.nio.channels.Channel;
 
 /**
+ * A Channel adapter that forwards all events to an encapsulated inner instance.
+ *
+ * @param <T> the type of Channel being encapsulated
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
- * @deprecated
  */
-@Deprecated
-class WeightedTokenPairVectorSink extends ForwardingChannel<WeightedTokenPairSink>
-        implements ObjectSink<Indexed<SparseDoubleVector>>, Flushable {
+@CheckReturnValue
+public abstract class ForwardingChannel<T extends Channel> implements Channel, Flushable {
 
-    public WeightedTokenPairVectorSink(WeightedTokenPairSink inner) {
-        super(inner);
+    private final T inner;
+
+    public ForwardingChannel(T inner) {
+        Checks.checkNotNull("inner", inner);
+        this.inner = inner;
+    }
+
+    public final T getInner() {
+        return inner;
     }
 
     @Override
-    public void write(Indexed<SparseDoubleVector> record) throws IOException {
-        final int entryId = record.key();
-        SparseDoubleVector vec = record.value();
-        for (int i = 0; i < vec.size; i++)
-            getInner().write(new Weighted<TokenPair>(new TokenPair(entryId, vec.keys[i]), vec.values[i]));
+    public boolean isOpen() {
+        return inner.isOpen();
+    }
+
+    @Override
+    @WillClose
+    public void close() throws IOException {
+        inner.close();
+    }
+
+    @Override
+    public void flush() throws IOException {
+        if (inner instanceof Flushable)
+            ((Flushable) inner).flush();
+    }
+
+    protected boolean equals(ForwardingChannel<?> other) {
+        return this.inner == other.inner || this.inner.equals(other.inner);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        return equals((ForwardingChannel) obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return inner.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "[inner=" + inner + ']';
     }
 
 }

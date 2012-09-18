@@ -39,7 +39,6 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.*;
 
 import javax.annotation.WillClose;
-import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.CharacterCodingException;
@@ -50,16 +49,12 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Wraps a (something) to produce complete feature
- * vectors instead of just individual entry/feature records.
+ * Wraps a (something) to produce complete feature vectors instead of just individual entry/feature records.
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class FastWeightedTokenPairVectorSource
-        implements SeekableObjectSource<Indexed<SparseDoubleVector>, Tell>,
-        Closeable {
-
-    private final SeekableDataSource inner;
+public class FastWeightedTokenPairVectorSource extends ForwardingChannel<SeekableDataSource>
+        implements SeekableObjectSource<Indexed<SparseDoubleVector>, Tell> {
 
     private int next_id1;
 
@@ -69,9 +64,8 @@ public class FastWeightedTokenPairVectorSource
 
     private Tell tell;
 
-    private FastWeightedTokenPairVectorSource(
-            SeekableDataSource inner) throws IOException {
-        this.inner = inner;
+    private FastWeightedTokenPairVectorSource(SeekableDataSource inner) throws IOException {
+        super(inner);
         tell = inner.position();
         next_id1 = -1;
         next_id2 = -1;
@@ -80,7 +74,7 @@ public class FastWeightedTokenPairVectorSource
 
     @Override
     public boolean hasNext() throws IOException {
-        return inner.canRead() || next_id1 != -1;
+        return getInner().canRead() || next_id1 != -1;
     }
 
     @Override
@@ -97,7 +91,7 @@ public class FastWeightedTokenPairVectorSource
             features.put(next_id2, next_weight);
             cardinality = Math.max(cardinality, next_id2 + 1);
             // XXX position() should not need to be called every iteration
-            tell = inner.position();
+            tell = getInner().position();
             readNext();
         } while (next_id1 != -1 && next_id1 == id1);
 
@@ -108,7 +102,7 @@ public class FastWeightedTokenPairVectorSource
 
     @Override
     public void position(Tell offset) throws IOException {
-        inner.position(offset);
+        getInner().position(offset);
         tell = offset;
         readNext();
     }
@@ -120,11 +114,11 @@ public class FastWeightedTokenPairVectorSource
 
     private void readNext() throws IOException {
         try {
-            if (inner.canRead()) {
-                next_id1 = inner.readInt();
-                next_id2 = inner.readInt();
-                next_weight = inner.readDouble();
-                inner.endOfRecord();
+            if (getInner().canRead()) {
+                next_id1 = getInner().readInt();
+                next_id2 = getInner().readInt();
+                next_weight = getInner().readDouble();
+                getInner().endOfRecord();
             } else {
                 next_id1 = -1;
             }
@@ -132,13 +126,6 @@ public class FastWeightedTokenPairVectorSource
             next_id1 = -1;
             throw e;
         }
-    }
-
-    @Override
-    @WillClose
-    public void close() throws IOException {
-        if (inner instanceof Closeable)
-            ((Closeable) inner).close();
     }
 
     private static SparseDoubleVector toDoubleVector(Int2DoubleMap map,

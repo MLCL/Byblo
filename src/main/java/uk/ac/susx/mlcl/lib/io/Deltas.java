@@ -33,9 +33,9 @@ package uk.ac.susx.mlcl.lib.io;
 import com.google.common.base.Predicate;
 
 import javax.annotation.WillClose;
-import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
+import java.nio.channels.Channel;
 
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
@@ -60,8 +60,7 @@ public final class Deltas {
         return new SeekableDeltaIntSource<SeekableDataSource>(inner, deltaCol);
     }
 
-    private static class AbstractDeltaInt<S>
-            implements Closeable {
+    private static class AbstractDeltaInt<S extends Channel> implements Channel {
 
         final S inner;
 
@@ -79,16 +78,20 @@ public final class Deltas {
         }
 
         @Override
+        public boolean isOpen() {
+            return inner.isOpen();
+        }
+
+        @Override
         @WillClose
         public void close() throws IOException {
-            if (inner instanceof Closeable)
-                ((Closeable) inner).close();
+            inner.close();
         }
+
+
     }
 
-    private static class DeltaIntSource<S extends DataSource>
-            extends AbstractDeltaInt<S>
-            implements DataSource {
+    private static class DeltaIntSource<S extends DataSource> extends AbstractDeltaInt<S> implements DataSource {
 
         DeltaIntSource(S inner, Predicate<Integer> deltaCol) {
             super(inner, deltaCol);

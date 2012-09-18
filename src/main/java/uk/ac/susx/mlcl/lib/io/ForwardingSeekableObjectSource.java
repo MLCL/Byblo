@@ -42,8 +42,7 @@ import java.io.IOException;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class ForwardingSeekableObjectSource<S extends SeekableObjectSource<T, P>, T, P>
-        extends ForwardingObjectSource<S, T>
-        implements SeekableObjectSource<T, P> {
+        extends ForwardingObjectSource<S, T> implements SeekableObjectSource<T, P> {
 
     public ForwardingSeekableObjectSource(S inner) {
         super(inner);

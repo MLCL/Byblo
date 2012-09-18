@@ -55,10 +55,9 @@ public abstract class TSV {
 
     private final Charset charset;
 
-    //    protected long row;
     long column;
 
-    TSV(File file, Charset charset)  {
+    TSV(File file, Charset charset) {
         Checks.checkNotNull("file", file);
         Checks.checkNotNull("charset", charset);
         this.file = file;
@@ -83,11 +82,13 @@ public abstract class TSV {
      *
      * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
      */
-    public static final class Sink extends TSV implements Closeable, Flushable, DataSink {
+    public static final class Sink extends TSV implements Flushable, DataSink {
 
         private static final Log LOG = LogFactory.getLog(Sink.class);
 
-        private final Appendable out;
+        private final BufferedWriter out;
+
+        private boolean open;
 
         @SuppressWarnings("DuplicateThrows")
         public Sink(File file, Charset charset)
@@ -95,9 +96,8 @@ public abstract class TSV {
             super(file, charset);
             if (LOG.isDebugEnabled())
                 LOG.debug("Opening file \"" + file + "\" for writing.");
-            out = new BufferedWriter(
-                    new OutputStreamWriter(
-                            new FileOutputStream(file), charset));
+            out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), charset));
+            open = true;
         }
 
         @Override
@@ -131,8 +131,7 @@ public abstract class TSV {
             writeString(Integer.toString(val));
         }
 
-        private final DecimalFormat DOUBLE_FORMAT =
-                new DecimalFormat("###0.0#####;-###0.0#####");
+        private final DecimalFormat DOUBLE_FORMAT = new DecimalFormat("###0.0#####;-###0.0#####");
 
         @Override
         public void writeDouble(double val) throws IOException {
@@ -169,16 +168,20 @@ public abstract class TSV {
         }
 
         @Override
+        public boolean isOpen() {
+            return open;
+        }
+
+        @Override
         @WillClose
         public void close() throws IOException {
-            if (out instanceof Closeable)
-                ((Closeable) out).close();
+            out.close();
+            open = false;
         }
 
         @Override
         public void flush() throws IOException {
-            if (out instanceof Flushable)
-                ((Flushable) out).flush();
+            out.flush();
         }
     }
 
@@ -187,21 +190,19 @@ public abstract class TSV {
      *
      * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
      */
-    public static final class Source extends TSV implements Closeable, SeekableDataSource {
+    public static final class Source extends TSV implements SeekableDataSource {
 
         private final Lexer lexer;
 
         public Source(File file, Charset charset) throws IOException {
             super(file, charset);
+
             if (!file.exists())
-                throw new FileNotFoundException(
-                        "Path " + file + " does not exist.");
+                throw new FileNotFoundException("Path does not exist: " + file);
             if (!file.isFile())
-                throw new IllegalArgumentException(
-                        "Path " + file + " is not a normal file.");
+                throw new IllegalArgumentException("Path is not a normal file: " + file);
             if (!file.canRead())
-                throw new IllegalArgumentException(
-                        "File " + file + " is not readable.");
+                throw new IllegalArgumentException("File is not readable: " + file);
 
             lexer = new Lexer(file, charset);
             lexer.setDelimiterMatcher(CharMatcher.anyOf("\n\t"));
@@ -239,7 +240,7 @@ public abstract class TSV {
             return isDelimiterNext() && lexer.charAt(0) == RECORD_DELIMITER;
         }
 
-        private boolean isDelimiterNext()  {
+        private boolean isDelimiterNext() {
             return lexer.type() == Lexer.Type.Delimiter;
         }
 
@@ -267,10 +268,8 @@ public abstract class TSV {
             try {
                 return Double.valueOf(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.
-                        format(
-                                "Caused by NumberFormatException parsing string \"{0}\"",
-                                str), nfe);
+                throw new DataFormatException(this, MessageFormat.format(
+                        "Caused by NumberFormatException parsing string \"{0}\"", str), nfe);
             }
         }
 
@@ -280,17 +279,14 @@ public abstract class TSV {
             try {
                 return Integer.parseInt(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.
-                        format(
-                                "Caused by NumberFormatException parsing string \"{0}\"",
-                                str), nfe);
+                throw new DataFormatException(this, MessageFormat.format(
+                        "Caused by NumberFormatException parsing string \"{0}\"", str), nfe);
             }
         }
 
         private void parseDelimiter(char delimiter) throws IOException {
-//            skipWhitespace();
             expectType(Lexer.Type.Delimiter, lexer.type());
-            expectDelim(delimiter, lexer.charAt(0));
+            expectDelimiter(delimiter, lexer.charAt(0));
             lexer.advanceIfPossible();
         }
 
@@ -301,11 +297,15 @@ public abstract class TSV {
             }
         }
 
-        private void expectDelim(char expected, char actual) throws DataFormatException {
+        private void expectDelimiter(char expected, char actual) throws DataFormatException {
             if (expected != actual)
-                throw new DataFormatException(this, "Expecting delimiter "
-                        + MiscUtil.printableUTF8(expected) + " but found "
-                        + MiscUtil.printableUTF8(actual));
+                throw new DataFormatException(this, MessageFormat.format("Expecting delimiter {0} but found {1}.",
+                        MiscUtil.printableUTF8(expected), MiscUtil.printableUTF8(actual)));
+        }
+
+        @Override
+        public boolean isOpen() {
+            return lexer.isOpen();
         }
 
         @Override
@@ -330,10 +330,8 @@ public abstract class TSV {
             try {
                 return Short.parseShort(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.
-                        format(
-                                "Caused by NumberFormatException parsing string \"{0}\"",
-                                str), nfe);
+                throw new DataFormatException(this, MessageFormat.format(
+                        "Caused by NumberFormatException parsing string \"{0}\"", str), nfe);
             }
         }
 
@@ -344,9 +342,7 @@ public abstract class TSV {
                 return Long.parseLong(str);
             } catch (NumberFormatException nfe) {
                 throw new DataFormatException(this, MessageFormat.
-                        format(
-                                "Caused by NumberFormatException parsing string \"{0}\"",
-                                str), nfe);
+                        format("Caused by NumberFormatException parsing string \"{0}\"", str), nfe);
             }
         }
 
@@ -357,9 +353,7 @@ public abstract class TSV {
                 return Float.parseFloat(str);
             } catch (NumberFormatException nfe) {
                 throw new DataFormatException(this, MessageFormat.
-                        format(
-                                "Caused by NumberFormatException parsing string \"{0}\"",
-                                str), nfe);
+                        format("Caused by NumberFormatException parsing string \"{0}\"", str), nfe);
             }
         }
     }
@@ -371,8 +365,7 @@ public abstract class TSV {
 
         private static final long serialVersionUID = 1L;
 
-        private static final String DEFAULT_MESSAGE =
-                "Invalid format found when parsing TSV file.";
+        private static final String DEFAULT_MESSAGE = "Invalid format found when parsing TSV file.";
 
         private final long offset;
 
@@ -380,17 +373,14 @@ public abstract class TSV {
 
         private final Charset charset;
 
-        public DataFormatException(Source src,
-                                   final String message) {
+        public DataFormatException(Source src, final String message) {
             super(message);
             offset = src.roughPosition();
             file = src.getFile();
             charset = src.getCharset();
         }
 
-        public DataFormatException(Source src,
-                                   String message,
-                                   Throwable cause) {
+        public DataFormatException(Source src, String message, Throwable cause) {
             super(message, cause);
             offset = src.roughPosition();
             file = src.getFile();
@@ -401,8 +391,7 @@ public abstract class TSV {
             this(src, DEFAULT_MESSAGE);
         }
 
-        public DataFormatException(Source src,
-                                   Throwable cause) {
+        public DataFormatException(Source src, Throwable cause) {
             this(src, DEFAULT_MESSAGE, cause);
         }
 
@@ -426,9 +415,8 @@ public abstract class TSV {
                 context = "";
             }
 
-            return "Invalid format found when parsing TSV file " + getFile()
-                    + " near byte offset " + getOffset() + ":"
-                    + context + ": " + super.getMessage();
+            return MessageFormat.format("Invalid format found when parsing file {0} near byte offset {1}:{2}: {3}",
+                    getFile(), getOffset(), context, super.getMessage());
         }
 
         private String context() throws IOException {

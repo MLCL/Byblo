@@ -33,9 +33,9 @@ package uk.ac.susx.mlcl.lib.io;
 import uk.ac.susx.mlcl.lib.Checks;
 
 import javax.annotation.WillClose;
-import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
+import java.nio.channels.Channel;
 
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
@@ -57,7 +57,7 @@ public final class Compact {
         Checks.checkNotNull("inner", inner);
         assert !(inner instanceof DSink);
         assert !(inner instanceof Enumerated.ComplexDSource);
-        assert !(inner instanceof Enumerated.ComplexSDSource);
+//        assert !(inner instanceof Enumerated.ComplexSDSource);
         assert !(inner instanceof Enumerated.SimpleDSource);
         assert !(inner instanceof Enumerated.SimpleSDSource);
         return new DSource<DataSource>(inner, numColumns);
@@ -68,13 +68,13 @@ public final class Compact {
         Checks.checkNotNull("inner", inner);
         assert !(inner instanceof DSink);
         assert !(inner instanceof Enumerated.ComplexDSource);
-        assert !(inner instanceof Enumerated.ComplexSDSource);
+//        assert !(inner instanceof Enumerated.ComplexSDSource);
         assert !(inner instanceof Enumerated.SimpleDSource);
         assert !(inner instanceof Enumerated.SimpleSDSource);
         return new SeekableDSource<SeekableDataSource>(inner, numColumns);
     }
 
-    private static abstract class AbstractCompact<I> implements Closeable {
+    private static abstract class AbstractCompact<I extends Channel> implements Channel {
 
         final int numColumns;
 
@@ -93,9 +93,13 @@ public final class Compact {
         }
 
         @Override
+        public boolean isOpen() {
+            return inner.isOpen();
+        }
+
+        @Override
         public void close() throws IOException {
-            if (inner instanceof Closeable)
-                ((Closeable) inner).close();
+            inner.close();
         }
     }
 

@@ -53,9 +53,8 @@ import java.util.Queue;
 import java.util.concurrent.*;
 
 /**
- * An all pairs similarity search implementation that parallelises another
- * implementation. This is achieved by breaking the work down into chunks that
- * are run concurrently.
+ * An all pairs similarity search implementation that parallelises another implementation. This is achieved by breaking
+ * the work down into chunks that are run concurrently.
  * <p/>
  *
  * @param <S> Type of "tell" object used to seek into the data source.
@@ -170,7 +169,7 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
 
                 @SuppressWarnings("unchecked")
                 NaiveApssTask<Integer> task = innerAlgorithm.newInstance();
-                task.setSourceA(chunkA.clone());
+                task.setSourceA(new Chunk<Indexed<SparseDoubleVector>>(chunkA));
                 task.setSourceB(chunkB);
                 task.setMeasure(getMeasure());
                 task.setProducePair(getProducePair());
@@ -350,9 +349,12 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
         // note that arrays should be packed even on 64 bit platforms
         final double bytesPerFeature = 4 + 8;
 
+        // Before we access available memory lets clear things up a bit. Explicit calling GC is controversial, but since
+        // it's very unlikely this method will run more than once we should be fine.
+        System.gc();
+
         // It's a tad conservative to use free memory rather than total memory,
         // but we can't be sure what else is going on
-        System.gc();
         final double availableMemory = MiscUtil.freeMaxMemory();
 
         double chunkSize = availableMemory / (nFeatures * nWorkUnits * pairMultiplier * bytesPerFeature);

@@ -40,11 +40,15 @@ import java.io.IOException;
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 public abstract class ForwardingSeekableDataSource<S extends SeekableDataSource>
-        extends ForwardingDataSource<S>
-        implements SeekableDataSource {
+        extends ForwardingDataSource<S> implements SeekableDataSource {
 
     public ForwardingSeekableDataSource(S inner) {
         super(inner);
+    }
+
+    @Override
+    public Tell position() throws IOException {
+        return getInner().position();
     }
 
     @Override
@@ -52,8 +56,4 @@ public abstract class ForwardingSeekableDataSource<S extends SeekableDataSource>
         getInner().position(offset);
     }
 
-    @Override
-    public Tell position() throws IOException {
-        return getInner().position();
-    }
 }

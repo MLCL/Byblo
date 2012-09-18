@@ -132,8 +132,7 @@ public final class Enumerated {
         return new SimpleDSink<DataSink>(inner, enumerator);
     }
 
-    static class SimpleDSource
-            extends ForwardingDataSource<DataSource> {
+    static class SimpleDSource extends ForwardingDataSource<DataSource> {
 
         final Enumerator<String> enumerator;
 
@@ -166,8 +165,7 @@ public final class Enumerated {
         }
     }
 
-    static class SimpleDSink<S extends DataSink>
-            extends ForwardingDataSink<S> {
+    static class SimpleDSink<S extends DataSink> extends ForwardingDataSink<S> {
 
         final Enumerator<String> enumerator;
 

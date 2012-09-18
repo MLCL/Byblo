@@ -34,6 +34,7 @@ import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
 import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
+import uk.ac.susx.mlcl.lib.io.ForwardingChannel;
 import uk.ac.susx.mlcl.lib.io.SeekableObjectSource;
 import uk.ac.susx.mlcl.lib.io.Tell;
 
@@ -50,25 +51,22 @@ import java.util.List;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightedTokenPairVectorSource
+public class WeightedTokenPairVectorSource extends ForwardingChannel<WeightedTokenPairSource>
         implements SeekableObjectSource<Indexed<SparseDoubleVector>, Tell> {
-
-    private final WeightedTokenPairSource inner;
 
     private Weighted<TokenPair> next;
 
     private Tell tell;
 
-    public WeightedTokenPairVectorSource(
-            WeightedTokenPairSource inner) throws IOException {
-        this.inner = inner;
+    public WeightedTokenPairVectorSource(WeightedTokenPairSource inner) throws IOException {
+        super(inner);
         tell = inner.position();
         next = null;
     }
 
     @Override
     public boolean hasNext() throws IOException {
-        return inner.hasNext() || next != null;
+        return getInner().hasNext() || next != null;
     }
 
     @Override
@@ -83,7 +81,7 @@ public class WeightedTokenPairVectorSource
             features.put(next.record().id2(), next.weight());
             cardinality = Math.max(cardinality, next.record().id2() + 1);
             // XXX position() should not need to be called every iteration
-            tell = inner.position();
+            tell = getInner().position();
             readNext();
         } while (next != null && next.record().id1() == start.record().id1());
 
@@ -94,7 +92,7 @@ public class WeightedTokenPairVectorSource
 
     @Override
     public void position(Tell offset) throws IOException {
-        inner.position(offset);
+        getInner().position(offset);
         tell = offset;
         readNext();
     }
@@ -106,15 +104,14 @@ public class WeightedTokenPairVectorSource
 
     private void readNext() throws IOException {
         try {
-            next = inner.hasNext() ? inner.read() : null;
+            next = getInner().hasNext() ? getInner().read() : null;
         } catch (CharacterCodingException e) {
             next = null;
             throw e;
         }
     }
 
-    private static SparseDoubleVector toDoubleVector(Int2DoubleMap map,
-                                                     int cardinality) {
+    private static SparseDoubleVector toDoubleVector(Int2DoubleMap map, int cardinality) {
         if (map == null) {
             throw new NullPointerException();
         }
@@ -145,4 +142,5 @@ public class WeightedTokenPairVectorSource
         vec.compact();
         return vec;
     }
+
 }

@@ -42,19 +42,12 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
- * An <tt>WeightedTokenPairSink</tt> object is used to store
- * {@link TokenPair} objects in a flat file.
- * <p/>
- * <p>The basic file format is Tab-Separated-Values (TSV) where records are
- * delimited by new-lines, and values are delimited by tabs. Two variants are
- * supported: verbose and compact. In verbose mode each
- * {@link TokenPair} corresponds to a single TSV record; i.e one line per object
- * consisting of two entries, and their weight. In compact mode each TSV record
- * consists of a single entry followed by the second-entry/weight pairs from all
- * sequentially written
- * {@link WeightedTokenPairSink} objects that share the same first entry.</p>
- * <p/>
- * Verbose mode example:
+ * An <tt>WeightedTokenPairSink</tt> object is used to store {@link TokenPair} objects in a flat file. <p/> <p>The basic
+ * file format is Tab-Separated-Values (TSV) where records are delimited by new-lines, and values are delimited by tabs.
+ * Two variants are supported: verbose and compact. In verbose mode each {@link TokenPair} corresponds to a single TSV
+ * record; i.e one line per object consisting of two entries, and their weight. In compact mode each TSV record consists
+ * of a single entry followed by the second-entry/weight pairs from all sequentially written {@link
+ * WeightedTokenPairSink} objects that share the same first entry.</p> <p/> Verbose mode example:
  * <pre>
  *      entry1  entry1    weight1
  *      entry1  entry2    weight2
@@ -63,47 +56,29 @@ import java.nio.charset.Charset;
  *      entry3  entry4    weight5
  *      entry3  entry1    weight6
  * </pre>
- * <p/>
- * Equivalent compact mode example:
+ * <p/> Equivalent compact mode example:
  * <pre>
  *      entry1  entry1    weight1 entry2    weight2
  *      entry2  entry3    weight3
  *      entry3  entry2    weight4 entry4    weight5 entry1    weight6
  * </pre>
- * <p/>
- * <p>Compact mode is the default behavior, since it can reduce file sizes by
- * approximately 50%, with corresponding reductions in I/O overhead.</p>
+ * <p/> <p>Compact mode is the default behavior, since it can reduce file sizes by approximately 50%, with corresponding
+ * reductions in I/O overhead.</p>
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightedTokenPairSink
-        implements ObjectSink<Weighted<TokenPair>>, Closeable, Flushable {
-
-    private final DataSink inner;
+public class WeightedTokenPairSink extends ForwardingChannel<DataSink> implements ObjectSink<Weighted<TokenPair>>, Flushable {
 
     private WeightedTokenPairSink(DataSink inner) {
-        this.inner = inner;
+        super(inner);
     }
 
     @Override
     public void write(Weighted<TokenPair> record) throws IOException {
-        inner.writeInt(record.record().id1());
-        inner.writeInt(record.record().id2());
-        inner.writeDouble(record.weight());
-        inner.endOfRecord();
-    }
-
-    @Override
-    @WillClose
-    public void close() throws IOException {
-        if (inner instanceof Closeable)
-            ((Closeable) inner).close();
-    }
-
-    @Override
-    public void flush() throws IOException {
-        if (inner instanceof Flushable)
-            ((Flushable) inner).flush();
+        getInner().writeInt(record.record().id1());
+        getInner().writeInt(record.record().id2());
+        getInner().writeDouble(record.weight());
+        getInner().endOfRecord();
     }
 
     public static WeightedTokenPairSink open(

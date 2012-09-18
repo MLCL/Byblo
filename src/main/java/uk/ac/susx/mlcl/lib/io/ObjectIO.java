@@ -30,15 +30,11 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
+import uk.ac.susx.mlcl.lib.Checks;
+
 import java.io.Flushable;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import uk.ac.susx.mlcl.lib.Checks;
+import java.util.*;
 
 /**
  * Static utility class for use with the ObjectSink and ObjectSource interfaces.
@@ -50,7 +46,6 @@ public final class ObjectIO {
     private ObjectIO() {
     }
 
-    
     public static <T> ObjectSink<T> nullSink() {
         return new ObjectSink<T>() {
 
@@ -59,6 +54,15 @@ public final class ObjectIO {
                 // nada
             }
 
+            @Override
+            public boolean isOpen() {
+                return true;
+            }
+
+            @Override
+            public void close() {
+                // cannot be closed
+            }
         };
     }
 
@@ -75,6 +79,15 @@ public final class ObjectIO {
                 return false;
             }
 
+            @Override
+            public boolean isOpen() {
+                return true;
+            }
+
+            @Override
+            public void close() {
+                // cannot be closed
+            }
         };
     }
 
@@ -101,65 +114,42 @@ public final class ObjectIO {
                 return null;
             }
 
+            @Override
+            public boolean isOpen() {
+                return true;
+            }
+
+            @Override
+            public void close() {
+                // cannot be closed
+            }
         };
     }
 
     public static <T> ObjectSink<T> asSink(final Collection<T> collection) {
-        return new ObjectSink<T>() {
-
-            @Override
-            public void write(T record) throws IOException {
-                collection.add(record);
-            }
-
-        };
+        try {
+            return new ObjectMemoryStore<T>(collection).openObjectSink();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
     }
 
-    public static <T> ObjectSource<T> asSource(final Iterable<T> iterable) {
-        return new ObjectSource<T>() {
-
-            private final Iterator<? extends T> it = iterable.iterator();
-
-            @Override
-            public T read() {
-                return it.next();
-            }
-
-            @Override
-            public boolean hasNext() {
-                return it.hasNext();
-            }
-
-        };
+    @SuppressWarnings("unchecked")
+    public static <T> ObjectSource<T> asSource(final Collection<T> data) {
+        try {
+            return new ObjectMemoryStore<T>((Collection<T>) data).openObjectSource();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
     }
 
-    public static <T> SeekableObjectSource<T, Integer> asSource(
-            final List<? extends T> list) {
-        return new SeekableObjectSource<T, Integer>() {
-
-            private ListIterator<? extends T> it = list.listIterator();
-
-            @Override
-            public T read() {
-                return it.next();
-            }
-
-            @Override
-            public boolean hasNext() {
-                return it.hasNext();
-            }
-
-            @Override
-            public void position(Integer offset) {
-                it = list.listIterator(offset);
-            }
-
-            @Override
-            public Integer position() {
-                return it.nextIndex();
-            }
-
-        };
+    @SuppressWarnings("unchecked")
+    public static <T> SeekableObjectSource<T, Integer> asSource(final List<T> list) {
+        try {
+            return new ObjectMemoryStore<T>((List<T>) list).openSeekableObjectSource();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
     }
 
     public static <T> long copy(final Iterable<? extends T> source,
@@ -217,8 +207,7 @@ public final class ObjectIO {
     }
 
     public static <T> List<T> readAll(ObjectSource<T> src) throws IOException {
-        @SuppressWarnings("unchecked")
-        List<T> result = (List<T>) new ArrayList<Object>();
+        List<T> result = new ArrayList<T>();
         copy(src, result);
         return result;
     }

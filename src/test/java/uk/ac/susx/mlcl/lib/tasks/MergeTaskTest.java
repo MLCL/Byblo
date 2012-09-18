@@ -30,7 +30,7 @@
  */
 package uk.ac.susx.mlcl.lib.tasks;
 
-import org.junit.*;
+import org.junit.Test;
 import uk.ac.susx.mlcl.lib.io.ObjectIO;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
@@ -64,8 +64,8 @@ public class MergeTaskTest {
 
         List<Integer> out = new ArrayList<Integer>();
 
-        ObjectSource<Integer> src1 = ObjectIO.asSource((Iterable<Integer>) in1);
-        ObjectSource<Integer> src2 = ObjectIO.asSource((Iterable<Integer>) in2);
+        ObjectSource<Integer> src1 = ObjectIO.asSource(in1);
+        ObjectSource<Integer> src2 = ObjectIO.asSource(in2);
         ObjectSink<Integer> sink = ObjectIO.asSink(out);
 
         Comparator<Integer> comparator = new IntegerNaturalOrderComparator();

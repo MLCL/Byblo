@@ -73,37 +73,20 @@ import java.nio.charset.Charset;
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class WeightedTokenSink implements ObjectSink<Weighted<Token>>, Closeable, Flushable {
-
-    private final DataSink inner;
+public class WeightedTokenSink extends ForwardingChannel<DataSink> implements ObjectSink<Weighted<Token>>, Flushable {
 
     private WeightedTokenSink(DataSink inner){
-        this.inner = inner;
+        super(inner);
     }
 
     @Override
     public void write(final Weighted<Token> record) throws IOException {
-        inner.writeInt(record.record().id());
-        inner.writeDouble(record.weight());
-        inner.endOfRecord();
+        getInner().writeInt(record.record().id());
+        getInner().writeDouble(record.weight());
+        getInner().endOfRecord();
     }
 
-    @Override
-    public void flush() throws IOException {
-        if (inner instanceof Flushable)
-            ((Flushable) inner).flush();
-    }
-
-    @Override
-    @WillClose
-    public void close() throws IOException {
-        if (inner instanceof Closeable)
-            ((Closeable) inner).close();
-    }
-
-    public static WeightedTokenSink open(
-            File f, Charset charset, SingleEnumerating idx, boolean skip1)
-            throws IOException {
+    public static WeightedTokenSink open(File f, Charset charset, SingleEnumerating idx, boolean skip1) throws IOException {
         DataSink tsv = new TSV.Sink(f, charset);
 
         if (skip1) {

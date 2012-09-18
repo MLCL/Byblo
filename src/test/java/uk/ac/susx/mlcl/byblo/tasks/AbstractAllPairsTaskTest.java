@@ -78,12 +78,12 @@ public abstract class AbstractAllPairsTaskTest<T extends NaiveApssTask> extends 
 
         WeightedTokenPairSource tokenSourceA = WeightedTokenPairSource.open(
                 TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false);
-        WeightedTokenPairVectorSource vectorSourceA = tokenSourceA.getVectorSource();
+        WeightedTokenPairVectorSource vectorSourceA = new WeightedTokenPairVectorSource(tokenSourceA);
 
         WeightedTokenPairSource tokenSourceB = WeightedTokenPairSource.open(
                 TEST_FRUIT_EVENTS, DEFAULT_CHARSET, del, false, false);
 
-        WeightedTokenPairVectorSource vectorSourceB = tokenSourceB.getVectorSource();
+        WeightedTokenPairVectorSource vectorSourceB = new WeightedTokenPairVectorSource(tokenSourceB);
 
 
         final String outFileName = String.format("%s#%s-%s-sims",

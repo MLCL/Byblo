@@ -40,10 +40,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Simple implementation of an ObjectStore that backs off to a Collection data structure, presumably storing everything
@@ -108,8 +105,6 @@ public class ObjectMemoryStore<T> implements ObjectStore<T, Integer> {
         } catch (URISyntaxException e) {
             throw new AssertionError(e);
         }
-
-
     }
 
     /**
@@ -136,7 +131,7 @@ public class ObjectMemoryStore<T> implements ObjectStore<T, Integer> {
      * @param name arbitrary string description of the store
      * @param data backing storage
      */
-    public ObjectMemoryStore(final String name, final Collection<T> data) {
+    public <S extends Collection<T>> ObjectMemoryStore(final String name, final S data) {
         Preconditions.checkNotNull(name, "name");
         Preconditions.checkNotNull(data, "data");
         try {
@@ -163,7 +158,7 @@ public class ObjectMemoryStore<T> implements ObjectStore<T, Integer> {
     public ObjectSource<T> openObjectSource() throws IOException {
         if (!exists())
             throw new IOException("Store does not exist.");
-        return ObjectIO.asSource(Collections.unmodifiableCollection(data));
+        return new Source();
     }
 
     @Override
@@ -172,14 +167,14 @@ public class ObjectMemoryStore<T> implements ObjectStore<T, Integer> {
             throw new IOException("Store does not exist.");
         if (!isSeekable())
             throw new IOException("Store does not support random access.");
-        return ObjectIO.asSource(Collections.unmodifiableList((List<T>) data));
+        return new SeekableSource();
     }
 
     @Override
     public ObjectSink<T> openObjectSink() throws IOException {
         if (!exists() && !touch())
             throw new AssertionError();
-        return ObjectIO.asSink(data);
+        return new Sink();
     }
 
     @Override
@@ -187,7 +182,7 @@ public class ObjectMemoryStore<T> implements ObjectStore<T, Integer> {
     public boolean touch() throws IOException {
         try {
             if (data == null) {
-                data = (Collection<T>)implementation.newInstance();
+                data = (Collection<T>) implementation.newInstance();
                 return true;
             } else {
                 return false;
@@ -260,4 +255,101 @@ public class ObjectMemoryStore<T> implements ObjectStore<T, Integer> {
     public String toString() {
         return getClass().getSimpleName() + "{" + "name='" + name + '\'' + '}';
     }
+
+    private class Source implements ObjectSource<T> {
+
+        @Nullable
+        private Iterator<? extends T> it = data.iterator();
+
+        @Override
+        public T read() throws IOException {
+            if (!isOpen())
+                throw new IOException("Source is closed.");
+            return it.next();
+        }
+
+        @Override
+        public boolean hasNext() throws IOException {
+            if (it == null)
+                throw new IOException("Source is closed.");
+            return it.hasNext();
+        }
+
+        @Override
+        public boolean isOpen() {
+            return it != null;
+        }
+
+        @Override
+        public void close() {
+            it = null;
+        }
+    }
+
+    private class SeekableSource implements SeekableObjectSource<T, Integer> {
+
+        @Nullable
+        private ListIterator<? extends T> it = ((List<T>) data).listIterator();
+
+        @Override
+        public T read() throws IOException {
+            if (it == null)
+                throw new IOException("Source is closed.");
+            return it.next();
+        }
+
+        @Override
+        public boolean hasNext() throws IOException {
+            if (!isOpen())
+                throw new IOException("Source is closed.");
+            return it.hasNext();
+        }
+
+        @Override
+        public void position(Integer offset) throws IOException {
+            if (!isOpen())
+                throw new IOException("Source is closed.");
+            it = ((List<T>) data).listIterator();
+        }
+
+        @Override
+        public Integer position() throws IOException {
+            if (!isOpen())
+                throw new IOException("Source is closed.");
+            return it.nextIndex();
+        }
+
+        @Override
+        public boolean isOpen() {
+            return it != null;
+        }
+
+        @Override
+        public void close() {
+            it = null;
+        }
+    }
+
+    private class Sink implements ObjectSink<T> {
+
+        private boolean open = true;
+
+        @Override
+        public void write(T record) throws IOException {
+            if (!isOpen())
+                throw new IOException("Sink is closed.");
+            data.add(record);
+        }
+
+        @Override
+        public boolean isOpen() {
+            return open;
+        }
+
+        @Override
+        public void close() {
+            open = false;
+        }
+    }
+
 }

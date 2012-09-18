@@ -37,7 +37,6 @@ import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.io.*;
 
 import javax.annotation.WillClose;
-import java.io.Closeable;
 import java.io.File;
 import java.io.Flushable;
 import java.io.IOException;
@@ -46,13 +45,11 @@ import java.nio.charset.Charset;
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-public class FastWeightedTokenPairVectorSink
-        implements ObjectSink<Indexed<SparseDoubleVector>>, Flushable, Closeable {
-
-    private final DataSink inner;
+public class FastWeightedTokenPairVectorSink extends ForwardingChannel<DataSink>
+        implements ObjectSink<Indexed<SparseDoubleVector>>, Flushable {
 
     private FastWeightedTokenPairVectorSink(DataSink inner) {
-        this.inner = inner;
+        super(inner);
     }
 
     @Override
@@ -60,24 +57,11 @@ public class FastWeightedTokenPairVectorSink
         int entryId = record.key();
         SparseDoubleVector vec = record.value();
         for (int i = 0; i < vec.size; i++) {
-            inner.writeInt(entryId);
-            inner.writeInt(vec.keys[i]);
-            inner.writeDouble(vec.values[i]);
-            inner.endOfRecord();
+            getInner().writeInt(entryId);
+            getInner().writeInt(vec.keys[i]);
+            getInner().writeDouble(vec.values[i]);
+            getInner().endOfRecord();
         }
-    }
-
-    @Override
-    public void flush() throws IOException {
-        if (inner instanceof Flushable)
-            ((Flushable) inner).flush();
-    }
-
-    @Override
-    @WillClose
-    public void close() throws IOException {
-        if (inner instanceof Closeable)
-            ((Closeable) inner).close();
     }
 
     public static FastWeightedTokenPairVectorSink open(
