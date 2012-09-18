@@ -34,20 +34,27 @@ package uk.ac.susx.mlcl.lib.io;
 import com.google.common.base.Preconditions;
 import uk.ac.susx.mlcl.lib.Comparators;
 
+import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
-import java.io.Closeable;
 import java.io.IOException;
-import java.nio.channels.Channel;
 import java.util.Arrays;
 import java.util.Comparator;
 
 /**
+ * <code>MergeObjectSource</code> performs a two-way merge on the output of two child <code>ObjectSource</code> objects;
+ * such that if the child sources where sorted, the result will also be sorted.
+ * <p/>
+ * Instances of <code>MergeObjectSource</code> can be stacked hierarchically to produce a binary-tree of merging sources
+ * known as a multi-way or k-way merge. The factory method {@link #merge(java.util.Comparator, ObjectSource[])} has been
+ * provided to automatically build a balanced k-way merge tree from the given array of sources.
+ *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
 @NotThreadSafe
-public final class MergeObjectSource<T> implements ObjectSource<T>, Channel {
+@CheckReturnValue
+public final class MergeObjectSource<T> implements ObjectSource<T> {
 
     private final Comparator<T> comparator;
 
@@ -138,9 +145,11 @@ public final class MergeObjectSource<T> implements ObjectSource<T>, Channel {
                 i += 2;
                 ++j;
             }
-            // Handle odd number of inputs by copying the final source
+            // Handle odd number of inputs by copying the final source to the first element. The first element is used
+            // so it will be combined in the next iteration, insuring the tree does not become unbalanced.
             if (n % 2 == 1) {
-                result[j] = result[i - 1];
+                result[j] = result[0];
+                result[0] = result[i - 1];
                 ++i;
                 ++j;
             }
@@ -177,24 +186,28 @@ public final class MergeObjectSource<T> implements ObjectSource<T>, Channel {
         return right;
     }
 
+    /**
+     * Close and free up resources associated with this source. Also closes child sources.
+     *
+     * @throws IOException thrown by <code>close()</code> on child sources
+     */
     @Override
     public void close() throws IOException {
-        if (left instanceof Closeable)
-            ((Closeable) left).close();
-        if (right instanceof Closeable)
-            ((Closeable) right).close();
+        left.close();
+        right.close();
         leftHead = null;
         rightHead = null;
-        open = false;
     }
 
-    private boolean open = true;
-
+    /**
+     * Get whether this source is open; which is true if either or both of the child sources are open, false if both
+     * child sources are closed.
+     *
+     * @return true if this source is open, false otherwise
+     */
     @Override
     public boolean isOpen() {
-        // TODO: XXX Fix this when integrated with Channel changes
-//        return left.isOpen() || right.isOpen();
-        return open;
+        return left.isOpen() || right.isOpen();
     }
 
     @Override
@@ -228,7 +241,9 @@ public final class MergeObjectSource<T> implements ObjectSource<T>, Channel {
      * @return current head of the first source, or <code>null</code> if the source is exhausted or uninitialised
      * @throws IOException when bad things happen
      */
-    private @Nullable T popLeft() throws IOException {
+    private
+    @Nullable
+    T popLeft() throws IOException {
         T previousHead = leftHead;
         leftHead = left.hasNext() ? left.read() : null;
         return previousHead;
@@ -240,7 +255,9 @@ public final class MergeObjectSource<T> implements ObjectSource<T>, Channel {
      * @return current head of the second source, or <code>null</code> if the source is exhausted or uninitialised
      * @throws IOException when bad things happen
      */
-    private @Nullable T popRight() throws IOException {
+    private
+    @Nullable
+    T popRight() throws IOException {
         T previousHead = rightHead;
         rightHead = right.hasNext() ? right.read() : null;
         return previousHead;
@@ -266,6 +283,83 @@ public final class MergeObjectSource<T> implements ObjectSource<T>, Channel {
         }
     }
 
+    public String treeString() throws IOException {
+        StringBuilder builder = new StringBuilder();
+        treeString(builder, "");
+        return builder.toString();
+    }
+
+    private void treeString(StringBuilder builder, String linePrefix) throws IOException {
+        if (!initialised) initialise();
+
+        builder.append(linePrefix);
+        builder.append("*-* ").append(leftHead);
+        if (left.getClass() != MergeObjectSource.class) {
+            builder.append(" <--\n");
+        } else {
+            builder.append("\n");
+            ((MergeObjectSource) left).treeString(builder, linePrefix + "|    ");
+        }
+
+        builder.append(linePrefix);
+        builder.append("\\-* ");
+        builder.append(rightHead);
+        if (right.getClass() != MergeObjectSource.class) {
+            builder.append(" <--\n");
+        } else {
+            builder.append('\n');
+            ((MergeObjectSource) right).treeString(builder, linePrefix + "     ");
+        }
+    }
+
+
+    public
+    @Nonnegative
+    int getMaxHeight() {
+        return 1 + Math.max(getMaxHeight(left), getMaxHeight(right));
+    }
+
+    public
+    @Nonnegative
+    int getMinHeight() {
+        return 1 + Math.min(getMaxHeight(left), getMaxHeight(right));
+    }
+
+    private static
+    @Nonnegative
+    int getMaxHeight(final ObjectSource<?> node) {
+        return node.getClass() == MergeObjectSource.class ? ((MergeObjectSource<?>) node).getMaxHeight() : 0;
+    }
+
+    private static
+    @Nonnegative
+    int getMinHeight(final ObjectSource<?> node) {
+        return node.getClass() == MergeObjectSource.class ? ((MergeObjectSource<?>) node).getMinHeight() : 0;
+    }
+
+    private static <T> PeekableObjectSource<T> ensurePeekable(ObjectSource<T> source) {
+        return source instanceof PeekableObjectSource
+                ? ((PeekableObjectSource<T>) source)
+                : new PeekableObjectSourceAdapter<T>(source);
+    }
+
+
+    /**
+     * Get whether or not the binary tree rooted by this <code>MergeObjectSource</code> instance is balanced. If it is
+     * balanced then the number of comparison operations will be optimal.
+     * <p/>
+     * A binary tree is defined balanced if (1) it is a leaf node, or (2) both the left and right sub-trees are balanced
+     * and their height is within 1 of each other.
+     *
+     * @return
+     */
+    public boolean isBalanced() {
+        return isBalanced(left) && isBalanced(right) && Math.abs(getMaxHeight(left) - getMaxHeight(right)) <= 1;
+    }
+
+    private static boolean isBalanced(final ObjectSource<?> node) {
+        return node.getClass() == MergeObjectSource.class ? ((MergeObjectSource) node).isBalanced() : true;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -275,7 +369,6 @@ public final class MergeObjectSource<T> implements ObjectSource<T>, Channel {
         MergeObjectSource that = (MergeObjectSource) o;
 
         if (initialised != that.initialised) return false;
-        if (open != that.open) return false;
         if (!comparator.equals(that.comparator)) return false;
         if (!left.equals(that.left)) return false;
         if (leftHead != null ? !leftHead.equals(that.leftHead) : that.leftHead != null) return false;
@@ -293,7 +386,17 @@ public final class MergeObjectSource<T> implements ObjectSource<T>, Channel {
         result = 31 * result + (leftHead != null ? leftHead.hashCode() : 0);
         result = 31 * result + (rightHead != null ? rightHead.hashCode() : 0);
         result = 31 * result + (initialised ? 1 : 0);
-        result = 31 * result + (open ? 1 : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "MergeObjectSource[" +
+                "comparator=" + comparator +
+                ", left=" + left +
+                ", right=" + right +
+                ", leftHead=" + leftHead +
+                ", rightHead=" + rightHead +
+                ']';
     }
 }

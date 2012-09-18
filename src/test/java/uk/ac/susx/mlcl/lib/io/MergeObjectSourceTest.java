@@ -31,7 +31,6 @@
 
 package uk.ac.susx.mlcl.lib.io;
 
-import com.google.common.base.internal.Finalizer;
 import junit.framework.Assert;
 import org.junit.Test;
 import uk.ac.susx.mlcl.lib.collect.ArrayUtil;
@@ -65,8 +64,8 @@ public class MergeObjectSourceTest extends AbstractObjectTest<MergeObjectSource>
 
     @Test
     public void testOddNumberOfLists() throws IOException {
-        final int[][] arrays = {{5, 10, 15, 20}, {10, 13, 16, 19}, {2, 19, 26, 40}};
-        final int[] expected = {2, 5, 10, 10, 13, 15, 16, 19, 19, 20, 26, 40};
+        final int[][] arrays = {{5, 10, 15, 20}, {10, 13, 16, 19}, {2, 19, 26, 40}, {10, 13}, {2, 19}};
+        final int[] expected = {2, 2, 5, 10, 10, 10, 13, 13, 15, 16, 19, 19, 19, 20, 26, 40};
         simpleIntegerExampleTest(arrays, expected);
     }
 
@@ -132,15 +131,30 @@ public class MergeObjectSourceTest extends AbstractObjectTest<MergeObjectSource>
 
         final ObjectSource<Integer> mergeSource = MergeObjectSource.merge(comparator, sources);
 
+
+        if (mergeSource.getClass() == MergeObjectSource.class) {
+            System.out.println(((MergeObjectSource) mergeSource).treeString());
+        }
+
+        final int maxDepth = (mergeSource.getClass() == MergeObjectSource.class)
+                ? ((MergeObjectSource) mergeSource).getMaxHeight() : 0;
+        Assert.assertTrue("Depth exceeds log(k) implying an unbalanced tree.",
+                maxDepth <= Math.ceil(Math.log(sources.length) / Math.log(2)));
+
+        final boolean balanced = (mergeSource.getClass() == MergeObjectSource.class)
+                ? ((MergeObjectSource) mergeSource).isBalanced() : true;
+        Assert.assertTrue("unbalanced tree.", balanced);
+
+
         for (int i = 0; i < expected.length; i++) {
             Assert.assertTrue(mergeSource.hasNext());
             Assert.assertEquals(expected[i], (int) mergeSource.read());
 
 
             final int k = arrays.length;
-            final int k_log_k = (int)Math.ceil(Math.log(k) / Math.log(2));
-            int lowerBound = k > 1 ? (i+1) : 0;
-            int upperBound =  ((i+k) * k_log_k);
+            final int k_log_k = (int) Math.ceil(Math.log(k) / Math.log(2));
+            int lowerBound = k > 1 ? (i + 1) : 0;
+            int upperBound = ((i + k) * k_log_k);
             boolean boundsCorrect = lowerBound <= comparisonCount.get() && comparisonCount.get() <= upperBound;
 //            System.out.printf("%d < %d < %d %s%n", lowerBound,  comparisonCount.get(), upperBound,boundsCorrect );
             Assert.assertTrue(boundsCorrect);
