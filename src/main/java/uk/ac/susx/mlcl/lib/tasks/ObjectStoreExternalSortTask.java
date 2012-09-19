@@ -34,7 +34,6 @@ package uk.ac.susx.mlcl.lib.tasks;
 import com.google.common.base.Preconditions;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.Comparators;
 import uk.ac.susx.mlcl.lib.MiscUtil;
 import uk.ac.susx.mlcl.lib.events.ProgressAggregate;
@@ -46,16 +45,8 @@ import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
-import java.io.Closeable;
-import java.io.File;
-import java.io.Flushable;
-import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
  * An <code>ObjectStoreSortTask</code> takes reads all the data from an <code>ObjectStore</code>, sorts it, then writes
@@ -71,16 +62,15 @@ import java.util.concurrent.Future;
 @NotThreadSafe
 public final class ObjectStoreExternalSortTask<T> extends AbstractParallelTask implements ProgressReporting {
 
-
     private static final Log LOG = LogFactory.getLog(ObjectStoreExternalSortTask.class);
 
     private final ProgressAggregate progress = new ProgressAggregate(this);
 
     @Nullable
-    private ObjectStore<T, ?> from;
+    private ObjectStore<T, ?> input;
 
     @Nullable
-    private ObjectStore<T, ?> to;
+    private ObjectStore<T, ?> output;
 
     @Nullable
     private Comparator<T> comparator;
@@ -90,21 +80,23 @@ public final class ObjectStoreExternalSortTask<T> extends AbstractParallelTask i
 
     private final ObjectStore<T, ?>[] nextStoreToMerge = new ObjectStore[64];
 
-    public ObjectStoreExternalSortTask(ObjectStore<T, ?> from, ObjectStore<T, ?> to, Comparator<T> comparator, StoreFactory<ObjectStore<T, ?>> tempFactory) {
-        setFrom(from);
-        setTo(to);
+    public ObjectStoreExternalSortTask(ObjectStore<T, ?> input, ObjectStore<T, ?> output, Comparator<T> comparator,
+                                       StoreFactory<ObjectStore<T, ?>> tempFactory) {
+        setInput(input);
+        setTo(output);
         setComparator(comparator);
         setTempFactory(tempFactory);
 
     }
 
-    public ObjectStoreExternalSortTask(ObjectStore<T, ?> from, ObjectStore<T, ?> to, StoreFactory<ObjectStore<T, ?>> tempFactory) {
+    public ObjectStoreExternalSortTask(ObjectStore<T, ?> from, ObjectStore<T, ?> to,
+                                       StoreFactory<ObjectStore<T, ?>> tempFactory) {
         this(from, to, Comparators.<T>naturalOrderIfPossible(), tempFactory);
     }
 
     public ObjectStoreExternalSortTask() {
-        from = null;
-        to = null;
+        input = null;
+        output = null;
         tempFactory = null;
         setComparator(Comparators.<T>naturalOrderIfPossible());
     }
@@ -114,25 +106,25 @@ public final class ObjectStoreExternalSortTask<T> extends AbstractParallelTask i
     }
 
     @Nullable
-    public final ObjectStore<T, ?> getFrom() {
-        return from;
+    public final ObjectStore<T, ?> getInput() {
+        return input;
     }
 
-    public final void setFrom(final ObjectStore<T, ?> from) {
-        Preconditions.checkNotNull(from, "from");
-        Preconditions.checkArgument(from.isReadable(), "from is not readable");
-        this.from = from;
+    public final void setInput(final ObjectStore<T, ?> input) {
+        Preconditions.checkNotNull(input, "input");
+        Preconditions.checkArgument(input.isReadable(), "input is not readable");
+        this.input = input;
     }
 
     @Nullable
-    public final ObjectStore<T, ?> getTo() {
-        return to;
+    public final ObjectStore<T, ?> getOutput() {
+        return output;
     }
 
-    public final void setTo(final ObjectStore<T, ?> to) {
-        Preconditions.checkNotNull(to, "to");
-        Preconditions.checkArgument(to.isWritable(), "to is not writable");
-        this.to = to;
+    public final void setTo(final ObjectStore<T, ?> output) {
+        Preconditions.checkNotNull(output, "output");
+        Preconditions.checkArgument(output.isWritable(), "output is not writable");
+        this.output = output;
     }
 
     public final void setComparator(final Comparator<T> comparator) {
@@ -150,19 +142,33 @@ public final class ObjectStoreExternalSortTask<T> extends AbstractParallelTask i
     }
 
 
-
     @Override
     protected void runTask() throws Exception {
         checkState();
 
+        progress.startAdjusting();
+        progress.setState(State.RUNNING);
+        progress.endAdjusting();
+
         final int maxChunkSize = estimateMaxChunkSize();
         LOG.info(MessageFormat.format("Estimated maximum chunk size: {0}", maxChunkSize));
 
-        final ObjectSource<T> source = getFrom().openObjectSource();
-        final ObjectSource<Chunk<T>> chunks = Chunker.newInstance(source, maxChunkSize);
+        ObjectSource<T> source = null;
+        try {
+            source = getInput().openObjectSource();
+            final ObjectSource<Chunk<T>> chunks = Chunker.newInstance(source, maxChunkSize);
 
-        progress.startAdjusting();
-        progress.setState(State.RUNNING);
+
+
+
+
+
+
+
+        } finally {
+            if (source != null && source.isOpen())
+                source.close();
+        }
 //
 //        FileMoveTask finalMoveTask = new FileMoveTask();
 //        finalMoveTask.setDstFile(getFileDelegate().getDestinationFile());
@@ -339,11 +345,11 @@ public final class ObjectStoreExternalSortTask<T> extends AbstractParallelTask i
 
     protected void checkState() {
         Preconditions.checkNotNull(getComparator(), "comparator");
-        Preconditions.checkNotNull(getFrom(), "from");
-        Preconditions.checkArgument(getFrom().isReadable(), "from is not readable");
-        Preconditions.checkArgument(getFrom().exists(), "from does not exist");
-        Preconditions.checkNotNull(getTo(), "to");
-        Preconditions.checkArgument(getTo().isWritable(), "to is not writable");
+        Preconditions.checkNotNull(getInput(), "from");
+        Preconditions.checkArgument(getInput().isReadable(), "from is not readable");
+        Preconditions.checkArgument(getInput().exists(), "from does not exist");
+        Preconditions.checkNotNull(getOutput(), "output");
+        Preconditions.checkArgument(getOutput().isWritable(), "output is not writable");
         Preconditions.checkNotNull(getTempFactory(), "tempFactory");
     }
 

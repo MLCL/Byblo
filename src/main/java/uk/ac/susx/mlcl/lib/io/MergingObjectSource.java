@@ -40,13 +40,14 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 
 /**
- * <code>MergeObjectSource</code> performs a two-way merge on the output of two child <code>ObjectSource</code> objects;
+ * <code>MergingObjectSource</code> performs a two-way merge on the output of two child <code>ObjectSource</code> objects;
  * such that if the child sources where sorted, the result will also be sorted.
  * <p/>
- * Instances of <code>MergeObjectSource</code> can be stacked hierarchically to produce a binary-tree of merging sources
+ * Instances of <code>MergingObjectSource</code> can be stacked hierarchically to produce a binary-tree of merging sources
  * known as a multi-way or k-way merge. The factory method {@link #merge(java.util.Comparator, ObjectSource[])} has been
  * provided to automatically build a balanced k-way merge tree from the given array of sources.
  *
@@ -54,7 +55,7 @@ import java.util.Comparator;
  */
 @NotThreadSafe
 @CheckReturnValue
-public final class MergeObjectSource<T> implements ObjectSource<T> {
+public final class MergingObjectSource<T> implements ObjectSource<T> {
 
     private final Comparator<T> comparator;
 
@@ -71,7 +72,7 @@ public final class MergeObjectSource<T> implements ObjectSource<T> {
     private boolean initialised = false;
 
     /**
-     * Construct a new <code>MergeObjectSource</code> instance, that merges the given <code>left</code> and
+     * Construct a new <code>MergingObjectSource</code> instance, that merges the given <code>left</code> and
      * <code>right</code> instances, using the given <code>comparator</code>.
      *
      * @param left       first source to merge
@@ -80,7 +81,7 @@ public final class MergeObjectSource<T> implements ObjectSource<T> {
      * @throws NullPointerException     if any parameter is null
      * @throws IllegalArgumentException if left and right are the same object
      */
-    public MergeObjectSource(final ObjectSource<T> left, final ObjectSource<T> right, final Comparator<T> comparator) {
+    public MergingObjectSource(final ObjectSource<T> left, final ObjectSource<T> right, final Comparator<T> comparator) {
         Preconditions.checkNotNull(left, "left");
         Preconditions.checkNotNull(right, "right");
         Preconditions.checkNotNull(comparator, "comparator");
@@ -91,7 +92,7 @@ public final class MergeObjectSource<T> implements ObjectSource<T> {
     }
 
     /**
-     * Construct a new <code>MergeObjectSource</code> instance, that merges the given <code>left</code> and
+     * Construct a new <code>MergingObjectSource</code> instance, that merges the given <code>left</code> and
      * <code>right</code> instances, using the underlying objects natural ordering. If they objects do not have a
      * natural order (i.e they do not implement {@link Comparable}) then expect failure in form of a {@link
      * ClassCastException} when an attempt is made to retrieve the first object..
@@ -101,13 +102,13 @@ public final class MergeObjectSource<T> implements ObjectSource<T> {
      * @throws NullPointerException     if any parameter is null
      * @throws IllegalArgumentException if left and right are the same object
      */
-    public MergeObjectSource(final ObjectSource<T> left, final ObjectSource<T> right) {
+    public MergingObjectSource(final ObjectSource<T> left, final ObjectSource<T> right) {
         this(left, right, Comparators.<T>naturalOrderIfPossible());
     }
 
     /**
      * Factory method producing an <code>ObjectSource</code> that k-way-merges all the input sources simultaneously.
-     * This is achieved by building a tree of binary mergers using <code>MergeObjectSource</code> instances.
+     * This is achieved by building a tree of binary mergers using <code>MergingObjectSource</code> instances.
      * <p/>
      * The alternative is to perform a two-way merge on each pair of sources, writing the resource out somewhere, then
      * repeat until all parts have been merged. The asymptotic complexity of number of comparisons is identical between
@@ -141,7 +142,7 @@ public final class MergeObjectSource<T> implements ObjectSource<T> {
             int i = 1;
             int j = 0;
             while (i < n) {
-                result[j] = new MergeObjectSource<T>(result[i - 1], result[i], comparator);
+                result[j] = new MergingObjectSource<T>(result[i - 1], result[i], comparator);
                 i += 2;
                 ++j;
             }
@@ -159,6 +160,9 @@ public final class MergeObjectSource<T> implements ObjectSource<T> {
         return result[0];
     }
 
+    public static <T> ObjectSource<T> merge(final Comparator<T> comparator, final Collection<ObjectSource<T>> inputs) {
+        return merge(comparator, inputs.toArray(new ObjectSource[inputs.size()]));
+    }
     /**
      * Get the comparator that was set at construction time.
      *
@@ -294,21 +298,21 @@ public final class MergeObjectSource<T> implements ObjectSource<T> {
 
         builder.append(linePrefix);
         builder.append("*-* ").append(leftHead);
-        if (left.getClass() != MergeObjectSource.class) {
+        if (left.getClass() != MergingObjectSource.class) {
             builder.append(" <--\n");
         } else {
             builder.append("\n");
-            ((MergeObjectSource) left).treeString(builder, linePrefix + "|    ");
+            ((MergingObjectSource) left).treeString(builder, linePrefix + "|    ");
         }
 
         builder.append(linePrefix);
         builder.append("\\-* ");
         builder.append(rightHead);
-        if (right.getClass() != MergeObjectSource.class) {
+        if (right.getClass() != MergingObjectSource.class) {
             builder.append(" <--\n");
         } else {
             builder.append('\n');
-            ((MergeObjectSource) right).treeString(builder, linePrefix + "     ");
+            ((MergingObjectSource) right).treeString(builder, linePrefix + "     ");
         }
     }
 
@@ -328,13 +332,13 @@ public final class MergeObjectSource<T> implements ObjectSource<T> {
     private static
     @Nonnegative
     int getMaxHeight(final ObjectSource<?> node) {
-        return node.getClass() == MergeObjectSource.class ? ((MergeObjectSource<?>) node).getMaxHeight() : 0;
+        return node.getClass() == MergingObjectSource.class ? ((MergingObjectSource<?>) node).getMaxHeight() : 0;
     }
 
     private static
     @Nonnegative
     int getMinHeight(final ObjectSource<?> node) {
-        return node.getClass() == MergeObjectSource.class ? ((MergeObjectSource<?>) node).getMinHeight() : 0;
+        return node.getClass() == MergingObjectSource.class ? ((MergingObjectSource<?>) node).getMinHeight() : 0;
     }
 
     private static <T> PeekableObjectSource<T> ensurePeekable(ObjectSource<T> source) {
@@ -345,7 +349,7 @@ public final class MergeObjectSource<T> implements ObjectSource<T> {
 
 
     /**
-     * Get whether or not the binary tree rooted by this <code>MergeObjectSource</code> instance is balanced. If it is
+     * Get whether or not the binary tree rooted by this <code>MergingObjectSource</code> instance is balanced. If it is
      * balanced then the number of comparison operations will be optimal.
      * <p/>
      * A binary tree is defined balanced if (1) it is a leaf node, or (2) both the left and right sub-trees are balanced
@@ -358,7 +362,7 @@ public final class MergeObjectSource<T> implements ObjectSource<T> {
     }
 
     private static boolean isBalanced(final ObjectSource<?> node) {
-        return node.getClass() == MergeObjectSource.class ? ((MergeObjectSource) node).isBalanced() : true;
+        return node.getClass() == MergingObjectSource.class ? ((MergingObjectSource) node).isBalanced() : true;
     }
 
     @Override
@@ -366,7 +370,7 @@ public final class MergeObjectSource<T> implements ObjectSource<T> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        MergeObjectSource that = (MergeObjectSource) o;
+        MergingObjectSource that = (MergingObjectSource) o;
 
         if (initialised != that.initialised) return false;
         if (!comparator.equals(that.comparator)) return false;
@@ -391,7 +395,7 @@ public final class MergeObjectSource<T> implements ObjectSource<T> {
 
     @Override
     public String toString() {
-        return "MergeObjectSource[" +
+        return "MergingObjectSource[" +
                 "comparator=" + comparator +
                 ", left=" + left +
                 ", right=" + right +

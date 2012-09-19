@@ -203,27 +203,27 @@ public abstract class AbstractObjectTest<T> extends AbstractTest {
         assertEquals("cloned copy is not equal", instance, copy);
         assertTrue("cloned object hash-code mismatch", copy.hashCode() == instance.hashCode());
     }
-
-    /**
-     * Concatenate two or more arrays.
-     * <p/>
-     * This should really be in ArrayUtil
-     *
-     * @param arrays
-     * @param <T>
-     * @return
-     */
-    protected static <T> T[] cat(final T[]... arrays) {
-        int n = 0;
-        for (T[] arr : arrays) n += arr.length;
-        @SuppressWarnings("unchecked")
-        T[] result = (T[]) Array.newInstance(arrays.getClass().getComponentType()
-                .getComponentType(), n);
-        int offset = 0;
-        for (T[] arr : arrays) {
-            System.arraycopy(arr, 0, result, offset, arr.length);
-            offset += arr.length;
-        }
-        return result;
-    }
+//
+//    /**
+//     * Concatenate two or more arrays.
+//     * <p/>
+//     * This should really be in ArrayUtil
+//     *
+//     * @param arrays
+//     * @param <T>
+//     * @return
+//     */
+//    protected static <T> T[] cat(final T[]... arrays) {
+//        int n = 0;
+//        for (T[] arr : arrays) n += arr.length;
+//        @SuppressWarnings("unchecked")
+//        T[] result = (T[]) Array.newInstance(arrays.getClass().getComponentType()
+//                .getComponentType(), n);
+//        int offset = 0;
+//        for (T[] arr : arrays) {
+//            System.arraycopy(arr, 0, result, offset, arr.length);
+//            offset += arr.length;
+//        }
+//        return result;
+//    }
 }

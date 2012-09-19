@@ -48,11 +48,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Created with IntelliJ IDEA. User: hiam20 Date: 17/09/2012 Time: 15:09 To change this template use File | Settings |
  * File Templates.
  */
-public class MergeObjectSourceTest extends AbstractObjectTest<MergeObjectSource> {
+public class MergingObjectSourceTest extends AbstractObjectTest<MergingObjectSource> {
 
     @Override
-    protected Class<? extends MergeObjectSource> getImplementation() {
-        return MergeObjectSource.class;
+    protected Class<? extends MergingObjectSource> getImplementation() {
+        return MergingObjectSource.class;
     }
 
     @Test
@@ -129,20 +129,20 @@ public class MergeObjectSourceTest extends AbstractObjectTest<MergeObjectSource>
             }
         };
 
-        final ObjectSource<Integer> mergeSource = MergeObjectSource.merge(comparator, sources);
+        final ObjectSource<Integer> mergeSource = MergingObjectSource.merge(comparator, sources);
 
+//
+//        if (mergeSource.getClass() == MergingObjectSource.class) {
+//            System.out.println(((MergingObjectSource) mergeSource).treeString());
+//        }
 
-        if (mergeSource.getClass() == MergeObjectSource.class) {
-            System.out.println(((MergeObjectSource) mergeSource).treeString());
-        }
-
-        final int maxDepth = (mergeSource.getClass() == MergeObjectSource.class)
-                ? ((MergeObjectSource) mergeSource).getMaxHeight() : 0;
+        final int maxDepth = (mergeSource.getClass() == MergingObjectSource.class)
+                ? ((MergingObjectSource) mergeSource).getMaxHeight() : 0;
         Assert.assertTrue("Depth exceeds log(k) implying an unbalanced tree.",
                 maxDepth <= Math.ceil(Math.log(sources.length) / Math.log(2)));
 
-        final boolean balanced = (mergeSource.getClass() == MergeObjectSource.class)
-                ? ((MergeObjectSource) mergeSource).isBalanced() : true;
+        final boolean balanced = (mergeSource.getClass() == MergingObjectSource.class)
+                ? ((MergingObjectSource) mergeSource).isBalanced() : true;
         Assert.assertTrue("unbalanced tree.", balanced);
 
 

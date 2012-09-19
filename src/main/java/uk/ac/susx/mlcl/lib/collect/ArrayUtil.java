@@ -36,12 +36,17 @@ import java.util.HashMap;
 import java.util.Map;
 import uk.ac.susx.mlcl.lib.Checks;
 
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+
 /**
  * Static utility class for symbolic manipulation of arrays.
  *
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
  */
-@SuppressWarnings("unchecked")
+@CheckReturnValue
+@Nonnull
 public final class ArrayUtil {
 
     private ArrayUtil() {}
@@ -51,10 +56,10 @@ public final class ArrayUtil {
         private Lazy() {}
     }
 
-    public static int countEQ(boolean[] logical, boolean value) {
+    public static @Nonnegative int countEQ(boolean[] logical, boolean value) {
         int n = 0;
-        for (int i = 0; i < logical.length; i++)
-            n += logical[i] == value ? 1 : 0;
+        for (boolean aLogical : logical)
+            n += aLogical == value ? 1 : 0;
         return n;
     }
 
@@ -67,37 +72,6 @@ public final class ArrayUtil {
     }
 
 
-    public static Boolean[] box(final boolean[] src) {
-        return box(src, 0, src.length);
-    }
-
-    public static Boolean[] box(final boolean[] src, final int offset) {
-        return box(src, offset, src.length - offset);
-    }
-
-    public static Boolean[] box(final boolean[] src, final int offset, final int len) {
-        Boolean[] dst = new Boolean[len];
-        for(int i = 0; i < len; i++)
-            dst[i] = (Boolean)src[offset + i];
-        return dst;
-    }
-
-    public static boolean[] unbox(final Boolean[] src) {
-        return unbox(src, 0, src.length);
-    }
-
-    public static boolean[] unbox(final Boolean[] src, final int offset) {
-        return unbox(src, offset, src.length - offset);
-    }
-
-    public static boolean[] unbox(final Boolean[] src, final int offset, final int len) {
-        boolean[] dst = new boolean[len];
-        for(int i = 0; i < len; i++)
-            dst[i] = (boolean)src[offset + i];
-        return dst;
-    }
-
-
 
     /*
      * ==================
@@ -105,29 +79,110 @@ public final class ArrayUtil {
      * ==================
      */
 
+
+    /**
+     * Convert an array of primitive <code>boolean</code> values to a new array of <code>Boolean</code> boxed objects.
+     *
+     * @param src Primitive array to convert
+     * @return a new array containing the boxed equivalents of the values in the given array
+     */
+    public static Boolean[] box(final boolean[] src) {
+        return box(src, 0, src.length);
+    }
+
+    /**
+     * Convert the tail of an array of primitive <code>boolean</code values to a new array of <code>Boolean</code> boxed objects.
+     *
+     * @param src    Primitive array to convert
+     * @param offset First index to covert (inclusive)
+     * @return a new array containing the boxed equivalents of the values in the given array
+     */
+    public static Boolean[] box(final boolean[] src,  @Nonnegative final int offset) {
+        return box(src, offset, src.length - offset);
+    }
+
+    /**
+     * Convert a portion of an array of primitive <code>boolean</code values to a new array of <code>Boolean</code> boxed objects.
+     *
+     * @param src    Primitive array to convert
+     * @param offset First index to covert (inclusive)
+     * @param len    Last index to covert (exclusive)
+     * @return a new array containing the boxed equivalents of the values in the given array.
+     */
+    public static Boolean[] box(final boolean[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
+        Boolean[] dst = new Boolean[len];
+        for(int i = 0; i < len; i++)
+            dst[i] = src[offset + i];
+        return dst;
+    }
+
+    /**
+     * Convert an array of <code>Boolean</code> boxed objects to a new array of primitive <code>boolean</code> values.
+     *
+     * @param src Boxed object array to convert
+     * @return a new array containing the primitive equivalents of the values in the given array
+     */
+    public static boolean[] unbox(final Boolean[] src) {
+        return unbox(src, 0, src.length);
+    }
+
+    /**
+     * Convert the tail of an array of <code>Boolean</code> boxed objects to a new array of primitive <code>boolean</code values.
+     *
+     * @param src    Boxed object array to convert
+     * @param offset First index to covert (inclusive)
+     * @return a new array containing the primitive equivalents of the values in the given array
+     */
+    public static boolean[] unbox(final Boolean[] src,  @Nonnegative final int offset) {
+        return unbox(src, offset, src.length - offset);
+    }
+
+    /**
+     * Convert a portion of an array of <code>Boolean</code> boxed objects to a new array of primitive <code>boolean</code values.
+     *
+     * @param src    Boxed object array to convert
+     * @param offset First index to covert (inclusive)
+     * @param len    Last index to covert (exclusive)
+     * @return a new array containing the primitive equivalents of the values in the given array.
+     */
+    public static boolean[] unbox(final Boolean[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
+        boolean[] dst = new boolean[len];
+        for(int i = 0; i < len; i++)
+            dst[i] = src[offset + i];
+        return dst;
+    }
+
+
+
     public static boolean[] copyOf(final boolean[] src) {
         return copyOf(src, 0, src.length);
     }
 
-    public static boolean[] copyOf(final boolean[] src, final int offset) {
+    public static boolean[] copyOf(final boolean[] src,  @Nonnegative final int offset) {
         return copyOf(src, offset, src.length - offset);
     }
 
-    public static boolean[] copyOf(final boolean[] src, final int offset, final int len) {
+    public static boolean[] copyOf(final boolean[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
         boolean[] dst = new boolean[len];
         System.arraycopy(src, offset, dst, 0, len);
         return dst;
     }
 
-    public static boolean[] cat(final boolean[]... arrs) {
+    /**
+     * Concatenate two or more arrays.
+     *
+     * @param arrays to be concatenated
+     * @return array contain all the elements of the input arrays
+     */
+     public static boolean[] cat(final boolean[]... arrays) {
         int n = 0;
-        for (int i = 0; i < arrs.length; i++)
-            n += arrs[i].length;
+        for (boolean[] array : arrays)
+            n += array.length;
         boolean[] result = new boolean[n];
         int offset = 0;
-        for (int i = 0; i < arrs.length; i++) {
-            System.arraycopy(arrs[i], 0, result, offset, arrs[i].length);
-            offset += arrs[i].length;
+        for (boolean[] array : arrays) {
+            System.arraycopy(array, 0, result, offset, array.length);
+            offset += array.length;
         }
         return result;
     }
@@ -136,11 +191,11 @@ public final class ArrayUtil {
         return firstIndexOf(arr, val, 0, arr.length);
     }
 
-    public static int firstIndexOf(final boolean[] arr, final boolean val, int fromIndex) {
+    public static int firstIndexOf(final boolean[] arr, final boolean val,  @Nonnegative int fromIndex) {
         return firstIndexOf(arr, val, fromIndex, arr.length);
     }
 
-    public static int firstIndexOf(final boolean[] arr, final boolean val, int fromIndex, int toIndex) {
+    public static int firstIndexOf(final boolean[] arr, final boolean val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         for (int i = fromIndex; i < toIndex; i++)
             if (arr[i] == val)
                 return i;
@@ -151,11 +206,11 @@ public final class ArrayUtil {
         return lastIndexOf(arr, val, 0, arr.length);
     }
 
-    public static int lastIndexOf(final boolean[] arr, final boolean val, int fromIndex) {
+    public static int lastIndexOf(final boolean[] arr, final boolean val,  @Nonnegative int fromIndex) {
         return lastIndexOf(arr, val, fromIndex, arr.length);
     }
 
-    public static int lastIndexOf(final boolean[] arr, final boolean val, int fromIndex, int toIndex) {
+    public static int lastIndexOf(final boolean[] arr, final boolean val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         for (int i = toIndex - 1; i >= fromIndex; i--)
             if (arr[i] == val)
                 return i;
@@ -166,11 +221,11 @@ public final class ArrayUtil {
         return firstIndexOf(arr, val) != -1;
     }
 
-    public static boolean contains(final boolean[] arr, final boolean val, int fromIndex) {
+    public static boolean contains(final boolean[] arr, final boolean val,  @Nonnegative int fromIndex) {
         return firstIndexOf(arr, val, fromIndex) != -1;
     }
 
-    public static boolean contains(final boolean[] arr, final boolean val, int fromIndex, int toIndex) {
+    public static boolean contains(final boolean[] arr, final boolean val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return firstIndexOf(arr, val, fromIndex, toIndex) != -1;
     }
 
@@ -179,9 +234,9 @@ public final class ArrayUtil {
         // O(n log n) by sorting in input first.
         boolean[] result = new boolean[arr.length];
         int j = 0;
-        for (int i = 0; i < arr.length; i++) {
-            if (!contains(result, arr[i])) {
-                result[j] = arr[i];
+        for (boolean anArr : arr) {
+            if (!contains(result, anArr)) {
+                result[j] = anArr;
                 j++;
             }
         }
@@ -192,17 +247,17 @@ public final class ArrayUtil {
         reverse(a, 0, a.length);
     }
 
-    public static void reverse(final boolean[] a, final int fromIndex) {
+    public static void reverse(final boolean[] a,  @Nonnegative final int fromIndex) {
         reverse(a, fromIndex, a.length);
     }
 
-    public static void reverse(final boolean[] a, final int fromIndex, final int toIndex) {
+    public static void reverse(final boolean[] a,  @Nonnegative final int fromIndex,  @Nonnegative final int toIndex) {
         for (int i = fromIndex, j = toIndex - 1; i < j; i++, j--) {
             swap(a, i, j);
         }
     }
 
-    public static void swap(final boolean[] a, final int i, final int j) {
+    public static void swap(final boolean[] a,  @Nonnegative final int i,  @Nonnegative final int j) {
         final boolean tmp = a[i];
         a[i] = a[j];
         a[j] = tmp;
@@ -210,7 +265,7 @@ public final class ArrayUtil {
 
     public static boolean[] elementsOf(boolean[] arr, int[] idx) {
         boolean[] result = new boolean[idx.length];
-        for (int i = 0, j = 0; i < idx.length; i++)
+        for (int i = 0; i < idx.length; i++)
             result[i] = arr[idx[i]];
         return result;
     }
@@ -247,19 +302,18 @@ public final class ArrayUtil {
 
     public static boolean mode(boolean[] arr) {
         Map<Boolean, Integer> map = new HashMap<Boolean, Integer>();
-        for (int i = 0; i < arr.length; i++) {
-            if (map.containsKey(arr[i]))
-                map.put(arr[i], map.get(arr[i]) + 1);
+        for (boolean anArr : arr) {
+            if (map.containsKey(anArr))
+                map.put(anArr, map.get(anArr) + 1);
             else
-                map.put(arr[i], 1);
+                map.put(anArr, 1);
         }
         int maxCount = -1;
         Boolean maxValue = arr[0];
-        for (Boolean key : map.keySet()) {
-            int count = map.get(key);
-            if (count > maxCount) {
-                maxCount = count;
-                maxValue = key;
+        for (Map.Entry<Boolean, Integer> entry : map.entrySet()) {
+            if (entry.getValue() > maxCount) {
+                maxCount = entry.getValue();
+                maxValue = entry.getKey();
             }
         }
         return maxValue;
@@ -271,7 +325,7 @@ public final class ArrayUtil {
         permute(a, 0, a.length);
     }
 
-    public static void permute(final boolean[] a, final int toIndex) {
+    public static void permute(final boolean[] a,  @Nonnegative final int toIndex) {
         permute(a, toIndex, a.length);
     }
 
@@ -281,13 +335,13 @@ public final class ArrayUtil {
      *
      * Use an algorithm defined in
      * http://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
-     * which probably isnt the most efficient solution.
+     * which probably isn't the most efficient solution.
      *
      * @param a the array to be permuted
      * @param toIndex index of the first element (inclusive) to be permuted
      * @param fromIndex index of the last element (exclusive) to be permuted
      */
-    public static void permute(final boolean[] a, final int fromIndex, final int toIndex) {
+    public static void permute(final boolean[] a,  @Nonnegative final int fromIndex,  @Nonnegative final int toIndex) {
         if (toIndex - fromIndex < 2)
             return;
 
@@ -323,7 +377,7 @@ public final class ArrayUtil {
         return values[argmin(values , 0, values.length - 1)];
     }
 
-    public static boolean min(boolean[] values , int fromIndex, int toIndex) {
+    public static boolean min(boolean[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return values[argmin(values , fromIndex, toIndex)];
     }
 
@@ -331,7 +385,7 @@ public final class ArrayUtil {
         return values[argmax(values , 0, values.length - 1)];
     }
 
-    public static boolean max(boolean[] values , int fromIndex, int toIndex) {
+    public static boolean max(boolean[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return values[argmax(values , fromIndex, toIndex)];
     }
 
@@ -339,7 +393,7 @@ public final class ArrayUtil {
         return argmin(values , 0, values.length - 1);
     }
 
-    public static int argmin(boolean[] values , int fromIndex, int toIndex) {
+    public static int argmin(boolean[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmin = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++)
             if ((values[i]==values[argmin]?1:0)<0)
@@ -351,7 +405,7 @@ public final class ArrayUtil {
         return argmax(values , 0, values.length - 1);
     }
 
-    public static int argmax(boolean[] values , int fromIndex, int toIndex) {
+    public static int argmax(boolean[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmax = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++)
             if ((values[i]==values[argmax]?1:0)>0)
@@ -359,7 +413,7 @@ public final class ArrayUtil {
         return argmax;
     }
 
-    public static int[] argminmax(boolean[] values , int fromIndex, int toIndex) {
+    public static int[] argminmax(boolean[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmax = fromIndex;
         int argmin = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++) {
@@ -375,7 +429,7 @@ public final class ArrayUtil {
         return minmax(values , 0, values.length - 1);
     }
 
-    public static boolean[] minmax(boolean[] values , int fromIndex, int toIndex) {
+    public static boolean[] minmax(boolean[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int[] mm = argminmax(values , fromIndex, toIndex);
         return new boolean[]{values[mm[1]], values[mm[0]]};
     }
@@ -394,7 +448,7 @@ public final class ArrayUtil {
 
     public static boolean[] clamp(boolean[] src , boolean min, boolean max) {
         boolean[] dst = new boolean[src.length];
-        clamp(src, min, max, dst);
+        clamp(src , min, max, dst);
         return dst;
     }
 
@@ -410,7 +464,7 @@ public final class ArrayUtil {
 
     public static boolean[] clampMin(boolean[] src , boolean min) {
         boolean[] dst = new boolean[src.length];
-        clampMin(src, min, dst);
+        clampMin(src , min, dst);
         return dst;
     }
 
@@ -426,38 +480,7 @@ public final class ArrayUtil {
 
     public static boolean[] clampMax(boolean[] src , boolean max) {
         boolean[] dst = new boolean[src.length];
-        clampMax(src, max, dst);
-        return dst;
-    }
-
-
-    public static Byte[] box(final byte[] src) {
-        return box(src, 0, src.length);
-    }
-
-    public static Byte[] box(final byte[] src, final int offset) {
-        return box(src, offset, src.length - offset);
-    }
-
-    public static Byte[] box(final byte[] src, final int offset, final int len) {
-        Byte[] dst = new Byte[len];
-        for(int i = 0; i < len; i++)
-            dst[i] = (Byte)src[offset + i];
-        return dst;
-    }
-
-    public static byte[] unbox(final Byte[] src) {
-        return unbox(src, 0, src.length);
-    }
-
-    public static byte[] unbox(final Byte[] src, final int offset) {
-        return unbox(src, offset, src.length - offset);
-    }
-
-    public static byte[] unbox(final Byte[] src, final int offset, final int len) {
-        byte[] dst = new byte[len];
-        for(int i = 0; i < len; i++)
-            dst[i] = (byte)src[offset + i];
+        clampMax(src , max, dst);
         return dst;
     }
 
@@ -469,29 +492,110 @@ public final class ArrayUtil {
      * ==================
      */
 
+
+    /**
+     * Convert an array of primitive <code>byte</code> values to a new array of <code>Byte</code> boxed objects.
+     *
+     * @param src Primitive array to convert
+     * @return a new array containing the boxed equivalents of the values in the given array
+     */
+    public static Byte[] box(final byte[] src) {
+        return box(src, 0, src.length);
+    }
+
+    /**
+     * Convert the tail of an array of primitive <code>byte</code values to a new array of <code>Byte</code> boxed objects.
+     *
+     * @param src    Primitive array to convert
+     * @param offset First index to covert (inclusive)
+     * @return a new array containing the boxed equivalents of the values in the given array
+     */
+    public static Byte[] box(final byte[] src,  @Nonnegative final int offset) {
+        return box(src, offset, src.length - offset);
+    }
+
+    /**
+     * Convert a portion of an array of primitive <code>byte</code values to a new array of <code>Byte</code> boxed objects.
+     *
+     * @param src    Primitive array to convert
+     * @param offset First index to covert (inclusive)
+     * @param len    Last index to covert (exclusive)
+     * @return a new array containing the boxed equivalents of the values in the given array.
+     */
+    public static Byte[] box(final byte[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
+        Byte[] dst = new Byte[len];
+        for(int i = 0; i < len; i++)
+            dst[i] = src[offset + i];
+        return dst;
+    }
+
+    /**
+     * Convert an array of <code>Byte</code> boxed objects to a new array of primitive <code>byte</code> values.
+     *
+     * @param src Boxed object array to convert
+     * @return a new array containing the primitive equivalents of the values in the given array
+     */
+    public static byte[] unbox(final Byte[] src) {
+        return unbox(src, 0, src.length);
+    }
+
+    /**
+     * Convert the tail of an array of <code>Byte</code> boxed objects to a new array of primitive <code>byte</code values.
+     *
+     * @param src    Boxed object array to convert
+     * @param offset First index to covert (inclusive)
+     * @return a new array containing the primitive equivalents of the values in the given array
+     */
+    public static byte[] unbox(final Byte[] src,  @Nonnegative final int offset) {
+        return unbox(src, offset, src.length - offset);
+    }
+
+    /**
+     * Convert a portion of an array of <code>Byte</code> boxed objects to a new array of primitive <code>byte</code values.
+     *
+     * @param src    Boxed object array to convert
+     * @param offset First index to covert (inclusive)
+     * @param len    Last index to covert (exclusive)
+     * @return a new array containing the primitive equivalents of the values in the given array.
+     */
+    public static byte[] unbox(final Byte[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
+        byte[] dst = new byte[len];
+        for(int i = 0; i < len; i++)
+            dst[i] = src[offset + i];
+        return dst;
+    }
+
+
+
     public static byte[] copyOf(final byte[] src) {
         return copyOf(src, 0, src.length);
     }
 
-    public static byte[] copyOf(final byte[] src, final int offset) {
+    public static byte[] copyOf(final byte[] src,  @Nonnegative final int offset) {
         return copyOf(src, offset, src.length - offset);
     }
 
-    public static byte[] copyOf(final byte[] src, final int offset, final int len) {
+    public static byte[] copyOf(final byte[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
         byte[] dst = new byte[len];
         System.arraycopy(src, offset, dst, 0, len);
         return dst;
     }
 
-    public static byte[] cat(final byte[]... arrs) {
+    /**
+     * Concatenate two or more arrays.
+     *
+     * @param arrays to be concatenated
+     * @return array contain all the elements of the input arrays
+     */
+     public static byte[] cat(final byte[]... arrays) {
         int n = 0;
-        for (int i = 0; i < arrs.length; i++)
-            n += arrs[i].length;
+        for (byte[] array : arrays)
+            n += array.length;
         byte[] result = new byte[n];
         int offset = 0;
-        for (int i = 0; i < arrs.length; i++) {
-            System.arraycopy(arrs[i], 0, result, offset, arrs[i].length);
-            offset += arrs[i].length;
+        for (byte[] array : arrays) {
+            System.arraycopy(array, 0, result, offset, array.length);
+            offset += array.length;
         }
         return result;
     }
@@ -500,11 +604,11 @@ public final class ArrayUtil {
         return firstIndexOf(arr, val, 0, arr.length);
     }
 
-    public static int firstIndexOf(final byte[] arr, final byte val, int fromIndex) {
+    public static int firstIndexOf(final byte[] arr, final byte val,  @Nonnegative int fromIndex) {
         return firstIndexOf(arr, val, fromIndex, arr.length);
     }
 
-    public static int firstIndexOf(final byte[] arr, final byte val, int fromIndex, int toIndex) {
+    public static int firstIndexOf(final byte[] arr, final byte val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         for (int i = fromIndex; i < toIndex; i++)
             if (arr[i] == val)
                 return i;
@@ -515,11 +619,11 @@ public final class ArrayUtil {
         return lastIndexOf(arr, val, 0, arr.length);
     }
 
-    public static int lastIndexOf(final byte[] arr, final byte val, int fromIndex) {
+    public static int lastIndexOf(final byte[] arr, final byte val,  @Nonnegative int fromIndex) {
         return lastIndexOf(arr, val, fromIndex, arr.length);
     }
 
-    public static int lastIndexOf(final byte[] arr, final byte val, int fromIndex, int toIndex) {
+    public static int lastIndexOf(final byte[] arr, final byte val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         for (int i = toIndex - 1; i >= fromIndex; i--)
             if (arr[i] == val)
                 return i;
@@ -530,11 +634,11 @@ public final class ArrayUtil {
         return firstIndexOf(arr, val) != -1;
     }
 
-    public static boolean contains(final byte[] arr, final byte val, int fromIndex) {
+    public static boolean contains(final byte[] arr, final byte val,  @Nonnegative int fromIndex) {
         return firstIndexOf(arr, val, fromIndex) != -1;
     }
 
-    public static boolean contains(final byte[] arr, final byte val, int fromIndex, int toIndex) {
+    public static boolean contains(final byte[] arr, final byte val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return firstIndexOf(arr, val, fromIndex, toIndex) != -1;
     }
 
@@ -543,9 +647,9 @@ public final class ArrayUtil {
         // O(n log n) by sorting in input first.
         byte[] result = new byte[arr.length];
         int j = 0;
-        for (int i = 0; i < arr.length; i++) {
-            if (!contains(result, arr[i])) {
-                result[j] = arr[i];
+        for (byte anArr : arr) {
+            if (!contains(result, anArr)) {
+                result[j] = anArr;
                 j++;
             }
         }
@@ -556,17 +660,17 @@ public final class ArrayUtil {
         reverse(a, 0, a.length);
     }
 
-    public static void reverse(final byte[] a, final int fromIndex) {
+    public static void reverse(final byte[] a,  @Nonnegative final int fromIndex) {
         reverse(a, fromIndex, a.length);
     }
 
-    public static void reverse(final byte[] a, final int fromIndex, final int toIndex) {
+    public static void reverse(final byte[] a,  @Nonnegative final int fromIndex,  @Nonnegative final int toIndex) {
         for (int i = fromIndex, j = toIndex - 1; i < j; i++, j--) {
             swap(a, i, j);
         }
     }
 
-    public static void swap(final byte[] a, final int i, final int j) {
+    public static void swap(final byte[] a,  @Nonnegative final int i,  @Nonnegative final int j) {
         final byte tmp = a[i];
         a[i] = a[j];
         a[j] = tmp;
@@ -574,7 +678,7 @@ public final class ArrayUtil {
 
     public static byte[] elementsOf(byte[] arr, int[] idx) {
         byte[] result = new byte[idx.length];
-        for (int i = 0, j = 0; i < idx.length; i++)
+        for (int i = 0; i < idx.length; i++)
             result[i] = arr[idx[i]];
         return result;
     }
@@ -611,19 +715,18 @@ public final class ArrayUtil {
 
     public static byte mode(byte[] arr) {
         Map<Byte, Integer> map = new HashMap<Byte, Integer>();
-        for (int i = 0; i < arr.length; i++) {
-            if (map.containsKey(arr[i]))
-                map.put(arr[i], map.get(arr[i]) + 1);
+        for (byte anArr : arr) {
+            if (map.containsKey(anArr))
+                map.put(anArr, map.get(anArr) + 1);
             else
-                map.put(arr[i], 1);
+                map.put(anArr, 1);
         }
         int maxCount = -1;
         Byte maxValue = arr[0];
-        for (Byte key : map.keySet()) {
-            int count = map.get(key);
-            if (count > maxCount) {
-                maxCount = count;
-                maxValue = key;
+        for (Map.Entry<Byte, Integer> entry : map.entrySet()) {
+            if (entry.getValue() > maxCount) {
+                maxCount = entry.getValue();
+                maxValue = entry.getKey();
             }
         }
         return maxValue;
@@ -635,7 +738,7 @@ public final class ArrayUtil {
         permute(a, 0, a.length);
     }
 
-    public static void permute(final byte[] a, final int toIndex) {
+    public static void permute(final byte[] a,  @Nonnegative final int toIndex) {
         permute(a, toIndex, a.length);
     }
 
@@ -645,13 +748,13 @@ public final class ArrayUtil {
      *
      * Use an algorithm defined in
      * http://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
-     * which probably isnt the most efficient solution.
+     * which probably isn't the most efficient solution.
      *
      * @param a the array to be permuted
      * @param toIndex index of the first element (inclusive) to be permuted
      * @param fromIndex index of the last element (exclusive) to be permuted
      */
-    public static void permute(final byte[] a, final int fromIndex, final int toIndex) {
+    public static void permute(final byte[] a,  @Nonnegative final int fromIndex,  @Nonnegative final int toIndex) {
         if (toIndex - fromIndex < 2)
             return;
 
@@ -687,7 +790,7 @@ public final class ArrayUtil {
         return values[argmin(values , 0, values.length - 1)];
     }
 
-    public static byte min(byte[] values , int fromIndex, int toIndex) {
+    public static byte min(byte[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return values[argmin(values , fromIndex, toIndex)];
     }
 
@@ -695,7 +798,7 @@ public final class ArrayUtil {
         return values[argmax(values , 0, values.length - 1)];
     }
 
-    public static byte max(byte[] values , int fromIndex, int toIndex) {
+    public static byte max(byte[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return values[argmax(values , fromIndex, toIndex)];
     }
 
@@ -703,7 +806,7 @@ public final class ArrayUtil {
         return argmin(values , 0, values.length - 1);
     }
 
-    public static int argmin(byte[] values , int fromIndex, int toIndex) {
+    public static int argmin(byte[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmin = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++)
             if ((byte)(values[i]-values[argmin])<0)
@@ -715,7 +818,7 @@ public final class ArrayUtil {
         return argmax(values , 0, values.length - 1);
     }
 
-    public static int argmax(byte[] values , int fromIndex, int toIndex) {
+    public static int argmax(byte[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmax = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++)
             if ((byte)(values[i]-values[argmax])>0)
@@ -723,7 +826,7 @@ public final class ArrayUtil {
         return argmax;
     }
 
-    public static int[] argminmax(byte[] values , int fromIndex, int toIndex) {
+    public static int[] argminmax(byte[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmax = fromIndex;
         int argmin = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++) {
@@ -739,7 +842,7 @@ public final class ArrayUtil {
         return minmax(values , 0, values.length - 1);
     }
 
-    public static byte[] minmax(byte[] values , int fromIndex, int toIndex) {
+    public static byte[] minmax(byte[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int[] mm = argminmax(values , fromIndex, toIndex);
         return new byte[]{values[mm[1]], values[mm[0]]};
     }
@@ -758,7 +861,7 @@ public final class ArrayUtil {
 
     public static byte[] clamp(byte[] src , byte min, byte max) {
         byte[] dst = new byte[src.length];
-        clamp(src, min, max, dst);
+        clamp(src , min, max, dst);
         return dst;
     }
 
@@ -774,7 +877,7 @@ public final class ArrayUtil {
 
     public static byte[] clampMin(byte[] src , byte min) {
         byte[] dst = new byte[src.length];
-        clampMin(src, min, dst);
+        clampMin(src , min, dst);
         return dst;
     }
 
@@ -790,7 +893,7 @@ public final class ArrayUtil {
 
     public static byte[] clampMax(byte[] src , byte max) {
         byte[] dst = new byte[src.length];
-        clampMax(src, max, dst);
+        clampMax(src , max, dst);
         return dst;
     }
 
@@ -798,47 +901,43 @@ public final class ArrayUtil {
 
 
     public static String toHexString(final byte[] arr) {
-        final StringBuilder sbuf = new StringBuilder();
-        sbuf.append('[');
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append('[');
         if (arr.length > 0)
-            sbuf.append(Integer.toHexString(arr[0]));
+            buffer.append(Integer.toHexString(arr[0]));
         for (int i = 1; i < arr.length; i++) {
-            sbuf.append(' ');
-            sbuf.append(Integer.toHexString(arr[i]));
+            buffer.append(' ');
+            buffer.append(Integer.toHexString(arr[i]));
         }
-        sbuf.append(']');
-        return sbuf.toString();
+        buffer.append(']');
+        return buffer.toString();
     }
 
 
-    public static Character[] box(final char[] src) {
-        return box(src, 0, src.length);
+    public static String toOctalString(final byte[] arr) {
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append('[');
+        if (arr.length > 0)
+            buffer.append(Integer.toOctalString(arr[0]));
+        for (int i = 1; i < arr.length; i++) {
+            buffer.append(' ');
+            buffer.append(Integer.toOctalString(arr[i]));
+        }
+        buffer.append(']');
+        return buffer.toString();
     }
 
-    public static Character[] box(final char[] src, final int offset) {
-        return box(src, offset, src.length - offset);
-    }
-
-    public static Character[] box(final char[] src, final int offset, final int len) {
-        Character[] dst = new Character[len];
-        for(int i = 0; i < len; i++)
-            dst[i] = (Character)src[offset + i];
-        return dst;
-    }
-
-    public static char[] unbox(final Character[] src) {
-        return unbox(src, 0, src.length);
-    }
-
-    public static char[] unbox(final Character[] src, final int offset) {
-        return unbox(src, offset, src.length - offset);
-    }
-
-    public static char[] unbox(final Character[] src, final int offset, final int len) {
-        char[] dst = new char[len];
-        for(int i = 0; i < len; i++)
-            dst[i] = (char)src[offset + i];
-        return dst;
+    public static String toBinaryString(final byte[] arr) {
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append('[');
+        if (arr.length > 0)
+            buffer.append(Integer.toBinaryString(arr[0]));
+        for (int i = 1; i < arr.length; i++) {
+            buffer.append(' ');
+            buffer.append(Integer.toBinaryString(arr[i]));
+        }
+        buffer.append(']');
+        return buffer.toString();
     }
 
 
@@ -849,29 +948,110 @@ public final class ArrayUtil {
      * ==================
      */
 
+
+    /**
+     * Convert an array of primitive <code>char</code> values to a new array of <code>Character</code> boxed objects.
+     *
+     * @param src Primitive array to convert
+     * @return a new array containing the boxed equivalents of the values in the given array
+     */
+    public static Character[] box(final char[] src) {
+        return box(src, 0, src.length);
+    }
+
+    /**
+     * Convert the tail of an array of primitive <code>char</code values to a new array of <code>Character</code> boxed objects.
+     *
+     * @param src    Primitive array to convert
+     * @param offset First index to covert (inclusive)
+     * @return a new array containing the boxed equivalents of the values in the given array
+     */
+    public static Character[] box(final char[] src,  @Nonnegative final int offset) {
+        return box(src, offset, src.length - offset);
+    }
+
+    /**
+     * Convert a portion of an array of primitive <code>char</code values to a new array of <code>Character</code> boxed objects.
+     *
+     * @param src    Primitive array to convert
+     * @param offset First index to covert (inclusive)
+     * @param len    Last index to covert (exclusive)
+     * @return a new array containing the boxed equivalents of the values in the given array.
+     */
+    public static Character[] box(final char[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
+        Character[] dst = new Character[len];
+        for(int i = 0; i < len; i++)
+            dst[i] = src[offset + i];
+        return dst;
+    }
+
+    /**
+     * Convert an array of <code>Character</code> boxed objects to a new array of primitive <code>char</code> values.
+     *
+     * @param src Boxed object array to convert
+     * @return a new array containing the primitive equivalents of the values in the given array
+     */
+    public static char[] unbox(final Character[] src) {
+        return unbox(src, 0, src.length);
+    }
+
+    /**
+     * Convert the tail of an array of <code>Character</code> boxed objects to a new array of primitive <code>char</code values.
+     *
+     * @param src    Boxed object array to convert
+     * @param offset First index to covert (inclusive)
+     * @return a new array containing the primitive equivalents of the values in the given array
+     */
+    public static char[] unbox(final Character[] src,  @Nonnegative final int offset) {
+        return unbox(src, offset, src.length - offset);
+    }
+
+    /**
+     * Convert a portion of an array of <code>Character</code> boxed objects to a new array of primitive <code>char</code values.
+     *
+     * @param src    Boxed object array to convert
+     * @param offset First index to covert (inclusive)
+     * @param len    Last index to covert (exclusive)
+     * @return a new array containing the primitive equivalents of the values in the given array.
+     */
+    public static char[] unbox(final Character[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
+        char[] dst = new char[len];
+        for(int i = 0; i < len; i++)
+            dst[i] = src[offset + i];
+        return dst;
+    }
+
+
+
     public static char[] copyOf(final char[] src) {
         return copyOf(src, 0, src.length);
     }
 
-    public static char[] copyOf(final char[] src, final int offset) {
+    public static char[] copyOf(final char[] src,  @Nonnegative final int offset) {
         return copyOf(src, offset, src.length - offset);
     }
 
-    public static char[] copyOf(final char[] src, final int offset, final int len) {
+    public static char[] copyOf(final char[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
         char[] dst = new char[len];
         System.arraycopy(src, offset, dst, 0, len);
         return dst;
     }
 
-    public static char[] cat(final char[]... arrs) {
+    /**
+     * Concatenate two or more arrays.
+     *
+     * @param arrays to be concatenated
+     * @return array contain all the elements of the input arrays
+     */
+     public static char[] cat(final char[]... arrays) {
         int n = 0;
-        for (int i = 0; i < arrs.length; i++)
-            n += arrs[i].length;
+        for (char[] array : arrays)
+            n += array.length;
         char[] result = new char[n];
         int offset = 0;
-        for (int i = 0; i < arrs.length; i++) {
-            System.arraycopy(arrs[i], 0, result, offset, arrs[i].length);
-            offset += arrs[i].length;
+        for (char[] array : arrays) {
+            System.arraycopy(array, 0, result, offset, array.length);
+            offset += array.length;
         }
         return result;
     }
@@ -880,11 +1060,11 @@ public final class ArrayUtil {
         return firstIndexOf(arr, val, 0, arr.length);
     }
 
-    public static int firstIndexOf(final char[] arr, final char val, int fromIndex) {
+    public static int firstIndexOf(final char[] arr, final char val,  @Nonnegative int fromIndex) {
         return firstIndexOf(arr, val, fromIndex, arr.length);
     }
 
-    public static int firstIndexOf(final char[] arr, final char val, int fromIndex, int toIndex) {
+    public static int firstIndexOf(final char[] arr, final char val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         for (int i = fromIndex; i < toIndex; i++)
             if (arr[i] == val)
                 return i;
@@ -895,11 +1075,11 @@ public final class ArrayUtil {
         return lastIndexOf(arr, val, 0, arr.length);
     }
 
-    public static int lastIndexOf(final char[] arr, final char val, int fromIndex) {
+    public static int lastIndexOf(final char[] arr, final char val,  @Nonnegative int fromIndex) {
         return lastIndexOf(arr, val, fromIndex, arr.length);
     }
 
-    public static int lastIndexOf(final char[] arr, final char val, int fromIndex, int toIndex) {
+    public static int lastIndexOf(final char[] arr, final char val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         for (int i = toIndex - 1; i >= fromIndex; i--)
             if (arr[i] == val)
                 return i;
@@ -910,11 +1090,11 @@ public final class ArrayUtil {
         return firstIndexOf(arr, val) != -1;
     }
 
-    public static boolean contains(final char[] arr, final char val, int fromIndex) {
+    public static boolean contains(final char[] arr, final char val,  @Nonnegative int fromIndex) {
         return firstIndexOf(arr, val, fromIndex) != -1;
     }
 
-    public static boolean contains(final char[] arr, final char val, int fromIndex, int toIndex) {
+    public static boolean contains(final char[] arr, final char val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return firstIndexOf(arr, val, fromIndex, toIndex) != -1;
     }
 
@@ -923,9 +1103,9 @@ public final class ArrayUtil {
         // O(n log n) by sorting in input first.
         char[] result = new char[arr.length];
         int j = 0;
-        for (int i = 0; i < arr.length; i++) {
-            if (!contains(result, arr[i])) {
-                result[j] = arr[i];
+        for (char anArr : arr) {
+            if (!contains(result, anArr)) {
+                result[j] = anArr;
                 j++;
             }
         }
@@ -936,17 +1116,17 @@ public final class ArrayUtil {
         reverse(a, 0, a.length);
     }
 
-    public static void reverse(final char[] a, final int fromIndex) {
+    public static void reverse(final char[] a,  @Nonnegative final int fromIndex) {
         reverse(a, fromIndex, a.length);
     }
 
-    public static void reverse(final char[] a, final int fromIndex, final int toIndex) {
+    public static void reverse(final char[] a,  @Nonnegative final int fromIndex,  @Nonnegative final int toIndex) {
         for (int i = fromIndex, j = toIndex - 1; i < j; i++, j--) {
             swap(a, i, j);
         }
     }
 
-    public static void swap(final char[] a, final int i, final int j) {
+    public static void swap(final char[] a,  @Nonnegative final int i,  @Nonnegative final int j) {
         final char tmp = a[i];
         a[i] = a[j];
         a[j] = tmp;
@@ -954,7 +1134,7 @@ public final class ArrayUtil {
 
     public static char[] elementsOf(char[] arr, int[] idx) {
         char[] result = new char[idx.length];
-        for (int i = 0, j = 0; i < idx.length; i++)
+        for (int i = 0; i < idx.length; i++)
             result[i] = arr[idx[i]];
         return result;
     }
@@ -991,19 +1171,18 @@ public final class ArrayUtil {
 
     public static char mode(char[] arr) {
         Map<Character, Integer> map = new HashMap<Character, Integer>();
-        for (int i = 0; i < arr.length; i++) {
-            if (map.containsKey(arr[i]))
-                map.put(arr[i], map.get(arr[i]) + 1);
+        for (char anArr : arr) {
+            if (map.containsKey(anArr))
+                map.put(anArr, map.get(anArr) + 1);
             else
-                map.put(arr[i], 1);
+                map.put(anArr, 1);
         }
         int maxCount = -1;
         Character maxValue = arr[0];
-        for (Character key : map.keySet()) {
-            int count = map.get(key);
-            if (count > maxCount) {
-                maxCount = count;
-                maxValue = key;
+        for (Map.Entry<Character, Integer> entry : map.entrySet()) {
+            if (entry.getValue() > maxCount) {
+                maxCount = entry.getValue();
+                maxValue = entry.getKey();
             }
         }
         return maxValue;
@@ -1015,7 +1194,7 @@ public final class ArrayUtil {
         permute(a, 0, a.length);
     }
 
-    public static void permute(final char[] a, final int toIndex) {
+    public static void permute(final char[] a,  @Nonnegative final int toIndex) {
         permute(a, toIndex, a.length);
     }
 
@@ -1025,13 +1204,13 @@ public final class ArrayUtil {
      *
      * Use an algorithm defined in
      * http://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
-     * which probably isnt the most efficient solution.
+     * which probably isn't the most efficient solution.
      *
      * @param a the array to be permuted
      * @param toIndex index of the first element (inclusive) to be permuted
      * @param fromIndex index of the last element (exclusive) to be permuted
      */
-    public static void permute(final char[] a, final int fromIndex, final int toIndex) {
+    public static void permute(final char[] a,  @Nonnegative final int fromIndex,  @Nonnegative final int toIndex) {
         if (toIndex - fromIndex < 2)
             return;
 
@@ -1067,7 +1246,7 @@ public final class ArrayUtil {
         return values[argmin(values , 0, values.length - 1)];
     }
 
-    public static char min(char[] values , int fromIndex, int toIndex) {
+    public static char min(char[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return values[argmin(values , fromIndex, toIndex)];
     }
 
@@ -1075,7 +1254,7 @@ public final class ArrayUtil {
         return values[argmax(values , 0, values.length - 1)];
     }
 
-    public static char max(char[] values , int fromIndex, int toIndex) {
+    public static char max(char[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return values[argmax(values , fromIndex, toIndex)];
     }
 
@@ -1083,7 +1262,7 @@ public final class ArrayUtil {
         return argmin(values , 0, values.length - 1);
     }
 
-    public static int argmin(char[] values , int fromIndex, int toIndex) {
+    public static int argmin(char[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmin = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++)
             if ((char)(values[i]-values[argmin])<0)
@@ -1095,7 +1274,7 @@ public final class ArrayUtil {
         return argmax(values , 0, values.length - 1);
     }
 
-    public static int argmax(char[] values , int fromIndex, int toIndex) {
+    public static int argmax(char[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmax = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++)
             if ((char)(values[i]-values[argmax])>0)
@@ -1103,7 +1282,7 @@ public final class ArrayUtil {
         return argmax;
     }
 
-    public static int[] argminmax(char[] values , int fromIndex, int toIndex) {
+    public static int[] argminmax(char[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmax = fromIndex;
         int argmin = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++) {
@@ -1119,7 +1298,7 @@ public final class ArrayUtil {
         return minmax(values , 0, values.length - 1);
     }
 
-    public static char[] minmax(char[] values , int fromIndex, int toIndex) {
+    public static char[] minmax(char[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int[] mm = argminmax(values , fromIndex, toIndex);
         return new char[]{values[mm[1]], values[mm[0]]};
     }
@@ -1138,7 +1317,7 @@ public final class ArrayUtil {
 
     public static char[] clamp(char[] src , char min, char max) {
         char[] dst = new char[src.length];
-        clamp(src, min, max, dst);
+        clamp(src , min, max, dst);
         return dst;
     }
 
@@ -1154,7 +1333,7 @@ public final class ArrayUtil {
 
     public static char[] clampMin(char[] src , char min) {
         char[] dst = new char[src.length];
-        clampMin(src, min, dst);
+        clampMin(src , min, dst);
         return dst;
     }
 
@@ -1170,7 +1349,7 @@ public final class ArrayUtil {
 
     public static char[] clampMax(char[] src , char max) {
         char[] dst = new char[src.length];
-        clampMax(src, max, dst);
+        clampMax(src , max, dst);
         return dst;
     }
 
@@ -1178,47 +1357,43 @@ public final class ArrayUtil {
 
 
     public static String toHexString(final char[] arr) {
-        final StringBuilder sbuf = new StringBuilder();
-        sbuf.append('[');
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append('[');
         if (arr.length > 0)
-            sbuf.append(Integer.toHexString(arr[0]));
+            buffer.append(Integer.toHexString(arr[0]));
         for (int i = 1; i < arr.length; i++) {
-            sbuf.append(' ');
-            sbuf.append(Integer.toHexString(arr[i]));
+            buffer.append(' ');
+            buffer.append(Integer.toHexString(arr[i]));
         }
-        sbuf.append(']');
-        return sbuf.toString();
+        buffer.append(']');
+        return buffer.toString();
     }
 
 
-    public static Short[] box(final short[] src) {
-        return box(src, 0, src.length);
+    public static String toOctalString(final char[] arr) {
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append('[');
+        if (arr.length > 0)
+            buffer.append(Integer.toOctalString(arr[0]));
+        for (int i = 1; i < arr.length; i++) {
+            buffer.append(' ');
+            buffer.append(Integer.toOctalString(arr[i]));
+        }
+        buffer.append(']');
+        return buffer.toString();
     }
 
-    public static Short[] box(final short[] src, final int offset) {
-        return box(src, offset, src.length - offset);
-    }
-
-    public static Short[] box(final short[] src, final int offset, final int len) {
-        Short[] dst = new Short[len];
-        for(int i = 0; i < len; i++)
-            dst[i] = (Short)src[offset + i];
-        return dst;
-    }
-
-    public static short[] unbox(final Short[] src) {
-        return unbox(src, 0, src.length);
-    }
-
-    public static short[] unbox(final Short[] src, final int offset) {
-        return unbox(src, offset, src.length - offset);
-    }
-
-    public static short[] unbox(final Short[] src, final int offset, final int len) {
-        short[] dst = new short[len];
-        for(int i = 0; i < len; i++)
-            dst[i] = (short)src[offset + i];
-        return dst;
+    public static String toBinaryString(final char[] arr) {
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append('[');
+        if (arr.length > 0)
+            buffer.append(Integer.toBinaryString(arr[0]));
+        for (int i = 1; i < arr.length; i++) {
+            buffer.append(' ');
+            buffer.append(Integer.toBinaryString(arr[i]));
+        }
+        buffer.append(']');
+        return buffer.toString();
     }
 
 
@@ -1229,29 +1404,110 @@ public final class ArrayUtil {
      * ==================
      */
 
+
+    /**
+     * Convert an array of primitive <code>short</code> values to a new array of <code>Short</code> boxed objects.
+     *
+     * @param src Primitive array to convert
+     * @return a new array containing the boxed equivalents of the values in the given array
+     */
+    public static Short[] box(final short[] src) {
+        return box(src, 0, src.length);
+    }
+
+    /**
+     * Convert the tail of an array of primitive <code>short</code values to a new array of <code>Short</code> boxed objects.
+     *
+     * @param src    Primitive array to convert
+     * @param offset First index to covert (inclusive)
+     * @return a new array containing the boxed equivalents of the values in the given array
+     */
+    public static Short[] box(final short[] src,  @Nonnegative final int offset) {
+        return box(src, offset, src.length - offset);
+    }
+
+    /**
+     * Convert a portion of an array of primitive <code>short</code values to a new array of <code>Short</code> boxed objects.
+     *
+     * @param src    Primitive array to convert
+     * @param offset First index to covert (inclusive)
+     * @param len    Last index to covert (exclusive)
+     * @return a new array containing the boxed equivalents of the values in the given array.
+     */
+    public static Short[] box(final short[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
+        Short[] dst = new Short[len];
+        for(int i = 0; i < len; i++)
+            dst[i] = src[offset + i];
+        return dst;
+    }
+
+    /**
+     * Convert an array of <code>Short</code> boxed objects to a new array of primitive <code>short</code> values.
+     *
+     * @param src Boxed object array to convert
+     * @return a new array containing the primitive equivalents of the values in the given array
+     */
+    public static short[] unbox(final Short[] src) {
+        return unbox(src, 0, src.length);
+    }
+
+    /**
+     * Convert the tail of an array of <code>Short</code> boxed objects to a new array of primitive <code>short</code values.
+     *
+     * @param src    Boxed object array to convert
+     * @param offset First index to covert (inclusive)
+     * @return a new array containing the primitive equivalents of the values in the given array
+     */
+    public static short[] unbox(final Short[] src,  @Nonnegative final int offset) {
+        return unbox(src, offset, src.length - offset);
+    }
+
+    /**
+     * Convert a portion of an array of <code>Short</code> boxed objects to a new array of primitive <code>short</code values.
+     *
+     * @param src    Boxed object array to convert
+     * @param offset First index to covert (inclusive)
+     * @param len    Last index to covert (exclusive)
+     * @return a new array containing the primitive equivalents of the values in the given array.
+     */
+    public static short[] unbox(final Short[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
+        short[] dst = new short[len];
+        for(int i = 0; i < len; i++)
+            dst[i] = src[offset + i];
+        return dst;
+    }
+
+
+
     public static short[] copyOf(final short[] src) {
         return copyOf(src, 0, src.length);
     }
 
-    public static short[] copyOf(final short[] src, final int offset) {
+    public static short[] copyOf(final short[] src,  @Nonnegative final int offset) {
         return copyOf(src, offset, src.length - offset);
     }
 
-    public static short[] copyOf(final short[] src, final int offset, final int len) {
+    public static short[] copyOf(final short[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
         short[] dst = new short[len];
         System.arraycopy(src, offset, dst, 0, len);
         return dst;
     }
 
-    public static short[] cat(final short[]... arrs) {
+    /**
+     * Concatenate two or more arrays.
+     *
+     * @param arrays to be concatenated
+     * @return array contain all the elements of the input arrays
+     */
+     public static short[] cat(final short[]... arrays) {
         int n = 0;
-        for (int i = 0; i < arrs.length; i++)
-            n += arrs[i].length;
+        for (short[] array : arrays)
+            n += array.length;
         short[] result = new short[n];
         int offset = 0;
-        for (int i = 0; i < arrs.length; i++) {
-            System.arraycopy(arrs[i], 0, result, offset, arrs[i].length);
-            offset += arrs[i].length;
+        for (short[] array : arrays) {
+            System.arraycopy(array, 0, result, offset, array.length);
+            offset += array.length;
         }
         return result;
     }
@@ -1260,11 +1516,11 @@ public final class ArrayUtil {
         return firstIndexOf(arr, val, 0, arr.length);
     }
 
-    public static int firstIndexOf(final short[] arr, final short val, int fromIndex) {
+    public static int firstIndexOf(final short[] arr, final short val,  @Nonnegative int fromIndex) {
         return firstIndexOf(arr, val, fromIndex, arr.length);
     }
 
-    public static int firstIndexOf(final short[] arr, final short val, int fromIndex, int toIndex) {
+    public static int firstIndexOf(final short[] arr, final short val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         for (int i = fromIndex; i < toIndex; i++)
             if (arr[i] == val)
                 return i;
@@ -1275,11 +1531,11 @@ public final class ArrayUtil {
         return lastIndexOf(arr, val, 0, arr.length);
     }
 
-    public static int lastIndexOf(final short[] arr, final short val, int fromIndex) {
+    public static int lastIndexOf(final short[] arr, final short val,  @Nonnegative int fromIndex) {
         return lastIndexOf(arr, val, fromIndex, arr.length);
     }
 
-    public static int lastIndexOf(final short[] arr, final short val, int fromIndex, int toIndex) {
+    public static int lastIndexOf(final short[] arr, final short val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         for (int i = toIndex - 1; i >= fromIndex; i--)
             if (arr[i] == val)
                 return i;
@@ -1290,11 +1546,11 @@ public final class ArrayUtil {
         return firstIndexOf(arr, val) != -1;
     }
 
-    public static boolean contains(final short[] arr, final short val, int fromIndex) {
+    public static boolean contains(final short[] arr, final short val,  @Nonnegative int fromIndex) {
         return firstIndexOf(arr, val, fromIndex) != -1;
     }
 
-    public static boolean contains(final short[] arr, final short val, int fromIndex, int toIndex) {
+    public static boolean contains(final short[] arr, final short val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return firstIndexOf(arr, val, fromIndex, toIndex) != -1;
     }
 
@@ -1303,9 +1559,9 @@ public final class ArrayUtil {
         // O(n log n) by sorting in input first.
         short[] result = new short[arr.length];
         int j = 0;
-        for (int i = 0; i < arr.length; i++) {
-            if (!contains(result, arr[i])) {
-                result[j] = arr[i];
+        for (short anArr : arr) {
+            if (!contains(result, anArr)) {
+                result[j] = anArr;
                 j++;
             }
         }
@@ -1316,17 +1572,17 @@ public final class ArrayUtil {
         reverse(a, 0, a.length);
     }
 
-    public static void reverse(final short[] a, final int fromIndex) {
+    public static void reverse(final short[] a,  @Nonnegative final int fromIndex) {
         reverse(a, fromIndex, a.length);
     }
 
-    public static void reverse(final short[] a, final int fromIndex, final int toIndex) {
+    public static void reverse(final short[] a,  @Nonnegative final int fromIndex,  @Nonnegative final int toIndex) {
         for (int i = fromIndex, j = toIndex - 1; i < j; i++, j--) {
             swap(a, i, j);
         }
     }
 
-    public static void swap(final short[] a, final int i, final int j) {
+    public static void swap(final short[] a,  @Nonnegative final int i,  @Nonnegative final int j) {
         final short tmp = a[i];
         a[i] = a[j];
         a[j] = tmp;
@@ -1334,7 +1590,7 @@ public final class ArrayUtil {
 
     public static short[] elementsOf(short[] arr, int[] idx) {
         short[] result = new short[idx.length];
-        for (int i = 0, j = 0; i < idx.length; i++)
+        for (int i = 0; i < idx.length; i++)
             result[i] = arr[idx[i]];
         return result;
     }
@@ -1371,19 +1627,18 @@ public final class ArrayUtil {
 
     public static short mode(short[] arr) {
         Map<Short, Integer> map = new HashMap<Short, Integer>();
-        for (int i = 0; i < arr.length; i++) {
-            if (map.containsKey(arr[i]))
-                map.put(arr[i], map.get(arr[i]) + 1);
+        for (short anArr : arr) {
+            if (map.containsKey(anArr))
+                map.put(anArr, map.get(anArr) + 1);
             else
-                map.put(arr[i], 1);
+                map.put(anArr, 1);
         }
         int maxCount = -1;
         Short maxValue = arr[0];
-        for (Short key : map.keySet()) {
-            int count = map.get(key);
-            if (count > maxCount) {
-                maxCount = count;
-                maxValue = key;
+        for (Map.Entry<Short, Integer> entry : map.entrySet()) {
+            if (entry.getValue() > maxCount) {
+                maxCount = entry.getValue();
+                maxValue = entry.getKey();
             }
         }
         return maxValue;
@@ -1395,7 +1650,7 @@ public final class ArrayUtil {
         permute(a, 0, a.length);
     }
 
-    public static void permute(final short[] a, final int toIndex) {
+    public static void permute(final short[] a,  @Nonnegative final int toIndex) {
         permute(a, toIndex, a.length);
     }
 
@@ -1405,13 +1660,13 @@ public final class ArrayUtil {
      *
      * Use an algorithm defined in
      * http://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
-     * which probably isnt the most efficient solution.
+     * which probably isn't the most efficient solution.
      *
      * @param a the array to be permuted
      * @param toIndex index of the first element (inclusive) to be permuted
      * @param fromIndex index of the last element (exclusive) to be permuted
      */
-    public static void permute(final short[] a, final int fromIndex, final int toIndex) {
+    public static void permute(final short[] a,  @Nonnegative final int fromIndex,  @Nonnegative final int toIndex) {
         if (toIndex - fromIndex < 2)
             return;
 
@@ -1447,7 +1702,7 @@ public final class ArrayUtil {
         return values[argmin(values , 0, values.length - 1)];
     }
 
-    public static short min(short[] values , int fromIndex, int toIndex) {
+    public static short min(short[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return values[argmin(values , fromIndex, toIndex)];
     }
 
@@ -1455,7 +1710,7 @@ public final class ArrayUtil {
         return values[argmax(values , 0, values.length - 1)];
     }
 
-    public static short max(short[] values , int fromIndex, int toIndex) {
+    public static short max(short[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return values[argmax(values , fromIndex, toIndex)];
     }
 
@@ -1463,7 +1718,7 @@ public final class ArrayUtil {
         return argmin(values , 0, values.length - 1);
     }
 
-    public static int argmin(short[] values , int fromIndex, int toIndex) {
+    public static int argmin(short[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmin = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++)
             if ((short)(values[i]-values[argmin])<0)
@@ -1475,7 +1730,7 @@ public final class ArrayUtil {
         return argmax(values , 0, values.length - 1);
     }
 
-    public static int argmax(short[] values , int fromIndex, int toIndex) {
+    public static int argmax(short[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmax = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++)
             if ((short)(values[i]-values[argmax])>0)
@@ -1483,7 +1738,7 @@ public final class ArrayUtil {
         return argmax;
     }
 
-    public static int[] argminmax(short[] values , int fromIndex, int toIndex) {
+    public static int[] argminmax(short[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmax = fromIndex;
         int argmin = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++) {
@@ -1499,7 +1754,7 @@ public final class ArrayUtil {
         return minmax(values , 0, values.length - 1);
     }
 
-    public static short[] minmax(short[] values , int fromIndex, int toIndex) {
+    public static short[] minmax(short[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int[] mm = argminmax(values , fromIndex, toIndex);
         return new short[]{values[mm[1]], values[mm[0]]};
     }
@@ -1518,7 +1773,7 @@ public final class ArrayUtil {
 
     public static short[] clamp(short[] src , short min, short max) {
         short[] dst = new short[src.length];
-        clamp(src, min, max, dst);
+        clamp(src , min, max, dst);
         return dst;
     }
 
@@ -1534,7 +1789,7 @@ public final class ArrayUtil {
 
     public static short[] clampMin(short[] src , short min) {
         short[] dst = new short[src.length];
-        clampMin(src, min, dst);
+        clampMin(src , min, dst);
         return dst;
     }
 
@@ -1550,7 +1805,7 @@ public final class ArrayUtil {
 
     public static short[] clampMax(short[] src , short max) {
         short[] dst = new short[src.length];
-        clampMax(src, max, dst);
+        clampMax(src , max, dst);
         return dst;
     }
 
@@ -1558,47 +1813,43 @@ public final class ArrayUtil {
 
 
     public static String toHexString(final short[] arr) {
-        final StringBuilder sbuf = new StringBuilder();
-        sbuf.append('[');
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append('[');
         if (arr.length > 0)
-            sbuf.append(Integer.toHexString(arr[0]));
+            buffer.append(Integer.toHexString(arr[0]));
         for (int i = 1; i < arr.length; i++) {
-            sbuf.append(' ');
-            sbuf.append(Integer.toHexString(arr[i]));
+            buffer.append(' ');
+            buffer.append(Integer.toHexString(arr[i]));
         }
-        sbuf.append(']');
-        return sbuf.toString();
+        buffer.append(']');
+        return buffer.toString();
     }
 
 
-    public static Integer[] box(final int[] src) {
-        return box(src, 0, src.length);
+    public static String toOctalString(final short[] arr) {
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append('[');
+        if (arr.length > 0)
+            buffer.append(Integer.toOctalString(arr[0]));
+        for (int i = 1; i < arr.length; i++) {
+            buffer.append(' ');
+            buffer.append(Integer.toOctalString(arr[i]));
+        }
+        buffer.append(']');
+        return buffer.toString();
     }
 
-    public static Integer[] box(final int[] src, final int offset) {
-        return box(src, offset, src.length - offset);
-    }
-
-    public static Integer[] box(final int[] src, final int offset, final int len) {
-        Integer[] dst = new Integer[len];
-        for(int i = 0; i < len; i++)
-            dst[i] = (Integer)src[offset + i];
-        return dst;
-    }
-
-    public static int[] unbox(final Integer[] src) {
-        return unbox(src, 0, src.length);
-    }
-
-    public static int[] unbox(final Integer[] src, final int offset) {
-        return unbox(src, offset, src.length - offset);
-    }
-
-    public static int[] unbox(final Integer[] src, final int offset, final int len) {
-        int[] dst = new int[len];
-        for(int i = 0; i < len; i++)
-            dst[i] = (int)src[offset + i];
-        return dst;
+    public static String toBinaryString(final short[] arr) {
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append('[');
+        if (arr.length > 0)
+            buffer.append(Integer.toBinaryString(arr[0]));
+        for (int i = 1; i < arr.length; i++) {
+            buffer.append(' ');
+            buffer.append(Integer.toBinaryString(arr[i]));
+        }
+        buffer.append(']');
+        return buffer.toString();
     }
 
 
@@ -1609,29 +1860,110 @@ public final class ArrayUtil {
      * ==================
      */
 
+
+    /**
+     * Convert an array of primitive <code>int</code> values to a new array of <code>Integer</code> boxed objects.
+     *
+     * @param src Primitive array to convert
+     * @return a new array containing the boxed equivalents of the values in the given array
+     */
+    public static Integer[] box(final int[] src) {
+        return box(src, 0, src.length);
+    }
+
+    /**
+     * Convert the tail of an array of primitive <code>int</code values to a new array of <code>Integer</code> boxed objects.
+     *
+     * @param src    Primitive array to convert
+     * @param offset First index to covert (inclusive)
+     * @return a new array containing the boxed equivalents of the values in the given array
+     */
+    public static Integer[] box(final int[] src,  @Nonnegative final int offset) {
+        return box(src, offset, src.length - offset);
+    }
+
+    /**
+     * Convert a portion of an array of primitive <code>int</code values to a new array of <code>Integer</code> boxed objects.
+     *
+     * @param src    Primitive array to convert
+     * @param offset First index to covert (inclusive)
+     * @param len    Last index to covert (exclusive)
+     * @return a new array containing the boxed equivalents of the values in the given array.
+     */
+    public static Integer[] box(final int[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
+        Integer[] dst = new Integer[len];
+        for(int i = 0; i < len; i++)
+            dst[i] = src[offset + i];
+        return dst;
+    }
+
+    /**
+     * Convert an array of <code>Integer</code> boxed objects to a new array of primitive <code>int</code> values.
+     *
+     * @param src Boxed object array to convert
+     * @return a new array containing the primitive equivalents of the values in the given array
+     */
+    public static int[] unbox(final Integer[] src) {
+        return unbox(src, 0, src.length);
+    }
+
+    /**
+     * Convert the tail of an array of <code>Integer</code> boxed objects to a new array of primitive <code>int</code values.
+     *
+     * @param src    Boxed object array to convert
+     * @param offset First index to covert (inclusive)
+     * @return a new array containing the primitive equivalents of the values in the given array
+     */
+    public static int[] unbox(final Integer[] src,  @Nonnegative final int offset) {
+        return unbox(src, offset, src.length - offset);
+    }
+
+    /**
+     * Convert a portion of an array of <code>Integer</code> boxed objects to a new array of primitive <code>int</code values.
+     *
+     * @param src    Boxed object array to convert
+     * @param offset First index to covert (inclusive)
+     * @param len    Last index to covert (exclusive)
+     * @return a new array containing the primitive equivalents of the values in the given array.
+     */
+    public static int[] unbox(final Integer[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
+        int[] dst = new int[len];
+        for(int i = 0; i < len; i++)
+            dst[i] = src[offset + i];
+        return dst;
+    }
+
+
+
     public static int[] copyOf(final int[] src) {
         return copyOf(src, 0, src.length);
     }
 
-    public static int[] copyOf(final int[] src, final int offset) {
+    public static int[] copyOf(final int[] src,  @Nonnegative final int offset) {
         return copyOf(src, offset, src.length - offset);
     }
 
-    public static int[] copyOf(final int[] src, final int offset, final int len) {
+    public static int[] copyOf(final int[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
         int[] dst = new int[len];
         System.arraycopy(src, offset, dst, 0, len);
         return dst;
     }
 
-    public static int[] cat(final int[]... arrs) {
+    /**
+     * Concatenate two or more arrays.
+     *
+     * @param arrays to be concatenated
+     * @return array contain all the elements of the input arrays
+     */
+     public static int[] cat(final int[]... arrays) {
         int n = 0;
-        for (int i = 0; i < arrs.length; i++)
-            n += arrs[i].length;
+        for (int[] array : arrays)
+            n += array.length;
         int[] result = new int[n];
         int offset = 0;
-        for (int i = 0; i < arrs.length; i++) {
-            System.arraycopy(arrs[i], 0, result, offset, arrs[i].length);
-            offset += arrs[i].length;
+        for (int[] array : arrays) {
+            System.arraycopy(array, 0, result, offset, array.length);
+            offset += array.length;
         }
         return result;
     }
@@ -1640,11 +1972,11 @@ public final class ArrayUtil {
         return firstIndexOf(arr, val, 0, arr.length);
     }
 
-    public static int firstIndexOf(final int[] arr, final int val, int fromIndex) {
+    public static int firstIndexOf(final int[] arr, final int val,  @Nonnegative int fromIndex) {
         return firstIndexOf(arr, val, fromIndex, arr.length);
     }
 
-    public static int firstIndexOf(final int[] arr, final int val, int fromIndex, int toIndex) {
+    public static int firstIndexOf(final int[] arr, final int val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         for (int i = fromIndex; i < toIndex; i++)
             if (arr[i] == val)
                 return i;
@@ -1655,11 +1987,11 @@ public final class ArrayUtil {
         return lastIndexOf(arr, val, 0, arr.length);
     }
 
-    public static int lastIndexOf(final int[] arr, final int val, int fromIndex) {
+    public static int lastIndexOf(final int[] arr, final int val,  @Nonnegative int fromIndex) {
         return lastIndexOf(arr, val, fromIndex, arr.length);
     }
 
-    public static int lastIndexOf(final int[] arr, final int val, int fromIndex, int toIndex) {
+    public static int lastIndexOf(final int[] arr, final int val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         for (int i = toIndex - 1; i >= fromIndex; i--)
             if (arr[i] == val)
                 return i;
@@ -1670,11 +2002,11 @@ public final class ArrayUtil {
         return firstIndexOf(arr, val) != -1;
     }
 
-    public static boolean contains(final int[] arr, final int val, int fromIndex) {
+    public static boolean contains(final int[] arr, final int val,  @Nonnegative int fromIndex) {
         return firstIndexOf(arr, val, fromIndex) != -1;
     }
 
-    public static boolean contains(final int[] arr, final int val, int fromIndex, int toIndex) {
+    public static boolean contains(final int[] arr, final int val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return firstIndexOf(arr, val, fromIndex, toIndex) != -1;
     }
 
@@ -1683,9 +2015,9 @@ public final class ArrayUtil {
         // O(n log n) by sorting in input first.
         int[] result = new int[arr.length];
         int j = 0;
-        for (int i = 0; i < arr.length; i++) {
-            if (!contains(result, arr[i])) {
-                result[j] = arr[i];
+        for (int anArr : arr) {
+            if (!contains(result, anArr)) {
+                result[j] = anArr;
                 j++;
             }
         }
@@ -1696,17 +2028,17 @@ public final class ArrayUtil {
         reverse(a, 0, a.length);
     }
 
-    public static void reverse(final int[] a, final int fromIndex) {
+    public static void reverse(final int[] a,  @Nonnegative final int fromIndex) {
         reverse(a, fromIndex, a.length);
     }
 
-    public static void reverse(final int[] a, final int fromIndex, final int toIndex) {
+    public static void reverse(final int[] a,  @Nonnegative final int fromIndex,  @Nonnegative final int toIndex) {
         for (int i = fromIndex, j = toIndex - 1; i < j; i++, j--) {
             swap(a, i, j);
         }
     }
 
-    public static void swap(final int[] a, final int i, final int j) {
+    public static void swap(final int[] a,  @Nonnegative final int i,  @Nonnegative final int j) {
         final int tmp = a[i];
         a[i] = a[j];
         a[j] = tmp;
@@ -1714,7 +2046,7 @@ public final class ArrayUtil {
 
     public static int[] elementsOf(int[] arr, int[] idx) {
         int[] result = new int[idx.length];
-        for (int i = 0, j = 0; i < idx.length; i++)
+        for (int i = 0; i < idx.length; i++)
             result[i] = arr[idx[i]];
         return result;
     }
@@ -1751,19 +2083,18 @@ public final class ArrayUtil {
 
     public static int mode(int[] arr) {
         Map<Integer, Integer> map = new HashMap<Integer, Integer>();
-        for (int i = 0; i < arr.length; i++) {
-            if (map.containsKey(arr[i]))
-                map.put(arr[i], map.get(arr[i]) + 1);
+        for (int anArr : arr) {
+            if (map.containsKey(anArr))
+                map.put(anArr, map.get(anArr) + 1);
             else
-                map.put(arr[i], 1);
+                map.put(anArr, 1);
         }
         int maxCount = -1;
         Integer maxValue = arr[0];
-        for (Integer key : map.keySet()) {
-            int count = map.get(key);
-            if (count > maxCount) {
-                maxCount = count;
-                maxValue = key;
+        for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+            if (entry.getValue() > maxCount) {
+                maxCount = entry.getValue();
+                maxValue = entry.getKey();
             }
         }
         return maxValue;
@@ -1775,7 +2106,7 @@ public final class ArrayUtil {
         permute(a, 0, a.length);
     }
 
-    public static void permute(final int[] a, final int toIndex) {
+    public static void permute(final int[] a,  @Nonnegative final int toIndex) {
         permute(a, toIndex, a.length);
     }
 
@@ -1785,13 +2116,13 @@ public final class ArrayUtil {
      *
      * Use an algorithm defined in
      * http://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
-     * which probably isnt the most efficient solution.
+     * which probably isn't the most efficient solution.
      *
      * @param a the array to be permuted
      * @param toIndex index of the first element (inclusive) to be permuted
      * @param fromIndex index of the last element (exclusive) to be permuted
      */
-    public static void permute(final int[] a, final int fromIndex, final int toIndex) {
+    public static void permute(final int[] a,  @Nonnegative final int fromIndex,  @Nonnegative final int toIndex) {
         if (toIndex - fromIndex < 2)
             return;
 
@@ -1827,7 +2158,7 @@ public final class ArrayUtil {
         return values[argmin(values , 0, values.length - 1)];
     }
 
-    public static int min(int[] values , int fromIndex, int toIndex) {
+    public static int min(int[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return values[argmin(values , fromIndex, toIndex)];
     }
 
@@ -1835,7 +2166,7 @@ public final class ArrayUtil {
         return values[argmax(values , 0, values.length - 1)];
     }
 
-    public static int max(int[] values , int fromIndex, int toIndex) {
+    public static int max(int[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return values[argmax(values , fromIndex, toIndex)];
     }
 
@@ -1843,7 +2174,7 @@ public final class ArrayUtil {
         return argmin(values , 0, values.length - 1);
     }
 
-    public static int argmin(int[] values , int fromIndex, int toIndex) {
+    public static int argmin(int[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmin = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++)
             if (values[i]-values[argmin]<0)
@@ -1855,7 +2186,7 @@ public final class ArrayUtil {
         return argmax(values , 0, values.length - 1);
     }
 
-    public static int argmax(int[] values , int fromIndex, int toIndex) {
+    public static int argmax(int[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmax = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++)
             if (values[i]-values[argmax]>0)
@@ -1863,7 +2194,7 @@ public final class ArrayUtil {
         return argmax;
     }
 
-    public static int[] argminmax(int[] values , int fromIndex, int toIndex) {
+    public static int[] argminmax(int[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmax = fromIndex;
         int argmin = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++) {
@@ -1879,7 +2210,7 @@ public final class ArrayUtil {
         return minmax(values , 0, values.length - 1);
     }
 
-    public static int[] minmax(int[] values , int fromIndex, int toIndex) {
+    public static int[] minmax(int[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int[] mm = argminmax(values , fromIndex, toIndex);
         return new int[]{values[mm[1]], values[mm[0]]};
     }
@@ -1898,7 +2229,7 @@ public final class ArrayUtil {
 
     public static int[] clamp(int[] src , int min, int max) {
         int[] dst = new int[src.length];
-        clamp(src, min, max, dst);
+        clamp(src , min, max, dst);
         return dst;
     }
 
@@ -1914,7 +2245,7 @@ public final class ArrayUtil {
 
     public static int[] clampMin(int[] src , int min) {
         int[] dst = new int[src.length];
-        clampMin(src, min, dst);
+        clampMin(src , min, dst);
         return dst;
     }
 
@@ -1930,7 +2261,7 @@ public final class ArrayUtil {
 
     public static int[] clampMax(int[] src , int max) {
         int[] dst = new int[src.length];
-        clampMax(src, max, dst);
+        clampMax(src , max, dst);
         return dst;
     }
 
@@ -1938,47 +2269,43 @@ public final class ArrayUtil {
 
 
     public static String toHexString(final int[] arr) {
-        final StringBuilder sbuf = new StringBuilder();
-        sbuf.append('[');
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append('[');
         if (arr.length > 0)
-            sbuf.append(Integer.toHexString(arr[0]));
+            buffer.append(Integer.toHexString(arr[0]));
         for (int i = 1; i < arr.length; i++) {
-            sbuf.append(' ');
-            sbuf.append(Integer.toHexString(arr[i]));
+            buffer.append(' ');
+            buffer.append(Integer.toHexString(arr[i]));
         }
-        sbuf.append(']');
-        return sbuf.toString();
+        buffer.append(']');
+        return buffer.toString();
     }
 
 
-    public static Long[] box(final long[] src) {
-        return box(src, 0, src.length);
+    public static String toOctalString(final int[] arr) {
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append('[');
+        if (arr.length > 0)
+            buffer.append(Integer.toOctalString(arr[0]));
+        for (int i = 1; i < arr.length; i++) {
+            buffer.append(' ');
+            buffer.append(Integer.toOctalString(arr[i]));
+        }
+        buffer.append(']');
+        return buffer.toString();
     }
 
-    public static Long[] box(final long[] src, final int offset) {
-        return box(src, offset, src.length - offset);
-    }
-
-    public static Long[] box(final long[] src, final int offset, final int len) {
-        Long[] dst = new Long[len];
-        for(int i = 0; i < len; i++)
-            dst[i] = (Long)src[offset + i];
-        return dst;
-    }
-
-    public static long[] unbox(final Long[] src) {
-        return unbox(src, 0, src.length);
-    }
-
-    public static long[] unbox(final Long[] src, final int offset) {
-        return unbox(src, offset, src.length - offset);
-    }
-
-    public static long[] unbox(final Long[] src, final int offset, final int len) {
-        long[] dst = new long[len];
-        for(int i = 0; i < len; i++)
-            dst[i] = (long)src[offset + i];
-        return dst;
+    public static String toBinaryString(final int[] arr) {
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append('[');
+        if (arr.length > 0)
+            buffer.append(Integer.toBinaryString(arr[0]));
+        for (int i = 1; i < arr.length; i++) {
+            buffer.append(' ');
+            buffer.append(Integer.toBinaryString(arr[i]));
+        }
+        buffer.append(']');
+        return buffer.toString();
     }
 
 
@@ -1989,29 +2316,110 @@ public final class ArrayUtil {
      * ==================
      */
 
+
+    /**
+     * Convert an array of primitive <code>long</code> values to a new array of <code>Long</code> boxed objects.
+     *
+     * @param src Primitive array to convert
+     * @return a new array containing the boxed equivalents of the values in the given array
+     */
+    public static Long[] box(final long[] src) {
+        return box(src, 0, src.length);
+    }
+
+    /**
+     * Convert the tail of an array of primitive <code>long</code values to a new array of <code>Long</code> boxed objects.
+     *
+     * @param src    Primitive array to convert
+     * @param offset First index to covert (inclusive)
+     * @return a new array containing the boxed equivalents of the values in the given array
+     */
+    public static Long[] box(final long[] src,  @Nonnegative final int offset) {
+        return box(src, offset, src.length - offset);
+    }
+
+    /**
+     * Convert a portion of an array of primitive <code>long</code values to a new array of <code>Long</code> boxed objects.
+     *
+     * @param src    Primitive array to convert
+     * @param offset First index to covert (inclusive)
+     * @param len    Last index to covert (exclusive)
+     * @return a new array containing the boxed equivalents of the values in the given array.
+     */
+    public static Long[] box(final long[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
+        Long[] dst = new Long[len];
+        for(int i = 0; i < len; i++)
+            dst[i] = src[offset + i];
+        return dst;
+    }
+
+    /**
+     * Convert an array of <code>Long</code> boxed objects to a new array of primitive <code>long</code> values.
+     *
+     * @param src Boxed object array to convert
+     * @return a new array containing the primitive equivalents of the values in the given array
+     */
+    public static long[] unbox(final Long[] src) {
+        return unbox(src, 0, src.length);
+    }
+
+    /**
+     * Convert the tail of an array of <code>Long</code> boxed objects to a new array of primitive <code>long</code values.
+     *
+     * @param src    Boxed object array to convert
+     * @param offset First index to covert (inclusive)
+     * @return a new array containing the primitive equivalents of the values in the given array
+     */
+    public static long[] unbox(final Long[] src,  @Nonnegative final int offset) {
+        return unbox(src, offset, src.length - offset);
+    }
+
+    /**
+     * Convert a portion of an array of <code>Long</code> boxed objects to a new array of primitive <code>long</code values.
+     *
+     * @param src    Boxed object array to convert
+     * @param offset First index to covert (inclusive)
+     * @param len    Last index to covert (exclusive)
+     * @return a new array containing the primitive equivalents of the values in the given array.
+     */
+    public static long[] unbox(final Long[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
+        long[] dst = new long[len];
+        for(int i = 0; i < len; i++)
+            dst[i] = src[offset + i];
+        return dst;
+    }
+
+
+
     public static long[] copyOf(final long[] src) {
         return copyOf(src, 0, src.length);
     }
 
-    public static long[] copyOf(final long[] src, final int offset) {
+    public static long[] copyOf(final long[] src,  @Nonnegative final int offset) {
         return copyOf(src, offset, src.length - offset);
     }
 
-    public static long[] copyOf(final long[] src, final int offset, final int len) {
+    public static long[] copyOf(final long[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
         long[] dst = new long[len];
         System.arraycopy(src, offset, dst, 0, len);
         return dst;
     }
 
-    public static long[] cat(final long[]... arrs) {
+    /**
+     * Concatenate two or more arrays.
+     *
+     * @param arrays to be concatenated
+     * @return array contain all the elements of the input arrays
+     */
+     public static long[] cat(final long[]... arrays) {
         int n = 0;
-        for (int i = 0; i < arrs.length; i++)
-            n += arrs[i].length;
+        for (long[] array : arrays)
+            n += array.length;
         long[] result = new long[n];
         int offset = 0;
-        for (int i = 0; i < arrs.length; i++) {
-            System.arraycopy(arrs[i], 0, result, offset, arrs[i].length);
-            offset += arrs[i].length;
+        for (long[] array : arrays) {
+            System.arraycopy(array, 0, result, offset, array.length);
+            offset += array.length;
         }
         return result;
     }
@@ -2020,11 +2428,11 @@ public final class ArrayUtil {
         return firstIndexOf(arr, val, 0, arr.length);
     }
 
-    public static int firstIndexOf(final long[] arr, final long val, int fromIndex) {
+    public static int firstIndexOf(final long[] arr, final long val,  @Nonnegative int fromIndex) {
         return firstIndexOf(arr, val, fromIndex, arr.length);
     }
 
-    public static int firstIndexOf(final long[] arr, final long val, int fromIndex, int toIndex) {
+    public static int firstIndexOf(final long[] arr, final long val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         for (int i = fromIndex; i < toIndex; i++)
             if (arr[i] == val)
                 return i;
@@ -2035,11 +2443,11 @@ public final class ArrayUtil {
         return lastIndexOf(arr, val, 0, arr.length);
     }
 
-    public static int lastIndexOf(final long[] arr, final long val, int fromIndex) {
+    public static int lastIndexOf(final long[] arr, final long val,  @Nonnegative int fromIndex) {
         return lastIndexOf(arr, val, fromIndex, arr.length);
     }
 
-    public static int lastIndexOf(final long[] arr, final long val, int fromIndex, int toIndex) {
+    public static int lastIndexOf(final long[] arr, final long val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         for (int i = toIndex - 1; i >= fromIndex; i--)
             if (arr[i] == val)
                 return i;
@@ -2050,11 +2458,11 @@ public final class ArrayUtil {
         return firstIndexOf(arr, val) != -1;
     }
 
-    public static boolean contains(final long[] arr, final long val, int fromIndex) {
+    public static boolean contains(final long[] arr, final long val,  @Nonnegative int fromIndex) {
         return firstIndexOf(arr, val, fromIndex) != -1;
     }
 
-    public static boolean contains(final long[] arr, final long val, int fromIndex, int toIndex) {
+    public static boolean contains(final long[] arr, final long val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return firstIndexOf(arr, val, fromIndex, toIndex) != -1;
     }
 
@@ -2063,9 +2471,9 @@ public final class ArrayUtil {
         // O(n log n) by sorting in input first.
         long[] result = new long[arr.length];
         int j = 0;
-        for (int i = 0; i < arr.length; i++) {
-            if (!contains(result, arr[i])) {
-                result[j] = arr[i];
+        for (long anArr : arr) {
+            if (!contains(result, anArr)) {
+                result[j] = anArr;
                 j++;
             }
         }
@@ -2076,17 +2484,17 @@ public final class ArrayUtil {
         reverse(a, 0, a.length);
     }
 
-    public static void reverse(final long[] a, final int fromIndex) {
+    public static void reverse(final long[] a,  @Nonnegative final int fromIndex) {
         reverse(a, fromIndex, a.length);
     }
 
-    public static void reverse(final long[] a, final int fromIndex, final int toIndex) {
+    public static void reverse(final long[] a,  @Nonnegative final int fromIndex,  @Nonnegative final int toIndex) {
         for (int i = fromIndex, j = toIndex - 1; i < j; i++, j--) {
             swap(a, i, j);
         }
     }
 
-    public static void swap(final long[] a, final int i, final int j) {
+    public static void swap(final long[] a,  @Nonnegative final int i,  @Nonnegative final int j) {
         final long tmp = a[i];
         a[i] = a[j];
         a[j] = tmp;
@@ -2094,7 +2502,7 @@ public final class ArrayUtil {
 
     public static long[] elementsOf(long[] arr, int[] idx) {
         long[] result = new long[idx.length];
-        for (int i = 0, j = 0; i < idx.length; i++)
+        for (int i = 0; i < idx.length; i++)
             result[i] = arr[idx[i]];
         return result;
     }
@@ -2131,19 +2539,18 @@ public final class ArrayUtil {
 
     public static long mode(long[] arr) {
         Map<Long, Integer> map = new HashMap<Long, Integer>();
-        for (int i = 0; i < arr.length; i++) {
-            if (map.containsKey(arr[i]))
-                map.put(arr[i], map.get(arr[i]) + 1);
+        for (long anArr : arr) {
+            if (map.containsKey(anArr))
+                map.put(anArr, map.get(anArr) + 1);
             else
-                map.put(arr[i], 1);
+                map.put(anArr, 1);
         }
         int maxCount = -1;
         Long maxValue = arr[0];
-        for (Long key : map.keySet()) {
-            int count = map.get(key);
-            if (count > maxCount) {
-                maxCount = count;
-                maxValue = key;
+        for (Map.Entry<Long, Integer> entry : map.entrySet()) {
+            if (entry.getValue() > maxCount) {
+                maxCount = entry.getValue();
+                maxValue = entry.getKey();
             }
         }
         return maxValue;
@@ -2155,7 +2562,7 @@ public final class ArrayUtil {
         permute(a, 0, a.length);
     }
 
-    public static void permute(final long[] a, final int toIndex) {
+    public static void permute(final long[] a,  @Nonnegative final int toIndex) {
         permute(a, toIndex, a.length);
     }
 
@@ -2165,13 +2572,13 @@ public final class ArrayUtil {
      *
      * Use an algorithm defined in
      * http://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
-     * which probably isnt the most efficient solution.
+     * which probably isn't the most efficient solution.
      *
      * @param a the array to be permuted
      * @param toIndex index of the first element (inclusive) to be permuted
      * @param fromIndex index of the last element (exclusive) to be permuted
      */
-    public static void permute(final long[] a, final int fromIndex, final int toIndex) {
+    public static void permute(final long[] a,  @Nonnegative final int fromIndex,  @Nonnegative final int toIndex) {
         if (toIndex - fromIndex < 2)
             return;
 
@@ -2207,7 +2614,7 @@ public final class ArrayUtil {
         return values[argmin(values , 0, values.length - 1)];
     }
 
-    public static long min(long[] values , int fromIndex, int toIndex) {
+    public static long min(long[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return values[argmin(values , fromIndex, toIndex)];
     }
 
@@ -2215,7 +2622,7 @@ public final class ArrayUtil {
         return values[argmax(values , 0, values.length - 1)];
     }
 
-    public static long max(long[] values , int fromIndex, int toIndex) {
+    public static long max(long[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return values[argmax(values , fromIndex, toIndex)];
     }
 
@@ -2223,7 +2630,7 @@ public final class ArrayUtil {
         return argmin(values , 0, values.length - 1);
     }
 
-    public static int argmin(long[] values , int fromIndex, int toIndex) {
+    public static int argmin(long[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmin = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++)
             if (values[i]-values[argmin]<0)
@@ -2235,7 +2642,7 @@ public final class ArrayUtil {
         return argmax(values , 0, values.length - 1);
     }
 
-    public static int argmax(long[] values , int fromIndex, int toIndex) {
+    public static int argmax(long[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmax = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++)
             if (values[i]-values[argmax]>0)
@@ -2243,7 +2650,7 @@ public final class ArrayUtil {
         return argmax;
     }
 
-    public static int[] argminmax(long[] values , int fromIndex, int toIndex) {
+    public static int[] argminmax(long[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmax = fromIndex;
         int argmin = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++) {
@@ -2259,7 +2666,7 @@ public final class ArrayUtil {
         return minmax(values , 0, values.length - 1);
     }
 
-    public static long[] minmax(long[] values , int fromIndex, int toIndex) {
+    public static long[] minmax(long[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int[] mm = argminmax(values , fromIndex, toIndex);
         return new long[]{values[mm[1]], values[mm[0]]};
     }
@@ -2278,7 +2685,7 @@ public final class ArrayUtil {
 
     public static long[] clamp(long[] src , long min, long max) {
         long[] dst = new long[src.length];
-        clamp(src, min, max, dst);
+        clamp(src , min, max, dst);
         return dst;
     }
 
@@ -2294,7 +2701,7 @@ public final class ArrayUtil {
 
     public static long[] clampMin(long[] src , long min) {
         long[] dst = new long[src.length];
-        clampMin(src, min, dst);
+        clampMin(src , min, dst);
         return dst;
     }
 
@@ -2310,7 +2717,7 @@ public final class ArrayUtil {
 
     public static long[] clampMax(long[] src , long max) {
         long[] dst = new long[src.length];
-        clampMax(src, max, dst);
+        clampMax(src , max, dst);
         return dst;
     }
 
@@ -2318,47 +2725,43 @@ public final class ArrayUtil {
 
 
     public static String toHexString(final long[] arr) {
-        final StringBuilder sbuf = new StringBuilder();
-        sbuf.append('[');
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append('[');
         if (arr.length > 0)
-            sbuf.append(Long.toHexString(arr[0]));
+            buffer.append(Long.toHexString(arr[0]));
         for (int i = 1; i < arr.length; i++) {
-            sbuf.append(' ');
-            sbuf.append(Long.toHexString(arr[i]));
+            buffer.append(' ');
+            buffer.append(Long.toHexString(arr[i]));
         }
-        sbuf.append(']');
-        return sbuf.toString();
+        buffer.append(']');
+        return buffer.toString();
     }
 
 
-    public static Float[] box(final float[] src) {
-        return box(src, 0, src.length);
+    public static String toOctalString(final long[] arr) {
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append('[');
+        if (arr.length > 0)
+            buffer.append(Long.toOctalString(arr[0]));
+        for (int i = 1; i < arr.length; i++) {
+            buffer.append(' ');
+            buffer.append(Long.toOctalString(arr[i]));
+        }
+        buffer.append(']');
+        return buffer.toString();
     }
 
-    public static Float[] box(final float[] src, final int offset) {
-        return box(src, offset, src.length - offset);
-    }
-
-    public static Float[] box(final float[] src, final int offset, final int len) {
-        Float[] dst = new Float[len];
-        for(int i = 0; i < len; i++)
-            dst[i] = (Float)src[offset + i];
-        return dst;
-    }
-
-    public static float[] unbox(final Float[] src) {
-        return unbox(src, 0, src.length);
-    }
-
-    public static float[] unbox(final Float[] src, final int offset) {
-        return unbox(src, offset, src.length - offset);
-    }
-
-    public static float[] unbox(final Float[] src, final int offset, final int len) {
-        float[] dst = new float[len];
-        for(int i = 0; i < len; i++)
-            dst[i] = (float)src[offset + i];
-        return dst;
+    public static String toBinaryString(final long[] arr) {
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append('[');
+        if (arr.length > 0)
+            buffer.append(Long.toBinaryString(arr[0]));
+        for (int i = 1; i < arr.length; i++) {
+            buffer.append(' ');
+            buffer.append(Long.toBinaryString(arr[i]));
+        }
+        buffer.append(']');
+        return buffer.toString();
     }
 
 
@@ -2369,29 +2772,110 @@ public final class ArrayUtil {
      * ==================
      */
 
+
+    /**
+     * Convert an array of primitive <code>float</code> values to a new array of <code>Float</code> boxed objects.
+     *
+     * @param src Primitive array to convert
+     * @return a new array containing the boxed equivalents of the values in the given array
+     */
+    public static Float[] box(final float[] src) {
+        return box(src, 0, src.length);
+    }
+
+    /**
+     * Convert the tail of an array of primitive <code>float</code values to a new array of <code>Float</code> boxed objects.
+     *
+     * @param src    Primitive array to convert
+     * @param offset First index to covert (inclusive)
+     * @return a new array containing the boxed equivalents of the values in the given array
+     */
+    public static Float[] box(final float[] src,  @Nonnegative final int offset) {
+        return box(src, offset, src.length - offset);
+    }
+
+    /**
+     * Convert a portion of an array of primitive <code>float</code values to a new array of <code>Float</code> boxed objects.
+     *
+     * @param src    Primitive array to convert
+     * @param offset First index to covert (inclusive)
+     * @param len    Last index to covert (exclusive)
+     * @return a new array containing the boxed equivalents of the values in the given array.
+     */
+    public static Float[] box(final float[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
+        Float[] dst = new Float[len];
+        for(int i = 0; i < len; i++)
+            dst[i] = src[offset + i];
+        return dst;
+    }
+
+    /**
+     * Convert an array of <code>Float</code> boxed objects to a new array of primitive <code>float</code> values.
+     *
+     * @param src Boxed object array to convert
+     * @return a new array containing the primitive equivalents of the values in the given array
+     */
+    public static float[] unbox(final Float[] src) {
+        return unbox(src, 0, src.length);
+    }
+
+    /**
+     * Convert the tail of an array of <code>Float</code> boxed objects to a new array of primitive <code>float</code values.
+     *
+     * @param src    Boxed object array to convert
+     * @param offset First index to covert (inclusive)
+     * @return a new array containing the primitive equivalents of the values in the given array
+     */
+    public static float[] unbox(final Float[] src,  @Nonnegative final int offset) {
+        return unbox(src, offset, src.length - offset);
+    }
+
+    /**
+     * Convert a portion of an array of <code>Float</code> boxed objects to a new array of primitive <code>float</code values.
+     *
+     * @param src    Boxed object array to convert
+     * @param offset First index to covert (inclusive)
+     * @param len    Last index to covert (exclusive)
+     * @return a new array containing the primitive equivalents of the values in the given array.
+     */
+    public static float[] unbox(final Float[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
+        float[] dst = new float[len];
+        for(int i = 0; i < len; i++)
+            dst[i] = src[offset + i];
+        return dst;
+    }
+
+
+
     public static float[] copyOf(final float[] src) {
         return copyOf(src, 0, src.length);
     }
 
-    public static float[] copyOf(final float[] src, final int offset) {
+    public static float[] copyOf(final float[] src,  @Nonnegative final int offset) {
         return copyOf(src, offset, src.length - offset);
     }
 
-    public static float[] copyOf(final float[] src, final int offset, final int len) {
+    public static float[] copyOf(final float[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
         float[] dst = new float[len];
         System.arraycopy(src, offset, dst, 0, len);
         return dst;
     }
 
-    public static float[] cat(final float[]... arrs) {
+    /**
+     * Concatenate two or more arrays.
+     *
+     * @param arrays to be concatenated
+     * @return array contain all the elements of the input arrays
+     */
+     public static float[] cat(final float[]... arrays) {
         int n = 0;
-        for (int i = 0; i < arrs.length; i++)
-            n += arrs[i].length;
+        for (float[] array : arrays)
+            n += array.length;
         float[] result = new float[n];
         int offset = 0;
-        for (int i = 0; i < arrs.length; i++) {
-            System.arraycopy(arrs[i], 0, result, offset, arrs[i].length);
-            offset += arrs[i].length;
+        for (float[] array : arrays) {
+            System.arraycopy(array, 0, result, offset, array.length);
+            offset += array.length;
         }
         return result;
     }
@@ -2400,11 +2884,11 @@ public final class ArrayUtil {
         return firstIndexOf(arr, val, 0, arr.length);
     }
 
-    public static int firstIndexOf(final float[] arr, final float val, int fromIndex) {
+    public static int firstIndexOf(final float[] arr, final float val,  @Nonnegative int fromIndex) {
         return firstIndexOf(arr, val, fromIndex, arr.length);
     }
 
-    public static int firstIndexOf(final float[] arr, final float val, int fromIndex, int toIndex) {
+    public static int firstIndexOf(final float[] arr, final float val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         for (int i = fromIndex; i < toIndex; i++)
             if (arr[i] == val)
                 return i;
@@ -2415,11 +2899,11 @@ public final class ArrayUtil {
         return lastIndexOf(arr, val, 0, arr.length);
     }
 
-    public static int lastIndexOf(final float[] arr, final float val, int fromIndex) {
+    public static int lastIndexOf(final float[] arr, final float val,  @Nonnegative int fromIndex) {
         return lastIndexOf(arr, val, fromIndex, arr.length);
     }
 
-    public static int lastIndexOf(final float[] arr, final float val, int fromIndex, int toIndex) {
+    public static int lastIndexOf(final float[] arr, final float val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         for (int i = toIndex - 1; i >= fromIndex; i--)
             if (arr[i] == val)
                 return i;
@@ -2430,11 +2914,11 @@ public final class ArrayUtil {
         return firstIndexOf(arr, val) != -1;
     }
 
-    public static boolean contains(final float[] arr, final float val, int fromIndex) {
+    public static boolean contains(final float[] arr, final float val,  @Nonnegative int fromIndex) {
         return firstIndexOf(arr, val, fromIndex) != -1;
     }
 
-    public static boolean contains(final float[] arr, final float val, int fromIndex, int toIndex) {
+    public static boolean contains(final float[] arr, final float val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return firstIndexOf(arr, val, fromIndex, toIndex) != -1;
     }
 
@@ -2443,9 +2927,9 @@ public final class ArrayUtil {
         // O(n log n) by sorting in input first.
         float[] result = new float[arr.length];
         int j = 0;
-        for (int i = 0; i < arr.length; i++) {
-            if (!contains(result, arr[i])) {
-                result[j] = arr[i];
+        for (float anArr : arr) {
+            if (!contains(result, anArr)) {
+                result[j] = anArr;
                 j++;
             }
         }
@@ -2456,17 +2940,17 @@ public final class ArrayUtil {
         reverse(a, 0, a.length);
     }
 
-    public static void reverse(final float[] a, final int fromIndex) {
+    public static void reverse(final float[] a,  @Nonnegative final int fromIndex) {
         reverse(a, fromIndex, a.length);
     }
 
-    public static void reverse(final float[] a, final int fromIndex, final int toIndex) {
+    public static void reverse(final float[] a,  @Nonnegative final int fromIndex,  @Nonnegative final int toIndex) {
         for (int i = fromIndex, j = toIndex - 1; i < j; i++, j--) {
             swap(a, i, j);
         }
     }
 
-    public static void swap(final float[] a, final int i, final int j) {
+    public static void swap(final float[] a,  @Nonnegative final int i,  @Nonnegative final int j) {
         final float tmp = a[i];
         a[i] = a[j];
         a[j] = tmp;
@@ -2474,7 +2958,7 @@ public final class ArrayUtil {
 
     public static float[] elementsOf(float[] arr, int[] idx) {
         float[] result = new float[idx.length];
-        for (int i = 0, j = 0; i < idx.length; i++)
+        for (int i = 0; i < idx.length; i++)
             result[i] = arr[idx[i]];
         return result;
     }
@@ -2511,19 +2995,18 @@ public final class ArrayUtil {
 
     public static float mode(float[] arr) {
         Map<Float, Integer> map = new HashMap<Float, Integer>();
-        for (int i = 0; i < arr.length; i++) {
-            if (map.containsKey(arr[i]))
-                map.put(arr[i], map.get(arr[i]) + 1);
+        for (float anArr : arr) {
+            if (map.containsKey(anArr))
+                map.put(anArr, map.get(anArr) + 1);
             else
-                map.put(arr[i], 1);
+                map.put(anArr, 1);
         }
         int maxCount = -1;
         Float maxValue = arr[0];
-        for (Float key : map.keySet()) {
-            int count = map.get(key);
-            if (count > maxCount) {
-                maxCount = count;
-                maxValue = key;
+        for (Map.Entry<Float, Integer> entry : map.entrySet()) {
+            if (entry.getValue() > maxCount) {
+                maxCount = entry.getValue();
+                maxValue = entry.getKey();
             }
         }
         return maxValue;
@@ -2535,7 +3018,7 @@ public final class ArrayUtil {
         permute(a, 0, a.length);
     }
 
-    public static void permute(final float[] a, final int toIndex) {
+    public static void permute(final float[] a,  @Nonnegative final int toIndex) {
         permute(a, toIndex, a.length);
     }
 
@@ -2545,13 +3028,13 @@ public final class ArrayUtil {
      *
      * Use an algorithm defined in
      * http://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
-     * which probably isnt the most efficient solution.
+     * which probably isn't the most efficient solution.
      *
      * @param a the array to be permuted
      * @param toIndex index of the first element (inclusive) to be permuted
      * @param fromIndex index of the last element (exclusive) to be permuted
      */
-    public static void permute(final float[] a, final int fromIndex, final int toIndex) {
+    public static void permute(final float[] a,  @Nonnegative final int fromIndex,  @Nonnegative final int toIndex) {
         if (toIndex - fromIndex < 2)
             return;
 
@@ -2587,7 +3070,7 @@ public final class ArrayUtil {
         return values[argmin(values , 0, values.length - 1)];
     }
 
-    public static float min(float[] values , int fromIndex, int toIndex) {
+    public static float min(float[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return values[argmin(values , fromIndex, toIndex)];
     }
 
@@ -2595,7 +3078,7 @@ public final class ArrayUtil {
         return values[argmax(values , 0, values.length - 1)];
     }
 
-    public static float max(float[] values , int fromIndex, int toIndex) {
+    public static float max(float[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return values[argmax(values , fromIndex, toIndex)];
     }
 
@@ -2603,7 +3086,7 @@ public final class ArrayUtil {
         return argmin(values , 0, values.length - 1);
     }
 
-    public static int argmin(float[] values , int fromIndex, int toIndex) {
+    public static int argmin(float[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmin = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++)
             if (values[i]-values[argmin]<0)
@@ -2615,7 +3098,7 @@ public final class ArrayUtil {
         return argmax(values , 0, values.length - 1);
     }
 
-    public static int argmax(float[] values , int fromIndex, int toIndex) {
+    public static int argmax(float[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmax = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++)
             if (values[i]-values[argmax]>0)
@@ -2623,7 +3106,7 @@ public final class ArrayUtil {
         return argmax;
     }
 
-    public static int[] argminmax(float[] values , int fromIndex, int toIndex) {
+    public static int[] argminmax(float[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmax = fromIndex;
         int argmin = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++) {
@@ -2639,7 +3122,7 @@ public final class ArrayUtil {
         return minmax(values , 0, values.length - 1);
     }
 
-    public static float[] minmax(float[] values , int fromIndex, int toIndex) {
+    public static float[] minmax(float[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int[] mm = argminmax(values , fromIndex, toIndex);
         return new float[]{values[mm[1]], values[mm[0]]};
     }
@@ -2658,7 +3141,7 @@ public final class ArrayUtil {
 
     public static float[] clamp(float[] src , float min, float max) {
         float[] dst = new float[src.length];
-        clamp(src, min, max, dst);
+        clamp(src , min, max, dst);
         return dst;
     }
 
@@ -2674,7 +3157,7 @@ public final class ArrayUtil {
 
     public static float[] clampMin(float[] src , float min) {
         float[] dst = new float[src.length];
-        clampMin(src, min, dst);
+        clampMin(src , min, dst);
         return dst;
     }
 
@@ -2690,7 +3173,7 @@ public final class ArrayUtil {
 
     public static float[] clampMax(float[] src , float max) {
         float[] dst = new float[src.length];
-        clampMax(src, max, dst);
+        clampMax(src , max, dst);
         return dst;
     }
 
@@ -2701,47 +3184,16 @@ public final class ArrayUtil {
 
 
     public static String toHexString(final float[] arr) {
-        final StringBuilder sbuf = new StringBuilder();
-        sbuf.append('[');
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append('[');
         if (arr.length > 0)
-            sbuf.append(Float.toHexString(arr[0]));
+            buffer.append(Float.toHexString(arr[0]));
         for (int i = 1; i < arr.length; i++) {
-            sbuf.append(' ');
-            sbuf.append(Float.toHexString(arr[i]));
+            buffer.append(' ');
+            buffer.append(Float.toHexString(arr[i]));
         }
-        sbuf.append(']');
-        return sbuf.toString();
-    }
-
-
-    public static Double[] box(final double[] src) {
-        return box(src, 0, src.length);
-    }
-
-    public static Double[] box(final double[] src, final int offset) {
-        return box(src, offset, src.length - offset);
-    }
-
-    public static Double[] box(final double[] src, final int offset, final int len) {
-        Double[] dst = new Double[len];
-        for(int i = 0; i < len; i++)
-            dst[i] = (Double)src[offset + i];
-        return dst;
-    }
-
-    public static double[] unbox(final Double[] src) {
-        return unbox(src, 0, src.length);
-    }
-
-    public static double[] unbox(final Double[] src, final int offset) {
-        return unbox(src, offset, src.length - offset);
-    }
-
-    public static double[] unbox(final Double[] src, final int offset, final int len) {
-        double[] dst = new double[len];
-        for(int i = 0; i < len; i++)
-            dst[i] = (double)src[offset + i];
-        return dst;
+        buffer.append(']');
+        return buffer.toString();
     }
 
 
@@ -2752,29 +3204,110 @@ public final class ArrayUtil {
      * ==================
      */
 
+
+    /**
+     * Convert an array of primitive <code>double</code> values to a new array of <code>Double</code> boxed objects.
+     *
+     * @param src Primitive array to convert
+     * @return a new array containing the boxed equivalents of the values in the given array
+     */
+    public static Double[] box(final double[] src) {
+        return box(src, 0, src.length);
+    }
+
+    /**
+     * Convert the tail of an array of primitive <code>double</code values to a new array of <code>Double</code> boxed objects.
+     *
+     * @param src    Primitive array to convert
+     * @param offset First index to covert (inclusive)
+     * @return a new array containing the boxed equivalents of the values in the given array
+     */
+    public static Double[] box(final double[] src,  @Nonnegative final int offset) {
+        return box(src, offset, src.length - offset);
+    }
+
+    /**
+     * Convert a portion of an array of primitive <code>double</code values to a new array of <code>Double</code> boxed objects.
+     *
+     * @param src    Primitive array to convert
+     * @param offset First index to covert (inclusive)
+     * @param len    Last index to covert (exclusive)
+     * @return a new array containing the boxed equivalents of the values in the given array.
+     */
+    public static Double[] box(final double[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
+        Double[] dst = new Double[len];
+        for(int i = 0; i < len; i++)
+            dst[i] = src[offset + i];
+        return dst;
+    }
+
+    /**
+     * Convert an array of <code>Double</code> boxed objects to a new array of primitive <code>double</code> values.
+     *
+     * @param src Boxed object array to convert
+     * @return a new array containing the primitive equivalents of the values in the given array
+     */
+    public static double[] unbox(final Double[] src) {
+        return unbox(src, 0, src.length);
+    }
+
+    /**
+     * Convert the tail of an array of <code>Double</code> boxed objects to a new array of primitive <code>double</code values.
+     *
+     * @param src    Boxed object array to convert
+     * @param offset First index to covert (inclusive)
+     * @return a new array containing the primitive equivalents of the values in the given array
+     */
+    public static double[] unbox(final Double[] src,  @Nonnegative final int offset) {
+        return unbox(src, offset, src.length - offset);
+    }
+
+    /**
+     * Convert a portion of an array of <code>Double</code> boxed objects to a new array of primitive <code>double</code values.
+     *
+     * @param src    Boxed object array to convert
+     * @param offset First index to covert (inclusive)
+     * @param len    Last index to covert (exclusive)
+     * @return a new array containing the primitive equivalents of the values in the given array.
+     */
+    public static double[] unbox(final Double[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
+        double[] dst = new double[len];
+        for(int i = 0; i < len; i++)
+            dst[i] = src[offset + i];
+        return dst;
+    }
+
+
+
     public static double[] copyOf(final double[] src) {
         return copyOf(src, 0, src.length);
     }
 
-    public static double[] copyOf(final double[] src, final int offset) {
+    public static double[] copyOf(final double[] src,  @Nonnegative final int offset) {
         return copyOf(src, offset, src.length - offset);
     }
 
-    public static double[] copyOf(final double[] src, final int offset, final int len) {
+    public static double[] copyOf(final double[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
         double[] dst = new double[len];
         System.arraycopy(src, offset, dst, 0, len);
         return dst;
     }
 
-    public static double[] cat(final double[]... arrs) {
+    /**
+     * Concatenate two or more arrays.
+     *
+     * @param arrays to be concatenated
+     * @return array contain all the elements of the input arrays
+     */
+     public static double[] cat(final double[]... arrays) {
         int n = 0;
-        for (int i = 0; i < arrs.length; i++)
-            n += arrs[i].length;
+        for (double[] array : arrays)
+            n += array.length;
         double[] result = new double[n];
         int offset = 0;
-        for (int i = 0; i < arrs.length; i++) {
-            System.arraycopy(arrs[i], 0, result, offset, arrs[i].length);
-            offset += arrs[i].length;
+        for (double[] array : arrays) {
+            System.arraycopy(array, 0, result, offset, array.length);
+            offset += array.length;
         }
         return result;
     }
@@ -2783,11 +3316,11 @@ public final class ArrayUtil {
         return firstIndexOf(arr, val, 0, arr.length);
     }
 
-    public static int firstIndexOf(final double[] arr, final double val, int fromIndex) {
+    public static int firstIndexOf(final double[] arr, final double val,  @Nonnegative int fromIndex) {
         return firstIndexOf(arr, val, fromIndex, arr.length);
     }
 
-    public static int firstIndexOf(final double[] arr, final double val, int fromIndex, int toIndex) {
+    public static int firstIndexOf(final double[] arr, final double val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         for (int i = fromIndex; i < toIndex; i++)
             if (arr[i] == val)
                 return i;
@@ -2798,11 +3331,11 @@ public final class ArrayUtil {
         return lastIndexOf(arr, val, 0, arr.length);
     }
 
-    public static int lastIndexOf(final double[] arr, final double val, int fromIndex) {
+    public static int lastIndexOf(final double[] arr, final double val,  @Nonnegative int fromIndex) {
         return lastIndexOf(arr, val, fromIndex, arr.length);
     }
 
-    public static int lastIndexOf(final double[] arr, final double val, int fromIndex, int toIndex) {
+    public static int lastIndexOf(final double[] arr, final double val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         for (int i = toIndex - 1; i >= fromIndex; i--)
             if (arr[i] == val)
                 return i;
@@ -2813,11 +3346,11 @@ public final class ArrayUtil {
         return firstIndexOf(arr, val) != -1;
     }
 
-    public static boolean contains(final double[] arr, final double val, int fromIndex) {
+    public static boolean contains(final double[] arr, final double val,  @Nonnegative int fromIndex) {
         return firstIndexOf(arr, val, fromIndex) != -1;
     }
 
-    public static boolean contains(final double[] arr, final double val, int fromIndex, int toIndex) {
+    public static boolean contains(final double[] arr, final double val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return firstIndexOf(arr, val, fromIndex, toIndex) != -1;
     }
 
@@ -2826,9 +3359,9 @@ public final class ArrayUtil {
         // O(n log n) by sorting in input first.
         double[] result = new double[arr.length];
         int j = 0;
-        for (int i = 0; i < arr.length; i++) {
-            if (!contains(result, arr[i])) {
-                result[j] = arr[i];
+        for (double anArr : arr) {
+            if (!contains(result, anArr)) {
+                result[j] = anArr;
                 j++;
             }
         }
@@ -2839,17 +3372,17 @@ public final class ArrayUtil {
         reverse(a, 0, a.length);
     }
 
-    public static void reverse(final double[] a, final int fromIndex) {
+    public static void reverse(final double[] a,  @Nonnegative final int fromIndex) {
         reverse(a, fromIndex, a.length);
     }
 
-    public static void reverse(final double[] a, final int fromIndex, final int toIndex) {
+    public static void reverse(final double[] a,  @Nonnegative final int fromIndex,  @Nonnegative final int toIndex) {
         for (int i = fromIndex, j = toIndex - 1; i < j; i++, j--) {
             swap(a, i, j);
         }
     }
 
-    public static void swap(final double[] a, final int i, final int j) {
+    public static void swap(final double[] a,  @Nonnegative final int i,  @Nonnegative final int j) {
         final double tmp = a[i];
         a[i] = a[j];
         a[j] = tmp;
@@ -2857,7 +3390,7 @@ public final class ArrayUtil {
 
     public static double[] elementsOf(double[] arr, int[] idx) {
         double[] result = new double[idx.length];
-        for (int i = 0, j = 0; i < idx.length; i++)
+        for (int i = 0; i < idx.length; i++)
             result[i] = arr[idx[i]];
         return result;
     }
@@ -2894,19 +3427,18 @@ public final class ArrayUtil {
 
     public static double mode(double[] arr) {
         Map<Double, Integer> map = new HashMap<Double, Integer>();
-        for (int i = 0; i < arr.length; i++) {
-            if (map.containsKey(arr[i]))
-                map.put(arr[i], map.get(arr[i]) + 1);
+        for (double anArr : arr) {
+            if (map.containsKey(anArr))
+                map.put(anArr, map.get(anArr) + 1);
             else
-                map.put(arr[i], 1);
+                map.put(anArr, 1);
         }
         int maxCount = -1;
         Double maxValue = arr[0];
-        for (Double key : map.keySet()) {
-            int count = map.get(key);
-            if (count > maxCount) {
-                maxCount = count;
-                maxValue = key;
+        for (Map.Entry<Double, Integer> entry : map.entrySet()) {
+            if (entry.getValue() > maxCount) {
+                maxCount = entry.getValue();
+                maxValue = entry.getKey();
             }
         }
         return maxValue;
@@ -2918,7 +3450,7 @@ public final class ArrayUtil {
         permute(a, 0, a.length);
     }
 
-    public static void permute(final double[] a, final int toIndex) {
+    public static void permute(final double[] a,  @Nonnegative final int toIndex) {
         permute(a, toIndex, a.length);
     }
 
@@ -2928,13 +3460,13 @@ public final class ArrayUtil {
      *
      * Use an algorithm defined in
      * http://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
-     * which probably isnt the most efficient solution.
+     * which probably isn't the most efficient solution.
      *
      * @param a the array to be permuted
      * @param toIndex index of the first element (inclusive) to be permuted
      * @param fromIndex index of the last element (exclusive) to be permuted
      */
-    public static void permute(final double[] a, final int fromIndex, final int toIndex) {
+    public static void permute(final double[] a,  @Nonnegative final int fromIndex,  @Nonnegative final int toIndex) {
         if (toIndex - fromIndex < 2)
             return;
 
@@ -2970,7 +3502,7 @@ public final class ArrayUtil {
         return values[argmin(values , 0, values.length - 1)];
     }
 
-    public static double min(double[] values , int fromIndex, int toIndex) {
+    public static double min(double[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return values[argmin(values , fromIndex, toIndex)];
     }
 
@@ -2978,7 +3510,7 @@ public final class ArrayUtil {
         return values[argmax(values , 0, values.length - 1)];
     }
 
-    public static double max(double[] values , int fromIndex, int toIndex) {
+    public static double max(double[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return values[argmax(values , fromIndex, toIndex)];
     }
 
@@ -2986,7 +3518,7 @@ public final class ArrayUtil {
         return argmin(values , 0, values.length - 1);
     }
 
-    public static int argmin(double[] values , int fromIndex, int toIndex) {
+    public static int argmin(double[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmin = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++)
             if (values[i]-values[argmin]<0)
@@ -2998,7 +3530,7 @@ public final class ArrayUtil {
         return argmax(values , 0, values.length - 1);
     }
 
-    public static int argmax(double[] values , int fromIndex, int toIndex) {
+    public static int argmax(double[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmax = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++)
             if (values[i]-values[argmax]>0)
@@ -3006,7 +3538,7 @@ public final class ArrayUtil {
         return argmax;
     }
 
-    public static int[] argminmax(double[] values , int fromIndex, int toIndex) {
+    public static int[] argminmax(double[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmax = fromIndex;
         int argmin = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++) {
@@ -3022,7 +3554,7 @@ public final class ArrayUtil {
         return minmax(values , 0, values.length - 1);
     }
 
-    public static double[] minmax(double[] values , int fromIndex, int toIndex) {
+    public static double[] minmax(double[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int[] mm = argminmax(values , fromIndex, toIndex);
         return new double[]{values[mm[1]], values[mm[0]]};
     }
@@ -3041,7 +3573,7 @@ public final class ArrayUtil {
 
     public static double[] clamp(double[] src , double min, double max) {
         double[] dst = new double[src.length];
-        clamp(src, min, max, dst);
+        clamp(src , min, max, dst);
         return dst;
     }
 
@@ -3057,7 +3589,7 @@ public final class ArrayUtil {
 
     public static double[] clampMin(double[] src , double min) {
         double[] dst = new double[src.length];
-        clampMin(src, min, dst);
+        clampMin(src , min, dst);
         return dst;
     }
 
@@ -3073,7 +3605,7 @@ public final class ArrayUtil {
 
     public static double[] clampMax(double[] src , double max) {
         double[] dst = new double[src.length];
-        clampMax(src, max, dst);
+        clampMax(src , max, dst);
         return dst;
     }
 
@@ -3084,16 +3616,16 @@ public final class ArrayUtil {
 
 
     public static String toHexString(final double[] arr) {
-        final StringBuilder sbuf = new StringBuilder();
-        sbuf.append('[');
+        final StringBuilder buffer = new StringBuilder();
+        buffer.append('[');
         if (arr.length > 0)
-            sbuf.append(Double.toHexString(arr[0]));
+            buffer.append(Double.toHexString(arr[0]));
         for (int i = 1; i < arr.length; i++) {
-            sbuf.append(' ');
-            sbuf.append(Double.toHexString(arr[i]));
+            buffer.append(' ');
+            buffer.append(Double.toHexString(arr[i]));
         }
-        sbuf.append(']');
-        return sbuf.toString();
+        buffer.append(']');
+        return buffer.toString();
     }
 
 
@@ -3104,173 +3636,13 @@ public final class ArrayUtil {
      * ==================
      */
 
-    public static Object[] copyOf(final Object[] src) {
-        return copyOf(src, 0, src.length);
-    }
-
-    public static Object[] copyOf(final Object[] src, final int offset) {
-        return copyOf(src, offset, src.length - offset);
-    }
-
-    public static Object[] copyOf(final Object[] src, final int offset, final int len) {
-        Object[] dst = new Object[len];
-        System.arraycopy(src, offset, dst, 0, len);
-        return dst;
-    }
-
-    public static Object[] cat(final Object[]... arrs) {
-        int n = 0;
-        for (int i = 0; i < arrs.length; i++)
-            n += arrs[i].length;
-        Object[] result = new Object[n];
-        int offset = 0;
-        for (int i = 0; i < arrs.length; i++) {
-            System.arraycopy(arrs[i], 0, result, offset, arrs[i].length);
-            offset += arrs[i].length;
-        }
-        return result;
-    }
-
-    public static int firstIndexOf(final Object[] arr, final Object val) {
-        return firstIndexOf(arr, val, 0, arr.length);
-    }
-
-    public static int firstIndexOf(final Object[] arr, final Object val, int fromIndex) {
-        return firstIndexOf(arr, val, fromIndex, arr.length);
-    }
-
-    public static int firstIndexOf(final Object[] arr, final Object val, int fromIndex, int toIndex) {
-        for (int i = fromIndex; i < toIndex; i++)
-            if (arr[i] == val)
-                return i;
-        return -1;
-    }
-
-    public static int lastIndexOf(final Object[] arr, final Object val) {
-        return lastIndexOf(arr, val, 0, arr.length);
-    }
-
-    public static int lastIndexOf(final Object[] arr, final Object val, int fromIndex) {
-        return lastIndexOf(arr, val, fromIndex, arr.length);
-    }
-
-    public static int lastIndexOf(final Object[] arr, final Object val, int fromIndex, int toIndex) {
-        for (int i = toIndex - 1; i >= fromIndex; i--)
-            if (arr[i] == val)
-                return i;
-        return -1;
-    }
-
-    public static boolean contains(final Object[] arr, final Object val) {
-        return firstIndexOf(arr, val) != -1;
-    }
-
-    public static boolean contains(final Object[] arr, final Object val, int fromIndex) {
-        return firstIndexOf(arr, val, fromIndex) != -1;
-    }
-
-    public static boolean contains(final Object[] arr, final Object val, int fromIndex, int toIndex) {
-        return firstIndexOf(arr, val, fromIndex, toIndex) != -1;
-    }
-
-    public static Object[] unique(final Object... arr) {
-        // This is way to slow O(n^2) - can be done in
-        // O(n log n) by sorting in input first.
-        Object[] result = new Object[arr.length];
-        int j = 0;
-        for (int i = 0; i < arr.length; i++) {
-            if (!contains(result, arr[i])) {
-                result[j] = arr[i];
-                j++;
-            }
-        }
-        return copyOf(result, 0, j);
-    }
-
-    public static void reverse(final Object[] a) {
-        reverse(a, 0, a.length);
-    }
-
-    public static void reverse(final Object[] a, final int fromIndex) {
-        reverse(a, fromIndex, a.length);
-    }
-
-    public static void reverse(final Object[] a, final int fromIndex, final int toIndex) {
-        for (int i = fromIndex, j = toIndex - 1; i < j; i++, j--) {
-            swap(a, i, j);
-        }
-    }
-
-    public static void swap(final Object[] a, final int i, final int j) {
-        final Object tmp = a[i];
-        a[i] = a[j];
-        a[j] = tmp;
-    }
-
-    public static Object[] elementsOf(Object[] arr, int[] idx) {
-        Object[] result = new Object[idx.length];
-        for (int i = 0, j = 0; i < idx.length; i++)
-            result[i] = arr[idx[i]];
-        return result;
-    }
-
-    public static Object[] elementsOf(Object[] arr, boolean[] logical) {
-        return elementsOf(arr, find(logical));
-    }
-
-    public static boolean[] valuesEq(Object[] arr, Object val) {
-        boolean[] result = new boolean[arr.length];
-        for (int i = 0; i < arr.length; i++)
-            result[i] = arr[i] == val;
-        return result;
-    }
-
-    public static boolean[] valuesNeq(Object[] arr, Object val) {
-        boolean[] result = new boolean[arr.length];
-        for (int i = 0; i < arr.length; i++)
-            result[i] = arr[i] != val;
-        return result;
-    }
-
-    public static Object[] ensureCapacity(Object[] arr, int minCap) {
-        int oldCap = arr.length;
-        if (minCap > oldCap) {
-            int newCap = (oldCap * 3) / 2 + 1;
-            if (newCap < minCap)
-                newCap = minCap;
-            return copyOf(arr, 0, newCap);
-        } else {
-            return arr;
-        }
-    }
-
-    public static Object mode(Object[] arr) {
-        Map<Object, Integer> map = new HashMap<Object, Integer>();
-        for (int i = 0; i < arr.length; i++) {
-            if (map.containsKey(arr[i]))
-                map.put(arr[i], map.get(arr[i]) + 1);
-            else
-                map.put(arr[i], 1);
-        }
-        int maxCount = -1;
-        Object maxValue = arr[0];
-        for (Object key : map.keySet()) {
-            int count = map.get(key);
-            if (count > maxCount) {
-                maxCount = count;
-                maxValue = key;
-            }
-        }
-        return maxValue;
-    }
-
 
 
     public static void permute(final Object[] a) {
         permute(a, 0, a.length);
     }
 
-    public static void permute(final Object[] a, final int toIndex) {
+    public static void permute(final Object[] a,  @Nonnegative final int toIndex) {
         permute(a, toIndex, a.length);
     }
 
@@ -3280,13 +3652,13 @@ public final class ArrayUtil {
      *
      * Use an algorithm defined in
      * http://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
-     * which probably isnt the most efficient solution.
+     * which probably isn't the most efficient solution.
      *
      * @param a the array to be permuted
      * @param toIndex index of the first element (inclusive) to be permuted
      * @param fromIndex index of the last element (exclusive) to be permuted
      */
-    public static void permute(final Object[] a, final int fromIndex, final int toIndex) {
+    public static void permute(final Object[] a,  @Nonnegative final int fromIndex,  @Nonnegative final int toIndex) {
         if (toIndex - fromIndex < 2)
             return;
 
@@ -3322,7 +3694,7 @@ public final class ArrayUtil {
         return values[argmin(values , 0, values.length - 1)];
     }
 
-    public static Object min(Object[] values , int fromIndex, int toIndex) {
+    public static Object min(Object[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return values[argmin(values , fromIndex, toIndex)];
     }
 
@@ -3330,7 +3702,7 @@ public final class ArrayUtil {
         return values[argmax(values , 0, values.length - 1)];
     }
 
-    public static Object max(Object[] values , int fromIndex, int toIndex) {
+    public static Object max(Object[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return values[argmax(values , fromIndex, toIndex)];
     }
 
@@ -3338,7 +3710,7 @@ public final class ArrayUtil {
         return argmin(values , 0, values.length - 1);
     }
 
-    public static int argmin(Object[] values , int fromIndex, int toIndex) {
+    public static int argmin(Object[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmin = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++)
             if (((Comparable)values[i]).compareTo(values[argmin])<0)
@@ -3350,7 +3722,7 @@ public final class ArrayUtil {
         return argmax(values , 0, values.length - 1);
     }
 
-    public static int argmax(Object[] values , int fromIndex, int toIndex) {
+    public static int argmax(Object[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmax = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++)
             if (((Comparable)values[i]).compareTo(values[argmax])>0)
@@ -3358,7 +3730,7 @@ public final class ArrayUtil {
         return argmax;
     }
 
-    public static int[] argminmax(Object[] values , int fromIndex, int toIndex) {
+    public static int[] argminmax(Object[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmax = fromIndex;
         int argmin = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++) {
@@ -3374,7 +3746,7 @@ public final class ArrayUtil {
         return minmax(values , 0, values.length - 1);
     }
 
-    public static Object[] minmax(Object[] values , int fromIndex, int toIndex) {
+    public static Object[] minmax(Object[] values ,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int[] mm = argminmax(values , fromIndex, toIndex);
         return new Object[]{values[mm[1]], values[mm[0]]};
     }
@@ -3393,7 +3765,7 @@ public final class ArrayUtil {
 
     public static Object[] clamp(Object[] src , Object min, Object max) {
         Object[] dst = new Object[src.length];
-        clamp(src, min, max, dst);
+        clamp(src , min, max, dst);
         return dst;
     }
 
@@ -3409,7 +3781,7 @@ public final class ArrayUtil {
 
     public static Object[] clampMin(Object[] src , Object min) {
         Object[] dst = new Object[src.length];
-        clampMin(src, min, dst);
+        clampMin(src , min, dst);
         return dst;
     }
 
@@ -3425,8 +3797,183 @@ public final class ArrayUtil {
 
     public static Object[] clampMax(Object[] src , Object max) {
         Object[] dst = new Object[src.length];
-        clampMax(src, max, dst);
+        clampMax(src , max, dst);
         return dst;
+    }
+
+
+
+    /*
+     * ==================
+     *  Type: T
+     * ==================
+     */
+
+
+
+    public static <T> T[] copyOf(final T[] src) {
+        return copyOf(src, 0, src.length);
+    }
+
+    public static <T> T[] copyOf(final T[] src,  @Nonnegative final int offset) {
+        return copyOf(src, offset, src.length - offset);
+    }
+
+    public static <T> T[] copyOf(final T[] src,  @Nonnegative final int offset,  @Nonnegative final int len) {
+        T[] dst = (T[])new Object[len];
+        System.arraycopy(src, offset, dst, 0, len);
+        return dst;
+    }
+
+    /**
+     * Concatenate two or more arrays.
+     *
+     * @param arrays to be concatenated
+     * @return array contain all the elements of the input arrays
+     */
+     public static <T> T[] cat(final T[]... arrays) {
+        int n = 0;
+        for (T[] array : arrays)
+            n += array.length;
+        T[] result = (T[])new Object[n];
+        int offset = 0;
+        for (T[] array : arrays) {
+            System.arraycopy(array, 0, result, offset, array.length);
+            offset += array.length;
+        }
+        return result;
+    }
+
+    public static <T> int firstIndexOf(final T[] arr, final T val) {
+        return firstIndexOf(arr, val, 0, arr.length);
+    }
+
+    public static <T> int firstIndexOf(final T[] arr, final T val,  @Nonnegative int fromIndex) {
+        return firstIndexOf(arr, val, fromIndex, arr.length);
+    }
+
+    public static <T> int firstIndexOf(final T[] arr, final T val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
+        for (int i = fromIndex; i < toIndex; i++)
+            if (arr[i] == val)
+                return i;
+        return -1;
+    }
+
+    public static <T> int lastIndexOf(final T[] arr, final T val) {
+        return lastIndexOf(arr, val, 0, arr.length);
+    }
+
+    public static <T> int lastIndexOf(final T[] arr, final T val,  @Nonnegative int fromIndex) {
+        return lastIndexOf(arr, val, fromIndex, arr.length);
+    }
+
+    public static <T> int lastIndexOf(final T[] arr, final T val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
+        for (int i = toIndex - 1; i >= fromIndex; i--)
+            if (arr[i] == val)
+                return i;
+        return -1;
+    }
+
+    public static <T> boolean contains(final T[] arr, final T val) {
+        return firstIndexOf(arr, val) != -1;
+    }
+
+    public static <T> boolean contains(final T[] arr, final T val,  @Nonnegative int fromIndex) {
+        return firstIndexOf(arr, val, fromIndex) != -1;
+    }
+
+    public static <T> boolean contains(final T[] arr, final T val,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
+        return firstIndexOf(arr, val, fromIndex, toIndex) != -1;
+    }
+
+    public static <T> T[] unique(final T... arr) {
+        // This is way to slow O(n^2) - can be done in
+        // O(n log n) by sorting in input first.
+        T[] result = (T[])new Object[arr.length];
+        int j = 0;
+        for (T anArr : arr) {
+            if (!contains(result, anArr)) {
+                result[j] = anArr;
+                j++;
+            }
+        }
+        return copyOf(result, 0, j);
+    }
+
+    public static <T> void reverse(final T[] a) {
+        reverse(a, 0, a.length);
+    }
+
+    public static <T> void reverse(final T[] a,  @Nonnegative final int fromIndex) {
+        reverse(a, fromIndex, a.length);
+    }
+
+    public static <T> void reverse(final T[] a,  @Nonnegative final int fromIndex,  @Nonnegative final int toIndex) {
+        for (int i = fromIndex, j = toIndex - 1; i < j; i++, j--) {
+            swap(a, i, j);
+        }
+    }
+
+    public static <T> void swap(final T[] a,  @Nonnegative final int i,  @Nonnegative final int j) {
+        final T tmp = a[i];
+        a[i] = a[j];
+        a[j] = tmp;
+    }
+
+    public static <T> T[] elementsOf(T[] arr, int[] idx) {
+        T[] result = (T[])new Object[idx.length];
+        for (int i = 0; i < idx.length; i++)
+            result[i] = arr[idx[i]];
+        return result;
+    }
+
+    public static <T> T[] elementsOf(T[] arr, boolean[] logical) {
+        return elementsOf(arr, find(logical));
+    }
+
+    public static <T> boolean[] valuesEq(T[] arr, T val) {
+        boolean[] result = new boolean[arr.length];
+        for (int i = 0; i < arr.length; i++)
+            result[i] = arr[i] == val;
+        return result;
+    }
+
+    public static <T> boolean[] valuesNeq(T[] arr, T val) {
+        boolean[] result = new boolean[arr.length];
+        for (int i = 0; i < arr.length; i++)
+            result[i] = arr[i] != val;
+        return result;
+    }
+
+    public static <T> T[] ensureCapacity(T[] arr, int minCap) {
+        int oldCap = arr.length;
+        if (minCap > oldCap) {
+            int newCap = (oldCap * 3) / 2 + 1;
+            if (newCap < minCap)
+                newCap = minCap;
+            return copyOf(arr, 0, newCap);
+        } else {
+            return arr;
+        }
+    }
+
+    public static <T> T mode(T[] arr) {
+        Map<T, Integer> map = new HashMap<T, Integer>();
+        for (T anArr : arr) {
+            if (map.containsKey(anArr))
+                map.put(anArr, map.get(anArr) + 1);
+            else
+                map.put(anArr, 1);
+        }
+        int maxCount = -1;
+        T maxValue = arr[0];
+        for (Map.Entry<T, Integer> entry : map.entrySet()) {
+            if (entry.getValue() > maxCount) {
+                maxCount = entry.getValue();
+                maxValue = entry.getKey();
+            }
+        }
+        return maxValue;
     }
 
 
@@ -3435,7 +3982,7 @@ public final class ArrayUtil {
         permute(a, comp, 0, a.length);
     }
 
-    public static <T> void permute(final T[] a, Comparator<T> comp, final int toIndex) {
+    public static <T> void permute(final T[] a, Comparator<T> comp,  @Nonnegative final int toIndex) {
         permute(a, comp, toIndex, a.length);
     }
 
@@ -3445,13 +3992,13 @@ public final class ArrayUtil {
      *
      * Use an algorithm defined in
      * http://en.wikipedia.org/wiki/Permutation#Generation_in_lexicographic_order
-     * which probably isnt the most efficient solution.
+     * which probably isn't the most efficient solution.
      *
      * @param a the array to be permuted
      * @param toIndex index of the first element (inclusive) to be permuted
      * @param fromIndex index of the last element (exclusive) to be permuted
      */
-    public static <T> void permute(final T[] a, Comparator<T> comp, final int fromIndex, final int toIndex) {
+    public static <T> void permute(final T[] a, Comparator<T> comp,  @Nonnegative final int fromIndex,  @Nonnegative final int toIndex) {
         if (toIndex - fromIndex < 2)
             return;
 
@@ -3487,7 +4034,7 @@ public final class ArrayUtil {
         return values[argmin(values , comp, 0, values.length - 1)];
     }
 
-    public static <T> T min(T[] values , Comparator<T> comp, int fromIndex, int toIndex) {
+    public static <T> T min(T[] values , Comparator<T> comp,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return values[argmin(values , comp, fromIndex, toIndex)];
     }
 
@@ -3495,7 +4042,7 @@ public final class ArrayUtil {
         return values[argmax(values , comp, 0, values.length - 1)];
     }
 
-    public static <T> T max(T[] values , Comparator<T> comp, int fromIndex, int toIndex) {
+    public static <T> T max(T[] values , Comparator<T> comp,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         return values[argmax(values , comp, fromIndex, toIndex)];
     }
 
@@ -3503,7 +4050,7 @@ public final class ArrayUtil {
         return argmin(values , comp, 0, values.length - 1);
     }
 
-    public static <T> int argmin(T[] values , Comparator<T> comp, int fromIndex, int toIndex) {
+    public static <T> int argmin(T[] values , Comparator<T> comp,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmin = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++)
             if (comp.compare(values[i],values[argmin])<0)
@@ -3515,7 +4062,7 @@ public final class ArrayUtil {
         return argmax(values , comp, 0, values.length - 1);
     }
 
-    public static <T> int argmax(T[] values , Comparator<T> comp, int fromIndex, int toIndex) {
+    public static <T> int argmax(T[] values , Comparator<T> comp,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmax = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++)
             if (comp.compare(values[i],values[argmax])>0)
@@ -3523,7 +4070,7 @@ public final class ArrayUtil {
         return argmax;
     }
 
-    public static <T> int[] argminmax(T[] values , Comparator<T> comp, int fromIndex, int toIndex) {
+    public static <T> int[] argminmax(T[] values , Comparator<T> comp,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int argmax = fromIndex;
         int argmin = fromIndex;
         for (int i = fromIndex + 1; i <= toIndex; i++) {
@@ -3539,7 +4086,7 @@ public final class ArrayUtil {
         return minmax(values , comp, 0, values.length - 1);
     }
 
-    public static <T> T[] minmax(T[] values , Comparator<T> comp, int fromIndex, int toIndex) {
+    public static <T> T[] minmax(T[] values , Comparator<T> comp,  @Nonnegative int fromIndex,  @Nonnegative int toIndex) {
         int[] mm = argminmax(values , comp, fromIndex, toIndex);
         return (T[])new Object[]{values[mm[1]], values[mm[0]]};
     }
@@ -3558,7 +4105,7 @@ public final class ArrayUtil {
 
     public static <T> T[] clamp(T[] src , Comparator<T> comp, T min, T max) {
         T[] dst = (T[])new Object[src.length];
-        clamp(src, min, max, dst);
+        clamp(src , comp, min, max, dst);
         return dst;
     }
 
@@ -3574,7 +4121,7 @@ public final class ArrayUtil {
 
     public static <T> T[] clampMin(T[] src , Comparator<T> comp, T min) {
         T[] dst = (T[])new Object[src.length];
-        clampMin(src, min, dst);
+        clampMin(src , comp, min, dst);
         return dst;
     }
 
@@ -3590,7 +4137,7 @@ public final class ArrayUtil {
 
     public static <T> T[] clampMax(T[] src , Comparator<T> comp, T max) {
         T[] dst = (T[])new Object[src.length];
-        clampMax(src, max, dst);
+        clampMax(src , comp, max, dst);
         return dst;
     }
 

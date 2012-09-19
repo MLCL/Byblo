@@ -65,6 +65,7 @@ import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsCarrier;
 import uk.ac.susx.mlcl.byblo.weighings.MarginalDistribution;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.NullWeighting;
+import uk.ac.susx.mlcl.lib.collect.ArrayUtil;
 import uk.ac.susx.mlcl.lib.collect.Indexed;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
 import uk.ac.susx.mlcl.lib.test.ExitTrapper;
@@ -278,7 +279,7 @@ public abstract class AbstractMeasureTest<T extends Measure> extends AbstractObj
 					TestConstants.TEST_FRUIT_ENTRIES.toString(), "--output",
 					output.toString() };
 
-			args = cat(args, extraArgs);
+			args = ArrayUtil.cat(args, extraArgs);
 
 			Tools.main(args);
 

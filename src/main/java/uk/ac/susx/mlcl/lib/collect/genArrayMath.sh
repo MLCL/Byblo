@@ -527,7 +527,7 @@ cat << "---EOF---" \
         Arrays.sort(sorted);
         final int i = sorted.length / 2;
         return (sorted.length % 2 == 0)
-                ? (PRIMTYP)((sorted[i - 1] + sorted[i]) / 2)
+                ? (PRIMTYP)( (sorted[i - 1] + sorted[i]) / 2)
                 : sorted[i];
     }
 
@@ -538,7 +538,7 @@ cat << "---EOF---" \
         PRIMTYP srange = (PRIMTYP)(max(src) - smin);
         PRIMTYP drange = (PRIMTYP)(max - min);
         for (int i = 0; i < src.length; i++)
-            dst[i] = (PRIMTYP)(((src[i] - smin) / srange) * drange + min);
+            dst[i] = (PRIMTYP)( ( (src[i] - smin) / srange) * drange + min);
     }
 
     public static void normalise(PRIMTYP[] src, PRIMTYP[] dst) {
