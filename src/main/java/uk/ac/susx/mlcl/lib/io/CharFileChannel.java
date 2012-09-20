@@ -31,35 +31,33 @@
 package uk.ac.susx.mlcl.lib.io;
 
 import java.io.IOException;
-import java.nio.BufferOverflowException;
-import java.nio.BufferUnderflowException;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
+import java.nio.*;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.NonReadableChannelException;
+import java.nio.channels.NonWritableChannelException;
 import java.nio.charset.*;
 
 /**
  * <p>A class that gets round the problem of very large, seekable character files (greater than 2^31-1 bytes) by
  * borrowing API from the {@link java.nio.channels.FileChannel} and from Java 7's NIO improvements.
- *
+ * <p/>
  * All the positional accessors (such as {@code size()} and {@code position()}return offsets in bytes not characters.
  * This may seem confusing but there is simply no efficient way to determine these values in characters.
- *
+ * <p/>
  * This is not a complete implementation. The following additional functions would be required to be entirely compatible
  * with the {@link java.nio.channels.FileChannel} API:
- *
+ * <p/>
  * <ul>
- *
+ * <p/>
  * <li>Implementation of the WritableCharChannel interface and write(CharBuffer) method. </li>
- *
+ * <p/>
  * <li>Locking methods. These could probably be delegated to the inner FileChannel object.</li>
- *
+ * <p/>
  * <li>Other miscellaneous methods including: {@code size()}, {@code truncate()}, and {@code force(boolean)}.</li>
- *
+ * <p/>
  * </ul>
- *
+ * <p/>
  * If this code is ever ported to Java 7 then it will work for any Channel that also implements
  * java.nio.channels.SeekableByteChannel, not just {@link java.nio.channels.FileChannel}.
  *
@@ -107,7 +105,7 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
     /**
      * Construct a new {@link uk.ac.susx.mlcl.lib.io.CharFileChannel} object from the given {@link
      * java.nio.channels.FileChannel} and {@link java.nio.charset.CharsetDecoder}
-     *
+     * <p/>
      * The FileChannel must have been opened from a stream with the desired read/write mode.
      *
      * @param fileChannel byte based FileChannel to encapsulate
@@ -338,7 +336,7 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
      * Attempt to insure that the the required number of bytes ({@code requiredBytes}) is available for reading in the
      * buffer. If there is sufficient bytes available on the encapsulated {@link java.nio.channels.FileChannel}, and no
      * exception occurs, then this operation is guaranteed to succeed.
-     *
+     * <p/>
      * Note that this method has package protected accessibility for unit testing purposes only.
      *
      * @param requiredReadBytes minimum number of bytes to be mapped when this method returns
@@ -378,15 +376,16 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
             if (length < requireWriteBytes)
                 length = requireWriteBytes;
 
-//            if(length < requireWriteBytes)
-//                length = requireWriteBytes;
-
             if (length == 0) {
                 buffer = ByteBuffer.allocateDirect(0);
                 return;
             }
 
-            buffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, bufferOffset, length);
+            try {
+                buffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, bufferOffset, length);
+            } catch (NonWritableChannelException ex) {
+                buffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, bufferOffset, length);
+            }
         }
     }
 
@@ -399,40 +398,41 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
      */
     @Override
     public int write(CharBuffer src) throws IOException {
+        throw new UnsupportedOperationException();
 
-        // sanity check the state
-        if (!isOpen())
-            throw new ClosedChannelException();
-        if (src == null)
-            throw new NullPointerException("src is null");
-
-        // record the start offset so we can calculate how much has been read
-        final int startChar = src.position();
-
-        // reference the results of each decode here
-        CoderResult coderResult;
-        encoder.reset();
-
-        // Repeat reading until the destination buffer is full, or the source
-        // buffer is empty
-        do {
-
-            // Attempt to insure sufficient is data available for reading in the  mapped portion of the source channel,
-            // which is not guaranteed to succeed.
-            insureMapped(0, (int) Math.ceil(src.remaining() * encoder.maxBytesPerChar()));
-
-            coderResult = encoder.encode(src, buffer, !src.hasRemaining());
-            checkCoderResult(coderResult);
-
-        } while (src.hasRemaining());
-
-        checkCoderResult(encoder.encode(src, buffer, !src.hasRemaining()));
-        checkCoderResult(encoder.flush(buffer));
-
-        return src.position() - startChar;
+//        // sanity check the state
+//        if (!isOpen())
+//            throw new ClosedChannelException();
+//        if (src == null)
+//            throw new NullPointerException("src is null");
+//
+//        // record the start offset so we can calculate how much has been read
+//        final int startChar = src.position();
+//
+//        // reference the results of each decode here
+//        CoderResult coderResult;
+//        encoder.reset();
+//
+//        // Repeat reading until the destination buffer is full, or the source
+//        // buffer is empty
+//        do {
+//
+//            // Attempt to insure sufficient is data available for reading in the  mapped portion of the source channel,
+//            // which is not guaranteed to succeed.
+//            insureMapped(0, (int) Math.ceil(src.remaining() * encoder.maxBytesPerChar()));
+//
+//            coderResult = encoder.encode(src, buffer, !src.hasRemaining());
+//            checkCoderResult(coderResult);
+//
+//        } while (src.hasRemaining());
+//
+//        checkCoderResult(encoder.encode(src, buffer, !src.hasRemaining()));
+//        checkCoderResult(encoder.flush(buffer));
+//
+//        return src.position() - startChar;
     }
 
-    static void checkCoderResult(CoderResult coderResult) throws CharacterCodingException {
+    private static void checkCoderResult(CoderResult coderResult) throws CharacterCodingException {
         if (coderResult.isError()) {
             try {
                 coderResult.throwException();
