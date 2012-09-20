@@ -35,6 +35,7 @@ import java.util.Random;
 import java.util.HashMap;
 import java.util.Map;
 import uk.ac.susx.mlcl.lib.Checks;
+import java.lang.reflect.Array;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnegative;
@@ -47,6 +48,7 @@ import javax.annotation.Nonnull;
  */
 @CheckReturnValue
 @Nonnull
+@SuppressWarnings("unchecked")
 public final class ArrayUtil {
 
     private ArrayUtil() {}
@@ -178,7 +180,7 @@ public final class ArrayUtil {
         int n = 0;
         for (boolean[] array : arrays)
             n += array.length;
-        boolean[] result = new boolean[n];
+        boolean[] result = (boolean[])Array.newInstance(arrays[0].getClass().getComponentType(), n);
         int offset = 0;
         for (boolean[] array : arrays) {
             System.arraycopy(array, 0, result, offset, array.length);
@@ -591,7 +593,7 @@ public final class ArrayUtil {
         int n = 0;
         for (byte[] array : arrays)
             n += array.length;
-        byte[] result = new byte[n];
+        byte[] result = (byte[])Array.newInstance(arrays[0].getClass().getComponentType(), n);
         int offset = 0;
         for (byte[] array : arrays) {
             System.arraycopy(array, 0, result, offset, array.length);
@@ -1047,7 +1049,7 @@ public final class ArrayUtil {
         int n = 0;
         for (char[] array : arrays)
             n += array.length;
-        char[] result = new char[n];
+        char[] result = (char[])Array.newInstance(arrays[0].getClass().getComponentType(), n);
         int offset = 0;
         for (char[] array : arrays) {
             System.arraycopy(array, 0, result, offset, array.length);
@@ -1503,7 +1505,7 @@ public final class ArrayUtil {
         int n = 0;
         for (short[] array : arrays)
             n += array.length;
-        short[] result = new short[n];
+        short[] result = (short[])Array.newInstance(arrays[0].getClass().getComponentType(), n);
         int offset = 0;
         for (short[] array : arrays) {
             System.arraycopy(array, 0, result, offset, array.length);
@@ -1959,7 +1961,7 @@ public final class ArrayUtil {
         int n = 0;
         for (int[] array : arrays)
             n += array.length;
-        int[] result = new int[n];
+        int[] result = (int[])Array.newInstance(arrays[0].getClass().getComponentType(), n);
         int offset = 0;
         for (int[] array : arrays) {
             System.arraycopy(array, 0, result, offset, array.length);
@@ -2415,7 +2417,7 @@ public final class ArrayUtil {
         int n = 0;
         for (long[] array : arrays)
             n += array.length;
-        long[] result = new long[n];
+        long[] result = (long[])Array.newInstance(arrays[0].getClass().getComponentType(), n);
         int offset = 0;
         for (long[] array : arrays) {
             System.arraycopy(array, 0, result, offset, array.length);
@@ -2871,7 +2873,7 @@ public final class ArrayUtil {
         int n = 0;
         for (float[] array : arrays)
             n += array.length;
-        float[] result = new float[n];
+        float[] result = (float[])Array.newInstance(arrays[0].getClass().getComponentType(), n);
         int offset = 0;
         for (float[] array : arrays) {
             System.arraycopy(array, 0, result, offset, array.length);
@@ -3303,7 +3305,7 @@ public final class ArrayUtil {
         int n = 0;
         for (double[] array : arrays)
             n += array.length;
-        double[] result = new double[n];
+        double[] result = (double[])Array.newInstance(arrays[0].getClass().getComponentType(), n);
         int offset = 0;
         for (double[] array : arrays) {
             System.arraycopy(array, 0, result, offset, array.length);
@@ -3835,7 +3837,7 @@ public final class ArrayUtil {
         int n = 0;
         for (T[] array : arrays)
             n += array.length;
-        T[] result = (T[])new Object[n];
+        T[] result = (T[])Array.newInstance(arrays[0].getClass().getComponentType(), n);
         int offset = 0;
         for (T[] array : arrays) {
             System.arraycopy(array, 0, result, offset, array.length);

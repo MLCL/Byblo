@@ -100,6 +100,7 @@ import java.util.Random;
 import java.util.HashMap;
 import java.util.Map;
 import uk.ac.susx.mlcl.lib.Checks;
+import java.lang.reflect.Array;
 
 import javax.annotation.CheckReturnValue;
 import javax.annotation.Nonnegative;
@@ -270,7 +271,7 @@ cat << "---EOF---" \
         int n = 0;
         for (PRIMTYP[] array : arrays)
             n += array.length;
-        PRIMTYP[] result = NEWINSTANCE[n];
+        PRIMTYP[] result = (PRIMTYP[])Array.newInstance(arrays[0].getClass().getComponentType(), n);
         int offset = 0;
         for (PRIMTYP[] array : arrays) {
             System.arraycopy(array, 0, result, offset, array.length);

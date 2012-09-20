@@ -452,7 +452,7 @@ public final class ArrayMath {
         Arrays.sort(sorted);
         final int i = sorted.length / 2;
         return (sorted.length % 2 == 0)
-                ? (byte)((sorted[i - 1] + sorted[i]) / 2)
+                ? (byte)( (sorted[i - 1] + sorted[i]) / 2)
                 : sorted[i];
     }
 
@@ -463,7 +463,7 @@ public final class ArrayMath {
         byte srange = (byte)(max(src) - smin);
         byte drange = (byte)(max - min);
         for (int i = 0; i < src.length; i++)
-            dst[i] = (byte)(((src[i] - smin) / srange) * drange + min);
+            dst[i] = (byte)( ( (src[i] - smin) / srange) * drange + min);
     }
 
     public static void normalise(byte[] src, byte[] dst) {
@@ -852,7 +852,7 @@ public final class ArrayMath {
         Arrays.sort(sorted);
         final int i = sorted.length / 2;
         return (sorted.length % 2 == 0)
-                ? (char)((sorted[i - 1] + sorted[i]) / 2)
+                ? (char)( (sorted[i - 1] + sorted[i]) / 2)
                 : sorted[i];
     }
 
@@ -863,7 +863,7 @@ public final class ArrayMath {
         char srange = (char)(max(src) - smin);
         char drange = (char)(max - min);
         for (int i = 0; i < src.length; i++)
-            dst[i] = (char)(((src[i] - smin) / srange) * drange + min);
+            dst[i] = (char)( ( (src[i] - smin) / srange) * drange + min);
     }
 
     public static void normalise(char[] src, char[] dst) {
@@ -1252,7 +1252,7 @@ public final class ArrayMath {
         Arrays.sort(sorted);
         final int i = sorted.length / 2;
         return (sorted.length % 2 == 0)
-                ? (short)((sorted[i - 1] + sorted[i]) / 2)
+                ? (short)( (sorted[i - 1] + sorted[i]) / 2)
                 : sorted[i];
     }
 
@@ -1263,7 +1263,7 @@ public final class ArrayMath {
         short srange = (short)(max(src) - smin);
         short drange = (short)(max - min);
         for (int i = 0; i < src.length; i++)
-            dst[i] = (short)(((src[i] - smin) / srange) * drange + min);
+            dst[i] = (short)( ( (src[i] - smin) / srange) * drange + min);
     }
 
     public static void normalise(short[] src, short[] dst) {
@@ -1652,7 +1652,7 @@ public final class ArrayMath {
         Arrays.sort(sorted);
         final int i = sorted.length / 2;
         return (sorted.length % 2 == 0)
-                ? (int)((sorted[i - 1] + sorted[i]) / 2)
+                ? (int)( (sorted[i - 1] + sorted[i]) / 2)
                 : sorted[i];
     }
 
@@ -1663,7 +1663,7 @@ public final class ArrayMath {
         int srange = (int)(max(src) - smin);
         int drange = (int)(max - min);
         for (int i = 0; i < src.length; i++)
-            dst[i] = (int)(((src[i] - smin) / srange) * drange + min);
+            dst[i] = (int)( ( (src[i] - smin) / srange) * drange + min);
     }
 
     public static void normalise(int[] src, int[] dst) {
@@ -2052,7 +2052,7 @@ public final class ArrayMath {
         Arrays.sort(sorted);
         final int i = sorted.length / 2;
         return (sorted.length % 2 == 0)
-                ? (long)((sorted[i - 1] + sorted[i]) / 2)
+                ? (long)( (sorted[i - 1] + sorted[i]) / 2)
                 : sorted[i];
     }
 
@@ -2063,7 +2063,7 @@ public final class ArrayMath {
         long srange = (long)(max(src) - smin);
         long drange = (long)(max - min);
         for (int i = 0; i < src.length; i++)
-            dst[i] = (long)(((src[i] - smin) / srange) * drange + min);
+            dst[i] = (long)( ( (src[i] - smin) / srange) * drange + min);
     }
 
     public static void normalise(long[] src, long[] dst) {
@@ -2452,7 +2452,7 @@ public final class ArrayMath {
         Arrays.sort(sorted);
         final int i = sorted.length / 2;
         return (sorted.length % 2 == 0)
-                ? (float)((sorted[i - 1] + sorted[i]) / 2)
+                ? (float)( (sorted[i - 1] + sorted[i]) / 2)
                 : sorted[i];
     }
 
@@ -2463,7 +2463,7 @@ public final class ArrayMath {
         float srange = (float)(max(src) - smin);
         float drange = (float)(max - min);
         for (int i = 0; i < src.length; i++)
-            dst[i] = (float)(((src[i] - smin) / srange) * drange + min);
+            dst[i] = (float)( ( (src[i] - smin) / srange) * drange + min);
     }
 
     public static void normalise(float[] src, float[] dst) {
@@ -2875,7 +2875,7 @@ public final class ArrayMath {
         Arrays.sort(sorted);
         final int i = sorted.length / 2;
         return (sorted.length % 2 == 0)
-                ? (double)((sorted[i - 1] + sorted[i]) / 2)
+                ? (double)( (sorted[i - 1] + sorted[i]) / 2)
                 : sorted[i];
     }
 
@@ -2886,7 +2886,7 @@ public final class ArrayMath {
         double srange = (double)(max(src) - smin);
         double drange = (double)(max - min);
         for (int i = 0; i < src.length; i++)
-            dst[i] = (double)(((src[i] - smin) / srange) * drange + min);
+            dst[i] = (double)( ( (src[i] - smin) / srange) * drange + min);
     }
 
     public static void normalise(double[] src, double[] dst) {
