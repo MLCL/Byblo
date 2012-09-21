@@ -32,6 +32,7 @@ package uk.ac.susx.mlcl.lib.io;
 
 import junit.framework.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import uk.ac.susx.mlcl.TestConstants;
@@ -266,6 +267,7 @@ public class CharFileChannelTest extends AbstractObjectTest<CharFileChannel> {
 
 
     @Test
+    @Ignore(value = "writing is not currently enabled or supported by CharFileChannel")
     public void testWrite() throws IOException {
         File file = new File(TestConstants.TEST_OUTPUT_DIR, "blahblahblah");
 
@@ -273,7 +275,8 @@ public class CharFileChannelTest extends AbstractObjectTest<CharFileChannel> {
         FileChannel fileChannel = raf.getChannel();
         CharFileChannel charChannel = new CharFileChannel(fileChannel);
 
-        CharBuffer buf = CharBuffer.wrap("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut at nunc eu massa hendrerit porta eu in dui.");
+        CharBuffer buf = CharBuffer.wrap("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut at nunc eu " +
+                "massa hendrerit porta eu in dui.");
         charChannel.write(buf);
 
         charChannel.close();
