@@ -54,7 +54,7 @@ public abstract class AbstractCommand implements Command {
     private static final Log LOG = LogFactory.getLog(AbstractCommand.class);
 
     @Parameter(names = {"-h", "--help"},
-            description = "Display this help message.")
+            description = "Display this help message.", help=true)
     private boolean usageRequested = false;
 
     private final Map<String, Class<? extends Command>> subCommands;
