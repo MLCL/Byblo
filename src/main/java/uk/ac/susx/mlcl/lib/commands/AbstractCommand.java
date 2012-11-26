@@ -30,6 +30,7 @@
  */
 package uk.ac.susx.mlcl.lib.commands;
 
+import com.beust.jcommander.IDefaultProvider;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
@@ -44,6 +45,7 @@ import javax.annotation.CheckReturnValue;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
@@ -52,11 +54,9 @@ import java.util.Map;
 public abstract class AbstractCommand implements Command {
 
     private static final Log LOG = LogFactory.getLog(AbstractCommand.class);
-
     @Parameter(names = {"-h", "--help"},
-            description = "Display this help message.", help=true)
+    description = "Display this help message.", help = true)
     private boolean usageRequested = false;
-
     private final Map<String, Class<? extends Command>> subCommands;
 
     protected AbstractCommand(Map<String, Class<? extends Command>> subCommands) {
@@ -75,31 +75,22 @@ public abstract class AbstractCommand implements Command {
     @CheckReturnValue
     public abstract boolean runCommand();
 
-    @Override
-    @CheckReturnValue
-    public boolean runCommand(@NotNull final String[] args) {
-        Checks.checkNotNull("args", args);
-
-        if (LOG.isTraceEnabled())
-            LOG.trace("Initialising command: " + this);
-
-        // Store the return status of this invocation.
-        boolean completedSuccessfully = true;
-
+    protected JCommander initializeJCommander(
+            @Nullable final Map<? super String, ? super Command> subCommandInstances) {
         final JCommander jc = new JCommander();
         jc.setProgramName(this.getClass().getSimpleName());
         jc.addConverterFactory(new ConverterFactory());
         jc.addObject(this);
 
+
         // If sub-commands have been set then instantiate all the objects
         // and pass them to JCommander
-        final Map<String, Command> subCommandInstances;
         if (!subCommands.isEmpty()) {
 
-            if (LOG.isTraceEnabled())
+            if (LOG.isTraceEnabled()) {
                 LOG.trace("Initialising sub-commands: " + subCommands);
+            }
 
-            subCommandInstances = new HashMap<String, Command>();
             for (String command : subCommands.keySet()) {
                 final Command instance;
                 try {
@@ -111,24 +102,46 @@ public abstract class AbstractCommand implements Command {
                     // Sub-commands MUST have a public default constructor
                     throw new AssertionError(ex);
                 }
+                
                 jc.addCommand(command, instance);
-                subCommandInstances.put(command, instance);
+                
+                if (subCommandInstances != null) {
+                    subCommandInstances.put(command, instance);
+                }
             }
-        } else {
-            subCommandInstances = Collections.emptyMap();
         }
+
+        return jc;
+    }
+
+    @Override
+    @CheckReturnValue
+    public boolean runCommand(@NotNull final String[] args) {
+        Checks.checkNotNull("args", args);
+
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Initialising command: " + this);
+        }
+
+        // Store the return status of this invocation.
+        boolean completedSuccessfully = true;
+
+        Map<String, Command> subCommandInstances = new HashMap<String, Command>();
+        final JCommander jc = initializeJCommander(subCommandInstances);
 
 
         try {
 
-            if (LOG.isTraceEnabled())
+            if (LOG.isTraceEnabled()) {
                 LOG.trace("Parsing command line options.");
+            }
             jc.parse(args);
 
             if (isUsageRequested()) {
 
-                if (LOG.isTraceEnabled())
+                if (LOG.isTraceEnabled()) {
                     LOG.trace("Printing usage.");
+                }
 
                 if (jc.getParsedCommand() == null) {
                     jc.usage();
@@ -138,8 +151,9 @@ public abstract class AbstractCommand implements Command {
 
             } else if (!subCommands.isEmpty() && jc.getParsedCommand() == null) {
 
-                if (LOG.isTraceEnabled())
+                if (LOG.isTraceEnabled()) {
                     LOG.trace("Command required but not given.");
+                }
 
                 System.err.println("Command required but not given.");
                 StringBuilder sb = new StringBuilder();
@@ -153,12 +167,13 @@ public abstract class AbstractCommand implements Command {
                 if (jc.getParsedCommand() != null) {
                     Command instance = subCommandInstances.
                             get(jc.getParsedCommand());
-                    if (LOG.isTraceEnabled())
+                    if (LOG.isTraceEnabled()) {
                         LOG.
                                 trace(
-                                        "Running sub-command " + jc.getParsedCommand()
-                                                + ": "
-                                                + instance);
+                                "Running sub-command " + jc.getParsedCommand()
+                                + ": "
+                                + instance);
+                    }
                     completedSuccessfully = instance.runCommand();
 
                 } else {
@@ -170,8 +185,9 @@ public abstract class AbstractCommand implements Command {
             }
 
         } catch (ParameterException ex) {
-            if (LOG.isTraceEnabled())
+            if (LOG.isTraceEnabled()) {
                 LOG.trace("Parsing exception", ex);
+            }
 
             System.err.println(ex.getMessage());
             StringBuilder sb = new StringBuilder();
