@@ -35,14 +35,13 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
-import com.sun.istack.internal.NotNull;
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.commands.Command;
 import uk.ac.susx.mlcl.lib.commands.ConverterFactory;
 import uk.ac.susx.mlcl.lib.tasks.AbstractTask;
-
-import javax.annotation.CheckReturnValue;
 
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
@@ -76,8 +75,9 @@ public abstract class AbstractCommandTask extends AbstractTask implements Comman
     public boolean runCommand() {
         this.run();
         try {
-            if (this.isExceptionTrapped())
+            if (this.isExceptionTrapped()) {
                 throwTrappedException();
+            }
             return true;
         } catch (Exception e) {
             System.err.print(e);
@@ -87,12 +87,13 @@ public abstract class AbstractCommandTask extends AbstractTask implements Comman
 
     @Override
     @CheckReturnValue
-    public boolean runCommand(@NotNull String[] args) {
+    public boolean runCommand(@Nonnull String[] args) {
 
         Checks.checkNotNull("args", args);
 
-        if (LOG.isTraceEnabled())
+        if (LOG.isTraceEnabled()) {
             LOG.trace("Initialising command " + this);
+        }
 
         final JCommander jc = new JCommander();
         jc.setProgramName(this.getClass().getSimpleName());
@@ -113,14 +114,17 @@ public abstract class AbstractCommandTask extends AbstractTask implements Comman
         if (this.isUsageRequested()) {
             jc.usage();
         } else {
-            if (LOG.isTraceEnabled())
+            if (LOG.isTraceEnabled()) {
                 LOG.trace("Running command " + this);
+            }
 
-            if (!this.runCommand())
+            if (!this.runCommand()) {
                 return false;
+            }
 
-            if (LOG.isTraceEnabled())
+            if (LOG.isTraceEnabled()) {
                 LOG.trace("Completed command " + this);
+            }
         }
 
         return true;

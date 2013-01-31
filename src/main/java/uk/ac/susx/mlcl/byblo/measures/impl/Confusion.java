@@ -30,17 +30,16 @@
  */
 package uk.ac.susx.mlcl.byblo.measures.impl;
 
-import com.google.common.base.Preconditions;
-import com.sun.istack.internal.NotNull;
+import static com.google.common.base.Preconditions.*;
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import uk.ac.susx.mlcl.byblo.measures.Measure;
 import uk.ac.susx.mlcl.byblo.weighings.FeatureMarginalsCarrier;
 import uk.ac.susx.mlcl.byblo.weighings.MarginalDistribution;
 import uk.ac.susx.mlcl.byblo.weighings.Weighting;
 import uk.ac.susx.mlcl.byblo.weighings.impl.PositiveWeighting;
 import uk.ac.susx.mlcl.lib.collect.SparseDoubleVector;
-
-import javax.annotation.CheckReturnValue;
-import javax.annotation.Nullable;
 
 /**
  * Proximity measure computing the confusion probability between the given
@@ -87,16 +86,13 @@ public class Confusion implements Measure, FeatureMarginalsCarrier {
 
     @Override
     public MarginalDistribution getFeatureMarginals() {
-        if (featureMarginals == null)
-            throw new IllegalStateException(
-                    "marginals requested before they where set.");
+        checkState(featureMarginals != null, "marginals requested before they where set.");
         return featureMarginals;
     }
 
     @Override
-    public void setFeatureMarginals(@NotNull MarginalDistribution featureMarginals) {
-        Preconditions.checkNotNull(featureMarginals, "featureMarginals");
-        this.featureMarginals = featureMarginals;
+    public void setFeatureMarginals(@Nonnull MarginalDistribution featureMarginals) {
+        this.featureMarginals = checkNotNull(featureMarginals, "featureMarginals");
     }
 
     @Override
@@ -106,7 +102,7 @@ public class Confusion implements Measure, FeatureMarginalsCarrier {
 
     @Override
     @CheckReturnValue
-    public double similarity(@NotNull SparseDoubleVector A, @NotNull SparseDoubleVector B) {
+    public double similarity(@Nonnull SparseDoubleVector A, @Nonnull SparseDoubleVector B) {
         assert featureMarginals != null;
         final double N = featureMarginals.getFrequencySum();
 
@@ -124,8 +120,9 @@ public class Confusion implements Measure, FeatureMarginalsCarrier {
                 final double pFEb = B.values[j] / B.sum;
                 final double pF = featureMarginals.getPrior(A.keys[i]);
                 final double pEa = A.sum / N;
-                if (pFEa * pFEb * pEa * pF > 0)
+                if (pFEa * pFEb * pEa * pF > 0) {
                     sum += pFEa * pFEb * pEa / pF;
+                }
                 ++i;
                 ++j;
             }
@@ -154,10 +151,12 @@ public class Confusion implements Measure, FeatureMarginalsCarrier {
         return false;
     }
 
+    @Override
     public boolean equals(Object obj) {
         return obj != null && obj.getClass() == this.getClass();
     }
 
+    @Override
     public int hashCode() {
         return this.getClass().hashCode();
     }

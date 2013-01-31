@@ -30,16 +30,15 @@
  */
 package uk.ac.susx.mlcl.byblo.weighings;
 
-import com.google.common.base.Preconditions;
-import com.sun.istack.internal.NotNull;
-
+import static com.google.common.base.Preconditions.*;
 import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
- * {@link AbstractContextualWeighting} is an abstract super class that combines
- * an {@link AbstractElementwiseWeighting} scheme with the availability of feature
- * marginal scores via {@link FeatureMarginalsCarrier}.
+ * {@link AbstractContextualWeighting} is an abstract super class that combines an
+ * {@link AbstractElementwiseWeighting} scheme with the availability of feature marginal scores via
+ * {@link FeatureMarginalsCarrier}.
  * <p/>
  *
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
@@ -57,16 +56,13 @@ public abstract class AbstractContextualWeighting
 
     @Override
     public MarginalDistribution getFeatureMarginals() {
-        if (featureMarginals == null)
-            throw new IllegalStateException(
-                    "marginals requested before they where set.");
+        checkState(featureMarginals != null, "marginals requested before they where set.");
         return featureMarginals;
     }
 
     @Override
-    public void setFeatureMarginals(@NotNull MarginalDistribution featureMarginals) {
-        Preconditions.checkNotNull(featureMarginals, "featureMarginals");
-        this.featureMarginals = featureMarginals;
+    public void setFeatureMarginals(@Nonnull MarginalDistribution featureMarginals) {
+        this.featureMarginals = checkNotNull(featureMarginals, "featureMarginals");
     }
 
     @Override
@@ -76,9 +72,9 @@ public abstract class AbstractContextualWeighting
 
     protected boolean equals(AbstractContextualWeighting other) {
         return !(this.featureMarginals != other.featureMarginals
-                && (this.featureMarginals == null
-                || !this.featureMarginals.equals(
-                other.featureMarginals)));
+                 && (this.featureMarginals == null
+                     || !this.featureMarginals.equals(
+                     other.featureMarginals)));
     }
 
     @Override
@@ -89,18 +85,14 @@ public abstract class AbstractContextualWeighting
     @Override
     public int hashCode() {
         return 89 * 7 + (this.featureMarginals != null
-                ? this.featureMarginals.hashCode() : 0);
+                         ? this.featureMarginals.hashCode() : 0);
     }
 
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "[featureMarginals="
-				+ getFeatureMarginals() + ", bounds=("
-				+ getLowerBound() + ", " + getUpperBound()
-				+ ")]";
-	}
-    
-    
-    
-   
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "[featureMarginals="
+                + getFeatureMarginals() + ", bounds=("
+                + getLowerBound() + ", " + getUpperBound()
+                + ")]";
+    }
 }

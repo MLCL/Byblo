@@ -30,22 +30,21 @@
  */
 package uk.ac.susx.mlcl.lib.commands;
 
-import com.beust.jcommander.IDefaultProvider;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.google.common.base.Objects;
-import com.sun.istack.internal.NotNull;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import uk.ac.susx.mlcl.lib.Checks;
-
-import javax.annotation.CheckReturnValue;
+import static com.google.common.base.Preconditions.*;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import uk.ac.susx.mlcl.lib.Checks;
 
 /**
  * @author Hamish I A Morgan &lt;hamish.morgan@sussex.ac.uk&gt;
@@ -60,7 +59,7 @@ public abstract class AbstractCommand implements Command {
     private final Map<String, Class<? extends Command>> subCommands;
 
     protected AbstractCommand(Map<String, Class<? extends Command>> subCommands) {
-        this.subCommands = subCommands;
+        this.subCommands = checkNotNull(subCommands, "subCommands");
     }
 
     public AbstractCommand() {
@@ -116,7 +115,7 @@ public abstract class AbstractCommand implements Command {
 
     @Override
     @CheckReturnValue
-    public boolean runCommand(@NotNull final String[] args) {
+    public boolean runCommand(@Nonnull final String[] args) {
         Checks.checkNotNull("args", args);
 
         if (LOG.isTraceEnabled()) {
