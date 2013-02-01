@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (c) 2010-2012, University of Sussex
+    Copyright (c) 2010-2013, University of Sussex
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -270,7 +270,7 @@
                     </mapping>
                     <properties>
                         <inceptionYear>${project.inceptionYear}</inceptionYear>
-                        <currentYear>2012</currentYear>
+                        <currentYear>2013</currentYear>
                         <copyrightHolder>${project.organization.name}</copyrightHolder>
                         <organisation>${project.organization.name}</organisation>
                     </properties>
