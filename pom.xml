@@ -81,7 +81,7 @@
         <repository>
             <id>mlcl-repository</id>
             <name>MLCL Group Public Repository</name>
-            <url>http://kungf.eu:8081/nexus/content/groups/public/</url>
+            <url>http://k3d.org/nexus/content/groups/public/</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
@@ -134,7 +134,7 @@
 
 
         <!-- The following dependencies aren't on the central repository, but
-            are available at http://kungf.eu:8081/nexus/ -->
+            are available at http://k3d.org/nexus/ -->
 
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -333,13 +333,13 @@
                 <snapshotRepository>
                     <id>mlcl-snapshots</id>
                     <name>MLCL Group Snapshots</name>
-                    <url>http://kungf.eu:8081/nexus/content/repositories/snapshots/</url>
+                    <url>http://k3d.org/nexus/content/repositories/snapshots/</url>
                 </snapshotRepository>
 
                 <repository>
                     <id>mlcl-releases</id>
                     <name>MLCL Group Releases</name>
-                    <url>http://kungf.eu:8081/nexus/content/repositories/releases/</url>
+                    <url>http://k3d.org/nexus/content/repositories/releases/</url>
                 </repository>
 
             </distributionManagement>
