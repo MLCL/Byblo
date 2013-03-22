@@ -30,13 +30,22 @@
  */
 package uk.ac.susx.mlcl.lib.io;
 
+import com.google.common.base.Optional;
+import sun.misc.Cleaner;
+import sun.nio.ch.DirectBuffer;
+
+import javax.annotation.Nonnull;
 import java.io.IOException;
+import java.lang.ref.PhantomReference;
+import java.lang.ref.ReferenceQueue;
 import java.nio.*;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.NonReadableChannelException;
 import java.nio.channels.NonWritableChannelException;
 import java.nio.charset.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * <p>A class that gets round the problem of very large, seekable character files (greater than 2^31-1 bytes) by
@@ -45,7 +54,8 @@ import java.nio.charset.*;
  * All the positional accessors (such as {@code size()} and {@code position()}return offsets in bytes not characters.
  * This may seem confusing but there is simply no efficient way to determine these values in characters.
  * <p/>
- * This is not a complete implementation. The following additional functions would be required to be entirely compatible
+ * This is not a complete implementation. The following additional functions would be required to be entirely
+ * compatible
  * with the {@link java.nio.channels.FileChannel} API:
  * <p/>
  * <ul>
@@ -64,6 +74,8 @@ import java.nio.charset.*;
  * @author Hamish Morgan &lt;hamish.morgan@sussex.ac.uk%gt;
  */
 public class CharFileChannel implements CharChannel, Seekable<Long> {
+
+    private static final Logger LOG = Logger.getLogger(CharFileChannel.class.getName());
 
     private static final long DEFAULT_MAX_MAPPED_BYTES = Integer.MAX_VALUE;
 
@@ -90,7 +102,88 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
     /**
      * ByteBuffer over the currently mapped region of the file.
      */
-    private ByteBuffer buffer;
+    private
+    @Nonnull
+    Optional<ByteBuffer> _buffer = Optional.absent();
+
+
+    private boolean isBufferPresent() {
+        return this._buffer.isPresent();
+    }
+
+    private boolean isBufferAbsent() {
+        return !this._buffer.isPresent();
+    }
+
+    private void setBuffer(@Nonnull ByteBuffer buffer) {
+        freeBuffer();
+        this._buffer = Optional.of(buffer);
+    }
+
+    private void setBufferAbsent() {
+        freeBuffer();
+        this._buffer = Optional.absent();
+    }
+
+    private void setBufferEmpty() {
+        freeBuffer();
+        this._buffer = Optional.of(ByteBuffer.allocateDirect(0));
+    }
+
+    private
+    @Nonnull
+    ByteBuffer getBuffer() {
+        return this._buffer.get();
+    }
+
+    // Even if the previous mapping failed it could occupy considerable amount of memory. This memory
+    // is not reclaimed until the object is garbage collected, and may obstruct a subsequent mapping.
+    private void freeBuffer() {
+
+        if (LOG.isLoggable(Level.WARNING))
+            LOG.log(Level.WARNING, "Attempting to free ByteBuffer resources.");
+
+        if (!this._buffer.isPresent()) {
+            // Could still have been created but unassigned, like if a mapping failed, so
+            // attempt a single GC anyway
+            System.gc();
+        } else {
+            // Ok so we have a reference. First create a phantom to we can check when it's GC'd, then clear the
+            // strong reference, finally repeatedly GC until it's gone (is on the reference queue)
+            final ReferenceQueue<ByteBuffer> refQueue = new ReferenceQueue<ByteBuffer>();
+            final PhantomReference<ByteBuffer> phantom = new PhantomReference<ByteBuffer>(this._buffer.get(), refQueue);
+            this._buffer = Optional.absent();
+
+            int attemptCount = 1;
+            System.gc();
+
+            if (refQueue.poll() != null) {
+                if (LOG.isLoggable(Level.WARNING))
+                    LOG.log(Level.WARNING, "ByteBuffer freed.");
+            } else {
+                // Ok so it didn't work the first time so lets keep trying with increasing long timeouts.
+                try {
+                    long timeout = 1;
+
+                    while (refQueue.remove(timeout) == null) {
+                        timeout = (long) ((timeout + 1) * 1.5);
+                        ++attemptCount;
+                        if (LOG.isLoggable(Level.WARNING))
+                            LOG.log(Level.WARNING,
+                                    "Attempt {0} (with timeout {1}ms) to free ByteBuffer resources.",
+                                    new Object[]{attemptCount, timeout});
+                        System.gc();
+                    }
+                    if (LOG.isLoggable(Level.FINE))
+                        LOG.log(Level.FINE, "ByteBuffer freed.");
+
+                } catch (InterruptedException e) {
+                    LOG.log(Level.WARNING, "Ignoring exception caught during free ByteBuffer process.", e);
+                }
+            }
+        }
+    }
+
 
     /**
      * Offset of the mapped region from the start of the file.
@@ -125,7 +218,7 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
         this.fileChannel = fileChannel;
         this.decoder = decoder;
         this.encoder = encoder;
-        this.buffer = null;
+        setBufferAbsent();
         this.bufferOffset = 0;
     }
 
@@ -204,7 +297,7 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
      */
     @Override
     public final Long position() {
-        return bufferOffset + (buffer == null ? 0 : buffer.position());
+        return bufferOffset + (isBufferAbsent() ? 0 : getBuffer().position());
     }
 
     /**
@@ -218,13 +311,13 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
         if (pos < 0)
             throw new IllegalArgumentException("pos < 0");
 
-        if (buffer == null) {
+        if (isBufferAbsent()) {
             bufferOffset = pos;
-        } else if (pos >= bufferOffset && pos < bufferOffset + buffer.limit()) {
-            buffer.position((int) (pos - bufferOffset));
+        } else if (pos >= bufferOffset && pos < bufferOffset + getBuffer().limit()) {
+            getBuffer().position((int) (pos - bufferOffset));
         } else {
             bufferOffset = pos;
-            buffer = null;
+            setBufferAbsent();
         }
     }
 
@@ -246,7 +339,7 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
     @Override
     public void close() throws IOException {
         fileChannel.close();
-        buffer = null;
+        setBufferAbsent();
     }
 
     /**
@@ -261,7 +354,8 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
      * @throws java.nio.channels.NonReadableChannelException
      *                             If the mode is READ_ONLY but this channel was not opened for reading
      * @throws java.nio.channels.NonWritableChannelException
-     *                             If the mode is READ_WRITE or PRIVATE but this channel was not opened for both reading
+     *                             If the mode is READ_WRITE or PRIVATE but this channel was not opened for both
+     *                             reading
      *                             and writing
      * @throws java.nio.charset.UnmappableCharacterException
      *
@@ -298,12 +392,12 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
             // which is not guaranteed to succeed.
             insureMapped((int) Math.ceil(dst.remaining() * encoder.maxBytesPerChar()), 0);
 
-            coderResult = decoder.decode(buffer, dst, false);
+            coderResult = decoder.decode(getBuffer(), dst, false);
             checkCoderResult(coderResult);
 
         } while (hasBytesRemaining() && coderResult.isUnderflow());
 
-        checkCoderResult(decoder.decode(buffer, dst, true));
+        checkCoderResult(decoder.decode(getBuffer(), dst, true));
         checkCoderResult(decoder.flush(dst));
 
         return dst.position() - startChar;
@@ -319,7 +413,7 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
      * @throws java.io.IOException If some other I/O error occurs
      */
     public long bytesRemaining() throws IOException {
-        return size() - bufferOffset - (buffer == null ? 0 : buffer.position());
+        return size() - bufferOffset - (isBufferAbsent() ? 0 : getBuffer().position());
     }
 
     /**
@@ -343,7 +437,8 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
      * @throws java.nio.channels.NonReadableChannelException
      *                             If the mode is READ_ONLY but this channel was not opened for reading
      * @throws java.nio.channels.NonWritableChannelException
-     *                             If the mode is READ_WRITE or PRIVATE but this channel was not opened for both reading
+     *                             If the mode is READ_WRITE or PRIVATE but this channel was not opened for both
+     *                             reading
      *                             and writing
      * @throws java.nio.channels.ClosedChannelException
      *                             If this channel is closed
@@ -354,10 +449,10 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
 
         final boolean mappingRequired;
 
-        if (buffer == null) {
+        if (isBufferAbsent()) {
             mappingRequired = true;
-        } else if (hasBytesRemaining() && buffer.remaining() < Math.max(requiredReadBytes, requireWriteBytes)) {
-            bufferOffset += buffer.position();
+        } else if (hasBytesRemaining() && getBuffer().remaining() < Math.max(requiredReadBytes, requireWriteBytes)) {
+            bufferOffset += getBuffer().position();
             mappingRequired = true;
         } else {
             mappingRequired = false;
@@ -377,21 +472,19 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
                 length = requireWriteBytes;
 
             if (length == 0) {
-                buffer = ByteBuffer.allocateDirect(0);
+                setBufferEmpty();
                 return;
             }
 
-            try {
-                buffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, bufferOffset, length);
-            } catch (NonWritableChannelException ex) {
-                buffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, bufferOffset, length);
-            }
+//            try {
+//                setBuffer(fileChannel.map(FileChannel.MapMode.READ_WRITE, bufferOffset, length));
+//            } catch (NonWritableChannelException ex) {
+            setBuffer(fileChannel.map(FileChannel.MapMode.READ_ONLY, bufferOffset, length));
+//            }
         }
     }
 
     /**
-     *
-     *
      * @param src buffer from which bytes are to be retrieved
      * @return nothing
      * @throws UnsupportedOperationException always

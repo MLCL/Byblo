@@ -93,21 +93,21 @@ public class CharFileChannelTest extends AbstractObjectTest<CharFileChannel> {
 
     @Test
     public void testReadLargeBuffer() throws Exception {
-        testReadSmallBuffer(SMALL_SAMPLE_SIZE / 3 | 1);
+        doTestRead(SMALL_SAMPLE_SIZE / 3 | 1);
     }
 
 
     @Test
     public void testReadSmallBuffer() throws Exception {
-        testReadSmallBuffer(15);
+        doTestRead(15);
     }
 
     @Test
     public void testReadSizeOneBuffer() throws Exception {
-        testReadSmallBuffer(1);
+        doTestRead(1);
     }
 
-    static void testReadSmallBuffer(int bufferSize) throws Exception {
+    static void doTestRead(int bufferSize) throws Exception {
 
         File smallSampleFile = makeTempFile(SMALL_SAMPLE_SIZE);
 //        FileInputStream inputStream = null;
