@@ -273,7 +273,6 @@ public class MemoryUsageTest {
         final long expectedSize = mp.getSizeBits();
 
         for (int i = 0; i < 10000; i++) {
-            mp = new MemoryUsage();
             mp.add(cal);
             assertEquals(expectedSize, mp.getSizeBits());
         }
