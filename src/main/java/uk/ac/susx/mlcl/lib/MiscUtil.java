@@ -216,7 +216,7 @@ public class MiscUtil {
     private static final String[] UTF8_CHAR_NAMES = {
         "Null", "SOH", "STX", "ETX",
         "EOT", "ENQ", "ACK", "Bell",
-        "Backspace", "HT", "New-Line", "Tab",
+        "Backspace", "Tab", "New-Line", "VT",
         "FF", "Carriage-Return", "SO", "SI",
         "DLE", "DC1", "DC2", "DC3",
         "DC4", "NAK", "SYN", "ETB",
