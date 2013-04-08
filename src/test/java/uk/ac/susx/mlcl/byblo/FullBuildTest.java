@@ -34,6 +34,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 
 import static org.junit.Assert.assertTrue;
@@ -153,10 +154,21 @@ public class FullBuildTest {
     public void testRunCommand_GW5GR() throws Exception {
         System.out.println("Test on fruit");
 
+        final File inputFile = new File(TEST_DATA_DIR, "gw5-gramrels-sample200.tsv");
+
+        // Delete all the output files
+        for(File f : TEST_OUTPUT_DIR.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return name.startsWith(inputFile.getName());
+            }
+        })) {
+            f.delete();
+        }
 
         FullBuild instance = new FullBuild();
         instance.setCharset(DEFAULT_CHARSET);
-        instance.setInstancesFile(new File(TEST_DATA_DIR, "gw5-gramrels-sample200.tsv"));
+        instance.setInstancesFile(inputFile);
         instance.setOutputDir(TEST_OUTPUT_DIR);
         instance.setTempBaseDir(TEST_OUTPUT_DIR);
 
