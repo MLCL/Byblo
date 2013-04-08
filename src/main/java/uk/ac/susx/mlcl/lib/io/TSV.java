@@ -268,7 +268,7 @@ public abstract class TSV {
             try {
                 return Double.valueOf(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.format(
+                throw new TSVDataFormatException(this, MessageFormat.format(
                         "Caused by NumberFormatException parsing string \"{0}\"", str), nfe);
             }
         }
@@ -279,7 +279,7 @@ public abstract class TSV {
             try {
                 return Integer.parseInt(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.format(
+                throw new TSVDataFormatException(this, MessageFormat.format(
                         "Caused by NumberFormatException parsing string \"{0}\"", str), nfe);
             }
         }
@@ -290,16 +290,16 @@ public abstract class TSV {
             lexer.advanceIfPossible();
         }
 
-        private void expectType(Lexer.Type expected, Lexer.Type actual) throws DataFormatException {
+        private void expectType(Lexer.Type expected, Lexer.Type actual) throws TSVDataFormatException {
             if (expected != actual) {
-                throw new DataFormatException(this,
+                throw new TSVDataFormatException(this,
                         "Expecting type " + expected + " but found " + actual);
             }
         }
 
-        private void expectDelimiter(char expected, char actual) throws DataFormatException {
+        private void expectDelimiter(char expected, char actual) throws TSVDataFormatException {
             if (expected != actual)
-                throw new DataFormatException(this, MessageFormat.format("Expecting delimiter {0} but found {1}.",
+                throw new TSVDataFormatException(this, MessageFormat.format("Expecting delimiter {0} but found {1}.",
                         MiscUtil.printableUTF8(expected), MiscUtil.printableUTF8(actual)));
         }
 
@@ -330,7 +330,7 @@ public abstract class TSV {
             try {
                 return Short.parseShort(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.format(
+                throw new TSVDataFormatException(this, MessageFormat.format(
                         "Caused by NumberFormatException parsing string \"{0}\"", str), nfe);
             }
         }
@@ -341,7 +341,7 @@ public abstract class TSV {
             try {
                 return Long.parseLong(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.
+                throw new TSVDataFormatException(this, MessageFormat.
                         format("Caused by NumberFormatException parsing string \"{0}\"", str), nfe);
             }
         }
@@ -352,7 +352,7 @@ public abstract class TSV {
             try {
                 return Float.parseFloat(str);
             } catch (NumberFormatException nfe) {
-                throw new DataFormatException(this, MessageFormat.
+                throw new TSVDataFormatException(this, MessageFormat.
                         format("Caused by NumberFormatException parsing string \"{0}\"", str), nfe);
             }
         }
@@ -361,79 +361,28 @@ public abstract class TSV {
     /**
      * @author Hamish Morgan &lg;hamish.morgan@sussex.ac.uk&gt;
      */
-    public static class DataFormatException extends IOException {
+    public static class TSVDataFormatException extends DataFormatException {
 
         private static final long serialVersionUID = 1L;
 
         private static final String DEFAULT_MESSAGE = "Invalid format found when parsing TSV file.";
 
-        private final long offset;
-
-        private final File file;
-
-        private final Charset charset;
-
-        public DataFormatException(Source src, final String message) {
-            super(message);
-            offset = src.roughPosition();
-            file = src.getFile();
-            charset = src.getCharset();
+        public TSVDataFormatException(Source src, final String message) {
+            super(message, src.roughPosition(),src.getFile(),  src.getCharset());
         }
 
-        public DataFormatException(Source src, String message, Throwable cause) {
-            super(message, cause);
-            offset = src.roughPosition();
-            file = src.getFile();
-            charset = src.getCharset();
+        public TSVDataFormatException(Source src, String message, Throwable cause) {
+            super(message, cause,src.roughPosition(),src.getFile(),  src.getCharset());
         }
 
-        public DataFormatException(Source src) {
-            this(src, DEFAULT_MESSAGE);
+        public TSVDataFormatException(Source src) {
+            super(DEFAULT_MESSAGE,src.roughPosition(),src.getFile(),  src.getCharset());
         }
 
-        public DataFormatException(Source src, Throwable cause) {
-            this(src, DEFAULT_MESSAGE, cause);
-        }
-
-        public File getFile() {
-            return file;
-        }
-
-        public long getOffset() {
-            return offset;
-        }
-
-        @Override
-        public String getMessage() {
-            String context;
-            try {
-                context = '\'' + context() + '\'';
-            } catch (final IOException ex) {
-                // Yes ex is a dead store, but I don't really care about that 
-                // exception since we are trying to produce a report for 
-                // diagnosing another one.
-                context = "";
-            }
-
-            return MessageFormat.format("Invalid format found when parsing file {0} near byte offset {1}:{2}: {3}",
-                    getFile(), getOffset(), context, super.getMessage());
-        }
-
-        private String context() throws IOException {
-            final long start_offset = Math.max(offset - 32, 0);
-            final int len = 64;
-
-            RandomAccessFile in = null;
-            try {
-                in = new RandomAccessFile(file, "r");
-                final byte[] bytes = new byte[len];
-                in.seek(start_offset);
-                final int nBytesRead = in.read(bytes);
-                return new String(bytes, 0, nBytesRead, charset);
-            } finally {
-                if (in != null)
-                    in.close();
-            }
+        public TSVDataFormatException(Source src, Throwable cause) {
+            super(DEFAULT_MESSAGE, cause, src.roughPosition(),src.getFile(),  src.getCharset());
         }
     }
+
+
 }
