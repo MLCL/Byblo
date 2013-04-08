@@ -146,4 +146,21 @@ public class FullBuildTest {
         instance.setFilterEventMinFreq(40);
         assertTrue(instance.runCommand());
     }
+
+
+
+    @Test
+    public void testRunCommand_GW5GR() throws Exception {
+        System.out.println("Test on fruit");
+
+
+        FullBuild instance = new FullBuild();
+        instance.setCharset(DEFAULT_CHARSET);
+        instance.setInstancesFile(new File(TEST_DATA_DIR, "gw5-gramrels-sample200.tsv"));
+        instance.setOutputDir(TEST_OUTPUT_DIR);
+        instance.setTempBaseDir(TEST_OUTPUT_DIR);
+
+        assertTrue(instance.runCommand());
+    }
+
 }
