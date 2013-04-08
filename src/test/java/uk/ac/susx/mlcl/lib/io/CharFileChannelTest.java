@@ -70,6 +70,9 @@ public class CharFileChannelTest extends AbstractObjectTest<CharFileChannel> {
                 out = new BufferedOutputStream(new FileOutputStream(file));
                 byte[] data = new byte[1024];
                 newRandom().nextBytes(data);
+                // Insure all the data standard ASCII
+                for(int i = 0; i < data.length; i++)
+                    data[i] = (byte)(data[i] & 0x7F) ;
                 int i = 0;
                 while (i < size) {
                     out.write(data, 0, Math.min(data.length, size - i));
@@ -106,6 +109,14 @@ public class CharFileChannelTest extends AbstractObjectTest<CharFileChannel> {
     public void testReadSizeOneBuffer() throws Exception {
         doTestRead(1);
     }
+    @Test
+    public void testReadSizeTwoBuffer() throws Exception {
+        doTestRead(2);
+    }
+    @Test
+    public void testReadSizeFourBuffer() throws Exception {
+        doTestRead(4);
+    }
 
     static void doTestRead(int bufferSize) throws Exception {
 
@@ -140,9 +151,10 @@ public class CharFileChannelTest extends AbstractObjectTest<CharFileChannel> {
                 dst.clear();
             }
 
-            Assert.assertFalse(instance.hasBytesRemaining());
-            Assert.assertEquals(0, instance.bytesRemaining());
-            Assert.assertEquals(instance.size(), (long) instance.position());
+            Assert.assertEquals("Expected channel to be empty but found " + instance.bytesRemaining()
+                    + "bytes remaining.", 0, instance.bytesRemaining());
+            Assert.assertFalse("Expected channel to be empty but found remaining.", instance.hasBytesRemaining());
+            Assert.assertEquals("Expected channel position to be at size.", instance.size(), (long) instance.position());
 
 
             // For all file system this should hold

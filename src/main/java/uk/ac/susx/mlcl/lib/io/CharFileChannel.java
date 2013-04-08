@@ -141,8 +141,6 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
     //
     // Update: All this code didn't actually fix the problem, so I'm just going to not bother with it.
     private void freeBuffer() {
-
-//
 //        if (LOG.isLoggable(Level.WARNING))
 //            LOG.log(Level.WARNING, "Attempting to free ByteBuffer resources.");
 //
