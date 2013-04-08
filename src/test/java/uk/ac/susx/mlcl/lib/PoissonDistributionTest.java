@@ -156,13 +156,13 @@ public class PoissonDistributionTest extends AbstractTest {
             Assert.assertEquals(MessageFormat.format(
                     "Mean and variance should be approximately equal, but "
                             + "found mean = {0} and variance = {1}", mean,
-                    variance), mean / variance, 1.0, 0.05);
+                    variance), mean / variance, 1.0, 0.1);
 
             Assert.assertEquals(
                     MessageFormat.format(
                             "Mean and lambda should be approximately equal, but "
                                     + "found mean = {0} and lambda = {1}",
-                            mean, lambda), mean / lambda, 1.0, 0.05);
+                            mean, lambda), mean / lambda, 1.0, 0.1);
         }
     }
 
