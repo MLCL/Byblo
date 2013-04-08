@@ -138,50 +138,53 @@ public class CharFileChannel implements CharChannel, Seekable<Long> {
 
     // Even if the previous mapping failed it could occupy considerable amount of memory. This memory
     // is not reclaimed until the object is garbage collected, and may obstruct a subsequent mapping.
+    //
+    // Update: All this code didn't actually fix the problem, so I'm just going to not bother with it.
     private void freeBuffer() {
 
-        if (LOG.isLoggable(Level.WARNING))
-            LOG.log(Level.WARNING, "Attempting to free ByteBuffer resources.");
-
-        if (!this._buffer.isPresent()) {
-            // Could still have been created but unassigned, like if a mapping failed, so
-            // attempt a single GC anyway
-            System.gc();
-        } else {
-            // Ok so we have a reference. First create a phantom to we can check when it's GC'd, then clear the
-            // strong reference, finally repeatedly GC until it's gone (is on the reference queue)
-            final ReferenceQueue<ByteBuffer> refQueue = new ReferenceQueue<ByteBuffer>();
-            final PhantomReference<ByteBuffer> phantom = new PhantomReference<ByteBuffer>(this._buffer.get(), refQueue);
-            this._buffer = Optional.absent();
-
-            int attemptCount = 1;
-            System.gc();
-
-            if (refQueue.poll() != null) {
-                if (LOG.isLoggable(Level.WARNING))
-                    LOG.log(Level.WARNING, "ByteBuffer freed.");
-            } else {
-                // Ok so it didn't work the first time so lets keep trying with increasing long timeouts.
-                try {
-                    long timeout = 1;
-
-                    while (refQueue.remove(timeout) == null) {
-                        timeout = (long) ((timeout + 1) * 1.5);
-                        ++attemptCount;
-                        if (LOG.isLoggable(Level.WARNING))
-                            LOG.log(Level.WARNING,
-                                    "Attempt {0} (with timeout {1}ms) to free ByteBuffer resources.",
-                                    new Object[]{attemptCount, timeout});
-                        System.gc();
-                    }
-                    if (LOG.isLoggable(Level.FINE))
-                        LOG.log(Level.FINE, "ByteBuffer freed.");
-
-                } catch (InterruptedException e) {
-                    LOG.log(Level.WARNING, "Ignoring exception caught during free ByteBuffer process.", e);
-                }
-            }
-        }
+//
+//        if (LOG.isLoggable(Level.WARNING))
+//            LOG.log(Level.WARNING, "Attempting to free ByteBuffer resources.");
+//
+//        if (!this._buffer.isPresent()) {
+//            // Could still have been created but unassigned, like if a mapping failed, so
+//            // attempt a single GC anyway
+//            System.gc();
+//        } else {
+//            // Ok so we have a reference. First create a phantom to we can check when it's GC'd, then clear the
+//            // strong reference, finally repeatedly GC until it's gone (is on the reference queue)
+//            final ReferenceQueue<ByteBuffer> refQueue = new ReferenceQueue<ByteBuffer>();
+//            final PhantomReference<ByteBuffer> phantom = new PhantomReference<ByteBuffer>(this._buffer.get(), refQueue);
+//            this._buffer = Optional.absent();
+//
+//            int attemptCount = 1;
+//            System.gc();
+//
+//            if (refQueue.poll() != null) {
+//                if (LOG.isLoggable(Level.WARNING))
+//                    LOG.log(Level.WARNING, "ByteBuffer freed.");
+//            } else {
+//                // Ok so it didn't work the first time so lets keep trying with increasing long timeouts.
+//                try {
+//                    long timeout = 1;
+//
+//                    while (refQueue.remove(timeout) == null) {
+//                        timeout = (long) ((timeout + 1) * 1.5);
+//                        ++attemptCount;
+//                        if (LOG.isLoggable(Level.WARNING))
+//                            LOG.log(Level.WARNING,
+//                                    "Attempt {0} (with timeout {1}ms) to free ByteBuffer resources.",
+//                                    new Object[]{attemptCount, timeout});
+//                        System.gc();
+//                    }
+//                    if (LOG.isLoggable(Level.FINE))
+//                        LOG.log(Level.FINE, "ByteBuffer freed.");
+//
+//                } catch (InterruptedException e) {
+//                    LOG.log(Level.WARNING, "Ignoring exception caught during free ByteBuffer process.", e);
+//                }
+//            }
+//        }
     }
 
 
