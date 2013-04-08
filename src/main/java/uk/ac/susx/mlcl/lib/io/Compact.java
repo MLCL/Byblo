@@ -233,6 +233,13 @@ public final class Compact {
         }
 
         @Override
+        public void skipRecord() throws IOException {
+            inner.skipRecord();
+            column = 0;
+            currentHead = null;
+        }
+
+        @Override
         public byte readByte() throws IOException {
             if (column == 0) {
                 column++;

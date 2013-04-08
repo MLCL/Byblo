@@ -45,6 +45,11 @@ public abstract class ForwardingDataSource<T extends DataSource> extends Forward
     }
 
     @Override
+    public void skipRecord() throws IOException {
+        getInner().skipRecord();
+    }
+
+    @Override
     public void endOfRecord() throws IOException {
         getInner().endOfRecord();
     }

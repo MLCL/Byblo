@@ -38,6 +38,8 @@ import java.net.URI;
 public class DataMemoryStore implements DataStore {
 
 
+    private static final byte END_OF_RECORD_MARKER = 0;
+
     @Override
     public DataSource openDataSource() {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
@@ -88,14 +90,10 @@ public class DataMemoryStore implements DataStore {
         return false;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    private static final byte END_OF_RECORD_MARKER = 0;
-
     public static class DataMemorySink implements DataSink, Closeable, Flushable {
 
         final ByteArrayOutputStream bytesOut;
-
         final DataOutputStream dataOut;
-
         boolean open;
 
         public DataMemorySink(ByteArrayOutputStream bytesOut) {
@@ -170,9 +168,7 @@ public class DataMemoryStore implements DataStore {
     public static class DataMemorySource implements DataSource, Closeable {
 
         private final ByteArrayInputStream bytesIn;
-
         private final DataInputStream dataIn;
-
         private boolean open;
 
         public DataMemorySource(ByteArrayInputStream bytesIn) {
@@ -194,6 +190,13 @@ public class DataMemoryStore implements DataStore {
                 return (dataIn.readByte() == END_OF_RECORD_MARKER);
             } finally {
                 dataIn.reset();
+            }
+        }
+
+        @Override
+        public void skipRecord() throws IOException {
+            while (dataIn.readByte() != END_OF_RECORD_MARKER) {
+                // not a sausage
             }
         }
 

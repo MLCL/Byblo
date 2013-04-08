@@ -104,6 +104,12 @@ public final class Deltas {
         }
 
         @Override
+        public void skipRecord() throws IOException {
+            inner.skipRecord();
+            column = 0;
+        }
+
+        @Override
         public boolean isEndOfRecordNext() throws IOException {
             return inner.isEndOfRecordNext();
         }

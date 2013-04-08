@@ -50,6 +50,15 @@ public interface DataSource extends Channel {
 
     boolean isEndOfRecordNext() throws IOException;
 
+    /**
+     * Read until the start of a new record.
+     *
+     * This method is useful when attempting to recover from a format error.
+     *
+     * @throws IOException if naughty things happen
+     */
+    void skipRecord() throws IOException;
+
     byte readByte() throws IOException;
 
     char readChar() throws IOException;

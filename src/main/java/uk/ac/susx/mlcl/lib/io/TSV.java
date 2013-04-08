@@ -236,6 +236,15 @@ public abstract class TSV {
         }
 
         @Override
+        public void skipRecord() throws IOException {
+            while(lexer.hasNext() && !isEndOfRecordNext()) {
+                lexer.advance();
+            }
+            if(lexer.hasNext() && isEndOfRecordNext())
+                lexer.advance();
+        }
+
+        @Override
         public boolean isEndOfRecordNext() throws IOException {
             return isDelimiterNext() && lexer.charAt(0) == RECORD_DELIMITER;
         }
@@ -376,11 +385,11 @@ public abstract class TSV {
         }
 
         public TSVDataFormatException(Source src) {
-            super(DEFAULT_MESSAGE,src.roughPosition(),src.getFile(),  src.getCharset());
+            super(DEFAULT_MESSAGE, src.roughPosition(), src.getFile(), src.getCharset());
         }
 
         public TSVDataFormatException(Source src, Throwable cause) {
-            super(DEFAULT_MESSAGE, cause, src.roughPosition(),src.getFile(),  src.getCharset());
+            super(DEFAULT_MESSAGE, cause, src.roughPosition(), src.getFile(), src.getCharset());
         }
     }
 

@@ -31,10 +31,13 @@
 package uk.ac.susx.mlcl.lib.tasks;
 
 import com.google.common.base.Objects;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.lib.Checks;
 import uk.ac.susx.mlcl.lib.events.ProgressDelegate;
 import uk.ac.susx.mlcl.lib.events.ProgressListener;
 import uk.ac.susx.mlcl.lib.events.ProgressReporting;
+import uk.ac.susx.mlcl.lib.io.DataFormatException;
 import uk.ac.susx.mlcl.lib.io.ObjectSink;
 import uk.ac.susx.mlcl.lib.io.ObjectSource;
 
@@ -50,6 +53,8 @@ public class ObjectPipeTask<T> extends AbstractTask
         implements ProgressReporting {
 
     private static final long serialVersionUID = 1L;
+
+    private static final Log LOG = LogFactory.getLog(ObjectPipeTask.class);
 
     final ProgressDelegate progress = new ProgressDelegate(this, false);
 
@@ -96,14 +101,17 @@ public class ObjectPipeTask<T> extends AbstractTask
 
         int count = 0;
         while (getSource().hasNext()) {
-            getSink().write(getSource().read());
-            ++count;
+            try {
+                getSink().write(getSource().read());
+                ++count;
 
-            if (count % 1000000 == 0 || !getSource().hasNext()) {
-                progress.setMessage(
-                        MessageFormat.format("Processed {0} items.", count));
+                if (count % 1000000 == 0 || !getSource().hasNext()) {
+                    progress.setMessage(
+                            MessageFormat.format("Processed {0} items.", count));
+                }
+            } catch (DataFormatException ex) {
+                LOG.warn(ex.getMessage());
             }
-
         }
 
         if (getSink() instanceof Flushable)

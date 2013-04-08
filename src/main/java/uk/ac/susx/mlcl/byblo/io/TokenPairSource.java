@@ -31,6 +31,8 @@
 package uk.ac.susx.mlcl.byblo.io;
 
 import com.google.common.base.Predicate;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.lib.io.*;
@@ -48,6 +50,8 @@ import java.nio.charset.Charset;
  */
 public class TokenPairSource extends ForwardingChannel<SeekableDataSource> implements SeekableObjectSource<TokenPair, Tell> {
 
+    private static final Log LOG = LogFactory.getLog(TokenPairSource.class);
+
     private TokenPairSource(SeekableDataSource inner) {
         super(inner);
     }
@@ -60,6 +64,12 @@ public class TokenPairSource extends ForwardingChannel<SeekableDataSource> imple
             getInner().endOfRecord();
             return new TokenPair(id1, id2);
         } catch (TSV.TSVDataFormatException ex) {
+            try {
+                getInner().skipRecord();
+            } catch (IOException ex2) {
+                // swallow
+                LOG.error("Ignoring exception encounter during attempted recovery.", ex2);
+            }
             throw ex;
         } catch (Throwable ex) {
             throw new IOException("Error at position: " + position(), ex);
