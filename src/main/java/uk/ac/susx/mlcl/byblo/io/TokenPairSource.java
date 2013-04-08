@@ -35,8 +35,6 @@ import uk.ac.susx.mlcl.byblo.enumerators.DoubleEnumerating;
 import uk.ac.susx.mlcl.byblo.enumerators.Enumerator;
 import uk.ac.susx.mlcl.lib.io.*;
 
-import javax.annotation.WillClose;
-import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -61,8 +59,10 @@ public class TokenPairSource extends ForwardingChannel<SeekableDataSource> imple
             final int id2 = getInner().readInt();
             getInner().endOfRecord();
             return new TokenPair(id1, id2);
+        } catch (TSV.TSVDataFormatException ex) {
+            throw ex;
         } catch (Throwable ex) {
-            throw new IOException("Error at position " + position(), ex);
+            throw new IOException("Error at position: " + position(), ex);
         }
     }
 
