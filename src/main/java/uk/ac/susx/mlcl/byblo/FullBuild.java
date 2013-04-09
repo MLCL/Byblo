@@ -333,7 +333,7 @@ public final class FullBuild extends AbstractCommand {
 
         try {
             if (!new FullBuild().runCommand(args)) {
-                throw new RuntimeException("Build process failed.");
+                System.exit(-2);
             }
         } catch (ParameterException ex) {
             System.exit(-1);
