@@ -112,11 +112,11 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
         throttle = new Semaphore(getThrottleSize());
     }
 
-    private int nChunks = 0;
+    private long nChunks = 0;
 
-    private int queuedCount = 0;
+    private long queuedCount = 0;
 
-    private int completedCount = 0;
+    private long completedCount = 0;
 
     @Override
     protected void runTask() throws Exception {
@@ -143,27 +143,27 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
         SeekableObjectSource<Chunk<Indexed<SparseDoubleVector>>, S> chunkerB =
                 Chunker.newSeekableInstance(getSourceB(), maxChunkSize);
 
-        int i = 0;
+        long chunkIdx1 = 0;
         while (chunkerA.hasNext()) {
             if (LOG.isTraceEnabled()) {
-                LOG.trace("Reading chunk A" + i);
+                LOG.trace("Reading chunk A" + chunkIdx1);
             }
             Chunk<Indexed<SparseDoubleVector>> chunkA = chunkerA.read();
-            i++;
-            chunkA.setName(Integer.toString(i));
+            chunkIdx1++;
+            chunkA.setName(Long.toString(chunkIdx1));
 
-            int j = 0;
+            long chunkIdx2 = 0;
             S restartPos = chunkerB.position();
             while (chunkerB.hasNext()) {
                 if (LOG.isTraceEnabled()) {
-                    LOG.trace("Reading chunk B" + j);
+                    LOG.trace("Reading chunk B" + chunkIdx2);
                 }
                 Chunk<Indexed<SparseDoubleVector>> chunkB = chunkerB.read();
-                j++;
-                chunkB.setName(Integer.toString(j));
+                chunkIdx2++;
+                chunkB.setName(Long.toString(chunkIdx2));
 
                 progress.startAdjusting();
-                progress.setMessage(MessageFormat.format("Queueing chunk pair {0,number} and {1,number}", i, j));
+                progress.setMessage(MessageFormat.format("Queueing chunk pair {0,number} and {1,number}", chunkIdx1, chunkIdx2));
                 updateProgress();
                 progress.endAdjusting();
 
@@ -177,7 +177,7 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 task.setSink(getSink());
                 task.setStats(getStats());
                 task.setProperty("chunkPair", MessageFormat.format(
-                        "{0,number} and {1,number}", i, j));
+                        "{0,number} and {1,number}", chunkIdx1, chunkIdx2));
                 queueTask(task);
                 ++queuedCount;
 
@@ -185,7 +185,7 @@ public final class ThreadedApssTask<S> extends NaiveApssTask<S> {
                 clearCompleted(false);
             }
 
-            nChunks = j;
+            nChunks = chunkIdx2;
             chunkerB.position(restartPos);
         }
         getExecutor().shutdown();

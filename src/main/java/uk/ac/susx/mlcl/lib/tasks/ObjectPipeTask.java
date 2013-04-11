@@ -99,7 +99,7 @@ public class ObjectPipeTask<T> extends AbstractTask
 
         progress.setState(State.RUNNING);
 
-        int count = 0;
+        long count = 0;
         while (getSource().hasNext()) {
             try {
                 getSink().write(getSource().read());

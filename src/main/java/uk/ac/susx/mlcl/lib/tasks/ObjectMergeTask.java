@@ -161,7 +161,7 @@ public final class ObjectMergeTask<T> extends AbstractTask implements ProgressRe
 
         progress.setState(State.RUNNING);
 
-        int mergeCount = 0;
+        long mergeCount = 0;
 
         T a = sourceA.hasNext() ? sourceA.read() : null;
         T b = sourceB.hasNext() ? sourceB.read() : null;
