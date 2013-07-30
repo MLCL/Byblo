@@ -32,11 +32,15 @@ package uk.ac.susx.mlcl.byblo.enumerators;
 
 import org.apache.jdbm.DB;
 import org.apache.jdbm.DBMaker;
+import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author hiam20
@@ -119,4 +123,85 @@ public class JDBMTest {
         return used1;
 
     }
+
+    @Test
+    @Ignore
+    public void fooTest() {
+        final File dataPath = new File("/Volumes/LocalScratchHD/LocalHome/Projects/Byblo/data/jw-wiki-problem");
+        final File entryIndexFile = new File(dataPath, "wikipedia_nounsdeps_t100.pbfiltered.entry-index");
+        final File featureIndexFile = new File(dataPath, "wikipedia_nounsdeps_t100.pbfiltered.feature-index");
+
+        foo(entryIndexFile);
+//        foo(featureIndexFile);
+    }
+
+    void foo(File file) {
+
+        final DBMaker maker = DBMaker.openFile(file.toString());
+        maker.disableTransactions();
+        maker.disableLocking();
+        maker.enableMRUCache();
+        maker.setMRUCacheSize(100000);
+
+        final DB db = maker.make();
+
+
+        System.out.printf("Stats for db %s:%n%s", file, db.calculateStatistics());
+
+        System.out.println("COLLECTIONS:");
+        for (Map.Entry<String, Object> entry : db.getCollections().entrySet()) {
+            System.out.printf("  %s (%s)%n", entry.getKey(), entry.getValue().getClass().getCanonicalName());
+            if (entry.getValue() instanceof Set) {
+                System.out.println("    interface: set");
+                System.out.printf("    size: %d%n", ((Set) entry.getValue()).size());
+            } else if (entry.getValue() instanceof Map) {
+                System.out.println("    interface: map");
+                System.out.printf("    size: %d%n", ((Map) entry.getValue()).size());
+            } else {
+                System.out.println("    interface: unknown");
+                System.out.printf("    size: unknown%n");
+            }
+        }
+
+        System.out.println("PROPERTIES:");
+        for (Map.Entry<Object, Object> entry : db.getHashMap("properties").entrySet()) {
+            System.out.printf("  %s = %s%n", entry.getKey(), entry.getValue());
+        }
+
+
+        final Map<Integer, String> forwards = db.getHashMap("forwards");
+        final Map<String, Integer> backwards = db.getHashMap("backwards");
+
+
+        System.out.println("BIMAP INCONSISTENCIES:");
+        for (int id : forwards.keySet()) {
+            String str = forwards.get(id);
+//
+//            if (!backwards.containsKey(str))
+//                System.out.println("  " + id + " => " + str);
+//            else if (backwards.get(str) != id)
+//                System.out.println("  " + id + " => " + str + " => " + backwards.get(str));
+
+            Assert.assertTrue(MessageFormat.format("Forwards mapping contained pair {0} => {1}, but {1} is not a key " +
+                    "in the backwards mapping.", id, str), backwards.containsKey(str));
+            Assert.assertTrue(MessageFormat.format("Forwards mapping contained pair {0} => {1}, but backwards mapping " +
+                    "contained {1}=>{2}", id, str, backwards.get(str)), backwards.get(str).equals(id));
+
+        }
+
+        for (String str : backwards.keySet()) {
+            int id = backwards.get(str);
+
+            Assert.assertTrue(MessageFormat.format("Backwards mapping contained pair {0} => {1}, but {1} is not a key " +
+                    "in the forwards mapping.", str, id), forwards.containsKey(id));
+            Assert.assertTrue(MessageFormat.format("Backwards mapping contained pair {0} => {1}, but forwards mapping " +
+                    "contained {1}=>{2}", str, id, forwards.get(id)), forwards.get(id).equals(str));
+
+            if (!forwards.containsKey(id))
+                System.out.println("  " + str + " => " + id + " => ??????");
+            else if (!forwards.get(id).equals(str))
+                System.out.println("  " + str + " => " + id + " => " + forwards.get(id));
+        }
+    }
 }
+

@@ -30,8 +30,10 @@
  */
 package uk.ac.susx.mlcl.byblo.enumerators;
 
+import org.apache.jdbm.DB;
 import org.apache.jdbm.DBMaker;
 import org.junit.*;
+import uk.ac.susx.mlcl.byblo.commands.FilterCommand;
 import uk.ac.susx.mlcl.lib.ZipfianDistribution;
 
 import java.io.File;
@@ -47,16 +49,13 @@ import static uk.ac.susx.mlcl.TestConstants.TEST_OUTPUT_DIR;
  */
 public class JDBMStringEnumeratorTest {
 
+    private static int populationSize;
+    private static double zipfExponent;
+    private static int repeats;
+    private static ZipfianDistribution zipfDist;
+
     public JDBMStringEnumeratorTest() {
     }
-
-    private static int populationSize;
-
-    private static double zipfExponent;
-
-    private static int repeats;
-
-    private static ZipfianDistribution zipfDist;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -75,16 +74,6 @@ public class JDBMStringEnumeratorTest {
     @Before
     public void setUp() {
         zipfDist.setRandom(new Random(0));
-    }
-
-    enum CacheType {
-
-        MRU,
-        Hard,
-        Soft,
-        Weak,
-        None
-
     }
 
     @Test
@@ -317,6 +306,61 @@ public class JDBMStringEnumeratorTest {
             zipfDist.random();
             idx.indexOf(fmt.format(zipfDist.random()));
         }
+
+    }
+
+    /**
+     * Bug where by the nextId is not stored correctly during initialization. The next id will be 0 rather than
+     * 1 even after the filtered element is added.
+     *
+     * @throws IOException
+     */
+    @Test
+    public void testDbExistsButUninitialised() throws IOException {
+
+        final File file = File.createTempFile("jdbmtest", "", TEST_OUTPUT_DIR);
+        file.deleteOnExit();
+
+        {
+            DBMaker maker = DBMaker.openFile(file.toString());
+            maker.disableLocking();
+//            DB db = maker.make();
+
+            JDBMStringEnumerator idx = JDBMStringEnumerator.load(maker, file);
+
+            Assert.assertEquals(FilterCommand.FILTERED_ID, idx.indexOf(FilterCommand.FILTERED_STRING));
+            Assert.assertEquals(FilterCommand.FILTERED_STRING, idx.valueOf(FilterCommand.FILTERED_ID));
+            Assert.assertTrue(idx.getNextId() > FilterCommand.FILTERED_ID);
+
+//            db.close();
+        }
+
+        {
+            DBMaker maker = DBMaker.openFile(file.toString());
+            maker.disableLocking();
+//            DB db = maker.make();
+
+            JDBMStringEnumerator idx = JDBMStringEnumerator.load(maker, file);
+
+            Assert.assertEquals(FilterCommand.FILTERED_ID, idx.indexOf(FilterCommand.FILTERED_STRING));
+            Assert.assertEquals(FilterCommand.FILTERED_STRING, idx.valueOf(FilterCommand.FILTERED_ID));
+            Assert.assertTrue(idx.getNextId() > FilterCommand.FILTERED_ID);
+
+            System.out.println(idx.getNextId());
+//            db.close();
+        }
+
+
+    }
+
+
+    enum CacheType {
+
+        MRU,
+        Hard,
+        Soft,
+        Weak,
+        None
 
     }
 }
