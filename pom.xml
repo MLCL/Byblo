@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2010-2013, University of Sussex
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     * Redistributions of source code must retain the above copyright notice,
+       this list of conditions and the following disclaimer.
+
+     * Redistributions in binary form must reproduce the above copyright notice,
+       this list of conditions and the following disclaimer in the documentation
+       and/or other materials provided with the distribution.
+
+     * Neither the name of the University of Sussex nor the names of its
+       contributors may be used to endorse or promote products derived from this
+       software without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                             http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>uk.ac.susx.mlcl</groupId>
+    <artifactId>Byblo</artifactId>
+    <version>2.2.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>Byblo</name>
+    <description>
+        Byblo is a tool for the construction of large-scale
+        distributional thesauri. It provides an efficient yet flexible framework
+        for calculating all pair-wise similarities between terms in a corpus.
+    </description>
+    <url>https://github.com/MLCL/Byblo</url>
+    <inceptionYear>2010</inceptionYear>
+    <organization>
+        <name>University of Sussex</name>
+        <url>http://www.sussex.ac.uk</url>
+    </organization>
+
+    <scm>
+        <connection>scm:git:git://github.com/MLCL/Byblo.git</connection>
+        <tag>HEAD</tag>
+        <url>https://github.com/MLCL/Byblo</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <id>hamishmorgan</id>
+            <name>Hamish Morgan</name>
+            <email>hamish.morgan@sussex.ac.uk</email>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+            <name>BSD 3-clause Licence</name>
+            <url>https://raw.github.com/MLCL/Byblo/develop/LICENSE.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <repositories>
+        <repository>
+            <id>mlcl-repository</id>
+            <name>MLCL Group Public Repository</name>
+            <url>http://k3d.org/nexus/content/groups/public/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
+
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>1.30</version>
+        </dependency>
+        <dependency>
+            <groupId>it.unimi.dsi</groupId>
+            <artifactId>fastutil</artifactId>
+            <version>6.4.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>12.0</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+            <version>1.8</version>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.16</version>
+            <optional>true</optional>
+        </dependency>
+
+
+        <!-- The following dependencies aren't on the central repository, but
+            are available at http://k3d.org/nexus/ -->
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jdbm</artifactId>
+            <version>3.0-alpha3</version>
+        </dependency>
+
+        <!-- Testing scope dependencies -->
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>1.8.3</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
+
+        <resources>
+            <resource>
+                <directory>${project.basedir}/src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.12.2</version>
+                <configuration>
+                    <argLine>-Xmx2g</argLine>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>2.1.0</version>
+                <executions>
+                    <execution>
+                        <id>bundle-manifest</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>manifest</goal>
+                        </goals>
+                        <configuration>
+                            <instructions>
+                                <_versionpolicy>$(@)</_versionpolicy>
+                            </instructions>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <instructions>
+                        <Export-Package>uk.ac.susx.mlcl.lib.*</Export-Package>
+                        <Export-Package>uk.ac.susx.mlcl.byblo.*</Export-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>uk.ac.susx.mlcl.byblo.FullBuild</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>.</directory>
+                            <includes>
+                                <include>**/*.tmp</include>
+                                <include>**/*.log</include>
+                                <include>**/*.log.xml</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+
+            <!--
+            Goal for curating the licence headers in the source and associated resources:
+                * Perform a license check by running: mvn license:check
+                * Update the licenses by running: mvn license:format
+                * Remove the licenses by running: mvn license:remove
+            -->
+            <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <version>1.9.0</version>
+                <configuration>
+                    <strictCheck>true</strictCheck>
+                    <quiet>false</quiet>
+                    <header>src/license/license-header.txt</header>
+                    <includes>
+                        <include>src/**</include>
+                        <include>pom.xml</include>
+                        <include>LICENSE.txt</include>
+                    </includes>
+                    <useDefaultExcludes>false</useDefaultExcludes>
+                    <excludes>
+                        <exclude>src/test/resources/**</exclude>
+                        <exclude>**/.**</exclude>
+                    </excludes>
+                    <mapping>
+                        <java>SLASHSTAR_STYLE</java>
+                    </mapping>
+                    <properties>
+                        <inceptionYear>${project.inceptionYear}</inceptionYear>
+                        <currentYear>2013</currentYear>
+                        <copyrightHolder>${project.organization.name}</copyrightHolder>
+                        <organisation>${project.organization.name}</organisation>
+                    </properties>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+
+    </build>
+
+
+    <profiles>
+        <!--
+        Profile for validating and cleaning-up of the code-base in various ways.
+        -->
+        <profile>
+            <id>inspect</id>
+            <build>
+                <plugins>
+                    
+                    <!-- 
+                    Perform static analysis of the codebase, for usage display
+                    help screen: mvn -P validate findbugs:help
+                    -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>findbugs-maven-plugin</artifactId>
+                        <version>2.5.1</version>
+                        <configuration>
+                            <threshold>Normal</threshold>
+                            <effort>Max</effort>
+                            <!--<excludeFilterFile>${basedir}/conf/findbugs-exclude-filter.xml</excludeFilterFile>-->
+                        </configuration>
+                    </plugin>
+                    
+                </plugins>
+                        
+            </build>
+        </profile>
+
+
+        <!--
+            Profile for producing a distribution:
+             * Package by running: mvn -P release package
+             * Deploy locally by running: mvn -P release install
+             * Deploy in MLCL repository by running: mvn -P release deploy
+        -->
+        <profile>
+            <id>release</id>
+
+            <distributionManagement>
+
+                <snapshotRepository>
+                    <id>mlcl-snapshots</id>
+                    <name>MLCL Group Snapshots</name>
+                    <url>http://k3d.org/nexus/content/repositories/snapshots/</url>
+                </snapshotRepository>
+
+                <repository>
+                    <id>mlcl-releases</id>
+                    <name>MLCL Group Releases</name>
+                    <url>http://k3d.org/nexus/content/repositories/releases/</url>
+                </repository>
+
+            </distributionManagement>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.1.2</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.8.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadoc</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>2.3</version>
+
+                        <configuration>
+                            <descriptorSourceDirectory>${project.basedir}/src/assemble</descriptorSourceDirectory>
+                        </configuration>
+
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.4</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    
+    
+                </plugins>
+            </build>
+
+        </profile>
+
+        <!--
+            Profile for producing the maven site (needs work).
+            
+            mvn -P site site:site
+
+        -->
+        <profile>
+            <id>site</id>
+
+            <build>
+                <plugins>
+
+                    <plugin>
+                        <artifactId>maven-site-plugin</artifactId>
+                        <version>3.1</version>
+                        <configuration>
+                            <locales>en</locales>
+                            <reportPlugins>
+                                
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-project-info-reports-plugin</artifactId>
+                                    <version>2.4</version>
+                                </plugin>                                
+                                
+                                
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-changelog-plugin</artifactId>
+                                    <version>2.2</version>
+                                </plugin>
+                    
+                                <plugin>
+                                    <artifactId>maven-javadoc-plugin</artifactId>
+                                    <version>2.8.1</version>
+                                    <configuration>
+                                        <author>true</author>
+                                    </configuration>
+                                </plugin>
+                                
+                                <plugin>
+                                    <groupId>org.codehaus.mojo</groupId>
+                                    <artifactId>findbugs-maven-plugin</artifactId>
+                                    <version>2.5.1</version>
+                                    <configuration>
+                                        <threshold>Normal</threshold>
+                                        <effort>Max</effort>
+                                    </configuration>
+                                </plugin>
+
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-checkstyle-plugin</artifactId>
+                                    <version>2.9.1</version>
+                                </plugin>  
+                                                  
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-jxr-plugin</artifactId>
+                                    <version>2.3</version>
+                                </plugin>
+                                
+                             
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-pmd-plugin</artifactId>
+                                    <version>2.7.1</version>
+                                    <configuration>
+                                        <linkXref>true</linkXref>
+                                        <sourceEncoding>utf-8</sourceEncoding>
+                                        <minimumTokens>100</minimumTokens>
+                                        <targetJdk>1.6</targetJdk>
+                                    </configuration>
+                                </plugin>
+
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-surefire-report-plugin</artifactId>
+                                    <version>2.12</version>
+                                </plugin>      
+                                
+                                <plugin>
+                                    <groupId>org.codehaus.mojo</groupId>
+                                    <artifactId>jdepend-maven-plugin</artifactId>
+                                    <version>2.0-beta-2</version>
+                                </plugin>
+      
+                            </reportPlugins>
+                        </configuration>
+                    </plugin>
+               
+      
+                </plugins>
+            </build>
+
+        </profile>
+    </profiles>
+
+
+</project>
